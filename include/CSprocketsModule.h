@@ -63,6 +63,8 @@ public:
     // before Init and after Close. ChannelAt is the Mac's array index with a bounds test (it indexed without one).
     CSprocketsChannel** Channels() const;
     CSprocketsChannel* ChannelAt(uint32_t index) const;
+    // Unit v5L24: the Mac's store to mChannels (Init's array); the translated Init (src/CSprocketsModule_Init.cpp) writes through it.
+    void SetChannels(CSprocketsChannel** channels);
     tpw::SoundDevice* Device() const;   // the SDL device and its streams, one per channel
     const CSprocketsListener& Listener() const;
 };
