@@ -1,5 +1,6 @@
 // Unit v5560: the all-items list's row attach function (LCPostFormat of ui_allKidsPanel.cpp, 0x101966ec; named AllItemsListLCPostFormat
 // because LCPostFormat exists at other addresses). The row gets a text draw object, then the columns that the list type needs.
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <new>
@@ -53,7 +54,10 @@ void BarColumn(InterfaceWindow* window) {
 // The callees the host cannot call as the Mac does. The test library defines TPW_LCPOST_FAKES (its cmake file) and brings recording fakes.
 #ifndef TPW_LCPOST_FAKES
 namespace allitems_post_callee {
-void* OperatorNew(uint32_t size) { return ::operator new(size); }
+// The Mac allocates the sizes of its objects; the host's are larger (InterfaceTextObjectSprite 0x250 bytes for the Mac's 0x19c), so the block is
+// at least 0x400 bytes.
+static_assert(sizeof(InterfaceTextObjectSprite) <= 0x400 && sizeof(InterfaceDrawEngineHGradient) <= 0x400, "the allocation below is 0x400 at least");
+void* OperatorNew(uint32_t size) { return ::operator new(std::max<size_t>(size, 0x400)); }
 void SpriteCtor(void* mem) { new (mem) InterfaceTextObjectSprite(nullptr); }
 void NumberCtor(void* mem) { new (mem) InterfaceNumberTextObject(nullptr); }
 void CashCtor(void* mem) { new (mem) InterfaceCashTextObject(nullptr); }

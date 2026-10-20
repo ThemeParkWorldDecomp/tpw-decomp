@@ -1,4 +1,5 @@
 // ui_parkStatus.cpp (main app), unit v5572: CreateParkStatusPanel 0x101aca78 (3932 bytes), the park status panel's creation.
+#include <algorithm>
 #include <cstdint>
 #include <new>
 
@@ -20,8 +21,12 @@ __attribute__((weak)) int16_t gParkStatusScript[] = {TPW_WINDOW_SCRIPT_102AB734}
 __attribute__((weak)) const char gParkStatusMeshNames[] = "sad_undec.wct\0hap.wct";                 // 0x1024e180
 
 // The callees the host cannot call as the Mac does: weak here, the test library defines its own fakes.
+static_assert(sizeof(InterfaceTextObjectSprite) <= 0x400 && sizeof(InterfaceDrawObjectSprite) <= 0x400 && sizeof(InterfaceDrawEngineHGradient) <= 0x400, "the allocation below is 0x400 at least");
+
 namespace parkstatus_callee {
-__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(size); }
+// The Mac allocates the sizes of its objects; the host's are larger (InterfaceTextObjectSprite 0x250 bytes for the Mac's 0x19c), so the block is
+// at least 0x400 bytes.
+__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(std::max<size_t>(size, 0x400)); }
 __attribute__((weak)) void SpriteCtor(void* mem) { new (mem) InterfaceTextObjectSprite(nullptr); }
 __attribute__((weak)) void DrawSpriteCtor(void* mem) { new (mem) InterfaceDrawObjectSprite(nullptr); }
 __attribute__((weak)) void NumberCtor(void* mem) { new (mem) InterfaceNumberTextObject(nullptr); }

@@ -12,6 +12,7 @@
 #include "UI_Base.h"
 #include "email.h"
 #include "tb_ezsprite.h"
+#include "tb_starfield.h"
 #include "ui_controls.h"
 #include "ui_main.h"
 
@@ -126,12 +127,13 @@ void CUI2DMapSprite::SetVisibility(int32_t visible) {
     *reinterpret_cast<uint32_t*>(details + 0x10) = flags;
 }
 
+// The detail block is the sprite instance (SSpriteGameData): its sprite (Mac 0x28, a native pointer on the host) gives the image's
+// width (Mac 0x0c), and the scale goes to Mac 0x2c (mF2C).
 void CUI2DMapSprite::SetScale(float scale) {
-    uint8_t* details = static_cast<uint8_t*>(gei_EZSprite.GetSpriteDetails(mSprite));
-    uint8_t* inner = Ptr32<uint8_t>{*reinterpret_cast<uint32_t*>(details + 0x28)}.get();   // a Ptr32 word of the detail block
-    float width = static_cast<float>(static_cast<double>(*reinterpret_cast<uint16_t*>(inner + 0xc)));
+    SSpriteGameData* details = static_cast<SSpriteGameData*>(gei_EZSprite.GetSpriteDetails(mSprite));
+    float width = static_cast<float>(static_cast<double>(details->mSprite->mWidth));
     float scaled = scale * width;
-    *reinterpret_cast<float*>(details + 0x2c) = scaled * 0.0625f;
+    details->mF2C = scaled * 0.0625f;
 }
 
 // ---- the program entry

@@ -47,7 +47,7 @@ CDRAW_CT, CDRAW_SET, CDRAW_CLIP, CDRAW_DT = 0x1023AED0, 0x1023AEE8, 0x1023AF00, 
 
 ADDR = dict(thing=0x1034CBFC, gworld=0x1037EBFC, end=0x102B2912, colours=0x103970F0, sw=0x102B2B54, sh=0x102B2B50)
 # sizeof(CThingArrayEntry) is the host's own (checked for being larger than the Mac's 20); the rest is checked exactly
-HOST_LAYOUT = [0x1DA748, 0x30, 0x58, 0x18, 4]
+HOST_LAYOUT = [0x1DA748, 0x50, 0x58, 0x18, 4]   # the sprite is 0x50 on the host since v5652 added its show status fields
 HOST_ENTRY = [0]
 
 PPC_OBJ = {}          # the persistent objects of the PowerPC side

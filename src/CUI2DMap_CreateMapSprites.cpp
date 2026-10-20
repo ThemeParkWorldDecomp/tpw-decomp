@@ -20,8 +20,9 @@ uint8_t Byte(const void* p, size_t off) { return Bytes(p)[off]; }
 uint16_t Half(const void* p, size_t off) { return *reinterpret_cast<const uint16_t*>(Bytes(p) + off); }
 int32_t Word(const void* p, size_t off) { return *reinterpret_cast<const int32_t*>(Bytes(p) + off); }
 
+// The image of the Mac word at off (0x20068 .. 0x2007c): the native pointer InitSprites keeps for it (CUI2DMap::HostImage).
 void* Image(const CUI2DMap* map, size_t off) {
-    return reinterpret_cast<void*>(static_cast<uintptr_t>(*reinterpret_cast<const uint32_t*>(Bytes(map) + off)));
+    return const_cast<CUI2DMap*>(map)->HostImage(static_cast<int32_t>((off - 0x20068) / 4));
 }
 
 int32_t Balance(size_t off) { return Word(&gMainBalance, off); }

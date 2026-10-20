@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -24,8 +25,12 @@
 #include "ThingReceivers.h"
 
 // The runtime's operator new (0x102384b8, never NULL): a weak seam the test library replaces with a recording fake.
+static_assert(sizeof(InterfaceTextObjectSprite) <= 0x400 && sizeof(InterfaceWindow) <= 0x400 && sizeof(CFSUserInfo) <= 0x400, "the allocation below is 0x400 at least");
+
 namespace postcard_callee {
-__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(size); }
+// The Mac allocates the sizes of its objects; the host's are larger (InterfaceTextObjectSprite 0x250 bytes for the Mac's 0x19c), so the block is
+// at least 0x400 bytes.
+__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(std::max<size_t>(size, 0x400)); }
 }  // namespace postcard_callee
 
 // 0x103959a0 (name invented): the research list's row height, worked out by the first ResearchListLCFormat (0 until then).

@@ -84,6 +84,9 @@ void CDraw::SetCurrent(TbRenderArea* area) {
 }  // namespace draw
 }  // namespace bfl
 
+// The context the SetCurrent fake sets is a CUI2DMapDrawOps already (the host's adapter is not linked here).
+CUI2DMapDrawOps* UI2DMapDrawOps(void* context) { return static_cast<CUI2DMapDrawOps*>(context); }
+
 void GAME_ASSERTMSG(int32_t condition, const char* format, ...) {
     int64_t sum = 0;
     for (const char* p = format; *p; p++) sum += static_cast<uint8_t>(*p);

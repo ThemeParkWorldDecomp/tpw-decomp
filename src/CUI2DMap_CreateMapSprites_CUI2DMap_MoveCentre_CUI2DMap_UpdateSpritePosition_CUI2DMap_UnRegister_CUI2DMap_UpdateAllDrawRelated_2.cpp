@@ -88,7 +88,7 @@ void CUI2DMap::UpdateAllDrawRelated() {
     int32_t flags = 8;
     const int32_t perX = static_cast<int32_t>(ppc_fctiwz(static_cast<double>(480.0f / static_cast<float>(SWord(map, 0x24)))));
     const int32_t perY = static_cast<int32_t>(ppc_fctiwz(static_cast<double>(425.0f / static_cast<float>(SWord(map, 0x28)))));
-    CUI2DMapDrawOps* ctx = static_cast<CUI2DMapDrawOps*>(draw.mRenderContext);
+    CUI2DMapDrawOps* ctx = UI2DMapDrawOps(draw.mRenderContext);
 
     int32_t y = 0x2a;
     for (int32_t row = 0; row < SWord(map, 0x28); row++) {

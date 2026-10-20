@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdint>
 #include <new>
 #include "InterfaceWindow.h"
@@ -14,8 +15,12 @@
 const char gStatusMeshNames[] = "ridestatbar.wct\0happygrad.wct";
 
 // The real versions (the host cannot call the Mac's new plus constructor); the test library has strong fakes.
+static_assert(sizeof(InterfaceTextObjectSprite) <= 0x400 && sizeof(InterfaceDrawEngineHGradient) <= 0x400, "the allocation below is 0x400 at least");
+
 namespace statusinit_callee {
-__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(size); }
+// The Mac allocates the sizes of its objects; the host's are larger (InterfaceTextObjectSprite 0x250 bytes for the Mac's 0x19c), so the block is
+// at least 0x400 bytes.
+__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(std::max<size_t>(size, 0x400)); }
 __attribute__((weak)) void SpriteCtor(void* mem) { new (mem) InterfaceTextObjectSprite(nullptr); }
 __attribute__((weak)) void CashCtor(void* mem) { new (mem) InterfaceCashTextObject(nullptr); }
 __attribute__((weak)) void GradientCtor(void* mem, const char* meshName) {

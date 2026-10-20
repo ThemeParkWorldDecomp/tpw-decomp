@@ -1,5 +1,6 @@
 // CreateHireListPanel 0x101a1c88 (3316 bytes, ui_mainpanel2.cpp's hire panel): builds the hire panel (or, when it is up already, only
 // switches its staff type), fills the cash line, the staff type list with its column buttons and the finance summary below it.
+#include <algorithm>
 #include <new>
 
 #include "LoadPanelMsg.h"
@@ -33,9 +34,13 @@ char gHireListStrings[24] = {'h', 'i', 'l', 'i', 'g', 'h', 't', 0, 'r', 'i', 'd'
 __attribute__((weak)) InterfaceWindow* HireListLCFormat() { return nullptr; }   // 0x101a1798
 __attribute__((weak)) int32_t HirePanelMsg(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }   // 0x101a1314
 
+static_assert(sizeof(InterfaceTextObjectSprite) <= 0x400 && sizeof(InterfaceDrawEngineHGradient) <= 0x400, "the allocation below is 0x400 at least");
+
 namespace hirelist_callee {
 __attribute__((weak)) int32_t Labs(int32_t value) { return value < 0 ? static_cast<int32_t>(0u - static_cast<uint32_t>(value)) : value; }
-__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(size); }
+// The Mac allocates the sizes of its objects; the host's are larger (InterfaceTextObjectSprite 0x250 bytes for the Mac's 0x19c), so the block is
+// at least 0x400 bytes.
+__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(std::max<size_t>(size, 0x400)); }
 __attribute__((weak)) void TitleCtor(void* mem) { new (mem) InterfaceTitleTextObject(nullptr); }
 __attribute__((weak)) void SpriteCtor(void* mem) { new (mem) InterfaceTextObjectSprite(nullptr); }
 __attribute__((weak)) void CashCtor(void* mem) { new (mem) InterfaceCashTextObject(nullptr); }

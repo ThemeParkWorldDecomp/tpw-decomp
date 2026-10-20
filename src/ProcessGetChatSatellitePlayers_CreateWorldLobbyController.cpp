@@ -1,5 +1,6 @@
 // Unit v5948: the world lobby window's creation and the satellite number windows' message function (main app).
 //   CreateWorldLobbyController 0x1022b038 (1600), SatelliteMsg 0x1022ae30 (464)
+#include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 #include "FS_Online.h"
@@ -21,7 +22,7 @@ int16_t gWorldLobbyScript[2] = {1, 0};   // 0x102b20f8
 // Weak; the test library fakes it (the constructor is another file's).
 namespace worldlobby_callee {
 __attribute__((weak)) InterfaceDrawObject* NewNumberText() {
-    void* memory = ::operator new(0x19c);
+    void* memory = ::operator new(std::max<size_t>(0x19c, sizeof(InterfaceNumberTextObject)));   // the host object is larger than the Mac's
     lender_callee::NumberCtor(memory);   // 0x1018d930 with NULL
     return static_cast<InterfaceDrawObject*>(memory);
 }

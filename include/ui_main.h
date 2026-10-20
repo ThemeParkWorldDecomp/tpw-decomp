@@ -470,6 +470,11 @@ public:
     void UpdateAllSpritePositions();   // 0x10230974 (96 bytes, untranslated)
     // Unit v5194: the object's storage, so the static initialiser can write the Mac offsets 0, 4, 0x10 .. 0x20, 0x5c and 0x20060 of the global.
     alignas(16) uint8_t mBytes[0x20100];
+    // Host only: the six sprite images InitSprites loads, as native pointers at 0x200b8 .. 0x200e7 (the Mac's Ptr32 words at
+    // 0x20068 .. 0x2007c cannot hold a host heap pointer; 0x200a0 .. 0x200b7 are MapAreaCallback's host-only places). Image k is
+    // the one of the Mac word at 0x20068 + 4 * k.
+    static constexpr size_t kHostImagesOffset = 0x200b8;
+    void*& HostImage(int32_t k) { return reinterpret_cast<void**>(mBytes + kHostImagesOffset)[k]; }
     // Unit v5200 (src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition.cpp). More Mac offsets: the render area
     // (a TbRenderArea) at 0x2c whose depth word at 0x3c gives the bytes per pixel, and the map grid of 128 x 128 eight-byte entries at 0x60
     // (a type int, a thing id halfword at +4).
@@ -642,6 +647,19 @@ void CoasterEditMode(void* object);       // 0x1019c584
 void WhichSpecialButton();                                // 0x1019c3e8 (368 bytes)
 void LinkSlideoutPanel(InterfaceWindow* panel, int32_t n);
 InterfaceWindow* LinkSlideoutPanelResult(InterfaceWindow* panel, int32_t n);   // same code, keeps r3 (the panel, or NULL)   // 0x101a82ec (src/ui_mainpanel2_window_LinkSlideoutPanel.cpp): answers the panel, or NULL when slot 0x21 already holds one
+// Host only: the slide-out slot's message 0xa carries the arriving panel as a 32-bit word (the Mac's pointer); a host window is above
+// 4 GB, so LinkSlideoutPanel notes the panel here and RailsCallback's WindowFromWord gets it back from the word's low 32 bits.
+inline InterfaceWindow* gSlideoutWordWindows[16] = {};
+inline void NoteSlideoutWord(InterfaceWindow* window) {
+    const uint32_t word = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(window));
+    InterfaceWindow** slot = &gSlideoutWordWindows[(word >> 4) & 15];
+    *slot = window;
+}
+inline InterfaceWindow* SlideoutWordWindow(int32_t word) {
+    InterfaceWindow* window = gSlideoutWordWindows[(static_cast<uint32_t>(word) >> 4) & 15];
+    if (window != nullptr && static_cast<uint32_t>(reinterpret_cast<uintptr_t>(window)) == static_cast<uint32_t>(word)) return window;
+    return reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(static_cast<uint32_t>(word)));
+}
 int32_t IsTrackClosed(void* coaster);                     // 0x10052850 (stand-in)
 void GetCoasterEditAvailableButtons(uint32_t* out);       // 0x10057278 (stand-in): bit mask of the buttons
 void GetCoasterEditDefaultButtons(uint32_t* out);         // 0x10057120 (stand-in)
@@ -1433,6 +1451,11 @@ struct CUI2DMapDrawOps {
     virtual void Slot24(const void* viewPort, const void* clip, int32_t flags, const int32_t* rect, const void* colour) = 0;
     virtual void Slot28(const void* viewPort, const void* clip, int32_t flags, const int32_t* rect, const void* colour) = 0;
 };
+// Host seam: the draw ops of CDraw's render context. On the Mac the context is one of Draw.cpp's four objects and the slots
+// are its vtable's HorizontalLine (+0x10), VerticalLine (+0x14), RectangleOutline (+0x24) and RectangleFilled (+0x28); the
+// host's contexts have no vtable, so src/host_ui2dmap_draw_ops.cpp answers an adapter onto CRenderClass8 .. 32 for them
+// (any other context as it is). The unit test's library defines it as the identity.
+CUI2DMapDrawOps* UI2DMapDrawOps(void* context);
 
 // ---- Unit v5991 (src/ContactsLCFormat_OnlineReceiveString_2.cpp)
 class COnlineControl;

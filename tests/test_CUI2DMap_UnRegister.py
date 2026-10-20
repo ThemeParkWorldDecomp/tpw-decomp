@@ -159,6 +159,9 @@ class Side:
     def rd_word(self, a):
         return self.rd_words(a, 1)[0]
 
+    def images(self, ws):
+        self.words(self.map + 0x20068, ws)
+
     def lab(self, a):
         if a == 0xDEAD:
             return "none"
@@ -299,6 +302,11 @@ class Host(Side):
     def put_ptr(self, a, p):
         self.write(a, struct.pack("<Q", p))
 
+    def images(self, ws):
+        # the host keeps each image as a native pointer at 0x200b8 + 8 * k (CUI2DMap::HostImage), the Mac word at 0x20068 + 4 * k
+        self.words(self.map + 0x20068, ws)
+        self.write(self.map + 0x200B8, b"".join(struct.pack("<Q", w & MASK) for w in ws))
+
     def set_ptrs(self, theme, tga):
         self.lib.tpw_c2m_setptrs(theme, tga)
 
@@ -402,7 +410,7 @@ def build(s, case):
     s.words(s.map + 0x20, case["mapw"])
     if case["op"] == "zoom":
         s.words(s.map + 0x5C, [case["z"]])
-    s.words(s.map + 0x20068, case["images"])
+    s.images(case["images"])
     if case["items"] is not None:
         s.init_sprites()
         lst = s.mklist([s.sprite_addr(i) for i in case["items"]])

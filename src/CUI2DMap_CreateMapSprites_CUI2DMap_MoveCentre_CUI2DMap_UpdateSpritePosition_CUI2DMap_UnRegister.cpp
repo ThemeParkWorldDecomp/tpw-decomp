@@ -75,7 +75,7 @@ void CUI2DMap::CloseSprites() {
     if (list != nullptr) delete list;   // the virtual deleting destructor, flag 1
     list = nullptr;
     for (int32_t i = 0; i < 6; i++)
-        gei_EZSprite.DeleteSprite(reinterpret_cast<void*>(static_cast<uintptr_t>(Field<uint32_t>(this, 0x20068 + i * 4))));
+        gei_EZSprite.DeleteSprite(HostImage(i));   // the image of the word at 0x20068 + 4 * i, kept native on the host
     gei_EZSprite.Disable();
     gei_EZSprite.Close();
 }

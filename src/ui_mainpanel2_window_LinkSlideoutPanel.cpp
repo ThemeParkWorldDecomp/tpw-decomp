@@ -22,6 +22,7 @@ InterfaceWindow* LinkSlideoutPanelResult(InterfaceWindow* panel, int32_t n) {
         if (slot != nullptr) {
             if (slot->getExtraParam(2) != nullptr) return nullptr;
             UI_SendMessage(slot, 0xb, 0, 0);
+            NoteSlideoutWord(panel);   // host only: the word below is the pointer's low 32 bits
             UI_PostMessage(slot, 0xa, static_cast<int32_t>(reinterpret_cast<intptr_t>(panel)), 0);
         }
     }

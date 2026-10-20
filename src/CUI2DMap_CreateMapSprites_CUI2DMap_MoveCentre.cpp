@@ -98,8 +98,9 @@ void CUI2DMap::InitSprites() {
     gei_EZSprite.Enable();
     for (int32_t i = 0; i < 6; i++) {
         SSpriteEngineData* image = gei_EZSprite.LoadSprite(const_cast<char*>(gUI2DMapImages[i].mName));
-        // the images are Ptr32 words at 0x20068 (see CreateMapSprites)
+        // the images are Ptr32 words at 0x20068 (see CreateMapSprites); the host keeps the native pointer too (HostImage)
         Field<uint32_t>(this, 0x20068 + i * 4) = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(image));
+        HostImage(i) = image;
     }
     // The original also stores the address of a data object (0x102b2998) over the new list's first word, the vtable of its
     // class; the host list keeps the vtable of TbTList.

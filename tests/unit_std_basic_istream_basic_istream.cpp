@@ -20,6 +20,7 @@
 #include "UI_Base.h"
 #include "email.h"
 #include "tb_ezsprite.h"
+#include "tb_starfield.h"
 #include "ui_controls.h"
 #include "ui_main.h"
 
@@ -134,6 +135,10 @@ int32_t tpw_isg_layout(int64_t* out) {
     out[n++] = reinterpret_cast<char*>(&s->mVisible) - reinterpret_cast<char*>(s);
     out[n++] = static_cast<int64_t>(sizeof(InterfaceKnob));
     out[n++] = reinterpret_cast<char*>(&k->mValue) - reinterpret_cast<char*>(k);
+    // SetScale's detail block (the sprite instance) and its sprite: the sprite pointer, the scale, the image's width
+    out[n++] = static_cast<int64_t>(offsetof(SSpriteGameData, mSprite));
+    out[n++] = static_cast<int64_t>(offsetof(SSpriteGameData, mF2C));
+    out[n++] = static_cast<int64_t>(offsetof(SSpriteEngineData, mWidth));
     return n;
 }
 

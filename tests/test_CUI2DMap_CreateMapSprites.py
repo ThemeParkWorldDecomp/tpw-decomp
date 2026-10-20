@@ -33,8 +33,8 @@ HEAD, NEXT, CTOR, UPDATE, ASSERT = 0x1013ADB0, 0x1013AE08, 0x10230D64, 0x10230A0
 ADDR = dict(none=0x102B294C, objnone=0x102B294E, world=0x1037EBFC, tarr=0x1034CBFC, bal=0x102B4568)
 BAL_OFFS = (0x5D0, 0x600, 0x618, 0x630, 0x648)
 IMAGES = (0x20068, 0x2006C, 0x20070, 0x20074, 0x20078, 0x2007C)
-# the sprite entry: 48 bytes, mThing at 0; the sprite: mX 4, mY 8, mThing 0x18, size 0x30
-HOST_LAYOUT = [48, 0, 4, 8, 0x18, 0x30]
+# the sprite entry: 48 bytes, mThing at 0; the sprite: mX 4, mY 8, mThing 0x18, host size 0x50 (v5652 added the show status fields)
+HOST_LAYOUT = [48, 0, 4, 8, 0x18, 0x50]
 NTHINGS = 12
 
 
@@ -90,10 +90,13 @@ class Side:
     def half(self, a, v):
         self.write(a, struct.pack(self.fmt[0] + "H", v & 0xFFFF))
 
+    def images(self, ws):
+        self.words(self.map + 0x20068, ws)
+
     def objects(self, case):
         """Allocates the world, the map and the things (label 1, 2, 10 + id); returns {label: address}."""
         self.world = self.alloc(0x1DA748)
-        self.map = self.alloc(0x20080)
+        self.map = self.alloc(0x20100)
         self.things = [0] + [self.alloc(0x30) for _ in range(NTHINGS)]
         d = {1: self.world, 2: self.map}
         for i in range(1, NTHINGS + 1):
@@ -166,6 +169,11 @@ class Host(Side):
     def ptr(self, a, v):
         self.write(a, struct.pack("<Q", v))
 
+    def images(self, ws):
+        # the host keeps each image as a native pointer at 0x200b8 + 8 * k (CUI2DMap::HostImage), the Mac word at 0x20068 + 4 * k
+        self.words(self.map + 0x20068, ws)
+        self.write(self.map + 0x200B8, b"".join(struct.pack("<Q", w & MASK) for w in ws))
+
     def log(self):
         return CL.host_end(self.lib)
 
@@ -202,8 +210,7 @@ def build(s, case):
     for off, v in zip(BAL_OFFS, case["bal"]):
         s.words(s.g("bal") + off, [v])
     s.words(s.map + 0x24, [case["w"], case["h"]])
-    for k, off in enumerate(IMAGES):
-        s.words(s.map + off, [0xA00 + k])
+    s.images([0xA00 + k for k in range(len(IMAGES))])
     for (x, y), v in case["cells"].items():
         s.words(s.world + 0x2D8 + (x + (y << 7)) * 0x44 + 0x2C, [v])
     s.half(s.world + 0x1DA746, case["objhead"])

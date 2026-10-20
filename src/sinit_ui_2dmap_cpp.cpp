@@ -17,6 +17,9 @@ CUI2DMapGlobalNode gUI2DMapNameNode;                       // 0x103970e4
 CUI2DMapGlobalNode gUI2DMapNode;                           // 0x103b74b4
 alignas(16) uint8_t gUI2DMapTgaName[0x40];                 // 0x103970d0
 alignas(16) uint8_t gUI2DMapNameStrings[6][0x40];          // 0x10397010
+// The same six strings as InitSprites reads them (the name at +8 of a 0x14-byte entry is the string's text on the Mac): the host's
+// strings are a different size, so InitSprites reads this table, which the initialiser fills with each string's text.
+CUI2DMapImageEntry gUI2DMapImages[6];                      // 0x10397010
 uint32_t gUI2DMapCounterA;                                 // 0x103b74c4
 uint32_t gUI2DMapCounterB;                                 // 0x103b74c0
 uint32_t gUI2DMapVtableSlot;                               // 0x102b296c
@@ -74,6 +77,7 @@ extern "C" void __sinit_ui_2dmap_cpp() {
     __register_global_object(object, destroy, &gUI2DMapNameNode);
     for (int i = 0; i < 6; i++) {
         object = new (gUI2DMapNameStrings[i]) TbDynamicStringTemplate<char>(kImageNames[i]);
+        gUI2DMapImages[i].mName = static_cast<TbStringBase<char>*>(static_cast<TbDynamicStringTemplate<char>*>(object))->mData;
         __register_global_object(object, destroy, &gUI2DMapImageNodes[5 - i]);
     }
 }

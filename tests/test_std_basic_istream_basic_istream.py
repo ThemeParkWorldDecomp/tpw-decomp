@@ -172,6 +172,7 @@ class Ppc(Side):
     fmt = ">I"
     is_host = False
     sprite_off, vis_off, knob_off = 0x28, 0x2C, 0x158
+    det_sprite, det_scale, width_off = 0x28, 0x2C, 0xC   # SetScale's detail block (the sprite instance) and its sprite
     arena = 0
 
     def __init__(self, e, case):
@@ -217,6 +218,7 @@ class Host(Side):
         self.lib = lib
         bind(lib)
         self.sprite_off, self.vis_off, self.knob_off = lib.layout[4], lib.layout[5], lib.layout[7]
+        self.det_sprite, self.det_scale, self.width_off = lib.layout[8], lib.layout[9], lib.layout[10]
         self.arena = lib.tpw_isg_arena_base()
         CL.host_begin(lib, {}, case["queues"])
 
@@ -378,13 +380,21 @@ def op_sdtor(s, case):
 
 
 def details(s, case, with_inner):
-    det = s.alloc(0x40)
-    s.words(det, case["det"])
+    det = s.alloc(0x60)
     inner = 0
-    if with_inner:
+    if not with_inner:   # SetVisibility reads the flags word only
+        s.words(det, case["det"])
+    else:
+        # SetScale: the detail block is the sprite instance; the Mac's words 0 .. 0x27 sit at the same places on the host, the sprite
+        # (Mac 0x28) is a native pointer there, so the scale (Mac 0x2c) and the words after it move (det_scale).
+        s.words(det, case["det"][:10])
+        s.words(det + s.det_scale, case["det"][11:])
         inner = s.alloc(0x20)
         s.words(inner, case["inner"])
-        s.words(det + 0x28, [s.pw(inner)])
+        if s.is_host:
+            s.write(det + s.det_sprite, struct.pack("<Q", inner))
+        else:
+            s.words(det + 0x28, [inner])
     if s.is_host:
         s.lib.tpw_isg_set_details(det)
     else:
@@ -415,14 +425,13 @@ def op_setvis(s, case):
 def op_setscale(s, case):
     sp = make_sprite(s, case)
     det, inner = details(s, case, True)
-    s.write(inner + 0xC, struct.pack(s.fmt[0] + "H", case["w"]))
+    s.write(inner + s.width_off, struct.pack(s.fmt[0] + "H", case["w"]))
     if s.is_host:
         s.lib.tpw_isg_setscale(sp, bitsf(case["scale"]))
     else:
         T.call_ppc(s.e, F_SETSCALE, [sp, T.F(bitsf(case["scale"]))])
-    d = s.rd_words(det, 16)
-    d[0x28 // 4] = 0
-    d[0x2C // 4] = canon_f(d[0x2C // 4])
+    after = s.rd_words(det + s.det_scale, 5)
+    d = s.rd_words(det, 10) + [0, canon_f(after[0])] + after[1:]
     return {"det": d}
 
 
