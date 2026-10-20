@@ -81,7 +81,7 @@ MAC = {
 ORDER = ["inst", "brace", "bdata", "type", "set", "mesh", "hdr", "node", "pylon", "train"]
 # ---- the host's offsets and sizes the module relies on, checked once against tpw_ci_layout (catches a header that moved); the last is
 # sizeof(CCoasterBalance)
-HOST_LAYOUT = [0, 8, 16, 20, 24, 28, 32, 40, 44, 48, 56, 64, 88, 120, 212, 300, 336, 340, 360, 392, 416, 8, 112, 264, 288, 4, 8, 0, 916, 40, 180, 828, 832, 848, 944, 8, 16, 384, 8, 112, 120, 184, 68, 160, 188, 192, 296, 0, 144, 30464]
+HOST_LAYOUT = [0, 8, 16, 20, 24, 28, 32, 40, 44, 48, 56, 64, 88, 120, 212, 300, 336, 340, 360, 392, 496, 8, 112, 264, 496, 4, 72, 0, 916, 40, 180, 828, 832, 848, 944, 8, 16, 392, 8, 112, 120, 184, 68, 160, 188, 192, 296, 0, 144, 30464]
 HOST = {}
 HOSTSIZE = {}
 BALANCE_MAC = 0x3B80

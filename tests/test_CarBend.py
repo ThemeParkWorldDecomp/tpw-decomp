@@ -80,7 +80,7 @@ HOST = {}          # struct -> {field: offset}, filled by bind
 HOST_SIZE = {}
 # The host's offsets and sizes (native pointers: a car is 120 bytes and a train 144 where the Mac's are 0x60 and 0x80, a sample 64 where the
 # Mac's is 0x38; the M3D2 pieces keep the file layout: header 184, node 160, mini node 88, vertex set 48).
-HOST_LAYOUT = [8, 20, 24, 28, 32, 88, 120, 0, 24, 64, 76, 80, 84, 88, 92, 96, 104, 116, 120, 124, 128, 132, 136, 144, 8, 16, 192, 204, 212, 416, 84, 92, 96, 944, 44, 48, 52, 64, 0, 4, 8, 12, 16, 72, 16, 384, 8, 112, 68, 112, 116, 156, 184, 0, 88, 96, 160, 0, 88, 48]
+HOST_LAYOUT = [8, 20, 24, 28, 32, 88, 120, 0, 24, 64, 76, 80, 84, 88, 92, 96, 104, 116, 120, 124, 128, 132, 136, 144, 8, 16, 192, 204, 212, 496, 84, 92, 96, 944, 44, 48, 52, 64, 0, 4, 8, 12, 16, 72, 16, 392, 8, 112, 68, 112, 116, 156, 184, 0, 88, 96, 160, 0, 88, 48]
 SAMPLE_FIELDS = ("mFlags", "mPos.x", "mPos.y", "mPos.z", "mYaw")
 L_MESH = 20        # a ride set's mesh is label 20 + the ride's number
 

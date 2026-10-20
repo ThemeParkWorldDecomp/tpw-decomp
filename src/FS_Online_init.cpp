@@ -29,6 +29,7 @@ CFSOnlineSystem::CFSOnlineSystem() {   // 0x1016f7d0
     new (&mF348) TbDynamicStringTemplate<char16_t>();
     new (&mF35C) TbDynamicStringTemplate<char16_t>();
     new (&mF3AC) TbDynamicStringTemplate<char>();
+    new (&mF3C8) TbPtrList<TbDynamicStringTemplate<char16_t>>();   // a union member since v5921 (its destructor runs by hand), so built here
     new (&mF3DC) TbDynamicStringTemplate<char>();
     mLogin = nullptr;
     InitLogin();

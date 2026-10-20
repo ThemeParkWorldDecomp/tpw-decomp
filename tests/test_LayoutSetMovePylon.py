@@ -36,7 +36,7 @@ C_GEN, C_EXCH, C_FIND, C_SETEDIT = 0x10050FCC, 0x10053594, 0x10043380, 0x100585F
 
 ADDR = dict(edit=0x102B68B0, drag=0x102C178C, w16e0=0x102C16E0, current=0x102B68A8, currentdata=0x102B68A4, table=0x102B6F04)
 # the host's offsets: brace +0x100 pointer, brace size, instance size, flags offset, pointer size
-HOST_LAYOUT = [0x108, 0x140, 0x1d8, 0, 8]
+HOST_LAYOUT = [0x108, 0x1f0, 0x1f0, 0, 8]
 PPC_LAYOUT = dict(data=0x100, brace=0x110, inst=0x200, psz=4)
 
 CUR = None

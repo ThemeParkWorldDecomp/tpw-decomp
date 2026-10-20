@@ -35,7 +35,7 @@ CAPTURE, REMOVE, SYSCTOR, DOLOGIN = 0x101DCCEC, 0x101E2BE4, 0x1016F7D0, 0x101712
 ADDR = dict(overlay=0x10395D04, shown=0x10395D00, flag=0x10395D2C, password=0x10395D30, name=0x10395D72, script=0x102B0288,
             cb=0x102684B0, notext=0x1024EE5E, buf=0x10380C48, sys=0x10380AB0, lobby=0x102E4888, text6=0x1037FF18 + 0x564)
 # the host's offsets: CLBLobby.mWindow, CFSOnlineCity.mName, .mValue, sizeof
-HOST_LAYOUT = [8, 0, 8, 16]
+HOST_LAYOUT = [8, 0, 8, 168]
 
 IDS = [0x16C11, 0x16C12, 0x4B, 0x49]
 NAMES = ["A", "B", "C", "D", "OVL", "FONT", "P0", "P1", "P2", "P3", "LW", "PW", "TABLE", "NAME1", "NAME2", "CITY1", "CITY2", "OLDSYS", "LOBBY"]

@@ -35,7 +35,7 @@ INSTANCE, SHOW, SETDIR, SETPOS, SCALE = 0x100a8408, 0x100a7860, 0x100a798c, 0x10
 WCSICMP, PTRGLUE, DELETE = 0x102399b8, 0x1023baa8, 0x10238218
 
 G_MESHES = 0x102e48d0
-HOST_LAYOUT = [8, 16, 24, 32, 0, 8, 12, 16, 20, 24]
+HOST_LAYOUT = [8, 16, 24, 32, 0, 8, 12, 16, 20, 168]
 OFF_PPC = dict(mesh=4, globe=8, city=0xC, name=0x14, value=0x40, x=0x34, y=0x38, z=0x3C)
 OFF_HOST = dict(mesh=8, globe=16, city=24, name=0, value=8, x=12, y=16, z=20)
 PN = ("meshes", "mesh", "globe", "flag", "city", "name")

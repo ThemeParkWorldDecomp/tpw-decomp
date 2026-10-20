@@ -4,8 +4,8 @@
 //                                            six chat satellite globals
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The virtual calls
-// on the lobby screens go through a hand-made vtable (Itanium slots: Show 8, Hide 9, Slot50 11). The globals of other files the
-// unit reads are defined here.
+// on the lobby screens go through a hand-made vtable (Show, Hide and Slot50 at the slots the headers give them now, read from the
+// member pointers: virtuals declared later in the class family move them). The globals of other files the unit reads are defined here.
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
@@ -65,7 +65,22 @@ MslCharRep* MakeRep(const char* text) {
 void FakeShow(void* self) { ev("Show", {I(lab(self))}); }
 void FakeHide(void* self) { ev("Hide", {I(lab(self))}); }
 void FakeSlot50(void* self) { ev("Slot50", {I(lab(self))}); }
-void* gVtable[16];
+void* gVtable[32];
+
+// The vtable slot of a virtual member (Itanium member pointer; the ARM form keeps the byte offset in ptr and the virtual flag in adj).
+template<class P> int32_t VSlot(P member) {
+    struct {
+        uintptr_t ptr;
+        intptr_t adj;
+    } m;
+    static_assert(sizeof m == sizeof member, "an Itanium member pointer");
+    std::memcpy(&m, &member, sizeof m);
+#if defined(__aarch64__) || defined(__arm__)
+    return static_cast<int32_t>(m.ptr / sizeof(void*));
+#else
+    return static_cast<int32_t>((m.ptr - 1) / sizeof(void*));
+#endif
+}
 
 }  // namespace
 
@@ -216,9 +231,9 @@ template<> TbDynamicStringTemplate<char>& TbDynamicStringTemplate<char>::operato
 extern "C" {
 
 uint64_t tpw_cs_addr(const char* name) {
-    gVtable[8] = reinterpret_cast<void*>(&FakeShow);
-    gVtable[9] = reinterpret_cast<void*>(&FakeHide);
-    gVtable[11] = reinterpret_cast<void*>(&FakeSlot50);
+    gVtable[VSlot(&CLBScreenComponentThemeIslands::Show)] = reinterpret_cast<void*>(&FakeShow);
+    gVtable[VSlot(&CLBScreenComponentDownloadGlobe::Hide)] = reinterpret_cast<void*>(&FakeHide);
+    gVtable[VSlot(&CLBScreenComponentDownloadGlobe::Slot50)] = reinterpret_cast<void*>(&FakeSlot50);
     struct Entry {
         const char* name;
         const void* address;

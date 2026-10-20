@@ -107,7 +107,7 @@ SZM = {st: FIELDS[st][1] for st in FIELDS}
 # ---- the host's offsets and sizes the module relies on, checked once against tpw_cst_layout (catches a header that moved): every struct's
 # fields in FIELDS order then its size, then the sine table's mask, scale and table in gTPGlobals
 HOST_LAYOUT = [
-    0, 8, 16, 72, 112, 120, 192, 204, 208, 212, 300, 312, 316, 320, 324, 328, 332, 352, 360, 384, 416,        # inst
+    0, 8, 16, 72, 112, 120, 192, 204, 208, 212, 300, 312, 316, 320, 324, 328, 332, 352, 360, 384, 496,        # inst
     0, 16, 20, 40, 44, 48, 56, 60, 132, 136, 144,                                                              # train
     0, 8, 20, 80, 88, 120,                                                                                     # car
     48, 52, 64,                                                                                                # ctype
@@ -115,8 +115,8 @@ HOST_LAYOUT = [
     908, 912, 944,                                                                                             # type
     0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 48, 72,                                                           # sample
     16, 24,                                                                                                    # piece
-    8, 104, 260, 288,                                                                                          # brace
-    8, 16, 288, 292, 384,                                                                                      # set
+    8, 104, 260, 496,                                                                                          # brace
+    8, 16, 288, 292, 392,                                                                                      # set
     4, 8, 12,                                                                                                  # gTPGlobals
 ]
 HOST_OFF, HOST_SZ, HOST_SIN = {}, {}, ()

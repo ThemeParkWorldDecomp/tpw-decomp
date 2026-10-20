@@ -32,7 +32,7 @@ OWN = set(SIZES)
 
 ADDR = {}
 # sizeof, mF04, mTotal, mDone, mBuffer, mDataSocket, mListenSocket, mPort, mIpWord, mStrings, mPath, mServer, FTPStringRep.mData, its size
-HOST_LAYOUT = [0x2378, 8, 0x1C, 0x20, 0x24, 0x2024, 0x2028, 0x202E, 0x2030, 0x203C, 0x215C, 0x2360, 16, 24]
+HOST_LAYOUT = [0x2380, 8, 0x1C, 0x20, 0x24, 0x2024, 0x2028, 0x202E, 0x2030, 0x203C, 0x215C, 0x2360, 16, 24]
 
 # Offsets in the object: the Mac's and the host's. sa is the control sockaddr_in (family, port, ip, 8 zero bytes).
 MAC = dict(size=0x2780, zero=0, sock=4, sa=8, total=0x18, done=0x1C, dsock=0x2424, lsock=0x2428, port=0x242E, ipw=0x2430,
