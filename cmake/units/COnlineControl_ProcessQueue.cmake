@@ -1,0 +1,3 @@
+# Unit v5695: COnlineControl::ProcessQueue, AddBuddy and LoadBuddy (src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_ProcessQueue.cpp).
+# The callees outside the unit are recording fakes in tests/unit_COnlineControl_ProcessQueue.cpp, which also defines the globals of other files.
+set(TPW_UNIT_COnlineControl_ProcessQueue src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_ProcessQueue.cpp platform/arena.cpp)

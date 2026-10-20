@@ -1,0 +1,1 @@
+set(TPW_UNIT_TbTextResourceManager src/TbTextResourceManager.cpp)

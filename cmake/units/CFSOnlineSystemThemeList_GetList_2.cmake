@@ -1,0 +1,2 @@
+# Unit v5928: the theme list (GetList, RequestListFromServer, StoreReceivedList, ReturnOnlineThemeID), its login callback and two park lists' RequestListFromServer (src/CFSOnlineSystemThemeList_GetList_2.cpp). The callees are recording fakes in tests/unit_CFSOnlineSystemThemeList_GetList_2.cpp.
+set(TPW_UNIT_CFSOnlineSystemThemeList_GetList_2 src/CFSOnlineSystemThemeList_GetList_2.cpp platform/arena.cpp)

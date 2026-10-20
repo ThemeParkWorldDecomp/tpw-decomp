@@ -1,0 +1,2 @@
+# Unit v5905: UpgradeStatusPanel InitStatusWindow, UpdateStatusWindow, InitWindow, Show (src/UpgradeStatusMsg_UpgradeStatusPanel_InitStatusWindow_2.cpp).
+set(TPW_UNIT_UpgradeStatusPanel_InitStatusWindow_2 src/UpgradeStatusMsg_UpgradeStatusPanel_InitStatusWindow_2.cpp platform/arena.cpp)

@@ -1,0 +1,4 @@
+# Unit v51016: CPerson::EveryTimeMods, UpdateTemporaryHistory, UseObject, GetTimeInPark, LookForMinorDest
+# (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_EveryTimeMods_2.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CPerson_EveryTimeMods_2.cpp, which also defines the globals of other files.
+set(TPW_UNIT_CPerson_EveryTimeMods_2 src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_EveryTimeMods_2.cpp platform/arena.cpp)

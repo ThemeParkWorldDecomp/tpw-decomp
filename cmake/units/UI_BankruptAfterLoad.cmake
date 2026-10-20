@@ -1,0 +1,1 @@
+set(TPW_UNIT_UI_BankruptAfterLoad src/ui_main_panel_UI_Congratulations_UI_BankruptAfterLoad.cpp platform/arena.cpp)

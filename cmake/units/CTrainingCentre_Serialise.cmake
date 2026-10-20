@@ -1,0 +1,1 @@
+set(TPW_UNIT_CTrainingCentre_Serialise src/TrackCell_CTrainingCentre_Serialise.cpp platform/arena.cpp)

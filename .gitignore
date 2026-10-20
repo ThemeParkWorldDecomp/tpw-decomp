@@ -1,0 +1,53 @@
+# Build output
+build/
+cmake-build-*/
+*.o
+*.a
+*.dylib
+*.so
+*.dll
+*.exe
+
+# NEVER commit Bullfrog / EA / Feral files: game binaries, data, dumps.
+# The decompile sources here are written by us; the originals stay outside this repo.
+*.wad
+*.sdt
+*.sam
+*.map
+*.wct
+*.bf4
+*.md2
+*.mov
+*.tqi
+*.bin
+*.pef
+*.sit
+*.zip
+*.toast
+*.iso
+*.img
+*.dmg
+*.rsrc
+*.gpr
+*.rep/
+dumps/
+staging/
+extracted/
+ghidra/
+reference/
+manuals/
+*symbols shared*
+SimTheme Park*
+Theme Park World*
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+

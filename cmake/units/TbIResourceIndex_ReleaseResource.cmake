@@ -1,0 +1,2 @@
+# Unit v5260: TbIResourceIndex::ReleaseResource and ReleaseItem (src/TbIResourceIndex_TbIResourceIndex_ReleaseResource.cpp).
+set(TPW_UNIT_TbIResourceIndex_ReleaseResource src/TbIResourceIndex_TbIResourceIndex_ReleaseResource.cpp platform/arena.cpp)

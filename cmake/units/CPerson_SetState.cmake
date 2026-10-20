@@ -1,0 +1,3 @@
+# Unit v5370: CPerson::SetState (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_SetState.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CPerson_SetState.cpp, which also defines the globals of other files.
+set(TPW_UNIT_CPerson_SetState src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_SetState.cpp platform/arena.cpp)

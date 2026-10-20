@@ -1,0 +1,3 @@
+# Unit v5939: nine advisor scorers (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_SHOPS_POOR_SELECTION.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CAdvisorScoring__ADVISOR_SHOPS_POOR_SELECTION.cpp, which also defines gGameWorld.
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_SHOPS_POOR_SELECTION src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_SHOPS_POOR_SELECTION.cpp platform/arena.cpp)

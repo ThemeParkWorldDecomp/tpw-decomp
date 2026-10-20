@@ -1,0 +1,2 @@
+# Unit v5727: CParser::CParser and SetupWhitespaceSet (src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_cmp_nocase_CParser_CParser.cpp).
+set(TPW_UNIT_CParser_CParser src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_cmp_nocase_CParser_CParser.cpp platform/arena.cpp)

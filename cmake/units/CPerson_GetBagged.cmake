@@ -1,0 +1,3 @@
+# Unit v5293: CPerson balloon, happiness and catch helpers (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CPerson_GetBagged.cpp.
+set(TPW_UNIT_CPerson_GetBagged src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged.cpp platform/arena.cpp)

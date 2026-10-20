@@ -1,0 +1,3 @@
+# Unit v5315: LOADVAR<CPerson::PersonState> (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_LOADVAR.cpp).
+# The callees outside the unit are recording fakes in tests/unit_LOADVAR.cpp.
+set(TPW_UNIT_LOADVAR src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_LOADVAR.cpp platform/arena.cpp)

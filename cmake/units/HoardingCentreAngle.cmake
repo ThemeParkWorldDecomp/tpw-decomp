@@ -1,0 +1,2 @@
+# Unit v5646: HoardingCentreAngle (src/LevelSystems_GenerateHoardingMeshes_HoardingCentreAngle.cpp).
+set(TPW_UNIT_HoardingCentreAngle src/LevelSystems_GenerateHoardingMeshes_HoardingCentreAngle.cpp platform/arena.cpp)

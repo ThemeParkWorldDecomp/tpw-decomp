@@ -1,0 +1,1 @@
+set(TPW_UNIT_TbIRLE4bitFont_TbIRLE4bitFont src/TbIRLE4bitFont_TbIRLE4bitFont_TbIRLE4bitFont.cpp platform/arena.cpp)

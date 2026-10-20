@@ -1,0 +1,1 @@
+set(TPW_UNIT_CFSUserInfo_GameLogout src/FS_UserInfo_CFSUserInfo_GameLogout.cpp platform/arena.cpp)

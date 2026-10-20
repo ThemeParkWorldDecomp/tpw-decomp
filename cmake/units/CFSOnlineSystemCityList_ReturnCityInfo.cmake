@@ -1,0 +1,6 @@
+# Unit v51065: the online lists' small members, two destructors, the park lists' GetList, the login callbacks and the FTP getters
+# (src/FS_Online_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor_CFSOnlineSystemParkList_InCity_GetList_CFSOnlineSystemCityList_StoreReceivedList_CFSOnlineSystemCityList_ReturnCityInfo.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CFSOnlineSystemCityList_ReturnCityInfo.cpp, which also defines the globals of other files.
+set(TPW_UNIT_CFSOnlineSystemCityList_ReturnCityInfo src/FS_Online_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor_CFSOnlineSystemParkList_InCity_GetList_CFSOnlineSystemCityList_StoreReceivedList_CFSOnlineSystemCityList_ReturnCityInfo.cpp platform/arena.cpp)
+
+set(TPW_UNIT_CFSOnlineSystemCityList_ReturnCityInfo_OWN_CALLLOG ON)

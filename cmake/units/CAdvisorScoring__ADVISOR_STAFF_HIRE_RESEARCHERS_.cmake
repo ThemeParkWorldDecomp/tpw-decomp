@@ -1,0 +1,4 @@
+# Unit v5971: the open / close park, researcher and coverage scorers and GetHighestScoringFromNext (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.cpp, which also
+# defines the globals of other files.
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_ src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.cpp platform/arena.cpp)

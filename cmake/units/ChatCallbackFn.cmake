@@ -1,0 +1,3 @@
+# Unit v5212: ChatCallbackFn (src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_ChatCallbackFn.cpp). The callees are recording fakes in
+# tests/unit_ChatCallbackFn.cpp, which also defines gOnlineControl.
+set(TPW_UNIT_ChatCallbackFn src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_ChatCallbackFn.cpp platform/arena.cpp)

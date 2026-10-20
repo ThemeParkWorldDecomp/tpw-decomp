@@ -1,0 +1,1 @@
+set(TPW_UNIT_sinit_ui_cityLobbyController_cpp src/UI_IslandLobby_msg_sinit_ui_cityLobbyController_cpp.cpp platform/arena.cpp)

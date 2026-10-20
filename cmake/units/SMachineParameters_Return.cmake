@@ -1,0 +1,2 @@
+# Unit v5730: SMachineParameters::Return (src/tb_init_SMachineParameters_Output_SMachineParameters_Return.cpp).
+set(TPW_UNIT_SMachineParameters_Return src/tb_init_SMachineParameters_Output_SMachineParameters_Return.cpp platform/arena.cpp)

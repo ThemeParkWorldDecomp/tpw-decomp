@@ -1,0 +1,3 @@
+# Unit v5973: six advisor scorers (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_RIDES_POOR_SELECTION_2.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CAdvisorScoring__ADVISOR_RIDES_POOR_SELECTION_2.cpp.
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_RIDES_POOR_SELECTION_2 src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_RIDES_POOR_SELECTION_2.cpp platform/arena.cpp)

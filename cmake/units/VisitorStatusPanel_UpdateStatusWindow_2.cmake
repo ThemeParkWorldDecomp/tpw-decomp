@@ -1,0 +1,3 @@
+# Unit v51022: VisitorStatusPanel::UpdateStatusWindow and UpdateViewWindow (src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2_VisitorStatusPanel_UpdateStatusWindow_2.cpp).
+# The callees outside the unit are recording fakes in tests/unit_VisitorStatusPanel_UpdateStatusWindow_2.cpp, which also defines the globals of other files.
+set(TPW_UNIT_VisitorStatusPanel_UpdateStatusWindow_2 src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2_VisitorStatusPanel_UpdateStatusWindow_2.cpp platform/arena.cpp)

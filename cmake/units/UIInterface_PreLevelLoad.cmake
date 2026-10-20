@@ -1,0 +1,3 @@
+# Unit v51061: UIInterface stand-ins (src/OnlineParkFindPanelMsg_ContactMenu_ButtonsUnderlayMsg_2_UIInterface_PreLevelLoad.cpp). The callees are
+# recording fakes in tests/unit_UIInterface_PreLevelLoad.cpp.
+set(TPW_UNIT_UIInterface_PreLevelLoad src/OnlineParkFindPanelMsg_ContactMenu_ButtonsUnderlayMsg_2_UIInterface_PreLevelLoad.cpp platform/arena.cpp)

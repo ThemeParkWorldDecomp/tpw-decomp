@@ -1,0 +1,2 @@
+# Unit v51068: constant and balance-value scorers of CAdvisorScoring (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_NEW_RESEARCH_GROUP_SIDE.cpp). No callees.
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_NEW_RESEARCH_GROUP_SIDE src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_NEW_RESEARCH_GROUP_SIDE.cpp platform/arena.cpp)

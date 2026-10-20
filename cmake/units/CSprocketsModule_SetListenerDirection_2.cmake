@@ -1,0 +1,4 @@
+# Unit v5997: CSprocketsModule constructor, Close, Tick, StreamData, SetChannelInfo, SetListenerDirection
+# (src/TbSoundPipeChannel_CSprocketsModule_SetChannelVolume_CSprocketsModule_SetListenerDirection_2.cpp). The callees outside the unit are
+# recording fakes in tests/unit_CSprocketsModule_SetListenerDirection_2.cpp.
+set(TPW_UNIT_CSprocketsModule_SetListenerDirection_2 src/TbSoundPipeChannel_CSprocketsModule_SetChannelVolume_CSprocketsModule_SetListenerDirection_2.cpp src/TbSoundSystemModule.cpp platform/arena.cpp)

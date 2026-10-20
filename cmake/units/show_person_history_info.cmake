@@ -1,0 +1,1 @@
+set(TPW_UNIT_show_person_history_info src/ui_Postcard_panel_win_ticket_1_show_person_history_info.cpp platform/arena.cpp)

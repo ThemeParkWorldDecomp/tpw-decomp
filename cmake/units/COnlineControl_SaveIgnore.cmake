@@ -1,0 +1,3 @@
+# Unit v5235: COnlineControl::SaveIgnore and LoadIgnore (src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_SaveIgnore.cpp).
+# The callees outside the unit are recording fakes in tests/unit_COnlineControl_SaveIgnore.cpp, which also defines the globals of other files.
+set(TPW_UNIT_COnlineControl_SaveIgnore src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_SaveIgnore.cpp platform/arena.cpp)

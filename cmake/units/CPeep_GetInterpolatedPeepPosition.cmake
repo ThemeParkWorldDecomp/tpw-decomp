@@ -1,0 +1,3 @@
+# Unit v5533: CPeep::GetInterpolatedPeepPosition and CPeep::Serialise (src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_GetInterpolatedPeepPosition.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CPeep_GetInterpolatedPeepPosition.cpp.
+set(TPW_UNIT_CPeep_GetInterpolatedPeepPosition src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_GetInterpolatedPeepPosition.cpp platform/arena.cpp)

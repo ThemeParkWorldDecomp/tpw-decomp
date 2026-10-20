@@ -1,0 +1,2 @@
+# Unit v5740: TbFPUSinglePrecision destructor (src/CreateDirectDrawObject_TbFPUSinglePrecision_Dtor_TbFPUSinglePrecision.cpp).
+set(TPW_UNIT_TbFPUSinglePrecision_Dtor_TbFPUSinglePrecision src/CreateDirectDrawObject_TbFPUSinglePrecision_Dtor_TbFPUSinglePrecision.cpp platform/arena.cpp)

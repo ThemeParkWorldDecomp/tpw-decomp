@@ -1,0 +1,1 @@
+set(TPW_UNIT_CResearchCategory_Serialise src/ResearchLab_projects_CResearchCategory_Serialise.cpp platform/arena.cpp)

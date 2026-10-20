@@ -1,0 +1,3 @@
+# Unit v5461: the system event callback object (destructor, EventNotification, DeleteAllCallbacks; src/LbFile_LbApp_GetWindowsScreenMode_LbSystemEventCallback_Dtor__LbSystemEventCallbac.cpp).
+# The callees outside the unit are recording fakes in tests/unit_LbSystemEventCallback_Dtor__LbSystemEventCallbac.cpp.
+set(TPW_UNIT_LbSystemEventCallback_Dtor__LbSystemEventCallbac src/LbFile_LbApp_GetWindowsScreenMode_LbSystemEventCallback_Dtor__LbSystemEventCallbac.cpp platform/arena.cpp)

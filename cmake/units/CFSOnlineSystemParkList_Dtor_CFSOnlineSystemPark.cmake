@@ -1,0 +1,3 @@
+# Unit v5154: CFSOnlineSystemParkList::~CFSOnlineSystemParkList (src/FS_Online_gametype_CFSOnlineSystemParkList_Dtor_CFSOnlineSystemPark.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CFSOnlineSystemParkList_Dtor_CFSOnlineSystemPark.cpp.
+set(TPW_UNIT_CFSOnlineSystemParkList_Dtor_CFSOnlineSystemPark src/FS_Online_gametype_CFSOnlineSystemParkList_Dtor_CFSOnlineSystemPark.cpp)

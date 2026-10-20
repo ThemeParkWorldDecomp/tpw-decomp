@@ -1,0 +1,3 @@
+# Unit v5972: CPerson::Serialise (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_Serialise.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CPerson_Serialise.cpp.
+set(TPW_UNIT_CPerson_Serialise src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_Serialise.cpp platform/arena.cpp)

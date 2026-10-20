@@ -1,0 +1,4 @@
+# Unit v5708: std::basic_istream<wchar_t> ~basic_istream, getline and the constructor
+# (src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_SaveIgnore_std_basic_istream_Dtor_basic_istream_2.cpp).
+# The callees outside the unit are recording fakes in tests/unit_std_basic_istream_Dtor_basic_istream_2.cpp, which also defines the globals of other files.
+set(TPW_UNIT_std_basic_istream_Dtor_basic_istream_2 src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_SaveIgnore_std_basic_istream_Dtor_basic_istream_2.cpp platform/arena.cpp)

@@ -1,0 +1,3 @@
+# Unit v5248: COnlineControl::ProcessInitResponse (src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_ProcessInitResponse.cpp).
+# The callees outside the unit are recording fakes in tests/unit_COnlineControl_ProcessInitResponse.cpp, which also defines the globals of other files.
+set(TPW_UNIT_COnlineControl_ProcessInitResponse src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_ProcessInitResponse.cpp platform/arena.cpp)

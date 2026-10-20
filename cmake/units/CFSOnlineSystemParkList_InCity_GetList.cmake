@@ -1,0 +1,3 @@
+# Unit v5244: CFSOnlineSystemParkList_InCity::GetList (src/FS_Online_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor_CFSOnlineSystemParkList_InCity_GetList.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CFSOnlineSystemParkList_InCity_GetList.cpp, which also defines gOnlineSystem.
+set(TPW_UNIT_CFSOnlineSystemParkList_InCity_GetList src/FS_Online_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor_CFSOnlineSystemParkList_InCity_GetList.cpp platform/arena.cpp)

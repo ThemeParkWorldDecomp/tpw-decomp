@@ -1,0 +1,2 @@
+# Unit v51073: constant and balance-word scorers of CAdvisorScoring (src/AdvisorScoring_..._GENERAL_WON_FIRST_GOLDE.cpp).
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_GENERAL_WON_FIRST_GOLDE src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_NEW_RESEARCH_GROUP_SIDE_CAdvisorScoring__ADVISOR_GENERAL_WON_FIRST_GOLDE.cpp platform/arena.cpp)

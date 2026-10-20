@@ -1,0 +1,3 @@
+# Unit v5986: CUI2DMap::CreateMapPanel (src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister_CUI2DMap_CreateMapPanel.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CUI2DMap_CreateMapPanel.cpp, which also defines the globals of other files.
+set(TPW_UNIT_CUI2DMap_CreateMapPanel src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister_CUI2DMap_CreateMapPanel.cpp platform/arena.cpp)

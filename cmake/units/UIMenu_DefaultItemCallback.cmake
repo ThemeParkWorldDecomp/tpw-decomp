@@ -1,0 +1,2 @@
+# Unit v5575: UIMenu_DefaultItemCallback, UIMenu_DefaultCallback (src/InterfaceWindow_virtuals_UIMenu_DefaultItemCallback.cpp).
+set(TPW_UNIT_UIMenu_DefaultItemCallback src/InterfaceWindow_virtuals_UIMenu_DefaultItemCallback.cpp platform/arena.cpp)

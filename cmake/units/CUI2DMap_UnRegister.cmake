@@ -1,0 +1,4 @@
+# Unit v5959: the 2D map's sprite list and map picture functions (UnRegister, DeleteSpriteListEntries, UpdateAllSpritePositions,
+# CloseSprites, Zoom, LoadMap, UpdateMap; src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister.cpp).
+# The callees outside the unit are recording fakes in tests/unit_CUI2DMap_UnRegister.cpp, which also defines the globals of other files.
+set(TPW_UNIT_CUI2DMap_UnRegister src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister.cpp platform/arena.cpp)

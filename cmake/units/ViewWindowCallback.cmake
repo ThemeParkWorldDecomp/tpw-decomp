@@ -1,0 +1,1 @@
+set(TPW_UNIT_ViewWindowCallback src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_ViewWindowCallback.cpp platform/arena.cpp)
