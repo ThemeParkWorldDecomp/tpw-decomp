@@ -170,7 +170,7 @@ int32_t tpw_LC_layout(int64_t* out) {
     O(tag_sTrackBrace, mFlags);
     O(tag_sTrackBrace, mPrev);
     O(tag_sTrackBrace, mFB0);
-    O(tag_sTrackBrace, mFB4);
+    O(tag_sTrackBrace, mCollisions);
     O(tag_sTrackBrace, mF70);
     O(tag_sTrackBrace, mF90);
     O(tag_sTrackBrace, mF74);

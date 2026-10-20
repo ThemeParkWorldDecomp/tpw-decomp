@@ -65,7 +65,9 @@ sFixedRideParams* GetTempFixedRideParams(int32_t a, int32_t b, int32_t x, int32_
 void* MReleaseAllocF(uint32_t size, uint32_t flags) {
     void* p = gAllocCount < 2 ? gAllocs[gAllocCount] : nullptr;
     gAllocCount++;
-    ev("MReleaseAllocF", {I(static_cast<int32_t>(size)), I(static_cast<int32_t>(flags)), lab(p)});
+    // -1: the brace's own size (the Mac's 0x104), as the module records it
+    int32_t recorded = size == sizeof(tag_sTrackBrace) ? -1 : static_cast<int32_t>(size);
+    ev("MReleaseAllocF", {I(recorded), I(static_cast<int32_t>(flags)), lab(p)});
     return p;
 }
 

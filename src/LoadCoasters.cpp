@@ -43,8 +43,8 @@ float EntranceHeight(uint32_t entrance) {
     return value;
 }
 
-// Reads a brace's mFB0 words into mFB4 (halfwords of the file); false on a short read.
-uint32_t* BraceWords(tag_sTrackBrace* brace) { return reinterpret_cast<uint32_t*>(brace->mFB4); }
+// Reads a brace's mFB0 collision entries (halfwords of the file: the braces' numbers) into mCollisions, the numbers held as
+// pointers until they are resolved; false on a short read. A count above 8 fills slots the Mac shares with mFD4..mFDC.
 
 bool ReadBraceList(void* file, tag_sTrackBrace* brace) {
     for (uint32_t k = 0; k < brace->mFB0; k++) {
@@ -56,7 +56,7 @@ bool ReadBraceList(void* file, tag_sTrackBrace* brace) {
             return false;
         }
         TPCoasterSwap::USwapInplace16UShort(half);
-        BraceWords(brace)[k] = half;
+        brace->mCollisions[k] = reinterpret_cast<tag_sTrackBrace*>(static_cast<uintptr_t>(half));
     }
     return true;
 }
@@ -250,8 +250,8 @@ int32_t LoadCoasters(void* file) {
 
         for (tag_sTrackBrace* b = instance->mLastBrace; b != nullptr; b = b->mPrev) {
             for (uint32_t k = 0; k < b->mFB0; k++) {
-                tag_sTrackBrace* found = GetTrackBrace(reinterpret_cast<sCoasterTrackParams*>(&instance->mBlock3C), BraceWords(b)[k]);
-                BraceWords(b)[k] = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(found));
+                const uint32_t number = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(b->mCollisions[k]));
+                b->mCollisions[k] = GetTrackBrace(reinterpret_cast<sCoasterTrackParams*>(&instance->mBlock3C), number);
             }
         }
 

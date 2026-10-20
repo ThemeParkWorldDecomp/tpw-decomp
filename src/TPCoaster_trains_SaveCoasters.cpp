@@ -78,9 +78,9 @@ bool WriteWord(void* file, uint32_t& word, uint32_t shift) {
 }
 
 bool WriteHeights(void* file, const tag_sTrackBrace* brace) {
-    uint32_t* const* heights = reinterpret_cast<uint32_t* const*>(brace->mFB4);
+    // The collision list (mCollisions on the host): each brace's first word, its number.
     for (uint32_t i = 0; i < brace->mFB0; ++i) {
-        uint16_t value = static_cast<uint16_t>(*heights[i]);
+        uint16_t value = static_cast<uint16_t>(*reinterpret_cast<const uint32_t*>(brace->mCollisions[i]));
         uint32_t transferred;
         TPCoasterSwap::USwapInplace16UShort(value);
         LbFile_Write(file, &value, 2, &transferred);

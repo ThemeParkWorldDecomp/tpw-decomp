@@ -119,7 +119,10 @@ struct tag_sCoasterInstance {
     float mF90;                       // 0x90  (a4)
     uint8_t mF94[0x9c - 0x94];        // 0x94
     struct sTrackSample* mSamples;    // 0x9c  the sampled track, 0x38 bytes a sample on the Mac (unit w212; name invented)
-    uint8_t mFA0[0xa4 - 0xa0];        // 0xa0
+    union {
+        uint8_t mFA0[0xa4 - 0xa0];    // 0xa0
+        uint32_t mSegmentSpan;        // 0xa0  the most samples between two braces plus 1 (LinearSampleTrack): the collision chunk buffers hold so many (unit v5L20; name invented)
+    };
     uint32_t mSampleCount;            // 0xa4  the number of samples (unit w212; name invented)
     float mLength;                    // 0xa8  the track's length in samples, the position a train wraps at (unit w212; name invented)
     float mFAC;                       // 0xac  3.0 from InstanceCoaster (name invented)
@@ -145,7 +148,10 @@ struct tag_sCoasterInstance {
     float mBankFadeStart;             // 0x134  the sample from which the banking fades out (unit w212; name invented)
     uint8_t mF138[0x13c - 0x138];     // 0x138
     float* mUVOffsets;                // 0x13c  one float per type texture, allocated when the type's flag 4 is set (name invented)
-    uint8_t mF140[0x148 - 0x140];     // 0x140
+    union {
+        uint8_t mF140[0x148 - 0x140];  // 0x140
+        uint32_t mCollisionRefs;       // 0x140  the entries of all the braces' collision lists (unit v5L20; name invented)
+    };
     uint32_t* mHeads;                 // 0x148  mF318 * 2 words, the cars' head words (name invented, unit w192); the Mac allocates 0x14c bytes; the host sizeof(tag_sCoasterInstance)
     struct sCoasterPylon* mPylons;    // 0x4c  (unit v5038, appended: the Mac offset, the host's is further) the head of the pylon list, linked by the node's +0x28
     tag_sTrackBrace* mPreviewBrace;   // 0x60  (unit v5054, appended: the Mac offset, the host's is further) the editor's brace (HandleCoasterDataChange compares it)
@@ -601,8 +607,8 @@ struct tag_sTrackBrace {
     tag_sTrackBrace* mPrev;           // 0x64  the previous brace of the instance's list (unit w212)
     tag_sTrackBrace* mNext;           // 0x68  the next brace of the instance's list (unit w186)
     uint8_t mF70[0xb0 - 0x70];        // 0x70
-    uint32_t mFB0;                    // 0xb0  nonzero: ExtrudeTrackSection takes the fixed extrusion (unit w213; name invented)
-    uint8_t mFB4[0xe0 - 0xb4];        // 0xb4
+    uint32_t mFB0;                    // 0xb0  nonzero: ExtrudeTrackSection takes the fixed extrusion (unit w213; name invented). The length of mCollisions (unit v5L20)
+    uint8_t mFB4[0xe0 - 0xb4];        // 0xb4  the Mac's collision list (mCollisions on the host)
     float mAngle;                     // 0xe0  the yaw the drag turns by
     float mFE4;                       // 0xe4  the bank, blended by InterpolateCoasterSpline (unit w213; name invented)
     uint8_t mFE8[0xfc - 0xe8];        // 0xe8
@@ -634,12 +640,21 @@ struct tag_sTrackBrace {
     uint32_t mCount84;                // 0x84  the second's
     // Unit v5667 (appended: the Mac offsets, the host's are further; names invented): words RestorePylonDetails copies
     float mF94w;                      // 0x94
-    uint32_t mW98;                    // 0x98
-    uint32_t mW9C;                    // 0x9c
-    uint32_t mWA0;                    // 0xa0
-    uint32_t mWA4;                    // 0xa4
-    uint32_t mWA8;                    // 0xa8
-    uint32_t mWAC;                    // 0xac
+    union {
+        struct {
+            uint32_t mW98;            // 0x98
+            uint32_t mW9C;            // 0x9c
+            uint32_t mWA0;            // 0xa0
+            uint32_t mWA4;            // 0xa4
+            uint32_t mWA8;            // 0xa8
+            uint32_t mWAC;            // 0xac
+        };
+        sAlignedBox mCollisionBounds;  // 0x98  the box of the track from this brace to the one before it, widened by the pylon radius (unit v5L20)
+    };
+    // Unit v5L20 (appended: the Mac's list is the 8 words at 0xb4, here pointer-sized): the braces this one's track section crosses,
+    // mFB0 of them. Slots 8 to 10 are the Mac's words 0xd4 to 0xdc (mFD4, mFD8, mFDC), which only LoadCoasters writes, for a count
+    // above 8 read from the file. SaveCoasters writes each entry's number.
+    tag_sTrackBrace* mCollisions[11];
 };
 struct tag_sRideAnimSet;
 // The ticks (names invented unless noted):
@@ -891,7 +906,7 @@ extern float gPylonMoveHeight;              // 0x102c1778
 extern tag_sTrackBrace* gPylonMoveBrace;    // 0x102c177c  the dragged brace
 extern tag_sTrackBrace* gPylonMoveMark2;    // 0x102c1780
 extern tag_sTrackBrace* gPylonMoveMark1;    // 0x102c1784
-tag_sPylon* GetPylonAtCell(uint32_t x, uint32_t z, uint32_t* out);   // 0x1003f954 (124 bytes)
+tag_sPylon* GetPylonAtCell(uint32_t x, uint32_t z, uint32_t* out);   // 0x1003f954 (124 bytes, src/TPConfig_collision.cpp, unit v5L20)
 void MoveBrace(tag_sCoasterInstance* instance, tag_sTrackBrace* brace, tag_sPylon* pylon, uint32_t x, uint32_t z, float* a, float* b, int32_t c,
                int32_t d);   // 0x10054978 (1,232 bytes)
 void LLCC_AbortPylonMove();                 // 0x1008f1a4 (292 bytes)
@@ -1168,7 +1183,7 @@ struct sBraceControl;                                              // the pylon 
 void SetupBraceInfo(tag_sTrackBrace* brace, sBraceInfo* info, sBraceControl* control, sPylonControl* pylon);   // 0x1003df2c (212 bytes, stand-in)
 void UnLinkBrace(tag_sTrackBrace* brace, sCoasterTrackParams* params);                                          // 0x1003e5c0 (212 bytes, stand-in)
 void RestorePylonDetails(tag_sCoasterInstance* instance, tag_sPylon* pylon);                                    // 0x1003ec00 (448 bytes, stand-in)
-void RemoveBraceFromCollisionSystem(tag_sTrackBrace* brace, tag_sCoasterInstance* instance);                    // 0x10048fc4 (src/LayoutSetRotatePylon_DeleteLastTrackBrace.cpp)
+void RemoveBraceFromCollisionSystem(tag_sTrackBrace* brace, tag_sCoasterInstance* instance);                    // 0x10048fc4 (84 bytes, src/TPConfig_collision.cpp, unit v5L20)
 // ---- Unit v5551 (src/TPCoaster_instances_IsValidPylonPosition.cpp): the clamp bounds of IsValidPylonPosition's angle fraction (names invented)
 extern float gPylonClampMax;   // 0x1029cd48  1.0f
 extern float gPylonClampMin;   // 0x1029cd4c  0.0f
@@ -1238,15 +1253,15 @@ extern int32_t gCoasterCapacityFloor;     // 0x1029ce28  CoasterSetCapacity's lo
 // Unit v51008 (src/TPConfig_extrude_GenerateTrackSubdivisions_2.cpp)
 int32_t GenerateTrackSubdivisions(tag_sTrackBrace* a, tag_sTrackBrace* b, sExtrusionParams* params, float* out, float span);   // 0x1004e8c0 (260 bytes)
 void LayoutRecordCoasterSpeed(tag_sCoasterInstance* instance, uint32_t speed);   // 0x100590a0 (56 bytes, stand-in)
-void FlagRecalcAllCoasterCollisions(tag_sCoasterInstance* instance);             // 0x10049078 (92 bytes, stand-in)
+void FlagRecalcAllCoasterCollisions(tag_sCoasterInstance* instance);             // 0x10049078 (92 bytes, src/TPConfig_collision.cpp, unit v5L20)
 // Unit v51024 (src/LevelSystems_GetRequiredBraceTangents_2.cpp): the clamp constants of GetRequiredBraceTangents (names invented)
 extern float gBraceTangentOne;         // 0x1029cd1c  1.0f
 extern float gBraceTangentMinusOne;    // 0x1029cd18  -1.0f
 extern int32_t gKickPeepsFloor;          // 0x1029ce2c  KickPeepsFromEntranceQueue's lower bound on the number kicked (a max with it; bss, name invented)
 // Unit v5992 (src/DestroyCoasterPylons_SetupBraceBezierCtrlParams.cpp; names invented)
 void SetupBraceBezierCtrlParams(tag_sCoasterInstance* instance);   // 0x10050a3c (880 bytes)
-void RecalcTrackBounds(tag_sCoasterInstance* instance);            // 0x10047818 (96 bytes, stand-in)
-void DoCollisionChecking(tag_sCoasterInstance* instance);          // 0x10048f64 (32 bytes, stand-in)
+void RecalcTrackBounds(tag_sCoasterInstance* instance);            // 0x10047818 (96 bytes, src/TPConfig_collision.cpp, unit v5L20)
+void DoCollisionChecking(tag_sCoasterInstance* instance);          // 0x10048f64 (32 bytes, src/TPConfig_collision.cpp, unit v5L20)
 extern float gBraceBezierMin;                       // 0x1029ce78  0.0f, the lower bound of the bezier weight after the pivot
 extern float gBraceBezierMax;                       // 0x1029ce7c  1.0f, the upper bound
 extern const uint32_t* gTrackTextureCacheType;      // 0x102b74bc  the coaster type whose texture flags gExtrudeFaceStoreB holds
@@ -1256,3 +1271,39 @@ int32_t IsTrackClosed(tag_sCoasterInstance* instance);   // 0x10052780 (36 bytes
 void SetPlaceNormalPylon();                              // 0x10058b68 (36 bytes)
 void SetPlaceSpecialPylon();                             // 0x10058bb8 (36 bytes)
 void LayoutDeleteLastTrackBrace();                       // 0x10058f4c (32 bytes)
+
+// ---- Unit v5L20 (src/TPConfig_collision.cpp): the coaster collision system (TPConfig.cpp on the Mac; names invented). Each brace keeps
+// the box of the track from it back to the brace before it (mCollisionBounds) and the braces whose track crosses that section
+// (mCollisions, mFB0 of them, at most 8; a brace with more is flagged 0x400000). Flag 0x200000 asks for the brace's collisions to be
+// worked out again, 0x10000 keeps the brace out of them. The radius widening each box is the pylon control's word 0x58.
+// One stretch of track between two samples and its box (0x1c bytes on the Mac; MReleaseAllocF'd, the instance's mSegmentSpan of them).
+struct sTrackChunk {
+    uint32_t mSample;                 // 0x00  the index of the first sample
+    sAlignedBox mBounds;              // 0x04
+};
+static_assert(sizeof(sTrackChunk) == 0x1c, "track chunk size");
+extern sTrackChunk* gCollisionChunksA;       // 0x102b7460  the first track's chunks (CheckAllTrackToTrackCollisions' blocks)
+extern sTrackChunk* gCollisionChunksB;       // 0x102b745c  the second track's
+extern void* gCollisionBlockA;               // 0x102b7468  0x78 bytes per chunk, allocated and freed only
+extern void* gCollisionBlockB;               // 0x102b7464  the same
+extern sTrackSample* gCollisionSampleA;      // 0x102b7330  the first sample of the pair DoProperChunkCollision tests
+extern sTrackSample* gCollisionSampleB;      // 0x102b732c
+extern tag_sCoasterType* gCollisionTypeA;    // 0x102b7458  (the Mac keeps the address of the type's mPairs and mPairCount)
+extern tag_sCoasterType* gCollisionTypeB;    // 0x102b7454
+// The two cross sections of each track, the type's pairs turned to the samples' orientation: ring B (0x102b7334) and ring A
+// (0x102b73c4), 0x90 bytes each and in that order, so the host keeps them in one array (B then A).
+extern s3DPoint gCollisionRings[24];
+extern s3DPoint* gCollisionCorner0;          // 0x102b7328  the four corners of ring A's face being tested
+extern s3DPoint* gCollisionCorner1;          // 0x102b7324
+extern s3DPoint* gCollisionCorner2;          // 0x102b7320
+extern s3DPoint* gCollisionCorner3;          // 0x102b731c
+void GetTrackBounds(tag_sCoasterInstance* instance, tag_sTrackBrace* a, tag_sTrackBrace* b, sAlignedBox* box);   // 0x10047634 (372 bytes)
+void GenerateSamplesInBoundArea(tag_sCoasterInstance* instance, tag_sTrackBrace* a, tag_sTrackBrace* b, const sAlignedBox* box,
+                                sTrackChunk* chunks, uint32_t* count);                                          // 0x100478b8 (800 bytes)
+int32_t DoProperChunkCollision(sTrackChunk* a, sTrackChunk* b);                                                  // 0x10047c64 (2,052 bytes)
+float DotProduct3D(const s3DPoint* a, const s3DPoint* b);                                                        // 0x100484b0 (40 bytes)
+void CheckTrackToTrackCollisions(tag_sCoasterInstance* instanceA, tag_sCoasterInstance* instanceB, tag_sTrackBrace* a0,
+                                 tag_sTrackBrace* a1, tag_sTrackBrace* b0, tag_sTrackBrace* b1);                 // 0x10048510 (1,196 bytes)
+void RemoveAllCollisionsFromBrace(tag_sCoasterInstance* instance, tag_sTrackBrace* brace);                       // 0x10048a64 (528 bytes)
+void CheckTrackToAllTracksCollisions(tag_sCoasterInstance* instance, tag_sTrackBrace* brace);                    // 0x10048cd0 (208 bytes)
+void CheckAllTrackToTrackCollisions(tag_sCoasterInstance* instance);                                             // 0x10048e00 (280 bytes)

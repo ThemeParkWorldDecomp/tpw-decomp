@@ -128,7 +128,7 @@ int32_t tpw_sc_layout(int64_t* out) {
     O(tag_sTrackBrace, mPrev);
     O(tag_sTrackBrace, mWord70);
     O(tag_sTrackBrace, mFB0);
-    O(tag_sTrackBrace, mFB4);
+    O(tag_sTrackBrace, mCollisions);
     O(tag_sTrackBrace, mFD8);
     O(tag_sTrackBrace, mFDC);
     O(tag_sTrackBrace, mAngle);

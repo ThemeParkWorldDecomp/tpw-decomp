@@ -26,7 +26,8 @@ tag_sTrackBrace* NewTrackBrace(sPylonRecord* pylon, float x, float z, float loft
                                uint32_t level, uint32_t extra) {
     tag_sCoasterInstance* instance = gCoasterEditInstance;
     uint32_t* params = &instance->mBlock3C;
-    tag_sTrackBrace* brace = static_cast<tag_sTrackBrace*>(MReleaseAllocF(0x104, 1));
+    // The Mac asks for 0x104 bytes; the host brace is larger (native pointers and the collision list), so ask for its size.
+    tag_sTrackBrace* brace = static_cast<tag_sTrackBrace*>(MReleaseAllocF(sizeof(tag_sTrackBrace), 1));
     uint32_t second = flags & 2;
     if (second != 0) brace->mFlags |= 0x2000;
     if ((control == nullptr || (control->mFlags & 0x4000) == 0) && second == 0) instance->mBraceB5C = brace;

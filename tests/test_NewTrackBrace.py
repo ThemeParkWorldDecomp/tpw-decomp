@@ -111,7 +111,9 @@ def rec_params(e, p):
 def stub_malloc(e):
     L = e.cl
     addr = L.allocs.pop(0) if L.allocs else 0
-    L.rec("MReleaseAllocF", (s32(e.r(3)), s32(e.r(4)), L.lab(addr)))
+    # the brace: the Mac asks for 0x104, the host for its own brace size; both sides record -1 for it
+    size = -1 if e.r(3) == 0x104 else s32(e.r(3))
+    L.rec("MReleaseAllocF", (size, s32(e.r(4)), L.lab(addr)))
     e.set_r(3, addr)
 
 

@@ -12,7 +12,8 @@ TPW_SWAP_FILE_WORDS: the host is little-endian like the file), so the two sides 
 The world of a case: the list of coaster instances, each with a list of braces (their data blocks and heights), the three object table
 counters. What is compared: the answer, the counters, every brace's count word (swapped in place and back), the event log.
 
-No fused operations. Not tested: a brace with more than 5 heights (the host's array of height pointers is 0x2c bytes at 0xb4).
+No fused operations. The heights are the brace's collision list (mCollisions on the host, unit v5L20): each entry's first word is
+written. Not tested: a list of more than 8 (CheckTrackToTrackCollisions stops at 8).
 """
 import ctypes as C
 import random
@@ -394,6 +395,9 @@ def edges():
     yield w
     w = world(r, ni=1, fail=None)
     w["insts"][0]["braces"] = [brace(r, number=2, hidden=False, nh=5) for _ in range(3)]
+    yield w
+    w = world(r, ni=1, fail=None)
+    w["insts"][0]["braces"] = [brace(r, number=2, hidden=False, nh=8) for _ in range(2)]
     yield w
     for fail in range(0, 30, 2):
         w = world(r, ni=1, fail=fail, mode=1)

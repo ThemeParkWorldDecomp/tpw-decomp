@@ -192,6 +192,14 @@ class Side:
     def rd_ptr(self, a):
         return struct.unpack(self.pfmt, self.read(a, self.PW))[0]
 
+    # a brace's collision list: 32-bit words on the PowerPC, pointer slots (the values zero-extended) on the host
+    def slots(self, a, ws):
+        for i, w in enumerate(ws):
+            self.wptr(a + i * self.PW, w & MASK)
+
+    def rd_slots(self, a, n):
+        return [self.rd_ptr(a + i * self.PW) for i in range(n)]
+
 
 class Ppc(Side):
     fmt = ">I"
@@ -319,7 +327,7 @@ def make_world(s, case):
         s.words(b + o["b_number"], [spec["number"]])
         s.words(b + o["b_flags"], [spec["flags"]])
         s.words(b + o["b_fb0"], [spec["fb0"]])
-        s.words(b + o["b_fb4"], spec["fb4"])
+        s.slots(b + o["b_fb4"], spec["fb4"])
         table = None
         if data:
             d = blk()
@@ -431,7 +439,7 @@ def observe(s, case, answer):
         d = {nm: s.rd_word(b + o[nm]) for nm in ("b_number", "b_flags", "b_fb0")}
         if label == short_label and s.fmt == ">I":
             d["b_fb0"] = int.from_bytes(d["b_fb0"].to_bytes(4, "big"), "little")
-        d["fb4"] = s.rd_words(b + o["b_fb4"], 11)
+        d["fb4"] = s.rd_slots(b + o["b_fb4"], 11)
         d["prev"] = lab_of(W, s.rd_ptr(b + o["b_prev"]))
         v = s.rd_ptr(b + o["b_f90"])
         d["f90"] = 0 if v == 0 else v - b - o["b_f70"]
