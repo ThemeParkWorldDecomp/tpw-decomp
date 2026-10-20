@@ -393,7 +393,7 @@ int32_t BMP_TrackSectionPlaceSection(int32_t ride, int32_t x, int32_t z, int32_t
 
 // Unit v5999 (src/LLCR_OverRide_LLCR_DeleteRide_2.cpp defines the word; name invented).
 extern uint16_t gLLCRNoRide;   // 0x1029e04e  0 (halfword): the thing id LLCR_OverRide answers when no ride stands on the cell (LLCR_DeleteRide compares with it)
-int32_t FindDataNodeIndexByDisableCode(tag_sRideAnimSet* set, uint32_t a, uint32_t code);   // 0x1020017c (104 bytes): -1 for none
+int32_t FindDataNodeIndexByDisableCode(tag_sRideAnimSet* set, uint32_t code, uint32_t id);   // 0x1020017c (104 bytes, src/advisor_leaves.cpp): -1 for none
 
 // Unit v51060 (src/MapDelta_map_CMapCell_IsQueue.cpp): 0x10090b2c (16 bytes), the static initialiser of LLCellRide.cpp: gLLCCE092 = 0.
 void __sinit_LLCellRide_cpp();

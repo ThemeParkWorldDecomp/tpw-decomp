@@ -380,8 +380,8 @@ public:
     int32_t _ADVISOR_GENERAL_WON_GOLDEN_TICKET();          // 0x10016038 (8 bytes, untranslated)
     int32_t _ADVISOR_AWARD_GIVEN();                        // 0x1001608c (8 bytes, untranslated)
     int32_t _ADVISOR_AWARD_MOVED();                        // 0x100160d0 (8 bytes, untranslated)
-    int32_t _ADVISOR_MAX_MECHANICS();                      // 0x100170b0 (120 bytes, untranslated)
-    int32_t _ADVISOR_BOAT_ARRIVED();                       // 0x10017ae4 (8 bytes, untranslated)
+    int32_t _ADVISOR_MAX_MECHANICS();                      // 0x100170b0 (120 bytes, unit v5L21)
+    int32_t _ADVISOR_BOAT_ARRIVED();                       // 0x10017ae4 (8 bytes, unit v5L21)
 
     int32_t mCursor;           // 0x00 the place in the table GetHighestScoringFromNext goes on from (the constructor zeroes it)
     uint16_t mWord4;           // 0x04  written by LastMinuteCheck and the scorers (not set by the constructor)

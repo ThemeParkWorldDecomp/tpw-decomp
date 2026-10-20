@@ -197,7 +197,8 @@ public:
 // ---- Bank::CBank (0xc bytes) -------------------------------------------------------------------------------------------
 namespace Bank {
 // What the codecs hold: a reference counted handle on a TbBank. The remaining members of the class (IsType,
-// GetNumberOfSamples, GetSampleLength, GetSampleName at 0x1001463c..0x10014810) are not translated yet; unit w80b added the three
+// GetNumberOfSamples, GetSampleLength, GetSampleName at 0x1001463c..0x10014810) are in src/TbSoundCore_TbSpeaker_Mono_operator_int.cpp
+// (units v51075, v5L21); unit w80b added the three
 // the codec factory calls.
 class CBank : public TbRefRelease {
 public:
@@ -213,6 +214,7 @@ public:
     // Unit v51075: the bank's, 0 (false, NULL) without a bank.
     bool IsType(uint32_t type) const;                                         // 0x1001463c (64): slot +0x30
     uint32_t GetSampleLength(uint32_t index) const;                           // 0x10014798 (64): slot +0x20
+    int32_t GetNumberOfSamples() const;                                       // 0x100146a8 (64): slot +0x18 (unit v5L21)
     const char* GetSampleName(uint32_t index) const;                          // 0x10014810 (64): slot +0x24
 
     TbBank* mBank;   // +8

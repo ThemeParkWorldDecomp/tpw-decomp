@@ -162,8 +162,8 @@ void LogText(const char* name, const void* object, const char16_t* text) {
 }
 }  // namespace
 
-void CObject::SetSignNameA(char16_t* text) { LogText("SetSignNameA", this, text); }
-void CObject::SetSignNameB(char16_t* text) { LogText("SetSignNameB", this, text); }
+void CObject::SetSignNameA(const char16_t* text) { LogText("SetSignNameA", this, text); }
+void CObject::SetSignNameB(const char16_t* text) { LogText("SetSignNameB", this, text); }
 void CObject::GetSignNameA(char16_t* buffer, uint32_t size) {
     ev("GetSignNameA", {Tag(this), size});
     WriteSign(buffer);

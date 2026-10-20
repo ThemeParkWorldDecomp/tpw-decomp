@@ -77,8 +77,8 @@ void UIMain_DecideKbCapture() { ev("DecideKbCapture", {}); }
 void UIStatusPanel::EditNamePanelGone() { ev("EditNamePanelGone", {lab(this)}); }
 void UIStatusPanel::GetNextObject() { ev("GetNextObject", {lab(this)}); }
 void UIStatusPanel::GetPreviousObject() { ev("GetPreviousObject", {lab(this)}); }
-void CObject::SetSignNameA(char16_t* text) { ev("SetSignNameA", {lab(this), Ident(text)}); }
-void CObject::SetSignNameB(char16_t* text) { ev("SetSignNameB", {lab(this), Ident(text)}); }
+void CObject::SetSignNameA(const char16_t* text) { ev("SetSignNameA", {lab(this), Ident(text)}); }
+void CObject::SetSignNameB(const char16_t* text) { ev("SetSignNameB", {lab(this), Ident(text)}); }
 void RegenerateRideSign(void* object, const char16_t* signA, const char16_t* signB) {
     ev("RegenerateRideSign", {lab(object), Ident(signA), Ident(signB)});
 }

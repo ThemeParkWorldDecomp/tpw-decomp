@@ -35,6 +35,10 @@ bool CBank::IsType(uint32_t type) const {
     if (mBank == nullptr) return false;
     return mBank->IsType(type);
 }
+int32_t CBank::GetNumberOfSamples() const {   // 0x100146a8 (unit v5L21)
+    if (mBank == nullptr) return 0;
+    return mBank->GetNumberOfSamples();
+}
 uint32_t CBank::GetSampleLength(uint32_t index) const {
     if (mBank == nullptr) return 0;
     return mBank->GetSampleLength(index);

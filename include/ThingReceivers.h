@@ -16,6 +16,7 @@
 class CMsg;
 class TbTimeDiff;
 struct RideInfo;
+class ObjectControl;   // unit w210: CObject::GetControl's answer (include/ObjectControl.h)
 struct IDXTYPEUniqueNameThingId;
 
 // The constructors below are declared for CWorld::SetupNewLevel (unit w117), which builds each singleton thing as raw memory of the
@@ -350,7 +351,6 @@ public:
     // Unit w123a: direct dispatch callees, untranslated.
     void UpdateTurn();   // 0x1010d634
     void ModelState();   // 0x1010daa0
-    void FinalDestroy();   // 0x10107828
     // 0x10105d74, 1,800 bytes (src/Object.cpp, unit w126): the map cell the object stands on, its object type, the rotation and one more long.
     CObject(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> map, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> type, int32_t a, int32_t b);
     // 0x1010dc94, 2,000 bytes (src/Object.cpp, unit w126): see there.
@@ -358,26 +358,11 @@ public:
     // Unit w152 (untranslated callees of the analyser's shop and sideshow queries):
     using ShopType = CObjectShopType;   // the ride record's kRideSlot_ShopType values (0 to 7, src/RideDB_balance.cpp 95); names unknown. The enum itself is
                                         // declared in analyser.h (this header includes it, and CParkAnalyser's queries take it before CObject exists).
-    // Unit w142 (untranslated; ContextMouse): UpgradesWhat answers a hidden halfword result (not const on the Mac).
-    tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> UpgradesWhat();   // 0x1011050c
-    void GetUIName(char16_t* out, uint32_t size);                       // 0x10110690
-    // Unit w153 (untranslated; the analyser's ride superlatives call them):
-    int32_t IsCoaster() const;   // 0x10110cd8 (76 bytes, src/gameplay_leaves.cpp, unit v5L07)
-    int32_t IsTrackRide() const;   // 0x10110d50 (200 bytes, untranslated)
-    uint8_t GetExcitementLevel(bool flag) const;   // 0x1010cfb0 (252 bytes, untranslated; the listings mask the answer with 0xff)
     void UpdateEngine(int32_t flag);             // 0x10107d38
     void CreateRideScript();                     // 0x101076b0
     // Unit w132 (untranslated callees of CObject::UpdateTurn, ModelState, CreateRideScript):
-    const char16_t* GetFileName() const;         // 0x1011062c: the ride record's name, a wide string (CRideDatabase::GetFileName; the area note says char*)
     bool IsClosed() const;   // 0x1010cae8 (24 bytes, src/Object_queries.cpp, unit w151): mF64 is 0
     bool IsBrokenDown() const;   // 0x1010c878 (24 bytes, unit w151): mState is 1
-    // Unit v5057 (stand-ins, untranslated): the ride's sign texts.
-    void GetSignNameA(char16_t* buffer, uint32_t size);   // 0x101107c4
-    void GetSignNameB(char16_t* buffer, uint32_t size);   // 0x101108dc
-    void SetSignNameA(char16_t* text);                    // 0x10110948
-    void SetSignNameB(char16_t* text);                    // 0x10110b10
-    // Unit v5150: 0x1010a4fc (1,028 bytes, untranslated): the stand point (entry or exit) of the ride, as two map positions.
-    void GetStandPoint(int32_t which, MapPos* first, MapPos* second);
 
     // Unit w197 (src/Object_queue.cpp): the ride's queue. The queue is a list of people (the head in mQueuedPerson, the link to the person behind at +0x228 and
     // to the person ahead at +0x22a of each person) and, for a ride with the queue flag (mFlags 8), a line of map cells from the entry cell (mF32) back to the
@@ -493,8 +478,23 @@ public:
     // Unit w229 (src/Object_serialise.cpp)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x10106570 (4,368 bytes)
 
-    // Unit v5191 (stand-in, untranslated; the callers mask the answer with 0xff): the excitement a ride would have for these three settings.
-    int32_t GetProspectiveExcitementLevel(int32_t speed, int32_t duration, int32_t capacity) const;   // 0x1010cba0 (976 bytes)
+    // Unit w210 (src/Object_info.cpp): a ride's names, kind, excitement, stand point and final destroy. Each function fetches the ride record again with
+    // CRideDatabase::GetRideInfo of mObjectType for every slot it reads (the original calls it each time). The sign text is two wide strings of 0x21
+    // characters (mSignA at +0x3c4, mSignB at +0x406); a full 0x21 character mSignA has no terminator and runs on into mSignB.
+    tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> UpgradesWhat();   // 0x1011050c (72 bytes): the record's UpgradesId slot (+0x284), a halfword through a hidden pointer (not const on the Mac)
+    ObjectControl* GetControl();   // 0x10110580 (72 bytes): the world's control manager's GetObjectControl of mObjectType (flag 0)
+    const char16_t* GetFileName() const;   // 0x1011062c (56 bytes): the ride record's name, a wide string (CRideDatabase::GetFileName; the area note says char*)
+    void GetUIName(char16_t* out, uint32_t size);   // 0x10110690 (264 bytes): mSignA and mSignB joined (a trailing '-' of mSignA is dropped and the halves run together, else a space)
+    void GetSignNameA(char16_t* out, uint32_t size);   // 0x101107c4 (232 bytes): mSignA (a trailing "--" is cut to one '-')
+    void GetSignNameB(char16_t* out, uint32_t size);   // 0x101108dc (60 bytes): mSignB
+    void SetSignNameA(const char16_t* text);   // 0x10110948 (412 bytes): copies the text (the Mac takes wchar_t*) into mSignA, tells the master save when this is the gates thing and the game is not online, records action 0x50
+    void SetSignNameB(const char16_t* text);   // 0x10110b10 (412 bytes): the same for mSignB, records action 0x55
+    int32_t IsCoaster() const;   // 0x10110cd8 (76 bytes, src/gameplay_leaves.cpp, unit v5L07)
+    int32_t IsTrackRide() const;   // 0x10110d50 (200 bytes)
+    int32_t GetProspectiveExcitementLevel(int32_t a, int32_t b, int32_t c) const;   // 0x1010cba0 (976 bytes): the excitement the ride would have with these settings; for a sideshow a is the prize value, b the price per use and c the chance of winning, for another ride a is the operating speed and b the duration (c is unused; a coaster uses none of them)
+    uint8_t GetExcitementLevel(bool flag) const;   // 0x1010cfb0 (252 bytes; the listings mask the answer with 0xff)
+    void GetStandPoint(int32_t which, MapPos* x, MapPos* y);   // 0x1010a4fc (1,028 bytes): the stand point of the entry cell (which 0) or of the exit cell (otherwise) as a cell and an offset in each of x and y
+    void FinalDestroy();   // 0x10107828 (724 bytes)
 
     CThing mBase;                // 0x00
     uint16_t mF0C;               // 0x0c  cleared last by the constructor
@@ -503,7 +503,7 @@ public:
     uint32_t mBuilt[2];          // 0x14  the park time the ride was built (a time stamp as two words, CParkTime::GetFunnyTime)
     uint32_t mF1C;               // 0x1c  the index of the ride's anim set in gRideAnimSets (SetState)
     uint32_t mF20;               // 0x20  the ride's script handle (SetState)
-    int32_t mF24;                // 0x24  the constructor's fourth argument (GoFirstPerson asks BMP_GetCameraMesh for its camera mesh while it is not 0)
+    int32_t mF24;                // 0x24  the constructor's fourth argument (GoFirstPerson asks BMP_GetCameraMesh for its camera mesh while it is not 0; unit w210: GetProspectiveExcitementLevel hands it to BMP_CountTrackSections as the ride)
     int32_t mF28;                // 0x28  1 (the constructor); while it is 0, IsAvailableToChoose refuses a ride whose record's WhichTrackType (slot 36, +0x9c) is 1 or 2
     uint16_t mF2C;               // 0x2c  the upgrade parent (SetUpgradeParent, GetUpgradeParent)
     uint16_t mFlags;             // 0x2e  1 provides relief, 2 chills you out, 4 is choosable, 8 has a queue, 0x10 provides security, 0x20 handles its sprite, 0x40 holds litter, 0x80 fireworks, 0x100 runs continuously
@@ -547,13 +547,6 @@ public:
     CHistory<int32_t, 30> mHistory33C;     // 0x33c
     char16_t mSignA[0x21];       // 0x3c4  the sign text's first part (CRideDatabase::GetSignNameA fills it)
     char16_t mSignB[0x21];       // 0x406  the second part (GetSignNameB)
-    // Unit v5238 (stand-in, untranslated): the ride's control block.
-    struct CObjectControl* GetControl();   // 0x10110580 (72 bytes)
-};
-// Unit v5238 (name invented): the block CObject::GetControl answers; TooPricey reads the word at +0xc.
-struct CObjectControl {
-    uint8_t mPad[0xc];   // 0x00
-    int32_t mF0C;        // 0x0c
 };
 static_assert(sizeof(CObject) == 0x448, "CObject is 0x448 bytes");
 static_assert(offsetof(CObject, mObjectType) == 0x0e && offsetof(CObject, mBuilt) == 0x14 && offsetof(CObject, mFlags) == 0x2e, "CObject layout");

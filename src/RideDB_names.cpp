@@ -5,6 +5,7 @@
 
 #include "Text.h"
 #include "TPEngine.h"
+#include "analyser.h"
 #include "TbITable.h"
 #include "platform/msl.h"
 
@@ -227,4 +228,23 @@ void CRideDatabase::GetSignNameB(uint16_t id, char16_t* buffer, uint32_t size) {
         }
         wcsncpy(buffer, ride->mSignB, size);
     }
+}
+
+// Unit w210: the ride record's name (mItemName) of a ride type, a wide string; CObject::GetFileName asks for it. NULL when no record has the id.
+const char16_t* CRideDatabase::GetFileName(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id) {
+    RideInfo* ride;
+    if (id.mIndex == mCachedId) {
+        ride = mCachedRide;
+    } else {
+        ride = nullptr;
+        for (int32_t i = 0; i < mRideCount; ++i) {
+            if (mRides[i]->mId == id.mIndex) {
+                mCachedId = id.mIndex;
+                mCachedRide = mRides[i];
+                ride = mRides[i];
+                break;
+            }
+        }
+    }
+    return ride != nullptr ? ride->mItemName : nullptr;
 }

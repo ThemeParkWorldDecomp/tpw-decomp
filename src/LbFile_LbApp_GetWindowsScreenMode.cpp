@@ -9,7 +9,8 @@ static const char kBullfrogStrings[] = "Bullfrog\0DISPLAY";
 char gLbWindowName[64] = "Bullfrog";   // 0x10072600
 LbSCBackGlobals gLbSCBack;              // 0x10073e0c
 
-// Not translated yet: empty stand-ins so the launcher links (their bodies are in the original).
+// Empty host adapters for __construct_array: the list bodies are TbPtrList_LbSEFunction_Ctor and _DtorBody (units v51127, v5L21),
+// but the host's gLbSCBack keeps the Mac's 0x10-byte stride, which a host TbPtrList does not fit.
 void LbSEFunctionList_Construct(void*) {}
 void LbSEFunctionList_Destruct(void*) {}
 void LbSystemEventCallback_Destruct(void*) {}

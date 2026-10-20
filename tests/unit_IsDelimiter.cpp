@@ -133,6 +133,7 @@ int32_t tpw_u_layout(int64_t* out) {
 void tpw_u_sinit() { __sinit_TbIResourceIndex_cpp(); }
 
 uint32_t tpw_u_isdelim(uint64_t p) { return static_cast<uint32_t>(IsDelimiter(P<CCharacterInfo>(p))); }
+uint32_t tpw_u_isparen(uint64_t p) { return static_cast<uint32_t>(IsParenthesis(P<CCharacterInfo>(p))); }
 
 int32_t tpw_u_sethj(uint64_t object, int32_t value) {
     return P<TbTextFormatter>(object)->SetHorizontalJustification(static_cast<TbTextFormatter::eJustification>(value));

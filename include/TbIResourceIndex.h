@@ -22,6 +22,7 @@ public:
     TbError Initialise(const char* path, void* data, uint32_t count);
     uint16_t GetResourceType(void* handle);
     void* GetResourceItemHandle(uint32_t id);
+    resourceIndexItem* GetItem(uint32_t id);   // 0x1000383c (unit v5L21): the item with the id, NULL if none
     // 0x100039ac: the resource an item already holds, with a reference added; -1 if none.
     TbError GetPreOpenedResource(void* handle, void** out);
     void Close();

@@ -1,9 +1,11 @@
 // The small functions the advisor calls (main app of SimTheme Park 2.04b3), each from a range of its own:
 //   GetDeferredAnim 0x100c7a74 and GetAnimLength 0x100c7bb4 (rsse.cpp, next to the animation tick),
 //   SetMeshInUISpace 0x1006553c (TPRide.cpp, the mesh draw switches),
-//   FindDataNodeIndexByID 0x101ffdc8 and FindDataNodeIndexByIDAdvisorTempHack 0x101fff90 (TPEmbed.cpp).
+//   FindDataNodeIndexByID 0x101ffdc8 and FindDataNodeIndexByIDAdvisorTempHack 0x101fff90 (TPEmbed.cpp),
+//   FindDataNodeIndexByDisableCode 0x1020017c (TPEmbed.cpp, unit v5L21).
 // They are here and not in the files of their neighbours so that the advisor's unit library links without the rest of
 // those files. (ScaleLMatrixNoTrans is in src/rsse_matrix.cpp and SND_DuckVolume in src/TPSound.cpp.)
+#include "LLCellSystem.h"
 #include "TPEngine.h"
 #include "m3d2.h"
 #include "platform/macdoze.h"
@@ -37,6 +39,18 @@ uint32_t FindDataNodeIndexByID(tag_sRideAnimSet* set, uint32_t mask, uint32_t id
         if (entry.mF04 == id && (mask & entry.mFlags) != 0) return i;
     }
     return 0xffffffffu;
+}
+
+// As FindDataNodeIndexByID, but the id is the entry's third word (0x08) and a code with none of the bits the entries use
+// is replaced by 1. The original reloads the header on every pass; nothing in the loop writes it.
+int32_t FindDataNodeIndexByDisableCode(tag_sRideAnimSet* set, uint32_t code, uint32_t id) {
+    if ((code & 0x3da1f82) == 0) code = 1;
+    tag_sM3D2Header* header = set->mHeads->mHeader;
+    for (uint32_t i = 0; i < header->mEmbeddedCount; ++i) {
+        const sEmbeddedData& entry = header->mEmbedded[i];
+        if (entry.mF08 == id && (code & entry.mFlags) != 0) return static_cast<int32_t>(i);
+    }
+    return -1;
 }
 
 // Quirks: the nodes are all taken as full nodes (0xa0 bytes), however many of the mAllNodeCount are mini nodes, so a name

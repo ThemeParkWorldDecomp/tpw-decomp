@@ -7,6 +7,7 @@
 
 #include "CMpegBase.h"
 #include "TbSoundBank.h"
+#include "snd_handles.h"
 
 _TbSoundSampleMPEG2* _TbSoundSampleMPEG2::mFirst_TbSoundSampleMPEG2 = nullptr;
 int32_t _TbSoundSampleMPEG2::mCurrent_TbSoundSampleMPEG2 = 0;
@@ -112,11 +113,6 @@ void PoolClearCache() {
 
 // The Mac's LB_MIN<int,int> (0x1000e7d8, 24 bytes): `a < b ? a : b` on references, signed.
 const int32_t& LbMinInt(const int32_t& a, const int32_t& b) {
-    return a < b ? a : b;
-}
-
-// The Mac's LB_MIN<unsigned int,unsigned int> (0x100081c4, 24 bytes).
-const uint32_t& LbMinUnsigned(const uint32_t& a, const uint32_t& b) {
     return a < b ? a : b;
 }
 
@@ -299,7 +295,7 @@ int32_t _TbSoundSampleMPEG2File::GetMpegBlock(void* buffer, int32_t bytes) {
 int32_t _TbSoundSampleMPEG2File::Read(void* buffer, uint32_t count) {
     uint32_t position = static_cast<uint32_t>(mFile->GetPos());
     uint32_t left = mDataSize - (position - mStart);
-    const uint32_t& wanted = LbMinUnsigned(count, left);
+    const uint32_t& wanted = LB_MIN<uint32_t, uint32_t>(count, left);   // 0x100081c4 (include/snd_handles.h)
     if (static_cast<int32_t>(wanted) <= 0) return -1;
     return mFile->Read(buffer, wanted);
 }

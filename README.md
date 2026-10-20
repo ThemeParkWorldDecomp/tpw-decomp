@@ -8,7 +8,7 @@ compile back to the same machine code, it is meant to compute the same results. 
 original by a differential test, which runs the original PowerPC code in an emulator beside the C++ build and compares the
 results, memory writes and calls case by case.
 
-Progress: 9155 functions translated and tested (99.68% of the five programs' functions), 2736.8 KB of code (99.75% of the bytes).
+Progress: 9183 functions translated and tested (99.99% of the five programs' functions), 2743.2 KB of code (99.98% of the bytes).
 
 This is a reference: there is no launcher, no platform layer and no fix of the game's bugs here. The playable port, which
 builds this repository as a submodule and lists every deliberate change it makes, is

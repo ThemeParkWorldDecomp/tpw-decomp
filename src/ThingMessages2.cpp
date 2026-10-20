@@ -29,7 +29,7 @@ CMsgBlockedExit::CMsgBlockedExit(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t
     mThingId = id.mIndex;
 }
 
-// CMsgRideDeleted has no constructor: untranslated code fills it.
+// CMsgRideDeleted's constructor (unit w210) is at the end of this file.
 int32_t CMsgNewRide::GetType() const { return 6; }
 int32_t CMsgRideBrokenDown::GetType() const { return 7; }
 int32_t CMsgRideCondemned::GetType() const { return 8; }
@@ -44,3 +44,9 @@ CMsgRideCondemned::~CMsgRideCondemned() {}
 CMsgRideWantsUpgrade::~CMsgRideWantsUpgrade() {}
 CMsgRideDeleted::~CMsgRideDeleted() {}
 CMsgBlockedExit::~CMsgBlockedExit() {}
+
+// Unit w210: CObject::FinalDestroy builds this message on its stack and posts it; the id (the HIGH halfword of the register argument) goes to +8 as the others do.
+CMsgRideDeleted::CMsgRideDeleted(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> id) {
+    mFlags = 0;
+    mThingId = id.mIndex;
+}

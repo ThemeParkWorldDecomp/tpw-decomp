@@ -521,6 +521,7 @@ public:
     // record when the id is the cached one, else the first slot below the count (signed) whose record starts with that halfword (the id and the record are then
     // cached), else NULL (the cache is left alone).
     RideInfo* GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id);
+    const char16_t* GetFileName(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id);   // 0x10154930 (128 bytes, src/RideDB_names.cpp, unit w210): the record's mItemName, a wide string; NULL when no record has the id
 
     RideInfo* mRides[0x14a];       // 0x000  the ride types, in the order they were loaded
     int32_t mRideCount;            // 0x528

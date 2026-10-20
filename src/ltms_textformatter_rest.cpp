@@ -192,8 +192,8 @@ void MslVector<TbPoint>::insert(TbPoint* position, uint32_t count, const TbPoint
 
 namespace {
 
-// The bracket kind of a character: 1 for '(', 2 for ')', 0 otherwise.
-int ParenthesisKind(const CCharacterInfo* character) {
+// IsParenthesis 0x10006864 (inlined in the original's callers; tested, unit v5L21): 1 for '(', 2 for ')', 0 otherwise.
+int IsParenthesis(const CCharacterInfo* character) {
     if (character->mChar == 0x28) return 1;
     if (character->mChar == 0x29) return 2;
     return 0;
@@ -221,11 +221,11 @@ void InvertLine(CCharacterInfo* first, CCharacterInfo* last) {
 // to 0 that character and the first are swapped, whole records. An empty range or no match changes nothing. The first character always
 // counts 1, so the match is never the first itself.
 void FixParenthesis(CCharacterInfo* first, CCharacterInfo* last) {
-    const int kind = ParenthesisKind(first);
+    const int kind = IsParenthesis(first);
     int depth = 0;
     if (last <= first) return;
     for (CCharacterInfo* p = first; p < last; ++p) {
-        const int other = ParenthesisKind(p);
+        const int other = IsParenthesis(p);
         if (kind == other) depth = depth + 1;
         else if (other != 0) depth = depth - 1;
         if (depth == 0) {
@@ -262,7 +262,7 @@ void ProcessLine(CCharacterInfo* first, CCharacterInfo* last) {
             }
         }
         if (HasHebrew(start, end)) {
-            if (ParenthesisKind(start) > 0) FixParenthesis(start, end);
+            if (IsParenthesis(start) > 0) FixParenthesis(start, end);
         } else {
             InvertLine(start, end);
         }

@@ -68,6 +68,7 @@ public:
 };
 
 // The two emitted unsigned-long copies are 0x1000fdf0 and 0x1001bc00 (24 each).
+// LB_MIN<unsigned int,unsigned int> is 0x100081c4 (24, StreamableMpeg2.cpp; unit v5L21 test: test_TbSpeaker_Mono_operator_int).
 template<class T, class U> const T& LB_MIN(const T& a, const U& b) {
     return a < b ? a : b;
 }

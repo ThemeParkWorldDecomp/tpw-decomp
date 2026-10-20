@@ -2,7 +2,7 @@
 (PROGRAM "bullfrog symbols shared"), src/LbFile_LbApp_GetWindowsScreenMode_LbApp_SetWindowIcon.cpp:
   LbApp_SetWindowIcon 0x10014238, Get/SetUserWndProc 0x10014170/0x10014138, Get/SetCloseDownRequest 0x100140c0/0x100140fc,
   Get/SetHWnd 0x10013fb4/0x10013fe4, Get/SetHInstance 0x10013f44/0x10013f7c, TbPtrList<_LbSEFunction>::TbPtrList 0x100144f0,
-  TbTList<_LbSEFunction*,_LbSEFunction*>::~TbTList 0x1001491c, RemoveAll 0x100149c8, RemoveHead 0x10014a78, CConverter::~CConverter
+  TbTList<_LbSEFunction*,_LbSEFunction*>::~TbTList 0x1001491c, TbPtrList<_LbSEFunction>::~TbPtrList 0x10014450 (unit v5L21), RemoveAll 0x100149c8, RemoveHead 0x10014a78, CConverter::~CConverter
   0x10019358, RotateLeft<unsigned long> 0x10019f3c, USwapInplace32<unsigned long> 0x10009d44 and 0x100445f0, USwapBlock32<unsigned long>
   0x10009ce4 and 0x10044590, TbJPEGLoader::TbJPEGLoader 0x10024228 and ~TbJPEGLoader 0x10024290, _LbSemaLock::_LbSemaLock 0x10024ac4 and
   Release 0x10024b9c, TbPoint::TbPoint 0x100591c4.
@@ -252,6 +252,8 @@ OPS = {
     "TbPtrList<_LbSEFunction>::TbPtrList": op(0x100144f0, "PtrListCtor", ["obj"], ["obj"], "p>u", "list", this=True, ctor=True),
     "TbTList<_LbSEFunction*,_LbSEFunction*>::~TbTList": op(0x1001491c, "ListDtor", ["obj", "$0"], ["obj", "$0"], "pi>u", "list", this=True,
                                                           edges=[[f] for f in FLAGS], rnd=flag_rnd, nullable=True),
+    "TbPtrList<_LbSEFunction>::~TbPtrList": op(0x10014450, "PtrListDtor", ["obj", "$0"], ["obj", "$0"], "pi>u", "list", this=True,
+                                               edges=[[f] for f in FLAGS], rnd=flag_rnd, nullable=True),
     "TbTList<_LbSEFunction*,_LbSEFunction*>::RemoveAll": op(0x100149c8, "RemoveAll", ["obj"], ["obj"], "p>n", "list"),
     "TbTList<_LbSEFunction*,_LbSEFunction*>::RemoveHead": op(0x10014a78, "RemoveHead", ["obj"], ["obj"], "p>u", "list"),
     "CConverter::~CConverter": op(0x10019358, "ConverterDtor", ["obj", "$0"], ["obj", "$0"], "pi>u", "none", this=True,

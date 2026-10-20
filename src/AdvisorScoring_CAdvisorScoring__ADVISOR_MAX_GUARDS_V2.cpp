@@ -1,4 +1,5 @@
-// Unit v5108: the eight "max staff" advisor scorers (CAdvisorScoring::_ADVISOR_MAX_*, 0x10016e68 .. 0x10017460).
+// Unit v5108: the eight "max staff" advisor scorers (CAdvisorScoring::_ADVISOR_MAX_*, 0x10016e68 .. 0x10017460); unit v5L21 added the
+// ninth, _ADVISOR_MAX_MECHANICS (0x100170b0), and _ADVISOR_BOAT_ARRIVED (0x10017ae4).
 // Each compares a staff-limit slot of gMainBalance (Mac +0x2a8 .. +0x2b8) with a slot of the advisor's own balance table, then asks the park
 // analyser how many staff of one type there are. The Mac offsets in the comments are of the 4-byte slots; the host's slots are wider.
 #include <cstdint>
@@ -43,6 +44,13 @@ int32_t CAdvisorScoring::_ADVISOR_MAX_ENTERTAINERS_V2() {
     return 0;
 }
 
+// 0x100170b0
+int32_t CAdvisorScoring::_ADVISOR_MAX_MECHANICS() {
+    if (MainSlot(0x2ac) != AdvisorSlot(this, 0x3a4)) return 0;
+    if (StaffCount(4) < AdvisorSlot(this, 0x3a4)) return 0;
+    return AdvisorSlot(this, 0x3a8);
+}
+
 // 0x10017168
 int32_t CAdvisorScoring::_ADVISOR_MAX_MECHANICS_V2() {
     if (MainSlot(0x2ac) == AdvisorSlot(this, 0x3a4)) return 0;
@@ -77,3 +85,6 @@ int32_t CAdvisorScoring::_ADVISOR_MAX_RESEARCHERS_V2() {
     if (StaffCount(8) == MainSlot(0x2b8)) return AdvisorSlot(this, 0x3c4);
     return 0;
 }
+
+// 0x10017ae4: the advisor table's value at 0x40c, nothing else.
+int32_t CAdvisorScoring::_ADVISOR_BOAT_ARRIVED() { return AdvisorSlot(this, 0x40c); }

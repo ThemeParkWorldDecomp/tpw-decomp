@@ -81,6 +81,11 @@ int32_t tpw_index_call(TbIResourceIndex* p, int32_t op, int32_t slot, uint32_t i
         value = found ? int32_t(found - p->mFirst) : -1;
         break;
     }
+    case 10: {
+        auto* found = p->GetItem(id);
+        value = found ? int32_t(found - p->mFirst) : -1;
+        break;
+    }
     case 7: new (&resource) Resource; break;
     case 8:
         if (slot < 0) p->mFirst = nullptr;

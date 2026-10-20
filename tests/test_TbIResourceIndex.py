@@ -1,4 +1,5 @@
-"""Resource-index tests: fields and file records compare as values, pointers as labels."""
+"""Resource-index tests: fields and file records compare as values, pointers as labels.
+Unit v5L21 adds TbIResourceIndex::GetItem 0x1000383c (op 10, the same calls as GetResourceItemHandle)."""
 import ctypes as C
 import random
 import struct
@@ -15,7 +16,7 @@ LABELS = ["__ct__16TbIResourceIndexFv", "GetResource__16TbIResourceIndexFPvPPv",
           "OpenResourceFile__16TbIResourceIndexFRQ33bfl10FileSystem5CFilePQ216TbIResourceIndex17resourceIndexItem",
           "Initialise__16TbIResourceIndexFPCcPvUl", "GetResourceType__16TbIResourceIndexFPv",
           "GetResourceItemHandle__16TbIResourceIndexFUl", "__ct__10TbResourceFv", "Close__16TbIResourceIndexFv",
-          "__dt__16TbIResourceIndexFv"]
+          "__dt__16TbIResourceIndexFv", "GetItem__16TbIResourceIndexFUl"]
 
 
 def F(lib, name, restype, *args):
@@ -198,7 +199,7 @@ TESTS = [FnTest(name, lambda e, c, op=i: ppc(e, c, op), lambda l, c, op=i: host(
     "TbIResourceIndex::OpenResource", "TbIResourceIndex::OpenResourceFile",
     "TbIResourceIndex::Initialise", "TbIResourceIndex::GetResourceType",
     "TbIResourceIndex::GetResourceItemHandle", "TbResource::TbResource", "TbIResourceIndex::Close",
-    "TbIResourceIndex::~TbIResourceIndex"])]
+    "TbIResourceIndex::~TbIResourceIndex", "TbIResourceIndex::GetItem"])]
 
 
 def resource_ppc(e, c, op):

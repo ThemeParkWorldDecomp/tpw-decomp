@@ -4,6 +4,8 @@
   GetSampleLength, IsType, TbSoundSampleStore::operator[] (src/TbSoundSampleStore.cpp), __sinit_UserCallback_cpp, __sinit_TimerCodec_cpp,
   __sinit_TbSoundSampleWAVFile_cpp, the three _CS_ destructors, CRefManager::CRefManager, TbStaticFileBank::IsType,
   TbDynamicStringTemplate<char>::operator_const_char*, std::powf, LB_MIN<int,int>, std::fabs (two), std::fabsf, TbRect::TbRect.
+Unit v5L21 adds Bank::CBank::GetNumberOfSamples 0x100146a8 (slot +0x18, logged as 0x7018) and LB_MIN<unsigned int,unsigned int>
+0x100081c4 (the header template, unsigned compare).
 
 A case is a world and a call, built twice by one piece of Python code (emulator memory for the original, the host library's for the
 translation). The callees outside the unit are fakes on both sides that record the same events: the virtual-call glue 0x1002f154
@@ -29,7 +31,7 @@ MASK = 0xFFFFFFFF
 A = dict(mono=0x10014b14, head=0x10014aa8, stereo=0x10014a44, setspk=0x100149e8, sinit_cs=0x10014d1c, name=0x10014810,
          length=0x10014798, istype=0x1001463c, store=0x10015478, sinit_uc=0x10013ed0, d_timer=0x100139c8, sinit_timer=0x1001396c,
          refmgr=0x10013824, sfb=0x1001330c, nametext=0x10016bd8, powf=0x10012580, d_wavfile=0x10011c48, sinit_wavfile=0x10011be4,
-         lbmin=0x10011a98, fabs_f=0x10017bf8, fabsf=0x10017c38, fabs_d=0x10017c7c, rect=0x10018158, d_wav=0x100114ac)
+         lbmin=0x10011a98, lbminu=0x100081c4, count=0x100146a8, fabs_f=0x10017bf8, fabsf=0x10017c38, fabs_d=0x10017c7c, rect=0x10018158, d_wav=0x100114ac)
 GLUE, FREE, REG, POW, CSCTOR = 0x1002f154, 0x1002ea94, 0x1002eefc, 0x1002ee54, 0x10014d6c
 CLR_TIMER, CLR_WAV, CLR_WAVFILE, STORE_CONV = 0x100133f8, 0x10010e34, 0x10011534, 0x1000fd90
 ADDR = dict(mpSpeaker=0x1003f348)
@@ -119,7 +121,7 @@ def setup(runner):
     T.install_std_stubs(e)
     spk_vt = T.persist_alloc(e, 32, struct.pack(">5I", 0, 0, 0x7008, 0x700C, 0x7010) + bytes(12))
     SPK_ADDR = T.persist_alloc(e, 16, struct.pack(">I", spk_vt) + bytes(12))
-    bank_vt = T.persist_alloc(e, 0x40, bytes(0x20) + struct.pack(">I", 0x7020) + struct.pack(">I", 0x7024) + bytes(8)
+    bank_vt = T.persist_alloc(e, 0x40, bytes(0x18) + struct.pack(">I", 0x7018) + bytes(4) + struct.pack(">I", 0x7020) + struct.pack(">I", 0x7024) + bytes(8)
                               + struct.pack(">I", 0x7030) + bytes(12))
     BANK_ADDR = T.persist_alloc(e, 16, struct.pack(">I", bank_vt) + bytes(12))
 
@@ -216,6 +218,7 @@ def bind(lib):
     f("tpw_u_fabs_f", C.c_float, [C.c_float])
     f("tpw_u_fabsf", C.c_float, [C.c_float])
     f("tpw_u_fabs_d", C.c_double, [C.c_double])
+    f("tpw_u_lbminu", C.c_uint32, [C.c_uint64, C.c_uint64])
     f("tpw_u_lbmin", C.c_uint32, [C.c_uint64, C.c_uint64])
     f("tpw_u_rect", None, [C.c_uint64])
     out = (C.c_int64 * 32)()
@@ -227,7 +230,7 @@ def bind(lib):
 # ---------------------------------------------------------------------------------------------------------------- the world and the call
 SINIT = dict(sinit_cs=0, sinit_uc=1, sinit_timer=2, sinit_wavfile=3)
 SPEAKER = dict(mono=0, head=1, stereo=2)
-BANK = dict(name=0, length=1, istype=2)
+BANK = dict(name=0, length=1, istype=2, count=3)
 DTOR = dict(d_timer=0, d_wavfile=1, d_wav=2)
 
 
@@ -331,14 +334,14 @@ def execute(s, case):
         else:
             f1 = s.lib.tpw_u_fabs_d(bitsd(a[0]))
         obs["answer"] = canon_d(db(f1))
-    elif op == "lbmin":
+    elif op in ("lbmin", "lbminu"):
         blk = s.alloc(16)
         s.words(blk, [a[0], a[1], 0, 0])
         if P:
             r = s.call(A[op], [blk, blk + 4])[0]
             obs["answer"] = 0 if r == blk else (1 if r == blk + 4 else 2)
         else:
-            obs["answer"] = s.lib.tpw_u_lbmin(blk, blk + 4)
+            obs["answer"] = (s.lib.tpw_u_lbmin if op == "lbmin" else s.lib.tpw_u_lbminu)(blk, blk + 4)
     elif op == "rect":
         blk = s.alloc(16)
         s.words(blk, a)
@@ -535,6 +538,7 @@ TESTS = [
     mk("Bank::CBank::GetSampleName", "name", bank_edges(VALUES), bank_rnd([])),
     mk("Bank::CBank::GetSampleLength", "length", bank_edges(VALUES), bank_rnd([])),
     mk("Bank::CBank::IsType", "istype", bank_edges([0, 1]), bank_rnd([0, 1])),
+    mk("Bank::CBank::GetNumberOfSamples", "count", bank_edges(VALUES), bank_rnd([])),
     mk("TbSoundSampleStore::operator[]", "store", store_edges, store_rnd),
     mk("__sinit_UserCallback_cpp", "sinit_uc", none_edges, none_rnd),
     mk("_CS_TbTimerCodec::~_CS_TbTimerCodec", "d_timer", dtor_edges, dtor_rnd),
@@ -546,6 +550,7 @@ TESTS = [
     mk("_CS__TbSoundSampleWAVFile::~_CS__TbSoundSampleWAVFile", "d_wavfile", dtor_edges, dtor_rnd),
     mk("__sinit_TbSoundSampleWAVFile_cpp", "sinit_wavfile", none_edges, none_rnd),
     mk("LB_MIN<int,int>", "lbmin", lbmin_edges, lbmin_rnd),
+    mk("LB_MIN<unsigned_int,unsigned_int>", "lbminu", lbmin_edges, lbmin_rnd),
     mk("std::fabs@0x10017bf8", "fabs_f", float_edges, float_rnd),
     mk("std::fabsf", "fabsf", float_edges, float_rnd),
     mk("std::fabs@0x10017c7c", "fabs_d", double_edges, double_rnd),

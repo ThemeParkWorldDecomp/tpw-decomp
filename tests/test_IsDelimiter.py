@@ -33,7 +33,7 @@ PROGRAM = "ltms symbols shared"
 SHIM_LIBRARY = "unit_IsDelimiter"
 MASK = 0xFFFFFFFF
 
-FN = dict(isdelim=0x100068c4, sinit=0x10004068, sethj=0x1000632c, vchar=0x100060ec, clist=0x10006060, vline=0x10005fb0,
+FN = dict(isdelim=0x100068c4, isparen=0x10006864, sinit=0x10004068, sethj=0x1000632c, vchar=0x100060ec, clist=0x10006060, vline=0x10005fb0,
           vpoint=0x10005e7c, uni=0x10005674, addref=0x10005324, smb=0x1000514c, smu=0x10004f64, mslstr=0x10008274,
           lwhat=0x100089a0, ewhat=0x100089d8, refc=0x10008a10, sw16=0x100043e4, sw32=0x1000439c, rle=0x10004150,
           fmt=0x1000937c, mb=0x100032a8)
@@ -281,6 +281,7 @@ def _sm(kind):
 
 HOST_CALLS = {
     "isdelim": lambda lib, a: lib.tpw_u_isdelim(a[0]),
+    "isparen": lambda lib, a: lib.tpw_u_isparen(a[0]),
     "sethj": lambda lib, a: lib.tpw_u_sethj(a[0], s32(a[1])),
     "vchar": _vec(0), "vline": _vec(1), "vpoint": _vec(2), "clist": _vec(3),
     "uni": _cd(0), "mb": _cd(1), "rle": _cd(2),
@@ -311,6 +312,7 @@ def bind(lib):
     sig("layout", i32, C.POINTER(C.c_int64))
     sig("sinit", None)
     sig("isdelim", u32, u64)
+    sig("isparen", u32, u64)
     sig("sethj", i32, u64, i32)
     sig("vdtor", u64, i32, u64, i32)
     sig("cdtor", u64, i32, u64, i32)
@@ -349,7 +351,7 @@ def run(s, case):
 def build(s, case):
     op = case["op"]
     A = s.A
-    if op == "isdelim":
+    if op in ("isdelim", "isparen"):
         s.write(A(1), case["rest"])
         s.hw(A(1), case["ch"])
     elif op == "sethj":
@@ -380,8 +382,8 @@ def build(s, case):
 
 def execute(s, case):
     op, A = case["op"], s.A
-    if op == "isdelim":
-        return s.call("isdelim", [A(1)])
+    if op in ("isdelim", "isparen"):
+        return s.call(op, [A(1)])
     if op == "sethj":
         if isinstance(s, Host):
             r = s32(s.call("sethj", [A(1), case["value"]]))
@@ -513,6 +515,21 @@ def isdelim_edges():
     r = random.Random(101)
     for ch in (0x20, 0x2C, 0x1F, 0x21, 0x2B, 0x2D, 0, 0x120, 0x20 << 8, 0x2C << 8, 0xFFFF, 0x8020, 0x802C, 0x09, 0x2E):
         yield isdelim_case(r, ch)
+
+
+# ---- IsParenthesis (unit v5L21)
+def isparen_case(r, ch=None):
+    c = isdelim_case(r, ch)
+    c["op"] = "isparen"
+    if ch is None:
+        c["ch"] = r.choice([0x28, 0x29, 0x27, 0x2A, 0x5B, 0x5D, 0, 0x128, 0x2800, 0x2900, 0xFFFF, r.randrange(65536)])
+    return c
+
+
+def isparen_edges():
+    r = random.Random(102)
+    for ch in (0x28, 0x29, 0x27, 0x2A, 0x5B, 0x5D, 0x7B, 0x7D, 0, 0x128, 0x129, 0x28 << 8, 0x29 << 8, 0xFFFF, 0x8028, 0x8029):
+        yield isparen_case(r, ch)
 
 
 # ---- sethj
@@ -711,6 +728,7 @@ def edges_of(gen):
 
 TESTS = [
     FnTest("IsDelimiter", ppc, host, edge=isdelim_edges, rnd=rnd(isdelim_case)),
+    FnTest("IsParenthesis", ppc, host, edge=isparen_edges, rnd=rnd(isparen_case)),
     FnTest("__sinit_TbIResourceIndex_cpp", ppc, host, edge=sinit_edges, rnd=sinit_case),
     FnTest("TbTextFormatter::SetHorizontalJustification", ppc, host, edge=sethj_edges, rnd=rnd(sethj_case)),
     FnTest("std::vector<CCharacterInfo,std::allocator<CCharacterInfo>>::~vector", ppc, host, edge=vec_edges("vchar"), rnd=rnd(vec_case, "vchar")),

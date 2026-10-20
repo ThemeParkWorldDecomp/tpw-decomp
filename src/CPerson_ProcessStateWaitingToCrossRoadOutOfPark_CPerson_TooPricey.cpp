@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "MainBalance.h"
+#include "ObjectControl.h"
 #include "ThingReceivers.h"
 #include "World.h"
 #include "analyser.h"
@@ -90,9 +91,9 @@ bool CPerson::TooPricey(CObject* object) const {
     uint32_t chance = object->GetChanceOfWinning() & 0xff;
     uint32_t prize = 0;
     if (At<int32_t>(static_cast<const void*>(object->GetDBInfo()), 0x7a8) == 2) prize = object->GetPrizeValue();
-    CObjectControl* control = object->GetControl();
+    ObjectControl* control = object->GetControl();
     int32_t winnings = Div100(static_cast<int32_t>(chance * prize));
-    uint32_t controlFactor = static_cast<uint32_t>(control->mF0C + 100);
+    uint32_t controlFactor = static_cast<uint32_t>(control->mRipOffOK + 100);
     uint32_t happyFactor = Low8(At<float>(this, 0x19c)) + 100;
     value = (value + static_cast<uint32_t>(winnings)) * controlFactor;
     value = UDiv100(value);

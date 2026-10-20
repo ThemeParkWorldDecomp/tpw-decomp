@@ -114,6 +114,10 @@ const char* FakeName(void* self, uint32_t index) {
     ev("vcall", {0x7024, lab(self), static_cast<int64_t>(static_cast<int32_t>(index))});
     return reinterpret_cast<const char*>(static_cast<uintptr_t>(static_cast<uint32_t>(ret("vcall"))));
 }
+int32_t FakeCount(void* self) {
+    ev("vcall", {0x7018, lab(self)});
+    return static_cast<int32_t>(ret("vcall"));
+}
 bool FakeIsType(void* self, uint32_t type) {
     ev("vcall", {0x7030, lab(self), static_cast<int64_t>(static_cast<int32_t>(type))});
     return static_cast<uint32_t>(ret("vcall")) != 0;
@@ -124,6 +128,7 @@ void SetupBank() {
     gBankReady = true;
     gBankVtable[SlotOf(&TbBank::GetSampleLength)] = reinterpret_cast<void*>(&FakeLength);
     gBankVtable[SlotOf(&TbBank::GetSampleName)] = reinterpret_cast<void*>(&FakeName);
+    gBankVtable[SlotOf(&TbBank::GetNumberOfSamples)] = reinterpret_cast<void*>(&FakeCount);
     gBankVtable[SlotOf(static_cast<bool (TbBank::*)(uint32_t) const>(&TbBank::IsType))] = reinterpret_cast<void*>(&FakeIsType);
 }
 
@@ -268,6 +273,7 @@ uint64_t tpw_u_bank(int32_t op, int32_t has, uint32_t index) {
     bank->mBank = has ? reinterpret_cast<TbBank*>(&gBankObj) : nullptr;
     if (op == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(bank->GetSampleName(index)));
     if (op == 1) return bank->GetSampleLength(index);
+    if (op == 3) return static_cast<uint32_t>(bank->GetNumberOfSamples());
     return bank->IsType(index) ? 1 : 0;
 }
 
@@ -309,6 +315,12 @@ float tpw_u_fabsf(float x) { return tbstd::fabsf(x); }
 double tpw_u_fabs_d(double x) { return tbstd::fabs(x); }
 
 // 0 when LB_MIN answers the first, 1 the second.
+uint32_t tpw_u_lbminu(uint64_t a, uint64_t b) {
+    const uint32_t* pa = reinterpret_cast<const uint32_t*>(static_cast<uintptr_t>(a));
+    const uint32_t* pb = reinterpret_cast<const uint32_t*>(static_cast<uintptr_t>(b));
+    const uint32_t& answer = LB_MIN<uint32_t, uint32_t>(*pa, *pb);
+    return &answer == pa ? 0 : 1;
+}
 uint32_t tpw_u_lbmin(uint64_t a, uint64_t b) {
     const int* pa = reinterpret_cast<const int*>(static_cast<uintptr_t>(a));
     const int* pb = reinterpret_cast<const int*>(static_cast<uintptr_t>(b));

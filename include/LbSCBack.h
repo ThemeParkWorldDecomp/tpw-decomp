@@ -33,9 +33,10 @@ struct LbAppResult { int32_t mCode; };
 extern "C" void __construct_array(void* array, void* ctor, void* dtor, int32_t size, int32_t count);
 extern "C" void __register_global_object(void* object, void* destructor, void* node);
 
-// Not translated yet (empty stand-ins, defined in LbFile_LbApp_GetWindowsScreenMode.cpp).
+// Empty host adapters for __construct_array (defined in LbFile_LbApp_GetWindowsScreenMode.cpp): the bodies are translated (unit v51127,
+// v5L21) but the host's gLbSCBack keeps the Mac's 0x10-byte stride, which a host TbPtrList does not fit.
 void LbSEFunctionList_Construct(void* self);        // TbPtrList<_LbSEFunction>::TbPtrList 0x100144f0
-void LbSEFunctionList_Destruct(void* self);         // TbPtrList<_LbSEFunction>::~TbPtrList 0x10014450
+void LbSEFunctionList_Destruct(void* self);         // TbPtrList<_LbSEFunction>::~TbPtrList 0x10014450 (body: TbPtrList_LbSEFunction_DtorBody)
 void LbSystemEventCallback_Destruct(void* self);    // _LbSystemEventCallback::~_LbSystemEventCallback 0x10014564
 
 // The global at 0x10073e0c: six lists of 16 bytes, then the critical section handle.
@@ -104,6 +105,8 @@ TbPtrList<_LbSEFunction>* TbPtrList_LbSEFunction_Ctor(TbPtrList<_LbSEFunction>* 
 // TbTList<_LbSEFunction*,_LbSEFunction*>: ~TbTList 0x1001491c (flag: the hidden delete-storage short), RemoveAll 0x100149c8 and
 // RemoveHead 0x10014a78 are explicit specialisations of the members; the constructor is 0x100148b8 (outside the unit).
 TbTList<_LbSEFunction*, _LbSEFunction*>* TbTListLbSEFunction_DtorBody(TbTList<_LbSEFunction*, _LbSEFunction*>* self, int16_t flag);
+// TbPtrList<_LbSEFunction>::~TbPtrList 0x10014450 (unit v5L21, flag: the hidden delete-storage short); answers this.
+TbPtrList<_LbSEFunction>* TbPtrList_LbSEFunction_DtorBody(TbPtrList<_LbSEFunction>* self, int16_t flag);
 CConverter* CConverter_DtorBody(CConverter* self, int16_t flag);   // 0x10019358
 namespace SamsUtilities {
 namespace UBinary { uint32_t RotateLeft_ulong(uint32_t value, int32_t amount); }   // 0x10019f3c

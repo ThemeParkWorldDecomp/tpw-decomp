@@ -80,6 +80,8 @@ int32_t tpw_adv_call(int32_t which, uint64_t object) {
         case 4: return self->_ADVISOR_MAX_GUARDS();
         case 5: return self->_ADVISOR_MAX_GUARDS_V2();
         case 6: return self->_ADVISOR_MAX_RESEARCHERS();
+        case 8: return self->_ADVISOR_MAX_MECHANICS();
+        case 9: return self->_ADVISOR_BOAT_ARRIVED();
         default: return self->_ADVISOR_MAX_RESEARCHERS_V2();
     }
 }

@@ -11,6 +11,7 @@
 #include "calllog.h"
 #include "platform/arena.h"
 #include "MainBalance.h"
+#include "ObjectControl.h"
 #include "ThingReceivers.h"
 #include "World.h"
 #include "analyser.h"
@@ -42,9 +43,9 @@ uint32_t CObject::GetPrizeValue() const {
     ev("GetPrizeValue", {lab(static_cast<const void*>(this))});
     return static_cast<uint32_t>(ret("GetPrizeValue"));
 }
-CObjectControl* CObject::GetControl() {
+ObjectControl* CObject::GetControl() {
     ev("GetControl", {lab(static_cast<const void*>(this))});
-    return reinterpret_cast<CObjectControl*>(gControl);
+    return reinterpret_cast<ObjectControl*>(gControl);
 }
 uint8_t CObject::GetExcitementLevel(bool flag) const {
     ev("GetExcitementLevel", {lab(static_cast<const void*>(this)), flag ? 1 : 0});
@@ -82,7 +83,7 @@ uint64_t tpw_t_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_c
 
 int32_t tpw_t_layout(int64_t* out) {
     int32_t n = 0;
-    out[n++] = static_cast<int64_t>(offsetof(CObjectControl, mF0C));
+    out[n++] = static_cast<int64_t>(offsetof(ObjectControl, mRipOffOK));
     return n;
 }
 

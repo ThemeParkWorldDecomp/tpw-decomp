@@ -93,6 +93,16 @@ TbTList<_LbSEFunction*, _LbSEFunction*>* TbTListLbSEFunction_DtorBody(TbTList<_L
     return self;
 }
 
+// TbPtrList<_LbSEFunction>::~TbPtrList 0x10014450 (unit v5L21): the list's vtable, the base destructor with no delete, then the
+// storage when the flag is positive; answers this.
+TbPtrList<_LbSEFunction>* TbPtrList_LbSEFunction_DtorBody(TbPtrList<_LbSEFunction>* self, int16_t flag) {
+    if (self != nullptr) {
+        TbTListLbSEFunction_DtorBody(self, 0);
+        if (flag > 0) LbSE_OperatorDelete(self);
+    }
+    return self;
+}
+
 // CConverter::~CConverter 0x10019358.
 CConverter* CConverter_DtorBody(CConverter* self, int16_t flag) {
     if (self != nullptr) {

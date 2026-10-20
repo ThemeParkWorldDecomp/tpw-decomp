@@ -103,7 +103,8 @@ uint16_t TbIResourceIndex::GetResourceType(void* handle) {
     return handle ? static_cast<resourceIndexItem*>(handle)->mType : 6;
 }
 
-void* TbIResourceIndex::GetResourceItemHandle(uint32_t id) {
+// 0x1000383c (unit v5L21): the binary search over the sorted ids between the sentinels mFirst - 1 and mLast + 1; NULL when absent.
+TbIResourceIndex::resourceIndexItem* TbIResourceIndex::GetItem(uint32_t id) {
     // Integer positions preserve the original's sentinels without forming a pointer
     // before the allocation.
     std::ptrdiff_t low = -1;
@@ -117,3 +118,6 @@ void* TbIResourceIndex::GetResourceItemHandle(uint32_t id) {
     }
     return nullptr;
 }
+
+// The same search, emitted again (128 bytes each).
+void* TbIResourceIndex::GetResourceItemHandle(uint32_t id) { return GetItem(id); }

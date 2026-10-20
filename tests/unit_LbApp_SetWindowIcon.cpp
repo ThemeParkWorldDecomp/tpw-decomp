@@ -103,6 +103,9 @@ uint32_t tpw_lbapp_GetHInstance() { return P(LbApp_GetHInstance()); }
 
 uint32_t tpw_lbapp_PtrListCtor(uint64_t self) { return P(TbPtrList_LbSEFunction_Ctor(A<TbPtrList<_LbSEFunction>>(self))); }
 uint32_t tpw_lbapp_ListDtor(uint64_t self, int32_t flag) { return P(TbTListLbSEFunction_DtorBody(A<LbList>(self), static_cast<int16_t>(flag))); }
+uint32_t tpw_lbapp_PtrListDtor(uint64_t self, int32_t flag) {
+    return P(TbPtrList_LbSEFunction_DtorBody(A<TbPtrList<_LbSEFunction>>(self), static_cast<int16_t>(flag)));
+}
 void tpw_lbapp_RemoveAll(uint64_t self) { A<LbList>(self)->RemoveAll(); }
 uint32_t tpw_lbapp_RemoveHead(uint64_t self) { return P(A<LbList>(self)->RemoveHead()); }
 uint32_t tpw_lbapp_ConverterDtor(uint64_t self, int32_t flag) { return P(CConverter_DtorBody(A<CConverter>(self), static_cast<int16_t>(flag))); }

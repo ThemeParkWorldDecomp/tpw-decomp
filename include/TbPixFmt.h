@@ -25,6 +25,21 @@ extern TbPixFormat TbPixFormat16;   // 0x10073eb8  x1r5g5b5
 extern TbPixFormat TbPixFormat24;   // 0x10073ea0
 extern TbPixFormat TbPixFormat32;   // 0x10073e88  a8r8g8b8
 
+// Colour.cpp's records (src/bfl_Colour.cpp, __sinit_Colour_cpp 0x1001a104, unit v5L21; invented names, by layout).
+extern TbPixFormat gColourFormatRGBA8888;          // 0x10073f38
+extern TbPixFormat gColourFormatRGBA4444;          // 0x10073f50
+extern TbPixFormat gColourFormatXBGR8888;          // 0x10073f68
+extern TbPixFormat gColourFormatXRGB8888;          // 0x10073f80
+extern TbPixFormat gColourFormatABGR8888;          // 0x10073f98
+extern TbPixFormat gColourFormatARGB8888;          // 0x10073fb0
+extern TbPixFormat gColourFormatBGR888;            // 0x10073fc8
+extern TbPixFormat gColourFormatRGB888;            // 0x10073fe0
+extern TbPixFormat gColourFormatARGB4444;          // 0x10073ff8
+extern TbPixFormat gColourFormatRGB565;            // 0x10074010
+extern TbPixFormat gColourFormatXRGB1555;          // 0x10074028
+extern TbPixFormat gColourFormatARGB1555;          // 0x10074040
+extern TbPixFormat gColourFormatARGB8888Default;   // 0x10074058
+
 // How to move one channel so that its top bit lands on bit `topBit`: shift right by
 // mShiftRight or left by mShiftLeft (one of them is 0). A zero mask counts as bit 31.
 class TbMaskInfo {

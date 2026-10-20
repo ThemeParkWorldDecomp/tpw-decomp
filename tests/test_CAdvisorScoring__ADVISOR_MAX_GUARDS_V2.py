@@ -2,12 +2,13 @@
 (tests/unit_CAdvisorScoring__ADVISOR_MAX_GUARDS_V2.cpp), main app, src/AdvisorScoring_CAdvisorScoring__ADVISOR_MAX_GUARDS_V2.cpp:
   _ADVISOR_MAX_HANDYMEN_V2 0x10016e68, _ADVISOR_MAX_ENTERTAINERS 0x10016f2c, _ADVISOR_MAX_ENTERTAINERS_V2 0x10016fe8,
   _ADVISOR_MAX_MECHANICS_V2 0x10017168, _ADVISOR_MAX_GUARDS 0x10017230, _ADVISOR_MAX_GUARDS_V2 0x100172e4,
-  _ADVISOR_MAX_RESEARCHERS 0x100173a8, _ADVISOR_MAX_RESEARCHERS_V2 0x10017460
+  _ADVISOR_MAX_RESEARCHERS 0x100173a8, _ADVISOR_MAX_RESEARCHERS_V2 0x10017460; unit v5L21: _ADVISOR_MAX_MECHANICS 0x100170b0 and
+  _ADVISOR_BOAT_ARRIVED 0x10017ae4 (the table's value at 0x40c; no call)
 
 A case is a world and a call. The world is built by one piece of Python code in both memories. CWorld::GetParkAnalyser and
 CParkAnalyser::NumberOfStaffType are fakes on both sides that record their arguments; the count answers from the case's queue.
 
-The world: gGameWorld, the five staff-limit slots of gMainBalance (Mac +0x2a8..+0x2b8) and the scoring object's slots (Mac +0x38c..+0x3c4),
+The world: gGameWorld, the five staff-limit slots of gMainBalance (Mac +0x2a8..+0x2b8) and the scoring object's slots (Mac +0x38c..+0x3c4 and +0x40c),
 small values so that the equalities and the thresholds are hit. Compared: the answer and the event log. No fused operations.
 Not tested: a NULL gGameWorld (the original reads it unconditionally).
 """
@@ -32,6 +33,8 @@ FUNCS = {
     "_ADVISOR_MAX_GUARDS_V2": (0x100172E4, 132, 5, 7, "_ADVISOR_MAX_GUARDS_V2__15CAdvisorScoringFv"),
     "_ADVISOR_MAX_RESEARCHERS": (0x100173A8, 120, 6, 8, "_ADVISOR_MAX_RESEARCHERS__15CAdvisorScoringFv"),
     "_ADVISOR_MAX_RESEARCHERS_V2": (0x10017460, 132, 7, 8, "_ADVISOR_MAX_RESEARCHERS_V2__15CAdvisorScoringFv"),
+    "_ADVISOR_MAX_MECHANICS": (0x100170B0, 120, 8, 4, "_ADVISOR_MAX_MECHANICS__15CAdvisorScoringFv"),
+    "_ADVISOR_BOAT_ARRIVED": (0x10017AE4, 8, 9, 0, "_ADVISOR_BOAT_ARRIVED__15CAdvisorScoringFv"),
 }
 OWN = {a for a, *_ in FUNCS.values()}
 
@@ -41,7 +44,7 @@ MAIN_BALANCE = 0x102B4568
 GAME_WORLD = 0x1037EBFC
 
 BAL_OFFS = [0x2A8, 0x2AC, 0x2B0, 0x2B4, 0x2B8]
-OBJ_OFFS = list(range(0x38C, 0x3C8, 4))
+OBJ_OFFS = list(range(0x38C, 0x3C8, 4)) + [0x40C]
 
 STUBS = CL.Stubs()
 STUBS.real.update(OWN)
@@ -99,7 +102,7 @@ class Ppc(Side):
         self.words(MAIN_BALANCE + off, [v])
 
     def new_obj(self):
-        self.obj = self.e.alloc(0x400)
+        self.obj = self.e.alloc(0x410)
 
     def set_obj(self, off, v):
         self.words(self.obj + off, [v])

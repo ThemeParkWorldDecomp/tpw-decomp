@@ -176,8 +176,8 @@ void CObject::GetSignNameB(char16_t* buffer, uint32_t size) {
     ev("GetSignNameB", {objTag(this), whichBuf(buffer), I(size)});
     copyText(buffer, gSignB);
 }
-void CObject::SetSignNameA(char16_t* text) { evText("SetSignNameA", objTag(this), text); }
-void CObject::SetSignNameB(char16_t* text) { evText("SetSignNameB", objTag(this), text); }
+void CObject::SetSignNameA(const char16_t* text) { evText("SetSignNameA", objTag(this), text); }
+void CObject::SetSignNameB(const char16_t* text) { evText("SetSignNameB", objTag(this), text); }
 
 void CFSGlobalMasterSave::SetSignNameA(const char16_t* text) { evText("MasterSetSignNameA", lab(this), text); }
 void CFSGlobalMasterSave::SetSignNameB(const char16_t* text) { evText("MasterSetSignNameB", lab(this), text); }
