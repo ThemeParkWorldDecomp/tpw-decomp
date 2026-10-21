@@ -7,6 +7,7 @@
 #include <string>
 
 #include "email.h"
+#include "platform/macdoze.h"
 
 namespace {
 const char kAddressBookFile[] = ":addrbook.dat";

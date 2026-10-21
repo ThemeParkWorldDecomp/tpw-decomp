@@ -11,6 +11,11 @@ The world of a case: the globals, fake track cells (never dereferenced), the thi
 the things (kind +2, next +0xa, script handle +0xc), the hot sprite and the mouse. What is compared: the answer (as a thing number), the
 globals written and the event log.
 
+The widescreen peep point (unit v5L51): a library built with the port fixes, with the unit space of a 16:9 screen (2730 units), puts the
+pointer's x in the view's -1..1 as x times (2 / 2730), less 1, where the Mac has x / 1024 - 1. "the widescreen peep point" runs cases on the
+original and expects that hot x from the host, the rest unchanged. A library built without the port fixes keeps x / 1024 - 1; there its own
+hot x is replaced the same way, so the test is the 4:3 comparison again.
+
 No fused operations that round (the products are exact). Not tested: a direction other than 1, 4, 0x10, 0x40 in RemoveBridge (the original
 then uses the caller's r25 and r26, undefined), a thing list that is not finished or reaches a missing thing.
 """
@@ -329,6 +334,8 @@ def ppc(e, case):
 
 
 def host(lib, case):
+    lib.tpw_rb_unitwidth.restype, lib.tpw_rb_unitwidth.argtypes = C.c_int32, [C.c_int32]
+    lib.tpw_rb_unitwidth(case.get("units", 0x800))
     return run(Host(lib, case), case)
 
 
@@ -415,7 +422,50 @@ def pt_random(r):
     return pt_case(r)
 
 
+# ---------------------------------------------------------------------------------------------------------------- the widescreen peep point
+
+WIDE_UNITS = 2730   # the unit space of a 16:9 screen (3840 x 2160, or 2730 x 1536)
+
+
+def f32(v):
+    return struct.unpack(">f", struct.pack(">f", v))[0]
+
+
+def wide_hot(out, case):
+    """out with the hot x the widescreen gives: UI_UnitToViewX (include/UI_Base.h), x times (2 / units) less 1, each step a single."""
+    x = T.s16(case["queues"]["mx"][0])
+    hot = f32(f32(x * f32(2.0 / WIDE_UNITS)) - 1.0)
+    out = dict(out)
+    out["hot"] = [struct.unpack(">I", struct.pack(">f", hot))[0]] + list(out["hot"][1:])
+    return out
+
+
+def wide_case(r, mx=None):
+    c = pt_case(r)
+    c["units"] = WIDE_UNITS
+    c["queues"]["mx"] = [r.randrange(0, WIDE_UNITS) if mx is None else mx]
+    return c
+
+
+def wide_edges():
+    r = random.Random(5151)
+    for mx in (0, 1, 1024, 1365, 2047, 2048, 2729, -1, 32767, -32768):
+        yield wide_case(r, mx)
+
+
+def ppc_wide(e, case):
+    return wide_hot(ppc(e, case), case)
+
+
+def host_wide(lib, case):
+    out = host(lib, case)
+    if lib.tpw_rb_unitwidth(0x800) == 0:
+        out = wide_hot(out, case)
+    return out
+
+
 TESTS = [
     FnTest("RemoveBridge", ppc, host, edge=rb_edges, rnd=rb_random),
     FnTest("LLCC_SystemGetPointedPeepThing", ppc, host, edge=pt_edges, rnd=pt_random),
+    FnTest("the widescreen peep point", ppc_wide, host_wide, edge=wide_edges, rnd=wide_case),
 ]

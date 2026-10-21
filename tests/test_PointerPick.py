@@ -13,6 +13,12 @@ of gPointedRide, the once byte and factor, gPointedRidePosition, and the call lo
 Unicorn computes fmadds in double precision and rounds twice; HardwareRounding (a code hook per fused instruction, as in
 test_RideAnimInterp.py) gives each the processor's single rounding.
 
+The widescreen pick (unit v5L51): a library built with the port fixes, with the unit space of a 16:9 screen (2730 units), scales the x of the
+three corners by 0.75 view centre x / view centre y before they go through the camera matrix, so the ray reaches as far across as the
+widened 3D view. "the widescreen pick" runs 16:9 cases on the original as they are and expects the host's log to hold the same corners
+with x scaled that way, the rest unchanged. A library built without the port fixes keeps the 4:3 corners; there its own log is scaled the
+same way, so the test is the 4:3 comparison again.
+
 Not tested: a ray that never ends (the original loops while the height is at or above the limit, so the cases keep the ray descending or
 make FindPointedRide answer a ride in the end); NaN and infinite inputs.
 """
@@ -317,6 +323,8 @@ def ppc(e, case):
 
 
 def host(lib, case):
+    lib.tpw_pp_unitwidth.restype, lib.tpw_pp_unitwidth.argtypes = C.c_int32, [C.c_int32]
+    lib.tpw_pp_unitwidth(case.get("units", 0x800))
     CL.host_begin(lib, {}, {"FindPointedRide": case["rides"], "RidePos": case["ridepos"], "Vec": case["vec"], "Dist": case["dist"]})
     lib.tpw_pp_labels()
 
@@ -338,4 +346,61 @@ def host(lib, case):
     return [[canon(w) for w in part] for part in out], CL.host_end(lib)
 
 
-TESTS = [FnTest("CalculatePointerWorldPosn", ppc, host, edge=edges, rnd=rnd)]
+# ------------------------------------------------------------------ the widescreen pick (unit v5L51)
+
+WIDE_UNITS = 2730   # the unit space of a 16:9 screen (3840 x 2160, or 2730 x 1536)
+
+
+def wide_scale(case):
+    """UI_PickAcrossScale (include/UI_Base.h): 0.75 times the view centre x, over the view centre y, each step a single."""
+    cx, cy = (struct.unpack(">f", struct.pack(">I", case[k]))[0] for k in ("cx", "cy"))
+    return f32(f32(0.75 * cx) / cy)
+
+
+def widen(log, case):
+    """The log with the x of each point sent through the camera matrix scaled as the widescreen pick scales it."""
+    k = wide_scale(case)
+    out = []
+    for name, ints, texts in log:
+        if name == "VectorThroughLMatrixNoWNoTrans":
+            x = struct.unpack(">f", struct.pack(">I", ints[1] & MASK))[0]
+            ints = (ints[0], fb(f32(x * k))) + tuple(ints[2:])
+        out.append((name, ints, texts))
+    return out
+
+
+def wide_case(r, **kw):
+    """A case on a 16:9 view: the view centre y as make draws it, x 16/9 of it, the pointer anywhere across."""
+    cy = f32(r.uniform(200, 800))
+    cx = f32(cy * 16.0 / 9.0)
+    kw.setdefault("px", fb(f32(r.uniform(0, 2 * cx))))
+    return make(r, cx=fb(cx), cy=fb(cy), units=WIDE_UNITS, **kw)
+
+
+def wide_edges():
+    import random
+    r = random.Random(5151)
+    # the pointer at the left edge, the middle and the right edge of a 3840 x 2160 view
+    for px in (0.0, 1920.0, 3839.0):
+        yield make(r, cx=fb(1920.0), cy=fb(1080.0), px=fb(px), py=fb(1080.0), fov=fb(f32(1.5707964)), factor=fb(f32(0.885)),
+                   once=1, mode=2, flags=2, nulls=0, units=WIDE_UNITS)
+    for _ in range(8):
+        yield wide_case(r, mode=2, flags=2, nulls=0)
+
+
+def ppc_wide(e, case):
+    out, log = ppc(e, case)
+    return out, widen(log, case)
+
+
+def host_wide(lib, case):
+    out, log = host(lib, case)
+    if lib.tpw_pp_unitwidth(0x800) == 0:
+        log = widen(log, case)
+    return out, log
+
+
+TESTS = [
+    FnTest("CalculatePointerWorldPosn", ppc, host, edge=edges, rnd=rnd),
+    FnTest("the widescreen pick", ppc_wide, host_wide, edge=wide_edges, rnd=wide_case),
+]

@@ -11,6 +11,7 @@
 #include "TPEngine.h"
 #include "TPGlobals.h"
 #include "TPMain.h"
+#include "UI_Base.h"
 #include "calllog.h"
 #include "platform/arena.h"
 
@@ -76,6 +77,11 @@ extern "C" void tpw_pp_labels() {
     tpw_cl_label(2, gRides[1]);
     tpw_cl_label(3, &gCameraViewPoint);
     tpw_cl_label(4, &gCameraMatrix);
+}
+// The unit space's width (the port's widescreen); 0 when the library is built without the port fixes.
+extern "C" int32_t tpw_pp_unitwidth(int32_t width) {
+    (void)width;
+    return 0;
 }
 extern "C" void tpw_pp_table(const uint32_t* words, int32_t n) {
     for (int32_t i = 0; i < n; ++i) reinterpret_cast<TPGlobals*>(gGlobalsStorage)->mSinTable[i] = FromBits(words[i]);

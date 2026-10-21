@@ -13,6 +13,10 @@ The world of a case: five windows (links, depth, pivot), the keyboard window glo
 pixel buffer, and the JPEG geometry the start fake writes into the decompressor. What is compared: the answer, every window's links
 and shorts, the keyboard window and the event log (the jpeg fakes log the row pointer as an offset from the pixel buffer).
 
+Port fix (unit v5L48): a library built with the port fix macro makes read_JPEG_file open the host file of its path (tpw::GamePathForReading, a
+recording fake that answers host_path) in place of the Mac path. There each host fopen must follow a GamePathForReading of the Mac path and
+open host_path of it; that pair is then compared as the Mac's one fopen of the path, and any other host fopen is marked unmapped, so it fails.
+
 No fused operations. Not tested: a NULL this window, a NULL window in the message functions (the original reads through it).
 """
 import ctypes as C
@@ -38,6 +42,11 @@ EMU_FILES = 0x7D3F50A8      # the emulator places the import __files at 0x7d3f50
 PPC_OFF = dict(next=0x50, prev=0x54, child=0x58, parent=0x5C, z=0xDC, px=0xE0, py=0xE2)
 HOST_NAMES = ["next", "prev", "child", "parent", "z", "px", "py"]
 WIN_SIZE = 0x138
+
+
+def host_path(path):
+    """The unit's fake tpw::GamePathForReading: "<host>/" and the path with ':' made '/'."""
+    return "<host>/" + path.replace(":", "/")
 NWIN = 5
 
 STUBS = CL.Stubs()
@@ -301,7 +310,20 @@ class Host(Side):
         C.memmove(a, data, len(data))
 
     def log(self):
-        return CL.host_end(self.lib)
+        log = CL.host_end(self.lib)
+        if self.lib.tpw_ilk_portfix() == 0:
+            return log
+        out = []
+        for ev in log:
+            if ev[0] != "fopen":
+                out.append(ev)
+                continue
+            prev = out[-1] if out else None
+            if prev is not None and prev[0] == "GamePathForReading" and ev[2][0] == host_path(prev[2][0]):
+                out[-1] = ("fopen", ev[1], (prev[2][0],) + ev[2][1:])
+            else:
+                out.append(("fopen unmapped",) + ev[1:])
+        return out
 
     def zero_windows(self):
         for i in self.addrs:
@@ -329,6 +351,7 @@ def bind(lib):
     getattr(lib, p + "addr").restype, getattr(lib, p + "addr").argtypes = C.c_uint64, [C.c_char_p]
     getattr(lib, p + "alloc").restype, getattr(lib, p + "alloc").argtypes = C.c_uint64, [C.c_uint32]
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]
+    lib.tpw_ilk_portfix.restype, lib.tpw_ilk_portfix.argtypes = C.c_int32, []
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
     lib.lay = list(out)[:n]
@@ -538,6 +561,11 @@ def jpeg_edges():
     yield jpeg_case(r, fopen=0x1234, setjmp=0, w=7, h=3, c_=1, s=0xFFFFFFFF)
     yield jpeg_case(r, fopen=0x1234, setjmp=0, w=0x10000000, h=3, c_=4, s=0)
     yield jpeg_case(r, fopen=0x1234, setjmp=0, w=0, h=3, c_=3, s=0)
+    # The Mac path of an outbox mail's picture, as UpdatePreview passes it (the port fix maps it to the user or game folder).
+    for fopen in (0, 0x1234):
+        c = jpeg_case(r, fopen=fopen, setjmp=0, w=7, h=2, c_=3, s=0)
+        c["path"] = b"TPW:Theme Park Data:save:users:1Tess:outbox:00000001.jpg"
+        yield c
 
 
 def jpeg_random(r):

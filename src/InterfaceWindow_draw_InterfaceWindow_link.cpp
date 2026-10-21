@@ -13,6 +13,7 @@
 #include "AdvisorScoring.h"
 #include "TbDynamicStringTemplate.h"
 #include "std_basic_ifstream.h"
+#include "platform/macdoze.h"
 
 // 0x101ddf20: makes `child` the LAST child of this window. Nothing happens (0) when `child` is NULL or has a parent or siblings already.
 // The flags a and b (the Mac's chars, tested as signed bytes) give the child the parent's depth plus 2 and the parent's pivot. Then the

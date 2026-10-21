@@ -274,6 +274,11 @@ namespace tpw {
 int32_t ReadFileReference(int32_t reference, uint32_t offset, void* buffer, uint32_t count);
 // The host file a game path ("data:levels:jungle:Features:x:x.hmp") is created or written as: the user folder's copy of that path,
 // its folders made (files.cpp's HostPathForWriting). CreateFile, and so TPFile_Open, finds that copy before the game folder's. For the
-// game's own fopen writes that the Mac made beside its data (unit v5L44, SaveRideHeightMap).
+// game's own fopen writes that the Mac made beside its data (unit v5L44, SaveRideHeightMap) and its MSL output streams (v5L48: the
+// address book, the outbox and its mails).
 std::string GamePathForWriting(const char* gamePath);
+// The host file a game path is read from: the user folder's copy, else the game folder's (files.cpp's FindHostPath, as CreateFile
+// finds it). A path neither folder has is given back as it is, so a host path still opens and a missing file still fails. For the
+// game's reads through fopen and the MSL input streams (unit v5L48: the outbox's mails and their pictures).
+std::string GamePathForReading(const char* gamePath);
 }  // namespace tpw

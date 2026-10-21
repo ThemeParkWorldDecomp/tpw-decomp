@@ -16,6 +16,7 @@
 #include "MapCell.h"
 #include "ObjectParts.h"
 #include "TrackCell.h"
+#include "UI_Base.h"
 #include "World.h"
 #include "analyser.h"
 #include "intrface.h"
@@ -138,6 +139,12 @@ void tpw_rb_removebridge(uint64_t cell, int32_t ax, int32_t ay, int32_t bx, int3
     MapDelta a{ax, ay, 0};
     MapDelta b{bx, by, 0};
     RemoveBridge(reinterpret_cast<CTrackCell*>(cell), a, b);
+}
+
+// The unit space's width (the port's widescreen); 0 when the library is built without the port fixes.
+int32_t tpw_rb_unitwidth(int32_t width) {
+    (void)width;
+    return 0;
 }
 
 uint64_t tpw_rb_peep() { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(LLCC_SystemGetPointedPeepThing())); }

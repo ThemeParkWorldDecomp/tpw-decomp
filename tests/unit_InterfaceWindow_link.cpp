@@ -2,6 +2,8 @@
 //   src/InterfaceWindow_draw_InterfaceWindow_link.cpp   InterfaceWindow::link, __sinit_ui_islandLobbyController_cpp,
 //   LobbyOnlineLoginPanelDlgMsg, AdressesTextPanelMsg, read_JPEG_file
 //
+// Built with the port fix (unit v5L48), read_JPEG_file opens tpw::GamePathForReading of its path, a recording fake here.
+//
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The windows
 // are raw blocks of a pool (no constructor runs); the first word of each is a vtable whose slots are all fakes, so a virtual call
 // is recorded with the Mac's vtable offset (SetText is slot 10 of the host's table and offset 0x2c of the Mac's).
@@ -24,6 +26,7 @@
 #include "AdvisorScoring.h"
 #include "TbDynamicStringTemplate.h"
 #include "std_basic_ifstream.h"
+#include "platform/macdoze.h"
 
 using namespace calllog;
 
@@ -121,6 +124,15 @@ int32_t JpegSetJmp(void* buffer) {
     return static_cast<int32_t>(ret("setjmp"));
 }
 }  // namespace outbox_callee
+
+// The host file of a game path, faked: "<host>/" and the path with its ':' made '/' (test_InterfaceWindow_link.host_path).
+std::string tpw::GamePathForReading(const char* gamePath) {
+    ev("GamePathForReading", std::initializer_list<int64_t>{}, {gamePath});
+    std::string host = std::string("<host>/") + gamePath;
+    for (char& c : host)
+        if (c == ':') c = '/';
+    return host;
+}
 
 extern "C" FILE* fopen(const char* path, const char* mode) {
     ev("fopen", {}, {path, mode});
@@ -221,6 +233,10 @@ int32_t tpw_ilk_login(uint64_t window, int32_t m, int32_t a, int32_t b) {
 }
 int32_t tpw_ilk_adr(uint64_t window, int32_t m, int32_t a, int32_t b) {
     return AdressesTextPanelMsg(reinterpret_cast<InterfaceWindow*>(window), m, a, b);
+}
+// 1 when the library is built with the port fix (read_JPEG_file opens the host file of its path), else 0.
+int32_t tpw_ilk_portfix() {
+    return 0;
 }
 int32_t tpw_ilk_jpeg(uint64_t path, uint64_t pixels) {
     gPixBase = static_cast<uintptr_t>(pixels);

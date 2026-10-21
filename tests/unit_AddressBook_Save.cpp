@@ -13,8 +13,13 @@
 #include "calllog.h"
 #include "platform/arena.h"
 #include "email.h"
+#include "platform/macdoze.h"
 
 using namespace calllog;
+
+// The weak stream glue in the source file (unit v5L48, a port fix) maps its path with tpw::GamePathForWriting; the fakes here replace
+// that glue, so the mapping is never called and only has to link.
+std::string tpw::GamePathForWriting(const char* gamePath) { return gamePath; }
 
 namespace {
 struct CaseData {

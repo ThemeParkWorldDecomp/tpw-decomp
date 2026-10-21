@@ -16,8 +16,13 @@
 #include "calllog.h"
 #include "platform/arena.h"
 #include "email.h"
+#include "platform/macdoze.h"
 
 using namespace calllog;
+
+// The weak stream glue in the source file (unit v5L48, a port fix) maps its path with tpw::GamePathForReading; the fakes here replace
+// that glue, so the mapping is never called and only has to link.
+std::string tpw::GamePathForReading(const char* gamePath) { return gamePath; }
 
 // Outbox::Outbox() is defined in a file this library does not compile.
 Outbox::Outbox() {}
