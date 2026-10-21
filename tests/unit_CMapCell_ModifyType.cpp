@@ -36,6 +36,17 @@ namespace {
 alignas(16) uint8_t gTestWorld[0x112000];
 uint32_t gMarkers[8];
 
+// The tile tables and counts as the library was loaded (before a case writes them): the "image" test compares them with the Mac's data (unit v5L35).
+struct InitialTiles {
+    CMapCellTileEntry a[11], b[49];
+    int32_t countA, countB;
+    InitialTiles() : countA(gTileCountA), countB(gTileCountB) {
+        std::memcpy(a, gTileTableA, sizeof(a));
+        std::memcpy(b, gTileTableB, sizeof(b));
+    }
+};
+const InitialTiles gInitialTiles;
+
 int32_t Rel(const void* p) { return static_cast<int32_t>(reinterpret_cast<const uint8_t*>(p) - reinterpret_cast<const uint8_t*>(gGameWorld)); }
 int64_t CellId(const void* cell) { return *reinterpret_cast<const uint16_t*>(cell); }
 CMapCell* CellAt(int index) { return reinterpret_cast<CMapCell*>(gTestWorld + 0x2d8 + index * 0x44); }
@@ -160,6 +171,10 @@ uint64_t tpw_cm_addr(const char* name) {
         {"cntA", &gTileCountA},
         {"tabB", gTileTableB},
         {"cntB", &gTileCountB},
+        {"initA", gInitialTiles.a},
+        {"initCntA", &gInitialTiles.countA},
+        {"initB", gInitialTiles.b},
+        {"initCntB", &gInitialTiles.countB},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));

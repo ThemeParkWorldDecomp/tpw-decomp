@@ -13,6 +13,11 @@ recording word, the no-object thing id, the first eight rows of gThingArray (mar
 counts. What is compared: the answer (and the rotation out parameter), the cells' bytes, the globals the functions write and the event log.
 
 No fused operations. Not tested: a map cell whose parent id is 0 (the original reads before the map).
+
+A third test (unit v5L35), "the tile tables": the host's initial tile tables and counts (copied when the library loads, before a case writes them)
+against the words of the program image at 0x1029d870 to 0x1029db47, read from the data section's dump (the other tests write over the emulator's
+copy). One case per entry (tile, rotation, mask, pad bytes) and one per count. With only the first word of each table set, every path cell of the
+host matched entry 0 of table B and drew the same piece.
 """
 import ctypes as C
 import random
@@ -208,9 +213,21 @@ STUBS.imp("abs", st_abs)
 STUBS.imp("rand", st_rand)
 
 
+IMAGE = {}
+
+
+def read_image(emu):
+    """The tables' bytes of the program image (the data section's dump; tables of numbers, nothing relocated)."""
+    data = next(b for b in emu.blocks if b["initialized"] and not b["execute"] and b["name"] != "IMPORTS")
+    blob = (emu.dir / data["file"]).read_bytes()
+    lo = ADDR["tabA"]
+    IMAGE["bytes"] = blob[lo - data["start"]:ADDR["cntB"] + 4 - data["start"]]
+
+
 def setup(runner):
     T.install_std_stubs(runner.emu)
     WORLD_PPC[0] = T.persist_alloc(runner.emu, 0x112000)
+    read_image(runner.emu)
 
 
 # ---------------------------------------------------------------------------------------------------------------- the two sides
@@ -518,7 +535,42 @@ def tile_random(r):
     return tile_case(r)
 
 
+def table_entry(raw, fmt, i):
+    tile, rot, mask = struct.unpack_from(fmt + "IiB", raw, i * 12)
+    return [tile, rot, mask, list(raw[i * 12 + 9:i * 12 + 12])]
+
+
+def table_ppc(e, case):
+    raw = IMAGE["bytes"]
+    if case["count"]:
+        return {"count": s32(struct.unpack_from(">I", raw, case["at"] - ADDR["tabA"])[0])}
+    return {"entry": table_entry(raw[case["at"] - ADDR["tabA"]:], ">", case["i"])}
+
+
+def table_host(lib, case):
+    bind(lib)
+    if case["count"]:
+        name = {ADDR["cntA"]: b"initCntA", ADDR["cntB"]: b"initCntB"}[case["at"]]
+        return {"count": s32(struct.unpack("<I", C.string_at(lib.tpw_cm_addr(name), 4))[0])}
+    name = {ADDR["tabA"]: b"initA", ADDR["tabB"]: b"initB"}[case["at"]]
+    return {"entry": table_entry(C.string_at(lib.tpw_cm_addr(name), (case["i"] + 1) * 12), "<", case["i"])}
+
+
+def table_edges():
+    for at, cap in ((ADDR["tabA"], CAP_A), (ADDR["tabB"], CAP_B)):
+        for i in range(cap):
+            yield dict(at=at, i=i, count=False)
+    for at in (ADDR["cntA"], ADDR["cntB"]):
+        yield dict(at=at, i=0, count=True)
+
+
+def table_random(r):
+    at, cap = r.choice(((ADDR["tabA"], CAP_A), (ADDR["tabB"], CAP_B)))
+    return dict(at=at, i=r.randrange(cap), count=False)
+
+
 TESTS = [
     FnTest("CMapCell::ModifyType", ppc, host, edge=modify_edges, rnd=modify_random),
     FnTest("CMapCell::GetTile", ppc, host, edge=tile_edges, rnd=tile_random),
+    FnTest("the tile tables", table_ppc, table_host, edge=table_edges, rnd=table_random),
 ]

@@ -155,7 +155,7 @@ extern uint16_t gGetObjectThingIdEnd;     // 0x102a0b52
 extern uint16_t gMapEmptyCellId;          // 0x102a0a9e
 
 // Unit v5535 (src/MapDelta_map_CMapCell_ModifyType.cpp; names invented). GetTile's two tables of 12 byte entries (tile word kind << 16 | index,
-// rotation, neighbour mask byte, three pad bytes); the host's initial data is only the first word of each (the rest of the Mac's data is not known).
+// rotation, neighbour mask byte, three pad bytes); the initial data is the Mac's (unit v5L35).
 struct CMapCellTileEntry {
     uint32_t mTile;       // 0x00
     int32_t mRotation;    // 0x04

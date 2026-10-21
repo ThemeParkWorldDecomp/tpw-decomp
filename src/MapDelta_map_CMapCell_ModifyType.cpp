@@ -17,13 +17,32 @@
 #include "ActionRecorder.h"
 #include "ThingReceivers.h"
 
-// Globals nobody else defines. Only the first word of each table is known (the rest of the Mac's initialised data is not in the sources).
+// Globals nobody else defines. The two tile tables are the Mac's initialised data ({tile, rotation, neighbour mask}, read from the data
+// section; unit v5L35). With only the first word of each, every path cell matched entry 0 of table B (mask 0) and drew the same piece.
 uint16_t gNoObjectThingId = 0;     // 0x1029e212
 uint8_t gTileRandomFlag = 0;       // 0x102e4830
 int32_t gTileCountA = 11;          // 0x1029d8f4
 int32_t gTileCountB = 0x31;        // 0x1029db44
-CMapCellTileEntry gTileTableA[11] = {{0x00020002u, 0, 0, {0, 0, 0}}};   // 0x1029d870
-CMapCellTileEntry gTileTableB[49] = {{0x0001000au, 0, 0, {0, 0, 0}}};   // 0x1029d8f8
+CMapCellTileEntry gTileTableA[11] = {   // 0x1029d870 (the queue pieces)
+    {0x00020002u, 0, 0x11, {}}, {0x00020002u, 90, 0x44, {}}, {0x00020001u, 0, 0x10, {}}, {0x00020001u, 90, 0x40, {}},
+    {0x00020001u, 180, 0x01, {}}, {0x00020001u, 270, 0x04, {}}, {0x00020003u, 0, 0x14, {}}, {0x00020003u, 90, 0x50, {}},
+    {0x00020003u, 180, 0x41, {}}, {0x00020003u, 270, 0x05, {}}, {0x00020000u, 0, 0x00, {}},
+};
+CMapCellTileEntry gTileTableB[49] = {   // 0x1029d8f8 (the path pieces; the masks include the diagonals)
+    {0x0001000au, 0, 0x1f, {}}, {0x0001000au, 90, 0x7c, {}}, {0x0001000au, 180, 0xf1, {}}, {0x0001000au, 270, 0xc7, {}},
+    {0x00010007u, 0, 0x1d, {}}, {0x00010007u, 90, 0x74, {}}, {0x00010007u, 180, 0xd1, {}}, {0x00010007u, 270, 0x47, {}},
+    {0x0001000fu, 0, 0x71, {}}, {0x0001000fu, 90, 0xc5, {}}, {0x0001000fu, 180, 0x17, {}}, {0x0001000fu, 270, 0x5c, {}},
+    {0x00010004u, 0, 0x15, {}}, {0x00010004u, 90, 0x54, {}}, {0x00010004u, 180, 0x51, {}}, {0x00010004u, 270, 0x45, {}},
+    {0x00010002u, 0, 0x11, {}}, {0x00010002u, 90, 0x44, {}}, {0x0001000du, 0, 0xff, {}}, {0x0001000bu, 0, 0x7f, {}},
+    {0x0001000bu, 90, 0xfd, {}}, {0x0001000bu, 180, 0xf7, {}}, {0x0001000bu, 270, 0xdf, {}}, {0x00010006u, 0, 0x7d, {}},
+    {0x00010006u, 90, 0xf5, {}}, {0x00010006u, 180, 0xd7, {}}, {0x00010006u, 270, 0x5f, {}}, {0x0001000cu, 0, 0x77, {}},
+    {0x0001000cu, 90, 0xdd, {}}, {0x0001000cu, 180, 0x77, {}}, {0x0001000cu, 270, 0xdd, {}}, {0x00010008u, 0, 0xd5, {}},
+    {0x00010008u, 90, 0x57, {}}, {0x00010008u, 180, 0x5d, {}}, {0x00010008u, 270, 0x75, {}}, {0x00010005u, 0, 0x55, {}},
+    {0x00010009u, 0, 0x1c, {}}, {0x00010009u, 90, 0x70, {}}, {0x00010009u, 180, 0xc1, {}}, {0x00010009u, 270, 0x07, {}},
+    {0x00010003u, 0, 0x14, {}}, {0x00010003u, 90, 0x50, {}}, {0x00010003u, 180, 0x41, {}}, {0x00010003u, 270, 0x05, {}},
+    {0x00010001u, 0, 0x10, {}}, {0x00010001u, 90, 0x40, {}}, {0x00010001u, 180, 0x01, {}}, {0x00010001u, 270, 0x04, {}},
+    {0x00010000u, 0, 0x00, {}},
+};
 
 namespace {
 using MapId = tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>;

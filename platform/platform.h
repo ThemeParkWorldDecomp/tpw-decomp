@@ -24,6 +24,10 @@ namespace tpw {
 struct Config {
     std::filesystem::path gameDir;   // the installed game: the folder that holds "data"
     std::filesystem::path userDir;   // everything the game writes (saves, settings)
+    // Which edition the game folder holds (--edition): "stp", SimTheme Park (the US Mac disc), or "tpw", Theme Park
+    // World (the UK/European disc, made by devtools/import_eur.py). The code is the same; the data picks the language,
+    // splash, speech and logos by itself. Empty: EditionOf the game folder. The window's title follows it.
+    std::string edition;
     // The four bytes of the original's "debug options" resource (MacLoadDebugSettings in
     // TPEngine.cpp): option bit 0x4, full screen, sound flag 0x400, the front end. 0xff
     // leaves the game's own choice, 1 sets the option, 0 clears it.
@@ -125,6 +129,8 @@ struct DirEntry {
     uint64_t fileTime = 0;   // the last write time as a Win32 FILETIME (100 ns ticks since 1601); 0 when it cannot be read
 };
 std::vector<DirEntry> ListGameFolder(const std::string& gamePath);
+// The edition a game folder holds, by its data:Language folder: "stp" when it has American (the US disc's), else "tpw".
+std::string EditionOf(const std::filesystem::path& gameDir);
 
 // ---- Window -------------------------------------------------------------------------
 // The one window. The game holds it as a GrafPort* and reads portRect.
@@ -135,6 +141,9 @@ struct Window : GrafPort {
     bool fullScreenBox = false;   // made with procID 2: the game's full-screen window
 };
 Window* MainWindow();             // NULL before NewCWindow
+// The window's title for the game's Pascal-string title: the game calls its window "Theme Park World" in both editions,
+// which is the UK edition's name; the US edition's window is "SimTheme Park", the name on its box, splash and menus.
+std::string WindowTitle(const std::string& edition, const unsigned char* title);
 // The window's content origin in screen coordinates (the Mac's "global" coordinates).
 void WindowOrigin(int32_t& x, int32_t& y);
 // The size of the surface the game draws into, in points (what the game counts in) and in pixels; zeros without a
