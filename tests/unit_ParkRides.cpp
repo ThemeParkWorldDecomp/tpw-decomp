@@ -1,4 +1,4 @@
-// Differential library for unit w153, the analyser's ride superlatives (src/ParkAnalyser_rides.cpp).
+// Differential library for unit w153, the analyser's ride superlatives (src/game/park/analyser.cpp).
 //
 // Every callee is a fake that records the same event as the PowerPC side's stub: GAME_ASSERTMSG (condition and text), the world accessor, CWorld::GetUsedThingHead
 // and GetNextUsedThing, CRideDatabase::GetRideInfo (the object type id), CObject::GetDBInfo, GetExcitementLevel, IsCoaster, IsTrackRide, IsBOQConnected and

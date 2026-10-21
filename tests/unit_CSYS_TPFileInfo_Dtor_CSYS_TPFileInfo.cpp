@@ -1,5 +1,5 @@
 // Test library for CSYS_TPFileInfo::~CSYS_TPFileInfo (unit v5714), main app:
-//   src/FS_System_CSYS_TPFileInfo_Dtor_CSYS_TPFileInfo.cpp
+//   src/game/ui/3DFont.cpp
 //
 // The string destructor and operator delete are fakes that record the object as a label.
 #include <cstddef>

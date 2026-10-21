@@ -1,5 +1,5 @@
 """Unit v5055, the address book panel's message function and its list filler, against libtpw_unit_AddressBookMsg.dylib
-(tests/unit_AddressBookMsg.cpp), main app ("SimTheme Park"), src/ui_newname_AddressBookMsg.cpp:
+(tests/unit_AddressBookMsg.cpp), main app ("SimTheme Park"), src/game/ui/ui_Postcard.cpp:
   AddressBookMsg 0x101afb34, FillAddressList 0x101aff60
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,15 +1,15 @@
 """Unit w129 (main app), against libtpw_unit_MacroAI.dylib (tests/unit_MacroAI.cpp):
 
-  src/MacroAI.cpp            CMacroAI::Init (0x1010096c) and Update (0x101009dc)
-  src/Arrival_update.cpp     CArrival::Init (0x100f22c4), Update (0x100f22ec), UpdateArrivalRate (0x100f2600)
-  src/ParkTime_update.cpp    CParkTime::Init (0x10112694), Update (0x10112214), GetFunnyTimeSinceSessionStart (0x10112b14)
-  src/StaffDB_update.cpp     CStaffDB::Init (0x10129298), Update (0x1012a10c)
-  src/GoldenTicket_check.cpp CGoldenTicketControl::CheckForTickets (0x100fbd2c)
-  src/Game_iterate.cpp       CGame::Iterate (0x10149838)
-  src/ControlManager_setup.cpp CControlManager::SetupInitialControls (0x100fa2ac)
-  src/WorldSavvy.cpp         CWorldSavvy::GetWorld (0x1014205c)
-  src/ParkAnalyser_gates.cpp CParkAnalyser::GatesOpen (0x100e7028)
-  src/DateMessages.cpp       the constructor, GetType and destructor of CMsgEndOfDay, CMsgEndOfMonth and CMsgEndOfYear
+  src/game/park/Map.cpp            CMacroAI::Init (0x1010096c) and Update (0x101009dc)
+  src/game/people/Arrival.cpp     CArrival::Init (0x100f22c4), Update (0x100f22ec), UpdateArrivalRate (0x100f2600)
+  src/game/people/ParkTime.cpp    CParkTime::Init (0x10112694), Update (0x10112214), GetFunnyTimeSinceSessionStart (0x10112b14)
+  src/game/people/StaffDB.cpp     CStaffDB::Init (0x10129298), Update (0x1012a10c)
+  src/game/park/GoldenTickets.cpp CGoldenTicketControl::CheckForTickets (0x100fbd2c)
+  src/game/Game.cpp       CGame::Iterate (0x10149838)
+  src/game/ControlManager.cpp CControlManager::SetupInitialControls (0x100fa2ac)
+  src/game/ui/ui_visitorStatus.cpp         CWorldSavvy::GetWorld (0x1014205c)
+  src/game/park/analyser.cpp CParkAnalyser::GatesOpen (0x100e7028)
+  src/game/people/ParkTime.cpp, src/game/people/Peep.cpp, src/game/ui/MessageCentre.cpp       the constructor, GetType and destructor of CMsgEndOfDay, CMsgEndOfMonth and CMsgEndOfYear
 
 They run as the original on the PowerPC side (the signed 64 bit divide helper 0x10237e1c and CTimeSig's two inline members too) and as src/ on the host.
 Every other callee is a fake that records the same event on both sides (see unit_MacroAI.cpp).

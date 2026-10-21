@@ -1,5 +1,5 @@
 // Test library for the ride height polygon search (unit v5228; libtpw_unit_GetRideHeightAtPoint.dylib, tests/test_GetRideHeightAtPoint.py), main app:
-//   src/CalculateMaxVertexHeights_GetRideHeightAtPoint.cpp   DoNodePolySearch, GetHeightFromPolySearch, GetRideHeightAtPoint, gRideCtx, gRideFlags
+//   src/game/park/TPHField.cpp   DoNodePolySearch, GetHeightFromPolySearch, GetRideHeightAtPoint, gRideCtx, gRideFlags
 //
 // Callees outside the unit: MathLib::__fpclassifyf and DetermineHFieldHeightQuick, recording fakes answering from the test's queues.
 #include <cstddef>

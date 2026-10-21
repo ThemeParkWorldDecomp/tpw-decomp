@@ -1,6 +1,6 @@
 // Test library for the WinScrn terminate / message / mode enumeration functions (unit v5737; libtpw_unit_LbScreen_Terminate.dylib,
 // tests/test_LbScreen_Terminate.py), main app:
-//   src/LbScreen_Initialise_LbScreen_Terminate.cpp   the five functions; src/LbList.cpp runs for real (LbList_GetFirst).
+//   src/bullfrog/WinScrn.cpp   the five functions; src/bullfrog/LbLog.cpp runs for real (LbList_GetFirst).
 //
 // The callees outside the unit are fakes that record the arguments the real ones read; the globals of other files are defined here.
 #include <cstddef>

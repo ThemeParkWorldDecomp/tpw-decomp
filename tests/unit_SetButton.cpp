@@ -1,5 +1,5 @@
 // Test library for the status panel's button helpers (unit v5240; libtpw_unit_SetButton.dylib, tests/test_SetButton.py), main app:
-//   src/ui_StatusPanel_SetButton.cpp   SetButton, DoButton
+//   src/game/ui/ui_tags.cpp   SetButton, DoButton
 //
 // The callees outside the unit (the draw object library, the panels, the zooms, the maintenance request, the challenge answers, the assert)
 // are fakes that record what the real ones read. InterfaceWindow's constructor and virtuals are defined here (Enable records its call),

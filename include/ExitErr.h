@@ -1,6 +1,6 @@
 // ExitErr.cpp (main app): CExitError, the reason the game gives up and the box that shows it.
-// SetError (src/ExitErr.cpp) keeps the reason; ReportAnyError, HandleEngineErrors and
-// ConvertEngineErrors (src/ExitErr_report.cpp) show it.
+// SetError (src/game/ExitErr.cpp) keeps the reason; ReportAnyError, HandleEngineErrors and
+// ConvertEngineErrors (src/game/ExitErr.cpp) show it.
 #pragma once
 #include <cstdint>
 
@@ -10,7 +10,7 @@ public:
     // the code: 12 is the engine-error type (ReportAnyError asks the engine's error stack what
     // went wrong and shows the answer) and 13 is the type with no message of its own (the box
     // shows only the text SetError kept). The others are plain numbers; the string id each one
-    // asks the UI string table for is in src/ExitErr_report.cpp. A type above 0x2a also shows
+    // asks the UI string table for is in src/game/ExitErr.cpp. A type above 0x2a also shows
     // no message of its own. Types seen in callers: 2 (a bad command-line argument), 3 (a data
     // file that would not load, with its path as the text), 4, 8, 12.
     enum ErrorType : int32_t {

@@ -1,5 +1,5 @@
 """Unit v5160, CUIGrapher::DrawGrid and CUIGrapher::DrawGraph, against libtpw_unit_CUIGrapher_DrawGraph.dylib
-(tests/unit_CUIGrapher_DrawGraph.cpp), main app, src/ui_cursor_classes_CUIGrapher_DrawGraph.cpp:
+(tests/unit_CUIGrapher_DrawGraph.cpp), main app, src/game/ui/UIGrapher.cpp:
   DrawGrid 0x101fdb1c, DrawGraph 0x101fddbc
 
 A case is a grapher object (fields by Mac offset) and a call. The object is built twice by one piece of code: in emulator memory

@@ -1,5 +1,5 @@
 """Unit v5972, CPerson::Serialise, against libtpw_unit_CPerson_Serialise.dylib (tests/unit_CPerson_Serialise.cpp), main app
-("SimTheme Park"), src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_Serialise.cpp:
+("SimTheme Park"), src/game/people/Person.cpp:
   CPerson::Serialise 0x101170b4
 
 A case is a person block (0x240 bytes, gaps filled with a pattern) and a call. The block is built twice by ONE piece of Python code: in

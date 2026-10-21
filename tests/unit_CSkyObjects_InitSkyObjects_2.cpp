@@ -1,6 +1,6 @@
 // Test library for seven small main-app functions (unit v51029; libtpw_unit_CSkyObjects_InitSkyObjects_2.dylib,
 // tests/test_CSkyObjects_InitSkyObjects_2.py), main app:
-//   src/SkyObjects_destroy_CSkyObjects_InitSkyObjects_2.cpp   InitSkyObjects, CText_Destroy, the two initialisers, Save, GetWidth, LastCharIn
+//   src/game/keyboard.cpp, src/game/park/SkyObjects.cpp, src/game/rides/RideDB.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/MessageCentre.cpp   InitSkyObjects, CText_Destroy, the two initialisers, Save, GetWidth, LastCharIn
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The strings
 // are a one-buffer fake (the narrow one keeps its text in gStringBuffer so the path the code builds can be read back). The globals of

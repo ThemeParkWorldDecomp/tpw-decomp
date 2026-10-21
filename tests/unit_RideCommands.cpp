@@ -1,6 +1,6 @@
 // Test library for a ride script's ride-specific commands (unit w172; libtpw_unit_RideCommands.dylib, tests/test_RideCommands.py), main app:
-//   src/rsse_commands.cpp  ExecuteTourSpecificCommand, ExecuteBumperSpecificCommand, ExecuteCoasterSpecificCommand, __sinit_rsse_cpp
-// src/rsse_objects.cpp is linked for ReadScript and ExtractData (the dispatchers call them); its other callees are fakes copied from
+//   src/game/rides/rsse.cpp  ExecuteTourSpecificCommand, ExecuteBumperSpecificCommand, ExecuteCoasterSpecificCommand, __sinit_rsse_cpp
+// src/game/rides/RideEffects.cpp, src/game/rides/rsse.cpp is linked for ReadScript and ExtractData (the dispatchers call them); its other callees are fakes copied from
 // tests/unit_RideObjects.cpp, unused here. Every ride callee (FLY_, BMP_, Coaster, LLCC_, GetCoasterInstanceID, FindDataNodeIndexByID) is a fake that
 // records its arguments (the same event names and arguments as the module's PowerPC stubs) and answers from the case's queue of its name.
 #include <cstdarg>
@@ -166,7 +166,7 @@ int32_t GetRideMasterBoundArea(uint32_t ride, sAlignedBox* box) {
 
 
 // ---- the ride callees of the three dispatchers: each records its name and arguments and answers from the case's queue of its own name
-// (a void callee answers nothing). FLY_RemoveBase is declared in HLSprite.h (its translation, src/hlsprite_flybase.cpp, is not linked).
+// (a void callee answers nothing). FLY_RemoveBase is declared in HLSprite.h (its translation, src/game/rides/FlyingRide.cpp, is not linked).
 void FLY_RemoveBase(int32_t fly) { ev("FLY_RemoveBase", {fly}); }
 void FLY_SetRunTime(int32_t fly, int32_t time) { ev("FLY_SetRunTime", {fly, time}); }
 void CoasterSetSpeed(uint32_t coaster, uint32_t speed) { ev("CoasterSetSpeed", {coaster, speed}); }

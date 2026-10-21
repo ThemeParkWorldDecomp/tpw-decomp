@@ -1,6 +1,6 @@
 """Unit w206, the hoarding edit (the fill of the park's inside and the legality and cost check of an edit, with four cell tests) against
-libtpw_unit_HoardingEdit.dylib (tests/unit_HoardingEdit.cpp), main app ("SimTheme Park"): src/LLCellSystem_hoardedit.cpp (LLCC_FillInsideOfPark
-0x10093b0c and LLCC_IsHoardingEditLegal 0x1009464c), src/TrackCell_isflag.cpp (CTrackCell::IsFlag 0x100a2918) and src/MapCell_kinds.cpp
+libtpw_unit_HoardingEdit.dylib (tests/unit_HoardingEdit.cpp), main app ("SimTheme Park"): src/game/park/LLCellSystem.cpp (LLCC_FillInsideOfPark
+0x10093b0c and LLCC_IsHoardingEditLegal 0x1009464c), src/game/park/TrackCell.cpp (CTrackCell::IsFlag 0x100a2918) and src/game/park/MapCell.cpp
 (CMapCell::UnSetFlag 0x1009bc18, IsFreeform 0x1009c59c, IsWater 0x1009c408): 6 functions.
 
 A case is the cell system's words (the hoarding extents, gLLCC4818, the width and height of the fill, the four edge counts, the 0x200 bytes of edge
@@ -10,7 +10,7 @@ then the 16384 track cells of 0x28 bytes; every cell has its id and kind, the ca
 (big endian) and in the host library's memory (little endian). The original runs for real on the PowerPC side: the six functions, CCellBase::
 GetNeighbours, NumberOfNeighbours, NumberOfHVNeighbours, SetOverlapCounter, GetMapCellEquiv and GetTrackCellEquiv, both CTrackCell::GetNeighbouringCell,
 CMapCell::GetNeighbouringCell, MapDelta::operator*, OPPOSITE, CMap::IsXYValid, and the landed CTrackCell::IsHoarding, IsTrackX, IsCorner, IsStraight
-and CMapCell::IsFlag (the host copies the bodies of the small ones from src/MapDelta_map.cpp; the eight compass deltas are written by this module,
+and CMapCell::IsFlag (the host copies the bodies of the small ones from src/game/park/Map.cpp, src/game/park/MapDelta.cpp; the eight compass deltas are written by this module,
 the Mac builds them at startup). Every other callee is a fake on both sides that records its arguments (a cell is named by its index in its block, the
 bank by a label): CTrackCell::Delete and QuickDelete, CMapCell::SetHFieldTile, LLCC_CopyCurrentToNewImage, LLCC_AddNewAreaToImage, LLCC_SoIsItLegal
 (answers from a queue), CWorld::GetBankAccount, CBankAccount::GetBalance (answers from a queue), CTRACE and GAME_ASSERTMSG.

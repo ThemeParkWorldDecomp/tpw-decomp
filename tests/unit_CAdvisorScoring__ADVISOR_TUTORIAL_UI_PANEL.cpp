@@ -1,6 +1,6 @@
 // Test library for the advisor scoring unit v5767 (libtpw_unit_CAdvisorScoring__ADVISOR_TUTORIAL_UI_PANEL.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_TUTORIAL_UI_PANEL.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_TUTORIAL_UI_PANEL.cpp   Load, Save, GetFirstResponseFor and three scorers
+//   src/game/advisor/AdvisorScoring.cpp   Load, Save, GetFirstResponseFor and three scorers
 //
 // The callees outside the unit are recording fakes (the same events as the module's PowerPC stubs). The globals of other files the
 // unit reads (the world pointers, gMasterSave, gMainBalance, the message table) are defined here.

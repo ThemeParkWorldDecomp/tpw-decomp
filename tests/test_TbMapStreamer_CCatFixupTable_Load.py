@@ -1,5 +1,5 @@
 """Unit v5234, TbMapStreamer::CCatFixupTable::Load, against libtpw_unit_TbMapStreamer_CCatFixupTable_Load.dylib
-(tests/unit_TbMapStreamer_CCatFixupTable_Load.cpp), sound library, src/TbMapStreamer_TbMapStreamer_CCatFixupTable_Load.cpp:
+(tests/unit_TbMapStreamer_CCatFixupTable_Load.cpp), sound library, src/sound/TbMapStreamer.cpp:
   TbMapStreamer::CCatFixupTable::Load 0x1002388c
 
 A case is a file image (size word, count word, count slot words, then records: a length byte and a name) read through a fake

@@ -1,8 +1,8 @@
 // Test library for two leaves of the main app (unit v5L16; libtpw_unit_TailSeven.dylib, tests/test_TailSeven.py):
-//   src/TailSeven.cpp   UIMain_GetObjectName, CalcZTrans
+//   src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/ui_main.cpp   UIMain_GetObjectName, CalcZTrans
 //
 // CObject::GetUIName is a fake that records the object (its 32-bit label), whether the buffer is gUIMainConvertBuffer and the size,
-// then writes the case's four characters. gUIMainConvertBuffer (src/ui_main.cpp) is defined here.
+// then writes the case's four characters. gUIMainConvertBuffer (src/game/ui/ui_main.cpp) is defined here.
 #include <cstdint>
 #include <initializer_list>
 

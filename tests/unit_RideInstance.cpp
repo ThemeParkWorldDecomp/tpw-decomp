@@ -1,4 +1,4 @@
-// Test library for src/RideInstance.cpp (libtpw_unit_RideInstance.dylib; see tests/test_RideInstance.py):
+// Test library for src/engine/EngineUtil.cpp, src/game/Debug.cpp, src/game/TPEmbed.cpp, src/game/TPInstance.cpp, src/game/rides/RideAnim.cpp, src/game/rides/RidePlacement.cpp, src/game/rides/TPRide.cpp (libtpw_unit_RideInstance.dylib; see tests/test_RideInstance.py):
 // InstanceRideAnimSet, InstanceMesh, InstanceAnim, InstanceDynamicMeshSet, DisableDataNodesRender and its
 // sibling, CorrectFaceFlags1, CorrectNodeFlags2, SetupRideHeads, GetFontPath, OverrideActiveChannels,
 // ERRORBox and AlignTo32Bit.

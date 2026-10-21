@@ -1,8 +1,8 @@
 // Test library for the vehicles' path following (unit w209; libtpw_unit_VehiclePath.dylib, tests/test_VehiclePath.py), main app:
-//   src/Vehicle_path.cpp          Follow_Path::calculate, Vehicle::next_step, recalc_path and is_stuck, Pilot::init_behaviours, Pilot::Pilot
-//   src/VehicleCallbacks_map.cpp  map_global_to_local, map_fn
+//   src/game/rides/vehicle.cpp          Follow_Path::calculate, Vehicle::next_step, recalc_path and is_stuck, Pilot::init_behaviours, Pilot::Pilot
+//   src/game/rides/VehicleCallbacks.cpp  map_global_to_local, map_fn
 //
-// Real code besides the unit: unit w203's steering code (src/Vehicle_steer.cpp: truncate, normalise, perp, is_finished_path, set_speed, clear_behaviours and the
+// Real code besides the unit: unit w203's steering code (src/game/rides/vehicle.cpp: truncate, normalise, perp, is_finished_path, set_speed, clear_behaviours and the
 // globals gVehZero, gVehOne and the behaviour list), FixMul, FixDiv and isqrt. The callees outside are fakes that record what the real ones read, with the same
 // event names and arguments as the module's PowerPC stubs: wallhug_tricky (0x10136e7c; it also "plans": it copies the case's path bytes into the buffer),
 // CMap::GetTimeStampCell, CMap::MakeNewTimeStamp and CMap::IsXYValid (the map is reported as its offset from gGameWorld), implement_nav_rulesA2B

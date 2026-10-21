@@ -1,8 +1,8 @@
 // Test library for the park click and the staff mouse modes (unit w143; libtpw_unit_StaffModes.dylib, tests/test_StaffModes.py), main app:
-//   src/Mouse_staff.cpp     CSpritePlaceMode (OnMouseMove 0x1007e528, the destructor 0x1007ec14, OnRelease 0x10081550), CMMPlaceStaff, CMMPickUpStaff
-//   src/ui_main_click.cpp   ContextMouseClick 0x10183320
-//   src/TPRide_pickup.cpp   GetPickupWorldPosn 0x10067220
-//   src/Mouse.cpp           (landed) AssignMouseMode, CMMDefault: they run for real, so the mode handover (the old mode released and deleted) is tested
+//   src/game/Mouse.cpp     CSpritePlaceMode (OnMouseMove 0x1007e528, the destructor 0x1007ec14, OnRelease 0x10081550), CMMPlaceStaff, CMMPickUpStaff
+//   src/game/ui/ui_main.cpp   ContextMouseClick 0x10183320
+//   src/game/TPPointer.cpp   GetPickupWorldPosn 0x10067220
+//   src/game/Mouse.cpp           (landed) AssignMouseMode, CMMDefault: they run for real, so the mode handover (the old mode released and deleted) is tested
 // Every other callee is a fake that records the event the PowerPC stub records: the cell predicates, the five staff constructors, DropStaff,
 // the staff HQ, the advisor, the script and drawing calls, the cursor, the trace, the assertion, the panels, the keyboard, the nothrow new,
 // the delete (calllog.cpp), CMMOnline and the CMMPathDraw (constructors and virtuals; unit w144 translates it). The globals of other files are
@@ -39,7 +39,7 @@
 
 using namespace calllog;
 
-// ---- globals of other files the unit reads or writes, defined here (gMouse, gMouseMode and the two words are src/Mouse.cpp's)
+// ---- globals of other files the unit reads or writes, defined here (gMouse, gMouseMode and the two words are src/game/Mouse.cpp's)
 int32_t gGameWinWordC38;
 CThingArrayEntry gThingArray[kThingArraySize];
 CIntrface gIntrface;
@@ -143,7 +143,7 @@ void* RecordedNew(std::size_t size) {
 }
 void* operator new(std::size_t size, const std::nothrow_t&) noexcept { return RecordedNew(size); }
 
-// The staff are made on the game heap (the Mac's operator new), which is the arena on the host since unit v5L31 (src/Mouse_staff.cpp
+// The staff are made on the game heap (the Mac's operator new), which is the arena on the host since unit v5L31 (src/game/Mouse.cpp
 // NewStaff); the unit links no arena, and the arena's allocation is the same recording new.
 namespace tpw {
 void* ArenaAlloc(std::size_t size) { return RecordedNew(size); }

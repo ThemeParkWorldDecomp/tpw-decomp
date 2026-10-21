@@ -34,7 +34,7 @@ public:
     Char* SBCstrncpy(Char* dst, const Char* src, uint32_t count);
     Char* SBCstrcat(Char* dst, const Char* src);
     Char* SBCstrncat(Char* dst, const Char* src, uint32_t count);
-    // Unit w225 (src/TbString_more.cpp), char / wide addresses.
+    // Unit w225 (src/bullfrog/FileSystem.cpp), char / wide addresses.
     bool operator==(const Char& ch) const; // 0x100116a4 / 0x10011ec8
     bool operator!=(const Char& ch) const; // 0x10011864 / 0x10012080
     bool operator!=(const TbStringBase& other) const; // 0x100119b0 / 0x100121c4
@@ -65,7 +65,7 @@ public:
     explicit TbDynamicStringTemplate(const Char* text);
     TbDynamicStringTemplate(const TbDynamicStringTemplate& other);
     TbDynamicStringTemplate(const TbStringBase<Char>& other);
-    // Unit w225 (src/TbString_more.cpp).
+    // Unit w225 (src/bullfrog/FileSystem.cpp).
     explicit TbDynamicStringTemplate(const Char& ch); // 0x10010414 / 0x1000f978
     void FormatV(const Char* format, va_list args); // 0x1000fabc / 0x1000f028
     void Format(const Char*, ...) override;                  // 0x1000e810 / 0x1000ef84, slot 8
@@ -100,7 +100,7 @@ public:
     int32_t mTruncated;     // 0x10
 };
 
-// Unit w217 (src/TbTimeStamp_format.cpp), instantiated for char and char16_t only.
+// Unit w217 (src/bullfrog/TbTimeStamp.cpp), instantiated for char and char16_t only.
 class TbTimeStamp;
 namespace NS_MacDoze { struct _SYSTEMTIME; }
 // char 0x10027f88, 3,536 B; wchar_t 0x10027164, 3,540 B.

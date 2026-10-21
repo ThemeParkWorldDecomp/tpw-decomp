@@ -1,6 +1,6 @@
 // Test library for twelve advisor scorers (unit v5892; libtpw_unit_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The callees outside the unit (the world's analyser and staff HQ getters, the analyser's readers, the master save's constructor and
 // HaveTicket, operator new) are recording fakes that answer from the test's queues. The globals of other files are defined here.

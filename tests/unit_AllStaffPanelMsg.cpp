@@ -1,6 +1,6 @@
 // Test library for the all-staff and finance panels' message functions and UIStatusPanel::RequestMaintenance (unit v51004;
 // libtpw_unit_AllStaffPanelMsg.dylib, tests/test_AllStaffPanelMsg.py), main app:
-//   src/MainWindowCallback_CreateAllItemsPanel_AllStaffPanelMsg.cpp
+//   src/game/ui/ui_FinancePanel.cpp, src/game/ui/ui_StatusPanel.cpp, src/game/ui/ui_allStaffPanel.cpp
 //
 // Every callee outside the unit is a fake that records raw integers (pointers truncated to 32 bits) and answers from the test's queue.
 #include <cstddef>

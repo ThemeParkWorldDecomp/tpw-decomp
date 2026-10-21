@@ -1,5 +1,5 @@
 """Unit v5313, UI_SwitchGameWindow and UI_SetGameWindowCursor, against libtpw_unit_UI_SwitchGameWindow.dylib
-(tests/unit_UI_SwitchGameWindow.cpp), main app, src/ui_mainpanel2_window_bumhole_UI_SwitchGameWindow.cpp:
+(tests/unit_UI_SwitchGameWindow.cpp), main app, src/game/ui/ui_mainpanel2.cpp:
   UI_SwitchGameWindow 0x101a8cd8, UI_SetGameWindowCursor 0x101a8c58
 
 A case is a world and a call. The world is built twice by one piece of Python code (emulator memory for the original, host memory for the

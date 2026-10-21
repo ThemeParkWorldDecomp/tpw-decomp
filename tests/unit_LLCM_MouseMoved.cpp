@@ -1,5 +1,5 @@
 // Test library for LLCM_MouseMoved (unit v5633; libtpw_unit_LLCM_MouseMoved.dylib, tests/test_LLCM_MouseMoved.py), main app:
-//   src/LLCellMeshes_LLCM_RebuildUpgradeBridges_LLCM_MouseMoved.cpp   LLCM_MouseMoved and the ten words it defines
+//   src/game/park/LLCellMouse.cpp   LLCM_MouseMoved and the ten words it defines
 //
 // Every callee is a fake that records the arguments the real one reads (cells as their byte offset from gGameWorld, objects as labels,
 // the words behind out pointers) and answers from the test's queues; the line and boundary fakes move their out words by queued deltas.

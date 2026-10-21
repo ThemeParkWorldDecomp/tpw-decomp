@@ -1,6 +1,6 @@
 // Test library for SAVEVARSTRUCT<AdvisorHistory>, CAdvisorScoring::LastMinuteCheck and CAdvisorRequest::Serialise (unit v5937;
 // libtpw_unit_SAVEVARSTRUCT_2.dylib, tests/test_SAVEVARSTRUCT_2.py), main app:
-//   src/Serialise_basic_SAVEVARSTRUCT_2.cpp
+//   src/game/advisor/Advisor.cpp, src/game/advisor/AdvisorScoring.cpp
 //
 // The callees outside the unit are recording fakes: names are hashed (FNV-1a) into the event so that a wrong string shows. The globals of
 // other files (gSaveLoad, the message table) are defined here.

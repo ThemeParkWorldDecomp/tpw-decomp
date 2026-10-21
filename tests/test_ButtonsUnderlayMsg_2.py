@@ -1,5 +1,5 @@
 """Unit v51037, nine small functions of the online panels and the UIInterface, against libtpw_unit_ButtonsUnderlayMsg_2.dylib
-(tests/unit_ButtonsUnderlayMsg_2.cpp), main app ("SimTheme Park"), src/OnlineParkFindPanelMsg_ContactMenu_ButtonsUnderlayMsg_2.cpp:
+(tests/unit_ButtonsUnderlayMsg_2.cpp), main app ("SimTheme Park"), src/game/ui/UIInterface.cpp, src/game/ui/ui_onlinePanel.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_onlineParkListPanel.cpp:
   ButtonsUnderlayMsg 0x101e86c4, HideButtonsMenu 0x101e8b18, __sinit_ui_onlineParkInfoPanel_cpp 0x101ebae0,
   RemoveOnlineParkListPanel 0x101ec840, __sinit_ui_onlineParkListPanel_cpp 0x101ec90c, UIInterface::DateChange 0x101efe60,
   UIInterface::Screen_StaffLoc 0x101f07b4, UIInterface::Screen_PeepLoc 0x101f0834, UIInterface::ThingDeath 0x101f0c2c

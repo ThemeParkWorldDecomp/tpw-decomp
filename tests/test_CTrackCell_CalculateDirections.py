@@ -1,5 +1,5 @@
 """Unit v5696, CTrackCell::CalculateDirections and CTrackCell::GetTile, against libtpw_unit_CTrackCell_CalculateDirections.dylib
-(tests/unit_CTrackCell_CalculateDirections.cpp), main app ("SimTheme Park"), src/TrackCell_flags_CTrackCell_CalculateDirections.cpp:
+(tests/unit_CTrackCell_CalculateDirections.cpp), main app ("SimTheme Park"), src/game/park/TrackCell.cpp:
   CalculateDirections 0x100a12dc, GetTile 0x100a2a0c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

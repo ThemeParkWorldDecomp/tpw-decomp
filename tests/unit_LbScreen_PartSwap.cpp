@@ -1,5 +1,5 @@
 // Test library for the screen swap and mode list functions (unit v5334; libtpw_unit_LbScreen_PartSwap.dylib, tests/test_LbScreen_PartSwap.py), main app:
-//   src/CreateDirectDrawObject_LbScreen_PartSwap.cpp   LbScreen_Swap, LbScreen_PartSwap, CreateScreenModeList and four globals
+//   src/bullfrog/WinScrn.cpp   LbScreen_Swap, LbScreen_PartSwap, CreateScreenModeList and four globals
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The surfaces and
 // other globals of WinScrn.cpp that the unit reads are defined here, zero at start like the Mac's bss.

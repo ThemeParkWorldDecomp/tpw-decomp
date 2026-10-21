@@ -1,5 +1,5 @@
 """Unit v5691, the ride profile table and the pylon move start, against libtpw_unit_LLCC_GetRideProfileInfo.dylib
-(tests/unit_LLCC_GetRideProfileInfo.cpp), main app, src/LLCC_Kill_Them_KILL_THEM_ALL_LLCC_AbortPylonMove_LLCC_GetRideProfileInfo.cpp:
+(tests/unit_LLCC_GetRideProfileInfo.cpp), main app, src/game/park/LLCellRide.cpp:
   LLCC_GetRideProfileInfo 0x1008f880, LLCC_StartPylonMove 0x1008f0b4
 
 A case is a world and a call, built by one piece of Python for both memories. CCellBase::GetTrackCellEquiv and CMapCell::Delete are fakes

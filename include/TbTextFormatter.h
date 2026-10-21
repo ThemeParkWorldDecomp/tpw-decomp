@@ -54,14 +54,14 @@ struct MslVector {
     void clear();
     void push_back(const T& element);
     void resize(uint32_t size);
-    // Unit w44: the general erase and insert resize is built on (src/ltms_textformatter_rest.cpp); only MslVector<TbPoint> has them.
+    // Unit w44: the general erase and insert resize is built on (src/ltms/TbTextFormatter.cpp); only MslVector<TbPoint> has them.
     T* erase(T* first, T* last);
     void insert(T* position, uint32_t count, const T& value);
 };
 template <> void MslVector<CCharacterInfo>::tear_down();   // 0x10007cb4
 template <> void MslVector<CLineInfo>::tear_down();        // 0x1000839c
 template <> void MslVector<TbPoint>::tear_down();          // 0x1000879c
-// Unit w44, src/ltms_textformatter_rest.cpp (the size drops to 0, the block stays; push_back doubles the capacity from 1; resize pads
+// Unit w44, src/ltms/TbTextFormatter.cpp (the size drops to 0, the block stays; push_back doubles the capacity from 1; resize pads
 // with zero points through insert and cuts through erase):
 template <> void MslVector<CCharacterInfo>::clear();                              // 0x10007d74
 template <> void MslVector<CCharacterInfo>::push_back(const CCharacterInfo&);     // 0x10007e0c
@@ -73,13 +73,13 @@ template <> TbPoint* MslVector<TbPoint>::erase(TbPoint* first, TbPoint* last);  
 template <> void MslVector<TbPoint>::insert(TbPoint* position, uint32_t count, const TbPoint& value);   // 0x10008cf4
 
 // The file-static line processor (0x10006cfc): puts the characters of [first, last) in display order for right-to-left runs.
-// Unit w44 (src/ltms_textformatter_rest.cpp). The original's helpers (IsParenthesis, IsDelimiter, GetNextDelimiter, GetNextNonDelimiter,
+// Unit w44 (src/ltms/TbTextFormatter.cpp). The original's helpers (IsParenthesis, IsDelimiter, GetNextDelimiter, GetNextNonDelimiter,
 // IsHebInLine, InvertLine) are inlined into it; FixParenthesis is the one real call.
 void ProcessLine(CCharacterInfo* first, CCharacterInfo* last);
 // 0x1000691c: swaps the bracket at `first` with the bracket that closes it (or opens it) in [first, last).
 void FixParenthesis(CCharacterInfo* first, CCharacterInfo* last);
-// Unit v5757 (src/ltms_textformatter_rest_InvertLine.cpp). Each takes [first, last). (InvertLine 0x10006c3c is file-local in
-// src/ltms_textformatter_rest.cpp; the unit's file has its own copy for the test, declared in tests/unit_InvertLine.cpp.)
+// Unit v5757 (src/ltms/TbTextFormatter.cpp). Each takes [first, last). (InvertLine 0x10006c3c is file-local in
+// src/ltms/TbTextFormatter.cpp, src/engine/tb_depthoffield.cpp; the unit's file has its own copy for the test, declared in tests/unit_InvertLine.cpp.)
 bool IsHebInLine(CCharacterInfo* first, CCharacterInfo* last);                      // 0x10006bb4
 CCharacterInfo* GetNextNonDelimiter(CCharacterInfo* first, CCharacterInfo* last);   // 0x10006b04
 CCharacterInfo* GetNextDelimiter(CCharacterInfo* first, CCharacterInfo* last);      // 0x10006a68
@@ -137,7 +137,7 @@ public:
     static constexpr eJustification kJustifyBottom = kBottom;
 };
 
-// Unit v5297 (src/TbResource_CLineList_AddLine.cpp): the list of lines. Mac 0x10 bytes: the vector of lines, then the widest width.
+// Unit v5297 (src/ltms/TbTextFormatter.cpp): the list of lines. Mac 0x10 bytes: the vector of lines, then the widest width.
 // (TbTextFormatter::mLines and mMaxLineWidth at +0x6c and +0x78 are this object.) On the host the vector holds a native
 // pointer, so mMaxWidth sits after it; the test reads the host offset from the layout.
 class CLineList {
@@ -152,7 +152,7 @@ public:
     CLineList* Destruct(int16_t deleteFlag);
 };
 
-// Unit v5749 (src/ltms_textformatter_std_length_error_Dtor_length_error.cpp): std::length_error, Mac 0x0c bytes.
+// Unit v5749 (src/ltms/MslSupport.cpp): std::length_error, Mac 0x0c bytes.
 struct MslRefCountedCharsBlock {   // std::_RefCountedPtr<char, std::_Array<char>>
     char* mPtr;                    // +0x00 of the member
     int32_t* mCount;               // +0x04 of the member
@@ -170,7 +170,7 @@ void MslRefCountedCharsDtor(MslRefCountedCharsBlock* self, int16_t deleteFlag);
 // and operator delete for a flag above 0 (signed). Answers this.
 LengthError* LengthErrorDtor(LengthError* self, int16_t deleteFlag);
 void LengthErrorOperatorDelete(void* block);   // weak: the runtime's operator delete (0x1000f694)
-// Unit v51035 (src/TbUniStringVTag_TbIntegerVTag_Format_std__RefCountedPtr__RefCountedPtr.cpp):
+// Unit v51035 (src/ltms/TbVTag.cpp):
 void* LengthErrorOperatorNew(uint32_t size);   // the runtime's operator new (0x1000f76c); never answers NULL
 // 0x10008adc: std::_RefCountedPtr<char, std::_Array<char>>::_RefCountedPtr(char*): stores the pointer; for a non-NULL one a
 // counter of 4 bytes holding 1 is allocated. Answers this. (The exception cleanup path in the listing is unreachable.)
@@ -179,7 +179,7 @@ MslRefCountedCharsBlock* MslRefCountedCharsBlockCtor(MslRefCountedCharsBlock* se
 // the message's destructor with -1, the exception vtable, operator delete for a flag above 0. Answers this.
 LengthError* LogicErrorDtor(LengthError* self, int16_t deleteFlag);
 
-// Unit v51120 (src/ltms_textformatter_rest_IsDelimiter.cpp). The destructors with the CodeWarrior hidden delete flag (a signed 16
+// Unit v51120 (src/ltms/MslSupport.cpp). The destructors with the CodeWarrior hidden delete flag (a signed 16
 // bit value, operator delete for a flag above 0) answer `this`; the three Metrowerks vectors' and CCharInfoList's take the object.
 #include "CStaticBuffer.h"
 #include "TbResource.h"

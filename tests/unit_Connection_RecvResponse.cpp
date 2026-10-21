@@ -1,5 +1,5 @@
 // Test library for Connection::RecvResponse and Connection::GetLocalIPAddress (unit v5371; libtpw_unit_Connection_RecvResponse.dylib,
-// tests/test_Connection_RecvResponse.py), main app: src/Email_Send_CSock_SendData_Connection_RecvResponse.cpp.
+// tests/test_Connection_RecvResponse.py), main app: src/game/online/Connection.cpp.
 //
 // The callees (atoi, strncpy, memmove, recv, gethostname, gethostbyname, socket, inet_addr, connect, getsockname, closesocket) are fakes
 // that record what the real ones read; the answers come from the test's queues.

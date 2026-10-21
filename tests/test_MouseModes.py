@@ -1,5 +1,5 @@
 """Unit w144, the rest of Mouse.cpp, against libtpw_unit_MouseModes.dylib (tests/unit_MouseModes.cpp), main app ("SimTheme Park"):
-  src/Mouse_modes.cpp   CMouseMode base bodies (0x1007dfbc to 0x1007e4f8, inline in include/Mouse.h), CMMPathDraw (0x1007e6e4 to 0x1008151c),
+  src/game/Mouse.cpp   CMouseMode base bodies (0x1007dfbc to 0x1007e4f8, inline in include/Mouse.h), CMMPathDraw (0x1007e6e4 to 0x1008151c),
                         CMMOnline (0x1007faac to 0x10081228), CMMCoaster (0x1007fd14 to 0x10081174), CMMFirstPersonTarget (0x1007fe70 to 0x100810b8),
                         __sinit_Mouse_cpp 0x100815c8
 
@@ -7,7 +7,7 @@ A case is a world and a call. The world is built twice by ONE piece of Python co
 the original, and in the host library's memory (little-endian) for the translation; the same code reads both back. Every callee outside the
 unit is a fake on both sides that records its arguments and answers from the case's queues: the cell predicates, the cell system, the cursor,
 the shift key, the ride database and the ride record, the object calls, the coaster click, the online control, CTRACE, GAME_ASSERTMSG, the
-nothrow operator new, operator delete and a fake current mode. The landed src/Mouse.cpp (AssignMouseMode, CMMDefault) runs for real on both
+nothrow operator new, operator delete and a fake current mode. The landed src/game/Mouse.cpp (AssignMouseMode, CMMDefault) runs for real on both
 sides, as do the unit's own modes made by the hand over (CMMOnline's constructor included).
 
 The world of a case: gMouse, gMouseMode (none, the fake mode, or the mode under test), the two mouse words, gIntrface's cell id, the game
@@ -47,7 +47,7 @@ ADDR = {
 }
 SINIT = 0x100815C8
 OWN = {a for table in ADDR.values() for a in table.values()} | {SINIT}
-# the landed originals of src/Mouse.cpp that run for real: AssignMouseMode, the CMMDefault constructor, destructor, GetMode, OnLeftClick, OnRightClick, OnAssign
+# the landed originals of src/game/Mouse.cpp that run for real: AssignMouseMode, the CMMDefault constructor, destructor, GetMode, OnLeftClick, OnRightClick, OnAssign
 LANDED = {0x1007E2E0, 0x1007EA78, 0x100813E8, 0x10081468, 0x1007EAC4, 0x1007EAF8, 0x1007EB2C}
 OPID = dict(OnLeftClick=0, OnLeftRelease=1, OnRightClick=2, OnRightRelease=3, OnDoubleClick=4, OnMouseMove=5, WhileLeftDown=6,
             WhileRightDown=7, GetMode=8, OnAssign=9, OnRelease=10)

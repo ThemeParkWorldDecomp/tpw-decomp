@@ -1,7 +1,7 @@
 """Unit w201, the park's hoarding (the walk, the lock, the redraw, the image of the park and the legality checks) against
-libtpw_unit_HoardingImage.dylib (tests/unit_HoardingImage.cpp), main app ("SimTheme Park"): src/LLCellSystem_hoardimage.cpp (the 12 LLCC functions
-of LLCellSystem.cpp 0x100936f4 to 0x10096a44 that are listed below), src/TrackCell_flags.cpp (CTrackCell::GetFlag, SetFlag, UnSetFlag, IsHoarding,
-IsTrackX, IsCorner) and src/MapCell_flags.cpp (CMapCell::IsFlag): 19 functions.
+libtpw_unit_HoardingImage.dylib (tests/unit_HoardingImage.cpp), main app ("SimTheme Park"): src/game/park/LLCellSystem.cpp (the 12 LLCC functions
+of LLCellSystem.cpp 0x100936f4 to 0x10096a44 that are listed below), src/game/park/TrackCell.cpp (CTrackCell::GetFlag, SetFlag, UnSetFlag, IsHoarding,
+IsTrackX, IsCorner) and src/game/park/MapCell.cpp (CMapCell::IsFlag): 19 functions.
 
 A case is the cell system's words (the hoarding extents, the click stack count, gLLCC4818 and the rest), the 0x2312 bytes of the two images (the new
 image directly followed by the current one), the click stack (filled with a pattern), the world (a raw block of 0x1B0000 bytes from world + 0x2d8: the

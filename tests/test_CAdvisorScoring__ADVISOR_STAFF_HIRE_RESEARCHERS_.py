@@ -1,7 +1,7 @@
 """Unit v5971, the advisor scorers for opening and closing the park, hiring and training researchers, mechanic and handyman coverage,
 and GetHighestScoringFromNext, against libtpw_unit_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.dylib
 (tests/unit_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.cpp), main app ("SimTheme Park"),
-src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.cpp:
+src/game/advisor/AdvisorScoring.cpp:
   _ADVISOR_OPEN_PARK 0x100113dc, _ADVISOR_CLOSE_PARK 0x1001151c, _ADVISOR_STAFF_HIRE_RESEARCHERS_1 0x100121b0,
   _ADVISOR_STAFF_HIRE_RESEARCHERS_3 0x10012468, _ADVISOR_STAFF_MECHANIC_COVERAGE 0x1001274c,
   _ADVISOR_STAFF_HANDYMAN_COVERAGE 0x100129e4, _ADVISOR_STAFF_TRAIN_RESEARCHERS 0x10013444, GetHighestScoringFromNext 0x10010f88

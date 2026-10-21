@@ -1,6 +1,6 @@
 // Test library for ShowStatusPanel::UpdateWindow, __sinit_ui_upgradeStatus_cpp and YearEndPanelMsg (unit v51007;
 // libtpw_unit_ShowStatusPanel_UpdateWindow_2.dylib, tests/test_ShowStatusPanel_UpdateWindow_2.py), main app:
-//   src/ShowStatusPanel_UpdateStatusWindow_ShowStatusPanel_UpdateWindow_2.cpp
+//   src/game/ui/ui_showStatus.cpp, src/game/ui/ui_upgradeStatus.cpp, src/game/ui/ui_yearEndPanel.cpp
 //
 // The callees outside the unit are recording fakes; the panel's table entries and the windows' virtuals are exported function
 // pointers (tpw_us_fn) that the test puts in the table blocks. The globals of other files are defined here.
@@ -117,7 +117,7 @@ const char16_t* Slot3c(void* self) {
 }
 }  // namespace
 
-// The table the static initialiser stores (src/ui_StatusPanel_tables.cpp, unit v5L31): a block of the arena made on first use; the test
+// The table the static initialiser stores (src/game/ui/ui_StatusPanel.cpp, unit v5L31): a block of the arena made on first use; the test
 // compares only where it is stored.
 uint32_t* UpgradeStatusPanelTable() {
     static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));

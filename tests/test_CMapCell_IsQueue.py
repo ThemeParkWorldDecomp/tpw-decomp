@@ -1,6 +1,6 @@
 """Unit v51060, the small predicates and accessors of CMapCell, CTrackCell, CLBLobby and the cell system, against
 libtpw_unit_CMapCell_IsQueue.dylib (tests/unit_CMapCell_IsQueue.cpp), main app ("SimTheme Park"),
-src/MapDelta_map_CMapCell_IsQueue.cpp: thirty functions, listed in OPS with their addresses.
+src/game/online/lobby.cpp, src/game/park/LLCellRide.cpp, src/game/park/MapCell.cpp, src/game/park/TrackCell.cpp: thirty functions, listed in OPS with their addresses.
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian) for the translation; the same code reads both back (fields are written

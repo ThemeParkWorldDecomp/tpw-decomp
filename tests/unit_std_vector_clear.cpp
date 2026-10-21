@@ -1,5 +1,5 @@
 // Test library for the unit v5956 functions (libtpw_unit_std_vector_clear.dylib, tests/test_std_vector_clear.py), main app:
-//   src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_std_vector_clear.cpp
+//   src/game/MslSupport.cpp, src/game/online/OnlineParser.cpp
 //   std::vector<Argument>::clear / tear_down, CToken::CToken (two), CParser::GetChar, COnlinePerson::COnlinePerson,
 //   std::list<std::wstring>::insert.
 //

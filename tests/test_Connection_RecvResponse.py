@@ -1,5 +1,5 @@
 """Unit v5371, the connection base class's reply reader and local address, against libtpw_unit_Connection_RecvResponse.dylib
-(tests/unit_Connection_RecvResponse.cpp), main app, src/Email_Send_CSock_SendData_Connection_RecvResponse.cpp:
+(tests/unit_Connection_RecvResponse.cpp), main app, src/game/online/Connection.cpp:
   Connection::RecvResponse 0x10201bb4, Connection::GetLocalIPAddress 0x10201d80
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

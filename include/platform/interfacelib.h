@@ -95,7 +95,7 @@ void UseResFile(int16_t refNum);
 Handle GetNamedResource(uint32_t type, const unsigned char* name);
 void CloseResFile(int16_t refNum);
 
-// Unit w221 (src/LbFile_more.cpp), InterfaceLib imports.
+// Unit w221 (src/bullfrog/LbFile.cpp, src/bullfrog/LbApp.cpp), InterfaceLib imports.
 OSErr HGetVol(unsigned char* volName, int16_t* vRefNum, int32_t* dirID); // bullfrog glue 0x1006b55c
 void UpperString(unsigned char* text, bool diacSensitive); // glue 0x1006b574
 char* p2cstr(unsigned char* text); // glue 0x1006b58c

@@ -1,11 +1,11 @@
 // Test library for the default window handlers of five controls and their leaves (libtpw_unit_UIHandlers.dylib; see
-// tests/test_UIHandlers.py): src/ui_handlers_small.cpp (UI_DefaultButtonCallback, UI_DefaultCheckButtonsCallback,
-// UI_DefaultKnobCallback, UI_DefaultTextBoxCallback, UI_DefaultVaryBoxCallback), src/InterfaceWindow_focus.cpp (CheckFocus,
-// CaptureDevice, UnCaptureDevice, cursorChange, GetID, GetParent), src/InterfaceKnob.cpp (DoKnobMove, ChangeAngle) and
-// src/InterfaceVaryBox.cpp (DoVaryBoxButton), unit w37a. Under them, real: the button (src/InterfaceButton.cpp: the handler
+// tests/test_UIHandlers.py): src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp (UI_DefaultButtonCallback, UI_DefaultCheckButtonsCallback,
+// UI_DefaultKnobCallback, UI_DefaultTextBoxCallback, UI_DefaultVaryBoxCallback), src/game/ui/InterfaceWindow.cpp (CheckFocus,
+// CaptureDevice, UnCaptureDevice, cursorChange, GetID, GetParent), src/game/ui/InterfaceKnob.cpp (DoKnobMove, ChangeAngle) and
+// src/game/ui/InterfaceVaryBox.cpp (DoVaryBoxButton), unit w37a. Under them, real: the button (src/game/ui/InterfaceButton.cpp: the handler
 // reaches CalcFrame, DoTextColour, SetState, HiLight, StopHeldTimer and WhatAmI), the controls' constructors
-// (src/ui_controls_create.cpp, which build the test windows), the window's constructor (src/InterfaceWindow.cpp), GetWindow
-// (src/InterfaceWindow_show.cpp) and the rectangles (src/UI_Base.cpp).
+// (src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp, which build the test windows), the window's constructor (src/game/ui/InterfaceWindow.cpp), GetWindow
+// (src/game/ui/InterfaceWindow.cpp) and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp).
 //
 // Everything else the unit reaches is a fake that records through calllog: the message poster, the pointer update, the cursor,
 // the UI clock (IveGotTicks, which answers a clock the test sets and moves on by a step each call), the window's default handler,

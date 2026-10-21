@@ -1,6 +1,6 @@
 // Test library for the Metrowerks std::deque<std::vector<Argument>> (unit v5938; libtpw_unit_std_deque_std_vector_std_allocator_std_vector_pu.dylib,
 // tests/test_std_deque_std_vector_std_allocator_std_vector_pu.py), main app:
-//   src/std_deque_std_vector_std_allocator_std_vector_pu.cpp   push_back, pop_front, the copy constructor, make_iterator
+//   src/game/MslSupport.cpp   push_back, pop_front, the copy constructor, make_iterator
 //
 // The callees outside the unit are fakes that record what the real ones read: the block table (a std::__cdeque<const void*>) is modelled
 // by a few words of arithmetic, the vector copy constructor and destructor write a marker into the element, the runtime imports bump-allocate

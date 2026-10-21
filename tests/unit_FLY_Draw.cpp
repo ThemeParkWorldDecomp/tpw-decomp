@@ -1,5 +1,5 @@
 // Test library for FLY_Draw (unit v5007; libtpw_unit_FLY_Draw.dylib, tests/test_FLY_Draw.py), main app:
-//   src/hlsprite_flybase_FLY_Draw.cpp   FLY_Draw and its working globals
+//   src/game/rides/FlyingRide.cpp   FLY_Draw and its working globals
 //
 // The callees outside the unit (the matrix helpers, FindDataNodeIndexByID, PAR_SetEmitterPos and the float-to-angle function at 0x10237cd8)
 // are fakes that record the arguments the real ones read and answer from the test's queues. gFlyBases and gRideAnimSets belong to other

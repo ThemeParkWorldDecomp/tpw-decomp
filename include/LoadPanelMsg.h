@@ -1,4 +1,4 @@
-// Unit v5183 (src/LoadPanelMsg.cpp, ui_mainpanel2.cpp in the main app): the message functions of the load and save panels and the hire
+// Unit v5183 (src/game/ui/ui_loadSavePanel.cpp, ui_mainpanel2.cpp in the main app): the message functions of the load and save panels and the hire
 // panel's state change.
 #pragma once
 #include <cstdint>
@@ -29,7 +29,7 @@ extern char16_t gSavePanelName[34];     // 0x1039492c: the name typed in the sav
 extern int32_t gSavePanelOpen;          // 0x10394970
 extern int32_t gLoadPanelOpen;          // 0x10394974
 
-// Unit v5554 (src/HirePanelLCHandler.cpp): the hire panel's list row attach function and staff type button handler.
+// Unit v5554 (src/game/ui/ui_hirePanel.cpp): the hire panel's list row attach function and staff type button handler.
 enum StaffType : int32_t;
 void FillHireList(StaffType type, int32_t flag);      // 0x101a0fc8 (stand-in)
 void HirePanelLCPostFormat(InterfaceWindow* window);  // 0x101a18a4 (LCPostFormat of ui_mainpanel2.cpp's hire list)
@@ -41,12 +41,12 @@ extern int32_t gHireListScript;         // 0x1039490c (name invented)
 extern int32_t gHireListSelA;           // 0x102aa328 (name invented; -1 at start)
 extern int32_t gHireListSelB;           // 0x102aa32c (name invented; -1 at start)
 
-// Unit v5702 (src/LoadPanelMsg_LCFormat_5.cpp): the save panel's row maker (LCFormat of ui_mainpanel2.cpp at 0x101a3154; named so because
+// Unit v5702 (src/game/ui/ui_loadSavePanel.cpp): the save panel's row maker (LCFormat of ui_mainpanel2.cpp at 0x101a3154; named so because
 // LCFormat exists at other addresses). The window is 100 wide and gSavePanelListFormat high, with one child (kind 1, id 1).
 InterfaceWindow* SavePanelLCFormat();
 extern int32_t gSavePanelListFormat;    // 0x10394928 (name invented; 0 until the first row maker call)
 
-// Unit v51019 (src/HirePanelLCHandler_CreateHireListPanel_2.cpp): CreateHireListPanel (ui_main.h). Names invented; the addresses are the Mac's.
+// Unit v51019 (src/game/ui/ui_hirePanel.cpp): CreateHireListPanel (ui_main.h). Names invented; the addresses are the Mac's.
 extern int16_t gHirePanelScript[];     // 0x102a9ee8: the hire panel's window script (the image's words, generated at configure time)
 extern int32_t gHireColumnColour;       // 0x102aa320: the column buttons' colour (8 at start)
 extern int32_t gHireSortColumn;         // 0x102aa324: the column the list is sorted on (1 at start)
@@ -70,7 +70,7 @@ void WindowSetValue(InterfaceWindow* window, int32_t value);   // virtual slot 0
 void WindowSetText(InterfaceWindow* window, char16_t* text);   // virtual slot 0x2c
 }  // namespace hirelist_callee
 
-// Unit v5984 (src/sinit_ui_FinancePanel_cpp_UpdateViewWindow_2.cpp): the hire panel's staff preview, row maker and message function.
+// Unit v5984 (src/game/ui/ui_hirePanel.cpp): the hire panel's staff preview, row maker and message function.
 class InterfaceFont;
 void UpdateViewWindow(int32_t slot);   // 0x101a10f4 (504 bytes): puts the animated preview of staff slot `slot` in the hire panel (window 0x2484)
 extern int32_t gHireListFormat;        // 0x10394908 (name invented): the hire list row height HireListLCFormat works out once (0 until then)

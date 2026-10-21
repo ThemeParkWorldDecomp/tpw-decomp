@@ -1,9 +1,9 @@
 """Unit w180 (main app), against libtpw_unit_GoldenTicket.dylib (tests/unit_GoldenTicket.cpp):
 
-  src/GoldenTicket.cpp  CGoldenTicketControl::HowManyTickets 0x100fbdf8, SpendTicketOn 0x100fbea0, HasBeenBought 0x100fbfec, CanIAfford 0x100fc0c8,
+  src/game/park/GoldenTickets.cpp  CGoldenTicketControl::HowManyTickets 0x100fbdf8, SpendTicketOn 0x100fbea0, HasBeenBought 0x100fbfec, CanIAfford 0x100fc0c8,
                         CheckForLocal 0x100fc1d0, CheckForGlobal 0x100fc56c, CheckForSecret 0x100fc6c4, EarnedGoldenTicket 0x100fc7c4 (local),
                         0x100fc918 (global), 0x100fca5c (secret), TellIfFirst 0x100fd7f0
-  src/MsgAdvisor.cpp    CMsgAdvisor's constructor 0x1015190c, destructor 0x100fcea8 and GetType 0x100fd9cc
+  src/game/park/GoldenTickets.cpp, src/game/ui/MessageCentre.cpp    CMsgAdvisor's constructor 0x1015190c, destructor 0x100fcea8 and GetType 0x100fd9cc
 
 They run as the original on the PowerPC side (the signed 64 bit divide helper 0x10237e1c too, and the constructor, GetType and destructor of CMsgAdvisor
 where TellIfFirst uses them) and as src/ on the host. Every other callee is a fake that records the same event on both sides: the master save (its

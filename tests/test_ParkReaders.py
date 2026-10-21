@@ -1,4 +1,4 @@
-"""Differential tests for unit w125, the frame readers of the things (src/ParkAnalyser_readers.cpp, src/ui_TextObjects.cpp). See difftest.py and tpwtest.py.
+"""Differential tests for unit w125, the frame readers of the things (src/game/park/analyser.cpp, src/game/ui/InterfaceTextObjectSprite.cpp). See difftest.py and tpwtest.py.
 
 CParkAnalyser::HowBusyIsPark, NumberOfVisitorsInPark and CountNeighboursOfType, and the Change of InterfaceNumberTextObject and
 InterfaceCashAndGTickTextObject. Every callee is a fake that records the same event on both sides (GAME_ASSERTMSG, the world accessor and its used-thing

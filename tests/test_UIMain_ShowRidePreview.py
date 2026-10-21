@@ -1,5 +1,5 @@
 """Unit v5013: the ride and sprite previews, MAKECOLUMNBUTTON and UIMain_ZoomToThing, against libtpw_unit_UIMain_ShowRidePreview.dylib
-(tests/unit_UIMain_ShowRidePreview.cpp), main app ("SimTheme Park"), src/ui_main_kbcapture_UIMain_ShowRidePreview.cpp:
+(tests/unit_UIMain_ShowRidePreview.cpp), main app ("SimTheme Park"), src/game/ui/ui_main.cpp:
   UIMain_ShowRidePreview 0x10181400, UIMain_ShowSpritePreview 0x10181648, MAKECOLUMNBUTTON 0x101818e4, UIMain_ZoomToThing 0x10181b00
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

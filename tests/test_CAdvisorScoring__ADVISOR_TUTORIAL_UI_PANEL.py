@@ -1,6 +1,6 @@
 """Unit v5767, six CAdvisorScoring members, against libtpw_unit_CAdvisorScoring__ADVISOR_TUTORIAL_UI_PANEL.dylib
 (tests/unit_CAdvisorScoring__ADVISOR_TUTORIAL_UI_PANEL.cpp), main app ("SimTheme Park"),
-src/AdvisorScoring_CAdvisorScoring__ADVISOR_TUTORIAL_UI_PANEL.cpp:
+src/game/advisor/AdvisorScoring.cpp:
   _ADVISOR_TUTORIAL_UI_PANEL 0x1001b540, _ADVISOR_GOLD_TICKET_NEAR_TO_XPROFIT 0x1001b30c, _ADVISOR_PRICING_DRINKS_POOR_VALUE 0x100195c4,
   Save 0x10011294, Load 0x100111f0, GetFirstResponseFor 0x10010464
 

@@ -1,5 +1,5 @@
 // Test library for CreateAllShowsPanel (unit v5677; libtpw_unit_CreateAllShowsPanel.dylib), main app:
-//   src/LCPostFormat_CreateAllShowsPanel.cpp
+//   src/game/ui/ui_allItemsPanel.cpp
 // The callees are recording fakes; objects are fixed fake addresses that are never dereferenced.
 #include <cstddef>
 #include <cstdint>

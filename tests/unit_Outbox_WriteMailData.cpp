@@ -1,5 +1,5 @@
 // Test library for Outbox::Save and Outbox::WriteMailData (unit v5530; libtpw_unit_Outbox_WriteMailData.dylib, tests/test_Outbox_WriteMailData.py), main app:
-//   src/email_load_Outbox_Send_Outbox_WriteMailData.cpp   Outbox::Save, Outbox::WriteMailData
+//   src/game/online/email.cpp   Outbox::Save, Outbox::WriteMailData
 //
 // The stream functions (SaveStream*), time, localtime and MoveFile are recording fakes that answer from the case's queues. The Outbox is a
 // host object (std::string, std::list); the test sets and reads its parts through the tpw_ow_* functions. Outbox::Outbox is defined here

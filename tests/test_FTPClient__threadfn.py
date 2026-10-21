@@ -1,6 +1,6 @@
 """Unit v51070: FTPClient::_threadfn and 18 small library functions (constructors, destructors, list erase and splice, string
 equality, tree find, stream sentries, seekoff and seekpos, a cursor copy), against libtpw_unit_FTPClient__threadfn.dylib
-(tests/unit_FTPClient__threadfn.cpp), main app ("SimTheme Park"), src/FTPClient_RecvData_FTPClient_ParseFileSize_FTPClient__threadfn.cpp.
+(tests/unit_FTPClient__threadfn.cpp), main app ("SimTheme Park"), src/game/MslSupport.cpp, src/game/online/FTPClient.cpp.
 
 A case is a world and a call. The world is one 0x4000 byte block built twice by ONE piece of Python code (big-endian words in the
 emulator, little-endian words on the host); objects sit at fixed offsets in it, so every pointer a callee logs is the offset from

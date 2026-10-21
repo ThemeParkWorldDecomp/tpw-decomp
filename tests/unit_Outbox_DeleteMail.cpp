@@ -1,5 +1,5 @@
 // Test library for Outbox::DeleteMail (unit v5690; libtpw_unit_Outbox_DeleteMail.dylib, tests/test_Outbox_DeleteMail.py), main app:
-//   src/email_load_Outbox_Send_Outbox_WriteMailData_Outbox_DeleteMail.cpp
+//   src/game/online/email.cpp
 //
 // unlink is a fake that records the path as big-endian words (the same packing as the PowerPC stub).
 #include <cstddef>

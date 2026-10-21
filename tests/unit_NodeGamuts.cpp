@@ -1,4 +1,4 @@
-// Host side of the node gamut tests (src/NodeGamuts.cpp with src/rsse_matrix.cpp). The unit
+// Host side of the node gamut tests (src/game/MeshLoad.cpp with src/game/LMatrix.cpp). The unit
 // calls nothing outside itself, so there are no fakes and no call log: a case builds a tree
 // of nodes in the arena, calls a function and dumps everything the function could touch.
 // Each entry point takes and returns plain 32-bit words (float bit patterns included), laid

@@ -1,5 +1,5 @@
 """Unit v5766, two helpers of the online panel, against libtpw_unit_DisableVoteButton.dylib (tests/unit_DisableVoteButton.cpp), main app
-("SimTheme Park"), src/OnlinePanelMsg_DisableVoteButton.cpp:
+("SimTheme Park"), src/game/ui/ui_onlinePanel.cpp:
   DisableVoteButton 0x101e6224, EarmuffsButtonDown 0x101e6168
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: four fake windows (tags 1..4) chained by a word at +0x200

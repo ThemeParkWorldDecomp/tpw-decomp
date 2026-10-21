@@ -1,4 +1,4 @@
-"""The height field's view gamut (src/tb_hfield_gamut.cpp, src/tb_polygon.cpp), original versus
+"""The height field's view gamut (src/engine/Gamut.cpp), original versus
 translation: CGamut::CalculateGamut, CGamut::GetHFieldIntersection, CPolygon::DumpData,
 CPolygon::GetNewVertexOutsideStatus, CPolygon::IsOutsideOfPlane, GenerateClipXVector and
 GenerateClipZVector.

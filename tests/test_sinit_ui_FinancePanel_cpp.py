@@ -1,5 +1,5 @@
 """Unit v5377, the finance panel static initialiser, against libtpw_unit_sinit_ui_FinancePanel_cpp.dylib
-(tests/unit_sinit_ui_FinancePanel_cpp.cpp), main app, src/sinit_ui_FinancePanel_cpp.cpp:
+(tests/unit_sinit_ui_FinancePanel_cpp.cpp), main app, src/game/ui/ui_FinancePanel.cpp:
   __sinit_ui_FinancePanel_cpp 0x101a0dbc
 
 A case is a world and a call. The world is built by ONE piece of Python code in both memories. LbPalette_FindColour and the CUIGrapher

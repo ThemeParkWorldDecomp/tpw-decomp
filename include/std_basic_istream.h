@@ -118,7 +118,7 @@ char16_t Widen(void* ios, char c);             // basic_ios<wchar_t>::widen 0x10
 }  // namespace wistream_callee
 
 // Unit v5898: std::basic_ostream<wchar_t>::flush 0x102268f8 and basic_ostream<wchar_t>(streambuf*) 0x10226c94
-// (src/std_basic_ostream_flush_2.cpp). The stream starts with its ios pointer (Mac 0x00); the constructor writes Mac offsets.
+// (src/game/MslSupport.cpp). The stream starts with its ios pointer (Mac 0x00); the constructor writes Mac offsets.
 extern uint32_t gWostreamVtbl[4];     // 0x102b1f08 (TOC -0x5eb4; initial word 0x102b1f00)
 struct WostreamW {
     Ptr32<MacIosBase> mIos;   // 0x00

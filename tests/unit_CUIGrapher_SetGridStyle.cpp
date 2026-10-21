@@ -1,5 +1,5 @@
 // Test library for the unit v51056 functions (libtpw_unit_CUIGrapher_SetGridStyle.dylib, tests/test_CUIGrapher_SetGridStyle.py), main app:
-//   src/ui_cursor_classes_CUIGrapher_DrawGraph_CUIGrapher_SetGridStyle.cpp
+//   src/game/TPEmbed.cpp, src/game/online/bthread.cpp, src/game/save/FS_LoadSave.cpp, src/game/ui/UIGrapher.cpp, src/game/ui/ui_mainmenu.cpp
 //   CUIGrapher setters, CFSLoadSave Save/SaveHidden/LoadHidden/destructor, ui_mainmenu.cpp and TPEmbed.cpp small functions,
 //   bthread_create / bthread_mutex / bthread_cond::signal, the Argument vector and Connection destructors, operator_new.
 //

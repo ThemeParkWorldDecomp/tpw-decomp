@@ -1,5 +1,5 @@
 // Test entry point for the texture cache's frame calls (library unit_TextureFrame:
-// src/tb_texturecache_frame2.cpp): CTextureCache::Prepare, UploadToVRAM, GenerateTexturePages,
+// src/engine/TextureCache.cpp): CTextureCache::Prepare, UploadToVRAM, GenerateTexturePages,
 // ReInitialize, DumpTCStreamToLog_Prepare and _Execute, and CTextureLink::PageUpdated.
 //
 // A case is one call on a small world that tests/test_TextureFrame.py describes as a flat list
@@ -65,7 +65,7 @@ CDisplay::CDisplay() {}
 CDisplay gei_Display;
 CTextureSettings::CTextureSettings() {}
 CTextureSettings gei_TextureSettings;
-uint32_t gFrequencyIndex = 0;   // defined in src/tb_texturecache_frame.cpp (another unit)
+uint32_t gFrequencyIndex = 0;   // defined in src/engine/TextureCache.cpp (another unit)
 CTextureEntry::CTextureEntry() {}
 CTextureEntry::~CTextureEntry() {}
 

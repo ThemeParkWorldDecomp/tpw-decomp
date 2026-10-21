@@ -1,4 +1,4 @@
-// Fakes and entry points for the clipper (library unit_Clipping: src/tb_clipping.cpp).
+// Fakes and entry points for the clipper (library unit_Clipping: src/engine/Clipping.cpp).
 //
 // Everything the unit calls is a fake that records its arguments through tests/calllog.h: the
 // six edge clippers (VertexClip_*), the math unit's strided Transform and the assertion. The

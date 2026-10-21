@@ -1,4 +1,4 @@
-// Fakes for the map zoom (src/tb_mapzoom_class.cpp: all ten CMapZoom methods, and the
+// Fakes for the map zoom (src/engine/tb_mapzoom.cpp: all ten CMapZoom methods, and the
 // construction of the global gei_MapZoom, which is real in the unit).
 //
 // Everything the zoom calls outside the unit is a fake that records an event (tests/calllog.h):

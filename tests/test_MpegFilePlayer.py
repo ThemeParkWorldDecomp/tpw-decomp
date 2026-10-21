@@ -1,6 +1,6 @@
 """Unit w80c, the sound library's MPEG file player, against libtpw_unit_MpegFilePlayer.dylib (tests/unit_MpegFilePlayer.cpp), in
 the sound library ("sound symbols shared", Code at 0x10000000, TOC r2 = 0x1003abf0):
-  src/TbMpegFilePlayer.cpp  CMpegMacFilePlayerUnpooled: constructor 0x10007dac, destructor 0x10003a30, Open 0x100031e4, GetHeader
+  src/sound/CSprocketsModule.cpp, src/sound/LbMpeg.cpp, src/sound/MpegDecode.cpp, src/sound/StreamableMpeg2.cpp  CMpegMacFilePlayerUnpooled: constructor 0x10007dac, destructor 0x10003a30, Open 0x100031e4, GetHeader
                             0x1000339c, DecodeHeader 0x10003420, SeekBits 0x100034d4, NextBuffer 0x100035c4, ReadBuffered
                             0x10003620, RequestBuffer 0x10003868, Close 0x100039a0; SamsUtilities::UPooled<..., 10>: constructor
                             0x10007d1c, destructor 0x100086a4, operator new 0x10007ffc, operator delete 0x10007e20,

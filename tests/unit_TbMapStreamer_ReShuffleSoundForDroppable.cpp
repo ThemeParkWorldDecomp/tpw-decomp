@@ -1,6 +1,6 @@
 // Test library for TbMapStreamer::ReShuffleSoundForDroppable and SaveCatgoryFixupTable (unit v5047;
 // libtpw_unit_TbMapStreamer_ReShuffleSoundForDroppable.dylib), main app:
-//   src/TbMapStreamer_TbMapStreamer_ReShuffleSoundForDroppable.cpp
+//   src/sound/TbMapStreamer.cpp
 //
 // The callees outside the unit are recording fakes: TbSoundManager::IsBankDroppable, the file's Write / Seek / GetPos (a CFile
 // subclass) and the string helpers of TbMapStreamerFixup. mpSoundManager is defined here.

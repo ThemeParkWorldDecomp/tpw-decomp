@@ -1,5 +1,5 @@
 """Unit v51107, the small Sound Sprockets pieces of CSprocketsModule.cpp, against libtpw_unit_SamsUtilities_UCommand_SetImmediate.dylib
-(tests/unit_SamsUtilities_UCommand_SetImmediate.cpp), sound symbols shared, src/TbAudioBody_create_SamsUtilities_UCommand_SetImmediate.cpp:
+(tests/unit_SamsUtilities_UCommand_SetImmediate.cpp), sound symbols shared, src/sound/CSprocketsModule.cpp, src/sound/SprocketsChannel.cpp:
   UCommand::SetImmediate 0x1002a5c4, UHasFlags<unsigned long> ClearFlag 0x1002a63c, SetFlag 0x1002a690, UHasFlags() 0x1002a858,
   UHasFlags(unsigned long) 0x1002c4d8, UCommand() 0x1002a7e8, UCommand(unsigned long) 0x1002c468, UReferenceCounter::operator T* 0x1002a6e0,
   UCommandPlay 0x1002a774, CSprocketsChannel SetPipe 0x1002a94c, GetDescription 0x1002a99c, Is3D 0x1002b1fc, UReferenceCounted::AddReference

@@ -1,5 +1,5 @@
 // Test library for the tag panel functions (unit v5565; libtpw_unit_ShowTagPanel.dylib, tests/test_ShowTagPanel.py), main app:
-//   src/ui_StatusPanel_SetButton_ShowTagPanel.cpp   ShowTagPanel, TagCallback
+//   src/game/ui/ui_tags.cpp   ShowTagPanel, TagCallback
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The windows
 // are zeroed blocks whose first word is a fake vtable (slot 6 is Enable); the globals of other files are defined here.

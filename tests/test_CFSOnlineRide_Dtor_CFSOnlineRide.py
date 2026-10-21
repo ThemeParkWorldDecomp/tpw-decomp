@@ -1,5 +1,5 @@
 """Unit v5741, CFSOnlineRide::~CFSOnlineRide, against libtpw_unit_CFSOnlineRide_Dtor_CFSOnlineRide.dylib
-(tests/unit_CFSOnlineRide_Dtor_CFSOnlineRide.cpp), main app, src/CFSOnlineRide_Dtor_CFSOnlineRide.cpp:
+(tests/unit_CFSOnlineRide_Dtor_CFSOnlineRide.cpp), main app, src/game/online/FS_OnlineList.cpp:
   CFSOnlineRide::~CFSOnlineRide 0x1017cbf4
 
 A case is a ride list (up to 6 nodes holding rides 0..4, ride 0 is the one destroyed, maybe absent or repeated) and a delete flag. The

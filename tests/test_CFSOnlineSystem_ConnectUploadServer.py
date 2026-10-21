@@ -1,6 +1,6 @@
 """Unit v5935: CFSOnlineSystem::ConnectUploadServer and CFSOnlineSystem::LoggedInRequestFTPDownload, against
 libtpw_unit_CFSOnlineSystem_ConnectUploadServer.dylib (tests/unit_CFSOnlineSystem_ConnectUploadServer.cpp), main app
-("SimTheme Park"), src/FS_Online_init_CFSOnlineSystem_ConnectUploadServer.cpp:
+("SimTheme Park"), src/game/online/FS_Online.cpp:
   CFSOnlineSystem::ConnectUploadServer 0x10175808, CFSOnlineSystem::LoggedInRequestFTPDownload 0x10176418
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for

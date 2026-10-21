@@ -1,5 +1,5 @@
 """Unit v5019, the all-staff panel, against libtpw_unit_CreateAllStaffPanel.dylib (tests/unit_CreateAllStaffPanel.cpp), main app
-("SimTheme Park"), src/CreateAllStaffPanel.cpp:
+("SimTheme Park"), src/game/ui/ui_allStaffPanel.cpp:
   CreateAllStaffPanel 0x10199630
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

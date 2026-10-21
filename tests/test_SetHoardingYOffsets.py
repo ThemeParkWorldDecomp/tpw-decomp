@@ -1,5 +1,5 @@
 """Unit v5674, the ride hoardings' height offsets, against libtpw_unit_SetHoardingYOffsets.dylib (tests/unit_SetHoardingYOffsets.cpp), main app
-("SimTheme Park"), src/LevelSystems_SetHoardingYOffsets.cpp:
+("SimTheme Park"), src/game/park/TPHoardings.cpp:
   SetHoardingYOffsets 0x10060c80, GetRotatedHFieldCoord 0x10060ab8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

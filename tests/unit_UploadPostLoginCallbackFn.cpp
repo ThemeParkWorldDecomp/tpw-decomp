@@ -1,6 +1,6 @@
 // Test library for seven small online system members (unit v5961; libtpw_unit_UploadPostLoginCallbackFn.dylib,
 // tests/test_UploadPostLoginCallbackFn.py), main app:
-//   src/FS_Online_init_CFSOnlineSystem_LoggedInRequestUpload_UploadPostLoginCallbackFn.cpp
+//   src/game/online/FS_Online.cpp, src/game/online/FS_OnlineList.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The globals of other
 // files the unit reads (gOnlineSystem, gOnlineConfig, gText) are defined here.

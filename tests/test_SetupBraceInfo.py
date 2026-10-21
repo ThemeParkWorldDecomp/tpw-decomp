@@ -1,5 +1,5 @@
 """Unit v5731, the brace info blocks and the brace/pylon list links, against libtpw_unit_SetupBraceInfo.dylib (tests/unit_SetupBraceInfo.cpp), main app
-("SimTheme Park"), src/GetNewBraceLoftInterval_SetupBraceInfo.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   SetupBraceInfo 0x1003df2c, DestroyBraceInfo 0x1003e064, LinkPylon 0x1003e344, LinkBrace 0x1003e48c, UnLinkBrace 0x1003e5c0
 
 A case is a world and a call. The world is a set of named objects (braces, pylons, a parameters block, an info, blocks) built twice by ONE

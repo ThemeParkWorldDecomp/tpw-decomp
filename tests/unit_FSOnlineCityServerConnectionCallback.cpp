@@ -1,5 +1,5 @@
 // Test library for FSOnlineCityServerConnectionCallback (unit v5271; libtpw_unit_FSOnlineCityServerConnectionCallback.dylib), main app:
-//   src/FS_Online_init_FSOnlineCityServerConnectionCallback.cpp
+//   src/game/online/FS_Online.cpp
 //
 // Fakes: CFSOnlineSystem::CFSOnlineSystem and CFSOnlineSystem::CityServerConnectionCallback record their events. gOnlineSystem is defined here.
 #include <cstddef>

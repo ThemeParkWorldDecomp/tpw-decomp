@@ -1,5 +1,5 @@
 // Test library for the guard (unit w182; libtpw_unit_Guard.dylib, tests/test_Guard.py), main app:
-//   src/Guard.cpp   CGuard (both constructors, Init, FinalDestroy, ReceiveMessage, Serialise, ProsecutePerp, IsAvailable, IsCarrying, UpdateTurn,
+//   src/game/people/guard.cpp   CGuard (both constructors, Init, FinalDestroy, ReceiveMessage, Serialise, ProsecutePerp, IsAvailable, IsCarrying, UpdateTurn,
 //                   ChooseNextAction, ModelState, SetState, ProcessIdle, ProcessPatrolling, ProcessProsecuting, ProcessWalkingToEntrance,
 //                   ProcessReturningToPatrol)
 //
@@ -75,7 +75,7 @@ public:
 
 }  // namespace
 
-// Test-only key function and destructor of CMsgDeath (src/MsgDeath.cpp is not linked); TestMessage overrides GetType.
+// Test-only key function and destructor of CMsgDeath (src/game/ui/MessageCentre.cpp, src/game/Thing.cpp is not linked); TestMessage overrides GetType.
 int32_t CMsgDeath::GetType() const { return 0x1b; }
 CMsgDeath::~CMsgDeath() {}
 

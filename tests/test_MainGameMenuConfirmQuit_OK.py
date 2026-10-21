@@ -1,6 +1,6 @@
 """Unit v5958, the main menu's quit answer, item callback and fade, and two functions of CFSLoadSave, against
 libtpw_unit_MainGameMenuConfirmQuit_OK.dylib (tests/unit_MainGameMenuConfirmQuit_OK.cpp), main app ("SimTheme Park"),
-src/ui_iterators_MainGameMenuConfirmPublish_OK_MainGameMenuConfirmQuit_OK.cpp:
+src/game/save/FS_LoadSave.cpp, src/game/ui/ui_mainmenu.cpp:
   MainGameMenuConfirmQuit_OK 0x101fab10, MainMenuItemCB 0x101fa9dc, itemOnFrame 0x101fa8d4,
   CFSLoadSave::SaveInternal 0x101fc790, CFSLoadSave::GetFirstSaveFileDetails 0x101fc97c
 

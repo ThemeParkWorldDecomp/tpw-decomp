@@ -1,5 +1,5 @@
 """Unit v5530: Outbox::Save and Outbox::WriteMailData, against libtpw_unit_Outbox_WriteMailData.dylib (tests/unit_Outbox_WriteMailData.cpp), main
-app ("SimTheme Park"), src/email_load_Outbox_Send_Outbox_WriteMailData.cpp:
+app ("SimTheme Park"), src/game/online/email.cpp:
   Outbox::Save 0x1020461c, Outbox::WriteMailData 0x10205154
 
 A case is a world and a call. The Outbox is built twice by one piece of Python code: in emulator memory at the Mac's offsets (strings as a

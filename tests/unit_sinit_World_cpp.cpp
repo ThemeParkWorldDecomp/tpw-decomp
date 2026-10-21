@@ -1,5 +1,5 @@
 // Test library for World.cpp's static initialiser (libtpw_unit_sinit_World_cpp.dylib, tests/test_sinit_World_cpp.py), main app:
-//   src/World_save_sinit_World_cpp.cpp   __sinit_World_cpp
+//   src/game/World.cpp   __sinit_World_cpp
 // Callees (constructors, __construct_array, __register_global_object) are recording fakes.
 #include <cstddef>
 #include <cstdint>

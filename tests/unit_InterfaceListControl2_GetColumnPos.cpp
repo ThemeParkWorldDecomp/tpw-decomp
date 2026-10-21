@@ -1,6 +1,6 @@
 // Test library for the list control's GetColumnPos, GetItem, SetData, GetNonHierIndexedEntry and default message function (unit v5955;
 // libtpw_unit_InterfaceListControl2_GetColumnPos.dylib, tests/test_InterfaceListControl2_GetColumnPos.py), main app:
-//   src/InterfaceListControl2_items_InterfaceListControl2_GetColumnPos.cpp   the five functions and gListControl2Keys
+//   src/game/ui/InterfaceListControl2.cpp   the five functions and gListControl2Keys
 //
 // The callees outside the unit (AdvanceIndex, the list's other members, the window's members, the posts and the default function) are
 // recording fakes. The virtual calls (the rectangles' PointIn and Shift, the scroll bar's SetValue and GetValue, the draw object's Show)

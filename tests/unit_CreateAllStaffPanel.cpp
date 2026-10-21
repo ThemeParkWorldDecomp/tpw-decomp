@@ -1,5 +1,5 @@
 // Test library for the all-staff panel (unit v5019; libtpw_unit_CreateAllStaffPanel.dylib, tests/test_CreateAllStaffPanel.py), main app:
-//   src/CreateAllStaffPanel.cpp   CreateAllStaffPanel and the globals gStaffColumnFont, gStaffSort, gStaffPanel, gStaffType
+//   src/game/ui/ui_allStaffPanel.cpp   CreateAllStaffPanel and the globals gStaffColumnFont, gStaffSort, gStaffPanel, gStaffType
 //
 // Every callee is a fake that records the arguments the real one reads and answers from the test's queue. The windows are raw blocks
 // whose first word is a hand made vtable (SetValue and SetText are the only virtual calls). The objects the function makes (the

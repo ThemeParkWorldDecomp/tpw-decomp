@@ -1,5 +1,5 @@
 // Test library for the fly base creation (unit v5236; libtpw_unit_FLY_CreateBase.dylib, tests/test_FLY_CreateBase.py), main app:
-//   src/hlsprite_flies_init_FLY_CreateBase.cpp   FLY_CreateBase, EmployEric
+//   src/game/rides/FlyingRide.cpp   FLY_CreateBase, EmployEric
 //
 // The callees outside the unit are recording fakes (LbMem_Alloc, CWorld::GetRand, SND_SendIndirectedEvent, GAME_ASSERTMSG,
 // CRideDatabase::GetRideInfo, InstanceRide, SetCurRideAnimDuration, FindDataNodeIndexByID); the globals of other files are defined here.

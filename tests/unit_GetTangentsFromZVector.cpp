@@ -1,5 +1,5 @@
 // Test library for GetTangentsFromZVector (unit v5011; libtpw_unit_GetTangentsFromZVector.dylib, tests/test_GetTangentsFromZVector.py), main app:
-//   src/GetTangentsFromZVector.cpp   GetTangentsFromZVector 0x1003be20
+//   src/game/rides/CoasterPylon.cpp   GetTangentsFromZVector 0x1003be20
 //
 // The callees outside the unit are the MSL glue imports sqrt, __fpclassifyf and fmod: fakes that record the arguments (doubles as two words)
 // and answer from the test (sqrt and fmod compute; __fpclassifyf answers from its queue). gTPGlobals is defined here, zero at start.

@@ -1,5 +1,5 @@
 """Unit v51000, LbScreen_SetMode of WinScrn.cpp, against libtpw_unit_LbScreen_SetMode_2.dylib (tests/unit_LbScreen_SetMode_2.cpp), program
-"bullfrog", src/LbScreen_Initialise_LbScreen_Terminate_LbScreen_SetMode_2.cpp:
+"bullfrog", src/bullfrog/WinScrn.cpp:
   LbScreen_SetMode 0x10069100
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

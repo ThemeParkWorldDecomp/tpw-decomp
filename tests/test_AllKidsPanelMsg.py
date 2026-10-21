@@ -1,5 +1,5 @@
 """Unit v5078, the all-kids panel, against libtpw_unit_AllKidsPanelMsg.dylib (tests/unit_AllKidsPanelMsg.cpp), main app
-("SimTheme Park"), src/ui_allKidsPanel_AllKidsPanelMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_allKidsPanel.cpp:
   FillAllKidsListCallback 0x10194880, UpdateListEntries 0x101949cc, AllKidsPanelMsg 0x10194b4c, LCFormat 0x10194df0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

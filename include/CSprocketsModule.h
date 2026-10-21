@@ -63,13 +63,13 @@ public:
     // before Init and after Close. ChannelAt is the Mac's array index with a bounds test (it indexed without one).
     CSprocketsChannel** Channels() const;
     CSprocketsChannel* ChannelAt(uint32_t index) const;
-    // Unit v5L24: the Mac's store to mChannels (Init's array); the translated Init (src/CSprocketsModule_Init.cpp) writes through it.
+    // Unit v5L24: the Mac's store to mChannels (Init's array); the translated Init (src/sound/CSprocketsModule.cpp) writes through it.
     void SetChannels(CSprocketsChannel** channels);
     tpw::SoundDevice* Device() const;   // the SDL device and its streams, one per channel
     const CSprocketsListener& Listener() const;
 };
 
-// ---- unit v5250 (src/TbSoundPipeChannel_CSprocketsModule_SetChannelVolume.cpp): the Sound Sprockets commands the channel functions send.
+// ---- unit v5250 (src/sound/CSprocketsModule.cpp): the Sound Sprockets commands the channel functions send.
 // The Mac's commands are stack objects of about 0x40 to 0x6c bytes built by the constructors below (imports of main; the host
 // has no real ones in the test library, they are recording fakes).
 struct TbLegacyError {
@@ -137,7 +137,7 @@ UStatus SendToChannel(CSprocketsChannel* channel, UCommand& command);
 SpeakerType GetConfigSpeakerType(const TbSpeaker::Config& config);
 }  // namespace SamsUtilities
 
-// ---- unit v5263 (src/TbAudioBody_create_CSprocketsChannel_Callback.cpp): the Sound Sprockets channel class.
+// ---- unit v5263 (src/sound/PlaceHolderSentence.cpp): the Sound Sprockets channel class.
 // Mac layout (0x10c bytes): the USoundChannel base (0x00..0x13, vtable words at +4, +8 and +0x10), the Sound Manager channel at +0x14,
 // the UReferenceCounter<USoundDescription> at +0x18, the pipe at +0x3c, the buffer at +0x40, its size at +0x44, the 3D flag at +0x48
 // and a flag at +0x49. The host class keeps the fields in that order with native pointers (the offsets differ, the test exports them).
@@ -212,7 +212,7 @@ void USoundChannel_Free(void* channel);                                   // 0x1
 void SndDoImmediate_(void* sndChannel, const SndCommand* command);        // 0x1002ec2c
 void DisposeBuffer_(void* buffer);                                        // 0x1002ebcc
 
-// Unit v5758 (src/SamsUtilities_UCommandLoadSound_UCommandLoadSoun.cpp): the load-sound command.
+// Unit v5758 (src/sound/SprocketsChannel.cpp): the load-sound command.
 // Mac layout: the UCommand base (its own constructor, 0x1002a7e8) at +0, the vtable word at +4 (0x1003dfdc), the
 // UReferenceCounter<USoundDescription> at +8. Imports of main (recording fakes in the test library):
 namespace SamsUtilities {
@@ -266,7 +266,7 @@ void USoundBuffer_Construct(void* object, void* buffer, uint32_t size, uint8_t b
 }  // namespace SamsUtilities
 void* AllocBuffer_(uint32_t bytes);   // 0x1002ebfc: the buffer allocation (NULL when it fails); DisposeBuffer_ frees it
 
-// Unit v5997 (src/TbSoundPipeChannel_CSprocketsModule_SetChannelVolume_CSprocketsModule_SetListenerDirection_2.cpp)
+// Unit v5997 (src/sound/CSprocketsModule.cpp)
 namespace SamsUtilities {
 class UCommandPreroll : public UCommand {
 public:
@@ -338,7 +338,7 @@ public:
 };
 }  // namespace TbSpeaker
 
-// Unit v51107 (src/TbAudioBody_create_SamsUtilities_UCommand_SetImmediate.cpp). In-binary stand-ins as free functions on the raw
+// Unit v51107 (src/sound/CSprocketsModule.cpp). In-binary stand-ins as free functions on the raw
 // object (the Mac classes are not representable on the host); each writes the Mac's words, a vtable word as the TOC (0x1003abf0)
 // plus an offset, native-endian.
 struct TbRect;

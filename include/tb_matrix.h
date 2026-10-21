@@ -123,12 +123,12 @@ extern D3DVECTOR gUpVector;                    // 0x10051c48
 // the middle of the quad: x halfway between vertices 0 and 1, y halfway between vertices 0
 // and 2. Used by the sky's added sprites and the particles, and by the sprites' quads
 // (SSpriteGameData::SetupVertices). A given centre is used as it is (a copy of the first
-// vertex when SetupVertices makes the second turn). (0x10038cd0, src/tb_rotatevertex.cpp)
+// vertex when SetupVertices makes the second turn). (0x10038cd0, src/engine/EngineUtil.cpp)
 struct SVertex;
 void RotateVertex_Y(SVertex* vertices, float angle, SVertex* centre);
 // The same about the middle of the quad in x and z (x halfway between vertices 0 and 1, z
 // halfway between 0 and 2), `angle` in radians through the C library's cosine and sine (not
-// the table): the turn of a sprite lying on the ground. (0x10038e9c, src/tb_rotatevertex.cpp)
+// the table): the turn of a sprite lying on the ground. (0x10038e9c, src/engine/EngineUtil.cpp)
 void RotateVertex_Z(SVertex* vertices, float angle);
 
 int32_t Matrix_Init();

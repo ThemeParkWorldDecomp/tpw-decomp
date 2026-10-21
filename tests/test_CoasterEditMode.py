@@ -1,5 +1,5 @@
 """Unit v5246, the coaster edit mode, against libtpw_unit_CoasterEditMode.dylib (tests/unit_CoasterEditMode.cpp), main app
-("SimTheme Park"), src/ui_entryPricePanel_CoasterEditMode.cpp:
+("SimTheme Park"), src/game/ui/ui_coasterPanel.cpp:
   CoasterEditMode 0x1019c584, WhichSpecialButton 0x1019c3e8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

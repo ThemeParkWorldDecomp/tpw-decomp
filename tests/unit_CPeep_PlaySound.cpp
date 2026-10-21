@@ -1,5 +1,5 @@
 // Test library for the CPeep functions of Peep.cpp (unit v5281; libtpw_unit_CPeep_PlaySound.dylib, tests/test_CPeep_PlaySound.py), main app:
-//   src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound.cpp
+//   src/game/people/Peep.cpp
 //
 // The callees outside the unit are fakes that record the arguments (pointers as offsets from the peep) and answer from the test's queues.
 #include <cstddef>

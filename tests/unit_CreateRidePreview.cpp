@@ -1,5 +1,5 @@
 // Test library for the ride preview (unit v5213; libtpw_unit_CreateRidePreview.dylib, tests/test_CreateRidePreview.py), main app:
-//   src/CreateRidePreview.cpp   CreateRidePreview, DetermineRidePreviewScale and the preview block gRidePreviewBlock
+//   src/game/rides/RidePreview.cpp   CreateRidePreview, DetermineRidePreviewScale and the preview block gRidePreviewBlock
 //
 // The callees outside the unit (InstanceRide, _stricmp, ScaleMesh, SetMatrixIdentity, SetRideMobile, SetMeshInUISpace, EnableMeshDraw,
 // SetCurRideAnim, DistanceBetweenPoints) are fakes that record what the real ones read; gRideAnimSets and gRideTypes are defined here.

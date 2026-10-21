@@ -1,7 +1,7 @@
 """The game's mesh loading: LoadMesh, CreateMeshTypeEngineMesh, the mesh paths (GetMeshPath,
 Get/SetFileAccessIndex, BuildSharedTexturePath, SetNewMeshPaths, DestroyPathAllocs,
 OverrideTexturePaths), CreateMeshFromM3D2Header, CreateEngineMesh (main program,
-0x100b7d04..0x100b9140 and 0x10064cf0, 0x10064f40; src/MeshLoad.cpp).
+0x100b7d04..0x100b9140 and 0x10064cf0, 0x10064f40; src/game/MeshLoad.cpp, src/game/TPMesh.cpp).
 
 A case is a script over the three mesh folders, a mesh header with a few textures that
 the test lays out on both sides, and two mesh records. After every operation the test

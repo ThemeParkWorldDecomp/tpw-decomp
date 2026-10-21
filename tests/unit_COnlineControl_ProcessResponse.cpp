@@ -1,6 +1,6 @@
 // Test library for COnlineControl::ProcessResponse (unit v5638; libtpw_unit_COnlineControl_ProcessResponse.dylib,
 // tests/test_COnlineControl_ProcessResponse.py), main app:
-//   src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_ProcessResponse.cpp
+//   src/game/online/online.cpp
 //
 // Every callee outside the unit is a fake that records what the real one reads (strings by their text, pointers as labels) and answers
 // from the test's queues. The Arguments' strings are indices into the case's text tables (tpw_pr_set_text). The pointer words of the

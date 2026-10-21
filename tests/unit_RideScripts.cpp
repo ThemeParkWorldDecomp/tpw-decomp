@@ -27,7 +27,7 @@
 
 using namespace calllog;
 
-// The two CPerson members ModelState calls (declared against their Mac names in src/Object_turn.cpp).
+// The two CPerson members ModelState calls (declared against their Mac names in src/game/Object.cpp).
 void ObjectForceRideAdmittance(CPerson*) __asm__("__ZN7CPerson19ForceRideAdmittanceEv");
 void ObjectDismissFromQueue(CPerson*) __asm__("__ZN7CPerson16DismissFromQueueEv");
 

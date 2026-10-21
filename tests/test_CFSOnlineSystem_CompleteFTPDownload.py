@@ -1,6 +1,6 @@
 """Unit v5655, the FTP download job of the online system, against libtpw_unit_CFSOnlineSystem_CompleteFTPDownload.dylib
 (tests/unit_CFSOnlineSystem_CompleteFTPDownload.cpp), main app ("SimTheme Park"),
-src/FS_Online_init_CFSOnlineSystem_CompleteFTPDownload.cpp:
+src/game/online/FS_Online.cpp, src/game/online/FS_OnlineList.cpp:
   CFSOnlineSystem::CompleteFTPDownload 0x10176e90, FTPDownloadCallbackFn 0x101771a4, RequestNextFileForFTPDownload 0x101772ec,
   Instance 0x10178618
 

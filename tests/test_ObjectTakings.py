@@ -1,4 +1,4 @@
-"""Differential tests for unit w198, a ride's takings, costs, prizes and satisfaction (src/Object_takings.cpp), against libtpw_unit_ObjectTakings.dylib
+"""Differential tests for unit w198, a ride's takings, costs, prizes and satisfaction (src/game/Object.cpp), against libtpw_unit_ObjectTakings.dylib
 (tests/unit_ObjectTakings.cpp), main app ("SimTheme Park"): the 29 CObject members
   GetObjectAge 0x10107f50, GetRemainingLife 0x10108024, WalkedAway 0x1010eec4, HadCustomer 0x1010ef0c, RecordNewTakings 0x1010ef54,
   RecordACost 0x1010f34c, HadAWinner 0x1010f4b8, GetPricePerUse 0x1010f4f4, GetPrizeValue 0x1010f52c, SetPrizeValue 0x1010f564,

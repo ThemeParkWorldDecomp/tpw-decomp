@@ -66,7 +66,7 @@ bool TPStrGtr(const String& a, const String& b) {
     }
 }
 
-// The gate names (src/Game_theme.cpp, unit w59; tested in test_LobbyLeaves3) reach the ride database and the unicode compare;
+// The gate names (src/game/Game.cpp, unit w59; tested in test_LobbyLeaves3) reach the ride database and the unicode compare;
 // nothing in this unit calls them.
 CRideDatabase gRideDatabase;
 void CRideDatabase::GetSignNameA(uint16_t, char16_t*, uint32_t) {}

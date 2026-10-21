@@ -1,6 +1,6 @@
 // Test library for the coaster editor's button functions (unit v5920; libtpw_unit_GetCoasterEditDefaultButtons.dylib,
 // tests/test_GetCoasterEditDefaultButtons.py), main app:
-//   src/LayoutSetRotatePylon_DeleteLastTrackBrace_SetCoasterButtonState_GetCoasterEditDefaultButtons.cpp
+//   src/game/rides/CoasterEdit.cpp
 //   HandleCoasterButtonDown, GetCoasterEditDefaultButtons, GetCoasterEditAvailableButtons
 //
 // DisableCurrentPylonEditState, FlashEndPylons and SetPylonType are recording fakes; the globals of other files are defined here.

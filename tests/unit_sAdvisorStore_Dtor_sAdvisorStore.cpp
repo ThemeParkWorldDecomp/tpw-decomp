@@ -1,5 +1,5 @@
 // Test library for sAdvisorStore::~sAdvisorStore (unit v5704; libtpw_unit_sAdvisorStore_Dtor_sAdvisorStore.dylib), main app:
-//   src/TPAdvisor_model_sAdvisorStore_Dtor_sAdvisorStore.cpp
+//   src/game/TPCamera.cpp
 //
 // The delete the original calls is recorded as the event "delete"; the CLight destructor chain the original inlines
 // is faked as empty here (the host compiler calls it, the original inlines its vtable stores).

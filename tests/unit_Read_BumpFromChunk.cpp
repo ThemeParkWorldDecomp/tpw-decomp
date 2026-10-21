@@ -1,5 +1,5 @@
 // Test library for the advisor save's chunk reader (unit v51017; libtpw_unit_Read_BumpFromChunk.dylib, tests/test_Read_BumpFromChunk.py), main app:
-//   src/host_leaves_Write_BumpToChunk_BMP_Save_Read_BumpFromChunk.cpp   Read_OpenChunk, Read_DataFromChunk, Read_BumpFromChunk
+//   src/game/rides/BumperRide.cpp   Read_OpenChunk, Read_DataFromChunk, Read_BumpFromChunk
 //
 // The callees outside the unit are recording fakes: BMPFile_Read (answers from the queues, fills the buffer with a pattern of the
 // seed), LbFile_GetPosition, NS_MacDoze::GlobalAlloc (answers the block the test queued) and TRACE.

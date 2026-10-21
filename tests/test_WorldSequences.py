@@ -1,6 +1,6 @@
 """The world's sequences and small helpers (unit w194, main app), against libtpw_unit_WorldSequences.dylib (tests/unit_WorldSequences.cpp):
 
-  src/World_sequences.cpp   CWorld::PopulatePark (0x1013b6ac), StartingPopulationForOnline (0x1013b88c), StartBankruptcySequence (0x1013baa4),
+  src/game/World.cpp   CWorld::PopulatePark (0x1013b6ac), StartingPopulationForOnline (0x1013b88c), StartBankruptcySequence (0x1013baa4),
                             StartWinningSequence (0x1013bc68), IsPlayingWinningAnim (0x1013bdd0), EndWinningSequence (0x1013be2c),
                             GetPrevUsedThing (0x1013aeb0), SeedRand (0x1013b244), ReconstructFreeList (0x1013dd14), GetNewPersonIndex
                             (0x10140e64), FlagItemAsSelected (0x10140ee4), ConvertDLRidesUsedToIndices (0x1014113c), RestoreEngineObjects

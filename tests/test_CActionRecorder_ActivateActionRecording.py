@@ -1,6 +1,6 @@
 """Unit v51041, CActionRecorder::ActivateActionRecording and the RecordAction / ProcessAction overloads taking a RecordedAction, against
 libtpw_unit_CActionRecorder_ActivateActionRecording.dylib (tests/unit_CActionRecorder_ActivateActionRecording.cpp), main app
-("SimTheme Park"), src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ProcessAction_CActionRecorder_ActivateActionRecording.cpp:
+("SimTheme Park"), src/game/ActionRecorder.cpp:
   ActivateActionRecording 0x10143cf0, RecordAction 0x10143f48 0x10143ff8 0x101440e0 0x101441fc 0x101445d0 0x10144bec, ProcessAction 0x10146850
 
 A case is a recorder object and a call. The object (state 0x00, mode 0x04, recording 0x24) is built twice by the same Python code: in emulator

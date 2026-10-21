@@ -1,7 +1,7 @@
 // Test library for the window script interpreter and its small members (libtpw_unit_UIScript.dylib; see tests/test_UIScript.py):
-// src/InterfaceWindow_script.cpp (Build, ProcessScript, SetDrawObject, SetClientDrawObject, GetVisibility, SetCallbackFunction,
-// CaptureKb) and src/ui_controls_small.cpp (the knob, list box and list control setters and the three region constructors), under
-// them the real window constructor (src/InterfaceWindow.cpp) and the real rectangles (src/UI_Base.cpp).
+// src/game/ui/InterfaceWindow.cpp (Build, ProcessScript, SetDrawObject, SetClientDrawObject, GetVisibility, SetCallbackFunction,
+// CaptureKb) and src/game/ui/CoolRegion.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp (the knob, list box and list control setters and the three region constructors), under
+// them the real window constructor (src/game/ui/InterfaceWindow.cpp) and the real rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp).
 //
 // Everything else the unit reaches is a fake that records through calllog: CreateObject (it makes a window of the asked kind with the
 // real constructor, links it as the parent's last child and gives it the kind WhatAmI answers), WhatAmI, GetWindow, the draw object

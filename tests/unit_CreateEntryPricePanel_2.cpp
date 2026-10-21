@@ -1,5 +1,5 @@
 // Test library for the entry price panel (unit v5885; libtpw_unit_CreateEntryPricePanel_2.dylib, tests/test_CreateEntryPricePanel_2.py), main app:
-//   src/ShowEditParkNamePanel_CreateEntryPricePanel_2.cpp   CreateEntryPricePanel, EntryPricePanelTitleMsg, EntryPricePanelMsg
+//   src/game/ui/ui_entryPricePanel.cpp   CreateEntryPricePanel, EntryPricePanelTitleMsg, EntryPricePanelMsg
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue; the globals
 // of other files the unit reads, defined here, zero at start like the Mac's bss.

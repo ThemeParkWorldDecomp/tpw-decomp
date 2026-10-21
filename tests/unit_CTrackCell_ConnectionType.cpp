@@ -1,6 +1,6 @@
 // Test library for CTrackCell::ConnectionType (unit v5629; libtpw_unit_CTrackCell_ConnectionType.dylib, tests/test_CTrackCell_ConnectionType.py),
 // main app:
-//   src/TrackCell_flags_CTrackCell_ConnectionType.cpp   CTrackCell::ConnectionType and the words gLLCCC20C, gLLCCDB40, gLLCCDB60, gLLCCE0B4, gLLCCE0B8
+//   src/game/park/TrackCell.cpp   CTrackCell::ConnectionType and the words gLLCCC20C, gLLCCDB40, gLLCCDB60, gLLCCE0B4, gLLCCE0B8
 //
 // Every callee is a fake that records the arguments the real one reads and answers from the test's queues; the cells, rides and the bank
 // account they answer are looked up by label in a table the module fills (tpw_ct_label). The globals of other files the unit reads are

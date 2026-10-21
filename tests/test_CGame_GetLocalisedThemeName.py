@@ -1,5 +1,5 @@
 """Unit v5015, CGame::GetLocalisedThemeName 0x1014a570, against libtpw_unit_CGame_GetLocalisedThemeName.dylib
-(tests/unit_CGame_GetLocalisedThemeName.cpp), main app, src/Game_level_CGame_GetLocalisedThemeName.cpp.
+(tests/unit_CGame_GetLocalisedThemeName.cpp), main app, src/game/Game.cpp.
 
 A case is a theme string object (one of the four globals' addresses is picked by the TPUniStrEq fake from the case's "theme" queue: 0..3 or
 4 for none), a table pointer in gText+0x5a4 and an output string whose vtable slot 0x20 is a marker. The callees outside the unit are fakes on

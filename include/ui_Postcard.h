@@ -50,7 +50,7 @@ namespace NS_MacDoze {
 uint32_t GetTempPath(uint32_t size, char* path); // platform 0x1000515c
 }
 
-// Unit v5012 (src/ui_Postcard_panel_CreateAddressBook.cpp): the address book panel.
+// Unit v5012 (src/game/ui/ui_Postcard.cpp): the address book panel.
 void RemoveAddressBookEntry();     // 0x101b0420
 void NewEntryInAddressBook();      // 0x101b0168
 extern InterfaceWindow* gAddressBookPanel;     // 0x103956f8, original name unknown
@@ -67,7 +67,7 @@ void FillAddressList(int32_t);                                         // 0x101a
 void AddToAddressField(char16_t*);                                     // 0x101b0e98
 void RemoveAddressBook();                                              // 0x101b0a84 (unit v5055 declares it)
 
-// Unit v5884 (src/ui_Postcard_panel_SendPostcard.cpp): the e-mail completion callback and the send half of the panel.
+// Unit v5884 (src/game/ui/ui_Postcard.cpp): the e-mail completion callback and the send half of the panel.
 enum EmailCompletionCode : int32_t {};
 enum EmailErrorCode : int32_t {};
 void IllCallYouBack(EmailCompletionCode code, EmailErrorCode error);   // 0x101b0ca4

@@ -1,5 +1,5 @@
 """Unit w141, the camera modes and MAP_wall_in_way, against libtpw_unit_CameraModes.dylib (tests/unit_CameraModes.cpp), main app
-("SimTheme Park"), src/TPCamera_modes.cpp and src/MapDelta_wall.cpp:
+("SimTheme Park"), src/game/TPCamera.cpp and src/game/park/Map.cpp:
   __sinit_TPCamera_cpp 0x10036518, SetCameraMode 0x1003384c, LoadCamera 0x10036218, SaveCamera 0x10035f4c,
   ToggleFirstPersonWalkAround 0x10033b90, Setup1stPersonRideMeshes 0x10032c64, ToggleRideRideIn1stPerson 0x10032ff4,
   SetupRideRideMatrixAndSuch 0x10032e40, MAP_wall_in_way 0x10101ca4

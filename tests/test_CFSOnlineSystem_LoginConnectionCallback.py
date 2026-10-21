@@ -1,6 +1,6 @@
 """Unit v5924, the online system's login and news jobs, against libtpw_unit_CFSOnlineSystem_LoginConnectionCallback.dylib
 (tests/unit_CFSOnlineSystem_LoginConnectionCallback.cpp), main app ("SimTheme Park"),
-src/FS_Online_init_CFSOnlineSystem_LoginConnectionCallback.cpp:
+src/game/online/FS_Online.cpp:
   CFSOnlineSystem::LoginConnectionCallback 0x101715a0, DoLogin 0x10171234, LoggedInGetNews 0x10171eb8,
   NewsConnectionCallback 0x10172030, CompleteNews 0x1017253c
 

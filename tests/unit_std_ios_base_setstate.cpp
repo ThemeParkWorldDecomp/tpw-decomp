@@ -1,5 +1,5 @@
 // Test library for std::ios_base::setstate (unit v5523; libtpw_unit_std_ios_base_setstate.dylib, tests/test_std_ios_base_setstate.py):
-//   src/std_ios_base_setstate.cpp   MslIosSetstate
+//   src/game/MslSupport.cpp   MslIosSetstate
 //
 // __throw is a fake recording what the thrown object holds; the failure vtable globals are defined here.
 #include <cstddef>

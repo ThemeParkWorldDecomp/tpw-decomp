@@ -1,5 +1,5 @@
 """Unit v5024, the research lab's message handler and its save/load, against libtpw_unit_CResearchLab_ReceiveMessage.dylib
-(tests/unit_CResearchLab_ReceiveMessage.cpp), main app ("SimTheme Park"), src/ResearchLab_projects_CResearchLab_ReceiveMessage.cpp:
+(tests/unit_CResearchLab_ReceiveMessage.cpp), main app ("SimTheme Park"), src/game/buildings/ResearchLab.cpp:
   CResearchLab::ReceiveMessage 0x10123144, CResearchLab::Serialise 0x10121ce8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

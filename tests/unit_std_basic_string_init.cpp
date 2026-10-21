@@ -1,6 +1,6 @@
 // Test library for the MSL std::basic_string<wchar_t> init, constructors and change_size (unit v5645;
 // libtpw_unit_std_basic_string_init.dylib, tests/test_std_basic_string_init.py), main app:
-//   src/Cheat_std_basic_string_init.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read; texts are logged as an FNV-1a hash of their bytes,
 // memory addresses never (they differ between the two sides). Blocks come with padding on both sides, because a huge length wraps

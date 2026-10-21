@@ -1,6 +1,6 @@
 """Unit v5669, the staff room panel's list fill and window set-up, against libtpw_unit_StaffRoomStatusPanel_FillStaffRoomList.dylib
 (tests/unit_StaffRoomStatusPanel_FillStaffRoomList.cpp), main app ("SimTheme Park"),
-src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_StaffRoomStatusPanel_FillStaffRoomList.cpp:
+src/game/ui/ui_staffRoomStatus.cpp:
   StaffRoomStatusPanel::FillStaffRoomList 0x101c31d4, InitStatusWindow 0x101c2e88, InitWindow 0x101c36f0, UpdateViewSprite 0x101c2b88
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

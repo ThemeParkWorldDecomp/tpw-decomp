@@ -1,4 +1,36 @@
 # Unit v51115: the number-window text objects' constructors and destructors, UIMenu::UIMenu and small functions
-# (src/ui_TextObjects_InterfacePasswordTextObject_InterfacePasswordTex.cpp). The callees outside the unit are recording fakes in
+# (src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp). The callees outside the unit are recording fakes in
 # tests/unit_InterfacePasswordTextObject_InterfacePasswordTex.cpp.
-set(TPW_UNIT_InterfacePasswordTextObject_InterfacePasswordTex src/ui_TextObjects_InterfacePasswordTextObject_InterfacePasswordTex.cpp src/ui_DrawObjectText_ctor.cpp platform/arena.cpp)
+set(TPW_UNIT_InterfacePasswordTextObject_InterfacePasswordTex src/game/ui/InterfaceDrawEngine.cpp
+    src/game/ui/InterfaceTextObjectSprite.cpp src/game/ui/UIMenu.cpp src/game/ui/ui_bogStatus.cpp
+    src/game/ui/ui_main.cpp src/game/ui/ui_textmanager.cpp platform/arena.cpp)
+set(TPW_UNIT_InterfacePasswordTextObject_InterfacePasswordTex_KEEP
+  __Z31UIMain_GetObjectStateTextColouri   # UIMain_GetObjectStateTextColour(int)
+  __ZN12InterfaceBar12DrawFunctionEv   # InterfaceBar::DrawFunction()
+  __ZN14BogStatusPanel12ApplyChangesEv   # BogStatusPanel::ApplyChanges()
+  __ZN14BogStatusPanel12DeInitWindowEv   # BogStatusPanel::DeInitWindow()
+  __ZN14BogStatusPanel16DeInitViewWindowEv   # BogStatusPanel::DeInitViewWindow()
+  __ZN14BogStatusPanel18DeInitStatusWindowEv   # BogStatusPanel::DeInitStatusWindow()
+  __ZN16InterfaceTextBox10ClientDrawEv   # InterfaceTextBox::ClientDraw()
+  __ZN23InterfaceCashTextObjectC1EPv   # InterfaceCashTextObject::InterfaceCashTextObject(void*)
+  __ZN23InterfaceCashTextObjectD1Ev   # InterfaceCashTextObject::~InterfaceCashTextObject()
+  __ZN23InterfaceRankTextObjectC1EPv   # InterfaceRankTextObject::InterfaceRankTextObject(void*)
+  __ZN25InterfaceTextObjectSpriteC1EPv   # InterfaceTextObjectSprite::InterfaceTextObjectSprite(void*)
+  __ZN26InterfacePercentTextObjectC1EPv   # InterfacePercentTextObject::InterfacePercentTextObject(void*)
+  __ZN26InterfacePercentTextObjectD1Ev   # InterfacePercentTextObject::~InterfacePercentTextObject()
+  __ZN27InterfaceNullCashTextObjectC1EPv   # InterfaceNullCashTextObject::InterfaceNullCashTextObject(void*)
+  __ZN27InterfaceNullCashTextObjectD1Ev   # InterfaceNullCashTextObject::~InterfaceNullCashTextObject()
+  __ZN27InterfacePasswordTextObjectC1EPv   # InterfacePasswordTextObject::InterfacePasswordTextObject(void*)
+  __ZN28InterfaceDrawEngineHGradient4ShowEs   # InterfaceDrawEngineHGradient::Show(short)
+  __ZN29InterfaceVisitorNumTextObjectC1EPv   # InterfaceVisitorNumTextObject::InterfaceVisitorNumTextObject(void*)
+  __ZN29InterfaceVisitorNumTextObjectD1Ev   # InterfaceVisitorNumTextObject::~InterfaceVisitorNumTextObject()
+  __ZN30InterfaceVisitorTimeTextObjectC1EPv   # InterfaceVisitorTimeTextObject::InterfaceVisitorTimeTextObject(void*)
+  __ZN30InterfaceVisitorTimeTextObjectD1Ev   # InterfaceVisitorTimeTextObject::~InterfaceVisitorTimeTextObject()
+  __ZN6UIMenuC1Ev   # UIMenu::UIMenu()
+  TPW_UIMENU_CTOR_EXTERNAL@game/ui/InterfaceDrawEngine.cpp   # the #define TPW_UIMENU_CTOR_EXTERNAL of src/game/ui/InterfaceDrawEngine.cpp (a guard macro; src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp had it)
+  TPW_UIMENU_CTOR_EXTERNAL@game/ui/InterfaceTextObjectSprite.cpp   # the #define TPW_UIMENU_CTOR_EXTERNAL of src/game/ui/InterfaceTextObjectSprite.cpp (a guard macro; src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp had it)
+  TPW_UIMENU_CTOR_EXTERNAL@game/ui/UIMenu.cpp   # the #define TPW_UIMENU_CTOR_EXTERNAL of src/game/ui/UIMenu.cpp (a guard macro; src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp had it)
+  TPW_UIMENU_CTOR_EXTERNAL@game/ui/ui_bogStatus.cpp   # the #define TPW_UIMENU_CTOR_EXTERNAL of src/game/ui/ui_bogStatus.cpp (a guard macro; src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp had it)
+  TPW_UIMENU_CTOR_EXTERNAL@game/ui/ui_main.cpp   # the #define TPW_UIMENU_CTOR_EXTERNAL of src/game/ui/ui_main.cpp (a guard macro; src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp had it)
+  TPW_UIMENU_CTOR_EXTERNAL@game/ui/ui_textmanager.cpp   # the #define TPW_UIMENU_CTOR_EXTERNAL of src/game/ui/ui_textmanager.cpp (a guard macro; src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp had it)
+)

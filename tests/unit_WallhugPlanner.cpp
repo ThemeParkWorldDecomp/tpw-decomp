@@ -1,6 +1,6 @@
 // Test library for the walk planner (unit w196; libtpw_unit_WallhugPlanner.dylib, tests/test_WallhugPlanner.py), main app:
-//   src/World_wallhug.cpp   wallhug_continue_trivial, wallhug_trivial and their six globals;
-//   src/World_sight.cpp     w195's bresenham_start, line_of_sight and line_of_sight_cleanup, real on the host as on the PowerPC side.
+//   src/game/park/LineOfSight.cpp   wallhug_continue_trivial, wallhug_trivial and their six globals;
+//   src/game/park/LineOfSight.cpp     w195's bresenham_start, line_of_sight and line_of_sight_cleanup, real on the host as on the PowerPC side.
 //
 // The callees outside the two files are fakes that record what the real ones read: MAP_wall_in_way answers from a wall table of 256 x 256
 // squares (a byte per square, bit d = a wall in direction d) that the case loads; UDebug records its format.

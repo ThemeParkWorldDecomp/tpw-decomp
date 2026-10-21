@@ -1,8 +1,8 @@
 """Unit w120, the dynamic cell meshes in the frame, against libtpw_unit_DynamicCells.dylib (tests/unit_DynamicCells.cpp), main app
 ("SimTheme Park"):
-  DC_TickDynamicCellMeshes 0x100dfd88 and CDynamicMesh::DrawAll 0x100e1a04, DC_CreatePolyFace 0x100e2778 (src/DynamicCells.cpp),
+  DC_TickDynamicCellMeshes 0x100dfd88 and CDynamicMesh::DrawAll 0x100e1a04, DC_CreatePolyFace 0x100e2778 (src/game/park/DynamicCell.cpp),
   LLCCM_CreateQMesh 0x10081c58, LLCCM_CreateKTrackMesh 0x10081fb8, LLCCM_CreateWTrackMesh 0x10082350, LLCCM_CreateHoardingMesh
-  0x10082720 (src/LLCellMeshes.cpp).
+  0x10082720 (src/game/park/LLCellMouse.cpp).
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses and layouts
 (big-endian, 32-bit pointers) for the original, and in the host library's memory (little-endian, native pointers) for the translation; the

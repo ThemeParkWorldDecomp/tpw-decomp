@@ -1,6 +1,6 @@
 """Differential tests for the exit error report (unit w97), against libtpw_unit_ExitErr.dylib (tests/unit_ExitErr.cpp):
 
-  src/ExitErr_report.cpp   CExitError::ReportAnyError (0x1014b6c8), HandleEngineErrors (0x1014bc38),
+  src/game/ExitErr.cpp   CExitError::ReportAnyError (0x1014b6c8), HandleEngineErrors (0x1014bc38),
                            ConvertEngineErrors (0x1014bd04)
 
 A case is the object gExitError (error, type, value, the 0x50 text bytes), the text system's mInitialised word, the text the UI

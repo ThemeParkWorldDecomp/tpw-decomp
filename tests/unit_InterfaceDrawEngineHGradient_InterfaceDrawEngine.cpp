@@ -1,6 +1,6 @@
 // Test library for the horizontal gradient's constructor (unit v5080; libtpw_unit_InterfaceDrawEngineHGradient_InterfaceDrawEngine.dylib,
 // tests/test_InterfaceDrawEngineHGradient_InterfaceDrawEngine.py), main app:
-//   src/ui_DrawObjectEngineMesh_InterfaceDrawEngineHGradient_InterfaceDrawEngine.cpp   the constructor
+//   src/game/ui/InterfaceDrawEngine.cpp   the constructor
 //
 // The callees outside the unit (the base constructor, DMLoadTextures, DMCreateMesh, DMFreeTextures, SetMatrixIdentity, CalcVerts, CalcUVs) are
 // fakes that record what the real ones read. DMCreateMesh hands out blocks the test allocated (gBlocks), as the real one would make them.

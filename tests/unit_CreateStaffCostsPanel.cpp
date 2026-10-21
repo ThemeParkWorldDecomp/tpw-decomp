@@ -1,5 +1,5 @@
 // Test library for CreateStaffCostsPanel (unit v5088; libtpw_unit_CreateStaffCostsPanel.dylib, tests/test_CreateStaffCostsPanel.py), main app:
-//   src/CreateStaffCostsPanel.cpp   CreateStaffCostsPanel and the globals gStaffCostsPanel, the four history words and the script.
+//   src/game/ui/ui_StaffCostsPanel.cpp   CreateStaffCostsPanel and the globals gStaffCostsPanel, the four history words and the script.
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queues. The windows
 // the panel finds are HostWin objects: they have the vtable layout of InterfaceWindow (so SetValue and Enable reach the recording

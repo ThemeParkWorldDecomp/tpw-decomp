@@ -1,5 +1,5 @@
 """Unit v5891, the COnlineParser commands Reply, Last, Shout, Emote and EmoteTell, against libtpw_unit_COnlineParser_ParseReply_2.dylib
-(tests/unit_COnlineParser_ParseReply_2.cpp), main app, src/COnlineParser_ParseGoto_COnlineParser_ParseReply_2.cpp:
+(tests/unit_COnlineParser_ParseReply_2.cpp), main app, src/game/online/OnlineParser.cpp:
   ParseReply 0x1020f2f0, ParseLast 0x1020f460, ParseShout 0x1020f5d0, ParseEmote 0x1020f72c, ParseEmoteTell 0x1020f888
 
 A case is a parser object (the vector pointer and the text pointer at its Mac offsets 0x3c and 0x40) and a call. The callees (string and

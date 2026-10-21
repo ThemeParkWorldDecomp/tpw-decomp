@@ -1,6 +1,6 @@
 // Fakes and test entry points for unit w72, the sound library's sample banks (libtpw_unit_SoundBank.dylib, driven by
 // tests/test_SoundBank.py in the program "sound symbols shared"; see calllog.h):
-//   src/TbSoundBank.cpp    TbBank, TbFileBank, TbMMFileBank, TbSoundBankInfo, CBankFactory, Bank::CBank, the swap helpers,
+//   src/sound/Bank.cpp, src/sound/ListSentence.cpp, src/sound/TbBank.cpp, src/sound/TbMMFileBank.cpp, src/sound/TbSoundBankInfo.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundSampleInfo.cpp    TbBank, TbFileBank, TbMMFileBank, TbSoundBankInfo, CBankFactory, Bank::CBank, the swap helpers,
 //                          CFileOperation::GetBankPath, TbSoundSampleInfo::SetBank, the double to unsigned long conversion
 // Real: those, TbRefRelease and the bullfrog strings. Fakes, each recording what the original's callee would be given (the
 // PowerPC side records the same from its stubs):

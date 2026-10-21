@@ -1,15 +1,15 @@
 // Test library for a ride's wear and upkeep (unit w199; libtpw_unit_ObjectUpkeep.dylib, tests/test_ObjectUpkeep.py), main app:
-//   src/Object_upkeep.cpp   the 18 CObject members GetProspectiveDamagePerTurn, GetProspectiveReliability, AddWearAndTear, RepairFully, RequestMaintenance,
+//   src/game/Object.cpp   the 18 CObject members GetProspectiveDamagePerTurn, GetProspectiveReliability, AddWearAndTear, RepairFully, RequestMaintenance,
 //                           IsBeingWorkedUpon, AssignStaffMember, UnassignStaffMember, GetAssignedStaffMember, IsCondemned, IsDirty, IsFlaggedForMaintenance,
 //                           RequiresUpgrade, StartFixing, IsPlayingFixAnim, CleanFully, RequestBreakdown and SetWornFlag
-//   src/Object_queries.cpp  CObject::IsBrokenDown (another unit), run as translated
+//   src/game/Object.cpp  CObject::IsBrokenDown (another unit), run as translated
 //
 // Every other callee is a fake that records the same event as the PowerPC stub: the ride database's GetRideInfo (it answers the case's record), IsRunning,
 // IsCoaster, IsCoasterUseable, IsBOQConnected, GetFrontOfPhysicalQueue, SetState (it stores the state), the script calls (GetScriptPointer hands out the
 // next block of a pool), the ride effect, the sprite spawn (it logs the six words of the data block it is given), the hoardings, the world's advisor and
 // bank, the map's regional effectors, the two staff queries, the advisor request and its queue, the game type's constructor, the trace and the assertion.
 // The globals of other files are defined here: gWorld (pointing into a shifted tail block), gWorldMap, gThingArray, gRideDatabase, gRideAnimSets.
-// CThing::GetThingId (src/Thing_receive.cpp, another unit) is a copy here.
+// CThing::GetThingId (src/game/Thing.cpp, another unit) is a copy here.
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>

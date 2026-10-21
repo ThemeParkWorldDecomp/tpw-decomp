@@ -1,5 +1,5 @@
 """Unit v5066, the all-items panel builder, its entry handler and the staff list functions, against libtpw_unit_CreateAllItemsPanel.dylib
-(tests/unit_CreateAllItemsPanel.cpp), main app ("SimTheme Park"), src/MainWindowCallback_CreateAllItemsPanel.cpp:
+(tests/unit_CreateAllItemsPanel.cpp), main app ("SimTheme Park"), src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allStaffPanel.cpp:
   CreateAllItemsPanel 0x101983c4, AllItemsLCEntryHandler 0x10198264, FillAllStaffListCallback 0x10198690,
   FillAllStaffList 0x101987fc, UpdateListEntries 0x10198944
 

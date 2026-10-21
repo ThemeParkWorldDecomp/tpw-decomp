@@ -1,4 +1,4 @@
-// Differential library for unit w125, the park clock's leaves (src/TbTimeStamp_ops.cpp): TbTimeStamp::operator+, operator-, operator> and GetTime.
+// Differential library for unit w125, the park clock's leaves (src/bullfrog/TbTimeStamp.cpp): TbTimeStamp::operator+, operator-, operator> and GetTime.
 //
 // The only callee is NS_MacDoze::FileTimeToSystemTime, a fake that records the FILETIME words it is handed (low word, then high word) and answers what
 // the case queues: "ftres" is the result, "ftw" the eight SYSTEMTIME fields in the structure's order (year, month, day of week, day, hour, minute,

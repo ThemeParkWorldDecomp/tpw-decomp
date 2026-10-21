@@ -1,18 +1,18 @@
-// Test library for src/lobby_flyingmesh.cpp (libtpw_unit_LobbyFlyingMesh.dylib; see
+// Test library for src/game/Particles.cpp, src/game/online/LBFlyingMesh.cpp, src/game/online/lobby.cpp (libtpw_unit_LobbyFlyingMesh.dylib; see
 // tests/test_LobbyFlyingMesh.py): the lobby's flying meshes, driven by scripts over a world the
 // test builds, with the lobby's mesh system for real underneath.
 //
 // Real: the flying mesh system's constructor, destructor, Close, WindowMessagesFn, Register,
 // UnRegister and DeleteFlyingMeshGroupListEntries; the groups and the instances; the two lists
 // (TbTList's members); CLBLobby::WindowMessagesFn; PAR_GetEmitterParticleCount; and, under the
-// instances, src/lobby_meshes.cpp (CLBLobbyMeshes, CLBMeshType, CLBMeshInstance) and GetUniqueID.
+// instances, src/game/online/LBLobbyMeshes.cpp (CLBLobbyMeshes, CLBMeshType, CLBMeshInstance) and GetUniqueID.
 // Fakes that record: what the mesh code calls (the ride and height field loaders, the draw
 // switches, the matrix helpers, the string compare), the lobby system base class, the window's
 // default handler, the mail icon. Fakes that do not: the flying system's Init, Tick and Render
-// (src/lobby_islands_tick.cpp), the options table's own members, and the strings, which are
+// (src/game/online/lobby_island.cpp, src/game/online/LBFlyingMesh.cpp), the options table's own members, and the strings, which are
 // functional.
 //
-// The lobby's random numbers are CLBLobby::GetRand's text (src/lobby_islands_rest.cpp), copied
+// The lobby's random numbers are CLBLobby::GetRand's text (src/game/online/LBFlyingMesh.cpp), copied
 // here: linking that file would need the island parser's sixty callees. The PowerPC side runs
 // the original GetRand, so every draw the code takes is compared.
 #include <cstdlib>
@@ -93,7 +93,7 @@ CSYS_TPFileInfo gTPFileInfo;
 tag_sRideAnimSet* gRideAnimSets[kSets + 2];
 tag_sRideAnimSet* gHeightfieldRideSet;
 
-// ---- the lobby's generator (src/lobby_islands_rest.cpp's text)
+// ---- the lobby's generator (src/game/online/LBFlyingMesh.cpp's text)
 uint32_t CLBLobby::GetRand() {
     mStarted = mStarted * 0x19660du + 0x3c6ef35fu;
     return mStarted;

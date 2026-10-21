@@ -1,5 +1,5 @@
 """Unit v5673, RecalcBraceTangents, against libtpw_unit_RecalcBraceTangents.dylib (tests/unit_RecalcBraceTangents.cpp), main app
-("SimTheme Park"), src/GetActualBraceTrackPositions_RecalcBraceTangents.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   RecalcBraceTangents 0x1003d080
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,5 +1,5 @@
 """Unit v5139, the bump ride's peep lists and BMP_LeaveBump, against libtpw_unit_BMP_PollForPeeps.dylib (tests/unit_BMP_PollForPeeps.cpp), main app
-("SimTheme Park"), src/BMP_REMOVEBUMP_BMP_PollForPeeps.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_PollForPeeps 0x1002e198, BMP_AddPeepToRideLeavingList 0x1002e268, BMP_AddPeepToRideJoiningList 0x1002e070, BMP_LeaveBump 0x1002e370
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

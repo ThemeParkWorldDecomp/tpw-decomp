@@ -1,6 +1,6 @@
 // Test library for the online contacts panel's receive-string, list handler and buddy helpers (unit v5991;
 // libtpw_unit_OnlineReceiveString_2.dylib, tests/test_OnlineReceiveString_2.py), main app:
-//   src/ContactsLCFormat_OnlineReceiveString_2.cpp   OnlineReceiveString, ContactListHandler, _OnlineAddBuddy, _OnlineRemoveBuddy, _OnlineUpdateBuddy
+//   src/game/ui/ui_onlinePanel.cpp   OnlineReceiveString, ContactListHandler, _OnlineAddBuddy, _OnlineRemoveBuddy, _OnlineUpdateBuddy
 //
 // The callees outside the unit are recording fakes (same event names and arguments as the module's PowerPC stubs). The list controls are
 // raw arena blocks: the fakes keep the item count (mItemCount) the way the real AddItem / RemoveItem do.

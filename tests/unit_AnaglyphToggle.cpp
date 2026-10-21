@@ -1,5 +1,5 @@
 // Test library for AnaglyphToggle (unit v5715; libtpw_unit_AnaglyphToggle.dylib, tests/test_AnaglyphToggle.py), main app:
-//   src/keytables_enable_AnaglyphToggle.cpp
+//   src/game/keyboard.cpp
 //
 // gei_Display is defined here as raw storage under the program's symbol name (the CDisplay constructor is not linked).
 #include <cstddef>

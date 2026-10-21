@@ -1,6 +1,6 @@
 // Test library for the interface text box, the string heap and the timer's operator delete (unit v5975;
 // libtpw_unit_InterfaceTextBox_CalcTextPos_2.dylib, tests/test_InterfaceTextBox_CalcTextPos_2.py), main app:
-//   src/ui_whatami_InterfaceTextBox_CalcTextPos_2.cpp   CalcTextPos, SetText, GetString, GetAndCopy, OperatorDelete
+//   src/game/ui/InterfaceStringHeap.cpp, src/game/ui/InterfaceTextBox.cpp   CalcTextPos, SetText, GetString, GetAndCopy, OperatorDelete
 //
 // Fakes: the font's GetWidth / GetHeight (record and answer from the queues), operator new[] / operator delete (only while a wrapper
 // has the hook on: new[] answers the test's block), msl_assertion_failed (records). wcslen and wcscpy are plain here and in the

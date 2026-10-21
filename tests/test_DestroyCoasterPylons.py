@@ -1,5 +1,5 @@
 """Unit v5038, the coaster destroyers and the track position control, against libtpw_unit_DestroyCoasterPylons.dylib
-(tests/unit_DestroyCoasterPylons.cpp), main app ("SimTheme Park"), src/DestroyCoasterPylons.cpp:
+(tests/unit_DestroyCoasterPylons.cpp), main app ("SimTheme Park"), src/game/rides/CoasterTrack.cpp:
   DestroyCoasterTrack 0x10050df4, DestroyCoasterPylons 0x10050e84, IncrementTrackPosnControl 0x10051300,
   DecrementTrackPosnControl 0x100513fc, GetTrackPosition 0x100514f0
 

@@ -1,5 +1,5 @@
 // Test library for the online chat panel's first-person switches (unit v5919; libtpw_unit_ChatBackToThirdPerson_2.dylib, tests/test_ChatBackToThirdPerson_2.py), main app:
-//   src/LCPostFormat_2_ChatPrePostCard_ChatBackToThirdPerson_2.cpp   ChatBackToThirdPerson, ChatGoFirstPerson, UpdateAvatarPos, ChatGoFullScreen
+//   src/game/ui/ui_onlinePanel.cpp   ChatBackToThirdPerson, ChatGoFirstPerson, UpdateAvatarPos, ChatGoFullScreen
 //   and the globals gOnlineFirstPersonCountdown, gOnlineSavedFlags, gOnlineMapZ, gOnlineMapX
 //
 // The callees outside the unit are fakes that record what the real ones read: UI_SendMessage, InterfaceWindow::{setCursor, GetPosition,

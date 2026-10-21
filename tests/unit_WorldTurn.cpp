@@ -1,4 +1,4 @@
-// Test entry points for the world's turn (library unit_WorldTurn: src/World_turn.cpp, unit w121): CWorld::DoGameTurn, DoOnlineGameTurn,
+// Test entry points for the world's turn (library unit_WorldTurn: src/game/World.cpp, unit w121): CWorld::DoGameTurn, DoOnlineGameTurn,
 // UpdateThingsInEngine, UpdateBumperCarsInEngine, AddThingToThingList, _CThingArrayEntry::FreeMe, DeleteAllThings, DeletePendingThings,
 // GetNextUsedThing, GetUsedThingHead, IsParkClosed and ParkGates_GetStatus.
 //

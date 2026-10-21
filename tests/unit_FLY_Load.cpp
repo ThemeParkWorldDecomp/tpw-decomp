@@ -1,6 +1,6 @@
 // Test library for the fly file loader, the mesh restore and the object file loader (unit v5209; libtpw_unit_FLY_Load.dylib,
 // tests/test_FLY_Load.py), main app:
-//   src/FLY_Load.cpp   FLY_Load, FLY_RestoreMeshes, OBJECT_Load
+//   src/game/HLSprite.cpp, src/game/rides/FlyingRide.cpp   FLY_Load, FLY_RestoreMeshes, OBJECT_Load
 //
 // The callees outside the unit are fakes that record the arguments the real ones read (a text as its length and byte sum) and answer
 // from the test's queues; the file functions serve one byte stream set by the test. The globals of other files are defined here.

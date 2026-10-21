@@ -1,5 +1,5 @@
-// Fakes and drivers for the light manager's per-frame lighting (src/tb_lightmanager_frame.cpp)
-// and the render memory's small members (src/tb_rendermemory_frame.cpp), run by
+// Fakes and drivers for the light manager's per-frame lighting (src/engine/LightManager.cpp, src/engine/MapWho.cpp)
+// and the render memory's small members (src/engine/RenderMemory.cpp), run by
 // tests/test_LightFrame.py.
 //
 // What the lighting code calls outside the unit is faked here and records through

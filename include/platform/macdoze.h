@@ -241,7 +241,7 @@ int32_t GetDateFormatA(uint32_t locale, uint32_t flags, const _SYSTEMTIME* time,
                        char* out, int32_t size);
 int32_t GetTimeFormatA(uint32_t locale, uint32_t flags, const _SYSTEMTIME* time, const char* picture,
                        char* out, int32_t size);
-// Unit w221 (src/TbRegistryKey.cpp, src/LbFile_more.cpp). The original C imports
+// Unit w221 (src/bullfrog/TbRegistryKey.cpp, src/bullfrog/LbFile.cpp, src/bullfrog/LbApp.cpp). The original C imports
 // use this header's C++ namespace linkage. HKEY preserves the Mac's void* word.
 typedef uint32_t HKEY;
 constexpr HKEY HKEY_CLASSES_ROOT = 0x80000000u;
@@ -270,7 +270,7 @@ int32_t GetDiskFreeSpace(const char*, uint32_t*, uint32_t*, uint32_t*, uint32_t*
 namespace tpw {
 // Reads `count` bytes at `offset` of the open file whose Mac reference number (GetMacFileReference) is `reference` into `buffer`:
 // the bytes read (fewer than asked at the end of the file), or -1 for a reference no open file has. The File Manager read the
-// sound library's MPEG file player (src/TbMpegFilePlayer.cpp) makes in place of PBReadAsync (platform/file_handles.cpp).
+// sound library's MPEG file player (src/sound/LbMpeg.cpp, src/sound/MpegDecode.cpp, src/sound/CSprocketsModule.cpp, src/sound/StreamableMpeg2.cpp) makes in place of PBReadAsync (platform/file_handles.cpp).
 int32_t ReadFileReference(int32_t reference, uint32_t offset, void* buffer, uint32_t count);
 // The host file a game path ("data:levels:jungle:Features:x:x.hmp") is created or written as: the user folder's copy of that path,
 // its folders made (files.cpp's HostPathForWriting). CreateFile, and so TPFile_Open, finds that copy before the game folder's. For the

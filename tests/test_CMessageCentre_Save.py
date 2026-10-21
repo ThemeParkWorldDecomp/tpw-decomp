@@ -1,5 +1,5 @@
 """Unit v5760, CMessageCentre::Save, Load and UnsubscribeAll, against libtpw_unit_CMessageCentre_Save.dylib
-(tests/unit_CMessageCentre_Save.cpp), main app ("SimTheme Park"), src/ThingLoop_CMessageCentre_Save.cpp:
+(tests/unit_CMessageCentre_Save.cpp), main app ("SimTheme Park"), src/game/ui/MessageCentre.cpp:
   Save 0x10152758, Load 0x10152840, UnsubscribeAll 0x10152448
 
 A case is a message centre block (0x1d0 bytes, contents irrelevant: every callee is a fake) and a call. The callees outside the unit,

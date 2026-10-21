@@ -1,5 +1,5 @@
 // Test library for the pylon setters of the editor's coaster (unit v5039; libtpw_unit_LayoutSetRotatePylon.dylib, tests/test_LayoutSetRotatePylon.py), main app:
-//   src/LayoutSetRotatePylon.cpp   SetLoftPylon, LayoutSetLoftPylon, SetRotatePylon, LayoutSetRotatePylon, SetWobblePylon, LayoutSetWobblePylon,
+//   src/game/rides/CoasterEdit.cpp   SetLoftPylon, LayoutSetLoftPylon, SetRotatePylon, LayoutSetRotatePylon, SetWobblePylon, LayoutSetWobblePylon,
 //                                  ToggleDrawUpSpline, CorrectBraceNumbering; defines gDrawUpSplineFlag
 //
 // GetTrackBrace, HandleCoasterDataChange and FlagGenerateTrack are recording fakes; the brace GetTrackBrace answers is set by the test.

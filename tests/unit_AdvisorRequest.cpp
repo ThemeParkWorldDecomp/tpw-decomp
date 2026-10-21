@@ -1,4 +1,4 @@
-// Test library for src/AdvisorRequest.cpp and src/World_GetAdvisor.cpp (unit w103). The queue's own functions (src/AdvisorQueue.cpp,
+// Test library for src/game/advisor/Advisor.cpp and src/game/World.cpp (unit w103). The queue's own functions (src/game/advisor/Advisor.cpp,
 // unit w100), Valid and the request constructors run for real. Scoring construction and queries, the clock's ReadFixed, ADV_Slap and
 // GAME_ASSERTMSG are recording fakes at their real addresses.
 #include <cstring>
@@ -19,7 +19,7 @@ namespace {
 CAdvisor gObject;                 // label 2
 CAdvisorRequest gRequest;         // label 6, the request under construction or test
 CAdvisorRequest gOther;           // label 7, the copy constructor's source
-// The world is raw storage: CWorld has a constructor (src/World_init.cpp, unit w113) that this module does not link.
+// The world is raw storage: CWorld has a constructor (src/game/World.cpp, unit w113) that this module does not link.
 alignas(CWorld) unsigned char gTestWorldBytes[sizeof(CWorld)];
 CWorld& gTestWorld = *reinterpret_cast<CWorld*>(gTestWorldBytes);   // label 12
 CAdvisorScoring* gScoring;        // label 3

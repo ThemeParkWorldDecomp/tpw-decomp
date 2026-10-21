@@ -1,10 +1,10 @@
 // Test library for the lobby's small leaves part 5 (unit w64; libtpw_unit_LobbyLeaves5.dylib, tests/test_LobbyLeaves5.py):
-//   src/ui_mainpanel2_pause.cpp  HidePauseWindow 0x101a8744
-//   src/lobby_start_leaves.cpp   InterfaceStringHeap::DeAllocate 0x101d7978
-//   src/UI_close.cpp             UI_CloseSystem 0x101c8c2c, UI_CloseTimerSystem 0x101d8c2c,
+//   src/game/ui/ui_mainpanel2.cpp  HidePauseWindow 0x101a8744
+//   src/game/rides/RidePlacement.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/InterfaceStringHeap.cpp   InterfaceStringHeap::DeAllocate 0x101d7978
+//   src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp             UI_CloseSystem 0x101c8c2c, UI_CloseTimerSystem 0x101d8c2c,
 //                                InterfaceMessageQueue::~InterfaceMessageQueue 0x101c7b24, InterfaceTimedMessages::~InterfaceTimedMessages 0x101c8214
 //
-// Real: the four sources above and the timer's destructor (src/UI_timers_remove.cpp). Fakes that record the same event on both sides:
+// Real: the four sources above and the timer's destructor (src/game/ui/InterfaceTimer.cpp). Fakes that record the same event on both sides:
 // UI_SendMessage, UIMain_DecideKbCapture, DrawObjectLibrary::RemoveAll, CursorLibrary::RemoveAll and the window's destructor (a
 // recording TestWindow whose class operator delete records too). The three heap counters and which globals are set at the time are part
 // of the events of the last four, so the ORDER of the frees and of the clearing shows in the log.
@@ -39,7 +39,7 @@ InterfaceTimer* gUITimers;
 int32_t gUITimerCount;
 InterfaceTimer* gUITimerList;
 
-// The string heap's globals (src/lobby_start_leaves.cpp defines them without a header).
+// The string heap's globals (src/game/rides/RidePlacement.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/InterfaceStringHeap.cpp defines them without a header).
 extern uint8_t* gStringHeapTableB;
 extern uint8_t* gStringHeapTableA;
 extern int32_t gStringHeapRowsB;
@@ -118,7 +118,7 @@ int32_t InterfaceWindow::SetText(char16_t*) { return 0; }
 char16_t* InterfaceWindow::GetText() { return nullptr; }
 int32_t InterfaceWindow::GetHelpText() { return 0; }
 
-// ---- the classes' constructors (src/UI_init.cpp is not linked)
+// ---- the classes' constructors (src/game/ui/InterfaceMessageQueue.cpp is not linked)
 InterfaceMessageQueue::InterfaceMessageQueue() : mEntries(nullptr), mCount(0), mHead(0), mTail(0), mQueued(0) {}
 InterfaceTimedMessages::InterfaceTimedMessages() : mCount(0), mEntries(nullptr) {}
 InterfaceTimer::InterfaceTimer() {}

@@ -1,4 +1,4 @@
-"""Unit v5271, FSOnlineCityServerConnectionCallback 0x101733b0 (src/FS_Online_init_FSOnlineCityServerConnectionCallback.cpp), against
+"""Unit v5271, FSOnlineCityServerConnectionCallback 0x101733b0 (src/game/online/FS_Online.cpp), against
 libtpw_unit_FSOnlineCityServerConnectionCallback.dylib (tests/unit_FSOnlineCityServerConnectionCallback.cpp).
 
 A case is gOnlineSystem set (an object) or NULL and four arguments. The constructor and CityServerConnectionCallback are fakes on both

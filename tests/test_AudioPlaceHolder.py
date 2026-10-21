@@ -1,6 +1,6 @@
 """Unit w79g2, CAudioPlaceHolder and its small classes, against libtpw_unit_AudioPlaceHolder.dylib (tests/unit_AudioPlaceHolder.cpp), in
 the program "sound symbols shared" (Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/AudioPlaceHolder.cpp  TbSndCallback: SoundCallback 0x1000d48c, constructor 0x100179a8, CompletedCallback 0x1001baa4;
+  src/sound/AudioPlaceHolder.cpp, src/sound/AudioPlaceHolderList.cpp, src/sound/TbAudioBody.cpp, src/sound/TbSoundSampleCallback.cpp  TbSndCallback: SoundCallback 0x1000d48c, constructor 0x100179a8, CompletedCallback 0x1001baa4;
       CAudioPlaceHolder: SetSoundManager 0x100166b4, constructor 0x10017898, destructor 0x100179e0, ChangeDistPriority 0x10017aa4,
       SetPriorityAndVolume 0x10017d8c, UpdateParameter 0x10017f30, AllocateExtraData 0x10018034, UpdateParameterDepandants
       0x10018194, Update 0x100182a4, CompletedCallback 0x100185bc, Release 0x1001864c, SetFlagsFromEvent 0x100186b0,

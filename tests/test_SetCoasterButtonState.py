@@ -1,5 +1,5 @@
 """Unit v5578, SetCoasterButtonState, against libtpw_unit_SetCoasterButtonState.dylib (tests/unit_SetCoasterButtonState.cpp), main app,
-src/LayoutSetRotatePylon_DeleteLastTrackBrace_SetCoasterButtonState.cpp:
+src/game/rides/CoasterEdit.cpp:
   SetCoasterButtonState 0x10057064
 
 The callees DisableCurrentPylonEditState and HandleCoasterButtonDown are fakes on both sides recording their events (the latter with its

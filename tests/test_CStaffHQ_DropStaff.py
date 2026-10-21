@@ -1,5 +1,5 @@
 """Unit v5037, CStaffHQ::DropStaff and CStaffHQ::ForceStrike, against libtpw_unit_CStaffHQ_DropStaff.dylib
-(tests/unit_CStaffHQ_DropStaff.cpp), main app, src/ParkMessages_CStaffHQ_DropStaff.cpp:
+(tests/unit_CStaffHQ_DropStaff.cpp), main app, src/game/buildings/StaffHQ.cpp:
   DropStaff 0x1012c168, ForceStrike 0x1012c04c
 
 A case is a headquarters object (0x68 bytes) plus gThingArray rows. GAME_ASSERTMSG, CTRACE and CStaff::DropMe are fakes on both

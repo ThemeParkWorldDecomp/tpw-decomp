@@ -1,5 +1,5 @@
 // Test library for the shop status panel (unit v5085; libtpw_unit_ShopStatusPanel_InitWindow.dylib, tests/test_ShopStatusPanel_InitWindow.py), main app:
-//   src/ShopStatusPanel_InitWindow.cpp   ShopStatusPanel::InitWindow, UpdateStatusWindow and gShopStatusObject
+//   src/game/ui/ui_shopStatus.cpp   ShopStatusPanel::InitWindow, UpdateStatusWindow and gShopStatusObject
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The windows are
 // objects of a small class (InterfaceWindow's virtuals are defined here, empty) whose SetValue and SetText record. The globals of

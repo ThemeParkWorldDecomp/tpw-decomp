@@ -32,7 +32,7 @@ struct DDCOLORKEY {
     uint32_t dwColorSpaceHighValue;
 };
 
-// Unit w231 (src/LbSurface.cpp): original descriptor, 0x6c Mac bytes.
+// Unit w231 (src/bullfrog/LbSurface.cpp): original descriptor, 0x6c Mac bytes.
 // Native pointers change host offsets; this is distinct from DDSURFACEDESC2.
 struct DDSURFACEDESC {
     uint32_t dwSize, dwFlags, dwHeight, dwWidth; // 0x00..0x0c

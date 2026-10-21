@@ -1,6 +1,6 @@
 """Unit w33: the ESP sprite loader (HLSprite.cpp of the main app): ESP_CSprite's constructor, GetActionFrames, GetCustomData and
 LoadFromESPFile, ESP_SortFileList, ESP_FindESPFiles, ESP_LoadSprites, ESP_GetParticleSprite and ESP_InitialiseAndLoadSprites
-(src/ESP_sprites.cpp), against libtpw_unit_ESPSprites.dylib (tests/unit_ESPSprites.cpp).
+(src/game/HLSprite.cpp), against libtpw_unit_ESPSprites.dylib (tests/unit_ESPSprites.cpp).
 
 A case is a world and a script of operations. The world (listings of directory entries by search pattern, the files of three
 storages, the theme name, the options' answers, queued answers for the callees, the globals, the height field) is built on both

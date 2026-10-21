@@ -1,5 +1,5 @@
 // Test entry points for the bullfrog file system's disc side (library unit_bflDiscAccess:
-// src/bfl_DiscAccess.cpp with src/bfl_FileSystem.cpp and the string sources, all real). A
+// src/bullfrog/FileSystem.cpp, src/bullfrog/LbSemaphore.cpp, src/bullfrog/TbDiscAccess.cpp, src/bullfrog/TbFileStorageAccess.cpp, src/bullfrog/TbStorageAccess.cpp with src/bullfrog/FileSystem.cpp, src/bullfrog/LbMaths.cpp, src/bullfrog/MaskConverter.cpp, src/bullfrog/TbBufferAccess.cpp, src/bullfrog/TbFileStorageAccess.cpp, src/bullfrog/TbQuickPosAccess.cpp, src/bullfrog/TbSharedAccess.cpp, src/bullfrog/TbStorageAccess.cpp and the string sources, all real). A
 // case is a script of calls on one storage and one file, driven through the public
 // classes as the game drives them. Only the edges are fakes, recorded with their arguments
 // and answering from per-case queues: macdoze's Win32 file calls and the LbFile_* wrappers.

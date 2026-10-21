@@ -1,5 +1,5 @@
 """Unit v5153, the all-staff panel's row functions and button handler, against libtpw_unit_LCFormat_2.dylib (tests/unit_LCFormat_2.cpp), main app
-("SimTheme Park"), src/CreateAllStaffPanel_LCFormat.cpp:
+("SimTheme Park"), src/game/ui/ui_allStaffPanel.cpp:
   LCFormat 0x101991e8 (AllStaffLCFormat), LCPostFormat 0x10199370 (AllStaffLCPostFormat), AllStaffPanelLCHandler 0x10198d54
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

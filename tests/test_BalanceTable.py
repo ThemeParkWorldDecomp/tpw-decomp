@@ -1,7 +1,7 @@
-"""Differential test for src/CBalanceTable.cpp (the balance table reader: Init, UnInit,
+"""Differential test for src/game/balance/BalanceLoader.cpp (the balance table reader: Init, UnInit,
 FreeStrings, Load in both forms, Parse, LocateBalanceTableRow, AssignValue in both forms,
 InitialiseBalanceValues, CountBalanceDescriptionRows and the line readers) and
-src/GameAssert.cpp, against libtpw_unit_BalanceTable.dylib and libtpw_unit_GameAssert.dylib.
+src/game/advisor/Advisor.cpp, against libtpw_unit_BalanceTable.dylib and libtpw_unit_GameAssert.dylib.
 
 A table case is a script of operations on one table object that both sides run: the real
 table classes (the six of balance_support.UNITS, with the real .sam files read from
@@ -1529,7 +1529,7 @@ def map_random(r):
 
 
 class AssertTest:
-    """GAME_ASSERTMSG (0x1000dde8) against src/GameAssert.cpp: the original spills r5 to r10
+    """GAME_ASSERTMSG (0x1000dde8) against src/game/advisor/Advisor.cpp: the original spills r5 to r10
     into the caller's frame (the variable argument registers) and returns; the host returns.
     The case compares that both return, that the canary survives, and that the spill is r5
     to r10 as passed (the PowerPC side) against the host's arguments."""

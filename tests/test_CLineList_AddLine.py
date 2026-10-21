@@ -1,5 +1,5 @@
 """Unit v5297, CLineList::AddLine and CLineList::~CLineList, against libtpw_unit_CLineList_AddLine.dylib
-(tests/unit_CLineList_AddLine.cpp), ltms, src/TbResource_CLineList_AddLine.cpp:
+(tests/unit_CLineList_AddLine.cpp), ltms, src/ltms/TbTextFormatter.cpp:
   CLineList::AddLine 0x10005cc0, CLineList::~CLineList 0x10005f28
 
 A case is a world and a call. The world is built twice by one piece of Python code (emulator memory big-endian, host memory

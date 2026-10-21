@@ -1,6 +1,6 @@
 // Test library for the CPerson queue states and searches (unit v5245; libtpw_unit_CPerson_FindNearestReachableLitterBin.dylib,
 // tests/test_CPerson_FindNearestReachableLitterBin.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin.cpp
+//   src/game/people/PersonQueue.cpp
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue.
 // gThingArray and gWorld (defined by other files) are defined here.

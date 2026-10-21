@@ -1,6 +1,6 @@
 // Test library for twenty small main-app functions (unit v51058; libtpw_unit_ShowWorldLobbyController.dylib,
 // tests/test_ShowWorldLobbyController.py), main app:
-//   src/std_less_std_basic_string_operator_ShowWorldLobbyController.cpp   the functions and the storage of the static initialisers
+//   src/game/MslSupport.cpp, src/game/TPGlobals.cpp, src/game/online/OnlinePerson.cpp, src/game/ui/ui_2dmap.cpp, src/game/ui/ui_ErrorDisplay.cpp, src/game/ui/ui_publishParkPanel.cpp, src/game/ui/ui_worldLobbyController.cpp   the functions and the storage of the static initialisers
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues; the globals of
 // other files the unit reads are defined here, zero at start like the Mac's bss.

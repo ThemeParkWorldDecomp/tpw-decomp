@@ -68,7 +68,7 @@ extern uint8_t gNoSavedSettings;          // 0x102b2b44, set when save:config.tc
 // 0x102b2b48: game-wide option bits, set by the start-up and settings code (EngineStartup,
 // CGameType keeps the game-type bits). Only the bits GameSys.cpp tests are named.
 extern uint32_t gGameOptions;
-// The three game-type bits CGameType keeps in step with its type (src/FS_Online_gametype.cpp; names invented): exactly one is set once a
+// The three game-type bits CGameType keeps in step with its type (src/game/online/FS_Online.cpp; names invented): exactly one is set once a
 // type has been set (and none of the others cleared by anything else).
 constexpr uint32_t kGameOptionNormalGame = 0x800000;    // type 0
 constexpr uint32_t kGameOptionOnlineGame = 0x1000000;   // type 1
@@ -103,7 +103,7 @@ void OperatorDelete(void* p);   // 0x10238218, the runtime's operator delete (a 
 Exception* ExceptionDtor(Exception* self, int16_t flag);   // 0x10002184 (108)
 }  // namespace TPMainExc
 
-// Unit v51047: the program entry 0x102381a4 (68 bytes, src/std_basic_istream_basic_istream.cpp): the runtime start-up, main, exit(0).
+// Unit v51047: the program entry 0x102381a4 (68 bytes, src/game/ui/InterfaceKnob.cpp): the runtime start-up, main, exit(0).
 void entry();
 void RuntimeInit();               // 0x10238134 (a fake in the test)
 void RuntimeExit(int32_t code);   // exit 0x1023a0a8 (a fake in the test)

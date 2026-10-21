@@ -130,7 +130,7 @@ uint32_t RealTimePauseAdjusted() {
     ev("Clock", {tick});
     return tick;
 }
-// Unit w92 made gUIIME's classes real (src/ui_ime_lifetime.cpp, src/TPEmbed_ime.cpp); this shim fakes their lifetime with empty bodies,
+// Unit w92 made gUIIME's classes real (src/game/ui/ui_graph.cpp, src/game/ui/ui_iterators.cpp, src/game/ui/IME.cpp); this shim fakes their lifetime with empty bodies,
 // since the test fills the object with a pattern and compares it.
 IME::MslWideString::MslWideString() {}
 IME::MslWideString::~MslWideString() {}

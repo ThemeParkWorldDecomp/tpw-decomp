@@ -1,5 +1,5 @@
 // PlasticShader and ShadowGlow (main app, rsse.cpp range 0x100c8e40..0x100cb804; units w84 and w82): the two image shaders the
-// ride sign is composed with (SignRenderer::sign_render, src/SignRenderer.cpp, holds two PlasticShaders and two ShadowGlows by value).
+// ride sign is composed with (SignRenderer::sign_render, src/game/rides/RideSign.cpp, holds two PlasticShaders and two ShadowGlows by value).
 // Offsets describe the Mac's 32-bit layout; a Bitmap is 0x10 bytes there and larger on the host, so sizeof(PlasticShader) is 0x6c only
 // on the Mac.
 //

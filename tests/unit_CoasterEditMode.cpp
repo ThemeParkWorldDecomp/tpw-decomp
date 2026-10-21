@@ -1,5 +1,5 @@
 // Test library for the coaster edit mode (unit v5246; libtpw_unit_CoasterEditMode.dylib, tests/test_CoasterEditMode.py), main app:
-//   src/ui_entryPricePanel_CoasterEditMode.cpp   CoasterEditMode, WhichSpecialButton; it defines gCoasterEditObject and gCoasterEditBusy
+//   src/game/ui/ui_coasterPanel.cpp   CoasterEditMode, WhichSpecialButton; it defines gCoasterEditObject and gCoasterEditBusy
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The windows are
 // blocks of arena memory whose first word is the vtable of a fake class with the same virtual layout (Enable is slot 6), the mouse mode

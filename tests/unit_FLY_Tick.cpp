@@ -1,5 +1,5 @@
 // Test library for FLY_Tick (unit v5880; libtpw_unit_FLY_Tick.dylib, tests/test_FLY_Tick.py), main app:
-//   src/hlsprite_zone_FLY_Tick.cpp   FLY_Tick 0x1007567c and the three lowest-height globals (0x1029d2c4, 0x1029d2c8, 0x1029d2cc)
+//   src/game/rides/FlyingRide.cpp   FLY_Tick 0x1007567c and the three lowest-height globals (0x1029d2c4, 0x1029d2c8, 0x1029d2cc)
 //
 // The callees outside the unit (EmployEric, SetCurRideAnim, GAME_ASSERTMSG, RSSE_GetSoundEventCode, SOUND_SetParamValue,
 // GetNextHoldingWaypoint, GetNextWaypoint, CWorld::GetRand, GetWorldGSquareHeight, PAR_KillEmitter, DestroyRideInstance,

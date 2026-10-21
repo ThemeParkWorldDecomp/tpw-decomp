@@ -1,9 +1,9 @@
 """Differential tests for the region shapes' virtual members, against libtpw_unit_UICoolShapes.dylib
 (tests/unit_UICoolShapes.cpp):
 
-  src/ui_cool_shapes.cpp   CoolCircle, CoolEllipse and CoolPoly: PointIn, Shift, Adjust and the destructor (12 functions)
+  src/game/ui/CoolRegion.cpp   CoolCircle, CoolEllipse and CoolPoly: PointIn, Shift, Adjust and the destructor (12 functions)
 
-Real on both sides: those and under them the constructors (src/ui_controls_small.cpp). Only the allocator is a fake (it counts).
+Real on both sides: those and under them the constructors (src/game/ui/CoolRegion.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp). Only the allocator is a fake (it counts).
 
 A case is a script of operations on three shapes in slots: make one (the constructor), PointIn, Shift, Adjust, destroy it with the
 Mac's flag (positive also deletes the object), and poke a polygon's count or array. After each operation the answer, the live

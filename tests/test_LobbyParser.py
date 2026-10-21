@@ -1,4 +1,4 @@
-"""Differential test for src/lobby_parser.cpp (CLBLobbyGlobals::ParseLobbyDescriptor and
+"""Differential test for src/game/online/lobby_parser.cpp (CLBLobbyGlobals::ParseLobbyDescriptor and
 LB_ReadTbStringUntilNext), against libtpw_unit_LobbyParser.dylib.
 
 A case is the text of a lobby description file. Both sides parse it into an object whose

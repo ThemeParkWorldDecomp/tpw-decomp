@@ -1,5 +1,5 @@
 // Fakes and entry points for the height field's per-frame members and the texture cache's
-// frame calls (src/tb_hfield_frame.cpp, src/tb_texturecache_frame.cpp;
+// frame calls (src/engine/Gamut.cpp, src/engine/tb_hfield.cpp, src/engine/TextureCache.cpp;
 // tests/test_HFieldFrame.py). Every callee outside the unit records its arguments (objects by
 // label, floats by bit pattern) and answers from the case's queues (calllog.h). The PowerPC
 // side records the same events.

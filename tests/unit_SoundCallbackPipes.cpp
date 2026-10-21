@@ -1,9 +1,9 @@
 // Fakes and test entry points for unit w79i, the sound library's sample callback pipes (libtpw_unit_SoundCallbackPipes.dylib,
 // driven by tests/test_SoundCallbackPipes.py in the program "sound symbols shared"; see calllog.h):
-//   src/TbSoundSampleCallback.cpp   TbSoundUserCallback, _TbSoundSampleCallback, _TbSoundSampleCompletedCallback, CAutoDetach,
+//   src/game/advisor/AdvisorScoring.cpp, src/sound/TbSoundBankInfo.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleCallback.cpp, src/sound/TbSoundSampleCodec.cpp, src/sound/TbSoundSamplePipe.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/UserCallback.cpp   TbSoundUserCallback, _TbSoundSampleCallback, _TbSoundSampleCompletedCallback, CAutoDetach,
 //                                   their pools and the three cleanup objects
-// Real: those, unit w78's pipe base (src/TbSoundPipe.cpp), unit w77's sample info (src/TbSoundInfo.cpp), unit w80's timer codec
-// (src/TbSoundCodecs.cpp) and TbRefRelease. Fakes, each recording what the original's callee would be given (the PowerPC side
+// Real: those, unit w78's pipe base (src/sound/StreamableMpeg2.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleCallback.cpp, src/sound/TbSoundSampleCodec.cpp, src/sound/TbSoundSamplePipe.cpp, src/sound/TbSoundSystemInfo.cpp), unit w77's sample info (src/sound/AudioPlaceHolder.cpp, src/sound/SystemCommand.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundPosition.cpp, src/sound/TbSoundSampleInfo.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/TbSoundSystemInfo.cpp, src/sound/TbSysCommand.cpp), unit w80's timer codec
+// (src/game/advisor/AdvisorScoring.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleWAV.cpp, src/sound/TbSoundSampleWAVFile.cpp, src/sound/TimerCodec.cpp) and TbRefRelease. Fakes, each recording what the original's callee would be given (the PowerPC side
 // records the same from its stubs):
 //   FakeNode, a TbSoundSampleCodec that overrides every virtual slot and records it: the pipe behind a callback pipe. Its
 //       GetDataChunk answers the queue "Step" (the result in the high 32 bits, the bytes delivered in the low 32 bits, 0x7fffffff

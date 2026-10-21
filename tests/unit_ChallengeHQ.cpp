@@ -1,8 +1,8 @@
 // Test library for the challenge hall's progress (unit w175; libtpw_unit_ChallengeHQ.dylib, tests/test_ChallengeHQ.py), main app:
-//   src/ChallengeHQ_progress.cpp   CChallengeHQ::FinalDestroy, Serialise, AddToCounter, GetCurrentChallenge, ReceiveMessage, OfferFollowup,
+//   src/game/park/ChallengeHQ.cpp   CChallengeHQ::FinalDestroy, Serialise, AddToCounter, GetCurrentChallenge, ReceiveMessage, OfferFollowup,
 //                                  TellPlayerChallengeOffered, ChallengeAccepted, ChallengeDeclined, EndCurrentChallenge, WonCurrentChallenge and
 //                                  LostCurrentChallenge
-//   src/ThingMessages.cpp          the CMsgChallenge constructor (built for real by the hall)
+//   src/game/park/ChallengeHQ.cpp, src/game/park/Weather.cpp, src/game/ui/MessageCentre.cpp          the CMsgChallenge constructor (built for real by the hall)
 //
 // Every callee outside those is a fake that records the same event as the module's PowerPC stub, in the same order: CThing::Serialise, CChallenge::Serialise,
 // DidThisWinIt, GetOfferId / GetWinId / GetLoseId, LOADVAR / SAVEVAR of int and bool and the VARSTRUCT of the time stamp and the thing id, GetFunnyTime, the

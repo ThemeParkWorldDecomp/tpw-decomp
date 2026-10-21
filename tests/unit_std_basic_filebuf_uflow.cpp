@@ -1,6 +1,6 @@
 // Test library for std::basic_filebuf<wchar_t>::uflow (unit v5025; libtpw_unit_std_basic_filebuf_uflow.dylib,
 // tests/test_std_basic_filebuf_uflow.py), main app:
-//   src/std_basic_filebuf_uflow.cpp   BasicFilebufWchar::uflow
+//   src/game/MslSupport.cpp   BasicFilebufWchar::uflow
 //
 // The callees (fgetc, wmemmove, the codecvt virtuals, operator new/delete, string append and operator[]) are recording fakes.
 #include <cstddef>

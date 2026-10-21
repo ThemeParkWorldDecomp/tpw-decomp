@@ -1,6 +1,6 @@
 // Test library for ConvertSquareFrom32, PT_Load, CSwitch::Do and COpenGLPrintf::Close (unit v5953; libtpw_unit_ConvertSquareFrom32.dylib,
 // tests/test_ConvertSquareFrom32.py), engine:
-//   src/tb_capture_ConvertSquareFrom32.cpp
+//   src/engine/DirectDraw.cpp, src/engine/Switch.cpp, src/engine/tb_hfield.cpp, src/engine/tb_printf_opengl.cpp
 //
 // The callees outside the unit are recording fakes (UPixels, ULogManager, CHField::LoadProcTextures, CTextureCache, COpenGL,
 // CDirectDraw, CErrorHandler::Push, EngineAdd_Reinit, glDeleteLists, glGetError); the globals of other files are defined here.

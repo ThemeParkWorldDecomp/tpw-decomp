@@ -1,6 +1,6 @@
 // Unit w131 (the park's UI panel message functions): MainPanelButtonsMsg, HappyBarMsg, CashWindowCallback, BobbleCallback and GoldenStuffMsg
-// (src/ui_mainpanel2_msg.cpp), CashPanelMsg and ControlPanelMsg (src/ui_entryPricePanel_msg.cpp), StaffPanelMsg, StaffLocMsg and
-// ModifiedCheckButtonsCallback (src/ui_staffPanel_msg.cpp), UIInterface::CheckMouseContext and CIntrface::Process run for real; every callee
+// (src/game/ui/ui_mainpanel2.cpp), CashPanelMsg and ControlPanelMsg (src/game/ui/ui_cashPanel.cpp, src/game/ui/ui_controlPanel.cpp), StaffPanelMsg, StaffLocMsg and
+// ModifiedCheckButtonsCallback (src/game/ui/ui_staffPanel.cpp), UIInterface::CheckMouseContext and CIntrface::Process run for real; every callee
 // outside the unit is a fake that records through calllog (see tests/test_UIPanels.py). swprintf is the platform's (platform/msl.cpp).
 //
 // The windows are fixed stores labelled 1 to 15; the other labelled objects are the park analyser (11), a thing (12, its kind byte at +2), the

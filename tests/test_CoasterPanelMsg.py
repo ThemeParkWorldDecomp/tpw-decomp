@@ -1,5 +1,5 @@
 """Unit v5540, the message handler of the coaster edit panel, against libtpw_unit_CoasterPanelMsg.dylib (tests/unit_CoasterPanelMsg.cpp),
-main app ("SimTheme Park"), src/ui_entryPricePanel_CoasterPanelMsg.cpp:
+main app ("SimTheme Park"), src/game/ui/ui_coasterPanel.cpp:
   CoasterPanelMsg 0x1019b2b8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
@@ -26,7 +26,7 @@ MASK = 0xFFFFFFFF
 
 FN = 0x1019B2B8
 TABLE = 0x102A9610
-# the handler of each control 0x19 .. 0x21 (the jump table's words), the order src/ui_entryPricePanel_CoasterPanelMsg.cpp switches in
+# the handler of each control 0x19 .. 0x21 (the jump table's words), the order src/game/ui/ui_coasterPanel.cpp switches in
 TABLE_WORDS = [0x1019B8B8, 0x1019BA10, 0x1019B7D0, 0x1019BB68, 0x1019BE24, 0x1019BF7C, 0x1019B5D8, 0x1019B6C0, 0x1019BCC0]
 
 ADDR = dict(gMouseWord1E0=0x102DC1E0, gMouseWord1E4=0x102DC1E4, gMouseMode=0x102DC1F0, gMouse=0x102DC1F4,

@@ -1,12 +1,12 @@
 """Unit v5L07, leaves a park run reaches, against libtpw_unit_GameplayLeaves.dylib (tests/unit_GameplayLeaves.cpp), main app
-("SimTheme Park"), src/gameplay_leaves.cpp:
+("SimTheme Park"), src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/SkirtDeform.cpp, src/game/ui/ui_staffPanel.cpp:
   CellIsRide 0x1006d718, LocatorByeByeKid 0x101bf98c, CObject::IsCoaster 0x10110cd8,
   CAdvisor::FinalDestroy 0x1000a0ec
 
 A case is the staff panels' thing (gStaffPanelThing 0x10395a3c), written on both sides, and one call with its argument. The answer
 and the call log are compared; RemoveSlideoutPanel (0x101a83d8) is a fake that records its argument. The thing pointers are compared,
 never followed, so they are plain numbers on both sides. GetFirstPersonRideID 0x10032b64, a leaf the same runs reach, landed on main in
-src/AdvisorScoring_sinit_Advisor_cpp.cpp before this unit.
+src/game/rides/BumperRide.cpp, src/game/TPCamera.cpp, src/game/advisor/Advisor.cpp, src/game/rides/TPCoaster.cpp, src/game/rides/CoasterTrain.cpp, src/game/rides/CoasterQueue.cpp before this unit.
 
 IsCoaster's case is the object's type halfword (+0xe) and the track type word of the record (+0x9c on the Mac, slot WhichTrackType on
 the host) that the fake CRideDatabase::GetRideInfo (0x10154868) answers for any type; the fake records the database and the type.

@@ -1,6 +1,6 @@
 // Test library for the feature status panel (unit v5311; libtpw_unit_FeatureStatusPanel_UpdateStatusWindow.dylib,
 // tests/test_FeatureStatusPanel_UpdateStatusWindow.py), main app:
-//   src/FeatureStatusPanel_UpdateStatusWindow.cpp   UpdateStatusWindow, InitWindow, UpdateWindow, RideIt, UpdateViewWindow, Show
+//   src/game/ui/ui_FeatureStatus.cpp   UpdateStatusWindow, InitWindow, UpdateWindow, RideIt, UpdateViewWindow, Show
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues: CObject (GetDBInfo,
 // GetCurrentResidualValue, GoFirstPerson), CWorld::GetParkAnalyser, CParkAnalyser::NumberOfObjectInPark, the InterfaceWindow members

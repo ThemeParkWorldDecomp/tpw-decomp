@@ -1,12 +1,12 @@
 """Differential tests for the window's destructor chain, against libtpw_unit_UIDestroy.dylib (tests/unit_UIDestroy.cpp, unit w51):
 
-  src/InterfaceWindow_dtor.cpp   InterfaceWindow::~InterfaceWindow, PropagateDestruction, UnCaptureKeys
-  src/UI_timers_remove.cpp       UI_RemoveTimer, InterfaceTimer::FindTimer
-  src/UI_invalidate.cpp          ClearAllPointers, UI_InvalidateMessages, UI_InvalidateDrawMessages, UI_InvalidateDeferredMessages,
+  src/game/ui/InterfaceWindow.cpp   InterfaceWindow::~InterfaceWindow, PropagateDestruction, UnCaptureKeys
+  src/game/ui/InterfaceTimer.cpp       UI_RemoveTimer, InterfaceTimer::FindTimer
+  src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/UI_Base.cpp          ClearAllPointers, UI_InvalidateMessages, UI_InvalidateDrawMessages, UI_InvalidateDeferredMessages,
                                  InterfaceMessageQueue::InvalidateMsgs, InterfaceTimedMessages::InvalidateMsgs
 
-Real on both sides: those, and under them the window constructor (src/InterfaceWindow.cpp), UI_SendMessage and CallWindowHandler
-(src/UI_send.cpp) and the rectangles (src/UI_Base.cpp). Fakes that record the same event on both sides: the two window handlers (and
+Real on both sides: those, and under them the window constructor (src/game/ui/InterfaceWindow.cpp), UI_SendMessage and CallWindowHandler
+(src/game/ui/InterfaceWindow.cpp, src/game/ui/UI_Base.cpp) and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Fakes that record the same event on both sides: the two window handlers (and
 the default one), UI_PostMessage, UI_UpdatePointerIn, the help text handler's OnHideOrDelete, the draw objects' Show and destructor,
 the regions' destructor, the assertion, operator delete (the windows', the draw objects' and the regions' storage is kept).
 

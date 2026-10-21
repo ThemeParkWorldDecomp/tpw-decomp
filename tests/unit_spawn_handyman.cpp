@@ -1,5 +1,5 @@
 // Test library for the spawn and loan key actions (unit v5028; libtpw_unit_spawn_handyman.dylib, tests/test_spawn_handyman.py), main app:
-//   src/ui_Postcard_panel_spawn_handyman.cpp
+//   src/game/keyboard.cpp
 //
 // The callees (operator new, the staff and person constructors, the CWorld calls, ApplyForLoan, CTRACE) are recording fakes.
 #include <cstddef>

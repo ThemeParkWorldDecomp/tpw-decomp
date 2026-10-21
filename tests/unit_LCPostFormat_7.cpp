@@ -1,5 +1,5 @@
 // Test library for the park find panel's list functions (unit v5930; libtpw_unit_LCPostFormat_7.dylib, tests/test_LCPostFormat_7.py), main app:
-//   src/OnlineParkFindPanelMsg_LCPostFormat_7.cpp   OnlineParkFindLCFormat (LCFormat), OnlineParkFindLCPostFormat (LCPostFormat),
+//   src/game/ui/ui_onlineParkFindPanel.cpp   OnlineParkFindLCFormat (LCFormat), OnlineParkFindLCPostFormat (LCPostFormat),
 //                                                   FillOnlineParkFindList; it defines the guard byte and the row height.
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues. Texts are logged as a

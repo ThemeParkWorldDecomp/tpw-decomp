@@ -1,5 +1,5 @@
-// Test library for the archive name tree and the wildcard masks (src/bfl_WadFile.cpp,
-// src/TbStringMatch.cpp; libtpw_unit_bflWadTree.dylib; see tests/test_bflWadTree.py).
+// Test library for the archive name tree and the wildcard masks (src/bullfrog/TbWadStorageAccess.cpp, src/bullfrog/WadNameTree.cpp,
+// src/bullfrog/FileSystem.cpp, src/bullfrog/TbWadStorageAccess.cpp; libtpw_unit_bflWadTree.dylib; see tests/test_bflWadTree.py).
 //
 // The tree, its iterator, the node allocators and lists, the masks and the bullfrog strings
 // are all real; the archive is a file object over the test's bytes whose Seek and Read

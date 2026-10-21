@@ -1,5 +1,5 @@
 """Unit v5573, CBankContainer::~CBankContainer, against libtpw_unit_CBankContainer_Dtor_CBankContainer.dylib
-(tests/unit_CBankContainer_Dtor_CBankContainer.cpp), sound program, src/TbMapStreamer_TbMapStreamer_CCatFixupTable_Load_CBankContainer_Dtor_CBankContainer.cpp:
+(tests/unit_CBankContainer_Dtor_CBankContainer.cpp), sound program, src/sound/CSprocketsModule.cpp:
   CBankContainer::~CBankContainer 0x10023afc
 
 The callees are fakes on both sides: the CFileStorage destructor (0x1002eeb4, flag -1), the string destructor (0x1002eee4, flag -1),

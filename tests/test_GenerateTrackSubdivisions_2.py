@@ -1,6 +1,6 @@
 """Unit v51008: GenerateTrackSubdivisions 0x1004e8c0, CoasterSetSpeed 0x1004b94c, GetBankAtBrace 0x1004b1f8, FlashEndPylons 0x10052158,
 DecCoasterConst1 0x100524a0, against libtpw_unit_GenerateTrackSubdivisions_2.dylib (tests/unit_GenerateTrackSubdivisions_2.cpp), main app
-("SimTheme Park"), src/TPConfig_extrude_GenerateTrackSubdivisions_2.cpp.
+("SimTheme Park"), src/game/rides/CoasterExtrude.cpp, src/game/rides/CoasterTrack.cpp, src/game/rides/CoasterTrain.cpp.
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian) for the translation; the same code reads both back. The host structs have

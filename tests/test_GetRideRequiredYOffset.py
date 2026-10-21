@@ -1,5 +1,5 @@
 """Unit v5886, ride placement on the height field, against libtpw_unit_GetRideRequiredYOffset.dylib (tests/unit_GetRideRequiredYOffset.cpp),
-main app ("SimTheme Park"), src/PublishPanelMsg_GetRideRequiredYOffset.cpp:
+main app ("SimTheme Park"), src/game/rides/RidePlacement.cpp:
   GetRideMasterBoundArea 0x101ed058, GetNodeWorldVertPosnsIntoGeomBuffer (node, matrix) 0x101ed17c, GetRideRequiredYOffset 0x101ed29c,
   CorrectRidePosnForRotation 0x101ed5bc, SetRidePositionAndRotation 0x101ed6ac, MoveRide 0x101ed9a0
 

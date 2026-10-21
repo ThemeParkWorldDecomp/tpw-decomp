@@ -1,5 +1,5 @@
 // Test library for SaveCoasters (unit v5968; libtpw_unit_SaveCoasters.dylib, tests/test_SaveCoasters.py), main app:
-//   src/TPCoaster_trains_SaveCoasters.cpp   SaveCoasters
+//   src/game/rides/TPCoaster.cpp   SaveCoasters
 //
 // The callees outside the unit are fakes: LbFile_Write (records the file label, the length and the buffer's first 36 bytes as big-endian words,
 // answers the transferred count from the queue "Write"), SaveTrainsAndCars (records the labels), UDebug (records the text) and the file swaps

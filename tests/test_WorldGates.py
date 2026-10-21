@@ -1,6 +1,6 @@
 """The park gates and the arrival vehicle (unit w193, main app), against libtpw_unit_WorldGates.dylib (tests/unit_WorldGates.cpp):
 
-  src/World_gates.cpp  CWorld::SetParkOpenOrClosed (0x1013fc3c), ParkGates_Open (0x1014007c), ParkGates_Close (0x1014013c),
+  src/game/World.cpp  CWorld::SetParkOpenOrClosed (0x1013fc3c), ParkGates_Open (0x1014007c), ParkGates_Close (0x1014013c),
                        ArrivalVehicle_DoNextLeg (0x10140234), ArrivalVehicle_GetStatus (0x101406cc), ArrivalVehicle_CrossingIsClear
                        (0x1014080c), ArrivalVehicle_PeopleWaitingToLeave (0x10140b6c), ArrivalVehicle_PeopleLeftToDropOff (0x10140d98),
                        ArrivalVehicle_IsSeagoing (0x10140de0)

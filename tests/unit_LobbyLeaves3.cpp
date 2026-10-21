@@ -1,6 +1,6 @@
 // Test library for the lobby's small leaves, part 3 (libtpw_unit_LobbyLeaves3.dylib; see tests/test_LobbyLeaves3.py, unit w59):
-// the ride database's one-argument GetTypeName and the two sign-name members (src/RideDB_names.cpp), CGame::GetLocalisedThemeGateNames
-// (src/Game_theme.cpp), FLY_Close (src/hlsprite_flies.cpp) and RSSE_Close (src/rsse_close.cpp).
+// the ride database's one-argument GetTypeName and the two sign-name members (src/game/rides/RideDB.cpp, src/game/save/SaveLoad.cpp), CGame::GetLocalisedThemeGateNames
+// (src/game/Game.cpp), FLY_Close (src/game/rides/FlyingRide.cpp) and RSSE_Close (src/game/rides/rsse.cpp).
 //
 // Real under them: the name builder's GetNameA and GetNameB, TPUniStrEq, the 16-bit C library (wcsncpy) and the bullfrog strings
 // (the gate strings and the theme text). Fakes that record through calllog: the string table's FormatString (its text comes from

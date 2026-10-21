@@ -1,6 +1,6 @@
 // Test library for the bog status panel's window functions (unit v5301; libtpw_unit_BogStatusPanel_InitViewWindow.dylib,
 // tests/test_BogStatusPanel_InitViewWindow.py), main app:
-//   src/BogStatusPanel_InitViewWindow.cpp   InitViewWindow, UpdateViewWindow, InitWindow, UpdateWindow, Show
+//   src/game/ui/ui_bogStatus.cpp   InitViewWindow, UpdateViewWindow, InitWindow, UpdateWindow, Show
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The virtual calls of
 // the Mac (tables of TVector pointers) are the Ptr32 tables of UIStatusPanelFields with blocks holding the fake's address, and the

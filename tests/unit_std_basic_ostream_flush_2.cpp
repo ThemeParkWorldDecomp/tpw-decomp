@@ -1,6 +1,6 @@
 // Test library for std::basic_ostream<wchar_t>::flush and constructor (unit v5898; libtpw_unit_std_basic_ostream_flush_2.dylib,
 // tests/test_std_basic_ostream_flush_2.py), main app:
-//   src/std_basic_ostream_flush_2.cpp   WostreamFlush, WostreamConstruct, gWostreamVtbl
+//   src/game/MslSupport.cpp   WostreamFlush, WostreamConstruct, gWostreamVtbl
 //
 // The callees are recording fakes; globals of other files are defined here.
 #include <cstddef>

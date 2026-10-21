@@ -1,6 +1,6 @@
 // Test library for the static initialiser of ui_shopStatus.cpp (unit v5716; libtpw_unit_sinit_ui_shopStatus_cpp.dylib,
 // tests/test_sinit_ui_shopStatus_cpp.py), main app:
-//   src/CreateStaffCostsPanel_UpdateStaffCost_sinit_ui_shopStatus_cpp.cpp   __sinit_ui_shopStatus_cpp
+//   src/game/ui/ui_shopStatus.cpp   __sinit_ui_shopStatus_cpp
 //
 // The constructor UIStatusPanel_Construct is a fake recording its object. gShopStatusPanel is defined here.
 #include <cstddef>
@@ -17,7 +17,7 @@ ShopStatusPanel gShopStatusPanel;
 
 void UIStatusPanel_Construct(UIStatusPanel* self) { ev("UIStatusPanel", {lab(self)}); }
 
-// The shop panel's table: the main app's is in src/ui_StatusPanel_tables.cpp, outside the unit (unit v5L31). This one is a block of the
+// The shop panel's table: the main app's is in src/game/ui/ui_StatusPanel.cpp, outside the unit (unit v5L31). This one is a block of the
 // arena of its own, made on first use; only its address is compared.
 uint32_t* ShopStatusPanelTable() {
     static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(32 * 4));

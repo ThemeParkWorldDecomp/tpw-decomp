@@ -9,9 +9,9 @@ class CObject;
 void CoasterTickPreRender();    // 0x10043028
 void CoasterTickPostRender();   // 0x10043200
 void CoasterUserInputTick();    // 0x100554b4
-int32_t IsCoaster(uint32_t instance);                 // 0x10043330 (44 bytes, src/TPCoaster_instances.cpp, unit w186)
+int32_t IsCoaster(uint32_t instance);                 // 0x10043330 (44 bytes, src/game/rides/TPCoaster.cpp, unit w186)
 int32_t IsCoasterUseable(CObject* object);            // 0x10052954 (untranslated; unit w199: a coaster ride the guests can use, r3 is the CObject)
-uint32_t GetCoaster1stPersonCar(uint32_t entrance);   // 0x100433f4 (92 bytes, src/TPCoaster_trains.cpp, unit w192)
+uint32_t GetCoaster1stPersonCar(uint32_t entrance);   // 0x100433f4 (92 bytes, src/game/rides/TPCoaster.cpp, unit w192)
 void GetCoasterTrackStats(void* object, float* a, float* height, float* c, uint32_t* loops);   // 0x1004d970 (116 bytes, untranslated; unit w153)
 void CoasterAcceptLeftMouseClick(int32_t down);   // 0x10057f80 (1,372 bytes, unit v5943; unit w144: CMMCoaster click and release); answers StartMovePylon's answer in mode 2, else 0
 
@@ -20,7 +20,7 @@ void CoasterAcceptLeftMouseClick(int32_t down);   // 0x10057f80 (1,372 bytes, un
 
 #include "TPEngine.h"
 
-// ---- coaster instances (src/CoasterDestroy.cpp, unit w105): native pointers, the Mac offsets in comments
+// ---- coaster instances (src/game/rides/TPCoaster.cpp, unit w105): native pointers, the Mac offsets in comments
 // A queue of 0x20 bytes on the Mac (AllocateQueue 0x10049180 fills it): the capacity, the block of that many words, then the
 // read and write places. DestroyQueue (0x10049228, TPConfig.cpp) frees the block.
 struct sWraparoundQueue {
@@ -31,7 +31,7 @@ struct sWraparoundQueue {
 struct tag_sTrackBrace;
 struct sCarType;
 struct tag_sCoasterType;
-// Unit w192 (src/TPCoaster_trains.cpp): the cars and trains InstanceCoasterTrains (0x10042084) makes. The Mac's own names (from the mangled
+// Unit w192 (src/game/rides/TPCoaster.cpp): the cars and trains InstanceCoasterTrains (0x10042084) makes. The Mac's own names (from the mangled
 // names) are sCarInstance (0x60 bytes) and sTrainInstance (0x80 bytes); the host structs are bigger (native pointers) and have no sizeof assert.
 // Members this unit does not touch are kept as words: a later unit that finds a pointer there changes it. Names invented unless said.
 struct sCarInstance {
@@ -55,7 +55,7 @@ struct sCarInstance {
     float mF54[3];                    // 0x54..0x5f  the point half a sample ahead of mF48 (CoasterCarRideTrackTick, unit w215)
 };
 struct sTrainInstance {
-    uint32_t mFlags;                  // 0x00  2 active, 4 restored from a save, 0x20 loading, 0x40, 0x80 (src/TPCoaster_instances.cpp)
+    uint32_t mFlags;                  // 0x00  2 active, 4 restored from a save, 0x20 loading, 0x40, 0x80 (src/game/rides/TPCoaster.cpp, src/game/rides/CoasterPylon.cpp, src/game/rides/CoasterType.cpp)
     // ON THE MAC this word is the coaster type PLUS 0x2f0: the type's embedded train type (its +0 is the type's mF2F0, +4 the cars per
     // train mF2F4, +8 the heads per train mF2F8, +0xc..+0x18 the car type pointers 0x2fc..0x308). On the host those are separate members of
     // tag_sCoasterType used in many files, so the train points at the TYPE and readers use mType->mF2F4 and so on.
@@ -180,11 +180,11 @@ void DestroyCoasterInstance(tag_sCoasterInstance* instance);   // 0x100437cc: ou
                                                               // pylons and queues destroyed, freed
 void DestroyCoasterInstances();                                // 0x10043994: all of them, then the head is cleared
 // Untranslated (the unit's fakes stand in for them):
-void DestroyCoasterTrains(tag_sCoasterInstance* instance);     // 0x10042344 (240 bytes, src/TPCoaster_trains.cpp, unit w192)
+void DestroyCoasterTrains(tag_sCoasterInstance* instance);     // 0x10042344 (240 bytes, src/game/rides/TPCoaster.cpp, unit w192)
 void DestroyCoasterTrack(tag_sCoasterInstance* instance);      // 0x10050df4
 void DestroyCoasterPylons(tag_sCoasterInstance* instance);     // 0x10050e84
 void DestroyQueue(sWraparoundQueue* queue);                    // 0x10049228
-// Unit v51069 (src/AdvisorScoring_sinit_Advisor_cpp.cpp).
+// Unit v51069 (src/game/rides/CoasterTrain.cpp, src/game/rides/TPCoaster.cpp).
 void GetCoasterPeepStats(uint32_t id, float* ratingA, float* ratingB);   // 0x1004d920: the object table's instance's two ratings
 extern uint32_t gTPCoasterWord7314;   // 0x102b7314 (name invented), set to 0x10000 by __sinit_TPCoaster_cpp
 extern uint32_t gTPCoasterWord7318;   // 0x102b7318 (name invented), cleared by __sinit_TPCoaster_cpp
@@ -192,7 +192,7 @@ void __sinit_TPCoaster_cpp();         // 0x100459f4
 // 0x101ef310 (ui_ErrorDisplay.cpp): takes object number `id` out of the table `table`; the three counters are the table's.
 void RemoveObjectInstanceFromTable(uint32_t& count, uint32_t& firstFree, uint32_t& lowest, void** table, uint32_t id);
 
-// ---- the coaster types (src/LevelSystems.cpp, unit w111): native pointers, the Mac offsets in comments; only the words
+// ---- the coaster types (src/game/rides/CoasterType.cpp, unit w111): native pointers, the Mac offsets in comments; only the words
 // DestroyCoasterTypes frees are named (names invented).
 // A car type of a coaster type (0x34 bytes on the Mac; the type's array of them is at +0x308, and +0x2fc to +0x304 point into it).
 // Unit w138 (SetupCarAndTrainTypesFromSamFile) names the words it writes (names invented); the host record is bigger (native
@@ -235,10 +235,10 @@ struct sDTextureSet {
     sTexture* mTextures;              // 0x18  the header's mTextures
     sDMeshShared mUse;                // 0x1c  the Mac's word is the use count; the host wraps it so that tag_sDMeshSet::mShared finds it
 };
-// The static sets' entry arrays (src/LevelLeaves.cpp; initialised data of the image).
+// The static sets' entry arrays (src/game/DynamicMeshSet.cpp; initialised data of the image).
 extern sDTextureEntry gRideHoardingTextureEntries[4];    // 0x1029cf18
 extern sDTextureEntry gDynamicCellTextureEntries[20];    // 0x102a01bc
-// Unit w147 (src/TPCoaster_xsect.cpp; both struct names invented): the rows of the two blocks the cross-section builders fill.
+// Unit w147 (src/game/rides/CoasterType.cpp; both struct names invented): the rows of the two blocks the cross-section builders fill.
 struct sCrossSectionPoint {
     float mF00;                       // 0x00
     float mF04;                       // 0x04  the .sam word plus the type's mF40 (fadds)
@@ -256,7 +256,7 @@ struct sCrossSectionEdge {
 };
 static_assert(sizeof(sCrossSectionEdge) == 0xc, "cross-section edge size");
 
-// ---- Unit w213 (src/TPConfig_extrude.cpp): the coaster track's mesh: a spline between two braces, the rings extruded along it, their
+// ---- Unit w213 (src/game/rides/CoasterSpline.cpp, src/game/rides/CoasterExtrude.cpp): the coaster track's mesh: a spline between two braces, the rings extruded along it, their
 // faces and the track's mesh sets (TPConfig.cpp). Every name below is invented unless said; Mac offsets in the comments.
 struct sCoasterRecord;
 using sCrossSection = sCoasterRecord;     // the Mac's sCrossSection is the record of the table at +0x88, defined below
@@ -518,43 +518,43 @@ constexpr uint32_t kMaxCoasterTypes = 50;   // 0x102b68bc .. 0x102b6983
 extern uint32_t gCoasterTypeCount;                     // 0x102b68b8
 extern tag_sCoasterType* gCoasterTypes[kMaxCoasterTypes];   // 0x102b68bc
 extern uint32_t gCoasterTextureBase;                   // 0x1029ce20  3: the static entries at the start of a texture set
-// 0x1003acf0 (472 bytes): frees every coaster type (see src/LevelSystems.cpp) and clears the count.
+// 0x1003acf0 (472 bytes): frees every coaster type (see src/game/rides/CoasterType.cpp, src/game/rides/TPCoaster.cpp) and clears the count.
 void DestroyCoasterTypes();
 // 0x10042478 (72 bytes): CreateExtrudeFaceStorage(*0x102b6988, *0x102b6984) and SetupObjectInstanceTable on the object table's counters.
 void InitialiseCoasterTypes();
 extern uint32_t gExtrudeFaceCountA;                    // 0x102b6988  (names invented)
 extern uint32_t gExtrudeFaceCountB;                    // 0x102b6984
-void CreateExtrudeFaceStorage(uint32_t a, uint32_t b); // 0x1004e60c (96 bytes, src/LevelLeaves.cpp)
-void SetupObjectInstanceTable(uint32_t& count, uint32_t& firstFree, uint32_t& lowest);   // 0x101ef1b0 (12 bytes, src/LevelLeaves.cpp)
-// The coaster track extruder's two storage blocks (names invented; src/LevelLeaves.cpp): the face count, the records (0x1c bytes
+void CreateExtrudeFaceStorage(uint32_t a, uint32_t b); // 0x1004e60c (96 bytes, src/game/rides/CoasterExtrude.cpp)
+void SetupObjectInstanceTable(uint32_t& count, uint32_t& firstFree, uint32_t& lowest);   // 0x101ef1b0 (12 bytes, src/game/rides/RidePlacement.cpp)
+// The coaster track extruder's two storage blocks (names invented; src/game/rides/CoasterExtrude.cpp): the face count, the records (0x1c bytes
 // each) and the points (0x10 bytes each) CreateExtrudeFaceStorage allocates (zeroed).
 extern uint32_t gExtrudeFaceStoreCount;                // 0x102b74b8
 extern void* gExtrudeFaceStoreB;                       // 0x102b74b4  0x1c bytes each
 extern void* gExtrudeFaceStoreA;                       // 0x102b74b0  0x10 bytes each
 
-// ---- Unit w138 (src/TPCoaster_sam.cpp): the loaders CreateCoasterFromSamFile builds a coaster type with.
+// ---- Unit w138 (src/game/rides/CoasterType.cpp): the loaders CreateCoasterFromSamFile builds a coaster type with.
 class CCoasterBalance;
 // 0x10036b20 (480 bytes): the track's master mesh set and texture set. Returns 0 without any dynamic texture (.sam count at +0xfc).
 int32_t CreateCoasterTrackMasterDMeshSet(tag_sCoasterType* type, char* texturePath, CCoasterBalance* balance);
 int32_t CreateCrossSectionsFromSamFile(tag_sCoasterType* type, CCoasterBalance* balance);    // 0x10038ae4 (452 bytes)
 int32_t SetupPylonControlsFromSamFile(tag_sCoasterType* type, CCoasterBalance* balance);     // 0x10038d00 (1400 bytes)
 int32_t SetupCarAndTrainTypesFromSamFile(tag_sCoasterType* type, CCoasterBalance* balance);  // 0x100392cc (500 bytes)
-// The cross-section builders CreateCrossSectionsFromSamFile calls: translated in src/TPCoaster_xsect.cpp (unit w147); the CoasterTypes
+// The cross-section builders CreateCrossSectionsFromSamFile calls: translated in src/game/rides/CoasterType.cpp (unit w147); the CoasterTypes
 // test library keeps recording fakes of these two.
 int32_t BuildCrossSectionPoints(tag_sCoasterType* type, sCoasterRecord* records, CCoasterBalance* balance, int32_t* out); // 0x10036d5c
 int32_t BuildCrossSectionEdges(tag_sCoasterType* type, sCoasterRecord* records, CCoasterBalance* balance);                 // 0x10037aa8
-// Unit w148 (src/TPCoaster_loaders.cpp): the last argument is a FLAG (it goes to SetCrossSectionSelectDefaults), not an out pointer.
+// Unit w148 (src/game/rides/CoasterType.cpp): the last argument is a FLAG (it goes to SetCrossSectionSelectDefaults), not an out pointer.
 int32_t CreateCrossSectionSelectsFromSamFile(tag_sCoasterType* type, sCoasterRecord* records, uint32_t count,
                                              CCoasterBalance* balance, int32_t flag);                                      // 0x1003851c
 void OptimiseCrossSections(tag_sCoasterType* type, sCoasterRecord* records, uint32_t count);                               // 0x100388cc
-// The image's initialised data (names invented; src/TPCoaster_sam.cpp): the three static texture entries at 0x1029cdf0 (flags 7,
+// The image's initialised data (names invented; src/game/rides/CoasterType.cpp): the three static texture entries at 0x1029cdf0 (flags 7,
 // the names "m_erase.tga", "red.tga", "blue.tga"; they end every coaster type's texture set) and the default pairs the type points
 // at from +0x9c (0x1029cce4, five pairs of floats; the word pair at 0x1029cd0c is {pointer, 5}).
 extern sDTextureEntry gCoasterStaticTextureEntries[3];
 extern float gCoasterDefaultPairs[10];
 constexpr uint32_t kCoasterDefaultPairCount = 5;
 
-// ---- Unit w148 (src/TPCoaster_loaders.cpp): the coaster type's remaining loaders: track mesh, train and car types, pylons, cross-section
+// ---- Unit w148 (src/game/rides/CoasterType.cpp): the coaster type's remaining loaders: track mesh, train and car types, pylons, cross-section
 // selects. CreateTrackSectionMesh, SetupTrainType, LoadCoasterPylons, CreateCrossSectionSelectsFromSamFile and OptimiseCrossSections are
 // declared above (CreateTrackSectionMesh answers the type's mesh set in r3 on the Mac; the callers ignore it, so it stays void).
 // A cross-section select (0x2c bytes on the Mac, 0x38 on the host; names invented): four pairs of floats (the limits, +-FLT_MAX by
@@ -581,7 +581,7 @@ sFixedRideParams* GetTempFixedRideParams(int32_t a, int32_t b, int32_t x, int32_
 uint32_t CountDataNodesByType(tag_sRideAnimSet* set, uint32_t kind);                             // 0x101fff0c
 int32_t FindNthDataNodeIndex(tag_sRideAnimSet* set, uint32_t kind, uint32_t n);                  // 0x101ffe74
 
-// ---- Unit w137 (src/TPCoaster_ticks.cpp): the coasters' per-frame ticks and the track editor's pointer input.
+// ---- Unit w137 (src/game/rides/CoasterEdit.cpp): the coasters' per-frame ticks and the track editor's pointer input.
 // The words of the dragged brace CoasterUserInputTick reads (native pointers; the Mac offsets in comments).
 struct sTrackBraceData {
     uint32_t mF00;                    // 0x00
@@ -722,7 +722,7 @@ void HandleMultiBracePreviewChange(tag_sCoasterInstance* instance, tag_sRideAnim
                                    uint32_t cellX, uint32_t cellZ);   // 0x10054ea8
 float CalculateBraceCost(tag_sCoasterInstance* instance, int32_t a, tag_sTrackBrace* brace, float* b, float* c, float* d, float* e);   // 0x10058924
 
-// Unit w186 (src/TPCoaster_instances.cpp): the coaster instances (TPCoaster.cpp on the Mac). IsCoaster is declared at the top, IsCoasterType
+// Unit w186 (src/game/rides/CoasterType.cpp, src/game/rides/CoasterPylon.cpp): the coaster instances (TPCoaster.cpp on the Mac). IsCoaster is declared at the top, IsCoasterType
 // and InstanceCoaster in TPEngine.h, FlagGenerateTrack above.
 // The pylon-area words SetPotentialPylonArea (0x10041a58, untranslated) fills (names invented):
 extern uint32_t gCoasterWord689C;   // 0x102b689c  GetPotentialPylonPositionArea's first answer
@@ -768,11 +768,11 @@ void RestoreCoasterSounds(tag_sCoasterInstance* instance);                      
 uint32_t AllocateObjectInstanceToTable(uint32_t& count, uint32_t& firstFree, uint32_t& lowest, uint32_t flags, void** table, void* object,
                                        uint32_t extra);
 void AllocateQueue(sWraparoundQueue* queue, uint32_t capacity);                       // 0x10049180 (112 bytes)
-// Unit v5269 (src/AllocateQueue.cpp)
+// Unit v5269 (src/game/rides/CoasterQueue.cpp)
 void HACKCoasterReturnLostPeep(tag_sCoasterInstance* instance, uint32_t peep);        // 0x10049324 (224 bytes): the first queue with room takes the peep
 extern int32_t gCoasterQueueSpaceLimit;                                               // 0x1029ce24, read by CoasterGetQueueSpace (name invented)
 
-// Unit w192 (src/TPCoaster_trains.cpp): the coaster trains and cars. GetCoaster1stPersonCar is declared at the top, InstanceCoasterTrains above,
+// Unit w192 (src/game/rides/TPCoaster.cpp): the coaster trains and cars. GetCoaster1stPersonCar is declared at the top, InstanceCoasterTrains above,
 // DestroyCoasterTrains above (0x10042344, 240 bytes, unit w192; the declaration stays in the destroyers' list).
 int32_t SaveTrainsAndCars(void* file, tag_sCoasterInstance* instance);   // 0x10043a18 (864 bytes): the trains' records and the cars' (answers 0 on a short write)
 int32_t LoadTrainsAndCars(void* file, tag_sCoasterInstance* instance);   // 0x10043e8c (948 bytes): the same read back (answers 0 on a short read)
@@ -787,7 +787,7 @@ void USwapInplaceFloat(float& value);         // 0x10021bb4 (12 bytes)
 // Unit w192 (untranslated): TPConfig.cpp, the car's draw switch of a ride.
 void DisableCoasterCarDrawSafe(uint32_t ride);   // 0x1004a648 (224 bytes)
 
-// ---- Unit w212 (src/TPConfig_stats.cpp): the track's statistics and the trains' placing (TPConfig.cpp; names invented)
+// ---- Unit w212 (src/game/rides/CoasterTrain.cpp, src/game/rides/CoasterQueue.cpp): the track's statistics and the trains' placing (TPConfig.cpp; names invented)
 float ModF(float value, int32_t* whole);   // 0x1004a75c (84 bytes): the fraction of value (modf); *whole, when given, gets the whole part truncated to an int
 void SetCoasterCapacity(tag_sCoasterInstance* instance, uint32_t trains, uint32_t unused);   // 0x1004a248 (156 bytes): unloads the trains past the new count (the third argument is never read)
 void UpdateExcitementAtSample(tag_sCoasterInstance* instance, uint32_t sample, uint32_t word, float speed, float bank, s3DPoint* g, float time);   // 0x1004d424 (844 bytes; word and time are never read)
@@ -840,7 +840,7 @@ extern int32_t gExciteWord;           // 0x102b7498  written 0, never read
 extern float gExciteB;                // 0x102b749c
 extern float gExciteA;                // 0x102b74a0
 
-// ---- Unit w214 (src/TPConfig_bend.cpp): a coaster car bent to the track, and a running train's sounds and screams
+// ---- Unit w214 (src/game/rides/CoasterSounds.cpp): a coaster car bent to the track, and a running train's sounds and screams
 struct tag_sNode;
 struct sVertexPosnSet;
 extern float gBendAngleClamps[8];   // 0x1029cd8c (name invented): AccumulateBendAngles' acos clamps, (lo, hi) for loop 2's yaw and pitch, then loop 3's; all {0.0f, 1.0f}
@@ -851,7 +851,7 @@ void HandleScreams(tag_sCoasterInstance* instance, sTrainInstance* train, int32_
 void TickTrainSounds(tag_sCoasterInstance* instance, sTrainInstance* train);   // 0x1004702c (320 bytes)
 float InterpAngles(float a, float b, float t);   // 0x1004dd5c (188 bytes)
 
-// ---- Unit w215 (src/TPConfig_ridetick.cpp): a coaster's cars ridden along the track each frame, the turn of a car, the trains' collisions and
+// ---- Unit w215 (src/game/rides/CoasterTrain.cpp, src/game/rides/CoasterSounds.cpp): a coaster's cars ridden along the track each frame, the turn of a car, the trains' collisions and
 // their sounds (TPConfig.cpp; names invented)
 struct tag_sRideAnimSet;
 void CoasterCarRideTrackTick(tag_sCoasterInstance* instance);   // 0x1004c4f0 (3,512 bytes)
@@ -868,21 +868,21 @@ void UpdateRideAnimSpeedImmediate(tag_sRideAnimSet* set, float speed, int32_t fl
 extern uint8_t gCarRideTickInit;   // 0x102b746c  the tick's function-local static: set once the speed cap below is made (name invented)
 extern float gCarRideTickMax;      // 0x102b7470  the largest float, written by the first call (nothing in this unit reads it; name invented)
 
-// ---- Unit v5205 (src/TPConfig_bend_LayoutStartAllCoasterSounds.cpp): a train's sounds started
+// ---- Unit v5205 (src/game/rides/CoasterSounds.cpp): a train's sounds started
 void StartTrainSounds(tag_sCoasterInstance* instance, sTrainInstance* train, int32_t noState);   // 0x10046a18 (344 bytes): stops, then starts the train's four sound words and two loops; state 2 at 100 unless noState
 void LayoutStartAllCoasterSounds();   // 0x10046bc0 (388 bytes): StartTrainSounds' body for every train of every coaster, always setting state 2
 
-// ---- Unit v5369 (src/TPConfig_stats_RecalcDistancesFromCentreCar.cpp)
+// ---- Unit v5369 (src/game/rides/CoasterTrain.cpp)
 void RecalcDistancesFromCentreCar(tag_sCoasterInstance* instance, sTrainInstance* train);   // 0x1004a4e8 (260 bytes): each car's distance from the centre car (mF38, and mF3C divided by the instance's mFAC)
 void GetTrainFrontAndRearSamples(tag_sCoasterInstance* instance, sTrainInstance* train);    // 0x1004a7d0 (116 bytes; untranslated, the unit's fake stands in)
 
-// ---- Unit v5011 (src/GetTangentsFromZVector.cpp)
+// ---- Unit v5011 (src/game/rides/CoasterPylon.cpp)
 // 0x1003be20 (1,784 bytes): the control's tangents (floats 0x1c and 0x28), then its two handle points (0x34 and 0x4c). The pylon (word 0 bit 0x4000)
 // shapes the lengths from the track's banking; the last three arguments are never read (the flag's two branches are the same).
 void GetTangentsFromZVector(tag_sCoasterType* coaster, s3DPoint* point, tag_sBezierControl* control, float lengthA, float lengthB,
                             sPylonControl* pylon, s3DPoint* unusedA, s3DPoint* unusedB, int32_t flag, int32_t unusedC);
 
-// ---- Unit v5562 (src/GetActualBraceTrackPositions.cpp)
+// ---- Unit v5562 (src/game/rides/CoasterPylon.cpp)
 extern float gBraceTrackScale2;   // 0x1029cd14  2.0 at start (name invented): the distance array B's points stand above A's along the node's up axis
 // 0x1003cc34 (1,012 bytes): array B's points from array A's (the ride set's node when the brace has none of the end-pylon flags); stores the bank in mFE4.
 void GetActualBraceTrackPositions(tag_sRideAnimSet* set, tag_sTrackBrace* brace);
@@ -891,7 +891,7 @@ void GetActualBraceTangents(tag_sTrackBrace* brace, tag_sRideAnimSet* set);
 // 0x1003c59c (864 bytes): the lengths of the spans before and after control `index` of the brace's array A (useA != 0) or B, and the span vectors (nullable).
 void GetTangentLengths(uint32_t index, tag_sTrackBrace* brace, float* before, float* after, int32_t useA, s3DPoint* beforeVec, s3DPoint* afterVec);
 
-// ---- Unit v5026 (src/DoMovePylon.cpp): dragging a pylon of the track editor (TPConfig.cpp; names invented)
+// ---- Unit v5026 (src/game/rides/CoasterEdit.cpp): dragging a pylon of the track editor (TPConfig.cpp; names invented)
 typedef sTrackBraceData tag_sPylon;
 struct sPylonOwner {
     uint8_t mF00[0x70];               // 0x00
@@ -906,13 +906,13 @@ extern float gPylonMoveHeight;              // 0x102c1778
 extern tag_sTrackBrace* gPylonMoveBrace;    // 0x102c177c  the dragged brace
 extern tag_sTrackBrace* gPylonMoveMark2;    // 0x102c1780
 extern tag_sTrackBrace* gPylonMoveMark1;    // 0x102c1784
-tag_sPylon* GetPylonAtCell(uint32_t x, uint32_t z, uint32_t* out);   // 0x1003f954 (124 bytes, src/TPConfig_collision.cpp, unit v5L20)
+tag_sPylon* GetPylonAtCell(uint32_t x, uint32_t z, uint32_t* out);   // 0x1003f954 (124 bytes, src/game/rides/CoasterPylon.cpp, unit v5L20)
 void MoveBrace(tag_sCoasterInstance* instance, tag_sTrackBrace* brace, tag_sPylon* pylon, uint32_t x, uint32_t z, float* a, float* b, int32_t c,
                int32_t d);   // 0x10054978 (1,232 bytes)
 void LLCC_AbortPylonMove();                 // 0x1008f1a4 (292 bytes)
 void LLCC_ResetPylonMove();                 // 0x1008f2f4 (16 bytes)
 void LLCC_StartPylonMove(int32_t x, int32_t z, int32_t flag);   // 0x1008f0b4 (196 bytes)
-void LockPointedAtRide(int32_t flag);       // 0x10067288 (52 bytes, src/TPRide_pointed.cpp, unit v5L06)
+void LockPointedAtRide(int32_t flag);       // 0x10067288 (52 bytes, src/game/TPPointer.cpp, unit v5L06)
 void DisableCurrentPylonEditState();        // 0x10053b58 (508 bytes)
 void Assign3DObjectToAIWorld(void* instance, uint32_t a, uint32_t b, uint32_t c, int32_t d);   // 0x1005f53c (384 bytes)
 float CalculateBraceHeight(tag_sTrackBrace* brace);   // 0x1003e6e0 (192 bytes)
@@ -921,7 +921,7 @@ void SetPotentialPylonArea();               // 0x10041a58 (472 bytes)
 uint32_t DoMovePylon(uint32_t x, uint32_t z);   // 0x100579cc (1,024 bytes): drops the dragged brace on the cell, pays the difference; answers the brace's word 0x70 when it moved
 bool StartMovePylon(tag_sTrackBrace* brace);    // 0x10057738 (604 bytes): begins dragging; answers whether the pylon is of the second kind
 
-// ---- Unit v5038 (src/DestroyCoasterPylons.cpp): the destroyers of a coaster's track and pylons, and the track position control (TPConfig.cpp; names invented)
+// ---- Unit v5038 (src/game/rides/CoasterTrack.cpp): the destroyers of a coaster's track and pylons, and the track position control (TPConfig.cpp; names invented)
 struct sBraceInfo;
 // A node of a coaster's pylon list (native pointers, the Mac offsets in comments). Flag bit 0: a single brace (word 0x34) with its info at brace + 0x78.
 struct sCoasterPylon {
@@ -954,7 +954,7 @@ void Destroy3DObjectFromAIWorld(uint32_t a, uint32_t b);                    // 0
 void DestroyBraceInfo(tag_sTrackBrace* brace, sBraceInfo* info);            // 0x1003e064
 void DestroyDynamicMeshSetInstance(tag_sDMeshSet* set, sHeapInfo* heap, uint32_t flags);   // 0x10063264
 
-// ---- Unit v5053 (src/GetNewBraceLoftInterval.cpp): the loft of a new brace and the link level of a pylon (TPCoaster.cpp; names invented)
+// ---- Unit v5053 (src/game/rides/CoasterPylon.cpp): the loft of a new brace and the link level of a pylon (TPCoaster.cpp; names invented)
 // The pylon the track editor links: native pointers, so the host offsets differ from the Mac ones in the comments.
 struct sLinkPylon {
     uint32_t mF00;                    // 0x00
@@ -975,15 +975,15 @@ float GetNewBraceLoftInterval(sLinkPylon* pylon, sPylonControl* control, tag_sTr
 // 0x1003e7dc (1,000 bytes): finds the level the pylon's link stands at; answers 1 always.
 int32_t DetermineLinkLevel(float height, sLinkPylon* pylon, uint32_t* level, float* out, int32_t quiet);
 
-// ---- Unit v5054 (src/HandleCoasterDataChange.cpp; HandleCoasterDataChange is declared above)
+// ---- Unit v5054 (src/game/rides/CoasterEdit.cpp; HandleCoasterDataChange is declared above)
 struct sCoasterType;
 void DoImmediatePhysicsFeedback(tag_sCoasterInstance* instance);                     // 0x1004d2ec (4 bytes, untranslated)
 void SetupBraceAnimFrameData(sCoasterType* type, tag_sTrackBrace* brace);            // 0x1003bb44 (652 bytes, untranslated)
 void UpdatePylonStackMeshes(sPylonControl* control, tag_sPylon* pylon, int32_t a, int32_t b);   // 0x1003d958 (1,416 bytes, untranslated)
 int32_t ToggleLoftPylonState();                                                      // 0x10052ac4 (876 bytes): always answers 1
-extern float gCoasterVerticalFloor;   // 0x1029ce80  (name invented; zero) the lowest the loft drag may go, defined in src/HandleCoasterDataChange.cpp
+extern float gCoasterVerticalFloor;   // 0x1029ce80  (name invented; zero) the lowest the loft drag may go, defined in src/game/rides/CoasterEdit.cpp, src/game/rides/CoasterTrack.cpp
 
-// ---- Unit v5208 (src/TPConfig_extrude_GetCrossSectionFromParams.cpp)
+// ---- Unit v5208 (src/game/rides/CoasterExtrude.cpp)
 // 0x1004fd94 (300 bytes): the type (Mac layout, Ptr32 fields: 0x78 the table of 0x2c-byte entries, 0x7c the count; an entry holds the
 // float ranges 0x00..0x1c and the answer word at 0x20) entry whose four ranges hold the angle and the orientation's mF04, mF08, mF0C;
 // the last entry's word when none does (the last entry is never tested; the first float argument is unused). Needs a count of 1 or more.
@@ -1001,7 +1001,7 @@ struct sCoasterType {
 };
 int32_t GetCrossSectionFromParams(sCoasterType* type, float unused, sCoasterOrientation* orientation, float angle);
 
-// ---- Unit v5084 (src/DisableCurrentPylonEditState.cpp; DisableCurrentPylonEditState and SetTrackPreview2ndBrace are declared above)
+// ---- Unit v5084 (src/game/rides/CoasterEdit.cpp; DisableCurrentPylonEditState and SetTrackPreview2ndBrace are declared above)
 void ExchangeTrackBraces(tag_sTrackBrace* first, tag_sTrackBrace* second);   // 0x10053594 (316 bytes)
 void ToggleSwapUpPylonState();                  // 0x10053720 (328 bytes)
 void ToggleSwapDownPylonState();                // 0x10053898 (316 bytes)
@@ -1013,7 +1013,7 @@ extern uint32_t gCoasterWord1788;               // 0x102c1788  (name invented) c
 extern uint32_t gCoasterWord1790;               // 0x102c1790  (name invented) cleared by DisableCurrentPylonEditState
 extern uint32_t gCoasterWord16DC;               // 0x102c16dc  (name invented) cleared by DisableCurrentPylonEditState
 
-// ---- Unit v5091 (src/TPCoaster_loaders_NewPylon.cpp): NewPylon and UpdatePylonStackMeshes (names invented)
+// ---- Unit v5091 (src/game/rides/CoasterPylon.cpp): NewPylon and UpdatePylonStackMeshes (names invented)
 // A pylon of the editor (0x48 bytes on the Mac, MReleaseAllocF'd). Native pointers: the host offsets of mControl, mX.. and mCount, mBraces
 // are those of sLinkPylon (the same object); the Mac offsets are in comments, the two words the layout leaves out are appended.
 struct sPylonRecord {
@@ -1038,12 +1038,12 @@ sPylonRecord* NewPylon(uint32_t x, uint32_t z, uint32_t flags, int32_t unused, s
 int32_t FloatToCell(double value);
 // Unit v5524
 int32_t CalcNumTrackSamples(tag_sTrackBrace* brace, float step, float* total);   // 0x1005162c (260 bytes)
-// Unit v5664 (src/DestroyCoasterPylons_CalcNumTrackSamples_LinearSampleTrack.cpp)
+// Unit v5664 (src/game/rides/CoasterTrack.cpp)
 void GetWrappedTrackPosition(sTrackPosnControl* control, tag_sTrackBrace* brace, float t, s3DPoint* point);   // 0x1005158c (64 bytes, stand-in)
 void SetEntranceLinearSamples(tag_sCoasterInstance* instance);   // 0x10049ddc (104 bytes, stand-in)
 void LinearSampleTrack(tag_sCoasterInstance* instance);          // 0x10051770 (2,472 bytes)
 
-// ---- Unit v5366 (src/LinkPreviewBrace.cpp): the editor's preview brace (TPCoaster.cpp; names invented)
+// ---- Unit v5366 (src/game/rides/CoasterPylon.cpp): the editor's preview brace (TPCoaster.cpp; names invented)
 // The pylon of the instance's list is an sPylonRecord (its mNext is the Mac's +0x28). Copies of the pylon and its braces LinkPreviewBraceToPylon
 // keeps (the Mac copies 0x48 and 0x104 bytes; the host copies the whole records).
 extern uint32_t gLinkSavedFlag;               // 0x102b6efc  set to 1 with the copies
@@ -1071,9 +1071,9 @@ struct sPylonHeadTable {
     uint32_t mF00;                    // 0x00
     sPylonHeadEntry* mEntries;        // 0x04
 };
-extern uint32_t gPylonStackSkip;      // 0x102b68a0  (defined in src/TPCoaster_loaders_NewPylon.cpp) nonzero: UpdatePylonStackMeshes does nothing unless told to
+extern uint32_t gPylonStackSkip;      // 0x102b68a0  (defined in src/game/rides/CoasterPylon.cpp) nonzero: UpdatePylonStackMeshes does nothing unless told to
 
-// ---- Unit v5190 (src/TPCoaster_trains_SetPotentialPylonArea.cpp): SetPotentialPylonArea is declared above
+// ---- Unit v5190 (src/game/rides/CoasterPylon.cpp): SetPotentialPylonArea is declared above
 // 0x10041c5c (988 bytes): puts a pylon (the one at the cell, or a new one) and a brace on it into the editor's coaster. Answers 0 when the
 // last brace already stands there (flag 0), else 1. `level` 0xff takes the link level DetermineLinkLevel finds. The original's pointer
 // types are tag_sPylon** and tag_sTrackBrace**; the pylons it walks are sPylonRecords. With flag != 0 the original reads two uninitialised stack words (zero here).
@@ -1085,17 +1085,17 @@ tag_sTrackBrace* NewTrackBrace(sPylonRecord* pylon, float x, float z, float loft
                                uint32_t level, uint32_t extra);
 void UIHandleEndLoop();                                      // 0x100565cc (108 bytes)
 void UIHandleMidLoop();                                      // 0x10056548 (92 bytes)
-// Unit v5707 (src/LayoutSetRotatePylon_DeleteLastTrackBrace_UIHandleEndLoop.cpp)
+// Unit v5707 (src/game/rides/CoasterEdit.cpp)
 void SetPylonType(uint32_t type);                            // 0x100562d4 (436 bytes)
-// ---- Unit v5257 (src/DisableCurrentPylonEditState_SetCoasterEditState.cpp): SetCoasterEditState and RejoinTrack are declared above
+// ---- Unit v5257 (src/game/rides/CoasterEdit.cpp): SetCoasterEditState and RejoinTrack are declared above
 void SetCoasterButtonState(uint32_t state, uint32_t arg);    // 0x10057064 (140 bytes, stand-in)
 int32_t SetPlaceLoop();                                      // 0x10054554 (92 bytes): always answers 1
-// ---- Unit v5365 (src/TPCoaster_instances_DestroyTrackBrace.cpp): DestroyTrackBrace and PlaceEntrancePylons are declared above
+// ---- Unit v5365 (src/game/rides/CoasterPylon.cpp): DestroyTrackBrace and PlaceEntrancePylons are declared above
 tag_sTrackBrace* GetCurSelectedTrackBrace();                 // 0x10052290 (12 bytes, stand-in)
 void SetCurSelectedTrackBrace(tag_sTrackBrace* brace);       // 0x100522cc (12 bytes, stand-in)
 extern uint32_t gCoasterEditEnabled;                         // 0x102c16d4  (name invented) the enabled buttons mask
 extern uint32_t gCoasterEditDown;                            // 0x102c16d8  (name invented) the pressed buttons mask
-// ---- Unit v5278 (src/TPCoaster_loaders_GetActualBraceParams.cpp): UpdatePylonStackStructures is declared above
+// ---- Unit v5278 (src/game/rides/CoasterPylon.cpp): UpdatePylonStackStructures is declared above
 // 0x1003d4cc (184 bytes): walks the braces of the current coaster (the +0x3c block's word at 0x18, linked by +0x64) and recomputes their params.
 void GetActualBraceParams();
 // The records the two functions walk (native pointers: the host offsets are larger than the Mac's in the comments after the first pointer).
@@ -1153,7 +1153,7 @@ struct sPylonStackHead {
 // 0x1004e230 (128 bytes, stand-in): the orientation out buffer is the fourth argument (r6 on the Mac, after the float in r5's slot).
 void GetAlignmentParamsSlow(sCoasterTrackParams* params, s3DPoint* point, float f, sCoasterOrientation* orientation, int32_t a, float* out);
 void SetInitialOrientationParams(sCoasterOrientation* orient, sCoasterTrackParams* params, int32_t a);   // 0x1005092c (48 bytes, untranslated)
-// ---- Unit v5314 (src/TPConfig_LayoutSetMovePylon_SetCoasterEdit.cpp): SetCoasterEdit is declared in LLCellSystem.h
+// ---- Unit v5314 (src/game/rides/CoasterEdit.cpp): SetCoasterEdit is declared in LLCellSystem.h
 void HandleCoasterButtonClick(uint32_t buttons, uint32_t event);   // 0x10058510 (176 bytes)
 void HandleCoasterButtonDown(uint32_t buttons);                    // 0x10056d7c (696 bytes, stand-in)
 // The brace mesh lists (native pointers: the host offsets after the first pointer are larger than the Mac's in the comments).
@@ -1178,16 +1178,16 @@ struct sBraceMeshBlock {
 // with flag 0x20)
 sBraceMeshList* GetPylonFromBraceMesh(uint32_t id, uint32_t* out);
 void* GetNthBraceMesh(sBraceMeshList* list, uint32_t n);          // 0x10058888 (112 bytes)
-// ---- Unit v5157 (src/NewTrackBrace.cpp): NewTrackBrace and UnLinkPreviewBrace are declared above
+// ---- Unit v5157 (src/game/rides/CoasterPylon.cpp): NewTrackBrace and UnLinkPreviewBrace are declared above
 struct sBraceControl;                                              // the pylon control's +0x30 and +0x44 blocks
 void SetupBraceInfo(tag_sTrackBrace* brace, sBraceInfo* info, sBraceControl* control, sPylonControl* pylon);   // 0x1003df2c (212 bytes, stand-in)
 void UnLinkBrace(tag_sTrackBrace* brace, sCoasterTrackParams* params);                                          // 0x1003e5c0 (212 bytes, stand-in)
 void RestorePylonDetails(tag_sCoasterInstance* instance, tag_sPylon* pylon);                                    // 0x1003ec00 (448 bytes, stand-in)
-void RemoveBraceFromCollisionSystem(tag_sTrackBrace* brace, tag_sCoasterInstance* instance);                    // 0x10048fc4 (84 bytes, src/TPConfig_collision.cpp, unit v5L20)
-// ---- Unit v5551 (src/TPCoaster_instances_IsValidPylonPosition.cpp): the clamp bounds of IsValidPylonPosition's angle fraction (names invented)
+void RemoveBraceFromCollisionSystem(tag_sTrackBrace* brace, tag_sCoasterInstance* instance);                    // 0x10048fc4 (84 bytes, src/game/rides/CoasterCollision.cpp, unit v5L20)
+// ---- Unit v5551 (src/game/rides/CoasterPylon.cpp): the clamp bounds of IsValidPylonPosition's angle fraction (names invented)
 extern float gPylonClampMax;   // 0x1029cd48  1.0f
 extern float gPylonClampMin;   // 0x1029cd4c  0.0f
-// ---- Unit v5557 (src/TPConfig_extrude_GetCrossSectionFromParams_GenerateExtrusions.cpp): the track's extrusion table (names invented)
+// ---- Unit v5557 (src/game/rides/CoasterExtrude.cpp): the track's extrusion table (names invented)
 extern float gExtrudeBlendMin;                  // 0x1029ce70  0.0f: the lower clamp of a branch blend's ratio
 extern float gExtrudeBlendMax;                  // 0x1029ce74  1.0f: the upper clamp
 extern sExtrusionParams gExtrudeParamsBuf[2560];   // 0x102b7674  the table GenerateExtrusions fills (0x10 bytes a record on the Mac, 0x18 on the host; 0xa000 bytes up to 0x102c1674)
@@ -1198,23 +1198,23 @@ int32_t IsEndOfSampleBuffer(tag_sCoasterInstance* instance, float position);   /
 void SetInitialCoasterInterpParams(sCoasterTrackParams* params);               // 0x100509bc (52 bytes, stand-in)
 // 0x1004ff18 (2,536 bytes): walks the track every 0.25 and fills gExtrudeParamsBuf with the keys of each cross section change
 void GenerateExtrusions();
-// ---- Unit v5647 (src/DisableCurrentPylonEditState_SetCoasterEditState_DoDeleteMultiPylons.cpp)
+// ---- Unit v5647 (src/game/rides/CoasterEdit.cpp)
 void DoDeleteMultiPylons();     // 0x10053f98 (1,424 bytes): the delete button of the multi pylon selection
 void CoasterPlaceMouseMode();   // 0x1019b018 (220 bytes, stand-in)
 // The brace the Mac keeps in the word at 0x102c1788 (gCoasterWord1788 above is only 32 bits, the host's pointer is 64): DoDeleteMultiPylons keeps
 // the pointer here and the low 32 bits in gCoasterWord1788; it counts as cleared when gCoasterWord1788 no longer matches (another unit zeroes it).
 extern tag_sTrackBrace* gCoasterStartBrace;
-// ---- Unit v5667 (src/GetNewBraceLoftInterval_RestorePylonDetails.cpp): CalculateBraceHeight, RestorePylonDetails and InsertBraceIntoPylon are declared above
+// ---- Unit v5667 (src/game/rides/CoasterPylon.cpp): CalculateBraceHeight, RestorePylonDetails and InsertBraceIntoPylon are declared above
 // 0x1003ee10 (256 bytes): lowers the top braces of a pylon to the control's minimum interval while the stack is too tall; answers 1 if it changed any
 int32_t SquishPylonBracesIfRequired(tag_sCoasterInstance* instance, sPylonControl* control, sLinkPylon* pylon);
-// ---- Unit v5673 (src/GetActualBraceTrackPositions_RecalcBraceTangents.cpp)
+// ---- Unit v5673 (src/game/rides/CoasterPylon.cpp)
 void RecalcBraceTangents();                                                                  // 0x1003d080 (1,056 bytes)
 void GetRequiredBraceTangents(tag_sTrackBrace* brace, sCoasterType* type, sCoasterTrackParams* params);   // 0x1003aef4 (3,048 bytes, stand-in)
 float GetCarWantedSpeedAtHeight(sCoasterType* type, float a, float b, float c, float d);       // 0x1004aedc (132 bytes, stand-in)
 float GetBankAtBrace(tag_sCoasterInstance* instance, tag_sTrackBrace* brace, float f);        // 0x1004b1f8 (216 bytes, stand-in)
-// Unit v5688 (src/TPCoaster_ticks_HandleMultiBracePreviewChange.cpp)
+// Unit v5688 (src/game/rides/CoasterEdit.cpp)
 tag_sPylon* GetPylonUnderCursor(uint32_t* a, uint32_t* b, uint32_t* c);   // 0x1003f848 (216 bytes, stand-in)
-// Unit v5731 (src/GetNewBraceLoftInterval_SetupBraceInfo.cpp): the brace info blocks and the track's brace/pylon lists (names invented)
+// Unit v5731 (src/game/rides/CoasterPylon.cpp): the brace info blocks and the track's brace/pylon lists (names invented)
 // The Mac's {count, 0x4 block, 0x8 block}; the blocks hold count entries of 0x58 bytes. Native pointers, so the host offsets are 0, 8, 0x10.
 struct sBraceInfo {
     uint32_t mCount;                  // 0x00
@@ -1237,42 +1237,42 @@ struct sCoasterTrackParams {
     tag_sTrackBrace* mBraceTail;      // 0x24  the last brace
     tag_sTrackBrace* mLastBrace;      // 0x18  (unit v51074, appended: the Mac word, the host's is further) GetTrackBrace's start, the chain of the braces' +0x64
 };
-// ---- Unit v5893 (src/DisableCurrentPylonEditState_SetCoasterEditState_DeletePylon.cpp): the pylon edit helpers (names invented)
+// ---- Unit v5893 (src/game/rides/CoasterEdit.cpp): the pylon edit helpers (names invented)
 // 0x10054640 (380 bytes): takes the brace out of its pylon, closing the gap; the later braces get the removed one's ride node height and re-derive their interval.
 void RemoveTrackBraceFromPylon(tag_sCoasterInstance* instance, tag_sTrackBrace* brace);
 // 0x10054814 (284 bytes): unlinks the pylon from the instance's list, renumbers the rest, frees it (flag != 0: the 3D object stays)
 void DeletePylon(tag_sCoasterInstance* instance, tag_sPylon* pylon, int32_t flag);
 // 0x101ed9a0 (288 bytes, stand-in)
 void MoveRide(tag_sRideAnimSet* set, int32_t x, int32_t z, void* params, int32_t a, int32_t b, uint32_t c);
-// Unit v5900 (src/AllocateQueue_UnloadTrain_2.cpp)
+// Unit v5900 (src/game/rides/CoasterQueue.cpp)
 // Hands up to `count` cars' peeps (the entrance queue's, drawn at random among the cars first..first+count-1) to the train's cars.
 void LoadTrain(tag_sCoasterInstance* instance, sTrainInstance* train, uint32_t first, uint32_t count);   // 0x10049bf4 (412 bytes)
 // The first and the last car (indexes) whose span overlaps the station [0xf8, 0xfc].
 void GetCarsInStation(tag_sCoasterInstance* instance, sTrainInstance* train, uint32_t* first, uint32_t* last);   // 0x10049e8c (220 bytes)
 extern int32_t gCoasterCapacityFloor;     // 0x1029ce28  CoasterSetCapacity's lower bound (a max with it; bss, name invented)
-// Unit v51008 (src/TPConfig_extrude_GenerateTrackSubdivisions_2.cpp)
+// Unit v51008 (src/game/rides/CoasterExtrude.cpp)
 int32_t GenerateTrackSubdivisions(tag_sTrackBrace* a, tag_sTrackBrace* b, sExtrusionParams* params, float* out, float span);   // 0x1004e8c0 (260 bytes)
 void LayoutRecordCoasterSpeed(tag_sCoasterInstance* instance, uint32_t speed);   // 0x100590a0 (56 bytes, stand-in)
-void FlagRecalcAllCoasterCollisions(tag_sCoasterInstance* instance);             // 0x10049078 (92 bytes, src/TPConfig_collision.cpp, unit v5L20)
-// Unit v51024 (src/LevelSystems_GetRequiredBraceTangents_2.cpp): the clamp constants of GetRequiredBraceTangents (names invented)
+void FlagRecalcAllCoasterCollisions(tag_sCoasterInstance* instance);             // 0x10049078 (92 bytes, src/game/rides/CoasterCollision.cpp, unit v5L20)
+// Unit v51024 (src/game/rides/CoasterPylon.cpp): the clamp constants of GetRequiredBraceTangents (names invented)
 extern float gBraceTangentOne;         // 0x1029cd1c  1.0f
 extern float gBraceTangentMinusOne;    // 0x1029cd18  -1.0f
 extern int32_t gKickPeepsFloor;          // 0x1029ce2c  KickPeepsFromEntranceQueue's lower bound on the number kicked (a max with it; bss, name invented)
-// Unit v5992 (src/DestroyCoasterPylons_SetupBraceBezierCtrlParams.cpp; names invented)
+// Unit v5992 (src/game/rides/CoasterTrack.cpp; names invented)
 void SetupBraceBezierCtrlParams(tag_sCoasterInstance* instance);   // 0x10050a3c (880 bytes)
-void RecalcTrackBounds(tag_sCoasterInstance* instance);            // 0x10047818 (96 bytes, src/TPConfig_collision.cpp, unit v5L20)
-void DoCollisionChecking(tag_sCoasterInstance* instance);          // 0x10048f64 (32 bytes, src/TPConfig_collision.cpp, unit v5L20)
+void RecalcTrackBounds(tag_sCoasterInstance* instance);            // 0x10047818 (96 bytes, src/game/rides/CoasterCollision.cpp, unit v5L20)
+void DoCollisionChecking(tag_sCoasterInstance* instance);          // 0x10048f64 (32 bytes, src/game/rides/CoasterCollision.cpp, unit v5L20)
 extern float gBraceBezierMin;                       // 0x1029ce78  0.0f, the lower bound of the bezier weight after the pivot
 extern float gBraceBezierMax;                       // 0x1029ce7c  1.0f, the upper bound
 extern const uint32_t* gTrackTextureCacheType;      // 0x102b74bc  the coaster type whose texture flags gExtrudeFaceStoreB holds
 extern float gTrackSubdivTimes[100];                // 0x102b74c0  GenerateTrackSubdivisions' output (up to 0x102b7650)
-// Unit v51074 (src/DestroyCoasterPylons_SetupBraceBezierCtrlParams_SetInitialOrientationParams.cpp)
+// Unit v51074 (src/game/rides/CoasterTrack.cpp, src/game/rides/CoasterEdit.cpp)
 int32_t IsTrackClosed(tag_sCoasterInstance* instance);   // 0x10052780 (36 bytes; the overload on the coaster's object is 0x10052850)
 void SetPlaceNormalPylon();                              // 0x10058b68 (36 bytes)
 void SetPlaceSpecialPylon();                             // 0x10058bb8 (36 bytes)
 void LayoutDeleteLastTrackBrace();                       // 0x10058f4c (32 bytes)
 
-// ---- Unit v5L20 (src/TPConfig_collision.cpp): the coaster collision system (TPConfig.cpp on the Mac; names invented). Each brace keeps
+// ---- Unit v5L20 (src/game/rides/CoasterCollision.cpp, src/game/rides/CoasterPylon.cpp): the coaster collision system (TPConfig.cpp on the Mac; names invented). Each brace keeps
 // the box of the track from it back to the brace before it (mCollisionBounds) and the braces whose track crosses that section
 // (mCollisions, mFB0 of them, at most 8; a brace with more is flagged 0x400000). Flag 0x200000 asks for the brace's collisions to be
 // worked out again, 0x10000 keeps the brace out of them. The radius widening each box is the pylon control's word 0x58.

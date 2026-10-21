@@ -165,7 +165,7 @@ public:
     RECEIVED* mReceived;     // 0x30  the stored answer, reference counted
 };
 
-// Unit v5215 (src/CFSOnlineSystemList_LoggedInGetList.cpp): the city instances, 0x10178414 and 0x10173f98.
+// Unit v5215 (src/game/online/FS_OnlineList.cpp): the city instances, 0x10178414 and 0x10173f98.
 template<> void CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList>::LoggedInGetList();
 template<> void CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList>::CompleteGetList(int32_t error);
 // The Mac calls the list's callback (a function pointer word at 0x1c, its context at 0x20: 32-bit words in the host layout) through
@@ -180,7 +180,7 @@ public:
     // 0x10178718 (352, untranslated): asks the city server for the list of cities; non-virtual.
     void GetList(OnlineListCallback<TbPtrList<CFSOnlineCity>>::Type callback, const void* context);
     ~CFSOnlineSystemCityList() override;   // 0x10170e20
-    // Unit v5307 (src/FS_Online_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor_CFSOnlineSystemParkList_InCity_GetList_CFSOnlineSystemCityList_StoreReceivedList.cpp).
+    // Unit v5307 (src/game/online/FS_OnlineList.cpp).
     int32_t ChildLocked() override;                                   // 0x101788d8 (196): 1 unless the child lock (bit 0x10) forbids the lobby
     int32_t RequestListFromServer(City* city, uint32_t unused) override;   // 0x101789d8 (84)
     void StoreReceivedList(const ccCityList* list) override;          // 0x10178a78 (116): one CFSOnlineCity (0x68 bytes) per 0x30-byte info
@@ -204,7 +204,7 @@ namespace parklist_callee {
 void NewPark(const ccParkInfo* info, CFSOnlineSystemParkList* list);
 }
 
-// Unit v5994 (src/CFSOnlineSystemRideList_RequestListFromServer_CFSOnlineCity_CFSOnlineCity.cpp): the ride instances of the list callees,
+// Unit v5994 (src/game/online/FS_OnlineList.cpp): the ride instances of the list callees,
 // 0x10174410 and 0x1017b6c8 (untranslated, faked by the test library), and the list calls of the city and server records, weak
 // definitions in that file that the test library overrides.
 template<> void CFSOnlineSystemList<TbPtrList<CFSOnlineRide>, ccRideList>::CompleteGetList(int32_t error);
@@ -295,7 +295,7 @@ void ThemeListPostLoginCallbackFn(int32_t error, const void* context);
 // (0x1017a908, 0x1017b4a4) are the same code with the base's work inline, so they are empty here and run the base's.
 template<> CFSOnlineSystemList<TbPtrList<CFSOnlineServer>, ccServerList>::~CFSOnlineSystemList();
 template<> CFSOnlineSystemList<TbPtrList<CFSOnlineRide>, ccRideList>::~CFSOnlineSystemList();
-// Unit v51129 (src/ui_Postcard_panel_std_basic_string_assign_2.cpp): the theme list's destructor (0x10179d28) has the base's work inline; the
+// Unit v51129 (src/game/online/FS_OnlineList.cpp): the theme list's destructor (0x10179d28) has the base's work inline; the
 // callees of that work, weak defaults in the source (the real calls) that the test library replaces with recording fakes.
 namespace onlinelist3_callee {
 CFSOnlineTheme* ThemeRemoveHead(TbPtrList<CFSOnlineTheme>* list);   // 0x10177904
@@ -308,24 +308,24 @@ public:
     CFSOnlineSystemServerList();   // 0x1017a604
     void GetList();                // 0x1017ada8 (348, untranslated)
     ~CFSOnlineSystemServerList() override;   // 0x1017a908
-    // Unit v5713 (src/CFSOnlineSystemServerList_RequestListFromServer.cpp)
+    // Unit v5713 (src/game/online/FS_OnlineList.cpp)
     int32_t RequestListFromServer(City* city, uint32_t arg) override;   // 0x1017af40 (92): logs, asks the city for the server list; answers its request id
     void StoreReceivedList(const ccServerList* list) override;          // 0x1017afec (116): makes one CFSOnlineServer (0x80 bytes) per info
 };
 
-// Unit v5721 (src/ServerListPostLoginCallbackFn.cpp): the server instances (untranslated, fakes in the test).
+// Unit v5721 (src/game/online/FS_OnlineList.cpp): the server instances (untranslated, fakes in the test).
 template<> void CFSOnlineSystemList<TbPtrList<CFSOnlineServer>, ccServerList>::LoggedInGetList();     // 0x1017ab30 (412)
 template<> void CFSOnlineSystemList<TbPtrList<CFSOnlineServer>, ccServerList>::CompleteGetList(int32_t error);   // 0x1017464c (468)
 // 0x1017aa6c (140): makes the online system if there is none, then asks the server list: CompleteGetList(1) when error is nonzero,
 // else LoggedInGetList. The context is unused.
 // Weak fallbacks (the base placeholders) so unit libraries that do not link
-// src/CFSOnlineSystemServerList_RequestListFromServer.cpp still resolve the vtable; the real bodies there are strong.
+// src/game/online/FS_OnlineList.cpp still resolve the vtable; the real bodies there are strong.
 #ifndef TPW_SERVERLIST_STRONG
 __attribute__((weak)) inline int32_t CFSOnlineSystemServerList::RequestListFromServer(City*, uint32_t) { return 0; }
 __attribute__((weak)) inline void CFSOnlineSystemServerList::StoreReceivedList(const ccServerList*) {}
 #endif
 void ServerListPostLoginCallbackFn(int32_t error, const void* context);
-// Unit v51110 (src/CFSOnlineSystemServerList_RequestListFromServer_CFSOnlineSystemServerList_ReturnFTPDownloadServe.cpp): the callees of the
+// Unit v51110 (src/game/online/FS_OnlineList.cpp): the callees of the
 // list destructors, weak defaults in the source (the real calls) that the test library replaces with recording fakes.
 namespace onlinelist2_callee {
 CFSOnlineRide* RideRemoveHead(TbPtrList<CFSOnlineRide>* list);          // 0x10177758
@@ -427,13 +427,13 @@ public:
     int32_t mF68;                                   // 0x68
 };
 
-// Unit v5662 (src/FS_Online_init_CFSOnlineSystemList_CompleteGetList.cpp): the ride instance, 0x10174410 (468).
+// Unit v5662 (src/game/online/FS_Online.cpp): the ride instance, 0x10174410 (468).
 // The ride record's virtual destructor (vtable +8, flag 1) goes through this hook (default: delete); tests replace it.
 // The list's callback goes through gOnlineListCallbackCaller (declared above).
 template<> void CFSOnlineSystemList<TbPtrList<CFSOnlineRide>, ccRideList>::CompleteGetList(int32_t error);
 extern void (*gRideRecordDeleter)(CFSOnlineRide* ride);
 
-// Unit v51123 (src/FS_Online_init_CFSOnlineSystem_GotoPlayerByIDFTPPostLoginCallba.cpp): the park instance, 0x101741d4 (468); the server
+// Unit v51123 (src/game/online/FS_Online.cpp, src/game/save/FS_MasterSave.cpp): the park instance, 0x101741d4 (468); the server
 // (0x1017464c) and theme (0x1017488c) instances are declared above. Their record's virtual destructor (vtable +8, flag 1) goes through
 // these hooks (default: delete); tests replace them. The park and theme list heads are removed by the weak ParkRemoveHead /
 // ThemeRemoveHead (0x10177b98, 0x10177904), which tests replace.
@@ -457,11 +457,11 @@ public:
     TbDynamicStringTemplate<char> mText34;          // 0x34
 };
 
-// Unit v51065 (src/FS_Online_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor_CFSOnlineSystemParkList_InCity_GetList_CFSOnlineSystemCityList_StoreReceivedList_CFSOnlineSystemCityList_ReturnCityInfo.cpp).
+// Unit v51065 (src/game/online/FS_OnlineList.cpp).
 template<> void CFSOnlineSystemList<TbPtrList<CFSOnlinePark>, ccParkList>::LoggedInGetList();           // 0x10178ce4 (412)
 template<> void CFSOnlineSystemList<TbPtrList<CFSOnlinePark>, ccParkList>::CompleteGetList(int32_t error);   // 0x101741d4 (468, untranslated)
 // 0x10179b08 (288), the theme instance's out-of-line base destructor. The C++ destructor of that instance stays the empty one of unit
-// v51129 (src/ui_Postcard_panel_std_basic_string_assign_2.cpp), because ~CFSOnlineSystemThemeList does the same work inline and C++
+// v51129 (src/game/online/FS_OnlineList.cpp), because ~CFSOnlineSystemThemeList does the same work inline and C++
 // chains to the base; the Mac's copy is this function, which a deleting call (flag above 0) follows with the free.
 namespace online_list_base {
 void ThemeListBaseDtor(CFSOnlineSystemList<TbPtrList<CFSOnlineTheme>, ccThemeList>* self);

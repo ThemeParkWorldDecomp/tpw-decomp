@@ -1,5 +1,5 @@
 // Test library for bfl::draw::CDraw::SetSpritePalette (unit v5336; libtpw_unit_bfl_draw_CDraw_SetSpritePalette.dylib), main app:
-//   src/Draw_state_bfl_draw_CDraw_SetSpritePalette.cpp
+//   src/bullfrog/Draw.cpp
 //
 // TbMaskRotates::Init is a fake: it records both formats and writes the rotates from the case's queue "rot".
 #include <cstddef>

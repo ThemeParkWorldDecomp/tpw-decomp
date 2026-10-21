@@ -1,5 +1,5 @@
 // Test library for the all-rides and all-shops panels (unit v5964; libtpw_unit_CreateAllRidesPanel.dylib, tests/test_CreateAllRidesPanel.py):
-//   src/MainWindowCallback_CreateAllRidesPanel.cpp
+//   src/game/ui/ui_allItemsPanel.cpp
 // Every callee outside the unit is a fake that records what the PowerPC stub records.
 #include <cstddef>
 #include <cstdint>

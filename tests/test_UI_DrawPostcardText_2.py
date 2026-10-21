@@ -1,5 +1,5 @@
 """Unit v51012, the ui_utils helpers, against libtpw_unit_UI_DrawPostcardText_2.dylib (tests/unit_UI_DrawPostcardText_2.cpp), main app
-("SimTheme Park"), src/ui_loginpanel_UI_DrawPostcardText_2.cpp:
+("SimTheme Park"), src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_utils.cpp:
   UI_DrawPostcardText 0x1018bbc4, __sinit_ui_utils_cpp 0x1018bda8, MakeRenderAreaFromRAW 0x1018b434,
   InterfaceDrawEngineHGradient::CalcUVs 0x10189d70, InterfaceVisitorTimeTextObject::Change 0x1018efcc
 

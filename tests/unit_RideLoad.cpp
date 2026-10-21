@@ -1,5 +1,5 @@
 // Test library for the ride scripts' load (unit w167; libtpw_unit_RideLoad.dylib, tests/test_RideLoad.py), main app:
-//   src/rsse_save.cpp   RSSE_Load and RSSE_WALK::Byteswap (and w166's RSSE_Save, linked and not called)
+//   src/game/rides/rsse.cpp   RSSE_Load and RSSE_WALK::Byteswap (and w166's RSSE_Save, linked and not called)
 //
 // Every callee outside the unit is a fake that records what the PowerPC stub of the module records: LbFile_Read (the file, the length, whether a
 // transferred-bytes pointer was given; the bytes come from the test's stream, zeros past its end), CTRACE and GAME_ASSERTMSG (the texts), KillScript

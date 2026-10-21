@@ -1,6 +1,6 @@
 """Unit v5080: the horizontal gradient's constructor, against libtpw_unit_InterfaceDrawEngineHGradient_InterfaceDrawEngine.dylib
 (tests/unit_InterfaceDrawEngineHGradient_InterfaceDrawEngine.cpp), main app
-("SimTheme Park"), src/ui_DrawObjectEngineMesh_InterfaceDrawEngineHGradient_InterfaceDrawEngine.cpp:
+("SimTheme Park"), src/game/ui/InterfaceDrawEngine.cpp:
   InterfaceDrawEngineHGradient::InterfaceDrawEngineHGradient 0x101898c8
 
 A case is a world and a call. The world is built twice by one piece of Python code: in emulator memory (big-endian) for the original, and in

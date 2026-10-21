@@ -1,5 +1,5 @@
 """Unit v5140, ccServerInfo::~ccServerInfo, against libtpw_unit_ccServerInfo_Dtor_ccServerInfo.dylib
-(tests/unit_ccServerInfo_Dtor_ccServerInfo.cpp), main app, src/FS_Online_init_ccServerInfo_Dtor_ccServerInfo.cpp:
+(tests/unit_ccServerInfo_Dtor_ccServerInfo.cpp), main app, src/game/online/FS_Online.cpp:
   ccServerInfo::~ccServerInfo 0x101731dc
 
 A case is an object of 0x26 bytes with the five string pointers (+0x08, +0x0c, +0x16, +0x1a, +0x22) each NULL or a small block whose

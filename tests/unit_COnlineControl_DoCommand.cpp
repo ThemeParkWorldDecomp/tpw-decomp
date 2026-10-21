@@ -1,6 +1,6 @@
 // Test library for COnlineControl::DoCommand (unit v5636; libtpw_unit_COnlineControl_DoCommand.dylib, tests/test_COnlineControl_DoCommand.py),
 // main app:
-//   src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_DoCommand.cpp   DoCommand 0x10219bec
+//   src/game/online/online.cpp   DoCommand 0x10219bec
 //   and gVoteSendData
 //
 // The callees outside the unit are fakes that record what the real ones read (strings as length and hash, pointers as lab(p)) and answer

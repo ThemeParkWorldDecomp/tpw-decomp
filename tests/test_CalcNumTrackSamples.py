@@ -1,5 +1,5 @@
 """Unit v5524, CalcNumTrackSamples against libtpw_unit_CalcNumTrackSamples.dylib (tests/unit_CalcNumTrackSamples.cpp), main app,
-src/DestroyCoasterPylons_CalcNumTrackSamples.cpp:
+src/game/rides/CoasterTrack.cpp:
   CalcNumTrackSamples 0x1005162c
 
 A case is a brace (number, count, optional previous brace) and a call. The world is built by one piece of Python code on both sides.

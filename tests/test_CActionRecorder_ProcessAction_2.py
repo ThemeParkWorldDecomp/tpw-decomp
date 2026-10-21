@@ -1,6 +1,6 @@
 """Unit v5362, CActionRecorder replay and record functions, against libtpw_unit_CActionRecorder_ProcessAction_2.dylib
 (tests/unit_CActionRecorder_ProcessAction_2.cpp), main app ("SimTheme Park"),
-src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ProcessAction_CActionRecorder_ProcessAction_2.cpp:
+src/game/ActionRecorder.cpp:
   CActionRecorder::ProcessAction@0x10145e38 (action, halfword), CActionRecorder::ProcessAction@0x101465a8 (action, halfword, count,
   text), CActionRecorder::RecordAction (0x1014445c, action and three halfwords)
 

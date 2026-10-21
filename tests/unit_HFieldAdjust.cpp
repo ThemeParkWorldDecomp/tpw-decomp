@@ -1,4 +1,4 @@
-// Harness for CHField::AdjustHField (src/tb_hfield_adjust.cpp). The function calls nothing,
+// Harness for CHField::AdjustHField (src/engine/tb_hfield.cpp). The function calls nothing,
 // so there are no recording fakes; the constructor and destructor are empty stand-ins
 // because the test only needs the object's storage.
 #include "tb_hfield.h"

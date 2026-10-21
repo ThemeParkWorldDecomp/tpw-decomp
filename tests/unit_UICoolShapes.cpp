@@ -1,6 +1,6 @@
 // Test library for the region shapes' virtual members (libtpw_unit_UICoolShapes.dylib; see tests/test_UICoolShapes.py):
-// src/ui_cool_shapes.cpp (PointIn, Shift, Adjust and the destructor of CoolCircle, CoolEllipse and CoolPoly), under it the
-// constructors (src/ui_controls_small.cpp) and the base class (src/UI_Base.cpp). Nothing is faked but the allocator, which counts
+// src/game/ui/CoolRegion.cpp (PointIn, Shift, Adjust and the destructor of CoolCircle, CoolEllipse and CoolPoly), under it the
+// constructors (src/game/ui/CoolRegion.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp) and the base class (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Nothing is faked but the allocator, which counts
 // (tests/calllog.cpp).
 //
 // The Python module drives this library through extern "C" operations on three shapes in slots: make one, ask PointIn, Shift,

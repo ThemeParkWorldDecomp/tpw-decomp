@@ -1,12 +1,12 @@
 // Test library for unit w36 (libtpw_unit_UIScriptData.dylib; see tests/test_UIScriptData.py): the island lobby controller's message
-// function and its small companions (src/UI_IslandLobby_msg.cpp), the window classes' WhatAmI members, CalcClientArea and
-// CallDefaultWindowHandler (src/ui_whatami.cpp), the help text handler and the timer constructor (src/ui_helptext.cpp), and the login
-// panel's script (src/ui_loginpanel_data.cpp). The lobby's and the island controller's scripts live in src/lobby.cpp and
-// src/UI_IslandLobby.cpp, whose libraries (unit_Lobby, unit_IslandLobby) the Python module reads them from.
+// function and its small companions (src/game/ui/ui_islandLobbyController.cpp), the window classes' WhatAmI members, CalcClientArea and
+// CallDefaultWindowHandler (src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp), the help text handler and the timer constructor (src/game/ui/InterfaceHelpText.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp), and the login
+// panel's script (src/game/ui/ui_playerLogin.cpp). The lobby's and the island controller's scripts live in src/game/online/lobby.cpp and
+// src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_onlineOutbox.cpp, whose libraries (unit_Lobby, unit_IslandLobby) the Python module reads them from.
 //
-// Under them, real: the script interpreter (src/InterfaceWindow_script.cpp), the control factory and constructors
-// (src/ui_controls_create.cpp, src/InterfaceButton.cpp), the control setters (src/ui_controls_small.cpp), the region shapes
-// (src/ui_cool_shapes.cpp), the window constructor (src/InterfaceWindow.cpp) and the rectangles (src/UI_Base.cpp). So a script builds
+// Under them, real: the script interpreter (src/game/ui/InterfaceWindow.cpp), the control factory and constructors
+// (src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp), the control setters (src/game/ui/CoolRegion.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp), the region shapes
+// (src/game/ui/CoolRegion.cpp), the window constructor (src/game/ui/InterfaceWindow.cpp) and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). So a script builds
 // its windows here the way the game does, through WhatAmI.
 //
 // Everything else is a fake that records through calllog: the message senders, the pointer, the timer table, the draw objects (a
@@ -169,7 +169,7 @@ int32_t InterfaceWindow::Show(int16_t on) {
     ev("Window.Show", {lab(this), on});
     return 1;
 }
-// The first child with that id (src/InterfaceWindow_show.cpp's, which is not linked; it records nothing).
+// The first child with that id (src/game/ui/InterfaceWindow.cpp's, which is not linked; it records nothing).
 InterfaceWindow* InterfaceWindow::GetWindow(int32_t id) {
     for (InterfaceWindow* child = mChild; child != nullptr; child = child->mNext)
         if (child->mId == id) return child;
@@ -323,7 +323,7 @@ CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
 void CLBScreenComponentOnlineGlobe::Render() {}
 void CLBScreenComponentOnlineGlobe::Close() {}
 uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
-// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp).
+// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 CLBScreenComponentDownloadGlobe::~CLBScreenComponentDownloadGlobe() {}

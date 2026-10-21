@@ -1,11 +1,11 @@
 """Differential tests for the window's animation starters and the check buttons' destructor (unit w91), against
 libtpw_unit_UIWindowAnim.dylib (tests/unit_UIWindowAnim.cpp):
 
-  src/InterfaceWindow_anim.cpp         InterfaceWindow::setPivot, startAnim, startAnimTimer
-  src/InterfaceCheckButtons_dtor.cpp   InterfaceCheckButtons::~InterfaceCheckButtons
+  src/game/ui/InterfaceWindow.cpp         InterfaceWindow::setPivot, startAnim, startAnimTimer
+  src/game/ui/InterfaceButton.cpp   InterfaceCheckButtons::~InterfaceCheckButtons
 
 Real on both sides: those, SetPosition (which startAnim calls, with ShiftPosition and HandleScale under it), the window's constructor
-(src/InterfaceWindow.cpp, which builds the test trees), InterfaceTimer::Start and the rectangles (src/UI_Base.cpp). Fakes that record the
+(src/game/ui/InterfaceWindow.cpp, which builds the test trees), InterfaceTimer::Start and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Fakes that record the
 same event on both sides: the message senders, UI_UpdatePointerIn, UI_SetCursor, the UI clock (IveGotTicks, answers from a queue), the
 window's untranslated virtual members (DrawFunction, CalcClientArea, the destructor, GetHelpText) and Show, the draw objects (Draw and
 Change record the fields their flags name, the pivot pair of flag 0x40 included), the help text handler, two regions (Shift) and the

@@ -1,6 +1,6 @@
 // Test library for CTimeSig::Serialise and SecondsSinceLastUpdate (unit v5117; libtpw_unit_CTimeSig_Serialise.dylib,
 // tests/test_CTimeSig_Serialise.py), main app:
-//   src/TPOptions_CTimeSig_Serialise.cpp   the inline members of include/TimeSig.h
+//   src/game/TPOptions.cpp   the inline members of include/TimeSig.h
 //
 // SAVEVAR/LOADVAR<MacULong> and CWorldSavvy::GetWorld are fakes recording their arguments; gWorld is defined here.
 #include <cstddef>

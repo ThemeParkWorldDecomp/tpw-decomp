@@ -1,6 +1,6 @@
 // Test library for StartTrainSounds and LayoutStartAllCoasterSounds (unit v5205; libtpw_unit_LayoutStartAllCoasterSounds.dylib,
 // tests/test_LayoutStartAllCoasterSounds.py), main app:
-//   src/TPConfig_bend_LayoutStartAllCoasterSounds.cpp
+//   src/game/rides/CoasterSounds.cpp
 //
 // The callees (StopTrainSounds, RSSE_GetSoundEventCode, SND_SendIndirectedEvent, SetTrainSoundState) are recording fakes; the globals
 // of other files (gCoasterInstances, gSoundBanks, gActionRecorder) are defined here.

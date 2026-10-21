@@ -1,5 +1,5 @@
 """Unit v5010, the ride list panel, against libtpw_unit_CreateRideListPanel.dylib (tests/unit_CreateRideListPanel.cpp), main app
-("SimTheme Park"), src/CreateRideListPanel.cpp:
+("SimTheme Park"), src/game/ui/ui_ridepanel.cpp:
   CreateRideListPanel 0x101b8434
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

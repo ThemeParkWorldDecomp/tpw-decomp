@@ -1,5 +1,5 @@
 """Unit v5229: the case blind wide string's compare and substring constructor, against libtpw_unit_std_basic_string_compare_3.dylib
-(tests/unit_std_basic_string_compare_3.cpp), main app ("SimTheme Park"), src/std_basic_string_compare_3.cpp:
+(tests/unit_std_basic_string_compare_3.cpp), main app ("SimTheme Park"), src/game/MslSupport.cpp:
   std::basic_string<wchar_t,nocase_wchar_traits,...>::compare 0x10225a5c, ::basic_string (substring constructor) 0x1022213c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

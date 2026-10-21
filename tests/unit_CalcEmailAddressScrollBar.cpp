@@ -1,6 +1,6 @@
 // Test library for the online outbox panel's helpers (unit v5017; libtpw_unit_CalcEmailAddressScrollBar.dylib,
 // tests/test_CalcEmailAddressScrollBar.py), main app:
-//   src/UI_IslandLobby_CalcEmailAddressScrollBar.cpp   FillOutboxList, SetCurrentEmailInfo, CalcEmailAddressScrollBar, UpdatePreview
+//   src/game/ui/ui_onlineOutbox.cpp   FillOutboxList, SetCurrentEmailInfo, CalcEmailAddressScrollBar, UpdatePreview
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The windows are
 // five fixed blocks whose first word is a hand made vtable (SetValue and SetText are virtual calls); operator new answers from the arena

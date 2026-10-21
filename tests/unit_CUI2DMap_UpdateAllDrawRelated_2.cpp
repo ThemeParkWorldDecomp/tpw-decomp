@@ -1,6 +1,6 @@
 // Test library for CUI2DMap::UpdateAllDrawRelated (unit v5965; libtpw_unit_CUI2DMap_UpdateAllDrawRelated_2.dylib,
 // tests/test_CUI2DMap_UpdateAllDrawRelated_2.py), main app:
-//   src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister_CUI2DMap_UpdateAllDrawRelated_2.cpp
+//   src/game/ui/ui_2dmap.cpp
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs): the CDraw
 // constructor, SetCurrent and destructor, GAME_ASSERTMSG, CObject's three queries, UI2DMReturnScaleColour, DrawCoasterTracks,

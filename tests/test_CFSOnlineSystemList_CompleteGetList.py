@@ -1,5 +1,5 @@
 """Unit v5662, the ride instance of the list's completion step, against libtpw_unit_CFSOnlineSystemList_CompleteGetList.dylib
-(tests/unit_CFSOnlineSystemList_CompleteGetList.cpp), main app ("SimTheme Park"), src/FS_Online_init_CFSOnlineSystemList_CompleteGetList.cpp:
+(tests/unit_CFSOnlineSystemList_CompleteGetList.cpp), main app ("SimTheme Park"), src/game/online/FS_Online.cpp:
   CFSOnlineSystemList<TbPtrList<CFSOnlineRide>,ccRideList>::CompleteGetList 0x10174410
 
 A case is a world and a call. The world is built twice: in emulator memory (big-endian, the Mac layout) and in the host library's memory

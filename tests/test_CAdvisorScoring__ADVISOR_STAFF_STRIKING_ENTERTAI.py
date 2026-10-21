@@ -1,5 +1,5 @@
 """Unit v51055, the CAdvisorScoring word getters (lwz r3, off(r3); blr) and the two that return 0, against
-libtpw_unit_CAdvisorScoring__ADVISOR_STAFF_STRIKING_ENTERTAI.dylib, main app, src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_STAFF_STRIKING_ENTERTAI.cpp.
+libtpw_unit_CAdvisorScoring__ADVISOR_STAFF_STRIKING_ENTERTAI.dylib, main app, src/game/advisor/AdvisorScoring.cpp.
 
 A case is a 0x260-byte object of random words. The same bytes are written on both sides; compared: the answer and the whole object
 after the call. No callees, no fused operations. Not tested: nothing.

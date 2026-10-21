@@ -1,6 +1,6 @@
 // Test library for FTPClient::_Connect and FTPClient::_Download (unit v5227; libtpw_unit_FTPClient__Download.dylib,
 // tests/test_FTPClient__Download.py), main app:
-//   src/FTPClient_RecvData_FTPClient__Download.cpp   _Connect, _Download
+//   src/game/online/FTPClient.cpp   _Connect, _Download
 //
 // The callees outside the unit are recording fakes: the connection's SendCommandLine and RecvResponse, the socket and C library imports,
 // Sock::Close, _CloseDSocket, ParseFileSize, RecvData and _EnterPassiveMode. Each logs the arguments the real one reads and answers from

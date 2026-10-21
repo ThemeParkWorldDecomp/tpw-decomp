@@ -1,5 +1,5 @@
 // Test library for CPerson::SetState (unit v5370; libtpw_unit_CPerson_SetState.dylib, tests/test_CPerson_SetState.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_SetState.cpp
+//   src/game/people/PersonQueue.cpp
 //
 // The callees outside the unit are recording fakes (objects as offsets from the case's base block) that answer from the test's queues; the
 // globals of other files the unit reads are defined here.

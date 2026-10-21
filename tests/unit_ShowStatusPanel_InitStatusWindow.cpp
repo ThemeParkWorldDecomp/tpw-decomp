@@ -1,6 +1,6 @@
 // Test library for ShowStatusPanel::InitStatusWindow (unit v51018; libtpw_unit_ShowStatusPanel_InitStatusWindow.dylib,
 // tests/test_ShowStatusPanel_InitStatusWindow.py), main app:
-//   src/ShowStatusPanel_UpdateStatusWindow_ShowStatusPanel_InitStatusWindow.cpp   InitStatusWindow and gStatusMeshNames
+//   src/game/ui/ui_showStatus.cpp   InitStatusWindow and gStatusMeshNames
 //
 // The callees outside the unit are fakes that record what the real ones read.
 #include <cstddef>

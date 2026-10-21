@@ -1,5 +1,5 @@
 """Unit w205, the world's save and its small neighbours, against libtpw_unit_WorldSave.dylib (tests/unit_WorldSave.cpp), main app
-("SimTheme Park"), src/World_save.cpp and src/ChunkFile.cpp:
+("SimTheme Park"), src/game/Thing.cpp, src/game/World.cpp, src/game/park/Map.cpp, src/game/save/ChunkFileReader.cpp:
   CWorld::Save 0x1013bf18, SAVEVAR<CWorld::WorldState> 0x1014182c, SAVEVAR<CThing::ThingModel> 0x10141980, CWorld::GetStaffHQ 0x1013e99c,
   CWorld::GetMechanicHQ 0x1013ea24, CMacroAI::~CMacroAI 0x1013a13c, CMapAttribFileReader::~CMapAttribFileReader 0x1013e6b0,
   TbPtrList<CIndividualChunkHandler>::~TbPtrList 0x1013e7f0, CThing::CThing(const CSerialise&) 0x1013dce0

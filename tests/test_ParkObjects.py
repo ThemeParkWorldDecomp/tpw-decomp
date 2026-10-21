@@ -1,4 +1,4 @@
-"""Differential tests for unit w151, the park analyser's object and ride type queries (src/ParkAnalyser_objects.cpp, src/Object_queries.cpp). See difftest.py and tpwtest.py.
+"""Differential tests for unit w151, the park analyser's object and ride type queries (src/game/park/analyser.cpp, src/game/Object.cpp). See difftest.py and tpwtest.py.
 
 The 26 CParkAnalyser queries over the things (toilets, staff rooms, rides, shops), the object list, the ride database and the object controls, and
 CObject::IsClosed and IsBrokenDown. Every callee is a fake that records the same event on both sides (the world accessor and its used-thing walk, the asserts,

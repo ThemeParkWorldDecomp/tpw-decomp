@@ -1,5 +1,5 @@
 """Unit v5280, TbIntegerVTag::Format, against libtpw_unit_TbIntegerVTag_Format.dylib (tests/unit_TbIntegerVTag_Format.cpp), program ltms,
-src/TbUniStringVTag_TbIntegerVTag_Format.cpp:
+src/ltms/TbVTag.cpp:
   TbIntegerVTag::Format 0x1000923c
 
 A case is a tag with a value and a call. swprintf (0x1000f8bc) and the virtual call through __ptr_glue (0x1000f91c, AppendUnicode) are fakes on

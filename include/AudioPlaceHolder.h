@@ -1,7 +1,7 @@
 // AudioPlaceHolder.h: CAudioPlaceHolder, the base of every sound the game is playing or waiting to play, with its priority record
 // CDistPriority, its extra data CAudioPlaceHolderExtraData and the callback base TbSndCallback (unit w79g2, "sound symbols
 // shared", Code at 0x10000000, TOC r2 = 0x1003abf0; the library's file is AudioPlaceHolder.cpp). The functions are in
-// src/AudioPlaceHolder.cpp with their addresses.
+// src/sound/AudioPlaceHolder.cpp, src/sound/TbAudioBody.cpp, src/sound/AudioPlaceHolderList.cpp, src/sound/TbSoundSampleCallback.cpp with their addresses.
 //
 // Mac layout of a placeholder, 0x60 bytes (the pool, unit w79g1, keeps them in blocks of 100 slots; the subclasses of unit w79g3
 // are placement-constructed into the slots). The host members are native, so the host object is larger; the order is the Mac's:
@@ -224,7 +224,7 @@ public:
     CAudioPlaceHolderExtraData* mExtra;  // +0x5c
 };
 
-// ---- Unit v51112 (src/AudioPlaceHolder_LbMaths_Random_LbMaths_RangedRandomSlow.cpp; sound program) -------------------------------
+// ---- Unit v51112 (src/sound/AudioPlaceHolder.cpp; sound program) -------------------------------
 class CFormat;
 class CAudioPlaceHolder;
 namespace bfl::FileSystem {
@@ -261,7 +261,7 @@ void* DestructStandInCodecLoop(void* self, int16_t deleteFlag);  // 0x1000b590
 // operator_new__FUlPv 0x1001d248 (8): placement new, answers where. The existing operator_new (in a file that cannot link into a test
 // library) is the same code; this is the sound program's own spelling.
 void* OperatorNewPlacementSound(uint32_t size, void* where);
-// TbSoundSampleStore::CChannelIterator::operator++ 0x1000fed8 (40): the same code as the one in src/TbSoundSampleStore.cpp (that file
+// TbSoundSampleStore::CChannelIterator::operator++ 0x1000fed8 (40): the same code as the one in src/sound/TbSoundSampleStore.cpp (that file
 // does not link into a test library); the next channel (the element size is the Mac's 0x60) or NULL at the end.
 class TbSoundPipeChannel;
 namespace TbSoundSampleStoreSound {

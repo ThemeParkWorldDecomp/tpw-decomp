@@ -1,9 +1,9 @@
 // Fakes and test entry point for unit w79c, the sound library's pipe channel and sample store (libtpw_unit_SoundChannel.dylib,
 // driven by tests/test_SoundChannel.py in the program "sound symbols shared"; see calllog.h):
-//   src/TbSoundPipeChannel.cpp   TbSoundPipeChannel
-//   src/TbSoundSampleStore.cpp   TbSoundSampleStore, CChannelIterator, CUsedChannelIterator, CAutoArrayPtr<TbSoundPipeChannel>
-// Real (linked): the pipe base (src/TbSoundPipe.cpp), the sample info records (src/TbSoundInfo.cpp), the handle and critical
-// section values (src/snd_handles.cpp, included here to reach its cached mask). Fakes, each recording what the original's
+//   src/sound/TbSoundPipeChannel.cpp   TbSoundPipeChannel
+//   src/sound/TbSoundSampleStore.cpp   TbSoundSampleStore, CChannelIterator, CUsedChannelIterator, CAutoArrayPtr<TbSoundPipeChannel>
+// Real (linked): the pipe base (src/sound/StreamableMpeg2.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleCallback.cpp, src/sound/TbSoundSampleCodec.cpp, src/sound/TbSoundSamplePipe.cpp, src/sound/TbSoundSystemInfo.cpp), the sample info records (src/sound/AudioPlaceHolder.cpp, src/sound/SystemCommand.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundPosition.cpp, src/sound/TbSoundSampleInfo.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/TbSoundSystemInfo.cpp, src/sound/TbSysCommand.cpp), the handle and critical
+// section values (src/sound/TbSoundCodecLoop.cpp, included here to reach its cached mask). Fakes, each recording what the original's
 // callee would be given (the PowerPC side records the same from its stubs):
 //   FakePipe, a TbSoundSamplePipe that records every virtual slot (the codec behind a channel); its answers come from queues
 //       (Chunk, Done, SetInfoErr, FindPipe, Attatch), its destructor is silent and nothing deletes it
@@ -282,9 +282,19 @@ uint32_t CvtDblUl(double value) {
     return RealCvt(value);
 }
 
-#include "../src/TbSoundPipeChannel.cpp"
-#include "../src/TbSoundSampleStore.cpp"
-#include "../src/snd_handles.cpp"
+// src/TbSoundPipeChannel.cpp of before the regroup: the definitions it had, in sliced copies of the files that hold them (TPW_UNIT_SoundChannel_INCLUDED).
+#include "src/sound/CSprocketsModule.cpp"
+#include "src/sound/TbSoundCore.cpp"
+#include "src/sound/TbSoundPipe.cpp"
+#include "src/sound/TbSoundPipeChannel.cpp"
+#include "src/sound/TbSoundSampleStore.cpp"
+#include "src/sound/TbSoundSampleWAV.cpp"
+// src/TbSoundSampleStore.cpp of before the regroup: the definitions it had, in sliced copies of the files that hold them (TPW_UNIT_SoundChannel_INCLUDED), included above.
+// src/snd_handles.cpp of before the regroup: the definitions it had, in sliced copies of the files that hold them (TPW_UNIT_SoundChannel_INCLUDED).
+#include "src/sound/AudioComponent.cpp"
+#include "src/sound/ChannelState.cpp"
+#include "src/sound/SystemCommand.cpp"
+#include "src/sound/TbSoundCodecLoop.cpp"
 #undef memset
 
 // ---- the case ----------------------------------------------------------------------------------------------------------------

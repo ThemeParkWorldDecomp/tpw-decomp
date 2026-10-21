@@ -1,7 +1,7 @@
 // Test library for the number-window text objects' constructors and destructors, UIMenu::UIMenu and small functions (unit v51115;
 // libtpw_unit_InterfacePasswordTextObject_InterfacePasswordTex.dylib, tests/test_InterfacePasswordTextObject_InterfacePasswordTex.py), main app:
-//   src/ui_TextObjects_InterfacePasswordTextObject_InterfacePasswordTex.cpp
-//   src/ui_DrawObjectText_ctor.cpp (the text sprite's real constructor)
+//   src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp
+//   src/game/ui/InterfaceTextObjectSprite.cpp (the text sprite's real constructor)
 //
 // The callees outside the unit (the sprite constructor, the formatter, the sprite list, the engine data and the draw object destructors, the
 // cursor position text object's constructor, the mesh render calls, the ride preview) are recording fakes. The classes between (draw object,

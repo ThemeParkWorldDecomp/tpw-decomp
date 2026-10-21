@@ -1,4 +1,4 @@
-// Differential library for unit w154, the park analyser's visitor counts and opinions (src/ParkAnalyser_visitors.cpp).
+// Differential library for unit w154, the park analyser's visitor counts and opinions (src/game/park/analyser.cpp).
 //
 // Every callee is a fake that records the same event as the PowerPC side's stub: GAME_ASSERTMSG, the world accessor (CWorldSavvy::GetWorld), CWorldSavvy::GetMap,
 // CWorld::GetUsedThingHead and GetNextUsedThing, CPeep::IsInsidePark, CParkAnalyser::GatesOpen, CMap::GetTicketBoothPos, CParkTime::GetFunnyTimeForGameTurns,

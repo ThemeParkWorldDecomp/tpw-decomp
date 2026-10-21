@@ -1,5 +1,5 @@
 """Unit v5910, the status panel's handlers, against libtpw_unit_DefaultStatusPanelMsg.dylib (tests/unit_DefaultStatusPanelMsg.cpp), main app
-("SimTheme Park"), src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_ViewWindowCallback_DefaultStatusPanelMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_StatusPanel.cpp:
   UIStatusPanel::DisplayStatusText 0x10193af4, DefaultStatusPanelMsg 0x10193c78, UIStatusPanel::InitEditBox 0x10193dcc,
   TwoEditsMsg 0x10193fac (host name TwoEditsMsgStatus: the park-name handler owns the plain name)
 

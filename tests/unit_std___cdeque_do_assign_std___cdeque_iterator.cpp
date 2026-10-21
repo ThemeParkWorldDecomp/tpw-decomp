@@ -1,5 +1,5 @@
 // Test library for std::__cdeque<const void*>::do_assign (unit v5564; libtpw_unit_std___cdeque_do_assign_std___cdeque_iterator.dylib), main app:
-//   src/std___cdeque_do_assign_std___cdeque_iterator.cpp   CdequeDoAssign
+//   src/game/MslSupport.cpp   CdequeDoAssign
 //
 // The runtime callees (strlen, strcpy, operator new, new[], delete, delete[], __throw) are recording fakes. The throw fake leaves the
 // function by a C++ exception (the original never returns from __throw); the PowerPC stub jumps to the epilogue.

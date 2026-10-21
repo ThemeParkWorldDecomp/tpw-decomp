@@ -1,5 +1,5 @@
 """Unit v51118, small stand-ins of the main app, against libtpw_unit_CTimeSig_GetTimeSecond.dylib (tests/unit_CTimeSig_GetTimeSecond.cpp),
-src/TPOptions_CTimeSig_GetTimeSecond.cpp (CTimeSig's three members are inline in include/TimeSig.h):
+src/game/park/SkyObjects.cpp, src/game/save/SaveLoad.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/MessageCentre.cpp (CTimeSig's three members are inline in include/TimeSig.h):
   CTimeSig::GetTimeSecond 0x1015f0e8, TurnsSinceLastUpdate 0x1015f070, SetTimeSig 0x1015f02c, CSkyObjects::~CSkyObjects 0x1015b61c,
   CSaveLoad::PreSaveOperations 0x1015b428, WriteSerialiseLog 0x1015b3dc, CloseLogfile 0x1015b3a4, OpenLogfile 0x1015b370,
   InterfaceFontWrapper::GetHeight 0x10168c04, the destructors of std::set<unsigned short> 0x101696f8, std::list<std::wstring> 0x1016985c,

@@ -33,7 +33,7 @@ TPW_IMAGE_COPY(movievol, gMovieVolume);
 
 using namespace calllog;
 
-// InterfaceFont::GetHeight passes a wrapper on to its own (src/InterfaceFont.cpp), which lives in a file this unit does not link;
+// InterfaceFont::GetHeight passes a wrapper on to its own (src/game/ui/InterfaceFont.cpp), which lives in a file this unit does not link;
 // no case here asks a wrapper for its height.
 int32_t InterfaceFontWrapper::GetHeight() { return 0; }
 
@@ -77,7 +77,7 @@ TbError TbIMBToUnicode::ConvertString(char16_t* out, const unsigned char* source
     return TbError(0);
 }
 
-// UIMain_ConvertString (src/ui_main.cpp, unit w44) calls the Unicode to multibyte converter; this unit never calls it.
+// UIMain_ConvertString (src/game/ui/ui_main.cpp, unit w44) calls the Unicode to multibyte converter; this unit never calls it.
 TbError TbIUnicodeToMB::ConvertString(unsigned char*, const char16_t*, uint16_t) { return TbError(0); }
 
 // The text object's other members are not this unit's: blank ones, so it can exist.

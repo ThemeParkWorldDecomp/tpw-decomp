@@ -1,6 +1,6 @@
 // Fakes and test entry points for unit w78, the sound library's sample pipe base (libtpw_unit_SoundPipe.dylib, driven by
 // tests/test_SoundPipe.py in the program "sound symbols shared"; see calllog.h):
-//   src/TbSoundPipe.cpp   TbSoundSamplePipe (the pool, the chain, the forwards), TbSoundSPCodec, TbSoundSampleCodec
+//   src/sound/StreamableMpeg2.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleCallback.cpp, src/sound/TbSoundSampleCodec.cpp, src/sound/TbSoundSamplePipe.cpp, src/sound/TbSoundSystemInfo.cpp   TbSoundSamplePipe (the pool, the chain, the forwards), TbSoundSPCodec, TbSoundSampleCodec
 // Real: those and TbRefRelease. Fakes, each recording what the original's callee would be given (the PowerPC side records
 // the same from its stubs):
 //   FakeNode, a TbSoundSampleCodec that overrides every virtual slot and records it (the chain's tail, and a codec whose

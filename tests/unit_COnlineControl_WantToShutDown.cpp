@@ -1,6 +1,6 @@
 // Test library for COnlineControl's Shutdown, WantToShutDown, Update, CallbackFn and first-person moves (unit v5103;
 // libtpw_unit_COnlineControl_WantToShutDown.dylib, tests/test_COnlineControl_WantToShutDown.py), main app:
-//   src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown.cpp
+//   src/game/online/online.cpp
 //
 // The callees are fakes that record the arguments the real ones read and answer from the test's queue.
 #include <cstddef>

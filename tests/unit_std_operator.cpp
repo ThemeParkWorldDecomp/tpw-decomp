@@ -1,5 +1,5 @@
 // Test library for operator<<(wostream&, const wchar_t*) (unit v5640; libtpw_unit_std_operator.dylib, tests/test_std_operator.py), main app:
-//   src/std_operator.cpp   ignore_callee::OstreamWrite
+//   src/game/MslSupport.cpp   ignore_callee::OstreamWrite
 //
 // The callees are fakes that record the arguments the real ones read and answer from the test's queues; the failure globals are defined here.
 #include <cstddef>

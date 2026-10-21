@@ -1,7 +1,7 @@
 """Differential tests for the master save file (unit w89b), against libtpw_unit_MasterSave.dylib (tests/unit_MasterSave.cpp):
 
-  src/FS_MasterSave_file.cpp   CFSGlobalMasterSave: Save (0x1016a584), Load (0x1016a6c8), Serialise (0x1016aa08)
-  src/FS_MasterSave_park.cpp   CFSGlobalParkData: the loader constructor (0x1016bb04) and Serialise (0x1016bd9c)
+  src/game/save/FS_MasterSave.cpp   CFSGlobalMasterSave: Save (0x1016a584), Load (0x1016a6c8), Serialise (0x1016aa08)
+  src/game/save/FS_MasterSave.cpp   CFSGlobalParkData: the loader constructor (0x1016bb04) and Serialise (0x1016bd9c)
 
 A case is a world, one call and the fake file's bytes. The world: the master save under test (the flat fields, the set of bought things
 and the theme records), optionally a second master save, and what the global gMasterSave points to (nothing, the object under test or the

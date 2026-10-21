@@ -1,4 +1,4 @@
-// Advisor.cpp (main app): the advisor's speech and animation (ADV_*). src/Advisor.cpp translates the start-up and
+// Advisor.cpp (main app): the advisor's speech and animation (ADV_*). src/game/advisor/Advisor.cpp translates the start-up and
 // close, the pause pair, the animation sequences, the accessories and dressing, the per-frame ticks and the part that
 // makes him speak (ADV_Call, ADV_Slap, ADV_Kill, ADV_GetTag and ADV_Stat, 0x1000887c..0x10009194); the response table
 // they read is data (src/advisor_lines.cpp).

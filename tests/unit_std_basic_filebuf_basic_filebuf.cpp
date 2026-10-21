@@ -1,6 +1,6 @@
 // Test library for std::basic_filebuf<char> (unit v5046; libtpw_unit_std_basic_filebuf_basic_filebuf.dylib,
 // tests/test_std_basic_filebuf_basic_filebuf.py), main app:
-//   src/std_basic_filebuf_basic_filebuf.cpp   construct, open, uflow and the two vtable stand-ins it defines
+//   src/game/MslSupport.cpp   construct, open, uflow and the two vtable stand-ins it defines
 //
 // The callees outside the unit are recording fakes: the locale and facet calls, the three codecvt virtuals (__ptr_glue),
 // the C file functions, memmove, delete[], unshift and the string pieces. Pointers into the filebuf are logged as offsets from

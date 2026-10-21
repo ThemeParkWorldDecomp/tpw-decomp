@@ -36,7 +36,7 @@ public:
     void SetActiveLayers(int32_t layers);   // 0x1002aad8
     CTextureEntry* GetSkyTEntry();      // 0x1002b554
     D3DVECTOR* GetPosition();           // 0x1002b584
-    // Per frame (src/tb_sky_render.cpp). Prepare scrolls the layers and has the texture cache
+    // Per frame (src/engine/tb_sky.cpp). Prepare scrolls the layers and has the texture cache
     // place the sky's pictures; RenderAdd draws the added sprites whose layer mask (SSkyAdd::
     // mF08) meets `layers`; Render draws the sky layers, the cylinder and the sprites. Each
     // returns 0 when a draw call failed, else 1.

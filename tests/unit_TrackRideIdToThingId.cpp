@@ -1,5 +1,5 @@
 // Test library for TrackRideIdToThingId (unit v5124; libtpw_unit_TrackRideIdToThingId.dylib, tests/test_TrackRideIdToThingId.py), main app:
-//   src/LevelLeaves_TrackRideIdToThingId.cpp   TrackRideIdToThingId, gUsedListEnd
+//   src/game/rides/BumperRide.cpp   TrackRideIdToThingId, gUsedListEnd
 //
 // The callees outside the unit (CWorld::GetUsedThingHead, CWorld::GetNextUsedThing, CThing::GetThingId, GAME_ASSERTMSG) are recording fakes
 // answering from the test's queues. gGameWorld and gThingArray are defined here (zero at start like the Mac's bss).

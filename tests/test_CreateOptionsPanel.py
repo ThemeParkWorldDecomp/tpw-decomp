@@ -1,6 +1,6 @@
 """Unit v5634, the options panel's opening (the settings stored, the game paused when it ran, the map's render options saved and the
 panel built, its texts, scroll bars and buttons set from the player's settings), against libtpw_unit_CreateOptionsPanel.dylib
-(tests/unit_CreateOptionsPanel.cpp), main app ("SimTheme Park"), src/CreateOptionsPanel.cpp:
+(tests/unit_CreateOptionsPanel.cpp), main app ("SimTheme Park"), src/game/ui/ui_optionsPanel.cpp:
   CreateOptionsPanel 0x101a9fb8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

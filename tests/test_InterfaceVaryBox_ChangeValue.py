@@ -1,5 +1,5 @@
 """Unit v5266, InterfaceVaryBox::ChangeValue and SetMinMaxValues, against libtpw_unit_InterfaceVaryBox_ChangeValue.dylib
-(tests/unit_InterfaceVaryBox_ChangeValue.cpp), main app, src/ui_whatami_InterfaceVaryBox_ChangeValue.cpp:
+(tests/unit_InterfaceVaryBox_ChangeValue.cpp), main app, src/game/ui/InterfaceVaryBox.cpp:
   ChangeValue 0x101d9080, SetMinMaxValues 0x101d8e44
 
 A case is an object (a zeroed block) with the range, value, old value, force flag, id and parent set, built by one piece of code in both

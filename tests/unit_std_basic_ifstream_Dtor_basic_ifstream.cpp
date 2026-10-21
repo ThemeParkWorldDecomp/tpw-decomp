@@ -1,5 +1,5 @@
 // Test library for std::basic_ifstream<wchar_t>::~basic_ifstream (unit v5201; libtpw_unit_std_basic_ifstream_Dtor_basic_ifstream.dylib), main app:
-//   src/std_basic_ifstream_Dtor_basic_ifstream.cpp
+//   src/game/MslSupport.cpp
 //
 // Callees (close, locale dtor, ios_base dtor, operator delete) are fakes recording the object as a label and the flag.
 #include <cstddef>

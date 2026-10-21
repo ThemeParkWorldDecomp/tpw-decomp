@@ -1,6 +1,6 @@
 """Unit v5897, COnlineControl's name commands and contact-list updates, against libtpw_unit_COnlineControl_IgnoreOff.dylib
 (tests/unit_COnlineControl_IgnoreOff.cpp), main app ("SimTheme Park"),
-src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_IgnoreOff.cpp:
+src/game/online/online.cpp:
   IgnoreOff 0x1021922c, IgnoreOn 0x10219034, BuddyOff 0x10218e3c, SendText 0x10217b5c, RemoveContact 0x1021ba28,
   RemoveBuddy 0x1021bdcc, UpdateUserList 0x1021bf30
 

@@ -1,5 +1,5 @@
 // Test library for the park analyser's value and history save templates (unit w158; libtpw_unit_ParkSave.dylib, tests/test_ParkSave.py), main app:
-//   src/ParkAnalyser_save.cpp   CParkAnalyserVal<int>/<float>::Serialise, CHistory<T,N>::Serialise (seven instances) and
+//   src/game/park/analyser.cpp   CParkAnalyserVal<int>/<float>::Serialise, CHistory<T,N>::Serialise (seven instances) and
 //                               CHistory<ObjectId,3>::SerialiseStruct
 //
 // LOADVAR, SAVEVAR (int, bool, unsigned int, unsigned char, float) and LOADVARSTRUCT, SAVEVARSTRUCT (the ObjectId tag) are fakes. Each logs its kind, the

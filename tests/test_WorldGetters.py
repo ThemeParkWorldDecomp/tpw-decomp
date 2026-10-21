@@ -1,10 +1,10 @@
 """Unit w123b (main app), against libtpw_unit_WorldGetters.dylib (tests/unit_WorldGetters.cpp):
 
-  src/World_getters.cpp      CWorld::GetParkAnalyser const (0x1013eb38) and non-const (0x1013ebc8), GetResearchLab const (0x1013ec58) and non-const
+  src/game/World.cpp      CWorld::GetParkAnalyser const (0x1013eb38) and non-const (0x1013ebc8), GetResearchLab const (0x1013ec58) and non-const
                              (0x1013ece8), GetWeather (0x1013ed74), GetBankAccount (0x1013edfc), GetChallengeHQ (0x1013ee88)
-  src/ParkTime_funny.cpp     CParkTime::GetFunnyTime (0x101127d0)
-  src/ParkAnalyser_init.cpp  CParkAnalyser::Init (0x100e4a44)
-  src/ChallengeHQ_init.cpp   CChallengeHQ::Init (0x100f6904)
+  src/game/people/ParkTime.cpp     CParkTime::GetFunnyTime (0x101127d0)
+  src/game/park/analyser.cpp  CParkAnalyser::Init (0x100e4a44)
+  src/game/park/ChallengeHQ.cpp   CChallengeHQ::Init (0x100f6904)
 
 The ten run as the original on the PowerPC side (the signed 64 bit divide helper 0x10237e1c too) and as src/ on the host. Every other callee is a fake that
 records the same event on both sides: the assertion and the trace, the world accessor, TbTimeStamp::operator+ and GetTime, the message centre (Subscribe,

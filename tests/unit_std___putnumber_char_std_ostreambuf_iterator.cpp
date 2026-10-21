@@ -1,5 +1,5 @@
 // Test library for std::__putnumber<char, ostreambuf_iterator<char>> (unit v5068), main app:
-//   src/std___putnumber_char_std_ostreambuf_iterator.cpp   PutNumberChar
+//   src/game/MslSupport.cpp   PutNumberChar
 //
 // The streambuf overflow (via __ptr_glue) is a fake that records whether it got the test's streambuf and the character.
 #include <cstddef>

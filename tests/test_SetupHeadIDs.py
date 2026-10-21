@@ -1,5 +1,5 @@
 """Unit v5062, the advisor's bump (ride launch) functions, against libtpw_unit_SetupHeadIDs.dylib (tests/unit_SetupHeadIDs.cpp), main app
-("SimTheme Park"), src/SetupHeadIDs.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   SetupHeadIDs 0x1002cddc, BMP_AddJoiningListToBump 0x1002cc70, BMP_LAUNCH 0x1002cff4, BMP_Collision 0x1002c7ec
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

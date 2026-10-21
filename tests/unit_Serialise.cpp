@@ -1,4 +1,4 @@
-// The fakes for the basic serialisation instances (src/Serialise_basic.cpp;
+// The fakes for the basic serialisation instances (src/game/ControlManager.cpp, src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/rides/FlyingRide.cpp, src/game/save/FS_MasterSave.cpp;
 // libtpw_unit_Serialise.dylib; see calllog.h) and the test entry points. The file functions
 // work on one fake file: the bytes to read come from the test, what is written is recorded
 // as hex. A queue value "LbFile_Read:xfer" (or "LbFile_Write:xfer") replaces the transferred

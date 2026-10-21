@@ -1,5 +1,5 @@
 // Test library for the finance panel static initialiser (unit v5377; libtpw_unit_sinit_ui_FinancePanel_cpp.dylib):
-//   src/sinit_ui_FinancePanel_cpp.cpp   __sinit_ui_FinancePanel_cpp, gFinancePanelColours is defined here.
+//   src/game/ui/ui_FinancePanel.cpp   __sinit_ui_FinancePanel_cpp, gFinancePanelColours is defined here.
 //
 // LbPalette_FindColour and the CUIGrapher constructor are recording fakes; the globals are defined here.
 #include <cstddef>

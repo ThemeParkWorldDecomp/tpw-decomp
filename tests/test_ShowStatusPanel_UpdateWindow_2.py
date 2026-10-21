@@ -1,5 +1,5 @@
 """Unit v51007, the ship status panel's figures, gUpgradeStatusPanel's constructor and the year end panel's handler, against
-libtpw_unit_ShowStatusPanel_UpdateWindow_2.dylib (tests/unit_ShowStatusPanel_UpdateWindow_2.cpp), main app, src/ShowStatusPanel_UpdateStatusWindow_ShowStatusPanel_UpdateWindow_2.cpp:
+libtpw_unit_ShowStatusPanel_UpdateWindow_2.dylib (tests/unit_ShowStatusPanel_UpdateWindow_2.cpp), main app, src/game/ui/ui_showStatus.cpp, src/game/ui/ui_upgradeStatus.cpp, src/game/ui/ui_yearEndPanel.cpp:
   ShowStatusPanel::UpdateWindow 0x101c21c4, __sinit_ui_upgradeStatus_cpp 0x101c6738, YearEndPanelMsg 0x101c67b4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory, big-endian, and the host library's

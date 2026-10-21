@@ -1,7 +1,7 @@
 // ltms TbFontRender (TbFontRender.cpp range 0x10001fdc..0x10002298): draws one glyph with the render method its parameters
-// select. The 4-bit method's core (DrawChar and its helpers, 0x10000bf0..0x10001f64) is unit w45a (src/ltms_fontrender_method.cpp);
+// select. The 4-bit method's core (DrawChar and its helpers, 0x10000bf0..0x10001f64) is unit w45a (src/ltms/TbFontRender.cpp);
 // the four subclasses' constructors and destructors, the two one-colour classes' pixel writers, the objects and the table are unit w45b
-// (src/ltms_fontrender_methods.cpp, src/ltms_fontrender_onecolour.cpp, src/ltms_fontrender_onecolour_noblend.cpp); the two textured
+// (src/ltms/TbOneColourNoBlend4BitFontRenderMethod.cpp, src/ltms/TbOneColour4BitFontRenderMethod.cpp, src/ltms/TbTextured4BitFontRenderMethod.cpp, src/ltms/TbTexturedNoBlend4BitFontRenderMethod.cpp); the two textured
 // classes' writers (0x1000a1dc..0x1000cf98) are untranslated.
 #pragma once
 #include <cstdint>
@@ -18,7 +18,7 @@
 // TbTexturedNoBlend4BitFontRenderMethod.
 class TbFontRenderMethod {
 public:
-    virtual ~TbFontRenderMethod();   // 0x10000c38 (src/ltms_fontrender_method.cpp)
+    virtual ~TbFontRenderMethod();   // 0x10000c38 (src/ltms/StaticUnicodeBuffer.cpp)
     // Draws glyph `glyph` with its top left at `at` into the render area of `params` and answers, in `drawn`, the rectangle
     // it changed (left == right and top == bottom for none). Mac mangling: Tb4BitFontRenderMethod::DrawChar(const TbPoint&,
     // unsigned short, TbRect&, TbFontRenderParams&) at 0x10000d40.
@@ -114,7 +114,7 @@ public:
 // The method for each (blend, type, style), as the Mac's data holds it at 0x1001103c: 2 x 5 x 3 pointers of which four are
 // set, all at type 4: blend 0 style 1 the one-colour method without blending (0x10011734), style 2 the textured one without
 // blending (0x10011714); blend 1 style 1 the one-colour method (0x10011744), style 2 the textured one (0x10011724). The
-// table is the render methods' data, defined in src/ltms_fontrender_methods.cpp.
+// table is the render methods' data, defined in src/ltms/TbOneColourNoBlend4BitFontRenderMethod.cpp.
 extern TbFontRenderMethod* gFontRenderMethods[2][5][3];
 
 // Mac 0x58 bytes, vtable 0x100110bc (only the destructor, slot 8).
@@ -135,7 +135,7 @@ public:
 // unit w45b
 // The four method objects, global instances of the Mac (their addresses are in the comment on the classes above). They are
 // built by __sinit_TbFontRender_cpp (0x10002298) in the order one-colour, one-colour without blending, textured, textured
-// without blending, which the host reproduces by defining them in that order in src/ltms_fontrender_methods.cpp.
+// without blending, which the host reproduces by defining them in that order in src/ltms/TbOneColour4BitFontRenderMethod.cpp, src/ltms/TbOneColourNoBlend4BitFontRenderMethod.cpp, src/ltms/TbTextured4BitFontRenderMethod.cpp, src/ltms/TbTexturedNoBlend4BitFontRenderMethod.cpp.
 extern TbOneColour4BitFontRenderMethod gOneColour4BitFontRenderMethod;                 // 0x10011744
 extern TbOneColourNoBlend4BitFontRenderMethod gOneColourNoBlend4BitFontRenderMethod;   // 0x10011734
 extern TbTextured4BitFontRenderMethod gTextured4BitFontRenderMethod;                   // 0x10011724
@@ -190,7 +190,7 @@ inline void WalkOneColourGlyph(TbRenderArea& area, const C4BitFontRenderMethodPa
 }
 
 // unit w45c
-// The twelve writers of the two textured classes (src/ltms_fontrender_textured.cpp, src/ltms_fontrender_textured_noblend.cpp) draw the glyph
+// The twelve writers of the two textured classes (src/ltms/TbTextured4BitFontRenderMethod.cpp, src/ltms/TbTexturedNoBlend4BitFontRenderMethod.cpp) draw the glyph
 // through a 32-bit texture that the render parameters hold: the render area at +0x14..+0x3b (mState[4..13], a TbRenderArea by value: the
 // six format words, the pixels, the width, the height and the bytes in a row) and the texture origin at +0x3c and +0x40 (mState[14] and
 // mState[15], written by TbFontRenderParams::UseTexture).

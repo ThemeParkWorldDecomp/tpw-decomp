@@ -1,6 +1,6 @@
 """Unit v5955, the list control's GetColumnPos, GetItem, SetData, GetNonHierIndexedEntry and UI_DefaultListControl2Callback, against
 libtpw_unit_InterfaceListControl2_GetColumnPos.dylib (tests/unit_InterfaceListControl2_GetColumnPos.cpp), main app ("SimTheme Park"),
-src/InterfaceListControl2_items_InterfaceListControl2_GetColumnPos.cpp:
+src/game/ui/InterfaceListControl2.cpp:
   InterfaceListControl2::GetColumnPos 0x101d42ec, GetItem 0x101d40bc, SetData 0x101d3fcc, GetNonHierIndexedEntry 0x101d2c30,
   UI_DefaultListControl2Callback 0x101d51f0
 

@@ -1,5 +1,5 @@
 // Test library for the coaster queues and script commands (unit v5269; libtpw_unit_AllocateQueue.dylib, tests/test_AllocateQueue.py), main app:
-//   src/AllocateQueue.cpp   AllocateQueue, CoasterAddPeep, HACKCoasterReturnLostPeep, CoasterGetQueueSpace, CoasterGetPeep,
+//   src/game/rides/CoasterQueue.cpp   AllocateQueue, CoasterAddPeep, HACKCoasterReturnLostPeep, CoasterGetQueueSpace, CoasterGetPeep,
 //                           CoasterSetRepairState, CoasterSetSpeed, CoasterSetOpenClosedState; defines gCoasterQueueSpaceLimit
 //
 // Fakes: MReleaseAllocF, SetCoasterState and the 3-argument CoasterSetSpeed record their arguments (the instance as a label); the globals

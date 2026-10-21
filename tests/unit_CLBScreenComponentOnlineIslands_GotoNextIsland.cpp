@@ -1,6 +1,6 @@
 // Test library for the online islands screen's small members (unit v5255; libtpw_unit_CLBScreenComponentOnlineIslands_GotoNextIsland.dylib,
 // tests/test_CLBScreenComponentOnlineIslands_GotoNextIsland.py), main app:
-//   src/CLBScreenComponentOnlineIslands_GotoNextIsland.cpp   Tick, SelectCurrentIsland, EnterCurrentIsland, GotoNextIsland,
+//   src/game/online/lobby_island.cpp   Tick, SelectCurrentIsland, EnterCurrentIsland, GotoNextIsland,
 //                                                            DownloadFailFunction, HandleOnlineBacktrack
 //
 // The callees outside the unit are recording fakes. Objects are told apart in the log by a tag word at offset 0x200 of their block. The virtual

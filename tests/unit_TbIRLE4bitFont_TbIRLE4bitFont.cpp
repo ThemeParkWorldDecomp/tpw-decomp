@@ -8,7 +8,7 @@
 #include "platform/arena.h"
 #include "TbIRLE4bitFont.h"
 
-// The other virtuals live in src/TbIRLE4bitFont.cpp, which this library does not compile: empty bodies so the vtable links.
+// The other virtuals live in src/ltms/TbIRLE4bitFont.cpp, which this library does not compile: empty bodies so the vtable links.
 TbIRLE4bitFont::~TbIRLE4bitFont() {}
 uint32_t TbIRLE4bitFont::GetCharIndex(const unsigned char*&) { return 0; }
 uint16_t TbIRLE4bitFont::GetCharCount() { return 0; }

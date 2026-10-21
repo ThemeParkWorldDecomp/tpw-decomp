@@ -1,5 +1,5 @@
 """Unit v5057, the park name panel, against libtpw_unit_ShowEditParkNamePanel.dylib (tests/unit_ShowEditParkNamePanel.cpp), main app
-("SimTheme Park"), src/ShowEditParkNamePanel.cpp:
+("SimTheme Park"), src/game/ui/ui_entryPricePanel.cpp:
   ShowEditParkNamePanel 0x1019deac, TwoEditsMsg 0x1019da6c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

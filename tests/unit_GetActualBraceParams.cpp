@@ -1,5 +1,5 @@
 // Test library for GetActualBraceParams and UpdatePylonStackStructures (unit v5278; libtpw_unit_GetActualBraceParams.dylib,
-// tests/test_GetActualBraceParams.py), main app: src/TPCoaster_loaders_GetActualBraceParams.cpp
+// tests/test_GetActualBraceParams.py), main app: src/game/rides/CoasterPylon.cpp
 //
 // GetAlignmentParamsSlow is a fake that records what the real one reads. The globals gPylonStackSkip and gCoasterCurrentData are
 // defined here (zero at start like the Mac's bss).

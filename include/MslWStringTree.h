@@ -8,7 +8,7 @@
 
 struct MslWideString;   // std::basic_string<wchar_t> (opaque here)
 
-// Unit v5993: insert_node_at 0x10227c78 and destroy 0x10223204 (src/std___tree_std_basic_string_std_less_std_basic_s_3.cpp).
+// Unit v5993: insert_node_at 0x10227c78 and destroy 0x10223204 (src/game/MslSupport.cpp).
 namespace IME { struct MslWideStringRep; struct MslWideString; }
 // A node of the set<wstring> tree: node_base, then the string (one pointer to its representation) at 0x0c; the Mac node is 0x10 bytes.
 struct WStringTreeNode : MslRedBlackTree::node_base {
@@ -41,7 +41,7 @@ struct WStringTree {
 // 0x1021eb7c: std::less<std::wstring>::operator()(a, b) const
 bool WideStringLess(void* functor, const MslWideString* a, const MslWideString* b);
 
-// Unit v51044 (src/std_less_std_basic_string_operator.cpp)
+// Unit v51044 (src/game/online/online.cpp)
 namespace wstring_less_callee {
 bool Lt(const MslWideString* a, const MslWideString* b);   // 0x10225e8c std::operator<(wstring, wstring); the test library fakes it
 }

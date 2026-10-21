@@ -1,5 +1,5 @@
 // Test library for unit v51129 (libtpw_unit_std_basic_string_assign_2.dylib, tests/test_std_basic_string_assign_2.py), main app:
-//   src/ui_Postcard_panel_std_basic_string_assign_2.cpp   LCString::assign, InterfaceDrawEngineHGradient::~, CFSOnlineSystemRideList::GetList,
+//   src/game/MslSupport.cpp, src/game/online/FS_OnlineList.cpp, src/game/ui/InterfaceDrawEngine.cpp   LCString::assign, InterfaceDrawEngineHGradient::~, CFSOnlineSystemRideList::GetList,
 //   the server list's base destructor, the theme list's destructor and LoggedInGetList.
 //
 // The callees outside the unit are fakes that record what the real ones read (the PowerPC stubs of the module record the same events) and answer

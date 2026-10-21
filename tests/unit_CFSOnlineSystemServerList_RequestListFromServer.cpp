@@ -1,5 +1,5 @@
 // Test library for CFSOnlineSystemServerList (unit v5713; libtpw_unit_CFSOnlineSystemServerList_RequestListFromServer.dylib), main app:
-//   src/CFSOnlineSystemServerList_RequestListFromServer.cpp   GetList, RequestListFromServer, StoreReceivedList
+//   src/game/online/FS_OnlineList.cpp   GetList, RequestListFromServer, StoreReceivedList
 //
 // The callees are recording fakes (the PowerPC stubs record the same events). operator new/delete are replaced: new logs one event
 // (the host sizes differ from the Mac's), delete logs the pointer's label; new[]/delete[] are silent. gOnlineSystem is defined here.

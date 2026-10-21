@@ -1,6 +1,6 @@
 // Test library for the online park info panel (unit v5537; libtpw_unit_CreateOnlineParkInfoPanel.dylib,
 // tests/test_CreateOnlineParkInfoPanel.py), main app:
-//   src/CreateOnlineParkInfoPanel.cpp   CreateOnlineParkInfoPanel and the five globals of the panel
+//   src/game/ui/ui_onlineParkInfoPanel.cpp   CreateOnlineParkInfoPanel and the five globals of the panel
 //
 // Every callee is a recording fake with a PowerPC stub of the same name in the test module. The windows are fake objects (a vtable
 // whose SetText slot is the fake, and a token naming the window in the log), the strings are fakes that keep their text in a heap

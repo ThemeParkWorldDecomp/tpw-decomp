@@ -1,5 +1,5 @@
 // Test library for TPGlobals::~TPGlobals (unit v5692; libtpw_unit_TPGlobals_Dtor_TPGlobals.dylib), main app:
-//   src/TPGlobals_Dtor_TPGlobals.cpp   TPGlobals::~TPGlobals
+//   src/game/TPGlobals.cpp   TPGlobals::~TPGlobals
 //
 // The string destructors are fakes that record the member offset (this - object base). The deleting variant's flag is
 // done by the wrapper: a NULL object does nothing, a flag > 0 as a short records the "delete" event.

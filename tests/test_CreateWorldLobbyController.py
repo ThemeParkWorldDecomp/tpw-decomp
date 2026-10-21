@@ -1,6 +1,6 @@
 """Unit v5948, the world lobby window's creation (CreateWorldLobbyController) and the satellite number windows' message function
 (SatelliteMsg), against libtpw_unit_CreateWorldLobbyController.dylib (tests/unit_CreateWorldLobbyController.cpp), main app
-("SimTheme Park"), src/ProcessGetChatSatellitePlayers_CreateWorldLobbyController.cpp:
+("SimTheme Park"), src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_worldLobbyController.cpp:
   CreateWorldLobbyController 0x1022b038, SatelliteMsg 0x1022ae30
 
 A case is a world and a call. The world is built by one piece of Python code per side: in emulator memory at the Mac's addresses

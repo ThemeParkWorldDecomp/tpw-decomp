@@ -1,10 +1,10 @@
-// The ride messages (main app). Unit w126 (src/Object.cpp) posts four of them: CMsgNewRide (type 6, constructor 0x10151998, GetType 0x10110f6c, destructor
+// The ride messages (main app). Unit w126 (src/game/Object.cpp) posts four of them: CMsgNewRide (type 6, constructor 0x10151998, GetType 0x10110f6c, destructor
 // 0x101064fc), CMsgRideBrokenDown (7, 0x10151a14, 0x10110e84, 0x1010e524), CMsgRideCondemned (8, 0x10151a98, 0x10110ec0, 0x1010e5a0) and CMsgRideWantsUpgrade
 // (9, 0x10151b1c, 0x10110e44, 0x1010e4a4). Each constructor writes the base vtable, a zero flags word, its own vtable and the thing id at +8 (the argument's
-// two bytes are the HIGH halfword of the Mac's register); nothing else. Unit w200 (src/ThingMessages2.cpp) translates the constructors, the GetType functions
+// two bytes are the HIGH halfword of the Mac's register); nothing else. Unit w200 (src/game/Object.cpp) translates the constructors, the GetType functions
 // and the deleting destructors (76 bytes each: the vtable is reset and the block freed for a positive signed 16 bit flag; they are declared after GetType, so
 // GetType stays the native vtable's key function, as in include/CMsgDeath.h). The translated CObject code builds the messages as locals and posts them; the unit
-// tests that do not link src/ThingMessages2.cpp fake the constructor, GetType and destructor. The Mac vtables are never used by the host.
+// tests that do not link src/game/Object.cpp, src/game/ui/MessageCentre.cpp fake the constructor, GetType and destructor. The Mac vtables are never used by the host.
 // Unit w184 adds CMsgRideDeleted (type 10, GetType 0x10110f34, destructor 0x10107b28): only the type and the id at +8, which CHandyman::ReceiveMessage reads;
 // unit w210 adds its constructor (0x10151ba4, 40 bytes: CObject::FinalDestroy posts it). Unit w200 adds CMsgBlockedExit (type 0x14, constructor 0x10151e48, GetType 0x10110efc, destructor 0x1010aa34).
 #pragma once
@@ -58,7 +58,7 @@ public:
     ~CMsgBlockedExit() override;        // 0x1010aa34 (76 bytes)
     uint16_t mThingId;                  // 0x08
 };
-// Unit w189 (src/Staff.cpp): a staff member entered or left a room (type 15). The constructor is inline (no Mac address of its own is known); the Mac's
+// Unit w189 (src/game/people/staff.cpp): a staff member entered or left a room (type 15). The constructor is inline (no Mac address of its own is known); the Mac's
 // destructor is 0x1012622c (the deleting form: the vtable is reset, the block freed for a positive flag).
 class CMsgStaffRoomEvent : public CMsg {
 public:

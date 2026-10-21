@@ -1,5 +1,5 @@
-"""w123c: the death message and the message post, original code on one side and src/MsgDeath.cpp, src/MessageCentre_post.cpp,
-src/World_death.cpp and src/ParkTime_season.cpp on the other (tests/unit_DeathMessage.cpp).
+"""w123c: the death message and the message post, original code on one side and src/game/Thing.cpp, src/game/ui/MessageCentre.cpp, src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/save/BlockSave.cpp,
+src/game/World.cpp and src/game/people/ParkTime.cpp on the other (tests/unit_DeathMessage.cpp).
 
 Functions (main app): CMsgDeath::CMsgDeath 0x10152264, GetType 0x1012ec14, ~CMsgDeath 0x1012e984; CMessageCentre::PostMessage 0x1015256c (w107's
 translation, tested again here with every callee faked); CWorld::AddToPendingDeleteList 0x1013b154 and GetRand 0x1013b1e4; CParkTime::GetSeason

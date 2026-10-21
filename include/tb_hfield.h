@@ -47,17 +47,17 @@ public:
     void SetZ(float low, float high, float cell); // 0x10009cb4
     void CalcFurthestDistance();              // 0x10009bb8
     // Finds the cells and grid points in view: the footprint of the view volume on the height
-    // field, as rows (src/tb_hfield_gamut.cpp). Always 1.
+    // field, as rows (src/engine/Gamut.cpp). Always 1.
     int32_t CalculateGamut();                 // 0x10009f04
     // Where the ray through the view volume's corner `corner` (one of mCorners) meets the
     // height field, halfway between its top and bottom clip planes; the Mac returns the vector
-    // through a hidden pointer (src/tb_hfield_gamut.cpp).
+    // through a hidden pointer (src/engine/Gamut.cpp).
     _D3DVECTOR GetHFieldIntersection(_D3DVECTOR* corner);   // 0x10009d60
     // The cells in view: the SGamutQuads at +0xc4 (mFC4 onwards). Out of line at 0x1000bc40
-    // (src/tb_map_render.cpp).
+    // (src/engine/Gamut.cpp).
     SGamutQuads* GetQuads();
     // The grid points in view, in the same shape (+0x1cc, mF1CC onwards): CHField::Prepare
-    // copies them. Out of line at 0x1000bc70 (src/tb_hfield_frame.cpp).
+    // copies them. Out of line at 0x1000bc70 (src/engine/Gamut.cpp).
     SGamutQuads* GetVertices();
 
     float mCorners[4][3];
@@ -110,20 +110,20 @@ public:
     ~CHField();               // 0x1000c068
     void Init(tag_sM3D2Header* header);   // 0x1000d740
     int32_t InitGamut();                 // 0x1000dbc8
-    void AdjustHField();                // 0x1000c0e8 (src/tb_hfield_adjust.cpp)
+    void AdjustHField();                // 0x1000c0e8 (src/engine/tb_hfield.cpp)
     int32_t Close();          // 0x1000d8b8
     int32_t CloseGamut();     // 0x1000dce0: 1
-    int32_t LoadProcTextures(char* name, int32_t size);   // 0x1000d96c (src/tb_hfield_proctex.cpp)
-    void ProcTextureRange(int32_t x0, int32_t y0, int32_t x1, int32_t y1);   // 0x1000db80 (20 bytes, src/tb_hfield_texrange.cpp): PT_SetRange's callee
+    int32_t LoadProcTextures(char* name, int32_t size);   // 0x1000d96c (src/engine/tb_hfield.cpp)
+    void ProcTextureRange(int32_t x0, int32_t y0, int32_t x1, int32_t y1);   // 0x1000db80 (20 bytes, src/engine/tb_hfield.cpp): PT_SetRange's callee
     // The frame's members. DivideAndConquer fills the SGamutQuads at +0x128 (mF128 onwards) in
     // first-person views; Prepare, Execute and DrawSkyShadow return 0 on failure.
-    int32_t DivideAndConquer();   // 0x1000e144 (src/tb_hfield_frame.cpp)
+    int32_t DivideAndConquer();   // 0x1000e144 (src/engine/tb_hfield.cpp)
     // Has the texture cache place the pictures of the cells in view; with procedural textures
     // on it collects the cells inside the procedural window and hands them to the handler.
-    int32_t Prepare();            // 0x1000ed18 (src/tb_hfield_frame.cpp)
+    int32_t Prepare();            // 0x1000ed18 (src/engine/tb_hfield.cpp)
     // Tests the box of grid cells x0..x1, z0..z1 against the view volume and, when it is in
     // view, widens the rows of the grid points at +0x20 and raises mF1C; a box that is only
-    // partly in view is cut in four and each quarter tested (src/tb_hfield_conquad.cpp).
+    // partly in view is cut in four and each quarter tested (src/engine/tb_hfield.cpp).
     void TestConQuad(int32_t x0, int32_t z0, int32_t x1, int32_t z1);   // 0x1000dd14
 
     // The grid points in view (the SGamutQuads at +0x20: mF20 and mF24 are its rows, then the
@@ -133,17 +133,17 @@ public:
     SGamutQuads* QuadRows() { return reinterpret_cast<SGamutQuads*>(&mF128); }
     // Whether the cells in view (the SGamutQuads at +0x128) reach the area of cells a node
     // covers: `area` is the node's bytes mF90 (last row, first row, last column, first column;
-    // src/tb_hfield_helpers.cpp). QSort_textures sorts pages by address, with the quirk that
+    // src/engine/tb_hfield.cpp). QSort_textures sorts pages by address, with the quirk that
     // its second scan stops on the first index, not the last one.
     int32_t CheckGamutArea(int8_t* area);                              // 0x1000e760
     void QSort_textures(void** textures, int32_t low, int32_t high);   // 0x1000f060
-    // Draws the cells in view (src/tb_hfield_execute.cpp): when the view or the lights changed,
+    // Draws the cells in view (src/engine/tb_hfield.cpp): when the view or the lights changed,
     // one static primitive of their vertices, then one execution per run of cells on the same
     // texture page. 1 also when nothing is drawn; 0 when an execution fails.
     int32_t Execute();            // 0x1000f69c
-    int32_t DrawSkyShadow();      // 0x10011180 (src/tb_hfield_shadow.cpp)
+    int32_t DrawSkyShadow();      // 0x10011180 (src/engine/tb_hfield.cpp)
 
-    // Execute's helpers (src/tb_hfield_helpers.cpp). CalcFullLighting works out mVertexColours for the grid
+    // Execute's helpers (src/engine/tb_hfield.cpp). CalcFullLighting works out mVertexColours for the grid
     // points in view. CalcLine fills, for grid row `row` and columns low..high, the outside
     // codes (a byte a point) and the transformed points (x, y, z, rhw) of an array of 128; it
     // returns at once when low > 126 and never reads `spare` (128 words).
@@ -207,15 +207,15 @@ extern float gShadowUScale, gShadowVScale;                 // 0x10052dc8, 0x1005
 // 0x12974 bytes on the Mac.
 extern CHField* gei_HField;   // engine data 0x100af11c (not exported)
 // The overlay of each cell Prepare listed (0x14 bytes each on the Mac, 50,000 in all: they
-// end where gei_HField begins). Name invented; defined in src/tb_hfield_frame.cpp.
+// end where gei_HField begins). Name invented; defined in src/engine/tb_hfield.cpp.
 extern sTileOverlay gTileOverlays[CHField::kMaxOverlays];   // engine data 0x100a2dcc
 
-// Execute's work arrays (engine data, names invented; defined in src/tb_hfield_execute.cpp):
+// Execute's work arrays (engine data, names invented; defined in src/engine/tb_hfield.cpp):
 // the texture entry of each cell it may draw, which GetTexturesUsed fills, and the quads it drew.
 extern CTextureEntry* gQuadTextures[0x4000];   // 0x10052dcc
 extern QuadSaveInfo gQuadSaveInfo[0x4000];     // 0x10062dcc
 
-// Execute's work arrays (engine data, names invented; defined in src/tb_hfield_execute.cpp):
+// Execute's work arrays (engine data, names invented; defined in src/engine/tb_hfield.cpp):
 // the texture entry of each cell it may draw, which GetTexturesUsed fills, and the quads it drew.
 extern CTextureEntry* gQuadTextures[0x4000];   // 0x10052dcc
 extern QuadSaveInfo gQuadSaveInfo[0x4000];     // 0x10062dcc

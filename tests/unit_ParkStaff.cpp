@@ -1,5 +1,5 @@
 // Test library for the park analyser's staff queries (unit w155; libtpw_unit_ParkStaff.dylib, tests/test_ParkStaff.py), main app:
-//   src/ParkAnalyser_staff.cpp   the 13 functions; src/MainBalance.cpp is the real balance storage.
+//   src/game/park/analyser.cpp   the 13 functions; src/game/balance/MainBalance.cpp is the real balance storage.
 //
 // The callees outside the unit are fakes that record the same event as the PowerPC stubs and answer from the test's queues: GAME_ASSERTMSG, the world
 // accessor (answers world 1; the global gWorld is world 2), the used-thing walk, CStaff::TooTiredToWork and HasPatrolArea, CStaffDB::GetNumStaffOfType,

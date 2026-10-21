@@ -1,6 +1,6 @@
-// Differential library for unit w124: the things' turns (CWeather::UpdateTurn src/Weather_turn.cpp, CAdvisor::UpdateTurn src/Advisor_turn.cpp,
-// CChallengeHQ::UpdateTurn src/ChallengeHQ_turn.cpp, CParkAnalyser::UpdateTurn and CParkAnalyserCell::Init src/ParkAnalyser_turn.cpp,
-// SubscriptionTree::insert_one src/msl_tree_insert.cpp) and the nine companions of src/ThingMessages.cpp.
+// Differential library for unit w124: the things' turns (CWeather::UpdateTurn src/game/park/Weather.cpp, CAdvisor::UpdateTurn src/game/advisor/Advisor.cpp,
+// CChallengeHQ::UpdateTurn src/game/park/ChallengeHQ.cpp, CParkAnalyser::UpdateTurn and CParkAnalyserCell::Init src/game/park/analyser.cpp,
+// SubscriptionTree::insert_one src/game/MslSupport.cpp) and the nine companions of src/game/park/ChallengeHQ.cpp, src/game/park/Weather.cpp, src/game/ui/MessageCentre.cpp.
 //
 // Every callee outside those is a fake that records the same event as the PowerPC side's stub. The worlds are not blocks of their Mac size: only the 0x80
 // bytes at world + 0x1da6f0 are real memory (gTail), and a world pointer is that block's address minus 0x1da6f0 on both sides. The object under test lives

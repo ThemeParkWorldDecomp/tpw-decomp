@@ -1,5 +1,5 @@
 """Unit v5085, the shop status panel, against libtpw_unit_ShopStatusPanel_InitWindow.dylib (tests/unit_ShopStatusPanel_InitWindow.cpp), main app
-("SimTheme Park"), src/ShopStatusPanel_InitWindow.cpp:
+("SimTheme Park"), src/game/ui/ui_shopStatus.cpp:
   ShopStatusPanel::InitWindow 0x101bd28c, ShopStatusPanel::UpdateStatusWindow 0x101bcea0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

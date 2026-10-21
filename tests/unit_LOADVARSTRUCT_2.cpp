@@ -1,5 +1,5 @@
 // Test library for LOADVARSTRUCT<AdvisorHistory> (unit v5649; libtpw_unit_LOADVARSTRUCT_2.dylib, tests/test_LOADVARSTRUCT_2.py), main app:
-//   src/AdvisorBalance_LOADVARSTRUCT_2.cpp   LOADVARSTRUCT<AdvisorMessageState>
+//   src/game/advisor/Advisor.cpp   LOADVARSTRUCT<AdvisorMessageState>
 //
 // The callees outside the unit (WriteSerialiseLog, LbFile_Read, GAME_ASSERTMSG) are recording fakes; gSaveLoad is defined here.
 #include <cstddef>

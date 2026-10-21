@@ -1,5 +1,5 @@
 // Test library for SAVEVAR<ESP_Sprites> and __sinit_Peep_cpp (unit SAVEVAR_2; libtpw_unit_SAVEVAR_2.dylib, tests/test_SAVEVAR_2.py), main app:
-//   src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_SAVEVAR_2.cpp
+//   src/game/people/Peep.cpp
 //
 // Fakes: CSaveLoad::WriteSerialiseLog, GAME_ASSERTMSG, LbFile_Write, __register_global_object. Defined here: gSaveLoad, gNeighbourSteps.
 #include <cstddef>

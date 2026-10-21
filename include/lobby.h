@@ -1,5 +1,5 @@
 // lobby.cpp (main app): the 3D island lobby. The lobby object and the base class of its
-// systems are translated (src/lobby.cpp); the four systems themselves (meshes, view,
+// systems are translated (src/game/online/lobby.cpp); the four systems themselves (meshes, view,
 // flying meshes, screens) are declared here with what the lobby object needs of them and
 // are untranslated.
 #pragma once
@@ -48,7 +48,7 @@ public:
     const CFSOnlineCity* mCity;                   // 0x0c
 };
 
-// The lobby's description: the numbers of "data:lobby:lobby.txt" (src/lobby_parser.cpp).
+// The lobby's description: the numbers of "data:lobby:lobby.txt" (src/game/online/lobby_parser.cpp).
 // Mac 0x6c bytes, vtable 0x1029e3f0 (the destructor alone). Nothing sets the fields but
 // the file's lines.
 class CLBLobbyGlobals {
@@ -87,16 +87,16 @@ public:
     uint32_t GetRand();
     virtual void Register(CLBLobbySystem* system);     // 0x100a634c
     virtual void UnRegister(CLBLobbySystem* system);   // 0x100a63ac
-    // 0x100a6484 (src/lobby_flyingmesh.cpp): the lobby window's messages. 0x10003 sets the size, 0x10004 and 0x10005 clear
+    // 0x100a6484 (src/game/online/lobby.cpp): the lobby window's messages. 0x10003 sets the size, 0x10004 and 0x10005 clear
     // and set the bits (1, 2, 4) of the word at 0x1c, 0x22 clears that word, 0x14 forgets the window (when a lobby is
     // set), 0x11 with 1 updates the outbox's mail icon; then every system gets the message and the window's default
     // handler has the last word (its answer is the result).
     int32_t WindowMessagesFn(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
-    // unit w47, translated by unit w48 (src/lobby_sendquit.cpp): 0x100a643c, 32 bytes. Ignores `this`: sets gGame's word at 0x18 (mRestart)
+    // unit w47, translated by unit w48 (src/game/online/lobby.cpp): 0x100a643c, 32 bytes. Ignores `this`: sets gGame's word at 0x18 (mRestart)
     // to 1 and the word at 0x14 (mState) of gLobby to 3.
     void SendQuit();
 
-    // Unit v51060 (src/MapDelta_map_CMapCell_IsQueue.cpp): 0x100a66b0 (12 bytes), mF1C and the flag (the enum ELBKeyDownFlag is a bit mask).
+    // Unit v51060 (src/game/online/lobby.cpp): 0x100a66b0 (12 bytes), mF1C and the flag (the enum ELBKeyDownFlag is a bit mask).
     int32_t IsKeyDown(uint32_t flag);
 
     InterfaceWindow* mWindow;                // 0x04
@@ -138,7 +138,7 @@ class CLBFlyingMeshGroup;
 // A screen of the lobby. It registers with the screen system (gLobbyScreens) when it is
 // made and leaves it when it is destroyed; the system passes Init, Tick, Render, Close, the
 // window messages and "cancel" to the screens, the last four only to visible ones. Mac 8
-// bytes; vtable 0x1029eb30 (src/lobby_screen.cpp).
+// bytes; vtable 0x1029eb30 (src/game/online/lobby_screen.cpp).
 class CLBScreenComponent {
 public:
     CLBScreenComponent();                    // 0x100b6ba4
@@ -157,9 +157,9 @@ public:
 
 // ---- the concrete screens: declared with the members the screen system reaches (each class
 // the virtual members its own vtable has). The islands are 0xe8 bytes (the online ones 0xec),
-// the globes 0x7c, the advisor 0x2c. The advisor is translated (src/lobby_advisor.cpp) and the
-// islands' set-up, list, Show and Hide (src/lobby_islands.cpp); the rest is not.
-// One island on the lobby's map (src/lobby_islands.cpp). Mac 0x74 bytes, vtable 0x1029eaa4
+// the globes 0x7c, the advisor 0x2c. The advisor is translated (src/game/online/LBScreenComponentAdvisor.cpp) and the
+// islands' set-up, list, Show and Hide (src/game/online/lobby_island.cpp); the rest is not.
+// One island on the lobby's map (src/game/online/lobby_island.cpp). Mac 0x74 bytes, vtable 0x1029eaa4
 // (the destructor alone). It is made by ParseThemeDescriptor from an ISLAND( line and
 // registers itself with its screen; the lines that follow set its rain, lightning and sky
 // colour. Two meshes stand for it: both are placed and turned alike.
@@ -170,8 +170,8 @@ public:
     CLBIsland(const CLBScreenComponentIslands* owner, int32_t order, const char* name, const char* folder,
               const char* meshA, const char* meshB, float angle, const s3DPoint& position, const char16_t* title,
               const CFSOnlinePark* park, const char16_t* sign1, const char16_t* sign2);
-    virtual ~CLBIsland();                    // 0x100b0108 (src/lobby_islands_rest.cpp): leaves its screen's list
-    void Show();                             // 0x100b01c0 (src/lobby_islands_rest.cpp): both meshes on, once
+    virtual ~CLBIsland();                    // 0x100b0108 (src/game/online/lobby_island.cpp): leaves its screen's list
+    void Show();                             // 0x100b01c0 (src/game/online/lobby_island.cpp): both meshes on, once
 
     CLBMeshInstance* mMeshA;                 // 0x04  InstanceMeshType(folder, meshA, 0, 2, ...): given a random idle animation by Tick
     CLBMeshInstance* mMeshB;                 // 0x08  InstanceMeshType(folder, meshB, 0, 1, ...): plays animation 0 when the zoom starts
@@ -191,7 +191,7 @@ public:
     const CFSOnlinePark* mPark;              // 0x70  the online park on the island, if any
 };
 
-// The base of the theme islands and the online islands (src/lobby_islands.cpp). Mac 0xe8 bytes, vtable
+// The base of the theme islands and the online islands (src/game/online/lobby_island.cpp). Mac 0xe8 bytes, vtable
 // 0x1029ea1c; the derived classes are made by CLBScreenSystem::Init from this constructor with their
 // own vtable put in afterwards. The camera has two modes: it orbits the current island (mCameraState,
 // below) or, with no current island, flies a random path over the map (the Roam and Look fields).
@@ -213,7 +213,7 @@ public:
     void Register(CLBIsland* island);        // 0x100b2420: in front of the first island with an order not below its own
     void UnRegister(CLBIsland* island);      // 0x100b2534: no effect when it is not listed
     void SetCurrentIsland(const CLBIsland* island);   // 0x100b25d0: not for NULL; the camera state goes back to 0
-    // 0x100b0ab8, src/lobby_islands_tick.cpp: the islands' own per-frame work, slot 0x10 of the
+    // 0x100b0ab8, src/game/online/lobby_island.cpp, src/game/online/LBFlyingMesh.cpp: the islands' own per-frame work, slot 0x10 of the
     // vtable the base constructor installs. The theme and online islands' Ticks call it. It is
     // named TickIslands and not declared `Tick() override` because every unit library that
     // builds this class's vtable would then need a fake of it; the launcher's
@@ -227,19 +227,19 @@ public:
     void GotoNextIsland();                   // 0x100b2638 (the theme islands' 0x100b35ac replaces it in slot 0x40)
     void GotoPreviousIsland();               // 0x100b2808 (0x100b3684 in the theme islands)
     // Slot 0x50 of the vtable, called by Tick when the zoom's fade completes: the theme islands'
-    // 0x100b346c is translated (src/lobby_islands_rest.cpp); the online islands' 0x100b45d0 is not,
+    // 0x100b346c is translated (src/game/online/lobby_island.cpp); the online islands' 0x100b45d0 is not,
     // so nothing happens for them. (Slot 0x54 is SetCurrentIsland above: the theme override
     // 0x100b3540 is a plain member of the theme class with the same text; the online override
     // 0x100b4690 is untranslated and not declared, so the base's runs for it.)
     virtual void EnterCurrentIsland() {}
-    // 0x100b5d54 (src/lobby_islands_rest.cpp): reads the theme's lobby description file and makes its islands
+    // 0x100b5d54 (src/game/online/lobby_parser.cpp): reads the theme's lobby description file and makes its islands
     // and flying meshes. The gate names go to the islands' signs.
     void ParseThemeDescriptor(const char* theme, const CFSOnlinePark* park, int32_t order,
                               const char16_t* gate1, const char16_t* gate2);
-    // 0x100b2228 (src/lobby_islands_rest.cpp): fades the current island's looping sounds and restarts the
+    // 0x100b2228 (src/game/online/lobby_island.cpp): fades the current island's looping sounds and restarts the
     // sounds of the FIRST island in the list.
     void ResetIslandLoopingSounds();
-    // Unit v51106 (src/CLBScreenComponentOnlineIslands_GotoNextIsland_CLBScreenComponentOnlineIslands_StartCurrentIsla.cpp).
+    // Unit v51106 (src/game/online/lobby_island.cpp).
     // 0x100b1e3c, slot 0x1c of the base vtable (named apart so no unit library needs it): the arrow and return keys and clicks, through slots 0x44, 0x40, 0x48.
     void WindowMessagesFnIslands(int32_t message, int32_t a, int32_t b);
     void Slot48();                           // slot 0x48 of the base vtable (body not translated)
@@ -288,7 +288,7 @@ public:
     // one of the theme islands' slot overrides declared virtual here: nothing else reaches the others through
     // the base class (the Mac's vtable has them at 0x40..0x4c and 0x54; they are plain members here, hiding the
     // base class's of the same name, so that the unit libraries that build this class's vtable need one fake).
-    void EnterCurrentIsland() override;      // 0x100b346c (src/lobby_islands_rest.cpp)
+    void EnterCurrentIsland() override;      // 0x100b346c (src/game/online/lobby_island.cpp)
     void SetCurrentIsland(const CLBIsland* island);   // 0x100b3540, slot 0x54: the base class's text again
     void GotoNextIsland();                   // 0x100b35ac, slot 0x40: nothing in the easy game type
     void GotoPreviousIsland();               // 0x100b3684, slot 0x44
@@ -306,7 +306,7 @@ public:
     uint32_t ProcessCancel() override;       // 0x100b3cd0
     void Show() override;                    // 0x100b3ec8
     void Hide() override;                    // 0x100b4170
-    // Unit v5255 (src/CLBScreenComponentOnlineIslands_GotoNextIsland.cpp). Plain members (the vtable slots 0x40, 0x48 and 0x50 etc. are not
+    // Unit v5255 (src/game/online/lobby_island.cpp). Plain members (the vtable slots 0x40, 0x48 and 0x50 etc. are not
     // overridden here, so no unit library needs a fake of them).
     // 0x100b46fc, slot 0x40: the next island, unless the camera is zooming; then the city lobby controller shows.
     void GotoNextIsland();
@@ -315,9 +315,9 @@ public:
     void DownloadFailFunction();             // 0x100b4a98
     void HandleOnlineBacktrack();            // 0x100b4b48: this->Hide(), then the download globe's Show
     uint8_t mFE8[4];                         // 0xe8  (read and written as an int32 by the members above: 1 while the controller shows)
-    // Unit v5639 (src/CLBScreenComponentOnlineIslands_GotoNextIsland_CLBScreenComponentOnlineIslands_CreateParks.cpp)
+    // Unit v5639 (src/game/online/lobby_island.cpp)
     void CreateParks(TbPtrList<CFSOnlinePark>* parks);   // 0x100b4880: ParseThemeDescriptor for each park, then the first island is current
-    // Unit v51106 (src/CLBScreenComponentOnlineIslands_GotoNextIsland_CLBScreenComponentOnlineIslands_StartCurrentIsla.cpp). Plain members here.
+    // Unit v51106 (src/game/online/lobby_island.cpp). Plain members here.
     void StartCurrentIslandZoom();           // 0x100b4574, slot 0x4c: the camera state goes to 1
     void SetCurrentIsland(const CLBIsland* island);   // 0x100b4690, slot 0x54: the base class's text again
     void GotoPreviousIsland();               // 0x100b4790, slot 0x44
@@ -327,13 +327,13 @@ public:
 };
 // 0x100b3e28 (untranslated; its TVector is 0x10266778): the callback Show passes to CFSOnlineSystemParkList_InCityTop10::GetList.
 void PostGetTop10ParksListCallbackFunction(int32_t id, const void* context, TbPtrList<CFSOnlinePark>* parks);
-// The online globe's base class (0x7c bytes on the Mac, vtable 0x1029e830). The constructor (src/lobby_globe.cpp) makes the two lists
+// The online globe's base class (0x7c bytes on the Mac, vtable 0x1029e830). The constructor (src/game/online/lobby_globe.cpp) makes the two lists
 // (a failed allocation leaves the field NULL, as the Mac's operator new answers NULL) and sets nine floats; the words it does not write
 // are kept as opaque arrays. The floats' names are the Mac offsets (their use is untranslated).
 class CLBScreenComponentOnlineGlobe : public CLBScreenComponent {
 public:
     CLBScreenComponentOnlineGlobe();             // 0x100ac90c
-    ~CLBScreenComponentOnlineGlobe() override;   // 0x100aca4c (src/lobby_globe_close.cpp)
+    ~CLBScreenComponentOnlineGlobe() override;   // 0x100aca4c (src/game/online/lobby_globe.cpp)
     void Render() override;                  // 0x100ad4cc
     void Close() override;                   // 0x100ad50c: nothing
     uint32_t ProcessCancel() override;       // 0x100ad690
@@ -392,7 +392,7 @@ public:
     // Unit v51106.
     void TickGlobe();                      // 0x100acce0: the globe's own Tick, which the download and publish globes' Ticks call
     void Register(CLBGlobeCityFlag* flag); // 0x100ae1b0: at the end of the city flag list
-    // Unit v51119 (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Show_2_CLBScreenComponentOnlineGlobe_GlobeRight.cpp).
+    // Unit v51119 (src/game/online/lobby_globe.cpp).
     // The camera step is the Mac float at 0x14 (host mF0C + 8); the offsets are the Mac float at 0x48 (mF44 + 4) and 0x50 (mF44 + 12).
 #ifdef TPW_GLOBE_INIT_REAL
     void Init() override;                      // 0x100acc98: clears 0x70
@@ -405,7 +405,7 @@ public:
 void HideWorldLobbySats();   // 0x1022b85c
 void ShowWorldLobbySats();   // 0x1022b7e8
 // Unit v5571: the globe's sphere centre (0x1029e71c) and the view's target (0x1029e728), 12 bytes each, defined in
-// src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp.
+// src/game/online/lobby_globe.cpp.
 extern s3DPoint gGlobeCentre;       // 0x1029e71c
 extern s3DPoint gGlobeViewTarget;   // 0x1029e728
 void WorldLobbySetZoomButton(int32_t zoomedIn);   // 0x1022ba30 (stand-in)
@@ -419,7 +419,7 @@ public:
     void Show() override;                    // 0x100ae590
     void Hide() override;                    // 0x100ae63c
     virtual void Slot50() {}                 // slot 0x50 (unit v5130: EnterChatSatellite calls it on the lobby's download globe; body unknown)
-    // Unit v5957 (src/lobby_globe_CLBScreenComponentPublishGlobe_WindowMessagesFn.cpp).
+    // Unit v5957 (src/game/online/lobby_globe.cpp).
     void HandleOnlineBacktrack();            // 0x100ae9c0: this->Hide(), then the theme islands' Show
     void CreateCities(TbPtrList<CFSOnlineCity>* cities);   // 0x100ae8a0: a flag per wanted city, then the advisor says line 0x256
     // Unit v51106 (plain members; the Mac has them in vtable slots).
@@ -435,7 +435,7 @@ public:
     void WindowMessagesFn(int32_t message, int32_t a, int32_t b) override;   // 0x100aeb6c
     void Show() override;                    // 0x100aec3c
     void Hide() override;                    // 0x100aece8
-    // Unit v5957 (src/lobby_globe_CLBScreenComponentPublishGlobe_WindowMessagesFn.cpp).
+    // Unit v5957 (src/game/online/lobby_globe.cpp).
     void CreateCities(TbPtrList<CFSOnlineCity>* cities);   // 0x100aef90
     void HandleOnlineBacktrack();            // 0x100af094: this->Hide(), then the theme islands' Show and EnterCurrentIsland
     // Unit v51106 (plain members; the Mac has them in vtable slots).
@@ -446,7 +446,7 @@ public:
 // 0x100ad54c (untranslated; a plain function here so that the online globe's vtable is not changed): the base class's
 // window messages, which the publish globe's WindowMessagesFn calls first.
 void CLBScreenComponentOnlineGlobe_WindowMessagesFn(CLBScreenComponentOnlineGlobe* globe, int32_t message, int32_t a, int32_t b);
-// The advisor's screen (src/lobby_advisor.cpp): a queue of lines for the advisor to say,
+// The advisor's screen (src/game/online/LBScreenComponentAdvisor.cpp): a queue of lines for the advisor to say,
 // newest first, said one a tick from the old end while he is silent, and a line to say when
 // nothing has been said for a while. Mac 0x2c bytes, vtable 0x1029e474. The constructor is
 // inline in CLBScreenSystem::Init (the base's, then an empty list).
@@ -473,7 +473,7 @@ public:
     int32_t mSpoke;                          // 0x28  the last tick found him talking or gave him a line
 };
 
-// ---- the lobby's meshes (src/lobby_meshes.cpp). The lobby draws with the park's own
+// ---- the lobby's meshes (src/game/online/LBLobbyMeshes.cpp). The lobby draws with the park's own
 // machinery: its ground is the height field of the level "lobby", and everything on it is
 // an instance of a "ride type" (a mesh file of a folder).
 // A mesh file loaded as a ride type. Mac 0x2c bytes, no vtable; made and destroyed inline
@@ -570,7 +570,7 @@ public:
     int32_t mSkyTarget[3];             // 0x50
     int32_t mFadeCurrent, mFadeTarget;  // 0x5c, 0x60
 };
-// A flock of meshes that fly about over the lobby's islands (src/lobby_flyingmesh.cpp). Mac 0x5c bytes,
+// A flock of meshes that fly about over the lobby's islands (src/game/online/LBFlyingMesh.cpp). Mac 0x5c bytes,
 // vtable 0x1029e69c (destructor 8, Register 0xc, UnRegister 0x10). It is made by the theme
 // description's FLYINGMESH( lines, registers with the flying mesh system (gLobbyFlyingMeshes) and
 // then makes its instances a few at a time, one tick after another, up to a share of `number`
@@ -601,7 +601,7 @@ public:
     float mArriveDistSq;             // 0x54  500.0
     TbPtrList<CLBFlyingMeshInstance>* mInstances;   // 0x58
 };
-// One flying mesh (src/lobby_flyingmesh.cpp). Mac 0x60 bytes, vtable 0x1029e6e0 (the destructor alone).
+// One flying mesh (src/game/online/LBFlyingMesh.cpp). Mac 0x60 bytes, vtable 0x1029e6e0 (the destructor alone).
 // It flies from a random point of the group's box to another one, turning towards the goal a tenth
 // of the way a step, and picks a new goal when it is near enough. Its mesh is an instance of the
 // lobby's mesh system, which keeps it (the destructor does not destroy it).
@@ -627,20 +627,20 @@ public:
 };
 class CLBFlyingMeshSystem : public CLBLobbySystem {   // Mac 8 bytes, vtable 0x1029e644
 public:
-    CLBFlyingMeshSystem();           // 0x100ab578 (src/lobby_flyingmesh.cpp)
+    CLBFlyingMeshSystem();           // 0x100ab578 (src/game/online/LBFlyingMesh.cpp)
     ~CLBFlyingMeshSystem() override; // 0x100ab620: destroys the groups
     void Init() override;            // 0x100ab790
     void Tick() override;            // 0x100ab7c4
     void Render() override;          // 0x100ab83c
     void Close() override;           // 0x100ab874: nothing
     void WindowMessagesFn(int32_t message, int32_t a, int32_t b) override;   // 0x100ab8ac: nothing
-    // Slots 0x20 and 0x24 of the vtable (src/lobby_flyingmesh.cpp): the groups register when they are made.
+    // Slots 0x20 and 0x24 of the vtable (src/game/online/LBFlyingMesh.cpp): the groups register when they are made.
     virtual void Register(CLBFlyingMeshGroup* group);      // 0x100ab99c: at the end of the list
     virtual void UnRegister(CLBFlyingMeshGroup* group);    // 0x100aba0c: no effect when it is not listed
     void DeleteFlyingMeshGroupListEntries();     // 0x100ab8f0: destroys every group in the list
     TbPtrList<CLBFlyingMeshGroup>* mGroups;      // 0x04
 };
-// The screens' owner (src/lobby_screen.cpp). Mac 0x1c bytes, vtable 0x1029ead8 (after the
+// The screens' owner (src/game/online/lobby_screen.cpp). Mac 0x1c bytes, vtable 0x1029ead8 (after the
 // system members: Register 0x20, UnRegister 0x24).
 class CLBScreenSystem : public CLBLobbySystem {
 public:
@@ -671,12 +671,12 @@ extern CLBLobbyView* gLobbyView;               // 0x102e48cc
 extern CLBLobbyMeshes* gLobbyMeshes;           // 0x102e48d0
 // The Mac has ONE global here: 0x10395c24 is the interface's root window (gUIRootWindow, UI_Base.h), under which the lobby builds
 // its window when the interface has made one. gLobbyWindowDefinition is that same variable (unit w36 removed the separate NULL one).
-extern InterfaceWindow* gUIRootWindow;   // 0x10395c24, src/UI_focus.cpp
+extern InterfaceWindow* gUIRootWindow;   // 0x10395c24, src/game/ui/UI_Base.cpp
 inline InterfaceWindow*& gLobbyWindowDefinition = gUIRootWindow;
 extern int32_t gLobbyReturnFlag;               // 0x102e4860: nonzero opens the screen at 0x0c, once
-extern int16_t gLobbyWindowData[];             // 0x1029e382 (src/lobby.cpp, unit w36): InterfaceWindow::Build's description, 38 words
-extern int16_t gLoginPanelWindowData[];        // 0x102abbb0 (src/ui_loginpanel_data.cpp, unit w36): the login panel's description, 371 words
-// ---- the login panel (src/ui_loginpanel.cpp, unit w39; the file is ui_playerLogin.cpp)
+extern int16_t gLobbyWindowData[];             // 0x1029e382 (src/game/online/lobby.cpp, unit w36): InterfaceWindow::Build's description, 38 words
+extern int16_t gLoginPanelWindowData[];        // 0x102abbb0 (src/game/ui/ui_playerLogin.cpp, unit w36): the login panel's description, 371 words
+// ---- the login panel (src/game/ui/ui_playerLogin.cpp, unit w39; the file is ui_playerLogin.cpp)
 // 0x101ae9e0: asks who is playing. Disables the key tables, hides the lobby's window, builds gLoginPanelWindowData under the root window
 // with LoginPanelMsg, styles the four name rows and the quit row (title text objects, font 5, centred, the names' colour), fills the names
 // and tells the advisor what to say: lines 0x186 and 0x187 when no player is saved yet (and gLoginPanelFirstPlayer is set), 0x18e when
@@ -695,28 +695,28 @@ extern int32_t gLoginPanelFirstPlayer;         // 0x10394ab8: 1 when no player w
 extern int8_t gLoginNameRed;                   // 0x102ac004
 extern int8_t gLoginNameGreen;                 // 0x102ac005
 extern int8_t gLoginNameBlue;                  // 0x102ac006
-// 0x100b69f8 (src/lobby_islands_rest.cpp): like LB_ReadTbStringUntilNext, into a wide string; each char is
+// 0x100b69f8 (src/game/online/lobby_parser.cpp): like LB_ReadTbStringUntilNext, into a wide string; each char is
 // widened with its sign.
 TbDynamicStringTemplate<char16_t> LB_ReadTbUniStringUntilNext(char** cursor, char delimiter);
 
 // The lobby window's message function (0x100a5950) and its mail icon's (0x100a59ec).
 int32_t LB_Lobby_WindowMessagesFn(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
-// 0x100a59ec (src/lobby_mailicon.cpp, unit w40). On message 0x10006 (a click on the icon) it makes the online system when there is none,
+// 0x100a59ec (src/game/online/lobby.cpp, unit w40). On message 0x10006 (a click on the icon) it makes the online system when there is none,
 // then opens the outbox panel when the player is logged in and otherwise a dialog with the interface string 0x1d9 (white, one button,
 // no callbacks); every message, that one included, ends in the window's default handler, whose answer is returned.
 int32_t LB_Lobby_MailIconMessagesFn(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
 // 0x101e4f28 (untranslated, 952 bytes; the inventory files it with the online mail panels): the outbox panel. It answers 1 once it has
 // built the panel and 0 when it has not (the user info word at 0x8c is 0); CFSOnlineSystem::CompleteLogin asks (unit w69).
 int32_t CreateOnlineOutboxPanel();
-void UpdateOutboxMailIcon();                   // 0x101e3698 (src/UI_IslandLobby.cpp, unit w32): shows the mail icon when the outbox has mail
+void UpdateOutboxMailIcon();                   // 0x101e3698 (src/game/ui/ui_onlineOutbox.cpp, unit w32): shows the mail icon when the outbox has mail
 
-// Unit v5017 (src/UI_IslandLobby_CalcEmailAddressScrollBar.cpp): the online outbox panel's helpers.
+// Unit v5017 (src/game/ui/ui_onlineOutbox.cpp): the online outbox panel's helpers.
 extern InterfaceWindow* gOutboxWindow;         // 0x10395e3c: the outbox panel's window
 extern uint8_t* gOutboxCursor;                 // 0x10395e38: the outbox's cursor part (the outbox + 4); read by Mac offsets
 extern uint32_t gOutboxPreview[9];             // 0x10395e10: the preview's size: width at +0x1c (word 7), height at +0x20 (word 8)
 extern const char16_t gEmailSeparators[3];     // 0x1024eeca: an empty string, then (at +2) "\n"
 void FillOutboxList();                         // 0x101e378c
-// Unit v5096 (src/LCPostFormat_2.cpp): the outbox panel's row functions (LCFormat and LCPostFormat of ui_onlineOutbox.cpp) and its
+// Unit v5096 (src/game/ui/ui_onlineOutbox.cpp): the outbox panel's row functions (LCFormat and LCPostFormat of ui_onlineOutbox.cpp) and its
 // untranslated message functions and window description.
 InterfaceWindow* OutboxLCFormat();             // 0x101e4bdc
 void OutboxLCPostFormat(InterfaceWindow* window);   // 0x101e4d20
@@ -728,11 +728,11 @@ void CalcEmailAddressScrollBar();              // 0x101e3aac
 void UpdatePreview();                          // 0x101e3c94
 void read_JPEG_file(char* path, uint8_t* pixels);   // 0x101e538c (unit v5981)
 int32_t read_JPEG_fileChecked(char* path, uint8_t* pixels);   // unit v5981: the same, answering 1 when decoded, 0 when the file did not open or libjpeg failed
-// Unit v5239 (src/UI_IslandLobby_CalcEmailAddressScrollBar_OutboxSendingMsg_OutboxPanelMsg.cpp)
+// Unit v5239 (src/game/ui/ui_onlineOutbox.cpp)
 void SendAndDeleteOutbox(bool send);           // 0x101e4378: empties the outbox's lists, sends when `send`
 void ColumnClick(int32_t column);              // 0x101e3e98, untranslated
 extern uint32_t gOutboxCallbackVector[2];      // 0x10268500: the TVector of OutboxCallback (0x101e4124, untranslated); the outbox keeps its address
-// Unit v5579 (src/LCPostFormat_2_ChatPrePostCard.cpp)
+// Unit v5579 (src/game/ui/ui_onlineOutbox.cpp)
 extern InterfaceWindow* gOnlineWord80;         // 0x10395e80, original name unknown: not 0 wins in ChatPrePostCard
 extern InterfaceWindow* gOnlineSavedWindow84;  // 0x10395e84, original name unknown: ChatPrePostCard's choice
 extern uint8_t gOutboxStringStorage[];         // 0x10395e40: the global wide string (0x14 bytes on the Mac)
@@ -745,7 +745,7 @@ void ErrorOutput(uint32_t tvector, jpeg_common_struct* cinfo);   // __ptr_glue 0
 void JpegLongJmp(void* buffer, int32_t value);                   // 0x10238018 (import)
 int32_t JpegSetJmp(void* buffer);                                // 0x10237fa0 (import, setjmp; unit v5981 has a weak stand-in answering 0)
 }
-// Unit v5981 (src/InterfaceWindow_draw_InterfaceWindow_link.cpp): the island lobby controller's static strings and the online login
+// Unit v5981 (src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_onlineLogin.cpp): the island lobby controller's static strings and the online login
 // panel's and the outbox address panel's message functions.
 extern uint8_t gIslandLobbyText1Storage[];   // 0x10395ce0 (0x14 bytes on the Mac): the global wide string made first
 extern uint8_t gIslandLobbyText1Node[24];    // 0x10395cf4: its registration node
@@ -788,7 +788,7 @@ public:
     TbJPEGLoader();
     ~TbJPEGLoader();
     uint8_t mBytes[0x430];
-    // Unit v5528 (src/Lbgfsave_iffgiftim_TbJPEGLoader_ReadHeaderInfo.cpp)
+    // Unit v5528 (src/bullfrog/TbJPEGSaver.cpp)
     TbResult ReadHeaderInfo(bfl::FileSystem::CFile& file, TbRenderArea& area);   // 0x10024324
     // 0x100244c0: the palette goes to mBytes + 0x2c, four bytes an entry; the last argument is unused
     TbResult ReadData(const TbRenderArea& description, bfl::FileSystem::CFile& file, TbRenderArea& unused);
@@ -798,20 +798,20 @@ public:
 // ---- what the island screens call outside the lobby (all untranslated)
 // The island lobby's panels (ui_ files): made and removed with the screen, shown and hidden with it.
 void CreateIslandLobbyController();            // 0x101e0f68
-void RemoveIslandLobbyController();            // 0x101e11f8 (src/UI_IslandLobby_msg.cpp)
+void RemoveIslandLobbyController();            // 0x101e11f8 (src/game/ui/ui_islandLobbyController.cpp)
 void ShowIslandLobbyController();              // 0x101e1264
-void HideIslandLobbyController();              // 0x101e12d4 (src/UI_IslandLobby_msg.cpp)
+void HideIslandLobbyController();              // 0x101e12d4 (src/game/ui/ui_islandLobbyController.cpp)
 void UpdateIslandLobbyUI();                    // 0x101e15b4
-// The island lobby's controller (src/UI_IslandLobby.cpp, unit w32; the file is ui_islandLobbyController.cpp). CreateIslandLobbyController builds it
+// The island lobby's controller (src/game/ui/ui_islandLobbyController.cpp, unit w32; the file is ui_islandLobbyController.cpp). CreateIslandLobbyController builds it
 // under the lobby's window; Show, Hide and Remove send it messages 6 and 4. It keeps the golden key panel, the key count
 // and the park name up to date.
 extern InterfaceWindow* gIslandLobbyController;   // 0x10395cbc: the controller's window; NULL until Create has made it
 extern int32_t gIslandLobbyKeyEmitter;            // 0x10395cb4: the particle emitter over the key panel (0 for none)
 extern int32_t gIslandLobbyKeysShown;             // 0x10395cb8: the keys the player held when the display last looked
-extern int16_t gIslandLobbyWindowData[];          // 0x102b006e (src/UI_IslandLobby.cpp, unit w36): InterfaceWindow::Build's description, 269 words
-// 0x101e0d98 (src/UI_IslandLobby_msg.cpp, unit w36): the controller panel's message function (window handler).
+extern int16_t gIslandLobbyWindowData[];          // 0x102b006e (src/game/ui/ui_islandLobbyController.cpp, unit w36): InterfaceWindow::Build's description, 269 words
+// 0x101e0d98 (src/game/ui/ui_islandLobbyController.cpp, unit w36): the controller panel's message function (window handler).
 int32_t IslandLobbyControllerMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
-// 0x101e133c (src/UI_IslandLobby_msg.cpp): `on` starts the key emitter over the window's middle (when it is not running),
+// 0x101e133c (src/game/ui/ui_islandLobbyController.cpp): `on` starts the key emitter over the window's middle (when it is not running),
 // otherwise kills it.
 void UpdateKeyParticles(InterfaceWindow* window, bool on);
 // 0x101e1d40: enables or disables the two buttons and shows or hides the key cost panel and the key count panel.
@@ -821,9 +821,9 @@ void EnableIslandLobbyButtons(bool on);
 int32_t SND_RegisterLocalLobbySounds(char* name);   // 0x100df02c
 void SND_FreeLocalLobbySounds();               // 0x100df234
 void SOUND_FadeSoundEffect(int32_t sound);     // 0x100de0fc
-extern int32_t gLobbyThunderBank;               // 0x102f7cbc (0x102f7c94 + 0x28): the lightning's bank (src/TPSound.cpp)
-extern int32_t* gLobbyIslandSounds;            // 0x102f7cc0 (the pointer; original name unknown; src/TPSound.cpp)
-void KeyParticlePOUFFE();                      // 0x101e1460 (src/lobby_exit.cpp): the sparkle when the player enters an island
+extern int32_t gLobbyThunderBank;               // 0x102f7cbc (0x102f7c94 + 0x28): the lightning's bank (src/game/Sound.cpp)
+extern int32_t* gLobbyIslandSounds;            // 0x102f7cc0 (the pointer; original name unknown; src/game/Sound.cpp)
+void KeyParticlePOUFFE();                      // 0x101e1460 (src/game/ui/ui_islandLobbyController.cpp): the sparkle when the player enters an island
 // 0x102e48f8 (a file-static of lobby_island.cpp, constructed empty by __sinit_lobby_island_cpp 0x100b54f8): the
 // theme of the island the player last entered. EnterCurrentIsland sets it; ResetCurrentIsland(0) picks that
 // theme's island again.
@@ -831,7 +831,7 @@ extern TbDynamicStringTemplate<char> gLobbyIslandTheme;
 
 // unit w43
 void RemoveLoginPanel(int32_t cancel);   // 0x101af02c
-// ---- unit w43b: the "Create new player" name entry (src/ui_newname.cpp, ui_newname_data.cpp; the file is ui_playerLogin.cpp)
+// ---- unit w43b: the "Create new player" name entry (src/game/ui/ui_playerLogin.cpp, ui_newname_data.cpp; the file is ui_playerLogin.cpp)
 // 0x101af60c: the login panel's "Create new player" button. Nothing happens while the panel does not exist (gLoginPanelWindow NULL).
 // Otherwise the advisor is told line 0x23a (clearing his queue), the name entry dialog is made (Dialog with gNewNameWindowData and
 // CreatePlayerMsg, modal), kept in gNewNameWindow, and dressed: the edit box 0x70a gets the cursor-position text object, font 6, white,
@@ -841,12 +841,12 @@ void RemoveLoginPanel(int32_t cancel);   // 0x101af02c
 // a title text object (font 5, centred, string 0xef, the title colour). QUIRK: the check buttons are then asked for the current button
 // 0x7a17, which none of their children has (an id of the login panel's picture), so no button is selected.
 void NewName(int32_t slot);
-int32_t GameConfirmDelPlayer_OK(void* data);   // 0x101adddc (src/ui_newname_msg.cpp, unit w47): the delete-player confirmation's OK
-int32_t GameConfirmQuit_OK(void* data);        // 0x101ae1b0 (src/ui_newname_msg.cpp, unit w47): the quit confirmation's OK
+int32_t GameConfirmDelPlayer_OK(void* data);   // 0x101adddc (src/game/ui/ui_playerLogin.cpp, unit w47): the delete-player confirmation's OK
+int32_t GameConfirmQuit_OK(void* data);        // 0x101ae1b0 (src/game/ui/ui_playerLogin.cpp, unit w47): the quit confirmation's OK
 extern int8_t gLoginHoverRed;    // 0x102ac007
 extern int8_t gLoginHoverGreen;  // 0x102ac008
 extern int8_t gLoginHoverBlue;   // 0x10394ac0
-// 0x101af3fc (src/ui_newname_msg.cpp, unit w47): the name entry dialog's message function.
+// 0x101af3fc (src/game/ui/ui_playerLogin.cpp, unit w47): the name entry dialog's message function.
 int32_t CreatePlayerMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
 extern InterfaceWindow* gNewNameWindow;   // 0x10394a90 (name invented): the name entry dialog, NULL until NewName makes it
 extern char16_t gNewNameText[18];         // 0x10394a94 (name invented): the name being typed (the edit box's static text, 16 characters; the next global is at 0x10394ab8)
@@ -854,13 +854,13 @@ extern char16_t gNewNameText[18];         // 0x10394a94 (name invented): the nam
 // panel's (gLoginPanelWindowData). The dialog 0x708 holds the title 0x709, the edit box 0x70a (kind 5), a picture 0x70b, the check buttons
 // 0x70c with their buttons 0x70d and 0x70e, and two buttons with the ids -2 and -1.
 extern int16_t gNewNameWindowData[];
-// unit w47 (src/ui_newname_msg.cpp)
+// unit w47 (src/game/ui/ui_playerLogin.cpp)
 // 0x101af264: the name entry dialog's OK. The spaces at the end of gNewNameText are cut off in place; an empty name answers false and
 // nothing else happens. Otherwise the player is created in `slot` (the dialog's extra parameter 0, a pointer-sized number) with the
 // name, easy mode when the check buttons 0x70c have 0x70d as current, and logged in; true.
 bool NewNameOK(void* slot);
 
-// Unit v5128 (src/lobby_globe_close_PostGetCityListCallbackFunction.cpp)
+// Unit v5128 (src/game/online/lobby_globe.cpp)
 class CFSOnlineCity;
 // The screen that asked for the city list (class unknown): two virtual slots after IsVisible, called by the callback.
 class CLBCityListScreen : public CLBScreenComponent {
@@ -871,7 +871,7 @@ public:
 // 0x100ad6dc: error 0 calls the context's slot 0x30 with the list, otherwise its slot 0x34.
 void PostGetCityListCallbackFunction(int error, const void* context, TbPtrList<CFSOnlineCity>* cities);
 
-// Unit v5189 (src/UI_IslandLobby_msg_sinit_ui_cityLobbyController_cpp_UpdateCityLobbyUI.cpp)
+// Unit v5189 (src/game/ui/ui_cityLobbyController.cpp)
 class InterfaceWindow;
 extern InterfaceWindow* gCityLobbyWindow;   // 0x10395c70 (name invented): the city lobby's controller window, NULL when there is none
 extern int16_t gCityLobbyScript[];          // 0x102afe7a (name invented): its window description (only the address is used here)
@@ -894,15 +894,15 @@ void HideCityLobbyController();                                   // 0x101e08c0
 void IslandOnlineParkInfoPanelCancelCallback();                   // 0x100b43bc (the Mac passes its TVector at 0x10266750)
 void OnlineIslandParkDownloadCompleteCallback(int32_t, const void*);   // 0x100b4420 (TVector at 0x10266748)
 
-// Unit v5553 (src/lobby_globe_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo.cpp; untranslated callees of the download globe's Hide)
+// Unit v5553 (src/game/online/lobby_globe.cpp; untranslated callees of the download globe's Hide)
 void RemoveWorldLobbyController();                                // 0x1022b6ac
 void RemoveOnlineCityInfoOverlay();                               // 0x101e2314
 
-// Unit v51044 (src/std_less_std_basic_string_operator.cpp)
+// Unit v51044 (src/game/ui/ui_worldLobbyController.cpp)
 // 0x1022ba30: with the satellite panel's parent window made, the button 0x16006 below it is set (pressed) when `zoom` is 1, else released.
 void WorldLobbySetZoomButton(int32_t zoom);
 
-// Unit v51046 (src/CLBScreenComponentOnlineIslands_GotoNextIsland_OnlineIslandParkDownloadCompleteCallback_2.cpp)
+// Unit v51046 (src/game/online/lobby_parser.cpp)
 // The online islands screen's virtual slot 0x4c (untranslated): OnlineIslandParkDownloadCompleteCallback calls it when the download worked.
 void OnlineIslandsSlot4c(CLBScreenComponentOnlineIslands* screen);
 // 0x100b6ae4, lobby_parser.cpp's static initialiser: constructs the wide string at 0x102e4998 and the two narrow strings (gLobbyFolder,
@@ -913,7 +913,7 @@ extern uint8_t gLobbyParserWideNode[12];             // 0x102e49ac
 extern uint8_t gLobbyFolderNode[12];                 // 0x102e498c
 extern uint8_t gLobbyDescriptorFileNode[12];         // 0x102e496c
 
-// Unit v51058 (src/std_less_std_basic_string_operator_ShowWorldLobbyController.cpp)
+// Unit v51058 (src/game/ui/ui_worldLobbyController.cpp, src/game/ui/ui_publishParkPanel.cpp)
 void ShowWorldLobbyController();                      // 0x1022b718: message 6 (1, 0) to the satellite parent window
 void HideWorldLobbyController();                      // 0x1022b780: message 6 (0, 0)
 void __sinit_ui_worldLobbyController_cpp();           // 0x1022bacc

@@ -1,5 +1,5 @@
 """Unit v5565, the tag panel functions, against libtpw_unit_ShowTagPanel.dylib (tests/unit_ShowTagPanel.cpp), main app
-("SimTheme Park"), src/ui_StatusPanel_SetButton_ShowTagPanel.cpp:
+("SimTheme Park"), src/game/ui/ui_tags.cpp:
   ShowTagPanel 0x10190d0c, TagCallback 0x10190f04
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

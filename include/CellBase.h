@@ -15,33 +15,33 @@ enum CELL_MODES : int32_t {};
 
 class CCellBase {
 public:
-    // 0x10081678 (60 bytes, src/MapReset.cpp): clears the bits of `mask` in the neighbour mask. The cell system's flag byte
+    // 0x10081678 (60 bytes, src/game/park/CellBase.cpp): clears the bits of `mask` in the neighbour mask. The cell system's flag byte
     // (gLLCC4818) set and a track cell (kind 2) turn it to the hoarding mask at +0x22 instead.
     void RemoveNeighbour(uint8_t mask);
     // 0x10081810 (8 bytes): stores the direction byte.
     void ModifyDirection(uint8_t direction);
 
-    // 0x100f4780 (36 bytes, src/CellInit.cpp), a static member (the call sites pass the base in r3): records the map grid. The end is
+    // 0x100f4780 (36 bytes, src/game/park/CellBase.cpp), a static member (the call sites pass the base in r3): records the map grid. The end is
     // the base plus the size times 0x4000 in BYTES, computed in 32 bits (slwi 14), so a size of 0x40000 or more wraps on the Mac.
     // The parameter names are invented.
     static void RegisterMapGrid(const CMapCell* grid, int32_t cellSize);
     // 0x100f47e0 (36 bytes): the same for the track grid.
     static void RegisterTrackGrid(const CTrackCell* grid, int32_t cellSize);
-    // Unit w146 (src/CellBase.cpp, unit w179, 0x100f49fc, 836 bytes): the 0x24 bytes both cells share; the serialisers of the cells ignore its answer.
+    // Unit w146 (src/game/park/CellBase.cpp, unit w179, 0x100f49fc, 836 bytes): the 0x24 bytes both cells share; the serialisers of the cells ignore its answer.
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);
 
-    // Unit w139 (src/CellBase.cpp, unit w179): the map cell a cell stands for. 0x100f4928 (68 bytes, the CONST one: asks CWorldSavvy::GetMap on
+    // Unit w139 (src/game/park/CellBase.cpp, unit w179): the map cell a cell stands for. 0x100f4928 (68 bytes, the CONST one: asks CWorldSavvy::GetMap on
     // the cell) and 0x100f49a0 (44 bytes, reads gWorldMap). A cell with the id 0 lands one cell before the grid.
     const CMapCell* GetMapCellEquiv() const;
     CMapCell* GetMapCellEquiv();
-    // Unit w144 (src/CellBase.cpp, unit w179): 0x100f48c4 (48 bytes), the track cell a cell stands for.
+    // Unit w144 (src/game/park/CellBase.cpp, unit w179): 0x100f48c4 (48 bytes), the track cell a cell stands for.
     CTrackCell* GetTrackCellEquiv();
-    // Unit w141 (0x100816e8 and 0x10081930 translated in src/CellBase.cpp, unit w179; the asm keeps the low byte), 0x100f4844 (the CONST overload).
+    // Unit w141 (0x100816e8 and 0x10081930 translated in src/game/park/CellBase.cpp, unit w179; the asm keeps the low byte), 0x100f4844 (the CONST overload).
     uint8_t GetNeighbours() const;
     uint8_t GetDirection() const;
     const CTrackCell* GetTrackCellEquiv() const;
 
-    // Unit w179 (src/CellBase.cpp). The neighbour byte the next four use is the hoarding mask (+0x22) when the cell system's flag byte
+    // Unit w179 (src/game/park/CellBase.cpp). The neighbour byte the next four use is the hoarding mask (+0x22) when the cell system's flag byte
     // (gLLCC4818) is nonzero and mKind is 2, else mNeighbours (+0xc), as RemoveNeighbour.
     void ModifyNeighbours(uint8_t mask);        // 0x10081608 (60 bytes): ORs the mask in
     int32_t NumberOfNeighbours() const;         // 0x10081744 (152 bytes): the set bits of the byte

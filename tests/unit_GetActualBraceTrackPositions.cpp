@@ -1,6 +1,6 @@
 // Test library for the track editor's brace placement (unit v5562; libtpw_unit_GetActualBraceTrackPositions.dylib,
 // tests/test_GetActualBraceTrackPositions.py), main app:
-//   src/GetActualBraceTrackPositions.cpp   GetActualBraceTrackPositions, GetActualBraceTangents, GetTangentLengths, gBraceTrackScale2
+//   src/game/rides/CoasterPylon.cpp   GetActualBraceTrackPositions, GetActualBraceTangents, GetTangentLengths, gBraceTrackScale2
 //
 // The callees outside the unit are fakes that record what the real ones read: YRotateLMatrixNoTrans, the two vector rotation functions
 // (they answer from the test's queues) and GetTangentsFromZVector. The globals of other files the unit reads are defined here.

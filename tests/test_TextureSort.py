@@ -1,5 +1,5 @@
-"""The texture cache's sorting and lists, and CQSort (engine library, src/tb_texturecache_sort.cpp
-and src/tb_qsort.cpp): CQSort's eight sorts (ulAsc, ulDes, pulAsc, pfDes, each with the three
+"""The texture cache's sorting and lists, and CQSort (engine library, src/engine/TextureCache.cpp
+and src/engine/QSort.cpp): CQSort's eight sorts (ulAsc, ulDes, pulAsc, pfDes, each with the three
 argument core and the six argument entry point), CTextureCache::Textures_QSort, Textures_QSortFree,
 SortTextures, Entry_QSortInit, SortEntries, SortByCriteria, SortByAddress, MergeListsConditional
 and CreateNonWrappingTextureList.

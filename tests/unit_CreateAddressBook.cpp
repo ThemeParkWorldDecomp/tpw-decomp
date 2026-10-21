@@ -1,5 +1,5 @@
 // Test library for the address book panel (unit v5012; libtpw_unit_CreateAddressBook.dylib, tests/test_CreateAddressBook.py), main app:
-//   src/ui_Postcard_panel_CreateAddressBook.cpp   CreateAddressBook, RemoveAddressBookEntry, NewEntryInAddressBook and the globals they own.
+//   src/game/ui/ui_Postcard.cpp   CreateAddressBook, RemoveAddressBookEntry, NewEntryInAddressBook and the globals they own.
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues; the globals of other
 // files (gPostcardPanel, gUserInfo, gOnlineSystem, gText) are defined here. The constructors of classes whose bases are not linked are

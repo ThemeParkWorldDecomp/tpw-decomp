@@ -1,5 +1,5 @@
 """Unit v5372, LoadCoasters (reads the coasters of a park file), against libtpw_unit_LoadCoasters.dylib (tests/unit_LoadCoasters.cpp), main app
-("SimTheme Park"), src/LoadCoasters.cpp:
+("SimTheme Park"), src/game/rides/TPCoaster.cpp:
   LoadCoasters 0x10044d68
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian, 4-byte

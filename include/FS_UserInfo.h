@@ -1,7 +1,7 @@
-// FS_UserInfo.cpp (main app 0x1017de54..0x1017fdc8; src/FS_UserInfo.cpp): the four player
+// FS_UserInfo.cpp (main app 0x1017de54..0x1017fdc8; src/game/save/FS_UserInfo.cpp): the four player
 // login slots and the paths of the players' folders. PARTIAL: the start-up path is
 // translated, and (units w43, w48) GameLogin, SaveGlobalMasterSave and the creating and deleting of
-// users (src/FS_login.cpp, src/FS_UserInfo_slots.cpp); only GameLogout is not yet.
+// users (src/game/save/FS_MasterSave.cpp, src/game/save/FS_UserInfo.cpp); only GameLogout is not yet.
 #pragma once
 #include <cstdint>
 
@@ -40,7 +40,7 @@ public:
     TbDynamicStringTemplate<char16_t> ReturnUsersPath();            // 0x1017f7f4: the logged-in slot's
     TbDynamicStringTemplate<char16_t> ReturnUsersPathWithTheme();   // 0x1017f858: <users path>:<current theme>
     TbDynamicStringTemplate<char16_t> ReturnOnlinePath();           // 0x1017f980: <save>:online
-    // unit w48 (src/FS_UserInfo_slots.cpp), 0x1017ee38: a slot that holds a player loses the player's folder; then the slot
+    // unit w48 (src/game/save/FS_UserInfo.cpp), 0x1017ee38: a slot that holds a player loses the player's folder; then the slot
     // takes the name and the easy mode flag, the player's folders are made, the global master save is replaced by a blank one
     // (easy mode user when the flag is not 0) and written to the player's folder.
     void CreateNewGameLoginUserInSlot(EFSUserInfoGameUser slot, const TbDynamicStringTemplate<char16_t>& name,
@@ -48,14 +48,14 @@ public:
     // unit w48, 0x1017f0b8: the folder `path`, a folder of every theme under it, and (easy mode) the park's easymode file
     // copied from the data folder into each theme's folder where there is one.
     void CreateUsersDirectories(const TbDynamicStringTemplate<char16_t>& path, int32_t easyMode);
-    void GameLogin(EFSUserInfoGameUser slot);  // 0x1017f330, src/FS_login.cpp (unit w43)
+    void GameLogin(EFSUserInfoGameUser slot);  // 0x1017f330, src/game/save/FS_UserInfo.cpp (unit w43)
     void GameLogout();                         // 0x1017f61c, untranslated
-    // unit w47, translated by unit w48 (src/FS_UserInfo_slots.cpp), 0x1017ed10: removes the slot's folder, its name and easy flag.
+    // unit w47, translated by unit w48 (src/game/save/FS_UserInfo.cpp), 0x1017ed10: removes the slot's folder, its name and easy flag.
     void DeleteGameLoginUserInSlot(EFSUserInfoGameUser slot);
 
     // unit w43
     void SaveGlobalMasterSave();   // 0x1017fa50
-    // unit w48 (src/FS_UserInfo_slots.cpp), 0x1017fab0: writes the global master save (made when there is none) to the slot's
+    // unit w48 (src/game/save/FS_UserInfo.cpp), 0x1017fab0: writes the global master save (made when there is none) to the slot's
     // folder, file gms.dat.
     void InternalSaveGlobalMasterSave(EFSUserInfoGameUser slot);
 

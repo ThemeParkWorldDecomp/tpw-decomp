@@ -1,6 +1,6 @@
 // Test library for the city list's LoggedInGetList and CompleteGetList (unit v5215; libtpw_unit_CFSOnlineSystemList_LoggedInGetList.dylib,
 // tests/test_CFSOnlineSystemList_LoggedInGetList.py), main app:
-//   src/CFSOnlineSystemList_LoggedInGetList.cpp   the two functions, and the two hooks (callback caller, city record deleter)
+//   src/game/online/FS_OnlineList.cpp   the two functions, and the two hooks (callback caller, city record deleter)
 //
 // The callees are recording fakes: AddUIError, CFSOnlineSystem's constructor, Logout, Instance, ReturnConnectionToCityServer, the info
 // destructor, the three virtual slots (a test subclass), and the two hooks. gOnlineSystem is defined here.

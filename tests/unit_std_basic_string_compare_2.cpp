@@ -1,6 +1,6 @@
 // Test library for the std::basic_string<char> members compare / substring constructor / append (unit v5146;
 // libtpw_unit_std_basic_string_compare_2.dylib, tests/test_std_basic_string_compare_2.py), main app:
-//   src/std_basic_string_compare_2.cpp   msl_char_string::compare, construct, append; the global gMslCharNul
+//   src/game/MslSupport.cpp   msl_char_string::compare, construct, append; the global gMslCharNul
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record: operator new / new[] (the size; arena memory
 // that is zeroed), __throw (checksums of the type name and message, the labels of the vtable and destructor vector, the counter),

@@ -1,6 +1,6 @@
 // Test library for the keytable actions win_ticket_7/8/9, enter_hoarding_mode, force_ride_breakdown, park_attraction_value (unit v5296;
 // libtpw_unit_enter_hoarding_mode.dylib, tests/test_enter_hoarding_mode.py), main app:
-//   src/ui_Postcard_panel_win_ticket_1_show_person_history_info_enter_hoarding_mode.cpp
+//   src/game/keyboard.cpp
 //
 // The callees outside the unit are recording fakes; the globals of other files are defined here.
 #include <cstddef>

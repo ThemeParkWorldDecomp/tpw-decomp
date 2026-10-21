@@ -1,4 +1,4 @@
-"""Differential tests for unit w152, the park analyser's shop and sideshow superlatives (src/ParkAnalyser_shops.cpp). See difftest.py and tpwtest.py.
+"""Differential tests for unit w152, the park analyser's shop and sideshow superlatives (src/game/park/analyser.cpp). See difftest.py and tpwtest.py.
 
 The twelve CParkAnalyser::GetShopWith{Best,Worst}{Value,Satisfaction} (with a ShopType, and without one), GetSideshowWith{Best,Worst}Value and
 GetSideshowWith{Best,Worst}Satisfaction. Every callee is a fake that records the same event on both sides (GAME_ASSERTMSG, the world accessor and its

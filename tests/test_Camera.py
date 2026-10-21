@@ -1,4 +1,4 @@
-"""Differential test for src/TPCamera_handle.cpp and src/rsse_orientation.cpp (main app, unit w135): HandleCamera 0x1003491c (the park
+"""Differential test for src/game/TPCamera.cpp and src/game/LMatrix.cpp (main app, unit w135): HandleCamera 0x1003491c (the park
 camera's frame) and SetLMatrixOrientationHi 0x100c1db4, against libtpw_unit_Camera.dylib.
 
 Real on both sides: the external-camera branch of HandleCamera (a 0x80 in gFirstPersonFlags), SetMatrixIdentity 0x100c0e28,

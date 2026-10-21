@@ -1,5 +1,5 @@
 // Test library for COnlineParser::ParseReply, ParseLast, ParseShout, ParseEmote, ParseEmoteTell (unit v5891), main app:
-//   src/COnlineParser_ParseGoto_COnlineParser_ParseReply_2.cpp
+//   src/game/online/OnlineParser.cpp
 //
 // The callees (string constructors and destructors, Argument, the vector push_back, CParser::GetString and GetRemainingString) are
 // recording fakes; the global gOnlineParserInitialText is defined here.

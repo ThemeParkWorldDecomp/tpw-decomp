@@ -1,5 +1,77 @@
 # Unit w37c: the edit box, its handler, timer start and client mouse routing.
 # Rectangles, window text and the default handler are real. UI boundaries record in the test library.
-set(TPW_UNIT_UIEditBox src/InterfaceEditBox.cpp src/ui_editbox_handler.cpp src/InterfaceTimer_start.cpp
-    src/InterfaceWindow_mouse.cpp src/InterfaceWindow_font.cpp src/InterfaceWindow_draw.cpp src/UI_Base.cpp platform/msl.cpp)
+set(TPW_UNIT_UIEditBox src/game/ui/InterfaceDrawEngine.cpp src/game/ui/InterfaceEditBox.cpp
+    src/game/ui/InterfaceTimer.cpp src/game/ui/InterfaceWindow.cpp src/game/ui/CoolRect.cpp src/game/ui/CoolRegion.cpp
+    src/game/ui/UI_Base.cpp platform/msl.cpp)
+set(TPW_UNIT_UIEditBox_KEEP
+  __Z13UI_hash_cakesPKcj   # UI_hash_cakes(char const*, unsigned int)
+  __Z16NearestCharToPosP19InterfaceDrawObjectiii   # NearestCharToPos(InterfaceDrawObject*, int, int, int)
+  __Z19UI_SetRealScreenRezss   # UI_SetRealScreenRez(short, short)
+  __Z24UI_DefaultWindowCallbackP15InterfaceWindowiii   # UI_DefaultWindowCallback(InterfaceWindow*, int, int, int)
+  __Z25UI_DefaultEditBoxCallbackP15InterfaceWindowiii   # UI_DefaultEditBoxCallback(InterfaceWindow*, int, int, int)
+  __ZN10CoolRegion5ShiftEss   # CoolRegion::Shift(short, short)
+  __ZN10CoolRegion6AdjustEssss   # CoolRegion::Adjust(short, short, short, short)
+  __ZN10CoolRegion6MiddleEPsS0_   # CoolRegion::Middle(short*, short*)
+  __ZN10CoolRegion7PointInEss   # CoolRegion::PointIn(short, short)
+  __ZN10CoolRegionD1Ev   # CoolRegion::~CoolRegion()
+  __ZN10CoolRegioneqERS_   # CoolRegion::operator==(CoolRegion&)
+  __ZN14InterfaceTimer4StopEv   # InterfaceTimer::Stop()
+  __ZN14InterfaceTimer5StartEv   # InterfaceTimer::Start()
+  __ZN15InterfaceWindow10BringToTopEv   # InterfaceWindow::BringToTop()
+  __ZN15InterfaceWindow10ClientDrawEv   # InterfaceWindow::ClientDraw()
+  __ZN15InterfaceWindow11GetPositionEP8CoolRects   # InterfaceWindow::GetPosition(CoolRect*, short)
+  __ZN15InterfaceWindow11HandleScaleEssss   # InterfaceWindow::HandleScale(short, short, short, short)
+  __ZN15InterfaceWindow11SetFontJustEii   # InterfaceWindow::SetFontJust(int, int)
+  __ZN15InterfaceWindow11SetFontWrapEii   # InterfaceWindow::SetFontWrap(int, int)
+  __ZN15InterfaceWindow11SetPositionEP8CoolRect   # InterfaceWindow::SetPosition(CoolRect*)
+  __ZN15InterfaceWindow11doAnimFrameEv   # InterfaceWindow::doAnimFrame()
+  __ZN15InterfaceWindow13SetFontColourEiiii   # InterfaceWindow::SetFontColour(int, int, int, int)
+  __ZN15InterfaceWindow13ShiftPositionEss   # InterfaceWindow::ShiftPosition(short, short)
+  __ZN15InterfaceWindow13getExtraParamEs   # InterfaceWindow::getExtraParam(short)
+  __ZN15InterfaceWindow13setExtraParamEsPv   # InterfaceWindow::setExtraParam(short, void*)
+  __ZN15InterfaceWindow16CheckClientMouseEiii   # InterfaceWindow::CheckClientMouse(int, int, int)
+  __ZN15InterfaceWindow16DrawReverseOrderEv   # InterfaceWindow::DrawReverseOrder()
+  __ZN15InterfaceWindow17SetClientDrawTextEPDs   # InterfaceWindow::SetClientDrawText(char16_t*)
+  __ZN15InterfaceWindow19GetOriginalPositionEP8CoolRect   # InterfaceWindow::GetOriginalPosition(CoolRect*)
+  __ZN15InterfaceWindow6DrawMeEv   # InterfaceWindow::DrawMe()
+  __ZN15InterfaceWindow7SetFontEP13InterfaceFont   # InterfaceWindow::SetFont(InterfaceFont*)
+  __ZN15InterfaceWindow7SetTextEPDs   # InterfaceWindow::SetText(char16_t*)
+  __ZN15InterfaceWindow7setZRotEs   # InterfaceWindow::setZRot(short)
+  __ZN15InterfaceWindow8SetValueEi   # InterfaceWindow::SetValue(int)
+  __ZN16InterfaceEditBox10ClientDrawEv   # InterfaceEditBox::ClientDraw()
+  __ZN16InterfaceEditBox10MoveCursorEsss   # InterfaceEditBox::MoveCursor(short, short, short)
+  __ZN16InterfaceEditBox12DrawFunctionEv   # InterfaceEditBox::DrawFunction()
+  __ZN16InterfaceEditBox12LockOutMouseEb   # InterfaceEditBox::LockOutMouse(bool)
+  __ZN16InterfaceEditBox13GetCurrentLenEv   # InterfaceEditBox::GetCurrentLen()
+  __ZN16InterfaceEditBox14CalcClientAreaEv   # InterfaceEditBox::CalcClientArea()
+  __ZN16InterfaceEditBox17SetStaticTextAreaEPDsi   # InterfaceEditBox::SetStaticTextArea(char16_t*, int)
+  __ZN16InterfaceEditBox18SetUnAcceptedCharsEPDs   # InterfaceEditBox::SetUnAcceptedChars(char16_t*)
+  __ZN16InterfaceEditBox19SetCursorDrawObjectEP19InterfaceDrawObject   # InterfaceEditBox::SetCursorDrawObject(InterfaceDrawObject*)
+  __ZN16InterfaceEditBox4EditEs   # InterfaceEditBox::Edit(short)
+  __ZN16InterfaceEditBox7KeydownEsi   # InterfaceEditBox::Keydown(short, int)
+  __ZN16InterfaceEditBox7SetTextEPDs   # InterfaceEditBox::SetText(char16_t*)
+  __ZN16InterfaceEditBox8_SetTextEPDsb   # InterfaceEditBox::_SetText(char16_t*, bool)
+  __ZN16InterfaceEditBox9SelectAllEv   # InterfaceEditBox::SelectAll()
+  __ZN16InterfaceEditBoxD1Ev   # InterfaceEditBox::~InterfaceEditBox()
+  __ZN8CoolRect14RectIntersectsEPS_   # CoolRect::RectIntersects(CoolRect*)
+  __ZN8CoolRect3GetEPsS0_S0_S0_   # CoolRect::Get(short*, short*, short*, short*)
+  __ZN8CoolRect3SetEssss   # CoolRect::Set(short, short, short, short)
+  __ZN8CoolRect5ShiftEss   # CoolRect::Shift(short, short)
+  __ZN8CoolRect6AdjustEssss   # CoolRect::Adjust(short, short, short, short)
+  __ZN8CoolRect6MiddleEPsS0_   # CoolRect::Middle(short*, short*)
+  __ZN8CoolRect7GetDimsEPsS0_   # CoolRect::GetDims(short*, short*)
+  __ZN8CoolRect7PointInEss   # CoolRect::PointIn(short, short)
+  __ZN8CoolRectC1Essss   # CoolRect::CoolRect(short, short, short, short)
+  __ZN8CoolRectC1Ev   # CoolRect::CoolRect()
+  __ZN8CoolRectD1Ev   # CoolRect::~CoolRect()
+  _gUIAutoRedraw
+  _gUIButtons
+  _gUIDoubleClickTime
+  _gUIHelpTextResult
+  _gUIHighPresets
+  _gUIRealScreenHeight
+  _gUIRealScreenWidth
+  _gUIUnitWidth
+  _gUIWideAspect
+)
 set(TPW_UNIT_UIEditBox_OWN_CALLLOG ON)

@@ -1,6 +1,6 @@
 // Test library for COnlineControl's avatar moves, chat text and contact lookups (unit v5285; libtpw_unit_COnlineControl_CreateVisitor.dylib,
 // tests/test_COnlineControl_CreateVisitor.py), main app:
-//   src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_CreateVisitor.cpp
+//   src/game/online/online.cpp
 //
 // The callees outside the unit are fakes that record what the real one reads and answer from the test's queues. The globals of other files
 // (gGameWorld, gMasterSave, gUIInterface) are defined here, zero at start like the Mac's bss.
@@ -92,7 +92,7 @@ void* OperatorNew(uint32_t size) {
     return reinterpret_cast<void*>(static_cast<uintptr_t>(ret("new")));
 }
 
-// The handle table (defined in src/COnlineControl_COnlineControl.cpp for the program; this library does not compile that file).
+// The handle table (defined in src/game/online/online.cpp for the program; this library does not compile that file).
 static const void* gHandles[65536];
 static uint32_t gHandleCount;
 

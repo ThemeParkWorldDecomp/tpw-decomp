@@ -1,5 +1,5 @@
 """Unit w163, the script interpreter's core, against libtpw_unit_ScriptInterp.dylib (tests/unit_ScriptInterp.cpp), main app
-("SimTheme Park"), src/ScriptInterp.cpp:
+("SimTheme Park"), src/game/Script.cpp, src/game/ScriptOps.cpp:
   AssignSlot 0x100d8630, InitScript 0x100d8768, DoScript 0x100d88b4, SCR_Error 0x100d8740, SCR_Push 0x100d8cdc, SCR_Pop 0x100d8d34,
   SCR_SpawnScript 0x100d924c, SCR_SetScriptPosition 0x100d932c, SCR_GetScriptPosition 0x100d93b8, SCR_SetVariable 0x100d9514,
   SCR_SetFloatVariable 0x100d95a0, SCR_SetServiceInterval 0x100d9630, SCR_WhichScriptHasThisSprite 0x100da7e0, ESP_InitScript 0x100da008,

@@ -1,4 +1,4 @@
-"""LbDraw_GetClipRect (bullfrog 0x1002b554, src/bfl_lbdraw_leaves.cpp; unit w45b), against libtpw_unit_LbDrawGetClipRect.dylib
+"""LbDraw_GetClipRect (bullfrog 0x1002b554, src/bullfrog/LbDraw.cpp, src/bullfrog/LbDrawText.cpp, src/bullfrog/LbRect.cpp; unit w45b), against libtpw_unit_LbDrawGetClipRect.dylib
 (tests/unit_LbDrawGetClipRect.cpp). The function (8 bytes) answers the address of the clip rectangle, the library's word at
 0x10074860 (_lbCurrentClipRect). The ltms font render method reads the clip through it (CalculateSourceRect and DrawChar).
 

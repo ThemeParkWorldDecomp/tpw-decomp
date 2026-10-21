@@ -1,8 +1,8 @@
 // Test library for the island lobby's controller, the global master save and the ride names (libtpw_unit_IslandLobby.dylib; see
-// tests/test_IslandLobby.py): src/UI_IslandLobby.cpp (CreateIslandLobbyController, ShowIslandLobbyController, UpdateIslandLobbyUI,
-// UpdateIslandLobbyKeyDisplay, EnableIslandLobbyButtons, UpdateOutboxMailIcon), src/FS_MasterSave_global.cpp (the global master
-// save, the park record, the park balance table's two virtual members), src/RideDB_names.cpp (the name builder and the ride
-// database's GetTypeName) and src/InterfaceWindow_frame.cpp (SetFrame), all of unit w32. Real under them: the bullfrog strings (the
+// tests/test_IslandLobby.py): src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_onlineOutbox.cpp (CreateIslandLobbyController, ShowIslandLobbyController, UpdateIslandLobbyUI,
+// UpdateIslandLobbyKeyDisplay, EnableIslandLobbyButtons, UpdateOutboxMailIcon), src/game/save/FS_MasterSave.cpp (the global master
+// save, the park record, the park balance table's two virtual members), src/game/rides/RideDB.cpp, src/game/save/SaveLoad.cpp (the name builder and the ride
+// database's GetTypeName) and src/game/ui/InterfaceWindow.cpp (SetFrame), all of unit w32. Real under them: the bullfrog strings (the
 // theme map's keys), the 16-bit C library (swprintf, wcslen, wcsncpy) and the rectangles.
 //
 // Everything else is a fake that records through calllog: the window toolkit (Build, GetWindow, Show, GetPosition, the setters,
@@ -322,7 +322,7 @@ int32_t TbITable::FormatString(char16_t* out, uint32_t size, uint32_t id, ...) c
     return static_cast<int32_t>(count);
 }
 
-// (the real array is src/ui_main.cpp's, which this library does not link)
+// (the real array is src/game/ui/ui_main.cpp's, which this library does not link)
 char16_t gUIMainConvertBuffer[0x4000];
 
 extern "C" {

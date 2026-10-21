@@ -1,5 +1,5 @@
-// Fakes for the engine's frame (src/tb_map_render.cpp, src/tb_meshdelay.cpp, src/tb_fpu.cpp,
-// src/tb_loadsurface.cpp; tests/test_MapRender.py). Every callee outside the unit records
+// Fakes for the engine's frame (src/engine/Gamut.cpp, src/engine/MapWho.cpp, src/engine/Mesh.cpp, src/engine/EngineUtil.cpp,
+// src/engine/CsTexture.cpp; tests/test_MapRender.py). Every callee outside the unit records
 // its arguments (objects by label, floats by bit pattern) and answers from the case's queues
 // (calllog.h); some also record the state the call order matters for (the flag words, the
 // list being prepared, the view matrix). The PowerPC side records the same events.
@@ -426,7 +426,7 @@ int32_t CSky::Render() {
     ev("SkyRender", {lab(this)});
     return static_cast<int32_t>(ret("SkyRender", 1));
 }
-CMapZoom::CMapZoom() {}    // the real one (src/tb_mapzoom_class.cpp) is outside this unit
+CMapZoom::CMapZoom() {}    // the real one (src/engine/tb_mapzoom.cpp) is outside this unit
 CMapZoom::~CMapZoom() {}
 int32_t CMapZoom::Prepare() {
     ev("ZoomPrepare", {lab(this)});
@@ -436,7 +436,7 @@ int32_t CMapZoom::Execute() {
     ev("ZoomExecute", {lab(this)});
     return static_cast<int32_t>(ret("ZoomExecute", 1));
 }
-CStarfield::~CStarfield() {}   // the real one (src/tb_starfield_frame.cpp) is outside this unit
+CStarfield::~CStarfield() {}   // the real one (src/engine/tb_starfield.cpp) is outside this unit
 int32_t CStarfield::Prepare() {
     ev("StarPrepare", {lab(this)});
     return 1;

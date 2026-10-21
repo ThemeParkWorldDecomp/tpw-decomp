@@ -1,5 +1,5 @@
 """Unit v5753, two status panel window handlers, against libtpw_unit_ViewWindowCallback.dylib (tests/unit_ViewWindowCallback.cpp), main app,
-src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_ViewWindowCallback.cpp:
+src/game/ui/ui_StatusPanel.cpp:
   ViewWindowCallback 0x10193bac, StatusPanelTitleMsg 0x10193e7c
 
 A case is a world and a call, built by one piece of Python code in both memories. The callees outside the unit (getExtraParam,

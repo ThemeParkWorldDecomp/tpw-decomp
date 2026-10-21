@@ -1,7 +1,7 @@
 // Test library for SetRideMobile (unit v5306; libtpw_unit_SetRideMobile.dylib, tests/test_SetRideMobile.py), main app:
-//   src/TPEngine_SetRideMobile.cpp   SetRideMobile
+//   src/game/rides/TPRide.cpp   SetRideMobile
 //
-// No callees. gRideAnimSets (defined in src/RideTypes.cpp, not compiled here) is defined here.
+// No callees. gRideAnimSets (defined in src/game/rides/TPRide.cpp, not compiled here) is defined here.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

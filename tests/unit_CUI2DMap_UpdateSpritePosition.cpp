@@ -1,6 +1,6 @@
 // Test library for the map panel's sprite position, coaster tracks and grid details (unit v5200; libtpw_unit_CUI2DMap_UpdateSpritePosition.dylib,
 // tests/test_CUI2DMap_UpdateSpritePosition.py), main app:
-//   src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition.cpp   CUI2DMap::UpdateSpritePosition, DrawCoasterTracks,
+//   src/game/ui/ui_2dmap.cpp   CUI2DMap::UpdateSpritePosition, DrawCoasterTracks,
 //   StoreMapGridDetails, and the globals gUI2DMapGridThingListEnd and gUI2DMapColourTable.
 //
 // The callees outside the unit are fakes that record what the real ones read: the sprite's SetPosition and SetScale, the CDraw object, the coaster

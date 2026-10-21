@@ -1,5 +1,5 @@
 """Unit v5970, the coaster track's Bezier and alignment helpers, against libtpw_unit_GetAlignmentParamsQuick.dylib
-(tests/unit_GetAlignmentParamsQuick.cpp), main app ("SimTheme Park"), src/TPConfig_bend_GetAlignmentParamsQuick.cpp:
+(tests/unit_GetAlignmentParamsQuick.cpp), main app ("SimTheme Park"), src/game/rides/CoasterSpline.cpp:
   BezierPosition 0x1004da98, BezierTangent 0x1004dc00, GetAlignmentParamsQuick 0x1004de98, GetBankParams 0x1004e04c,
   GetAlignmentParamsSlow 0x1004e230
 

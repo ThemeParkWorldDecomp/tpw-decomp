@@ -1,10 +1,10 @@
 """Unit w27: the cursor classes and the picture loader, against libtpw_unit_CursorClasses.dylib (tests/unit_CursorClasses.cpp).
 
 Main app ("SimTheme Park"):
-  src/ui_cursor_classes.cpp  InterfaceBFCursor::~InterfaceBFCursor, GetVisible, Show, Hide, Use
-  src/ui_DrawObject.cpp      InterfaceCursor (ten members) and CursorTable (six), unit w21's translation, tested again here
+  src/game/ui/InterfaceBFCursor.cpp  InterfaceBFCursor::~InterfaceBFCursor, GetVisible, Show, Hide, Use
+  src/game/ui/InterfaceCursor.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceDrawObject.cpp      InterfaceCursor (ten members) and CursorTable (six), unit w21's translation, tested again here
 The bullfrog library ("bullfrog symbols shared"):
-  src/bfl_graphicfile.cpp    TbRenderArea (eight members), TbGraphicFileLoader (seven), TbTGALoader (five), _TgaGLL (seven),
+  src/bullfrog/AndyGLL.cpp, src/bullfrog/LbDrawText.cpp, src/bullfrog/Lbgfsave.cpp, src/bullfrog/TbRenderArea.cpp    TbRenderArea (eight members), TbGraphicFileLoader (seven), TbTGALoader (five), _TgaGLL (seven),
                              and, needed by them and not on the first list, _AndyGLL::DoRead and WriteLine and
                              LbPalette_FromCompact
 
@@ -58,7 +58,7 @@ WAD_OPEN, BUFFERED_OPEN, MEM_ALLOC, MEM_FREE, SURFACE_AREA = 0x1000CC48, 0x10049
 RECT_INTERSECTION, RECT_EMPTY = 0x10029AD0, 0x10029CD4
 CONV_CTOR, CONV_INIT, CONV_BUF, CONV_RELEASE = 0x10016B10, 0x10016B4C, 0x10016E5C, 0x10016FF4
 WAD_FILE_VTABLE, GLL_VTABLE = 0x10073038, 0x10072EB4
-# the pixel formats the static initialiser fills (src/TbPixFmt.cpp)
+# the pixel formats the static initialiser fills (src/bullfrog/TbPixFmt.cpp)
 FORMATS = {0x10073ED0: (0, 0, 0, 0, 8, 1), 0x10073EB8: (0x7C00, 0x3E0, 0x1F, 0, 16, 0), 0x10073EA0: (0xFF0000, 0xFF00, 0xFF, 0, 24, 0),
            0x10073E88: (0xFF0000, 0xFF00, 0xFF, 0xFF000000, 32, 0)}
 # the words the library compares its results with: 0, and -1 for the one in ReadNextLine (that comparison is written the other way round)

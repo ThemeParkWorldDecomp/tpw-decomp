@@ -1,4 +1,4 @@
-// The advisor message (unit w180, src/MsgAdvisor.cpp): CMsgAdvisor (type 5) carries one CAdvisorRequest to the advisor through the message
+// The advisor message (unit w180, src/game/ui/MessageCentre.cpp, src/game/park/GoldenTickets.cpp): CMsgAdvisor (type 5) carries one CAdvisorRequest to the advisor through the message
 // centre; CGoldenTicketControl::TellIfFirst makes two of them. Like CMsgWeather (include/ThingMessages.h) it has the constructor, GetType and
 // destructor of CMsgDeath: the Mac's destructor only stores the vtable and, for a positive (signed 16 bit) delete flag, calls operator delete. The
 // Mac vtables (base 0x102a10ec, CMsgAdvisor 0x102a09a4) are never used by the host. The receiver, CAdvisor::ReceiveMessage (0x1000c874), is untranslated.

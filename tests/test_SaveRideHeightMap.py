@@ -1,4 +1,4 @@
-"""Unit v5644, SaveRideHeightMap 0x1005e6a0 (src/RideDestroy_LoadFileIntoMemory_SaveRideHeightMap.cpp), against
+"""Unit v5644, SaveRideHeightMap 0x1005e6a0 (src/game/park/TPHField.cpp), against
 libtpw_unit_SaveRideHeightMap.dylib (tests/unit_SaveRideHeightMap.cpp).
 
 A case builds a height map (12 header words, width and height as two 16-bit halves at +8, source pointers at +0xc, +0x10, +0x14, any of them

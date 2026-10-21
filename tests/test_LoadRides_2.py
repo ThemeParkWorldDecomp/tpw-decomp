@@ -1,5 +1,5 @@
 """Unit v5890, LoadRides (the rides module of a save), against libtpw_unit_LoadRides_2.dylib (tests/unit_LoadRides_2.cpp), main app
-("SimTheme Park"), src/RestoreAnimTime_LoadRides_2.cpp:
+("SimTheme Park"), src/game/rides/TPRide.cpp:
   LoadRides 0x1006b878
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (the shared build): in emulator memory at the Mac's

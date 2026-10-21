@@ -1,5 +1,5 @@
 // Test library for the ride commands on the bump world (unit v51036; libtpw_unit_BMP_SetRideDuration.dylib, tests/test_BMP_SetRideDuration.py), main app:
-//   src/BMP_FixRide_BMP_CountTrackSections_BMP_SetRideDuration.cpp   the ride commands, the bump and buoy starts, the Hoardings sinit
+//   src/game/balance/HoardingsBalance.cpp, src/game/rides/BumperRide.cpp   the ride commands, the bump and buoy starts, the Hoardings sinit
 //
 // TRACE, CBalanceTable::Init and __register_global_object are fakes that record what the real ones read. The world list (0x102b56c0)
 // and the two hoardings tables are defined here (the program's definitions are in files this library does not compile).

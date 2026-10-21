@@ -51,7 +51,7 @@ public:
     int32_t Close();                             // 0x1002707c
     // `count` 16-byte vertices of scratch space, or NULL when it is used up.
     uint8_t* GetVertexBufferPtr(int32_t count);  // 0x100271a8
-    // Draws what is in the pools and has not been drawn yet (src/tb_rendermemory_execute.cpp);
+    // Draws what is in the pools and has not been drawn yet (src/engine/RenderMemory.cpp);
     // 0 on failure. The records not yet drawn (flag 0x10) are listed by number, the static ones
     // after CDrawPrimitive::ExecutePrimitiveIfInstant has had its go at them, the list is
     // sorted (renderer 4: the records whose blending mode has 0x1000 first, by texture, then the

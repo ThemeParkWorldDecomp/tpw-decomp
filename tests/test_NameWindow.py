@@ -1,5 +1,5 @@
 """Unit v5539, NameWindow and TankButton of the research panel, against libtpw_unit_NameWindow.dylib (tests/unit_NameWindow.cpp), main app
-("SimTheme Park"), src/DoScroll_NameWindow.cpp and src/CreateResearchPanel_RideMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_researchPanel.cpp:
   NameWindow 0x101b3da8, TankButton 0x101b4224
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

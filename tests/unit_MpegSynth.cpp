@@ -1,6 +1,6 @@
 // Test entry points for unit w71b, the second half of the MPEG audio decoder (libtpw_unit_MpegSynth.dylib, driven by
-// tests/test_MpegSynth.py). The program under test is "sound symbols shared". The library links src/TbMpegSynth.cpp (PolySynth,
-// dct64, WRITE_SAMPLE, Decode_Layer2, II_step_two, II_step_twoMMX and the tables) with src/TbMpegBase.cpp (part 1: GetBits,
+// tests/test_MpegSynth.py). The program under test is "sound symbols shared". The library links src/sound/MpegDecode.cpp (PolySynth,
+// dct64, WRITE_SAMPLE, Decode_Layer2, II_step_two, II_step_twoMMX and the tables) with src/sound/FileAccess.cpp, src/sound/LbMpeg.cpp, src/sound/MpegDecode.cpp (part 1: GetBits,
 // the header code, Decode, Read ...) and has NO fakes: every callee is real on both sides, so the PCM that Read writes for a
 // stream can be compared short by short with the original's. The object is loaded from a "Mac image" and written back as one
 // exactly as in unit_MpegBase.cpp (same layout, same conventions: the pool link is not used here).

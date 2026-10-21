@@ -1,6 +1,6 @@
 // Test library for the advisor's message receiver (unit v5631; libtpw_unit_CAdvisor_ReceiveMessage.dylib,
 // tests/test_CAdvisor_ReceiveMessage.py), main app:
-//   src/AdvisorQueue_CAdvisor_ReceiveMessage.cpp   CAdvisor::ReceiveMessage (0x1000c874)
+//   src/game/advisor/Advisor.cpp   CAdvisor::ReceiveMessage (0x1000c874)
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues: the request constructor
 // (it also fills the request from the queues), TheScoring (the original's inline guard: on a clear guard byte it records the scoring's

@@ -1,5 +1,5 @@
 // Test library for COnlineControl's chat commands (unit v5023; libtpw_unit_COnlineControl_Locate.dylib, tests/test_COnlineControl_Locate.py), main app:
-//   src/COnlineControl_COnlineControl_COnlineControl_Locate.cpp   Locate, Page, Goto, BlackMark, BuddyOn
+//   src/game/online/online.cpp   Locate, Page, Goto, BlackMark, BuddyOn
 //
 // The callees (strings, Argument, the argument vector, the buddy map's find, DoCommand) are fakes that record what the real ones read and
 // write marker words into the objects they build, so that the right object reaching the right call shows in the log.

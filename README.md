@@ -8,6 +8,8 @@ compile back to the same machine code, it is meant to compute the same results. 
 original by a differential test, which runs the original PowerPC code in an emulator beside the C++ build and compares the
 results, memory writes and calls case by case.
 
+![functions translated](https://img.shields.io/badge/functions_translated-100.00%25-2d9f4f) ![bytes translated](https://img.shields.io/badge/bytes_translated-100.00%25-2d9f4f)
+
 Progress: 9184 functions translated and tested (100.00% of the five programs' functions), 2743.6 KB of code (100.00% of the bytes).
 
 This is a reference: there is no launcher, no platform layer and no fix of the game's bugs here. The playable port, which
@@ -82,12 +84,13 @@ what the game computes:
 
 ## Layout
 
-    src/          the translation, one or more of the game's functions per file (each names its original address)
+    src/          the translation, one file per original source file of the game (src/FILES.md lists them; each
+                  function names its original address)
     include/      the game's classes and structures as the translation uses them
     platform/     the few host files the tests link (the arena, the C library's helpers, the pixel unpacker)
     tests/        the differential tests: difftest.py, ppcemu.py (the emulator harness), test_*.py, unit_*.cpp, shim_*.cpp
-    cmake/units/  the source list of each test's library
-    devtools/     gen_game_tables.py, mutate.py, hfsdump.py, wad.py
+    cmake/units/  the source list of each test's library, with the definitions it builds for real (its keep list)
+    devtools/     gen_game_tables.py, mutate.py, slicer.py (the per-test copies of the src files), hfsdump.py, wad.py
 
 ## See also
 

@@ -1,4 +1,4 @@
-// Fakes for the mesh object's per-frame members (src/tb_mesh_frame.cpp; tests/test_MeshFrame.py).
+// Fakes for the mesh object's per-frame members (src/engine/DirectDraw.cpp, src/engine/Mesh.cpp, src/engine/RenderList.cpp; tests/test_MeshFrame.py).
 //
 // Real: CMesh::Prepare, Preprocess, PreprocessTextures, StaticCalculateLights, ColorVertices,
 // DotProduct, and CsTexture::GetTextureEntry (inline). Everything else they call records its

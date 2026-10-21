@@ -1,6 +1,6 @@
-// Test library for unit w177 (libtpw_unit_BankScripts.dylib, tests/test_BankScripts.py), main app: src/BankAccount_loans.cpp (eleven CBankAccount members),
-// src/ChallengeBalance.cpp (the destructor and two virtuals of CChallengeBalance) and src/DelayedScript.cpp (CDelayedScript and its ScriptIdx LOADVAR /
-// SAVEVAR instances). gMainBalance is the real storage (src/MainBalance.cpp). Every other callee is a fake that records the same event as the PowerPC
+// Test library for unit w177 (libtpw_unit_BankScripts.dylib, tests/test_BankScripts.py), main app: src/game/park/BankAccount.cpp (eleven CBankAccount members),
+// src/game/park/ChallengeHQ.cpp (the destructor and two virtuals of CChallengeBalance) and src/game/DelayedScript.cpp (CDelayedScript and its ScriptIdx LOADVAR /
+// SAVEVAR instances). gMainBalance is the real storage (src/game/balance/MainBalance.cpp). Every other callee is a fake that records the same event as the PowerPC
 // side's stub.
 //
 // The worlds are not blocks of their Mac size: only the 0x80 bytes at world + 0x1da6f0 are real memory (gTail), and a world pointer is that block's
@@ -82,7 +82,7 @@ std::string Hex(const void* data, uint32_t size) {
 
 }  // namespace
 
-// ---- The unit's globals and the script code array (883 words, defined here: src/ScriptCheckTable.cpp is not linked)
+// ---- The unit's globals and the script code array (883 words, defined here: src/game/Script.cpp is not linked)
 CWorld* gWorld;
 CWorld* gGameWorld;
 CSaveLoad gSaveLoad;

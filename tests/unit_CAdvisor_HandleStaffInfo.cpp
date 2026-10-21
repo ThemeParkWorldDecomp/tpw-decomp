@@ -1,6 +1,6 @@
 // Test library for CAdvisor::HandleStaffInfo and CAdvisor::Serialise (unit v5223; libtpw_unit_CAdvisor_HandleStaffInfo.dylib,
 // tests/test_CAdvisor_HandleStaffInfo.py), main app:
-//   src/AdvisorQueue_CAdvisor_HandleStaffInfo.cpp
+//   src/game/advisor/Advisor.cpp
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues: CTRACE, the
 // CAdvisorRequest constructor (fills the request from the queue "req"), CAdvisorScoring::GetMessageCategory, TheScoring (the lazy

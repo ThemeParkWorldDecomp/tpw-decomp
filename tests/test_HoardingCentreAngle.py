@@ -1,4 +1,4 @@
-"""Unit v5646, HoardingCentreAngle 0x1005f8c4, against libtpw_unit_HoardingCentreAngle.dylib, src/LevelSystems_GenerateHoardingMeshes_HoardingCentreAngle.cpp.
+"""Unit v5646, HoardingCentreAngle 0x1005f8c4, against libtpw_unit_HoardingCentreAngle.dylib, src/game/park/TPHoardings.cpp.
 
 A case is (x, y, side, halfWidth, halfHeight). The callees atan2 and fmod (glue imports) are the C library's on both sides (math.atan2,
 math.fmod on the PowerPC fake; std:: on the host). Compared: the float answer's bits. No fused operations. Not tested: a side outside

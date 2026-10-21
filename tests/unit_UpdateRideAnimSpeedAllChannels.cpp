@@ -1,6 +1,6 @@
 // Test library for the ride animation leaves, the fly accessors, the ride pointers, Debug.cpp, the keyboard actions and the static
 // initialisers (unit v51077; libtpw_unit_UpdateRideAnimSpeedAllChannels.dylib, tests/test_UpdateRideAnimSpeedAllChannels.py), main app:
-//   src/advisor_leaves_UpdateRideAnimSpeedAllChannels.cpp
+//   src/game/Debug.cpp, src/game/keyboard.cpp, src/game/online/lobby_globe.cpp, src/game/online/lobby_island.cpp, src/game/online/lobby_screen.cpp, src/game/park/GoldenTickets.cpp, src/game/rides/FlyingRide.cpp, src/game/rides/RideAnim.cpp, src/game/rides/TPRide.cpp, src/game/save/BlockSave.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read: the two string constructors (the object and a
 // hash of the text), __register_global_object (the object, which destructor, the node), ShowCityLobbyController, UIInterface::EndCoasterEdit

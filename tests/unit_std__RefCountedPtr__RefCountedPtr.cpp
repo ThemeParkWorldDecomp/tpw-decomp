@@ -1,5 +1,5 @@
 // Test library for unit v51035 (libtpw_unit_std__RefCountedPtr__RefCountedPtr.dylib, tests/test_std__RefCountedPtr__RefCountedPtr.py), ltms:
-//   src/TbUniStringVTag_TbIntegerVTag_Format_std__RefCountedPtr__RefCountedPtr.cpp
+//   src/ltms/TbVTag.cpp
 //
 // Fakes: operator new, operator delete, the message destructor 0x10008a10 and swprintf, each recording what the real one reads.
 #include <cstddef>
@@ -16,7 +16,7 @@
 
 using namespace calllog;
 
-// The real tear_down lives in src/ltms_textformatter.cpp, whose link chain is too large for this library; this copy
+// The real tear_down lives in src/ltms/TbTextFormatter.cpp, whose link chain is too large for this library; this copy
 // uses the same operator delete fake (LengthErrorOperatorDelete) the unit's other tests record.
 template <>
 void MslVector<CLineInfo>::tear_down() {

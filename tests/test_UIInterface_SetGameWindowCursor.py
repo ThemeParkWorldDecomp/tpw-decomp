@@ -1,5 +1,5 @@
 """Unit v5574, UIInterface::SetGameWindowCursor and PostLevelLoad, against libtpw_unit_UIInterface_SetGameWindowCursor.dylib
-(tests/unit_UIInterface_SetGameWindowCursor.cpp), main app, src/UI_pump_UIInterface_SetGameWindowCursor.cpp:
+(tests/unit_UIInterface_SetGameWindowCursor.cpp), main app, src/game/ui/UIInterface.cpp:
   UIInterface::SetGameWindowCursor 0x101efa54, UIInterface::PostLevelLoad 0x101f0124
 
 A case is a world and a call. Callees (UI_SetGameWindowCursor, InterfaceWindow::setCursor, UI_ClearSelected, UI_BankruptAfterLoad,

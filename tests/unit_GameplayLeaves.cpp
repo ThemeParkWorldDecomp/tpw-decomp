@@ -1,4 +1,4 @@
-// Test library for the leaves of src/gameplay_leaves.cpp (unit v5L07; libtpw_unit_GameplayLeaves.dylib,
+// Test library for the leaves of src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/SkirtDeform.cpp, src/game/ui/ui_staffPanel.cpp (unit v5L07; libtpw_unit_GameplayLeaves.dylib,
 // tests/test_GameplayLeaves.py): CellIsRide, LocatorByeByeKid, CObject::IsCoaster and CAdvisor::FinalDestroy.
 // The staff panels' thing and the ride database (raw storage under its symbol name) are defined here;
 // RemoveSlideoutPanel, CRideDatabase::GetRideInfo and CThing::FinalDestroy are fakes that record.

@@ -1,5 +1,5 @@
 // PARTIAL ltms class. The constructors, the destructor (0x10002400, the key function: the vtable is emitted by
-// src/tb_fontrenderparams.cpp) and UseAlphaWriteMode are in that file (ltms 0x10002350, 0x10002400, 0x100024ac,
+// src/ltms/TbFontRenderParams.cpp) and UseAlphaWriteMode are in that file (ltms 0x10002350, 0x10002400, 0x100024ac,
 // 0x1000296c); the unit libraries that only fake the class define their own constructor and destructor.
 #pragma once
 #include <cstdint>
@@ -21,18 +21,18 @@ public:
     TbFontRenderParams(const TbFontRenderParams& other);
     virtual ~TbFontRenderParams();                             // 0x10002400: releases the font
     TbError UseAlphaWriteMode();                               // 0x1000296c
-    // Unit w35a (src/ltms_fontrender.cpp). Each answers 0, or -1 when the font is missing or lacks the capability.
+    // Unit w35a (src/ltms/TbFontRenderParams.cpp). Each answers 0, or -1 when the font is missing or lacks the capability.
     TbError UseReColour(const TbColour& colour);               // 0x10002800: needs a font with caps bit 2
     TbError UsePreColoured();                                  // 0x10002888: needs a font with caps bit 1
     TbError SetFont(TbIFont* font);                            // 0x100029d0: always 0
     // GetFont takes a reference on the font it answers and nobody lets it go (CreateInfoList leaks one per call).
-    // All of these are in src/ltms_fontrender.cpp (operator=, UseTexture, UseBlendedMode, GetStyle and GetType: unit w45a).
+    // All of these are in src/ltms/TbFontRenderParams.cpp (operator=, UseTexture, UseBlendedMode, GetStyle and GetType: unit w45a).
     TbFontRenderParams& operator=(const TbFontRenderParams& other);   // 0x100025e8: copies the words, takes a reference on the font
     // 0x10002718: a font with caps bit 2 (value 4): the render area and the point are copied in, the style becomes 2; else -1.
     TbError UseTexture(const TbRenderArea& area, const TbPoint& point);
     TbError UseBlendedMode();                                  // 0x100028f8: a font with caps bit 3 (value 8): the blend word becomes 1; else -1
     int32_t GetStyle() const;                                  // 0x10002ab8: the word at +0xc
-    TbIFont* GetFont() const;                                  // 0x10002af4 (src/ltms_fontrender.cpp, unit w44)
+    TbIFont* GetFont() const;                                  // 0x10002af4 (src/ltms/TbFontRenderParams.cpp, unit w44)
     int32_t GetType() const;                                   // 0x10002b70: the font's type, 5 without a font
     // Opaque logical slots from +0x04..0x4f (original size 0x50). Some hold
     // pointers, so native slots must be wide enough for them. The slots by their Mac offsets:

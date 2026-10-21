@@ -1,11 +1,11 @@
 // Test library for the hoarding edit (unit w206; libtpw_unit_HoardingEdit.dylib, tests/test_HoardingEdit.py), main app:
-//   src/LLCellSystem_hoardedit.cpp  LLCC_FillInsideOfPark and LLCC_IsHoardingEditLegal
-//   src/TrackCell_isflag.cpp, src/MapCell_kinds.cpp  CTrackCell::IsFlag and CMapCell::UnSetFlag, IsWater, IsFreeform
-//   src/TrackCell_flags.cpp, src/MapCell_flags.cpp (unit w201), src/TrackCell_shape.cpp (unit w204), src/CellBase.cpp, src/TrackCell.cpp, src/MapDelta.cpp
+//   src/game/park/LLCellSystem.cpp  LLCC_FillInsideOfPark and LLCC_IsHoardingEditLegal
+//   src/game/park/TrackCell.cpp, src/game/park/MapCell.cpp  CTrackCell::IsFlag and CMapCell::UnSetFlag, IsWater, IsFreeform
+//   src/game/park/TrackCell.cpp, src/game/park/MapCell.cpp (unit w201), src/game/park/TrackCell.cpp (unit w204), src/game/park/CellBase.cpp, src/game/buildings/TrainingCentre.cpp, src/game/park/MapDelta.cpp
 //   (landed): the flag and kind tests, the neighbour counts, the cell equivalents, GetNeighbouringCell of the track cell and the compass offsets
 // Every other callee is a fake that records the event the PowerPC stub records (a cell is named by its index in its block, never by its address). The
 // globals of other files are defined here, and so are the four tiny callees that run for real on the PowerPC side: OPPOSITE, CMap::IsXYValid,
-// MapDelta::operator* and CMapCell::GetNeighbouringCell (the host copies their bodies from src/MapDelta_map.cpp).
+// MapDelta::operator* and CMapCell::GetNeighbouringCell (the host copies their bodies from src/game/park/MapDelta.cpp).
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
@@ -30,7 +30,7 @@
 
 using namespace calllog;
 
-// ---- globals of other files (src/LLCellSystem.cpp's words, src/LLCellSystem_hoarding.cpp's extents, the recorder and the balance)
+// ---- globals of other files (src/game/park/LLCellSystem.cpp's words, src/game/park/LLCellSystem.cpp's extents, the recorder and the balance)
 CWorld* gGameWorld;
 CWorld* gWorld;
 CMap* gWorldMap;
@@ -46,7 +46,7 @@ char* gWorldStore;               // the world block (gGameWorld, gWorld and gWor
 alignas(16) char gBankStore[16];   // the token the fake CWorld::GetBankAccount hands out
 }
 
-// ---- the small callees that run for real on the PowerPC side: bodies as in src/MapDelta_map.cpp (0x10102500, 0x101012f4, 0x101037d0, 0x101036b0)
+// ---- the small callees that run for real on the PowerPC side: bodies as in src/game/park/Map.cpp, src/game/park/MapDelta.cpp (0x10102500, 0x101012f4, 0x101037d0, 0x101036b0)
 uint8_t OPPOSITE(uint8_t d) {
     if (d == 0) return 0;
     if (d < 0x10) return static_cast<uint8_t>((d << 4) & 0xf0);

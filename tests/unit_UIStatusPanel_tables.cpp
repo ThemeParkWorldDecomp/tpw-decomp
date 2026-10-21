@@ -1,5 +1,5 @@
 // Test library for the status panels' tables (unit v5L31; libtpw_unit_UIStatusPanel_tables.dylib, tests/test_UIStatusPanel_tables.py):
-//   src/ui_StatusPanel_tables.cpp   UIStatusPanelTable and the nine XxxStatusPanelTable
+//   src/game/ui/ui_StatusPanel.cpp   UIStatusPanelTable and the nine XxxStatusPanelTable
 //
 // Every member a table names is a fake recording its Mac address, its panel and its argument, so the test can call each slot through
 // the table (UIStatusPanel_CallSlot, as the base's members do) and compare the member reached with the one the Mac's vtable names.

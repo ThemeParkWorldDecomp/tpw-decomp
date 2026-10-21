@@ -1,5 +1,5 @@
 """Unit v5272, the light-node helpers, against libtpw_unit_SetLightColourExplicit.dylib (tests/unit_SetLightColourExplicit.cpp), main app
-("SimTheme Park"), src/LevelSystems_SetLightColourExplicit.cpp:
+("SimTheme Park"), src/game/TPLevel.cpp:
   SetLightColourExplicit 0x1006498c, EnableLight 0x10064ab8, SetLightColourRelative 0x10064854, DisableLight 0x10064b30
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory (big-endian, 4-byte pointers)

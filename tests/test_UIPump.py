@@ -1,14 +1,14 @@
 """Differential tests for the interface's message pump, against libtpw_unit_UIPump.dylib (tests/unit_UIPump.cpp):
 
-  src/UI_pump.cpp   UIInterface::Process, ProcessUI, UI_DispatchMessages, UI_DispatchDrawMessages,
+  src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/UIInterface.cpp, src/game/ui/UI_Base.cpp, src/game/ui/ui_ErrorDisplay.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_main.cpp   UIInterface::Process, ProcessUI, UI_DispatchMessages, UI_DispatchDrawMessages,
                     UI_DispatchDeferredMessages, UI_SendOnFrameMessages, onframe, UI_SendMessage, UI_ServiceAllTimers, UI_AddTimer,
                     IveGotTicks, InterfaceMessageQueue::Post, Peek, GetNumQd, InterfaceTimedMessages::Process,
                     InterfaceWindow::CallWindowHandler, AmIGettingDestroyed, GetChild, GetNext, GetAttr, UI_GetHighestZ,
                     UI_PostcardPending, TickUIErrors
 
-Real on both sides: those, and under them the window constructor (src/InterfaceWindow.cpp), the queues' Add, Flush and
-Initialise, UI_PostMessage and UI_FlushAllMessages (src/UI_init.cpp), the rectangles (src/UI_Base.cpp), the UI globals
-(src/UI_focus.cpp). Fakes that record the same event on both sides: the four window handlers and the default one, the two peek
+Real on both sides: those, and under them the window constructor (src/game/ui/InterfaceWindow.cpp), the queues' Add, Flush and
+Initialise, UI_PostMessage and UI_FlushAllMessages (src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp), the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp), the UI globals
+(src/game/ui/UI_Base.cpp). Fakes that record the same event on both sides: the four window handlers and the default one, the two peek
 callbacks, the clock, highestZ, UI_DialogBox with the strings it is given, the mutex, UI_ActuallyDoPostcard, the assertion.
 
 The world: twelve windows in a forest (made with the original constructor, then linked, given attributes, handlers and

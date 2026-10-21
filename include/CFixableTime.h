@@ -1,5 +1,5 @@
 // CFixableTime, the game clock's fixed-step mode (main app, Game.cpp range): UseFixedTime,
-// CancelFixedTime, NextFrame and ReadFixableTime at 0x101479c0..0x10147b58 (src/GameClock.cpp).
+// CancelFixedTime, NextFrame and ReadFixableTime at 0x101479c0..0x10147b58 (src/game/FixableTime.cpp).
 // Its state is CSaveableTime's mFixedFlag..mFixedAdjustment (0x2c..0x38), so it is an empty
 // base of CSaveableTime here and its members reach the state through that class; `this` is
 // the CSaveableTime, as in the original (GameSys.cpp calls it on gClock.mTime).

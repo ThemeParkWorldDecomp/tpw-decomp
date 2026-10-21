@@ -1,5 +1,5 @@
 """Unit v51108, the keyboard cheat actions, against libtpw_unit_open_park.dylib (tests/unit_open_park.cpp), main app
-("SimTheme Park"), src/ui_Postcard_panel_spawn_handyman_WeatherUpLots_open_park.cpp:
+("SimTheme Park"), src/game/keyboard.cpp:
   open_park, normal_speed_time, close_park, WeatherReset, FPSDisplayToggle, complete_all_research, uncomplete_all_research,
   create_arrival_vehicle, populate_park, start_bankruptcy_sequence, spawn_mechanic, spawn_researcher, spawn_guard, get_doshed_up,
   snapshot, continuous_snapshot, togglegamewindow, togglehud, mainmenu, Screen_BuyObject.

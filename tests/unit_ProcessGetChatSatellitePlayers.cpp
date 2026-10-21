@@ -1,6 +1,6 @@
 // Test library for the lobby's chat satellite (unit v5226; libtpw_unit_ProcessGetChatSatellitePlayers.dylib,
 // tests/test_ProcessGetChatSatellitePlayers.py), main app:
-//   src/ProcessGetChatSatellitePlayers.cpp   ChatServerCallbackFn, ProcessGetChatSatellitePlayers, WorldLobbyControllerMsg and the
+//   src/game/ui/ui_worldLobbyController.cpp   ChatServerCallbackFn, ProcessGetChatSatellitePlayers, WorldLobbyControllerMsg and the
 //                                            six chat satellite globals
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The virtual calls

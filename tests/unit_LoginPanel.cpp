@@ -1,11 +1,11 @@
-// Test library for unit w39, the login panel (libtpw_unit_LoginPanel.dylib; see tests/test_LoginPanel.py): src/ui_loginpanel.cpp
-// (CreateLoginPanel, FillLoginNames, UI_TITLE_COLOUR, UIMain_GetString), src/InterfaceWindow_font.cpp (SetFont, SetFontJust,
-// SetFontColour, setExtraParam, SetClientDrawText and the virtual SetText) and src/keytables_disable.cpp (DisableAllKeytables).
+// Test library for unit w39, the login panel (libtpw_unit_LoginPanel.dylib; see tests/test_LoginPanel.py): src/game/ui/ui_main.cpp, src/game/ui/ui_playerLogin.cpp, src/game/ui/ui_utils.cpp
+// (CreateLoginPanel, FillLoginNames, UI_TITLE_COLOUR, UIMain_GetString), src/game/ui/InterfaceWindow.cpp (SetFont, SetFontJust,
+// SetFontColour, setExtraParam, SetClientDrawText and the virtual SetText) and src/game/keyboard.cpp (DisableAllKeytables).
 //
 // Real under them, so that CreateLoginPanel builds the panel the way the game does (the window tree is compared with the original's):
-// the login panel's script (src/ui_loginpanel_data.cpp), the script interpreter (src/InterfaceWindow_script.cpp), the control factory and
-// constructors (src/ui_controls_create.cpp, src/InterfaceButton.cpp, src/ui_controls_small.cpp, src/ui_cool_shapes.cpp), the window
-// constructor (src/InterfaceWindow.cpp), WhatAmI and CalcClientArea (src/ui_whatami.cpp) and the rectangles (src/UI_Base.cpp).
+// the login panel's script (src/game/ui/ui_playerLogin.cpp), the script interpreter (src/game/ui/InterfaceWindow.cpp), the control factory and
+// constructors (src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/CoolRegion.cpp), the window
+// constructor (src/game/ui/InterfaceWindow.cpp), WhatAmI and CalcClientArea (src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp) and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp).
 //
 // Everything else is a fake that records through calllog: Show, the message senders, the pointer, the draw object library (a draw
 // object per hash) and the draw objects (Change, with the part of the change its flags select, and Show), the title text object's
@@ -212,7 +212,7 @@ void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
 }
 void* operator new[](std::size_t size, const std::nothrow_t&) noexcept { return operator new[](size); }
 
-// ---- the window's untranslated members. CalcClientArea and WhatAmI are src/ui_whatami.cpp's, SetText is the unit's.
+// ---- the window's untranslated members. CalcClientArea and WhatAmI are src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp's, SetText is the unit's.
 void InterfaceWindow::DrawFunction() {}
 InterfaceWindow::~InterfaceWindow() { ev("Window.dtor", {lab(this)}); }
 void InterfaceWindow::ClientDraw() {}
@@ -231,7 +231,7 @@ int32_t InterfaceWindow::Show(int16_t on) {
     if (ret("ShowDropsUserInfo") != 0) gUserInfo = nullptr;
     return 1;
 }
-// The first child with that id (src/InterfaceWindow_show.cpp's, which is not linked; it records nothing).
+// The first child with that id (src/game/ui/InterfaceWindow.cpp's, which is not linked; it records nothing).
 InterfaceWindow* InterfaceWindow::GetWindow(int32_t id) {
     for (InterfaceWindow* child = mChild; child != nullptr; child = child->mNext)
         if (child->mId == id) return child;

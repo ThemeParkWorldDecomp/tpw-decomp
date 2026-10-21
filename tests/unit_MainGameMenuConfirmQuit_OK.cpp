@@ -1,6 +1,6 @@
 // Test library for the main menu's quit answer, item callback and fade, and CFSLoadSave::SaveInternal / GetFirstSaveFileDetails
 // (unit v5958; libtpw_unit_MainGameMenuConfirmQuit_OK.dylib, tests/test_MainGameMenuConfirmQuit_OK.py), main app:
-//   src/ui_iterators_MainGameMenuConfirmPublish_OK_MainGameMenuConfirmQuit_OK.cpp
+//   src/game/save/FS_LoadSave.cpp, src/game/ui/ui_mainmenu.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read (the name and the arguments, objects as labels) and answer
 // from the test's queues. The strings carry a token in their text pointer (a 32-bit number the fakes mix: an append mixes the two

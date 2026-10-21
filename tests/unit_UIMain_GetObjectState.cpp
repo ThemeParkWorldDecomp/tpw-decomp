@@ -1,5 +1,5 @@
 // Test library for UIMain_GetObjectState (unit v5694; libtpw_unit_UIMain_GetObjectState.dylib, tests/test_UIMain_GetObjectState.py), main app:
-//   src/ui_main_panel_UIMain_GetObjectState.cpp   UIMain_GetObjectState
+//   src/game/ui/ui_main.cpp   UIMain_GetObjectState
 //
 // The callees outside the unit are recording fakes that answer from the test's queues; the globals of other files the unit reads are defined
 // here, zero at start like the Mac's bss.

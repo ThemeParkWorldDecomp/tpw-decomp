@@ -1,5 +1,5 @@
 """Unit v5253, std::basic_string<char> of the Metrowerks library, against libtpw_unit_std_basic_string_basic_string.dylib
-(tests/unit_std_basic_string_basic_string.cpp), main app, src/TPMain_std_basic_string_basic_string.cpp:
+(tests/unit_std_basic_string_basic_string.cpp), main app, src/game/MslSupport.cpp:
   basic_string(const char*, alloc) 0x10002338, ~basic_string 0x1000221c, init 0x10002b8c, assign(n, c) 0x100730e8, resize 0x10073558,
   basic_string(alloc) 0x1007363c, assign(text, n) 0x101b2440, append(text, n) 0x1020100c
 

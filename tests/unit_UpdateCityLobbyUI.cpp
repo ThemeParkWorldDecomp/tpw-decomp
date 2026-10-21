@@ -1,5 +1,5 @@
 // Test library for the city lobby controller (unit v5189; libtpw_unit_UpdateCityLobbyUI.dylib, tests/test_UpdateCityLobbyUI.py), main app:
-//   src/UI_IslandLobby_msg_sinit_ui_cityLobbyController_cpp_UpdateCityLobbyUI.cpp   UpdateCityLobbyUI, CreateCityLobbyController,
+//   src/game/ui/ui_cityLobbyController.cpp   UpdateCityLobbyUI, CreateCityLobbyController,
 //                                                                                    CityLobbyControllerMsg, gCityLobbyWindow, gCityLobbyScript
 //
 // The callees outside the unit are fakes that record the arguments the real ones read (labels for objects) and answer from the case's queues:

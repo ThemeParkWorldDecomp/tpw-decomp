@@ -1,6 +1,6 @@
 // Test library for the hoardings balance file writers and the static objects of LLCellSystem.cpp (unit w208; libtpw_unit_HoardingWrite.dylib,
 // tests/test_HoardingWrite.py), main app:
-//   src/LLCellSystem_hoardwrite.cpp   LLCC_WriteHoardingsLine, LLCC_WriteHoardingsToBalanceFile, LLCC_WriteCompleteHoardingsToBalanceFile, and
+//   src/game/park/LLCellSystem.cpp   LLCC_WriteHoardingsLine, LLCC_WriteHoardingsToBalanceFile, LLCC_WriteCompleteHoardingsToBalanceFile, and
 //                                     the definitions that stand for __sinit_LLCellSystem_cpp (the file, seven strings, nine offsets, two words)
 //
 // The callees outside the unit are recording fakes with the same event names and arguments as the module's PowerPC stubs: the string members,

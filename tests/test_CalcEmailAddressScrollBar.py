@@ -1,5 +1,5 @@
 """Unit v5017, the online outbox panel's helpers, against libtpw_unit_CalcEmailAddressScrollBar.dylib
-(tests/unit_CalcEmailAddressScrollBar.cpp), main app ("SimTheme Park"), src/UI_IslandLobby_CalcEmailAddressScrollBar.cpp:
+(tests/unit_CalcEmailAddressScrollBar.cpp), main app ("SimTheme Park"), src/game/ui/ui_onlineOutbox.cpp:
   FillOutboxList 0x101e378c, SetCurrentEmailInfo 0x101e3960, CalcEmailAddressScrollBar 0x101e3aac, UpdatePreview 0x101e3c94
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

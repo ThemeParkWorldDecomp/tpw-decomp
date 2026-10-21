@@ -1,11 +1,11 @@
 """Differential tests for the start of the interface, against libtpw_unit_UIStart.dylib
 (tests/unit_UIStart.cpp):
 
-  src/TPAdvisor.cpp      the text file reader (7 functions)
-  src/UI_Base.cpp        CoolRegion, CoolRect, UI_hash_cakes
-  src/ui_DrawObject.cpp  InterfaceCursor, CursorTable, InterfaceDrawObject, DrawObjectLibrary,
+  src/game/TextureTable.cpp      the text file reader (7 functions)
+  src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp        CoolRegion, CoolRect, UI_hash_cakes
+  src/game/ui/InterfaceCursor.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceDrawObject.cpp  InterfaceCursor, CursorTable, InterfaceDrawObject, DrawObjectLibrary,
                          the engine mesh objects' constructors, destructors and Show
-  src/ui_main_meshes.cpp TPResource_AddFrameMesh/SliderMesh/MeshDrawObject, LoadAllUIMeshes,
+  src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_main.cpp TPResource_AddFrameMesh/SliderMesh/MeshDrawObject, LoadAllUIMeshes,
                          LoadLocalisedUIMeshes, InitGeneralUI, UIInterface::InitGeneral, the
                          clock tick objects
 

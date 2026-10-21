@@ -1,8 +1,8 @@
 """Differential tests for highestZ and InterfaceListControl2::GetZOfEntries (unit w50), against libtpw_unit_UIHighestZ.dylib
 (tests/unit_UIHighestZ.cpp):
 
-  src/UI_Base_highestz.cpp   highestZ 0x101ca6dc (and its three static words)
-  src/ui_controls_small.cpp  InterfaceListControl2::GetZOfEntries 0x101d518c
+  src/game/ui/UI_Base.cpp   highestZ 0x101ca6dc (and its three static words)
+  src/game/ui/CoolRegion.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp  InterfaceListControl2::GetZOfEntries 0x101d518c
 
 Real on both sides: those two, the rectangles (CoolRect constructor, destructor, RectIntersects, Adjust) and InterfaceWindow::GetPosition
 (0x101db884), GetChild, GetNext and GetAttr (0x101dbac4, 0x101dbb38, 0x101dbb70). On the PowerPC side the windows are built by hand in

@@ -1,5 +1,5 @@
 """Unit v5759, GetPylonUnderCursor, against libtpw_unit_GetPylonUnderCursor.dylib (tests/unit_GetPylonUnderCursor.cpp), main app
-("SimTheme Park"), src/LinkPreviewBrace_GetPylonUnderCursor.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   GetPylonUnderCursor 0x1003f848
 
 A case is a world and a call. The world is built by ONE piece of Python code through small per-side primitives: in emulator memory

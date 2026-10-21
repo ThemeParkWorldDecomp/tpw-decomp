@@ -1,7 +1,7 @@
 // Fakes and test entry points for unit w79f, the audio object the game holds (libtpw_unit_AudioBody.dylib, driven by
 // tests/test_AudioBody.py in the program "sound symbols shared"; see calllog.h):
-//   src/TbAudioBody.cpp  TbAudioBody, CAudioComponentFactory, CreateAudioObject (the unit under test)
-// Real: the component chain (src/CAudioComponent.cpp), TbRefRelease (w78), the info and position records (w77) and the bullfrog
+//   src/sound/AudioComponent.cpp, src/sound/TbAudioBody.cpp, src/sound/TbSysCommand.cpp  TbAudioBody, CAudioComponentFactory, CreateAudioObject (the unit under test)
+// Real: the component chain (src/sound/AudioComponent.cpp), TbRefRelease (w78), the info and position records (w77) and the bullfrog
 // strings. Fakes, each recording what the original's callee is given (the PowerPC side records the same from its stubs):
 //   TbSoundManager (w79e) and the TbSoundCore under it (w79b): every member the body calls records and answers a queue; the
 //       manager is a fake so that every branch of the body is reachable (a real manager's Init always answers 0)
@@ -249,7 +249,7 @@ uint32_t CAudioPlaceHolder::GetClassID() { return 0; }
 
 // w79g1's real class holds a critical section and the priority array by value: the fake constructor gives the array no data (its
 // destructor then frees nothing) and the two small members of the critical section are defined here (the real ones are in
-// src/snd_handles.cpp, which this unit does not link).
+// src/sound/TbSoundCodecLoop.cpp, which this unit does not link).
 CAutoCriticalSection::CAutoCriticalSection() : mValue(0) {}
 CAutoCriticalSection::~CAutoCriticalSection() = default;
 CAudioPlaceHolderList::CAudioPlaceHolderList(uint32_t channels) : mPriorityList(nullptr) {

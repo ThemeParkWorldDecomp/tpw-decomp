@@ -1,4 +1,4 @@
-"""Unit v5754, TakeLoanOK 0x101a3ee0, against libtpw_unit_TakeLoanOK.dylib (tests/unit_TakeLoanOK.cpp), main app, src/ui_allKidsPanel_AllKidsPanelMsg_LoansPanelMsg_TakeLoanOK.cpp.
+"""Unit v5754, TakeLoanOK 0x101a3ee0, against libtpw_unit_TakeLoanOK.dylib (tests/unit_TakeLoanOK.cpp), main app, src/game/ui/ui_loansPanel.cpp.
 
 A case is the globals gGameWorld and gLoansPanel (small fake pointer values, never dereferenced), the loan parameter and the answers of the
 four callees (GetBankAccount, ApplyForLoan, GetWindow, FillLenderList), each a fake on both sides recording its arguments as raw values.

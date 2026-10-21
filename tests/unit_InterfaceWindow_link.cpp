@@ -1,5 +1,5 @@
 // Test library for unit v5981 (libtpw_unit_InterfaceWindow_link.dylib, tests/test_InterfaceWindow_link.py), main app:
-//   src/InterfaceWindow_draw_InterfaceWindow_link.cpp   InterfaceWindow::link, __sinit_ui_islandLobbyController_cpp,
+//   src/game/ui/InterfaceWindow.cpp, src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_onlineLogin.cpp, src/game/ui/ui_onlineOutbox.cpp   InterfaceWindow::link, __sinit_ui_islandLobbyController_cpp,
 //   LobbyOnlineLoginPanelDlgMsg, AdressesTextPanelMsg, read_JPEG_file
 //
 // Built with the port fix (unit v5L48), read_JPEG_file opens tpw::GamePathForReading of its path, a recording fake here.

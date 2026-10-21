@@ -1,4 +1,4 @@
-// Test library for src/HFieldTextures.cpp (see tests/test_HFieldTextures.py): the level
+// Test library for src/game/MeshLoad.cpp, src/game/TextureTable.cpp, src/game/park/TPHField.cpp (see tests/test_HFieldTextures.py): the level
 // height field's texture table, the mesh's texture arrays and the flatness marks.
 //
 // The unit's own code is HFieldTextures.cpp. The text reader of TPAdvisor.cpp (GetString

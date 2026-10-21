@@ -1,5 +1,5 @@
 // Test library for InterfaceTextBox::operator- (unit v5712; libtpw_unit_InterfaceTextBox_operator.dylib), main app:
-//   src/ui_handlers_small_InterfaceTextBox_operator.cpp
+//   src/game/ui/InterfaceTextBox.cpp
 //
 // The host window is an arena block whose vtable pointer is that of a Probe (same slot for WhatAmI as InterfaceWindow); the Probe's
 // WhatAmI records an event and answers the word the test put in mF144. wcscmp is a recording fake.

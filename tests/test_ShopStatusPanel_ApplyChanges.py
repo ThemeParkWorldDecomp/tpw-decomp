@@ -1,5 +1,5 @@
 """Unit v5734, the shop status panel's ApplyChanges, applytoallcallback and Show, against libtpw_unit_ShopStatusPanel_ApplyChanges.dylib
-(tests/unit_ShopStatusPanel_ApplyChanges.cpp), main app ("SimTheme Park"), src/ShopStatusPanel_InitWindow_ShopStatusPanel_ApplyChanges.cpp:
+(tests/unit_ShopStatusPanel_ApplyChanges.cpp), main app ("SimTheme Park"), src/game/ui/ui_shopStatus.cpp:
   ShopStatusPanel::ApplyChanges 0x101bd9bc, applytoallcallback 0x101bdab8, Show 0x101bdee0
 
 A case is a world and a call. The world is built twice by one piece of Python code. The callees outside the unit (the three CObject setters,

@@ -1,5 +1,5 @@
 // Test library for std::__cdeque<const void*>::insert (unit v51030; libtpw_unit_std___cdeque_insert_2.dylib, tests/test_std___cdeque_insert_2.py), main app:
-//   src/std___cdeque_insert_2.cpp   cdeque_callee::Insert; src/std___cdeque_iterator_operator_2.cpp supplies IterAdd (the original runs on the PowerPC side).
+//   src/game/MslSupport.cpp   cdeque_callee::Insert; src/game/MslSupport.cpp supplies IterAdd (the original runs on the PowerPC side).
 //
 // The callees outside the unit (strlen, operator new[], operator new, operator delete, strcpy, __throw, the iterator copy) are fakes that
 // record what the real one reads. __throw does not return on the Mac: the fake jumps out of the call, the PowerPC stub jumps to the epilogue.

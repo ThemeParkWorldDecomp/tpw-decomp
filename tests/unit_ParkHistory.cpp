@@ -1,5 +1,5 @@
 // Test library for the analyser's history rings and value templates (unit w157; libtpw_unit_ParkHistory.dylib, tests/test_ParkHistory.py), main app:
-//   src/ParkAnalyser_history.cpp   CHistory SetAtEnd, GetValue, HowFarBack, GetSumOfLast, GetAverageOfLast, SetFromTemp, GetHighestValue and
+//   src/game/park/analyser.cpp   CHistory SetAtEnd, GetValue, HowFarBack, GetSumOfLast, GetAverageOfLast, SetFromTemp, GetHighestValue and
 //                                  GetLowestValue (eight rings) and CParkAnalyserVal<int> Get and Set
 //
 // The only callee outside the unit is GAME_ASSERTMSG (a recording fake: the condition and the text). CTimeSig::SetTimeSig is the inline original; it

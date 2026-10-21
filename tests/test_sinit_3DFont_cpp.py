@@ -1,5 +1,5 @@
 """Unit v5109, the 3DFont.cpp static initialiser, against libtpw_unit_sinit_3DFont_cpp.dylib (tests/unit_sinit_3DFont_cpp.cpp), main app
-("SimTheme Park"), src/Light_sinit_3DFont_cpp.cpp:
+("SimTheme Park"), src/game/ui/3DFont.cpp:
   __sinit_3DFont_cpp 0x1000757c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code. The callees CLight::CLight, SetNormal, SetColor and

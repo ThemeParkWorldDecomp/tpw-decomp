@@ -1,5 +1,5 @@
 """Unit v5737, the WinScrn terminate / message / mode enumeration functions, against libtpw_unit_LbScreen_Terminate.dylib
-(tests/unit_LbScreen_Terminate.cpp), bullfrog, src/LbScreen_Initialise_LbScreen_Terminate.cpp:
+(tests/unit_LbScreen_Terminate.cpp), bullfrog, src/bullfrog/WinScrn.cpp:
   LbScreen_Terminate 0x10068b10, LbApp_ShowMessage 0x10068e54, LbScreen_GetDirectDraw 0x100687a8,
   LbScreen_ModeFindFirst 0x10068f70, LbScreen_ModeFindNext 0x10069024
 

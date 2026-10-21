@@ -1,5 +1,5 @@
 """Unit v5991, the online contacts panel's receive-string, list handler and buddy helpers, against libtpw_unit_OnlineReceiveString_2.dylib
-(tests/unit_OnlineReceiveString_2.cpp), main app ("SimTheme Park"), src/ContactsLCFormat_OnlineReceiveString_2.cpp:
+(tests/unit_OnlineReceiveString_2.cpp), main app ("SimTheme Park"), src/game/ui/ui_onlinePanel.cpp:
   OnlineReceiveString 0x101e7dd8, ContactListHandler 0x101e7854, _OnlineAddBuddy 0x101e839c, _OnlineRemoveBuddy 0x101e845c,
   _OnlineUpdateBuddy 0x101e8524
 

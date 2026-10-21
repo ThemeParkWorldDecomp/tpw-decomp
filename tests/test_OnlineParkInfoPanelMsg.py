@@ -1,5 +1,5 @@
 """Unit v5550, the online park info panel's messages and the park find panel, against libtpw_unit_OnlineParkInfoPanelMsg.dylib
-(tests/unit_OnlineParkInfoPanelMsg.cpp), main app ("SimTheme Park"), src/OnlineParkInfoPanelMsg.cpp:
+(tests/unit_OnlineParkInfoPanelMsg.cpp), main app ("SimTheme Park"), src/game/ui/ui_onlineParkFindPanel.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp:
   OnlineParkInfoPanelMsg 0x101ea7f0, GeneralParkDownloadCompleteCallback 0x101ea734, VisitParkPostDownloadCallbackFn 0x101ea684,
   __sinit_ui_onlineParkFindPanel_cpp 0x101ea5d8, UpdateParkFindPanelProgress 0x101ea4e4, RemoveOnlineParkFindPanel 0x101ea468
 

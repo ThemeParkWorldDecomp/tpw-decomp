@@ -1,4 +1,4 @@
-"""Differential test for src/HFieldTextures.cpp: the level height field's texture table
+"""Differential test for src/game/MeshLoad.cpp, src/game/TextureTable.cpp, src/game/park/TPHField.cpp: the level height field's texture table
 (BuildHFieldTextureTable, ParseLevelTCT, FreeHFieldTextureTable), the mesh's texture arrays
 (InterceptAndInsertM3D2Textures, ReplaceTextures) and DetermineHFieldFlatness, against
 libtpw_unit_HFieldTextures.dylib.

@@ -1,7 +1,7 @@
 // Fakes and test entry point for unit w79d, the SystemCommand Execute bodies of the sound library
 // (libtpw_unit_SoundCommands.dylib, driven by tests/test_SoundCommands.py in the program "sound symbols shared"; see calllog.h):
-//   src/snd_commands_execute.cpp  the fourteen functions under test (13 Execute bodies and SetSampleInfo::SetChannelInfo)
-// Real: the command constructors (w79b, src/snd_commands.cpp), the info records and positions (w77), the device-module base and
+//   src/sound/SystemCommand.cpp  the fourteen functions under test (13 Execute bodies and SetSampleInfo::SetChannelInfo)
+// Real: the command constructors (w79b, src/sound/AudioPlaceHolder.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSysCommand.cpp), the info records and positions (w77), the device-module base and
 // the handle values (w79a), the pipe base (w78) and CAudioComponentAccess's constructor (w79b).
 // Fakes, each recording what the original's callee is given (the PowerPC side records the same from its stubs):
 //   the access object (the core): GetSystemModule and GetSampleStore, and TbSoundCore::StopAndReleasePipe (w79b)

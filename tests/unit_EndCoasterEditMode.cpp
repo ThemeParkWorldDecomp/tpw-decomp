@@ -1,6 +1,6 @@
 // Test library for the coaster edit mode's end and its button enabling (unit v5538; libtpw_unit_EndCoasterEditMode.dylib,
 // tests/test_EndCoasterEditMode.py), main app:
-//   src/ui_coasteredit_kb_EndCoasterEditMode.cpp   EndCoasterEditMode, CoasterButtonsEnabled
+//   src/game/ui/ui_coasterPanel.cpp   EndCoasterEditMode, CoasterButtonsEnabled
 //
 // The callees outside the unit are fakes recording what the real ones read: RemoveSlideoutPanel, HandleCoasterButtonClick,
 // LLCC_SystemGetMode/SetMode, SetCoasterEdit, UIMain_DecideKbCapture, CMMDefault's constructor, CMouse::AssignMouseMode,

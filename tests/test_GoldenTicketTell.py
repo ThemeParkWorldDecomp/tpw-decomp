@@ -1,6 +1,6 @@
 """Unit w183 (main app), against libtpw_unit_GoldenTicketTell.dylib (tests/unit_GoldenTicketTell.cpp):
 
-  src/GoldenTicket_tell.cpp  CGoldenTicketControl::TellTheWorld, the local 0x100fcbb0, global 0x100fcf1c and secret 0x100fd4f4 overloads
+  src/game/park/GoldenTickets.cpp  CGoldenTicketControl::TellTheWorld, the local 0x100fcbb0, global 0x100fcf1c and secret 0x100fd4f4 overloads
 
 They run as the original on the PowerPC side (CMsgAdvisor's constructor 0x1015190c too) and as src/ on the host. Every other callee is a fake that
 records the same event on both sides: CTRACE (level, the integer arguments the format takes, the text), the advisor request's two constructors,

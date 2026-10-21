@@ -1,5 +1,5 @@
 // Test library for the ride commands (unit v5220; libtpw_unit_BMP_FixRide.dylib, tests/test_BMP_FixRide.py), main app:
-//   src/BMP_FixRide.cpp   BMP_HaltRide, BMP_BreakRide, BMP_FixRide, BMP_BeginRide
+//   src/game/rides/BumperRide.cpp   BMP_HaltRide, BMP_BreakRide, BMP_FixRide, BMP_BeginRide
 //
 // The callees outside the unit (TRACE, PAR_KillEmitter, PAR_InitEmitter, FlushDeferredAnim, SetCurRideAnim, SetControlType, BMP_DOCK,
 // BMP_CloseRide) are recording fakes. Objects are named in the log by their index (ride in the ride block, bump in the bump block, set in

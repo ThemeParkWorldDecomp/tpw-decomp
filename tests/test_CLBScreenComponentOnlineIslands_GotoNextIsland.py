@@ -1,5 +1,5 @@
 """Unit v5255, the online islands screen's small members, against libtpw_unit_CLBScreenComponentOnlineIslands_GotoNextIsland.dylib
-(tests/unit_CLBScreenComponentOnlineIslands_GotoNextIsland.cpp), main app, src/CLBScreenComponentOnlineIslands_GotoNextIsland.cpp:
+(tests/unit_CLBScreenComponentOnlineIslands_GotoNextIsland.cpp), main app, src/game/online/lobby_island.cpp:
   Tick 0x100b3b28, SelectCurrentIsland 0x100b44ac, EnterCurrentIsland 0x100b45d0, GotoNextIsland 0x100b46fc,
   DownloadFailFunction 0x100b4a98, HandleOnlineBacktrack 0x100b4b48
 

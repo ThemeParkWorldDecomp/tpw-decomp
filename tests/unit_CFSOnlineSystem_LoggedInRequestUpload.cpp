@@ -1,6 +1,6 @@
 // Test library for the online upload job and the city unpublish request (unit v5043; libtpw_unit_CFSOnlineSystem_LoggedInRequestUpload.dylib,
 // tests/test_CFSOnlineSystem_LoggedInRequestUpload.py), main app:
-//   src/FS_Online_init_CFSOnlineSystem_LoggedInRequestUpload.cpp   CFSOnlineSystem::UnpublishPark, RequestUpload, LoggedInRequestUpload,
+//   src/game/online/FS_Online.cpp   CFSOnlineSystem::UnpublishPark, RequestUpload, LoggedInRequestUpload,
 //                                                                  UploadServerConnectionCallback, ReturnUploadFilename
 //
 // The callees outside the unit are fakes that record what the real ones read (the same event names and arguments as the module's PowerPC

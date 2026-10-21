@@ -1,10 +1,10 @@
 // Test library for a ride's names, kind, excitement and stand point, and its final destroy (unit w210; libtpw_unit_ObjectInfo.dylib,
 // tests/test_ObjectInfo.py), main app:
-//   src/Object_info.cpp      the 14 CObject members UpgradesWhat, GetControl, GetFileName, GetUIName, GetSignNameA, GetSignNameB, SetSignNameA, SetSignNameB,
+//   src/game/Object.cpp      the 14 CObject members UpgradesWhat, GetControl, GetFileName, GetUIName, GetSignNameA, GetSignNameB, SetSignNameA, SetSignNameB,
 //                            IsTrackRide, GetProspectiveExcitementLevel, GetExcitementLevel, GetStandPoint and FinalDestroy
-//   src/gameplay_leaves.cpp  CObject::IsCoaster (unit v5L07; GetProspectiveExcitementLevel calls it)
-//   src/ThingMessages2.cpp   CMsgRideDeleted's constructor (and its GetType and destructor, written)
-//   src/RideDB_names.cpp     CRideDatabase::GetFileName (and the name table the file holds)
+//   src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/SkirtDeform.cpp, src/game/ui/ui_staffPanel.cpp  CObject::IsCoaster (unit v5L07; GetProspectiveExcitementLevel calls it)
+//   src/game/Object.cpp, src/game/ui/MessageCentre.cpp   CMsgRideDeleted's constructor (and its GetType and destructor, written)
+//   src/game/rides/RideDB.cpp, src/game/save/SaveLoad.cpp     CRideDatabase::GetFileName (and the name table the file holds)
 //
 // Every other callee is a fake that records the same event as the PowerPC stub: the ride database's GetRideInfo (it answers the case's record and counts every
 // fetch), CThing::GetThingId and CThing::FinalDestroy, the control manager's GetObjectControl (both overloads), the world's Unregister and GetBankAccount, the
@@ -63,7 +63,7 @@ CActionRecorder gActionRecorder;
 UIInterface gUIInterface;
 CText gText;
 
-// The name table of src/RideDB_names.cpp (the other functions of that file, never called here) needs the text object and the string table to link:
+// The name table of src/game/rides/RideDB.cpp, src/game/save/SaveLoad.cpp (the other functions of that file, never called here) needs the text object and the string table to link:
 // stand-ins that do nothing.
 InterfaceFont::InterfaceFont() {}
 InterfaceFont::~InterfaceFont() {}
@@ -234,7 +234,7 @@ void CActionRecorder::RecordAction(RecordedAction action, uint16_t value, uint8_
     ev("RecordAction", {lab(this), static_cast<int32_t>(action), value, length, lab(text)}, {narrow(text).c_str()});
 }
 
-// src/gameplay_leaves.cpp (CObject::IsCoaster, unit v5L07) also holds LocatorByeByeKid: its two callees, never called here.
+// src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/SkirtDeform.cpp, src/game/ui/ui_staffPanel.cpp (CObject::IsCoaster, unit v5L07) also holds LocatorByeByeKid: its two callees, never called here.
 CThing* gStaffPanelThing;
 void RemoveSlideoutPanel(int16_t) {}
 

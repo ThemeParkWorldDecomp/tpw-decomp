@@ -3,11 +3,11 @@
 // the range the inventory files under ui_cityLobbyController.cpp (0x101cccc0..0x101cd42c),
 // the engine mesh objects under ui_utils.cpp (0x10187a28..0x10188fb0).
 // PARTIAL: the engine mesh object's Change, CalculateFrame and InstanceMe, the gradients' Change and the matrix helpers they use (GetUIMatrix,
-// UpdateMeshLocalMatrix) are in src/ui_DrawObjectEngineMesh.cpp and src/ui_matrix.cpp (unit w42); the frame and slider objects' own Change and
-// InstanceMe are in src/ui_DrawObjectResizable.cpp (unit w44); the gradients' other members are untranslated. The sprite draw object
-// (InterfaceDrawObjectSprite, 0x1018c978..0x1018d0bc) is in src/ui_DrawObjectSprite.cpp, the text draw objects built on it
+// UpdateMeshLocalMatrix) are in src/game/TPMesh.cpp, src/game/ui/InterfaceDrawEngine.cpp and src/game/LMatrix.cpp (unit w42); the frame and slider objects' own Change and
+// InstanceMe are in src/game/ui/InterfaceDrawEngine.cpp (unit w44); the gradients' other members are untranslated. The sprite draw object
+// (InterfaceDrawObjectSprite, 0x1018c978..0x1018d0bc) is in src/game/ui/InterfaceDrawObjectSprite.cpp, the text draw objects built on it
 // (InterfaceTextObjectSprite, InterfaceTitleTextObject, InterfaceCursorPosTextObjectSprite, 0x1018d11c..0x1018ffb0) in
-// src/ui_DrawObjectText.cpp.
+// src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_textmanager.cpp.
 #pragma once
 #include <cstdint>
 
@@ -42,9 +42,9 @@ public:
 
 namespace SamsUtilities { class UCursor; }
 
-// A cursor made from a picture file (src/ui_cursors.cpp): the platform layer's cursor does the work. Mac 0x18
+// A cursor made from a picture file (src/game/ui/InterfaceBFCursor.cpp, src/game/ui/ui_main.cpp, src/game/ui/UIInterface.cpp): the platform layer's cursor does the work. Mac 0x18
 // bytes (the base's 0x14 and the pointer), vtable 0x102b1580; the virtual members other than the constructor
-// are in src/ui_cursor_classes.cpp (they call the platform's UCursor).
+// are in src/game/ui/InterfaceBFCursor.cpp (they call the platform's UCursor).
 class InterfaceBFCursor : public InterfaceCursor {
 public:
     InterfaceBFCursor();                              // 0x101fe208
@@ -167,7 +167,7 @@ public:
     int32_t mLocalised;    // 0x80  1 for the meshes of the language's folder
 };
 
-// The frames and the sliders, which stretch: their own Change and InstanceMe (src/ui_DrawObjectResizable.cpp, unit w44).
+// The frames and the sliders, which stretch: their own Change and InstanceMe (src/game/ui/InterfaceDrawEngine.cpp, unit w44).
 // Vtables 0x102a7c04 and 0x102a7bbc. Their destructors (0x10188704, 0x10188c04) are the
 // base's.
 class InterfaceDrawEngineResizableFrame : public InterfaceDrawEngineMesh {
@@ -185,9 +185,9 @@ public:
     InterfaceDrawObject* InstanceMe() override;                     // 0x10188ed0
 };
 
-// ---- the gradients and the matrix helpers (src/ui_DrawObjectEngineMesh.cpp and src/ui_matrix.cpp, unit w42)
+// ---- the gradients and the matrix helpers (src/game/ui/InterfaceDrawEngine.cpp, src/game/TPMesh.cpp and src/game/LMatrix.cpp, unit w42)
 
-// The matrix of an object placed in the UI's 2048 x 1536 space (src/ui_matrix.cpp, 0x10187ce4, 848 bytes). The object's box (lower left corner
+// The matrix of an object placed in the UI's 2048 x 1536 space (src/game/ui/InterfaceDrawEngine.cpp, 0x10187ce4, 848 bytes). The object's box (lower left corner
 // x, y and size w, h in the object's own units) is put on the rectangle whose left and BOTTOM edge are `left` and `bottom` and whose size is
 // `width` x `height` (UI units), then scaled to the engine's -1 to 1 screen. A nonzero `angle` (4096 to a turn) first turns the object about the
 // pivot (`pivotX`, `pivotY`, UI units) in the 4:3 screen, with TPGlobals' sine table. The fourth column of the result is the identity's.
@@ -226,7 +226,7 @@ public:
 };
 class InterfaceDrawEngineVGradient : public InterfaceDrawObject {
 public:
-    // `mesh` is the texture's name ("meter.wct"): the texture entry and DMCreateMesh both take it. The constructor (src/ui_DrawObjectGradient.cpp,
+    // `mesh` is the texture's name ("meter.wct"): the texture entry and DMCreateMesh both take it. The constructor (src/game/ui/InterfaceDrawEngine.cpp,
     // unit w118) fills the mesh set and its one entry, loads the textures, makes the mesh and the quad (CalcVerts and CalcUVs through the vtable
     // with the fraction 0); mData stays 0 when the textures or the mesh could not be made.
     explicit InterfaceDrawEngineVGradient(void* mesh);              // 0x10188ff8
@@ -294,7 +294,7 @@ public:
     int32_t (*mPostDraw)(TbRenderArea&) = nullptr;
 };
 
-// ---- the text draw objects (src/ui_DrawObjectText.cpp, unit w35c; the inventory files them under ui_textmanager.cpp)
+// ---- the text draw objects (src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_textmanager.cpp, unit w35c; the inventory files them under ui_textmanager.cpp)
 
 // What the text draw objects call that is not theirs (the main app's helpers of unit w35b and the Bullfrog drawing library). The unit's
 // tests fake all of them; the types are those of the mangled names.
@@ -373,21 +373,21 @@ public:
     void Change(uint32_t flags, DOChange* change) override;         // 0x1018efcc
 };
 
-// The text objects of the main panel's number windows (src/ui_DrawObjectNumber.cpp, unit w118). Mac 0x19c bytes like the text sprite; the Mac
+// The text objects of the main panel's number windows (src/game/ui/InterfaceTextObjectSprite.cpp, unit w118). Mac 0x19c bytes like the text sprite; the Mac
 // constructors are the text sprite's with its base constructor inlined and their own vtable stored last (0x102a8204 and 0x102a80f4), the
 // destructors the sprite chain inlined (the host's are the language's). Change is the part that puts the digits and the cash in the window
-// (flag 0x80, and for the number object flag 8); translated in src/ui_TextObjects.cpp (unit w125).
+// (flag 0x80, and for the number object flag 8); translated in src/game/ui/InterfaceTextObjectSprite.cpp (unit w125).
 class InterfaceNumberTextObject : public InterfaceTextObjectSprite {
 public:
     explicit InterfaceNumberTextObject(void* data);                 // 0x1018d930
     ~InterfaceNumberTextObject() override;                          // 0x1018da0c
-    void Change(uint32_t flags, DOChange* change) override;        // 0x1018db00 (src/ui_TextObjects.cpp)
+    void Change(uint32_t flags, DOChange* change) override;        // 0x1018db00 (src/game/ui/InterfaceTextObjectSprite.cpp)
 };
 class InterfaceCashAndGTickTextObject : public InterfaceTextObjectSprite {
 public:
     explicit InterfaceCashAndGTickTextObject(void* data);           // 0x1018e190
     ~InterfaceCashAndGTickTextObject() override;                    // 0x1018e274
-    void Change(uint32_t flags, DOChange* change) override;        // 0x1018e36c (src/ui_TextObjects.cpp)
+    void Change(uint32_t flags, DOChange* change) override;        // 0x1018e36c (src/game/ui/InterfaceTextObjectSprite.cpp)
 };
 
 // The shared draw objects, by the hash of their name: a singly linked list in the order
@@ -414,7 +414,7 @@ extern sHeapInfo* gUIHeap;        // 0x1038cc60, original name unknown: HNewHeap
 class InterfaceCashTextObject : public InterfaceTextObjectSprite {
 public:
     explicit InterfaceCashTextObject(void* data);                   // 0x1018de60
-    ~InterfaceCashTextObject() override;                            // 0x1018df3c (unit v51115, src/ui_TextObjects_InterfacePasswordTextObject_InterfacePasswordTex.cpp)
+    ~InterfaceCashTextObject() override;                            // 0x1018df3c (unit v51115, src/game/ui/InterfaceTextObjectSprite.cpp)
     void Change(uint32_t flags, DOChange* change) override;         // 0x1018e02c (vtable 0x102a8160)
 };
 
@@ -431,7 +431,7 @@ public:
     explicit InterfaceRankTextObject(void* data);                   // 0x1018f93c
 };
 
-// Unit v5983 (src/ui_TextObjects_InterfaceCashTextObject_Change.cpp): the Change overrides of five text objects as free functions. Flag 0x80
+// Unit v5983 (src/game/ui/InterfaceTextObjectSprite.cpp): the Change overrides of five text objects as free functions. Flag 0x80
 // (0x100 for the password) makes the text and draws it with flag 0x100; any other flags go straight to InterfaceTextObjectSprite::Change.
 // Unit v5L33: the cash, null cash, percent and visitor number classes' Change members (their Mac vtables' Change slots) call these; the
 // password class has no member yet (its vtable has no key function, so the member would pull the draw object chain into that unit).
@@ -451,7 +451,7 @@ void CursorDtor(void* self, int16_t deleteFlag);      // InterfaceCursorPosTextO
 void Delete(void* self);                              // operator delete, glue 0x10238218
 }  // namespace textobj_callee
 
-// Unit v51114 (src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_UIStatusPanel_EnableNameClick.cpp): InterfaceRankTextObject::~InterfaceRankTextObject
+// Unit v51114 (src/game/ui/ui_StatusPanel.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/Particles.cpp): InterfaceRankTextObject::~InterfaceRankTextObject
 // 0x1018fa18 (188 bytes) with the hidden delete flag; answers self. The class is not declared (see InterfaceRankTextObject_Change); the Mac
 // stores its vtables at +0x38 (not kept). Callees (faked by the test library): the sprite chain's destructors, inlined into this one.
 class InterfaceRankTextObject;

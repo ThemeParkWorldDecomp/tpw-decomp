@@ -1,10 +1,10 @@
 """Unit w128, the flags of the park, against libtpw_unit_DynamicFlags.dylib (tests/unit_DynamicFlags.cpp), main app ("SimTheme Park"),
-src/DynamicFlags.cpp:
+src/game/park/DynamicCell.cpp:
   DC_AnimateFlag 0x100E1350, DC_DrawFlag 0x100E087C.
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian) for the translation; the same code reads both back. The only callee
-outside the unit, DC_AddPolyFaceToList (src/DynamicFaces.cpp, unit w127), is a fake on both sides that records the texture and the type,
+outside the unit, DC_AddPolyFaceToList (src/game/park/DynamicCell.cpp, unit w127), is a fake on both sides that records the texture and the type,
 the twelve words of the positions, the u and v of the four texture coordinates (DC_DrawFlag never writes their z words, and the real function
 does not read them) and the twelve words of the points, NaNs made one value. sqrt is the host's double square root on both sides.
 

@@ -1,5 +1,5 @@
-// Test library for unit w49 (libtpw_unit_UIKbCapture.dylib; see tests/test_UIKbCapture.py): src/ui_main_kbcapture.cpp
-// (UIMain_DecideKbCapture, MainMenuUp, UIMenu::IsShown) and src/ui_coasteredit_kb.cpp (CoasterEditPanelUp, CoasterEditPanelGetKb), with
+// Test library for unit w49 (libtpw_unit_UIKbCapture.dylib; see tests/test_UIKbCapture.py): src/game/ui/UIMenu.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_mainmenu.cpp
+// (UIMain_DecideKbCapture, MainMenuUp, UIMenu::IsShown) and src/game/ui/ui_coasterPanel.cpp (CoasterEditPanelUp, CoasterEditPanelGetKb), with
 // the real key table Enable and the window's CaptureKb (GetAttr is below). The only fake is the message poster that CaptureKb calls (it records);
 // the windows are ten blocks the size of an InterfaceWindow that are never constructed (only the attribute word is read), the three key
 // tables the decision enables are real objects, and the menu and the lobby are blocks of their size. The Python module drives it through

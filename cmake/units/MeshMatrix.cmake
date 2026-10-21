@@ -1,1 +1,12 @@
-set(TPW_UNIT_MeshMatrix src/tb_mesh_matrix.cpp src/MatrixPowerPC.cpp)
+set(TPW_UNIT_MeshMatrix src/engine/Mesh.cpp src/engine/MatrixPowerPC.cpp)
+set(TPW_UNIT_MeshMatrix_KEEP
+  __ZN14CMatrixPowerPC10MultMatrixEPKfS1_Pf   # CMatrixPowerPC::MultMatrix(float const*, float const*, float*)
+  __ZN14CMatrixPowerPC11TransformUVEP16STMCoordinateSetP6sUVSetiii   # CMatrixPowerPC::TransformUV(STMCoordinateSet*, sUVSet*, int, int, int)
+  __ZN14CMatrixPowerPC5LightEP11SFVF_TLCTEXP9tag_sNodeP8sFaceSeti   # CMatrixPowerPC::Light(SFVF_TLCTEX*, tag_sNode*, sFaceSet*, int)
+  __ZN14CMatrixPowerPC7ProjectEPviii   # CMatrixPowerPC::Project(void*, int, int, int)
+  __ZN14CMatrixPowerPC9TransformEP7sMatrixPvP14sVertexPosnSetiii   # CMatrixPowerPC::Transform(sMatrix*, void*, sVertexPosnSet*, int, int, int)
+  __ZN14CMatrixPowerPC9TransformEP7sMatrixPvS2_iiii   # CMatrixPowerPC::Transform(sMatrix*, void*, void*, int, int, int, int)
+  __ZN14CMatrixPowerPCD1Ev   # CMatrixPowerPC::~CMatrixPowerPC()
+  __ZN5CMesh14SetLocalMatrixEiR7CMatrix   # CMesh::SetLocalMatrix(int, CMatrix&)
+  __ZN5CMesh14SetLocalMatrixEiR7sMatrix   # CMesh::SetLocalMatrix(int, sMatrix&)
+)

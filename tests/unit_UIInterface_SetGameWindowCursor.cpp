@@ -1,5 +1,5 @@
 // Test library for UIInterface::SetGameWindowCursor and PostLevelLoad (unit v5574; libtpw_unit_UIInterface_SetGameWindowCursor.dylib),
-// main app: src/UI_pump_UIInterface_SetGameWindowCursor.cpp (also defines gUIPostLoadDate).
+// main app: src/game/ui/UIInterface.cpp (also defines gUIPostLoadDate).
 // The callees are recording fakes; the globals of other files are defined here.
 #include <cstddef>
 #include <cstdint>

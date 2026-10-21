@@ -1,5 +1,5 @@
 // The fakes for FS_Registry.cpp, FS_System.cpp, the string helpers and FS_UserInfo.cpp
-// (src/FS_Registry.cpp, src/FS_System.cpp, src/TPString.cpp, src/FS_UserInfo.cpp;
+// (src/game/save/FS_Registry.cpp, src/game/save/FS_System.cpp, src/game/ui/3DFont.cpp, src/game/save/FS_UserInfo.cpp;
 // libtpw_unit_FSSystem.dylib, used by test_FSSystem.py and test_FSUserInfo.py; see
 // calllog.h) and the test entry points. The bullfrog strings are functional and unrecorded, as on the
 // PowerPC side (test_FSSystem.py); the file system, the resources and the Toolbox and

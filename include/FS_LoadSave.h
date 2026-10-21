@@ -1,5 +1,5 @@
 // FS_LoadSave.cpp (main app): park saving and loading by name. PARTIAL: LoadMostRecent is
-// translated (src/FS_LoadSave.cpp, unit w108); the others are not.
+// translated (src/game/save/FS_LoadSave.cpp, unit w108); the others are not.
 #pragma once
 #include <cstdint>
 
@@ -10,7 +10,7 @@ struct TFSLoadSaveSaveFileDetails;   // unit v5183: the details of one save file
 // Unit v5958: the object is a list of the save file details (the Mac's four words: table, head, tail, count; 0x10 bytes).
 class CFSLoadSave : public TbTList<TFSLoadSaveSaveFileDetails*, TFSLoadSaveSaveFileDetails*> {
 public:
-    // Unit v5958 (src/ui_iterators_MainGameMenuConfirmPublish_OK_MainGameMenuConfirmQuit_OK.cpp): 0x101fc790 (384 bytes): saves the park
+    // Unit v5958 (src/game/save/FS_LoadSave.cpp): 0x101fc790 (384 bytes): saves the park
     // as "<the player's folder for the theme>:<name><extension>" through CSaveLoad::Save (no header, type 2); its answer.
     int32_t SaveInternal(const TbDynamicStringTemplate<char16_t>& name, const TbDynamicStringTemplate<char16_t>& extension);
     // Unit v5183: the save file list. 0x101fc97c (848 bytes) the first entry or NULL; 0x101fcd08 (108 bytes) the one after `previous` or NULL.
@@ -23,7 +23,7 @@ public:
     // match the save pattern, no sub folders; the newest last write time wins, the first of equals wins) through CSaveLoad::Load,
     // type 2, no header. Nothing happens when the folder or a file is not there.
     void LoadMostRecent();
-    // 0x101fc408 (44 bytes, src/FS_LoadSave_load.cpp, unit w117): LoadInternal with the extension ".TPWS" (gTPGlobals.mF4420); its answer.
+    // 0x101fc408 (44 bytes, src/game/save/FS_LoadSave.cpp, unit w117): LoadInternal with the extension ".TPWS" (gTPGlobals.mF4420); its answer.
     int32_t Load(const TbDynamicStringTemplate<char16_t>& name);
     // 0x101fc5e0 (324 bytes, same file): loads the park file "<the logged-in player's folder for the theme>:<name><extension>" through
     // CSaveLoad::Load (no header, type 2); 1 on success, else 0.
@@ -45,7 +45,7 @@ extern CFSLoadSave gLoadSave;   // 0x10396a7c, original name unknown
 namespace v51056_callee {
 void LoadSaveListDtor(CFSLoadSave* self);
 }
-// Unit v5720 (src/ui_cursor_classes_CUIGrapher_DrawGraph_sinit_FS_LoadSave_cpp.cpp): 0x101fd668 (84 bytes) the static initialiser of
+// Unit v5720 (src/game/save/FS_LoadSave.cpp): 0x101fd668 (84 bytes) the static initialiser of
 // FS_LoadSave.cpp: gLoadSave's four words (0x10 bytes on the Mac: word 0 the 0x102b1540 table word, 1 to 3 zero) and its
 // __register_global_object record.
 void __sinit_FS_LoadSave_cpp();

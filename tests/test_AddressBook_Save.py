@@ -1,5 +1,5 @@
 """Unit v5009, AddressBook::Save, against libtpw_unit_AddressBook_Save.dylib (tests/unit_AddressBook_Save.cpp), main app
-("SimTheme Park"), src/email_load_AddressBook_Save.cpp:
+("SimTheme Park"), src/game/online/email.cpp:
   AddressBook::Save 0x102067cc
 
 A case is a book (a list of names) and a path. The PowerPC side builds the MSL list and string objects in emulator memory; the host

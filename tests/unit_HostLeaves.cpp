@@ -1,4 +1,4 @@
-// Test entry points for the four main-app leaves of src/host_leaves.cpp: RealTimePauseAdjusted, HOST_Sin,
+// Test entry points for the four main-app leaves of src/game/advisor/Advisor.cpp, src/game/rides/BumperRide.cpp: RealTimePauseAdjusted, HOST_Sin,
 // HOST_Cos and BMP_GenerateSinTab (library unit_HostLeaves). The advisor's state (the three words the clock keeps
 // its pauses in) and the table of sines are the real globals; the game clock's two reads are fakes that record
 // and answer from the case's queues.

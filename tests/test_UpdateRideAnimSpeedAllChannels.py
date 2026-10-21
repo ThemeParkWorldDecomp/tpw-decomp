@@ -1,6 +1,6 @@
 """Unit v51077, the ride animation leaves, the fly accessors, the ride pointers, Debug.cpp leaves, the keyboard actions and the static
 initialisers, against libtpw_unit_UpdateRideAnimSpeedAllChannels.dylib (tests/unit_UpdateRideAnimSpeedAllChannels.cpp), main app
-("SimTheme Park"), src/advisor_leaves_UpdateRideAnimSpeedAllChannels.cpp:
+("SimTheme Park"), src/game/Debug.cpp, src/game/keyboard.cpp, src/game/online/lobby_globe.cpp, src/game/online/lobby_island.cpp, src/game/online/lobby_screen.cpp, src/game/park/GoldenTickets.cpp, src/game/rides/FlyingRide.cpp, src/game/rides/RideAnim.cpp, src/game/rides/TPRide.cpp, src/game/save/BlockSave.cpp:
   UpdateRideAnimSpeedAllChannels 0x100c7ae4, UpdateRideAnimSpeedImmediate 0x100c7b58, GetCurrentAnim 0x100c7a00, FlushDeferredAnim 0x100c6604,
   GetAnimRemainingMilliseconds 0x100c5db8, GetRideAnimTime 0x100c3268, SetRideAnimTime 0x100c3234, __sinit_lobby_screen_cpp 0x100b7c9c,
   __sinit_lobby_island_cpp 0x100b54f8, IslandOnlineParkInfoPanelCancelCallback 0x100b43bc, __sinit_lobby_globe_cpp 0x100afe1c,

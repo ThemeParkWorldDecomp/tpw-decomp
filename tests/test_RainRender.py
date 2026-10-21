@@ -1,8 +1,8 @@
 """The weather's drawing and the draw primitive's polygon adder and sprite (engine library,
-src/tb_drawprimitive_sprite.cpp and src/tb_rain_render.cpp), original versus translation:
+src/engine/DrawPrimitive.cpp and src/engine/EngineUtil.cpp, src/engine/Rain.cpp), original versus translation:
 CDrawPrimitive::AddPoly_TLCTEX (0x100078c0) and DrawSprite (0x10007edc), CRain::__LightningFlash
 (0x10022b20), __RenderLightning (0x10022c10), __RenderRain (0x10022efc) and __RenderSnow
-(0x100233f8), GetCycleCount (0x10038b14), and the bolts' own members (src/tb_rain_lightning.cpp)
+(0x100233f8), GetCycleCount (0x10038b14), and the bolts' own members (src/engine/Rain.cpp)
 CRain::AddLightning (0x100243cc) and SLightning::Init (0x100244a0; run on bolt slot 2, with the
 real GetCycleCount over the faked timer and the host's sqrt on both sides).
 

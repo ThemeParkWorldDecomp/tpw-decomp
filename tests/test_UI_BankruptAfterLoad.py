@@ -1,5 +1,5 @@
 """UI_BankruptAfterLoad 0x1018710c against libtpw_unit_UI_BankruptAfterLoad.dylib (tests/unit_UI_BankruptAfterLoad.cpp),
-src/ui_main_panel_UI_Congratulations_UI_BankruptAfterLoad.cpp.
+src/game/ui/ui_main.cpp.
 
 Every callee is a fake on both sides recording its arguments. The world: gBumholeWindow and a built window (labels 1 and 2), the
 queue answers of GameWindowToggle_Hidden and the rectangle GetPosition writes (right, bottom). Compared: the log and gBankruptWindow

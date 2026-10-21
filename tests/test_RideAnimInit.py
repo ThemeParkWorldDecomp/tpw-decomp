@@ -1,4 +1,4 @@
-"""The ride animation set's set-up (src/RideAnimInit.cpp, and src/EmbeddedData.cpp): RAInitType,
+"""The ride animation set's set-up (src/game/rides/RideAnim.cpp, src/game/rides/TPRide.cpp, and src/game/TPEmbed.cpp): RAInitType,
 CorrectNodeFlags1, ResetAnimTimeStats, RAInitNodeAnimNodes, InitRideAnimSet, and the two
 embedded data functions. Each case builds the same mesh, header, nodes and animations on the
 PowerPC side (big-endian, Mac offsets) and in the host unit (native structures), runs the

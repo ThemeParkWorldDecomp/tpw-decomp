@@ -1,3 +1,21 @@
-# Unit v5122: the eight CONGRAT_PRICING value/satisfaction scorers (src/AdvisorScoring_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.cpp). The callees
+# Unit v5122: the eight CONGRAT_PRICING value/satisfaction scorers (src/game/advisor/AdvisorScoring.cpp). The callees
 # outside the unit are recording fakes in tests/unit_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.cpp, which also defines the globals of other files.
-set(TPW_UNIT_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_ src/AdvisorScoring_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.cpp platform/arena.cpp)
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_ src/game/advisor/AdvisorScoring.cpp platform/arena.cpp)
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__KEEP
+  __ZN15CAdvisorScoring41_ADVISOR_CONGRAT_PRICING_FOOD_GREAT_VALUEEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PRICING_FOOD_GREAT_VALUE()
+  __ZN15CAdvisorScoring42_ADVISOR_CONGRAT_PRICING_SHOPS_GREAT_VALUEEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PRICING_SHOPS_GREAT_VALUE()
+  __ZN15CAdvisorScoring43_ADVISOR_CONGRAT_PRICING_DRINKS_GREAT_VALUEEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PRICING_DRINKS_GREAT_VALUE()
+  __ZN15CAdvisorScoring46_ADVISOR_CONGRAT_PRICING_SIDESHOWS_GREAT_VALUEEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PRICING_SIDESHOWS_GREAT_VALUE()
+  __ZN15CAdvisorScoring47_ADVISOR_CONGRAT_PRICING_RESTAURANT_GREAT_VALUEEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PRICING_RESTAURANT_GREAT_VALUE()
+  __ZN15CAdvisorScoring48_ADVISOR_CONGRAT_PRICING_FOOD_GREAT_SATISFACTIONEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PRICING_FOOD_GREAT_SATISFACTION()
+  __ZN15CAdvisorScoring49_ADVISOR_CONGRAT_PRICING_SHOPS_GREAT_SATISFACTIONEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PRICING_SHOPS_GREAT_SATISFACTION()
+  __ZN15CAdvisorScoring54_ADVISOR_CONGRAT_PRICING_RESTAURANT_GREAT_SATISFACTIONEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PRICING_RESTAURANT_GREAT_SATISFACTION()
+  _gAdvisorNoneDrinksValue
+  _gAdvisorNoneFoodSat
+  _gAdvisorNoneFoodValue
+  _gAdvisorNoneRestaurantSat
+  _gAdvisorNoneRestaurantValue
+  _gAdvisorNoneShopsSat
+  _gAdvisorNoneShopsValue
+  _gAdvisorNoneSideshowsValue
+)

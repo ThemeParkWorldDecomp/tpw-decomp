@@ -1,5 +1,5 @@
 """Unit w79g3, the placeholder subclasses, against libtpw_unit_PlaceHolderTypes.dylib (tests/unit_PlaceHolderTypes.cpp), in the program
-"sound symbols shared" (Code at 0x10000000, TOC base r2 = 0x1003abf0): the 67 functions of src/PlaceHolderTypes.cpp, listed in FUNCS below with
+"sound symbols shared" (Code at 0x10000000, TOC base r2 = 0x1003abf0): the 67 functions of src/sound/ListSentence.cpp, src/sound/PlaceHolderSentence.cpp, src/sound/PlaceHolderTypes.cpp, listed in FUNCS below with
 their addresses (CPlaceHolderOneShot, CPlaceHolderOneShotSentence, CPlaceHolderOneShotBranchingSentence, CPlaceHolderSentence,
 CPlaceHolderLinearSentence, CPlaceHolderBranchingSentence, CPlaceHolderSentenceShuffle with CListShuffle, CListSentence with CListData: the
 constructors, destructors, class ids, the eight four-argument and eight one-argument CreateObject statics, and the overrides).

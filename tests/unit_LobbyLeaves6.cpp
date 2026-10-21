@@ -1,10 +1,10 @@
 // Test library for the lobby's small leaves part 6 (unit w75; libtpw_unit_LobbyLeaves6.dylib, tests/test_LobbyLeaves6.py):
-//   src/Game_exit.cpp            CGame::ExitLevel 0x101496ec
-//   src/InGame_start.cpp         CInGame::Start 0x1014b304
-//   src/ui_progress_cursor.cpp   CursorLibrary::RemoveAll 0x101cc8ec, FuckOffUIProgressBar 0x101e0294
-//   src/ui_image_dtor.cpp        InterfaceImage::~InterfaceImage 0x101cfebc
-//   src/MeshDestroy.cpp          DestroyEngineMesh 0x10065004, DestroyMeshInstance 0x100631c4
-//   src/RideWrapping.cpp         StripRideWrapping 0x101ee150
+//   src/game/Game.cpp            CGame::ExitLevel 0x101496ec
+//   src/game/InGame.cpp         CInGame::Start 0x1014b304
+//   src/game/ui/InterfaceCursor.cpp, src/game/ui/ui_progressBar.cpp   CursorLibrary::RemoveAll 0x101cc8ec, FuckOffUIProgressBar 0x101e0294
+//   src/game/ui/InterfaceImage.cpp        InterfaceImage::~InterfaceImage 0x101cfebc
+//   src/game/TPInstance.cpp, src/game/TPMesh.cpp          DestroyEngineMesh 0x10065004, DestroyMeshInstance 0x100631c4
+//   src/game/rides/RidePlacement.cpp         StripRideWrapping 0x101ee150
 //
 // Real: the six sources above. Fakes that record the same event on both sides: CWorld::ExitLevel and Free, the world's CStaffDB
 // destructor, CRideDatabase::ClearDatabase, CSky::Close, the sky objects' destructor and DestroySkyObjects, the message centre's

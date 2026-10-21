@@ -1,5 +1,5 @@
 """Unit v5163, UIMenu::Init and UIMenu::AddItem, against libtpw_unit_UIMenu_AddItem.dylib (tests/unit_UIMenu_AddItem.cpp), main app
-("SimTheme Park"), src/ui_main_kbcapture_UIMenu_AddItem.cpp:
+("SimTheme Park"), src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/UIMenu.cpp, src/game/ui/UI_Base.cpp:
   UIMenu::Init 0x1018ad20, UIMenu::AddItem 0x1018ae78
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

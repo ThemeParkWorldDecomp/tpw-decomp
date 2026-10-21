@@ -1,5 +1,5 @@
 """Unit v51015: base64enc, Email::Attachment::Attachment, Connection::Connection, Connection::SendCommandLine and CUIGrapher::DrawAxes,
-against libtpw_unit_base64enc.dylib (tests/unit_base64enc.cpp), main app ("SimTheme Park"), src/Email_Send_CSock_SendData_base64enc.cpp:
+against libtpw_unit_base64enc.dylib (tests/unit_base64enc.cpp), main app ("SimTheme Park"), src/game/online/Connection.cpp, src/game/online/EmailMessage.cpp, src/game/ui/UIGrapher.cpp:
   base64enc 0x10202114, Email::Attachment::Attachment 0x10202670, Connection::SendCommandLine 0x10201b14,
   Connection::Connection 0x10201a84, CUIGrapher::DrawAxes 0x101fda4c
 

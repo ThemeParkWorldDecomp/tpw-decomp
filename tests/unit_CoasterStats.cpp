@@ -1,5 +1,5 @@
 // Test library for the coaster's track statistics (unit w212; libtpw_unit_CoasterStats.dylib, tests/test_CoasterStats.py), main app:
-//   src/TPConfig_stats.cpp   ModF, SetCoasterCapacity, UpdateCoasterTrainsActive, UpdateCoasterTrainPosns, SpreadTrainsOnTrack,
+//   src/game/rides/CoasterQueue.cpp, src/game/rides/CoasterTrain.cpp   ModF, SetCoasterCapacity, UpdateCoasterTrainsActive, UpdateCoasterTrainPosns, SpreadTrainsOnTrack,
 //                            CalculateTrackGForcesSpeedAndExcitement, SetInitialExcitementValues, UpdateExcitementAtSample and
 //                            CollateCoasterStats (and the 22 words of TPConfig.cpp they work on)
 //
@@ -21,7 +21,7 @@
 
 using namespace calllog;
 
-// ---- the strings of gTPGlobals are never read: Format (the only member src/TbString.cpp leaves to the test) does nothing
+// ---- the strings of gTPGlobals are never read: Format (the only member src/bullfrog/FileSystem.cpp leaves to the test) does nothing
 template<> void TbDynamicStringTemplate<char>::Format(const char*, ...) {}
 template<> void TbDynamicStringTemplate<char16_t>::Format(const char16_t*, ...) {}
 template<> void TbStaticStringTemplate<char>::Format(const char*, ...) {}

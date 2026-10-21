@@ -1,5 +1,5 @@
 // Test library for the trains' capacity and activation (unit v5369; libtpw_unit_RecalcDistancesFromCentreCar.dylib, tests/test_RecalcDistancesFromCentreCar.py), main app:
-//   src/TPConfig_stats_RecalcDistancesFromCentreCar.cpp   RecalcDistancesFromCentreCar, SetTrainCapacity, ActivateCoasterTrain
+//   src/game/rides/CoasterQueue.cpp, src/game/rides/CoasterTrain.cpp   RecalcDistancesFromCentreCar, SetTrainCapacity, ActivateCoasterTrain
 //
 // The callees outside the unit are fakes that record the arguments the real ones read: GetTrainFrontAndRearSamples, GetRideAnimTime, both
 // EnableMeshDraw, SetCurRideAnim, StartTrainSounds. gRideAnimSets (RideTypes.cpp) is defined here.

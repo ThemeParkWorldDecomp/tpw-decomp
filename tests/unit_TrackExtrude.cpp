@@ -1,5 +1,5 @@
 // Test library for the coaster track's mesh (unit w213; libtpw_unit_TrackExtrude.dylib, tests/test_TrackExtrude.py), main app:
-//   src/TPConfig_extrude.cpp   ExtrudeTrackSection, ExtrudeCrossSectionVertices, GetNewTrackMeshSet, SkinCrossSectionFaces,
+//   src/game/rides/CoasterExtrude.cpp, src/game/rides/CoasterSpline.cpp   ExtrudeTrackSection, ExtrudeCrossSectionVertices, GetNewTrackMeshSet, SkinCrossSectionFaces,
 //                              LinkFEStoreToFETextureCont, CopyExtrudedFaceData and InterpolateCoasterSpline (the sTrackSample overload)
 //
 // The untranslated callees are recording fakes (the same event names and arguments as the module's PowerPC stubs): the four spline
@@ -20,7 +20,7 @@
 
 using namespace calllog;
 
-// ---- the strings of gTPGlobals are never read: Format (the only member src/TbString.cpp leaves to the test) does nothing
+// ---- the strings of gTPGlobals are never read: Format (the only member src/bullfrog/FileSystem.cpp leaves to the test) does nothing
 template<> void TbDynamicStringTemplate<char>::Format(const char*, ...) {}
 template<> void TbDynamicStringTemplate<char16_t>::Format(const char16_t*, ...) {}
 template<> void TbStaticStringTemplate<char>::Format(const char*, ...) {}

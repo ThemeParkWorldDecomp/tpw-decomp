@@ -1,5 +1,5 @@
 // Test library for the camera's small callees and the two height lookups (libtpw_unit_CameraCallees.dylib; see
-// tests/test_CameraCallees.py): src/TPCamera_callees.cpp and src/TPRide_height.cpp, real.
+// tests/test_CameraCallees.py): src/game/TPCamera.cpp and src/game/park/TPHField.cpp, real.
 //
 // Fakes that record through calllog: MAP_wall_in_way (answers the "Wall" queue), GetThingAtPosnIfEntrance (answers the case's object or
 // null), CObject::GoFirstPerson and CRideDatabase::GetRideInfo (answers null). The camera globals the callees touch are defined here.

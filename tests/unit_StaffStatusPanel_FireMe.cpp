@@ -1,5 +1,5 @@
 // Test library for the staff status panel (unit v5107; libtpw_unit_StaffStatusPanel_FireMe.dylib, tests/test_StaffStatusPanel_FireMe.py), main app:
-//   src/StaffStatusPanel_FireMe.cpp   FireMe, Show, InitWindow, UpdateViewWindow
+//   src/game/ui/ui_staffStatus.cpp   FireMe, Show, InitWindow, UpdateViewWindow
 //
 // Every callee outside the unit is a fake that records what the real one reads; the globals of other files are defined here.
 #include <cstddef>

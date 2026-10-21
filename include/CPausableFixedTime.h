@@ -1,5 +1,5 @@
 // CPausableFixedTime (main app): Pause, UnPause, TogglePause and ReadPausableFixedTime at
-// 0x1015400c..0x101541d0 (src/GameClock.cpp). It has no GetPauseFlag. Inline construction
+// 0x1015400c..0x101541d0 (src/game/PausableTime.cpp). It has no GetPauseFlag. Inline construction
 // recovered from __sinit_Clock_cpp at 0x101476dc.
 #pragma once
 #include "CFixedTime.h"

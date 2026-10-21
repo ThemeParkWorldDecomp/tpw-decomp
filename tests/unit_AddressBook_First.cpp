@@ -1,5 +1,5 @@
 // Test library for the small e-mail functions of unit v51057 (libtpw_unit_AddressBook_First.dylib, tests/test_AddressBook_First.py), main app:
-//   src/email_load_AddressBook_Save_AddressBook_Add_AddressBook_First.cpp   the 22 functions (namespace v51057, email_callee::MailCbfn)
+//   src/game/online/email.cpp   the 22 functions (namespace v51057, email_callee::MailCbfn)
 //
 // The callees outside the unit are recording fakes: list remove and clear, operator delete, ios_base::~ios_base, Sock::~Sock, the string
 // compare and Email::Callback. Every pointer argument is logged as its offset from the case's block (the test sets the base), so the

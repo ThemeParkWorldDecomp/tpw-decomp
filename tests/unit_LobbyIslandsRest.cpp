@@ -1,14 +1,14 @@
-// Test library for src/lobby_islands_rest.cpp (libtpw_unit_LobbyIslandsRest.dylib; see
+// Test library for src/game/online/LBFlyingMesh.cpp, src/game/online/lobby_island.cpp, src/game/online/lobby_parser.cpp (libtpw_unit_LobbyIslandsRest.dylib; see
 // tests/test_LobbyIslandsRest.py): the lobby's theme descriptor parser and the rest of the island and
 // theme island members, driven by scripts over two theme-island screens.
 //
-// Real: the unit (src/lobby_islands_rest.cpp), the island screen's set-up, list, show and hide
-// (src/lobby_islands.cpp, with CLBIsland's constructor), and the lobby description's string reader and its
-// folder (src/lobby_parser.cpp). Fakes that record: the screen base class, the view, the mesh system and its
+// Real: the unit (src/game/online/LBFlyingMesh.cpp, src/game/online/lobby_island.cpp, src/game/online/lobby_parser.cpp), the island screen's set-up, list, show and hide
+// (src/game/online/lobby_island.cpp, with CLBIsland's constructor), and the lobby description's string reader and its
+// folder (src/game/online/lobby_parser.cpp). Fakes that record: the screen base class, the view, the mesh system and its
 // instances, the flying meshes and their groups, the sounds, the island lobby's panels, the online system,
 // the rain, the game (its theme list, the current theme, the gate names), the master save and the user info,
 // the game type, the file system and the heap of the files, and the C library's rand. The strings are
-// functional. The theme islands' Tick belongs to src/lobby_islands_tick.cpp, which is not linked here.
+// functional. The theme islands' Tick belongs to src/game/online/lobby_island.cpp, src/game/online/LBFlyingMesh.cpp, which is not linked here.
 #include <cstdlib>
 #include <cstring>
 #include <new>
@@ -172,7 +172,7 @@ int32_t CLBScreenComponent::IsVisible() {
     return static_cast<int32_t>(ret("IsVisible", mVisible));
 }
 
-// The theme islands' Tick (src/lobby_islands_tick.cpp, not linked here; nothing calls it).
+// The theme islands' Tick (src/game/online/lobby_island.cpp, src/game/online/LBFlyingMesh.cpp, not linked here; nothing calls it).
 void CLBScreenComponentThemeIslands::Tick() {}
 // The base class's moves, called by the theme islands' own: recorded only.
 void CLBScreenComponentIslands::GotoNextIsland() { ev("Islands.GotoNextIsland", {lab(this)}); }

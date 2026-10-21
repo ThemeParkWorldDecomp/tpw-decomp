@@ -1,6 +1,6 @@
 // Test library for the advisor's staff hire, hungry and thirsty scorers (unit v5136;
 // libtpw_unit_CAdvisorScoring__ADVISOR_STAFF_HIRE_MECHANICS_3.dylib), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_STAFF_HIRE_MECHANICS_3.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The callees outside the unit (CWorld::GetParkAnalyser, IsParkClosed and the CParkAnalyser counters) are recording fakes that answer from
 // the test's queues. gGameWorld is defined here.

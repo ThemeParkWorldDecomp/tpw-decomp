@@ -2,7 +2,7 @@
 // the inventory's Wavelet.cpp range). The PC build put the x87 FPU in single precision for
 // the frame (CMapWho::Render); the Mac build's are empty: SetSinglePrecision answers 0 for
 // the state to restore, and the other two do nothing, so nothing on the host changes the
-// rounding either (src/tb_fpu.cpp).
+// rounding either (src/engine/EngineUtil.cpp).
 #pragma once
 #include <cstdint>
 

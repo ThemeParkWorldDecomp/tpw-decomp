@@ -1,5 +1,5 @@
 // Test library for the 3DFont.cpp static initialiser (unit v5109; libtpw_unit_sinit_3DFont_cpp.dylib), main app:
-//   src/Light_sinit_3DFont_cpp.cpp   __sinit_3DFont_cpp and its storage
+//   src/game/ui/3DFont.cpp   __sinit_3DFont_cpp and its storage
 //
 // Fakes: CLight::CLight, SetNormal, SetColor, __register_global_object, each recording what the PowerPC stub records.
 #include <cstddef>

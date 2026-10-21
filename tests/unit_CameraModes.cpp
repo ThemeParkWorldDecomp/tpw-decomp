@@ -1,7 +1,7 @@
 // Test library for the camera modes and MAP_wall_in_way (unit w141; libtpw_unit_CameraModes.dylib, tests/test_CameraModes.py), main app:
-//   src/TPCamera_modes.cpp  SetCameraMode, LoadCamera, SaveCamera, ToggleFirstPersonWalkAround, Setup1stPersonRideMeshes,
+//   src/game/TPCamera.cpp  SetCameraMode, LoadCamera, SaveCamera, ToggleFirstPersonWalkAround, Setup1stPersonRideMeshes,
 //                           ToggleRideRideIn1stPerson, SetupRideRideMatrixAndSuch and the load-time copy of __sinit_TPCamera_cpp
-//   src/MapDelta_wall.cpp   MAP_wall_in_way, gEntranceWalkEnd
+//   src/game/park/Map.cpp   MAP_wall_in_way, gEntranceWalkEnd
 //
 // Fakes that record through calllog (same event names and arguments as the module's PowerPC stubs): every cell predicate (answers from a
 // queue named after it, the cell as its index in the map), GetNeighbours, GetDirection, GetTrackCellEquiv, CTrackCell::IsBridge,

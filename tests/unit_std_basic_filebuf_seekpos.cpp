@@ -1,6 +1,6 @@
 // Test library for std::basic_filebuf<char> seekpos / seekoff / overflow (unit v5233; libtpw_unit_std_basic_filebuf_seekpos.dylib,
 // tests/test_std_basic_filebuf_seekpos.py), main app:
-//   src/std_basic_filebuf_seekpos.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues.
 #include <cstddef>

@@ -1,5 +1,5 @@
 // Test library for the park status panel's creation (unit v5572; libtpw_unit_CreateParkStatusPanel.dylib, tests/test_CreateParkStatusPanel.py), main app:
-//   src/CreateParkStatusPanel.cpp   CreateParkStatusPanel
+//   src/game/ui/ui_parkStatus.cpp   CreateParkStatusPanel
 //
 // Every callee outside the unit is a fake here that records the arguments the real one reads (the same event names as the module's PowerPC
 // stubs) and answers from the test's queues. The windows are blocks the test fills; GetWindow answers from the table gWins.
@@ -35,7 +35,7 @@ uint32_t Low(const void* p) { return static_cast<uint32_t>(reinterpret_cast<uint
 
 }  // namespace
 
-// The panel's message function (src/ParkInfoLines.cpp is not in this library); only its address is used.
+// The panel's message function (src/game/ui/ui_parkStatus.cpp is not in this library); only its address is used.
 int32_t ParkStatusPanelMsg(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
 
 // ---- the fakes
@@ -157,7 +157,7 @@ void WindowSetValue(InterfaceWindow* window, int32_t value) { ev("SetValue", {la
 void WindowSetText(InterfaceWindow* window, const char16_t* text) { ev("SetText", {lab(window), Low(text)}); }
 }  // namespace parkstatus_callee
 
-// The constructors the unit's weak callee wrappers name (src/CreateParkStatusPanel.cpp) but the library does not compile: empty bodies under
+// The constructors the unit's weak callee wrappers name (src/game/ui/ui_parkStatus.cpp) but the library does not compile: empty bodies under
 // their mangled names (never called, the fakes above replace the wrappers), so the library links without their classes' vtables.
 extern "C" {
 void tpw_ps_dummy_sprite1(void*) __asm__("__ZN25InterfaceTextObjectSpriteC1EPv");

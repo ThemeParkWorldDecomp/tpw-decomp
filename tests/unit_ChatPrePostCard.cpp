@@ -1,6 +1,6 @@
 // Test library for the chat postcard hand-over, the outbox static initialiser and the JPEG error exit (unit v5579;
 // libtpw_unit_ChatPrePostCard.dylib, tests/test_ChatPrePostCard.py), main app:
-//   src/LCPostFormat_2_ChatPrePostCard.cpp   ChatPrePostCard, ChatReinstateAfterPostcard, LockChatPanelOff, __sinit_ui_onlineOutbox_cpp,
+//   src/game/ui/ui_onlineOutbox.cpp, src/game/ui/ui_onlinePanel.cpp   ChatPrePostCard, ChatReinstateAfterPostcard, LockChatPanelOff, __sinit_ui_onlineOutbox_cpp,
 //   my_error_exit; it defines the four globals only these functions use.
 //
 // The callees outside the unit are fakes that record what the real ones read: UI_SendMessage, InterfaceWindow::CaptureKb, the string

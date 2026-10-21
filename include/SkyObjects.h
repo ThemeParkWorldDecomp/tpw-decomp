@@ -8,7 +8,7 @@ public:
     CSkyObjects();              // 0x1015b5f0 (empty)
     ~CSkyObjects();             // 0x1015b61c
     void InitSkyObjects();      // 0x1015b688
-    // 0x1015b804 (src/SkyObjects_destroy.cpp): takes each of the sky objects out of the sky (gei_Sky) in turn.
+    // 0x1015b804 (src/game/park/SkyObjects.cpp): takes each of the sky objects out of the sky (gei_Sky) in turn.
     void DestroySkyObjects();
 
     // The sky objects' texture pointers, from +0 (4 bytes each on the Mac). The count is gMainBalance's NumSkyObjects (slot at 0x6e4);

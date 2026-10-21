@@ -1,5 +1,5 @@
 """Unit v5364, the staff status panel's message functions, against libtpw_unit_StaffStatusMsg.dylib (tests/unit_StaffStatusMsg.cpp), main app
-("SimTheme Park"), src/StaffStatusPanel_FireMe_StaffStatusPanel_UpdateStatusWindow_StaffStatusMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_staffStatus.cpp:
   StaffStatusMsg 0x101c4f8c, OneEditMsg 0x101c56bc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

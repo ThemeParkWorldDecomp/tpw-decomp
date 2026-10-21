@@ -1,6 +1,6 @@
 // Test library for the Metrowerks std::vector<const void*> insert / erase / resize and std::__locale_imp<__int128>::~__locale_imp
 // (unit v5916; libtpw_unit_std_vector_insert.dylib, tests/test_std_vector_insert.py), main app:
-//   src/GetNextWaypoint_HeightAtPos_NAV_std_vector_insert.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit (operator new, new[], delete, strlen, strcpy, __throw, the facets' virtual destructor) are fakes that
 // record what the real ones read. The host elements are 8 bytes (4 on the Mac): a vector allocation is logged at half its size.

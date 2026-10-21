@@ -1,6 +1,6 @@
 // Test library for CSwitch::ModeSwitch and twelve small functions (unit v51066; libtpw_unit_CSwitch_ModeSwitch.dylib,
 // tests/test_CSwitch_ModeSwitch.py), engine program:
-//   src/tb_capture_ConvertSquareFrom32_CSwitch_ModeSwitch.cpp
+//   src/engine/DirectDraw.cpp, src/engine/DrawPrimitiveOpenGL.cpp, src/engine/EngineUtil.cpp, src/engine/Switch.cpp, src/engine/tb_hfield.cpp, src/engine/tb_init.cpp
 //
 // CSwitch::Do, COpenGLPrintf::Close and operator delete are fakes recording their arguments. gei_Switch and gei_TextureSettings
 // (defined by other files) are defined here.

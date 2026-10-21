@@ -1,5 +1,5 @@
 // Test library for GetNextWaypoint (unit v5198; libtpw_unit_GetNextWaypoint.dylib, tests/test_GetNextWaypoint.py), main app:
-//   src/GetNextWaypoint.cpp   GetNextWaypoint
+//   src/game/rides/FlyingRide.cpp   GetNextWaypoint
 //
 // The callees outside the unit (CWorld::GetRand, HeightAtPos_NAV, GetWorldGSquareHeight) are recording fakes answering from the test's
 // queues; the globals of other files the unit reads are defined here.

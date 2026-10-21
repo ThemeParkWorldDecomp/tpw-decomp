@@ -1,6 +1,6 @@
 // Test entry points for unit w77, the sound library's value classes (libtpw_unit_SoundInfo.dylib, driven by
 // tests/test_SoundInfo.py in the program "sound symbols shared"):
-//   src/TbSoundInfo.cpp   TbSoundPosition, TbSoundDistance, TbSoundReverbInfo, TbSoundVolumeControl, TbSoundSampleInfo,
+//   src/sound/AudioPlaceHolder.cpp, src/sound/SystemCommand.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundPosition.cpp, src/sound/TbSoundSampleInfo.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/TbSoundSystemInfo.cpp, src/sound/TbSysCommand.cpp   TbSoundPosition, TbSoundDistance, TbSoundReverbInfo, TbSoundVolumeControl, TbSoundSampleInfo,
 //                         TbSoundSystemInfo (TbSoundSampleInfo::SetBank is w72's and is tested in test_SoundBank.py)
 // The unit has no callees outside itself on the host, so there are no fakes: the test builds the records on both sides over
 // a recognisable fill, runs one function and compares every record byte for byte.

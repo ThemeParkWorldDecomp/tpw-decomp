@@ -1,5 +1,5 @@
 // Test library for the std::basic_ifstream<wchar_t> constructor (unit v5724; libtpw_unit_std_basic_ifstream_basic_ifstream_2.dylib), main app:
-//   src/std_basic_ifstream_basic_ifstream_2.cpp   BasicIfstreamWchar::construct
+//   src/game/MslSupport.cpp   BasicIfstreamWchar::construct
 //
 // The callees (basic_istream and basic_filebuf constructors) are fakes recording their arguments as tags; the vtable globals are defined here.
 #include <cstddef>

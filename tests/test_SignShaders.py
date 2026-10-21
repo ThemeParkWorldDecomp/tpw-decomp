@@ -1,8 +1,8 @@
 """Unit w84, the ride sign's image filters and shaders, against libtpw_unit_SignShaders.dylib (tests/unit_SignShaders.cpp), in the main
 app ("SimTheme Park"):
-  src/rsse_sign_filters.cpp   erodebuffer_erode 0x100c8e40, make_gaussian_filter_2d 0x100c90d8, copy_offset_alpha 0x100c922c,
+  src/game/rides/RideSign.cpp   erodebuffer_erode 0x100c8e40, make_gaussian_filter_2d 0x100c90d8, copy_offset_alpha 0x100c922c,
                               dilate 0x100c9404, erode 0x100c9650, blur 0x100c98e4
-  src/rsse_sign_shaders.cpp   PlasticShader::clear 0x100ca6a0, ~PlasticShader 0x100ca558, load_settings 0x100ca724, bevel 0x100ca95c,
+  src/game/rides/RideSign.cpp   PlasticShader::clear 0x100ca6a0, ~PlasticShader 0x100ca558, load_settings 0x100ca724, bevel 0x100ca95c,
                               blur_with_mask 0x100cab6c, plastic_shade 0x100caf40, ShadowGlow::shadow_glow 0x100cb468,
                               ~ShadowGlow 0x100cb7c0
 
@@ -24,7 +24,7 @@ multiply-adds twice, the processor once.
 
 Not tested: a positive mOffsetY in plastic_shade (the rows above it get a negative row number, whose remainder is negative, and the
 texel is read before the tile's buffer: the original's bug, reading memory the two sides do not share), the failure branches that need operator new[] to answer NULL (dilate, erode, blur, shadow_glow: the host's new[] throws,
-and so does the original's, see src/Bitmap.cpp), the destructors on a NULL object (the Mac tests for it; C++ never calls with NULL),
+and so does the original's, see src/engine/Bitmap.cpp), the destructors on a NULL object (the Mac tests for it; C++ never calls with NULL),
 negative or NaN sigma in blur and blur_with_mask (the kernel's new[] would be enormous), copies that would write outside the
 destination (copy_offset_alpha with a move of a whole width or more: the original's bug, not reproducible without corrupting memory).
 """

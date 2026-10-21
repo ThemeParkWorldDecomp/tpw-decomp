@@ -1,5 +1,5 @@
 // Test library for std::basic_string<char> (unit v5253; libtpw_unit_std_basic_string_basic_string.dylib), main app:
-//   src/TPMain_std_basic_string_basic_string.cpp   constructors, destructor, init, assign, resize, append
+//   src/game/MslSupport.cpp   constructors, destructor, init, assign, resize, append
 //
 // The callees outside the unit are fakes that record what the real ones read; the allocator fakes hand out zeroed blocks of at least 80
 // bytes with 16 guard bytes before (the original wraps an address at 32 bits when n = 0xffffffff).

@@ -1,6 +1,6 @@
 """Unit w69, the online system's tickers, against libtpw_unit_OnlineTick.dylib (tests/unit_OnlineTick.cpp), in the main app
 ("SimTheme Park"):
-  src/FS_Online_tick.cpp  CFSOnlineSystem::TickNews 0x1017232c, TickCity 0x10173afc, TickUpload 0x10175b00, TickFTPDownload 0x10176da4,
+  src/game/online/FS_Online.cpp  CFSOnlineSystem::TickNews 0x1017232c, TickCity 0x10173afc, TickUpload 0x10175b00, TickFTPDownload 0x10176da4,
                           CompleteLogin 0x10171c08, AreWeLoggedIn 0x1017178c
 
 The harness is unit w68's (tests/test_OnlineInit.py, imported as OI: a case is a script on one online system built over filler bytes

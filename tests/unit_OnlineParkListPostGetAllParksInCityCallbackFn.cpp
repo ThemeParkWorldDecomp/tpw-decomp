@@ -1,6 +1,6 @@
 // Test library for the small online UI functions of unit v51067 (libtpw_unit_OnlineParkListPostGetAllParksInCityCallbackFn.dylib,
 // tests/test_OnlineParkListPostGetAllParksInCityCallbackFn.py), main app:
-//   src/PublishPanelMsg_OnlineParkListPostGetAllParksInCityCallbackFn.cpp   the 20 functions of the unit
+//   src/game/ui/ui_cityLobbyController.cpp, src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineLogin.cpp, src/game/ui/ui_onlineNewsPanel.cpp, src/game/ui/ui_onlineOutbox.cpp, src/game/ui/ui_onlinePanel.cpp, src/game/ui/ui_onlineParkFindPanel.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_onlineParkListPanel.cpp   the 20 functions of the unit
 //
 // Every callee outside the unit is a fake that records what the real one reads (the same event name and arguments as the module's
 // PowerPC stubs). The globals of other files the unit reads are defined here, zero at start like the Mac's bss.
@@ -29,7 +29,7 @@
 
 using namespace calllog;
 
-// ---- the unit's functions and globals (src/PublishPanelMsg_OnlineParkListPostGetAllParksInCityCallbackFn.cpp)
+// ---- the unit's functions and globals (src/game/ui/ui_cityLobbyController.cpp, src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineLogin.cpp, src/game/ui/ui_onlineNewsPanel.cpp, src/game/ui/ui_onlineOutbox.cpp, src/game/ui/ui_onlinePanel.cpp, src/game/ui/ui_onlineParkFindPanel.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_onlineParkListPanel.cpp)
 void OutboxCallback(EmailCompletionCode code, EmailErrorCode error);
 void RemoveOnlinePanel();
 void RemoveOnlineNewsPanel();

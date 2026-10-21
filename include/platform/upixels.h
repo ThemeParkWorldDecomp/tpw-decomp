@@ -1,5 +1,5 @@
 // Sam's Utilities' pixel converter (sams utils shared, UPixels.cpp): the engine's image
-// loader converts every TGA through it (src/tb_loaders.cpp). Unlike the rest of the shim
+// loader converts every TGA through it (src/engine/TextureLoadManager.cpp). Unlike the rest of the shim
 // library this is pure computation, so platform/upixels.cpp is a translation of the
 // original, tested differentially (tests/test_UPixels.py).
 #pragma once

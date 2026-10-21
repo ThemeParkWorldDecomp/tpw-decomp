@@ -1,5 +1,5 @@
 // Test library for CreateResearchPanel (unit v5021; libtpw_unit_CreateResearchPanel.dylib, tests/test_CreateResearchPanel.py), main app:
-//   src/CreateResearchPanel.cpp   CreateResearchPanel and the panel's globals
+//   src/game/ui/ui_researchPanel.cpp   CreateResearchPanel and the panel's globals
 //
 // Every callee is a fake that records what the real one reads. The windows are fake objects (labels 1 to 0x3f) whose virtual SetValue is a
 // fake too; GetWindow answers the window whose label is the id's low byte (or NULL, as the case's mask says). The case's numbers come in

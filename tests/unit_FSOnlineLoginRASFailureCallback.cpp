@@ -1,5 +1,5 @@
 // Test library for the online login callbacks (unit v5113; libtpw_unit_FSOnlineLoginRASFailureCallback.dylib), main app:
-//   src/FS_Online_FSOnlineLoginRASFailureCallback.cpp   FSOnlineLoginRASFailureCallback, FSOnlineLoginConnectionCallback
+//   src/game/online/FS_Online.cpp   FSOnlineLoginRASFailureCallback, FSOnlineLoginConnectionCallback
 //
 // The constructor and the two forwarded calls are recording fakes; gOnlineSystem is defined here.
 #include <cstddef>

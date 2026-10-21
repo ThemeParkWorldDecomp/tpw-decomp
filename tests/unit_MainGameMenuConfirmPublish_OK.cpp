@@ -1,6 +1,6 @@
 // Test library for the game and lobby menus' handlers (unit v5522; libtpw_unit_MainGameMenuConfirmPublish_OK.dylib,
 // tests/test_MainGameMenuConfirmPublish_OK.py), main app:
-//   src/ui_iterators_MainGameMenuConfirmPublish_OK.cpp   MainGameMenuConfirmPublish_OK, MainGameMenuCB, MainLobbyMenuConfirmLogout_OK,
+//   src/game/ui/ui_mainmenu.cpp   MainGameMenuConfirmPublish_OK, MainGameMenuCB, MainLobbyMenuConfirmLogout_OK,
 //                                                        MainLobbyMenuCB
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of

@@ -9,11 +9,11 @@ public:
     void SetID(int32_t id) { mID = id; } // 0x1015eecc
     int32_t GetHeight();       // 0x10168fc0
     void Release();            // 0x10168ff8: frees the bitmap
-    // 0x1016906c (180 bytes, src/lobby_start_leaves.cpp): the built-in 8x8 font: a table of `a` entries of 8 bytes (new[]),
+    // 0x1016906c (180 bytes, src/game/ui/InterfaceFont.cpp): the built-in 8x8 font: a table of `a` entries of 8 bytes (new[]),
     // each with the byte `b`, the byte `e`, two bytes it leaves and a zero word, then mHeight = d (only when the table could
     // be made); mF02 = c in any case.
     void Gen8x8DebugFont(int16_t a, int16_t b, int16_t c, int16_t d, int16_t e);
-    // src/UI_drawtext.cpp (unit w35b). The glyph table is mBitmap: 8 bytes a glyph, the first a signed width.
+    // src/game/ui/InterfaceFont.cpp (unit w35b). The glyph table is mBitmap: 8 bytes a glyph, the first a signed width.
     // The width of `text` from character `first` to `last` (both included, 16-bit characters): the spacing mF02 plus the
     // glyph's width for each. 0 for no text, no table, an empty text, a range outside the text or a range of one character
     // or fewer; a `last` before `first` means the end of the text. The loop reaches the terminator when `last` is the

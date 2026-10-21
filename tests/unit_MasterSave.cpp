@@ -1,5 +1,5 @@
-// Test library for the master save file (libtpw_unit_MasterSave.dylib; see tests/test_MasterSave.py): src/FS_MasterSave_file.cpp (Save, Load,
-// Serialise) and src/FS_MasterSave_park.cpp (the park record's loader constructor and Serialise) of unit w89b, over the master save and
+// Test library for the master save file (libtpw_unit_MasterSave.dylib; see tests/test_MasterSave.py): src/game/save/FS_MasterSave.cpp (Save, Load,
+// Serialise) and src/game/save/FS_MasterSave.cpp (the park record's loader constructor and Serialise) of unit w89b, over the master save and
 // park record of units w32 and w89 (all real, with the std containers), the bullfrog strings (real) and the 16-bit C library.
 //
 // Fakes that record through calllog: the serialisation instances of the basic types (bool, int, unsigned int, unsigned short, char,
@@ -174,7 +174,7 @@ TbError LbFile_Close(void* file) {
     return TbError(0);
 }
 
-// ---- the player settings' serialiser (src/TPSettings.cpp; its own test is test_TPSettings): it records its arguments and answers the queue
+// ---- the player settings' serialiser (src/game/TPSettings.cpp; its own test is test_TPSettings): it records its arguments and answers the queue
 int32_t CPlayerSettings::SerialiseLocal(void* file, int32_t save, uint32_t version) {
     ev("CPlayerSettings::SerialiseLocal", {lab(this), lab(file), save, version});
     return static_cast<int32_t>(ret("SerialiseLocal"));

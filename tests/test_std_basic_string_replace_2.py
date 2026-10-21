@@ -1,5 +1,5 @@
 """Unit v5941, std::basic_string<char> replace 0x10002d20 and init 0x10072e6c, against libtpw_unit_std_basic_string_replace_2.dylib
-(tests/unit_std_basic_string_replace_2.cpp), main app ("SimTheme Park"), src/std_basic_string_replace_2.cpp.
+(tests/unit_std_basic_string_replace_2.cpp), main app ("SimTheme Park"), src/game/MslSupport.cpp.
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian at the Mac's addresses,
 host memory little-endian). The callees outside the unit (strlen, strcpy, new, new[], delete, memcpy, memset, __throw) are fakes on

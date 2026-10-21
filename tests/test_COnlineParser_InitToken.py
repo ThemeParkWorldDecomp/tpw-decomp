@@ -1,5 +1,5 @@
 """Unit v5187, COnlineParser's token list and the Say and Tell commands, against libtpw_unit_COnlineParser_InitToken.dylib
-(tests/unit_COnlineParser_InitToken.cpp), main app ("SimTheme Park"), src/COnlineParser_ParseGoto_COnlineParser_InitToken.cpp:
+(tests/unit_COnlineParser_InitToken.cpp), main app ("SimTheme Park"), src/game/online/OnlineParser.cpp:
   InitToken 0x1020ed70, InitTokenList 0x1020e898, ParseSay 0x1020ef70, ParseTell 0x1020f0cc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian, host memory

@@ -1,5 +1,5 @@
 // Test library for CLineList::AddLine and ~CLineList (unit v5297; libtpw_unit_CLineList_AddLine.dylib, tests/test_CLineList_AddLine.py), ltms:
-//   src/TbResource_CLineList_AddLine.cpp
+//   src/ltms/TbTextFormatter.cpp
 //
 // The callees (vector<CLineInfo>::push_back and tear_down, operator delete) are fakes that record their arguments; pointers into the
 // character block are logged as offsets from its base (set by the test).

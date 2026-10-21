@@ -1,5 +1,5 @@
-"""The height field's per-frame members and the texture cache's frame calls (src/tb_hfield_frame.cpp
-and src/tb_texturecache_frame.cpp): CHField::Prepare, CHField::DivideAndConquer, CGamut::GetVertices,
+"""The height field's per-frame members and the texture cache's frame calls (src/engine/Gamut.cpp, src/engine/tb_hfield.cpp
+and src/engine/TextureCache.cpp): CHField::Prepare, CHField::DivideAndConquer, CGamut::GetVertices,
 CTextureCache::Refresh and CTextureCache::Execute, against the original. Every callee outside the
 unit is a fake on both sides (tests/unit_HFieldFrame.cpp on the host) that records its arguments and
 answers from the case's queues: CGamut::GetQuads, TestConQuad, the texture entries' Lock and Unlock,

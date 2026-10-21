@@ -1,5 +1,5 @@
 """Unit v51109, twenty small panel functions against libtpw_unit_FillAllRidesListCallback.dylib (tests/unit_FillAllRidesListCallback.cpp), main app
-("SimTheme Park"), src/AddItemToAllRidesList_FillAllRidesListCallback_Upgrades_FillAllRidesListCallback.cpp:
+("SimTheme Park"), src/game/ui/ui_FinancePanel.cpp, src/game/ui/ui_StatusPanel.cpp, src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allKidsPanel.cpp, src/game/ui/ui_allStaffPanel.cpp, src/game/ui/ui_coasterPanel.cpp, src/game/ui/ui_controlPanel.cpp, src/game/ui/ui_entryPricePanel.cpp, src/game/ui/ui_hirePanel.cpp, src/game/ui/ui_loadSavePanel.cpp, src/game/ui/ui_loansPanel.cpp, src/game/ui/ui_textmanager.cpp:
   FillAllRidesListCallback 0x10195b40, __sinit_ui_allKidsPanel_cpp 0x1019592c, RemoveAllKidsPanel 0x101956a4,
   __sinit_ui_StatusPanel_cpp 0x101946ac, RemoveAllItemsPanel 0x1019862c, StatusPanelIteratorCallback 0x10192a3c,
   RemoveAllStaffPanel 0x10199e20, __sinit_ui_allStaffPanel_cpp 0x10199e84, __sinit_ui_textmanager_cpp 0x101902e8,

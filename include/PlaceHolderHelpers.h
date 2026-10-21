@@ -1,5 +1,5 @@
 // PlaceHolderHelpers.h: the placeholder helpers of the sound library (unit w79g4, "sound symbols shared", Code at 0x10000000, TOC r2 =
-// 0x1003abf0; the code is in src/PlaceHolderHelpers.cpp with the addresses):
+// 0x1003abf0; the code is in src/sound/AudioPlaceHolder.cpp, src/sound/PlaceHolderSentence.cpp with the addresses):
 //   CMapReference                                 resolves a placeholder's event, sound and sample pointers to the four ids the save game
 //                                                 stores and back, through the map streamer's category table
 //   CPlaceHolderOneShotThrowaway                  a one-shot placeholder that is not told when a sample ends

@@ -1,6 +1,6 @@
 // Test library for CSprocketsModule's constructor, Close, Tick, StreamData, SetChannelInfo and SetListenerDirection (unit v5997;
 // libtpw_unit_CSprocketsModule_SetListenerDirection_2.dylib, tests/test_CSprocketsModule_SetListenerDirection_2.py), "sound symbols shared":
-//   src/TbSoundPipeChannel_CSprocketsModule_SetChannelVolume_CSprocketsModule_SetListenerDirection_2.cpp
+//   src/sound/CSprocketsModule.cpp
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record. The vtable of CSprocketsModule is emitted by
 // the unit's source (the destructor is its key function), so every other override is a dummy here.
@@ -121,7 +121,7 @@ void TbSpeaker::ConfigSetModuleSpeaker(Module* speaker) {
     ev("SetModuleSpeaker", {p == nullptr ? 0 : (p == gLastAlloc ? 1 : 2)});
 }
 
-// The base class's member (0x1001493c, src/snd_handles.cpp is not compiled here); the destructor only runs if a module is destroyed.
+// The base class's member (0x1001493c, src/sound/ChannelState.cpp is not compiled here); the destructor only runs if a module is destroyed.
 TbSpeaker::AutoDelete::~AutoDelete() {}
 
 // ---- the other overrides: dummies, only for the vtable the unit's source emits

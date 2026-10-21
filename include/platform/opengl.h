@@ -88,7 +88,7 @@ void glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei widt
                   GLenum format, GLenum type, const void* pixels);
 void glTexSubImage2D(GLenum target, GLint level, GLint x, GLint y, GLsizei width, GLsizei height, GLenum format,
                      GLenum type, const void* pixels);
-// The draw primitive's drawing members (src/tb_opengl_draw.cpp): vertex arrays, immediate
+// The draw primitive's drawing members (src/engine/DrawPrimitiveOpenGL.cpp): vertex arrays, immediate
 // mode and pixel reads. glLockArraysEXT and glUnlockArraysEXT are GL_EXT_compiled_vertex_array.
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer);
 void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* pointer);

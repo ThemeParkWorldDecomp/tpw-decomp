@@ -1,4 +1,26 @@
 # Unit v51062: four COnlineControl members, Argument::StrVal / BStrVal and the wide stream / buddy map library functions around them
 # (src/COnlineControl_..._NoLongerAFK.cpp). The callees outside the unit are recording fakes in tests/unit_COnlineControl_NoLongerAFK.cpp,
 # which also defines the vtable tables of other files.
-set(TPW_UNIT_COnlineControl_NoLongerAFK src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_NoLongerAFK.cpp platform/arena.cpp)
+set(TPW_UNIT_COnlineControl_NoLongerAFK src/game/online/online.cpp platform/arena.cpp)
+set(TPW_UNIT_COnlineControl_NoLongerAFK_KEEP
+  __Z17CtypeWcharDoWidenPKvc   # CtypeWcharDoWiden(void const*, char)
+  __Z22BuddyTreeEraseOneCountP9BuddyTreePKv   # BuddyTreeEraseOneCount(BuddyTree*, void const*)
+  __ZN13ignore_callee11OstreamDtorEPNS_12IgnoreStreamEs   # ignore_callee::OstreamDtor(ignore_callee::IgnoreStream*, short)
+  __ZN13ignore_callee7IosDtorEPvs   # ignore_callee::IosDtor(void*, short)
+  __ZN13nocase_callee10DeallocateEPvS0_m   # nocase_callee::Deallocate(void*, void*, unsigned long)
+  __ZN13nocase_callee10StringDtorEP13nocase_strings   # nocase_callee::StringDtor(nocase_string*, short)
+  __ZN14COnlineControl10HideAvatarEv   # COnlineControl::HideAvatar()
+  __ZN14COnlineControl11NoLongerAFKEb   # COnlineControl::NoLongerAFK(bool)
+  __ZN14COnlineControl14DestroyVisitorERNSt3__112basic_stringIDsNS0_11char_traitsIDsEENS0_9allocatorIDsEEEE   # COnlineControl::DestroyVisitor(std::__1::basic_string<char16_t, std::__1::char_traits<char16_t>, std::__1::allocator<char16_t>>&)
+  __ZN14COnlineControl15UpdateAvatarPosE6MapPosS0_   # COnlineControl::UpdateAvatarPos(MapPos, MapPos)
+  __ZN16docommand_callee15ArgumentBStrValEPvPKv   # docommand_callee::ArgumentBStrVal(void*, void const*)
+  __ZN19BasicStreambufWchar4syncEv   # BasicStreambufWchar::sync()
+  __ZN19BasicStreambufWchar5imbueEPKv   # BasicStreambufWchar::imbue(void const*)
+  __ZN19BasicStreambufWchar6setbufEPDsi   # BasicStreambufWchar::setbuf(char16_t*, int)
+  __ZN19BasicStreambufWchar7destroyEs   # BasicStreambufWchar::destroy(short)
+  __ZN19BasicStreambufWchar8overflowEi   # BasicStreambufWchar::overflow(int)
+  __ZN19BasicStreambufWchar9pbackfailEi   # BasicStreambufWchar::pbackfail(int)
+  __ZN19BasicStreambufWchar9showmanycEv   # BasicStreambufWchar::showmanyc()
+  __ZN19BasicStreambufWchar9underflowEv   # BasicStreambufWchar::underflow()
+  __ZN21chat_satellite_callee14ArgumentStrValEP13MslCharStringPK8Argument   # chat_satellite_callee::ArgumentStrVal(MslCharString*, Argument const*)
+)

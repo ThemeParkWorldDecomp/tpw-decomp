@@ -1,5 +1,5 @@
 // Test library for the coaster type's remaining loaders (unit w148; libtpw_unit_CoasterLoaders.dylib, tests/test_CoasterLoaders.py), main app:
-//   src/TPCoaster_loaders.cpp   CreateTrackSectionMesh, SetupTrainType, SetupCarType, LoadCoasterPylons, SetupPylonData,
+//   src/game/rides/CoasterPylon.cpp, src/game/rides/CoasterType.cpp   CreateTrackSectionMesh, SetupTrainType, SetupCarType, LoadCoasterPylons, SetupPylonData,
 //                               CreateCrossSectionSelectsFromSamFile, SetCrossSectionSelectDefaults, RepackCrossSection,
 //                               OptimiseCrossSections, GetTempFixedRideParams
 //
@@ -25,7 +25,7 @@
 
 using namespace calllog;
 
-// ---- globals of other files the unit reads, defined here (src/RideTypes.cpp is not part of this unit)
+// ---- globals of other files the unit reads, defined here (src/game/rides/TPRide.cpp is not part of this unit)
 tag_sRideAnimSet* gRideTypes[16];
 tag_sRideAnimSet* gRideAnimSets[16];
 

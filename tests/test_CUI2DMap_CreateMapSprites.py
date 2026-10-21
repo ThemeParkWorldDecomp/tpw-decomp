@@ -1,5 +1,5 @@
 """Unit v5058, the 2D map's sprite maker, against libtpw_unit_CUI2DMap_CreateMapSprites.dylib (tests/unit_CUI2DMap_CreateMapSprites.cpp), main
-app ("SimTheme Park"), src/CUI2DMap_CreateMapSprites.cpp:
+app ("SimTheme Park"), src/game/ui/ui_2dmap.cpp:
   CUI2DMap::CreateMapSprites 0x1022fd78
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for

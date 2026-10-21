@@ -1,5 +1,5 @@
 // Test library for LbString_strnzcpy (unit v5703; libtpw_unit_LbString_strnzcpy.dylib), main app:
-//   src/Draw_colour_convert_LbString_strnzcpy.cpp
+//   src/bullfrog/LbString.cpp
 // strlen and memcpy are the C library's on both sides.
 #include <cstddef>
 #include <cstdint>

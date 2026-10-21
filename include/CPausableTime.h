@@ -1,5 +1,5 @@
 // CPausableTime (main app): Pause, UnPause, TogglePause, GetPauseFlag and ReadPausableTime
-// at 0x10154268..0x1015445c (src/GameClock.cpp). Inline construction recovered from
+// at 0x10154268..0x1015445c (src/game/PausableTime.cpp). Inline construction recovered from
 // __sinit_Clock_cpp at 0x101476dc.
 #pragma once
 #include "CVariableTime.h"

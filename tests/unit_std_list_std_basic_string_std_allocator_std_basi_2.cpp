@@ -1,5 +1,5 @@
 // Test library for std::list<std::string>::unique (unit v5259; libtpw_unit_std_list_std_basic_string_std_allocator_std_basi_2.dylib), main app:
-//   src/std_list_std_basic_string_std_allocator_std_basi_2.cpp   StringListUnique
+//   src/game/MslSupport.cpp   StringListUnique
 //
 // The callees are fakes: the string compare answers from the queue "compare", the list erase records its arguments (the host takes the
 // last iterator as the answer, which the real erase gives). Strings are told by the id word at rep + 0x10. Pointer words are arena offsets.

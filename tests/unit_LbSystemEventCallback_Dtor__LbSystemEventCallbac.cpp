@@ -1,5 +1,5 @@
 // Test library for the system event callback object (unit v5461; libtpw_unit_LbSystemEventCallback_Dtor__LbSystemEventCallbac.dylib), main app:
-//   src/LbFile_LbApp_GetWindowsScreenMode_LbSystemEventCallback_Dtor__LbSystemEventCallbac.cpp
+//   src/bullfrog/LbSCBack.cpp
 //
 // The callees outside the unit (critical section calls, operator delete, __destroy_arr, the list's RemoveHead, the registered callback) are
 // fakes that record what the PowerPC stubs record.

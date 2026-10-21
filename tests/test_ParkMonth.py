@@ -1,8 +1,8 @@
 """Unit w161, the park analyser's messages, month end, admissions, thoughts and cell save, against libtpw_unit_ParkMonth.dylib
 (tests/unit_ParkMonth.cpp), main app ("SimTheme Park"):
-  src/ParkAnalyser_month.cpp: CParkAnalyser::ReceiveMessage 0x100e41bc, PersonPaidAdmission 0x100e4470, UpdateEndOfMonth 0x100e47fc,
+  src/game/park/analyser.cpp: CParkAnalyser::ReceiveMessage 0x100e41bc, PersonPaidAdmission 0x100e4470, UpdateEndOfMonth 0x100e47fc,
     GetThreeMostDominantThoughts 0x100e5dc8, FinalDestroy 0x100e6fd0, CParkAnalyserCell::Serialise 0x100e60a0, __sinit_analyser_cpp 0x100f1fb0
-  src/ParkMessages.cpp: the constructors 0x1015210c 0x10151cfc 0x10151f14, GetType 0x100ef1f4 0x101244d0 0x1012c244 and destructors 0x100e4584
+  src/game/buildings/ResearchLab.cpp, src/game/buildings/StaffHQ.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/ui/MessageCentre.cpp: the constructors 0x1015210c 0x10151cfc 0x10151f14, GetType 0x100ef1f4 0x101244d0 0x1012c244 and destructors 0x100e4584
     0x1012412c 0x1012b4f4 of CMsgAddToChallenge, CMsgResearchCompleted and CMsgStaffInfo, and CBankAccount::GetBalance 0x100f32b4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for the

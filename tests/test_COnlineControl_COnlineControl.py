@@ -1,5 +1,5 @@
 """Unit v5016, the online client's object, against libtpw_unit_COnlineControl_COnlineControl.dylib
-(tests/unit_COnlineControl_COnlineControl.cpp), main app ("SimTheme Park"), src/COnlineControl_COnlineControl.cpp:
+(tests/unit_COnlineControl_COnlineControl.cpp), main app ("SimTheme Park"), src/game/online/online.cpp:
   COnlineControl::COnlineControl 0x10213870, COnlineControl::~COnlineControl 0x10213dd4, COnlineControl::InitClient 0x102143c4,
   COnlineControl::InitGameWorld 0x10214678
 

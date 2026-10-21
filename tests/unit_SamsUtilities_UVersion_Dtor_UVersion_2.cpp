@@ -1,5 +1,5 @@
 // Test library for unit v51042 (libtpw_unit_SamsUtilities_UVersion_Dtor_UVersion_2.dylib, tests/test_SamsUtilities_UVersion_Dtor_UVersion_2.py), main app:
-//   src/ui_main_panel_UI_Congratulations_SamsUtilities_UVersion_Dtor_UVersion_2.cpp   UVersion_Dtor, UIMain_SetObjectStateText,
+//   src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_loansPanel.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_parkStatus.cpp   UVersion_Dtor, UIMain_SetObjectStateText,
 //   InterfaceRankTextObject_Change, LenderListCallback, LendersItemsCallback, ThoughtMsg, NameEditMsg
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The globals of

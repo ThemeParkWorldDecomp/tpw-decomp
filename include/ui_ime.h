@@ -1,7 +1,7 @@
 // ui_IME.cpp (main app): the edit box's IME state. Mac offsets below; native pointers on the host.
 // Unit w92 adds the lifetime of the classes: IME::CIME (TPEmbed.cpp: constructor 0x101fe934, virtual destructor 0x101fe9ec), the
 // MSL vector tear_downs 0x101feb58 and 0x101f6ecc, IME::list_cand_data_t::~list_cand_data_t 0x101f6bec (ui_IME.cpp) and
-// CUIIME::~CUIIME 0x101f7d18 (ui_iterators.cpp). Sources: src/TPEmbed_ime.cpp and src/ui_ime_lifetime.cpp.
+// CUIIME::~CUIIME 0x101f7d18 (ui_iterators.cpp). Sources: src/game/ui/IME.cpp and src/game/ui/ui_iterators.cpp.
 #pragma once
 #include <cstdint>
 
@@ -28,23 +28,23 @@ struct MslWideString {
 struct list_cand_data_t {
     uint8_t mF00[0x10];                 // +0x00  not read or written by the lifetime code
     MslVector<MslWideString> mStrings;  // +0x10  capacity, size, data (Mac +0x10, +0x14, +0x18)
-    ~list_cand_data_t();                // 0x101f6bec (src/ui_ime_lifetime.cpp)
+    ~list_cand_data_t();                // 0x101f6bec (src/game/ui/ui_graph.cpp)
 };
 }
 // MslVector<IME::MslWideString> (the vector of strings) and MslVector<IME::list_cand_data_t> (the vector of candidate lists).
-template <> void MslVector<IME::MslWideString>::tear_down();       // 0x101f6ecc (src/ui_ime_lifetime.cpp): ~string of each, then the block
-template <> void MslVector<IME::list_cand_data_t>::tear_down();    // 0x101feb58 (src/TPEmbed_ime.cpp): each list's strings, then the block
+template <> void MslVector<IME::MslWideString>::tear_down();       // 0x101f6ecc (src/game/ui/ui_graph.cpp): ~string of each, then the block
+template <> void MslVector<IME::list_cand_data_t>::tear_down();    // 0x101feb58 (src/game/ui/IME.cpp): each list's strings, then the block
 
 namespace IME {
 // The input method editor of the build, Mac 0x138 bytes at CUIIME +0x1c. Polymorphic with one virtual, the destructor
 // (vtable 0x102b15b0). The constructor leaves +0x04, +0x30 and +0x38..+0x137 as they were.
 class CIME {
 public:
-    CIME();                    // 0x101fe934 (src/TPEmbed_ime.cpp)
+    CIME();                    // 0x101fe934 (src/game/ui/IME.cpp)
     virtual ~CIME();           // 0x101fe9ec: the candidate vector first, then the strings +0x10, +0x0c, +0x08
-    ActivationResult Activate(GrafPort* window); // 0x101feab0: Mac blr stub (src/TPEmbed_ime.cpp: the host answers a zeroed record)
-    void UnActivate();                         // 0x101feae8: Mac blr stub (src/TPEmbed_ime.cpp)
-    void SetMaxCompositionLength(int32_t length); // 0x101feb18: Mac blr stub (src/TPEmbed_ime.cpp)
+    ActivationResult Activate(GrafPort* window); // 0x101feab0: Mac blr stub (src/game/ui/IME.cpp: the host answers a zeroed record)
+    void UnActivate();                         // 0x101feae8: Mac blr stub (src/game/ui/IME.cpp)
+    void SetMaxCompositionLength(int32_t length); // 0x101feb18: Mac blr stub (src/game/ui/IME.cpp)
 
     uint32_t mF04;                          // +0x04  never written by the lifetime code
     MslWideString mString08;                // +0x08
@@ -72,14 +72,14 @@ public:
     uint8_t mF174[8];            // 0x174..0x17b  not used by the lifetime code
     int16_t mStoredLength;       // 0x17c
     int16_t mStoredInvalid;      // 0x17e
-    ~CUIIME();                   // 0x101f7d18 (src/ui_ime_lifetime.cpp): the candidate list, then the IME
+    ~CUIIME();                   // 0x101f7d18 (src/game/ui/ui_iterators.cpp): the candidate list, then the IME
     void Activate(InterfaceWindow* window); // 0x101f6c84
     void DeActivate();                      // 0x101f6d68
     void InvalidateStoredString(InterfaceWindow* window); // 0x101f6e0c
 };
 extern CUIIME gUIIME; // 0x103966c0: an object, not a pointer
 
-// Unit v5008: std::basic_string<wchar_t> compare / assign / substring constructor (src/UI_Base_std_basic_string_compare.cpp).
+// Unit v5008: std::basic_string<wchar_t> compare / assign / substring constructor (src/game/MslSupport.cpp).
 // The object IME::MslWideString holds one pointer to a shared representation. Representation, Mac offsets:
 //   +0x00 length, +0x04 capacity, +0x08 reference count (0 = not shared yet), +0x0c data pointer (native here: +0x10).
 // Written as free functions taking the string object (the stand-in class above is not touched).
@@ -120,7 +120,7 @@ void MslThrow(const char* typeName, void* object, const void* dtorTV); // __thro
 int32_t MslWmemcmp(const char16_t* a, const char16_t* b, uint32_t n);   // wmemcmp
 char16_t* MslWmemcpy(char16_t* d, const char16_t* s, uint32_t n);       // wmemcpy
 void MslRefCountedCharsCtor(MslRefCountedChars* self, char* p);         // 0x100026ac
-// Unit v5949 (src/TPMain_std_logic_error_Dtor_logic_error.cpp): the destructors take the hidden signed 16 bit delete flag and answer this.
+// Unit v5949 (src/game/MslSupport.cpp): the destructors take the hidden signed 16 bit delete flag and answer this.
 MslRefCountedChars* MslRefCountedCharsDtor25e0(MslRefCountedChars* self, int16_t deleteFlag); // 0x100025e0
 MslExceptionObject* MslLogicErrorDtor(MslExceptionObject* self, int16_t deleteFlag);          // 0x100020cc std::logic_error
 MslExceptionObject* MslOutOfRangeDtor(MslExceptionObject* self, int16_t deleteFlag);          // 0x10002008 std::out_of_range
@@ -128,7 +128,7 @@ void MslWideString_changeSize(MslWideString* self, uint32_t n, bool keep);      
 void MslWideString_replace(MslWideString* self, uint32_t pos, uint32_t n1, uint32_t n2, char16_t c); // 0x101f7740
 void MslWideString_init(MslWideString* self, const char16_t* first, const char16_t* last);      // 0x10146cf8
 
-// Unit v5044: replace 0x101f7740 (declared above), substr 0x1021212c, begin 0x10212448 (src/ui_iterators_std_basic_string_replace.cpp).
+// Unit v5044: replace 0x101f7740 (declared above), substr 0x1021212c, begin 0x10212448 (src/game/MslSupport.cpp).
 MslWideString* MslWideString_substr(MslWideString* result, const MslWideString* self, uint32_t pos, uint32_t n); // 0x1021212c (const)
 char16_t* MslWideString_begin(MslWideString* self);                                                            // 0x10212448
 extern char gMslLengthErrorVtbl[16];     // 0x10278b74: std::length_error vtable pointer stand-in
@@ -140,7 +140,7 @@ char16_t* MslWmemset(char16_t* d, char16_t c, uint32_t n);          // wmemset
 char16_t* MslWmemmove(char16_t* d, const char16_t* s, uint32_t n);  // wmemmove
 }
 
-// Unit v5086: std::list<std::string> of the Metrowerks library (src/ui_Postcard_panel_std_list_std_basic_string_std_allocator_std_basi.cpp).
+// Unit v5086: std::list<std::string> of the Metrowerks library (src/game/MslSupport.cpp).
 // Mac offsets in comments, native pointers here. A list is the count, then the sentinel link (prev, next); the sentinel's
 // address is the list +4 (the iterator end()). A node is a link and a string.
 namespace IME {
@@ -179,13 +179,13 @@ void MslStrList_clear(MslStrList* self);                                        
 void MslStrList_splice(MslStrList* self, MslStrNode* pos, MslStrList* other);           // 0x1020abec
 }
 
-// Unit v5099: std::basic_string<wchar_t>::operator[](unsigned long) 0x10212298 (src/std_basic_string_operator.cpp): makes the
+// Unit v5099: std::basic_string<wchar_t>::operator[](unsigned long) 0x10212298 (src/game/MslSupport.cpp): makes the
 // representation unshared (copy when the reference count is above 1), marks it 0 and answers the address of the character.
 namespace IME {
 char16_t* MslWideString_index(MslWideString* self, uint32_t index);   // 0x10212298
 }
 
-// Unit v5645: std::basic_string<wchar_t> constructors and init, change_size (src/Cheat_std_basic_string_init.cpp). The allocator
+// Unit v5645: std::basic_string<wchar_t> constructors and init, change_size (src/game/MslSupport.cpp). The allocator
 // arguments are dropped. The three terminators are globals of the library (initial word 0).
 namespace IME {
 extern char16_t gMslWcharNulInit;     // 0x102a4d3c: written after the last character by init
@@ -196,7 +196,7 @@ MslWideString* MslWideString_ctorCStr(MslWideString* self, const char16_t* text)
 MslWideString* MslWideString_ctorEmpty(MslWideString* self);                                // 0x101e0b84 basic_string(alloc)
 }
 
-// Unit v5768 (src/ui_iterators_sinit_ui_IME_cpp.cpp): ui_IME.cpp's static initialiser.
+// Unit v5768 (src/game/ui/ui_IME.cpp): ui_IME.cpp's static initialiser.
 void __sinit_ui_IME_cpp();                 // 0x101f7c74 (124)
 extern uint32_t gUIIMESinitDtorTV[2];      // 0x10268600: TVector of CUIIME::~CUIIME (stand-in)
 extern uint32_t gUIIMESinitNode[3];        // 0x10396a40: its __register_global_object record

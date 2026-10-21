@@ -1,6 +1,6 @@
 """Unit v5207, the staff status panel's InitStatusWindow, UpdateStatusWindow and UpdateWindow, against
 libtpw_unit_StaffStatusPanel_UpdateStatusWindow.dylib (tests/unit_StaffStatusPanel_UpdateStatusWindow.cpp), main app
-("SimTheme Park"), src/StaffStatusPanel_FireMe_StaffStatusPanel_UpdateStatusWindow.cpp:
+("SimTheme Park"), src/game/ui/ui_staffStatus.cpp:
   StaffStatusPanel::UpdateStatusWindow 0x101c4990, UpdateWindow 0x101c4d2c, InitStatusWindow 0x101c4304
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

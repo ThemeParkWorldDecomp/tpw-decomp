@@ -1,5 +1,5 @@
-// Differential library for unit w129: the macro AI (src/MacroAI.cpp, src/Arrival_update.cpp, src/ParkTime_update.cpp, src/StaffDB_update.cpp,
-// src/GoldenTicket_check.cpp, src/Game_iterate.cpp, src/ControlManager_setup.cpp, src/WorldSavvy.cpp, src/ParkAnalyser_gates.cpp, src/DateMessages.cpp).
+// Differential library for unit w129: the macro AI (src/game/park/Map.cpp, src/game/people/Arrival.cpp, src/game/people/ParkTime.cpp, src/game/people/StaffDB.cpp,
+// src/game/park/GoldenTickets.cpp, src/game/Game.cpp, src/game/ControlManager.cpp, src/game/ui/ui_visitorStatus.cpp, src/game/park/analyser.cpp, src/game/people/ParkTime.cpp, src/game/people/Peep.cpp, src/game/ui/MessageCentre.cpp).
 //
 // Every callee outside the unit is a fake that records the same event as the PowerPC side's stub: the funny time, the time stamp operators, the message
 // centre post and its lazy allocation, the UI (DateChange, StaffDBChange, three panels), the staff database's helpers, the arrivals' people, the world's

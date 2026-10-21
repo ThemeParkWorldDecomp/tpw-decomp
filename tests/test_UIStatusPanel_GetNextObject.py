@@ -1,6 +1,6 @@
 """Unit v5090, the UIStatusPanel members GetNextObject, FillObjectList, EraseObject, OpenWindow and Move, against
 libtpw_unit_UIStatusPanel_GetNextObject.dylib (tests/unit_UIStatusPanel_GetNextObject.cpp), main app ("SimTheme Park"),
-src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject.cpp:
+src/game/ui/ui_StatusPanel.cpp:
   GetNextObject 0x10192c28, FillObjectList 0x10192a90, EraseObject 0x10193138, OpenWindow 0x101935a0, Move 0x101938d8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

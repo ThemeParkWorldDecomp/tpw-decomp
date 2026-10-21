@@ -1,11 +1,11 @@
 """Unit w80b, the sound library's codec factory, bank file wrapper and MPEG sample codecs, against
 libtpw_unit_SoundCodecFactory.dylib (tests/unit_SoundCodecFactory.cpp), in the program "sound symbols shared" (the Mac's sound
 library, Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/CCodecFactory.cpp          CCodecFactory: constructor 0x10010b10, destructor 0x10010a88, CreateCodec 0x100007c4, CreateController
+  src/sound/FileAccess.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleStore.cpp          CCodecFactory: constructor 0x10010b10, destructor 0x10010a88, CreateCodec 0x100007c4, CreateController
                                  0x10000054, GetNextSampleFromBank 0x10000390, CreateCodecModifier 0x10000438;
                                  _CFileAccess: constructors 0x10001cf0 and 0x10001d90, Read 0x10001e30, Seek 0x10001fb0,
                                  SeekToDataStart 0x10002030, destructor 0x100020a8
-  src/TbSoundSampleMPEG2.cpp     _TbSoundSampleMPEG2: constructor 0x1000e44c, destructor 0x10007a74, SetInfo 0x1000e510, Release
+  src/game/advisor/AdvisorScoring.cpp, src/sound/StreamableMpeg2.cpp, src/sound/TbBank.cpp, src/sound/TbSoundSampleMPEG2.cpp, src/sound/TbSoundSamplePipe.cpp     _TbSoundSampleMPEG2: constructor 0x1000e44c, destructor 0x10007a74, SetInfo 0x1000e510, Release
                                  0x1000e618, GetDataChunk 0x1000e690, Restart 0x1000e850, OpenMpegFile 0x1000e8ec, CloseMpegFile
                                  0x1000eb44, GetMpegBlock 0x1000ebe4, SetNewDataPosition 0x1000ec48, SetDataPosition 0x1000ec8c,
                                  SetDataStart 0x100084f0, operator new 0x1000e1b4, operator delete 0x1000e284, TopUp 0x1000e328,
@@ -14,7 +14,7 @@ library, Code at 0x10000000, TOC base r2 = 0x1003abf0):
                                  0x100080f4, Seek 0x10008208, GetMpegBlock 0x1000828c, CloseMpegFile 0x10008304, Restart 0x100083a8,
                                  SetNewDataPosition 0x10008410, operator new 0x100076e4, operator delete 0x100077b8, TopUp
                                  0x10007860, SetLevel 0x10007948, ClearCache 0x1000764c, the cleanup destructor 0x1000881c
-  src/TbSoundBank.cpp (added by this unit)  Bank::CBank: the bank as a TbRefRelease 0x1001458c, IsStreaming 0x100145cc,
+  src/sound/Bank.cpp, src/sound/ListSentence.cpp, src/sound/TbBank.cpp, src/sound/TbMMFileBank.cpp, src/sound/TbSoundBankInfo.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundSampleInfo.cpp (added by this unit)  Bank::CBank: the bank as a TbRefRelease 0x1001458c, IsStreaming 0x100145cc,
                                  GetSamplePosition 0x10014720
 
 Each function runs as the original in the emulator and as the host's translation, in scripts of operations on a world of six node

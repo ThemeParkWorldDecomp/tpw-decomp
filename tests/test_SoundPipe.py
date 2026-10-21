@@ -1,6 +1,6 @@
 """Unit w78, the sound library's sample pipe base, against libtpw_unit_SoundPipe.dylib (tests/unit_SoundPipe.cpp), in the program
 "sound symbols shared" (the Mac's sound library, Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/TbSoundPipe.cpp  TbSoundSamplePipe: destructor 0x10000248, constructor 0x10000344, SetHandle 0x10000bb8, GetDataChunk
+  src/sound/StreamableMpeg2.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleCallback.cpp, src/sound/TbSoundSampleCodec.cpp, src/sound/TbSoundSamplePipe.cpp, src/sound/TbSoundSystemInfo.cpp  TbSoundSamplePipe: destructor 0x10000248, constructor 0x10000344, SetHandle 0x10000bb8, GetDataChunk
                        0x10001148, GetSampleRate 0x1000118c, Restart 0x10001204, SetDataStart 0x1000123c, ClearCache 0x1000edb8,
                        operator new 0x1000ee48, operator delete 0x1000ef14, TopUp 0x1000efb8, SetLevel 0x1000f098, Attatch
                        0x1000f440, AttachReplace 0x1000f4e4, Release 0x1000f588, Completed 0x1000f628, SetInfo 0x1000f694,

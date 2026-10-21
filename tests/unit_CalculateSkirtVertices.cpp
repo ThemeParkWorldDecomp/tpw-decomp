@@ -1,5 +1,5 @@
 // Test library for CalculateSkirtVertices (unit v5909; libtpw_unit_CalculateSkirtVertices.dylib, tests/test_CalculateSkirtVertices.py), main app:
-//   src/RideDestroy_CalculateSkirtVertices.cpp   CalculateSkirtVertices
+//   src/game/park/SkirtDeform.cpp   CalculateSkirtVertices
 //
 // The callees outside the unit (DecideRideShapeDeformEdges, SetMatrixIdentity, DoOrSetupSkirtDeform, MReleaseAllocF, CalcSkirtTextureDirnFlags,
 // ERRORBox) are fakes that record what the real ones read and answer from the test's queues. The skirt globals of Debug.cpp are defined here.

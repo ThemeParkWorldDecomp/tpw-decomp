@@ -1,5 +1,5 @@
 """Unit v5763, three coaster train functions, against libtpw_unit_DeactivateCoasterTrain.dylib (tests/unit_DeactivateCoasterTrain.cpp), main app,
-src/TPConfig_ridetick_DeactivateCoasterTrain.cpp:
+src/game/rides/CoasterTrain.cpp:
   DeactivateCoasterTrain 0x1004aa70, GetTrainFrontAndRearSamples 0x1004a7d0, GetCarWantedSpeedAtHeight 0x1004aedc
 
 A case is a world and a call, built by ONE piece of Python code in emulator memory (big-endian, 4-byte pointers, Mac offsets) and in host

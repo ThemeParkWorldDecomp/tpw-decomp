@@ -1,6 +1,6 @@
 // Test library for the coaster car's bend to the track and a train's sounds and screams (unit w214; libtpw_unit_CarBend.dylib,
 // tests/test_CarBend.py), main app:
-//   src/TPConfig_bend.cpp   AccumulateBendAngles, RotateNodeVertexPosns, BendCarToTrack, HandleScreams, TickTrainSounds, InterpAngles and
+//   src/game/rides/CoasterSounds.cpp, src/game/rides/CoasterSpline.cpp   AccumulateBendAngles, RotateNodeVertexPosns, BendCarToTrack, HandleScreams, TickTrainSounds, InterpAngles and
 //                           gBendAngleClamps
 //
 // Every callee outside the unit is a fake that records its arguments (floats as bits, the mesh as a label) and answers from the case's

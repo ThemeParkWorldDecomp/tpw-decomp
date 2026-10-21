@@ -1,5 +1,5 @@
 // Test library for CAdvisor::HandleEvent (unit v5679; libtpw_unit_CAdvisor_HandleEvent.dylib, tests/test_CAdvisor_HandleEvent.py), main app:
-//   src/AdvisorQueue_CAdvisor_HandleEvent.cpp   CAdvisor::HandleEvent
+//   src/game/advisor/Advisor.cpp   CAdvisor::HandleEvent
 //
 // The callees outside the unit (the request constructor, GetMessageCategory, CanIQueueThis, FindLowestScoringSlotInQueue, UDebug, the
 // game type constructor) are fakes that record the arguments and answer from the test's queues. TheScoring is defined here, with the

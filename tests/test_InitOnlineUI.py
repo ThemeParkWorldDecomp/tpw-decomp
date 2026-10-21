@@ -1,5 +1,5 @@
 """Unit v5060, the online lobby's interface set-up and the bankrupt window's message function, against libtpw_unit_InitOnlineUI.dylib
-(tests/unit_InitOnlineUI.cpp), main app ("SimTheme Park"), src/lobby_exit_InitOnlineUI.cpp:
+(tests/unit_InitOnlineUI.cpp), main app ("SimTheme Park"), src/game/ui/ui_main.cpp:
   InitOnlineUI 0x101864b0, BankruptWindowMsg 0x101868c0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

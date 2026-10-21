@@ -1,5 +1,5 @@
 """Unit v5127, the ride height map loaders, against libtpw_unit_LoadFileIntoMemory.dylib (tests/unit_LoadFileIntoMemory.cpp), main app
-("SimTheme Park"), src/RideDestroy_LoadFileIntoMemory.cpp:
+("SimTheme Park"), src/game/park/TPHField.cpp:
   LoadFileIntoMemory 0x1005e300, LoadRideHeightMap 0x1005e40c, GetRideHeightMap 0x1005e8e8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory (big-endian) for the original and in

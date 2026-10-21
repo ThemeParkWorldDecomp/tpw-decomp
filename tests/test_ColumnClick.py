@@ -1,5 +1,5 @@
 """Unit v5374, the outbox panel's column click, against libtpw_unit_ColumnClick.dylib (tests/unit_ColumnClick.cpp), main app
-("SimTheme Park"), src/UI_IslandLobby_CalcEmailAddressScrollBar_OutboxSendingMsg_ColumnClick.cpp:
+("SimTheme Park"), src/game/ui/ui_onlineOutbox.cpp:
   ColumnClick 0x101e3e98
 
 A case is a world and a call. The world is built twice by one piece of Python code. InterfaceWindow::GetWindow, InterfaceListControl2::

@@ -1,5 +1,5 @@
 """Unit v5667, the pylon brace functions, against libtpw_unit_RestorePylonDetails.dylib (tests/unit_RestorePylonDetails.cpp), main app
-("SimTheme Park"), src/GetNewBraceLoftInterval_RestorePylonDetails.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   CalculateBraceHeight 0x1003e6e0, RestorePylonDetails 0x1003ec00, SquishPylonBracesIfRequired 0x1003ee10, InsertBraceIntoPylon 0x1003ef78
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,4 +1,4 @@
-"""Unit v5L42, the window scripts of src/ui_window_scripts.cpp, against libtpw_unit_WindowScripts.dylib (tests/unit_WindowScripts.cpp), main app
+"""Unit v5L42, the window scripts of src/game/ui/ui_allStaffPanel.cpp, src/game/ui/ui_cityLobbyController.cpp, src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineOutbox.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_parkStatus.cpp, against libtpw_unit_WindowScripts.dylib (tests/unit_WindowScripts.cpp), main app
 ("SimTheme Park"): the arrays the launcher had as all-zero stand-ins until devtools/gen_game_tables.py generated them (WINDOW_SCRIPTS). Also
 the scripts that were two-word placeholders until then, which their panels' files define: each is read from that unit's library (ELSEWHERE).
 

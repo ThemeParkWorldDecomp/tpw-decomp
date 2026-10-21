@@ -1,9 +1,9 @@
 """Unit w105, the ride and mesh teardown, against libtpw_unit_RideDestroy.dylib (tests/unit_RideDestroy.cpp), in the main app
 ("SimTheme Park"):
-  src/RideDestroy.cpp     DestroyMeshHeader 0x10064d7c, DestroyMesh 0x10064de0, DestroyRideHeightMap 0x1005e9f4,
+  src/game/DynamicMeshSet.cpp, src/game/TPInstance.cpp, src/game/TPMesh.cpp, src/game/park/SkirtDeform.cpp, src/game/park/TPHField.cpp, src/game/rides/TPRide.cpp     DestroyMeshHeader 0x10064d7c, DestroyMesh 0x10064de0, DestroyRideHeightMap 0x1005e9f4,
                           DestroySkirtVertices 0x1006fbd8, DMFreeMesh 0x10030ae8, DMDisableMeshRender 0x100309c8 and 0x10030a48,
                           DestroyRideAnimSet 0x1006a5e8, DestroyRideAnimSetInstance 0x10063338, DestroyRideType 0x1006a768
-  src/CoasterDestroy.cpp  DestroyCoasterInstance 0x100437cc, DestroyCoasterInstanceFromEntranceID 0x100438fc,
+  src/game/rides/TPCoaster.cpp  DestroyCoasterInstance 0x100437cc, DestroyCoasterInstanceFromEntranceID 0x100438fc,
                           DestroyCoasterInstances 0x10043994
 
 A case is a world and an operation, built twice from one description: in emulator memory at the Mac's layouts for the original and by

@@ -1,5 +1,5 @@
 // Test library for CalculateMaxVertexHeights (unit v5061; libtpw_unit_CalculateMaxVertexHeights.dylib, tests/test_CalculateMaxVertexHeights.py), main app:
-//   src/CalculateMaxVertexHeights.cpp   CalculateMaxVertexHeights and the four globals it uses
+//   src/game/park/TPHField.cpp   CalculateMaxVertexHeights and the four globals it uses
 //
 // The callees outside the unit are recording fakes that answer from the test's queues:
 // CombineMatricesNoWDest2nd (changes two floats of the destination) and VectorThroughLMatrixNoW (replaces the point).

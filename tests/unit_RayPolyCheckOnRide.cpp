@@ -1,5 +1,5 @@
 // Test library for the ride pointer pick (unit v51021; libtpw_unit_RayPolyCheckOnRide.dylib, tests/test_RayPolyCheckOnRide.py), main app:
-//   src/advisor_leaves_RayPolyCheckOnRide.cpp   RayPolyCheckOnRide, FindPointedRide, the ray globals
+//   src/game/TPPointer.cpp   RayPolyCheckOnRide, FindPointedRide, the ray globals
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record; the globals of other files are defined here.
 #include <cstddef>

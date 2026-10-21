@@ -1,6 +1,6 @@
 // Test library for UIStatusPanel's GetNextObject, FillObjectList, EraseObject, OpenWindow and Move (unit v5090;
 // libtpw_unit_UIStatusPanel_GetNextObject.dylib, tests/test_UIStatusPanel_GetNextObject.py), main app:
-//   src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject.cpp   (also defines the three globals gStatusPanel*)
+//   src/game/ui/ui_StatusPanel.cpp   (also defines the three globals gStatusPanel*)
 //
 // Every callee outside the unit is a fake that records what the real one reads (pointers as the labels the test registered, new objects as
 // 100 + their order) and answers from the test's queues. The windows and the panel are blocks of the arena: a window has a vtable pointer made

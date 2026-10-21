@@ -1,5 +1,5 @@
 // Test library for CStaffHQ::DropStaff and ForceStrike (unit v5037; libtpw_unit_CStaffHQ_DropStaff.dylib), main app:
-//   src/ParkMessages_CStaffHQ_DropStaff.cpp
+//   src/game/buildings/StaffHQ.cpp
 //
 // Callees GAME_ASSERTMSG, CTRACE and CStaff::DropMe are recording fakes; gThingArray is defined here.
 #include <cstddef>

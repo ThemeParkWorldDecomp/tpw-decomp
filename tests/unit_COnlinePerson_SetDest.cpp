@@ -1,5 +1,5 @@
 // Test library for COnlinePerson's seven functions (unit v5133; libtpw_unit_COnlinePerson_SetDest.dylib, tests/test_COnlinePerson_SetDest.py), main app:
-//   src/COnlinePerson_SetDest.cpp
+//   src/game/online/OnlinePerson.cpp
 //
 // The CPeep callees, CDelayedScript::SetSpriteScript, ProcessIdle, the COnlineControl constructor and UpdateAvatarPos, operator new, CTRACE and
 // wcscmp are recording fakes. Offsets of `this` are logged relative to the person block.

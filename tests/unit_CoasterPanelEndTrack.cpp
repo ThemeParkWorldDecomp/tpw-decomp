@@ -1,5 +1,5 @@
 // Test library for CoasterPanelEndTrack (unit v5333; libtpw_unit_CoasterPanelEndTrack.dylib, tests/test_CoasterPanelEndTrack.py), main app:
-//   src/ui_entryPricePanel_CoasterPanelEndTrack.cpp   CoasterPanelEndTrack
+//   src/game/ui/ui_coasterPanel.cpp   CoasterPanelEndTrack
 //
 // Fakes (same events as the PowerPC stubs): operator new (size 1 or 8), CMMDefault::CMMDefault, CMMCoaster::CMMCoaster,
 // CMouse::AssignMouseMode, and the mode's GetMode virtual. The globals of Mouse.cpp are defined here.

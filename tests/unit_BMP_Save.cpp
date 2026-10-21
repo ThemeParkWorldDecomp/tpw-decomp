@@ -1,5 +1,5 @@
 // Test library for the advisor save (unit v5630; libtpw_unit_BMP_Save.dylib, tests/test_BMP_Save.py), main app:
-//   src/host_leaves_Write_BumpToChunk_BMP_Save.cpp   BMP_Save, gBMPSaveTime, gBMPSaveDate
+//   src/game/rides/BumperRide.cpp   BMP_Save, gBMPSaveTime, gBMPSaveDate
 //
 // The callees outside the unit (NS_MacDoze::GlobalAlloc, LbFile_GetPosition, LbFile_Write, Write_CloseChunk, Write_BumpToChunk) are
 // fakes that record the arguments the real ones read and answer from the test's queues; GlobalAlloc hands out the test's pool blocks.

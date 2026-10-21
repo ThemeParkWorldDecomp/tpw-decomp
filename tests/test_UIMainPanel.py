@@ -1,6 +1,6 @@
 """Unit w101, the UI main panel helpers, against libtpw_unit_UIMainPanel.dylib (tests/unit_UIMainPanel.cpp), in the main app
 ("SimTheme Park"):
-  src/ui_main_panel.cpp  UIMain_UISound 0x101802cc, UIMain_CheckPanel 0x10180514, UIMain_SetPanel 0x101805a0, UIMain_SetTitleText 0x10180794,
+  src/game/ui/ui_main.cpp  UIMain_UISound 0x101802cc, UIMain_CheckPanel 0x10180514, UIMain_SetPanel 0x101805a0, UIMain_SetTitleText 0x10180794,
                          UIMain_AdvisorMessage 0x101821cc, UIMain_CancelAdvisorMessage 0x1018227c, UIMain_DefaultPanelMsg 0x1018493c,
                          UIMain_GetFullyOutOfFirstPerson 0x10187434
 

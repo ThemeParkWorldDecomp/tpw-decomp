@@ -1,5 +1,5 @@
-"""w124: the things' turns, original code on one side and src/Weather_turn.cpp, src/Advisor_turn.cpp, src/ChallengeHQ_turn.cpp,
-src/ParkAnalyser_turn.cpp, src/msl_tree_insert.cpp and src/ThingMessages.cpp on the other (tests/unit_ThingTurns.cpp).
+"""w124: the things' turns, original code on one side and src/game/park/Weather.cpp, src/game/advisor/Advisor.cpp, src/game/park/ChallengeHQ.cpp,
+src/game/park/analyser.cpp, src/game/MslSupport.cpp and src/game/park/ChallengeHQ.cpp, src/game/park/Weather.cpp, src/game/ui/MessageCentre.cpp on the other (tests/unit_ThingTurns.cpp).
 
 Functions (main app): CWeather::UpdateTurn 0x10138670, CAdvisor::UpdateTurn 0x1000a8c8, CChallengeHQ::UpdateTurn 0x100f6b98, CParkAnalyser::UpdateTurn
 0x100e4188, CParkAnalyserCell::Init 0x100e6054, SubscriptionTree::insert_one 0x101530e4 (the set insertion of the message centre's tree), and the nine

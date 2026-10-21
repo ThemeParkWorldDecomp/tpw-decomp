@@ -1,9 +1,9 @@
 // Test library for the world's save (unit w205; libtpw_unit_WorldSave.dylib, tests/test_WorldSave.py), main app:
-//   src/World_save.cpp       CWorld::Save, SAVEVAR<CWorld::WorldState>, SAVEVAR<CThing::ThingModel>, CWorld::GetStaffHQ, CWorld::GetMechanicHQ,
+//   src/game/Thing.cpp, src/game/World.cpp       CWorld::Save, SAVEVAR<CWorld::WorldState>, SAVEVAR<CThing::ThingModel>, CWorld::GetStaffHQ, CWorld::GetMechanicHQ,
 //                            CMacroAI::~CMacroAI, CThing::CThing(const CSerialise&)
-//   src/ChunkFile.cpp        CMapAttribFileReader::~CMapAttribFileReader and the TbPtrList<CIndividualChunkHandler> destructor (with the list
+//   src/game/World.cpp, src/game/park/Map.cpp, src/game/save/ChunkFileReader.cpp        CMapAttribFileReader::~CMapAttribFileReader and the TbPtrList<CIndividualChunkHandler> destructor (with the list
 //                            members they run)
-//   src/Serialise_basic.cpp  the basic SAVEVAR instances (REAL on both sides: the file is the fake)
+//   src/game/ControlManager.cpp, src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/rides/FlyingRide.cpp, src/game/save/FS_MasterSave.cpp  the basic SAVEVAR instances (REAL on both sides: the file is the fake)
 //
 // The fake file: LbFile_Write records the bytes as hex and answers from its queues ("LbFile_Write" the result, "LbFile_Write:xfer" the
 // transferred count), LbFile_GetPosition answers from its queue. Every other callee of Save is a fake that records the arguments the real one
@@ -50,7 +50,7 @@ using namespace calllog;
 
 // ---- globals of other files the unit reads or writes, defined here (the program's definitions are in files this library does not compile)
 CSaveLoad gSaveLoad;
-CExitError gExitError;       // read by the chunk reader (src/ChunkFile.cpp), which is linked for its destructors
+CExitError gExitError;       // read by the chunk reader (src/game/World.cpp, src/game/park/Map.cpp, src/game/save/ChunkFileReader.cpp), which is linked for its destructors
 // The balance table is read only by ChunkFile.cpp's map parsing, which this unit never runs: its storage is bytes under the global's symbol
 // (a real object would need the table's constructor, destructor and vtable from files this library does not compile).
 alignas(16) unsigned char gMainBalanceBytes[sizeof(CMainBalance)] __asm__("_gMainBalance");

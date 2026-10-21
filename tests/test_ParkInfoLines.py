@@ -1,5 +1,5 @@
 """Unit v5232, the park status panel, against libtpw_unit_ParkInfoLines.dylib (tests/unit_ParkInfoLines.cpp), main app
-("SimTheme Park"), src/ParkInfoLines.cpp:
+("SimTheme Park"), src/game/ui/ui_parkStatus.cpp:
   ParkInfoLines 0x101abb90, ParkStatusPanelMsg 0x101abce4, DoDominantThoughts 0x101aba14
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,5 +1,5 @@
 // Test library for the tag save, load and add functions (unit v5001; libtpw_unit_SaveTags.dylib, tests/test_SaveTags.py), main app:
-//   src/ui_StatusPanel.cpp   AddATag 0x10191ef8, SaveTags 0x1019231c, LoadTags 0x10192704 and the globals gMaxTags, gTagCount,
+//   src/game/ui/ui_tags.cpp   AddATag 0x10191ef8, SaveTags 0x1019231c, LoadTags 0x10192704 and the globals gMaxTags, gTagCount,
 //                            gTagFirstWindow
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs): the file
@@ -24,7 +24,7 @@ using namespace calllog;
 InterfaceWindow* gGameWindow;     // 0x103949e4
 InterfaceWindow* gAerialWindow;   // 0x103949d4
 int32_t gSoundBanks[8];           // 0x102f7c94
-sStaticTag gStaticTags[10];        // 0x1038cd84 (src/ui_StatusPanel.cpp)
+sStaticTag gStaticTags[10];        // 0x1038cd84 (src/game/ui/ui_tags.cpp)
 
 static_assert(sizeof(InterfaceWindow) <= 0x400, "window block");
 

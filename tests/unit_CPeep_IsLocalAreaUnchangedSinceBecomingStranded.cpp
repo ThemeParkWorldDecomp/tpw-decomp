@@ -1,6 +1,6 @@
 // Test library for the CPeep stranded-area check, particle effect and event report (unit v5048;
 // libtpw_unit_CPeep_IsLocalAreaUnchangedSinceBecomingStranded.dylib, tests/test_CPeep_IsLocalAreaUnchangedSinceBecomingStranded.py), main app:
-//   src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded.cpp   CPeep::IsLocalAreaUnchangedSinceBecomingStranded, SpawnParticleEffect, ReportAllEvents
+//   src/game/people/Peep.cpp   CPeep::IsLocalAreaUnchangedSinceBecomingStranded, SpawnParticleEffect, ReportAllEvents
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues or from a pure function of
 // their arguments; the globals of other files the unit reads are defined here (zero at start like the Mac's bss).

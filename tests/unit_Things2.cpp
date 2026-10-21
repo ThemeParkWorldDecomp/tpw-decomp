@@ -1,7 +1,7 @@
-// Differential library for unit w130: the things' second batch (CResearchLab::Init, SetupProjects, SetupCategories in src/ResearchLab_init.cpp;
-// CChallengeHQ::AddChallenge, ClearInvalidFollowups, IsSystemOn, OfferNextChallenge in src/ChallengeHQ_offer.cpp; CParkAnalyser::BuiltSomething,
+// Differential library for unit w130: the things' second batch (CResearchLab::Init, SetupProjects, SetupCategories in src/game/buildings/ResearchLab.cpp;
+// CChallengeHQ::AddChallenge, ClearInvalidFollowups, IsSystemOn, OfferNextChallenge in src/game/park/ChallengeHQ.cpp; CParkAnalyser::BuiltSomething,
 // NumberOfStaffType, CBankAccount::MakeWithdrawal, CAdvisor::IsPlaying, FindHighestScoringSlotInQueue and CWeather::SetPrecipitationType in
-// src/Things2_small.cpp).
+// src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/Weather.cpp, src/game/park/analyser.cpp).
 //
 // Every callee outside those is a fake that records the same event as the PowerPC side's stub. The worlds are not blocks of their Mac size: only the
 // 0x80 bytes at world + 0x1da6f0 are real memory (gTail), and a world pointer is that block's address minus 0x1da6f0 on both sides. The object under

@@ -1,7 +1,7 @@
 """Unit w79h, the Execute bodies of the sound library's system commands, against libtpw_unit_SysCommands.dylib
 (tests/unit_SysCommands.cpp), in the program "sound symbols shared" (the Mac's sound library, Code at 0x10000000, TOC base r2 =
 0x1003abf0):
-  src/TbSysCommand.cpp  the 47 TbSysCommand::<Class>::Execute bodies (0x10027fd4 to 0x1002e348) and the five payload accessors of the
+  src/sound/TbSysCommand.cpp, src/sound/TpBody.cpp  the 47 TbSysCommand::<Class>::Execute bodies (0x10027fd4 to 0x1002e348) and the five payload accessors of the
                         command bases: SetValue::GetSysValue 0x1002899c, SetValue::GetFloatSysValue 0x10028658,
                         SetValue::GetTbHandleSysValue 0x100287d8, GetValue::GetSysValue 0x10028aa8, Serialise::GetHandle 0x1002df40
 

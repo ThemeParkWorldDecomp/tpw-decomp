@@ -1,5 +1,5 @@
 """Unit v5220, the ride commands of the bump world, against libtpw_unit_BMP_FixRide.dylib (tests/unit_BMP_FixRide.cpp), main app
-("SimTheme Park"), src/BMP_FixRide.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_HaltRide 0x100262cc, BMP_BreakRide 0x100264c0, BMP_FixRide 0x1002672c, BMP_BeginRide 0x10026924
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

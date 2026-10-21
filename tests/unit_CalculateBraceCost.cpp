@@ -1,6 +1,6 @@
 // Test library for CalculateBraceCost 0x10058924, SetCoasterEdit(tag_sCoasterInstance*, int) 0x100585f4 and CoasterAcceptLeftMouseClick 0x10057f80
 // (unit v5943; libtpw_unit_CalculateBraceCost.dylib, tests/test_CalculateBraceCost.py), main app:
-//   src/TPConfig_LayoutSetMovePylon_SetCoasterEdit_CalculateBraceCost.cpp
+//   src/game/rides/CoasterEdit.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues; the globals of other files the
 // unit reads or writes are defined here (zero at start like the Mac's bss).

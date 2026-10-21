@@ -1,5 +1,5 @@
 // Test library for LoadRides (unit v5890; libtpw_unit_LoadRides_2.dylib, tests/test_LoadRides_2.py), main app:
-//   src/RestoreAnimTime_LoadRides_2.cpp   LoadRides, gLoadRidesTbErrorZero, gLoadRidesShape
+//   src/game/rides/TPRide.cpp   LoadRides, gLoadRidesTbErrorZero, gLoadRidesShape
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues: LbFile_Read
 // (answers from a file image the test sets), MReleaseAllocF, MReleaseFreeF, TickRideAnims, GetRideInfo, InstanceRide (answers an instance

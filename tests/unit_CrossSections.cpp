@@ -1,5 +1,5 @@
 // Test library for the coaster cross-section builders (unit w147; libtpw_unit_CrossSections.dylib, tests/test_CrossSections.py), main app:
-//   src/TPCoaster_xsect.cpp   BuildCrossSectionPoints and BuildCrossSectionEdges
+//   src/game/rides/CoasterType.cpp   BuildCrossSectionPoints and BuildCrossSectionEdges
 //
 // The allocator and the free are recording fakes (the same event names and arguments as the module's PowerPC stubs). A block carries
 // kGuard bytes of 0xa5 after its end, so an overrun shows; the host's pointer table is twice the Mac's size (the module halves the

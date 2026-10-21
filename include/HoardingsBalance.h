@@ -13,7 +13,7 @@ public:
     BalanceValue mValues[130];  // 0x08, includes reserved slot zero
 };
 extern const BalanceDescription gHoardingsBalanceDescriptions[5]; // 0x102948a8
-// The two tables __sinit_HoardingsBalance_cpp (0x10021074) builds (src/HoardingsBalance_objects.cpp, unit w117): CGame::InitLevel_Load loads
+// The two tables __sinit_HoardingsBalance_cpp (0x10021074) builds (src/game/balance/HoardingsBalance.cpp, unit w117): CGame::InitLevel_Load loads
 // the level's "hoardings.sam" into the first and "endhoardings.sam" into the second. Original names unknown.
 extern CHoardingsBalance gHoardingsBalance434C;   // 0x102b434c
 extern CHoardingsBalance gHoardingsBalance4130;   // 0x102b4130

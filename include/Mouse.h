@@ -71,7 +71,7 @@ extern CMouseMode* gMouseMode;     // 0x102dc1f0
 extern int32_t gMouseLeftDown;     // 0x102dc1ec (invented name)
 extern int32_t gMouseRightDown;    // 0x102dc1e8 (invented name)
 
-// Online replacement of the default mode (8 bytes on the Mac); src/Mouse_modes.cpp, unit w144.
+// Online replacement of the default mode (8 bytes on the Mac); src/game/Mouse.cpp, unit w144.
 class CMMOnline : public CMouseMode {
 public:
     CMMOnline();                                           // 0x1007faac
@@ -83,7 +83,7 @@ public:
     void OnAssign() override;                              // 0x1007fcb8
 };
 
-// ---- Unit w143 (src/Mouse_staff.cpp): the sprite placing mode and the two staff modes. Every member name is invented.
+// ---- Unit w143 (src/game/Mouse.cpp): the sprite placing mode and the two staff modes. Every member name is invented.
 // CSpritePlaceMode (vtable 0x1029d678, 0xc bytes): the base of both staff modes. +4 is the base's word, +8 the handle of the script that
 // draws the staff member under the pointer (0 for none). GetMode is pure here: the class is abstract (the Mac slot is empty).
 class CSpritePlaceMode : public CMouseMode {
@@ -122,7 +122,7 @@ public:
     uint8_t mF10;          // +0x10
 };
 // CMMPathDraw (vtable 0x1029d640, 0x14 bytes): the path drawing mode. declared by unit w143 for ContextMouseClick, which makes
-// one; translated by unit w144 (src/Mouse_modes.cpp).
+// one; translated by unit w144 (src/game/Mouse.cpp).
 class CMMPathDraw : public CMouseMode {
 public:
     explicit CMMPathDraw(CELL_MODES mode);                                                          // 0x1007e6e4 (44 bytes)
@@ -141,7 +141,7 @@ public:
     uint16_t mObjectId;     // +0x10 the object id (the second constructor only)
 };
 
-// ---- Unit w144 (src/Mouse_modes.cpp): CMMCoaster and CMMFirstPersonTarget, and the globals of the Mouse.cpp data.
+// ---- Unit w144 (src/game/Mouse.cpp): CMMCoaster and CMMFirstPersonTarget, and the globals of the Mouse.cpp data.
 // CMMCoaster (vtable 0x1029d4a0, 8 bytes on the Mac): the roller coaster building mode.
 class CMMCoaster : public CMouseMode {
 public:

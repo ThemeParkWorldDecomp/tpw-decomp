@@ -3,7 +3,7 @@
 #pragma once
 #include <cstdint>
 
-// 0x1006fc5c (src/Debug.cpp): a number of its class, the class's base plus `index`.
+// 0x1006fc5c (src/game/Debug.cpp): a number of its class, the class's base plus `index`.
 enum eIDClass : int32_t { kIDClassLobbyMeshType = 18000 };   // the other classes are unknown
 uint32_t GetUniqueID(eIDClass idClass, uint32_t index);
 void CTRACE(uint32_t level, const char* format, ...);   // 0x1006fcbc
@@ -11,7 +11,7 @@ void TRACE(const char* format, ...);                    // 0x1006fcfc
 // 0x1006fc90 (4 bytes): an empty function in the 2.04b3 build (a stand-in until translated); the save file reader calls it with
 // a message and 0.
 void DEBUG_MESSAGE(const char* message, uint32_t flags);
-// 0x1006fd3c (src/RideInstance.cpp): the original is an empty function (it drops its message); the port formats the
+// 0x1006fd3c (src/game/Debug.cpp): the original is an empty function (it drops its message); the port formats the
 // text and writes it to the log through SamsUtilities::UDebug. No dialog, no exit.
 void ERRORBox(const char* format, ...);
 // Reports `format` when `condition` is 0 (0x1000dde8).
@@ -24,7 +24,7 @@ struct tag_sRideAnimSet;
 extern float gFlashPhase;                    // 0x102d1efc
 extern tag_sRideAnimSet* gFlashObjects;      // 0x102d1f00
 
-// Unit v5221: DoOrSetupSkirtDeform (src/Debug_overlays_DoOrSetupSkirtDeform.cpp). The by-value sMatrix is 64 bytes (r6.. then the stack).
+// Unit v5221: DoOrSetupSkirtDeform (src/game/park/SkirtDeform.cpp). The by-value sMatrix is 64 bytes (r6.. then the stack).
 struct tag_sNode;
 struct sHField;
 struct sMatrix;
@@ -34,6 +34,6 @@ extern uint32_t gSkirtCellFlags[20][20];   // 0x102da2ec  rows of 0x50 bytes; na
 extern uint32_t gSkirtRows;                // 0x102da92c
 extern uint32_t gSkirtColumns;             // 0x102da930
 
-// Unit v5915 (src/Debug_overlays_DecideRideShapeDeformEdges.cpp).
+// Unit v5915 (src/game/park/SkirtDeform.cpp).
 struct RideShape;
 void DecideRideShapeDeformEdges(RideShape* shape, int32_t width, int32_t height);   // 0x1006d76c

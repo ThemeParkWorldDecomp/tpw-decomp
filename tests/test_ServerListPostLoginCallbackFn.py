@@ -1,5 +1,5 @@
 """Unit v5721, the login callback of the server list, against libtpw_unit_ServerListPostLoginCallbackFn.dylib
-(tests/unit_ServerListPostLoginCallbackFn.cpp), main app ("SimTheme Park"), src/ServerListPostLoginCallbackFn.cpp:
+(tests/unit_ServerListPostLoginCallbackFn.cpp), main app ("SimTheme Park"), src/game/online/FS_OnlineList.cpp:
   ServerListPostLoginCallbackFn 0x1017aa6c
 
 A case is a world and a call. The callees outside the unit (the CFSOnlineSystem constructor, CompleteGetList and LoggedInGetList of the

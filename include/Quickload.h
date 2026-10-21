@@ -1,4 +1,4 @@
-// The quickload indexes (main app 0x1006736c..0x10068248; src/Quickload.cpp). The
+// The quickload indexes (main app 0x1006736c..0x10068248; src/game/save/TPQuickload.cpp). The
 // inventory files this range under TPRide.cpp; the original file name is unknown. For
 // each search path, the file names of the current mesh folder and of its theme texture
 // folder, read from their qickload.txt files, so lookups need no disk access.

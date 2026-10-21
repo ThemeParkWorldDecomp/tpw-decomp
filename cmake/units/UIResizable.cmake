@@ -1,3 +1,35 @@
 # Unit w44: the resizable frame's and slider's InstanceMe and Change, and TbColour's constructor. The base class's CalculateFrame and
 # Change, the engine mesh object's constructor and InstanceMesh are fakes in the unit file.
-set(TPW_UNIT_UIResizable src/ui_DrawObjectResizable.cpp src/TbColour.cpp src/UI_Base.cpp platform/arena.cpp)
+set(TPW_UNIT_UIResizable src/game/ui/InterfaceDrawEngine.cpp src/game/ui/intrface.cpp src/game/ui/CoolRect.cpp
+    src/game/ui/CoolRegion.cpp src/game/ui/UI_Base.cpp platform/arena.cpp)
+set(TPW_UNIT_UIResizable_KEEP
+  __Z13UI_hash_cakesPKcj   # UI_hash_cakes(char const*, unsigned int)
+  __Z19UI_SetRealScreenRezss   # UI_SetRealScreenRez(short, short)
+  __ZN10CoolRegion5ShiftEss   # CoolRegion::Shift(short, short)
+  __ZN10CoolRegion6AdjustEssss   # CoolRegion::Adjust(short, short, short, short)
+  __ZN10CoolRegion6MiddleEPsS0_   # CoolRegion::Middle(short*, short*)
+  __ZN10CoolRegion7PointInEss   # CoolRegion::PointIn(short, short)
+  __ZN10CoolRegionD1Ev   # CoolRegion::~CoolRegion()
+  __ZN10CoolRegioneqERS_   # CoolRegion::operator==(CoolRegion&)
+  __ZN33InterfaceDrawEngineResizableFrame10InstanceMeEv   # InterfaceDrawEngineResizableFrame::InstanceMe()
+  __ZN33InterfaceDrawEngineResizableFrame6ChangeEjP8DOChange   # InterfaceDrawEngineResizableFrame::Change(unsigned int, DOChange*)
+  __ZN34InterfaceDrawEngineResizableSlider10InstanceMeEv   # InterfaceDrawEngineResizableSlider::InstanceMe()
+  __ZN34InterfaceDrawEngineResizableSlider6ChangeEjP8DOChange   # InterfaceDrawEngineResizableSlider::Change(unsigned int, DOChange*)
+  __ZN8CoolRect14RectIntersectsEPS_   # CoolRect::RectIntersects(CoolRect*)
+  __ZN8CoolRect3GetEPsS0_S0_S0_   # CoolRect::Get(short*, short*, short*, short*)
+  __ZN8CoolRect3SetEssss   # CoolRect::Set(short, short, short, short)
+  __ZN8CoolRect5ShiftEss   # CoolRect::Shift(short, short)
+  __ZN8CoolRect6AdjustEssss   # CoolRect::Adjust(short, short, short, short)
+  __ZN8CoolRect6MiddleEPsS0_   # CoolRect::Middle(short*, short*)
+  __ZN8CoolRect7GetDimsEPsS0_   # CoolRect::GetDims(short*, short*)
+  __ZN8CoolRect7PointInEss   # CoolRect::PointIn(short, short)
+  __ZN8CoolRectC1Essss   # CoolRect::CoolRect(short, short, short, short)
+  __ZN8CoolRectC1Ev   # CoolRect::CoolRect()
+  __ZN8CoolRectD1Ev   # CoolRect::~CoolRect()
+  __ZN8TbColourC1Ev   # TbColour::TbColour()
+  _gUIHighPresets
+  _gUIRealScreenHeight
+  _gUIRealScreenWidth
+  _gUIUnitWidth
+  _gUIWideAspect
+)

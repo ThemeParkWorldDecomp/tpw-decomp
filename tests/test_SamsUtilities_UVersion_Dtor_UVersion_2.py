@@ -1,5 +1,5 @@
 """Unit v51042, against libtpw_unit_SamsUtilities_UVersion_Dtor_UVersion_2.dylib (tests/unit_SamsUtilities_UVersion_Dtor_UVersion_2.cpp),
-main app ("SimTheme Park"), src/ui_main_panel_UI_Congratulations_SamsUtilities_UVersion_Dtor_UVersion_2.cpp:
+main app ("SimTheme Park"), src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_loansPanel.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_parkStatus.cpp:
   SamsUtilities::UVersion::~UVersion 0x10187710, UIMain_SetObjectStateText 0x10181018, InterfaceRankTextObject::Change 0x1018fb08,
   LenderListCallback 0x101a4bec, LendersItemsCallback 0x101a4ce4, ThoughtMsg 0x101ab968, NameEditMsg 0x101afea4
 

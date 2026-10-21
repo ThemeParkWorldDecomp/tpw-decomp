@@ -1,9 +1,9 @@
 // Test library for unit w26b (libtpw_unit_ParticleSpawn.dylib; see tests/test_ParticleSpawn.py): the particle system's
 // spawning (SpawnParticle, PAR_InitEmitter, PAR_InitEmitterLaunch, PAR_InitEffecter, DoSpecialEmitter, SpecialEmitter1).
 //
-// Real: src/rsse_spawn.cpp, and from unit w23 the system's set-up (src/rsse_particles_init.cpp: PAR_ResetParticleSystem builds the
+// Real: src/game/Particles.cpp, and from unit w23 the system's set-up (src/game/Particles.cpp: PAR_ResetParticleSystem builds the
 // chains of a case, PAR_SetupSin the table of sines, PAR_LoadLibrary the library from the real Tp2.plb) with the state
-// (src/rsse_particles_state.cpp). The library file is read at run time by the test; nothing of the game is copied here.
+// (src/game/rides/rsse.cpp). The library file is read at run time by the test; nothing of the game is copied here.
 // Fakes that record on both sides (name, then every argument): ApplyParticleDensityAdjustment (unit w26a's function, called
 // by the starters; it also writes the new emitter's start count and life from the case's queues "count" and "life", so
 // that a case can steer them), and the marks the test puts between its steps. The loader's callees (the file calls, the

@@ -1,5 +1,5 @@
 """Unit v51127, small bullfrog functions, against libtpw_unit_LbApp_SetWindowIcon.dylib (tests/unit_LbApp_SetWindowIcon.cpp), bullfrog
-(PROGRAM "bullfrog symbols shared"), src/LbFile_LbApp_GetWindowsScreenMode_LbApp_SetWindowIcon.cpp:
+(PROGRAM "bullfrog symbols shared"), src/bullfrog/AndyGLL.cpp, src/bullfrog/Colour.cpp, src/bullfrog/Draw.cpp, src/bullfrog/LbApp.cpp, src/bullfrog/LbSCBack.cpp, src/bullfrog/LbZLib.cpp, src/bullfrog/TbJPEGSaver.cpp:
   LbApp_SetWindowIcon 0x10014238, Get/SetUserWndProc 0x10014170/0x10014138, Get/SetCloseDownRequest 0x100140c0/0x100140fc,
   Get/SetHWnd 0x10013fb4/0x10013fe4, Get/SetHInstance 0x10013f44/0x10013f7c, TbPtrList<_LbSEFunction>::TbPtrList 0x100144f0,
   TbTList<_LbSEFunction*,_LbSEFunction*>::~TbTList 0x1001491c, TbPtrList<_LbSEFunction>::~TbPtrList 0x10014450 (unit v5L21), RemoveAll 0x100149c8, RemoveHead 0x10014a78, CConverter::~CConverter

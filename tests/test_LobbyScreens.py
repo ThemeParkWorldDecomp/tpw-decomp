@@ -1,4 +1,4 @@
-"""Differential test for src/lobby_screen.cpp (CLBScreenSystem and CLBScreenComponent),
+"""Differential test for src/game/online/LBScreenComponentAdvisor.cpp, src/game/online/lobby_screen.cpp (CLBScreenSystem and CLBScreenComponent),
 against libtpw_unit_LobbyScreens.dylib (tests/unit_LobbyScreens.cpp).
 
 A case is a script: make the screen system, Init (it makes its five screens), test screens

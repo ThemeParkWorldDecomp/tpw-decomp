@@ -1,4 +1,4 @@
-// Unit v5073: FinanceGraphPanelMsg (src/FinanceGraphPanelMsg.cpp)
+// Unit v5073: FinanceGraphPanelMsg (src/game/ui/ui_FinancePanel.cpp)
 #pragma once
 
 #include <cstdint>
@@ -58,7 +58,7 @@ extern InterfaceWindow* gFinanceGraphPanel; // 0x10394904
 
 int32_t FinanceGraphPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x1019f5e4
 
-// Unit v5142: the park status panel (src/ui_loginpanel_msg_sinit_ui_parkStatus_cpp.cpp)
+// Unit v5142: the park status panel (src/game/ui/ui_parkStatus.cpp)
 void CUIGrapher_Construct(CUIGrapher* self);   // 0x101fd6e8: CUIGrapher::CUIGrapher(), a stand-in
 void __sinit_ui_parkStatus_cpp();               // 0x101adbe4
 extern CUIGrapher gParkStatusGrapher;           // 0x10394a28
@@ -67,19 +67,19 @@ extern int32_t gParkStatusRange;                // 0x10394a88
 extern InterfaceWindow* gParkStatusPanel;       // 0x10394a8c
 extern uint32_t gParkStatusFlags;               // 0x102abbac: bits 0..4 select the histories, 8 at start
 
-// Unit v5202: GraphLine (src/MinAnalyserValue_SetupGraph.cpp)
+// Unit v5202: GraphLine (src/game/ui/ui_graph.cpp)
 extern int32_t gGraphLineBuffer[160];   // 0x10396480: the values handed to DrawGraph
 void GraphLine(CUIGrapher& grapher, CHistory<float, 144>* history, TbColour& colour, int32_t step, int32_t mode);   // 0x101f62cc
 void GraphLine(CUIGrapher& grapher, CHistory<int32_t, 144>* history, TbColour& colour, int32_t step, int32_t mode);   // 0x101f6124
 
-// Unit v5232: the park status panel's message function (src/ParkInfoLines.cpp)
+// Unit v5232: the park status panel's message function (src/game/ui/ui_parkStatus.cpp)
 extern int32_t gParkStatusLastTotal;     // 0x10394a18: the visitors since the beginning the panel shows
 extern int32_t gParkStatusLastInPark;    // 0x10394a1c: the visitors in the park the panel shows
 void RemoveParkStatusPanel();            // 0x101ada00 (stand-in, 56 bytes)
 void DoDominantThoughts();               // 0x101aba14
 void ParkInfoLines(CUIGrapher& grapher);   // 0x101abb90; DrawMeGraph's callback (the Mac passes its TVector 0x10267ca8 = 101abb90 10267cc0)
 
-// Unit v5377: __sinit_ui_FinancePanel_cpp (src/sinit_ui_FinancePanel_cpp.cpp)
+// Unit v5377: __sinit_ui_FinancePanel_cpp (src/game/ui/ui_FinancePanel.cpp)
 void __sinit_ui_FinancePanel_cpp();            // 0x101a0dbc
 extern uint8_t gFinancePanelColours[8][5];     // 0x103948d8, dd, e2, e7, ec, f1, f6, fb: alpha, red, green, blue, palette index
 int32_t ParkStatusPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101abce4
@@ -87,11 +87,11 @@ int32_t ParkStatusPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, 
 // Unit v5904
 void KissMyLines(CUIGrapher& grapher);   // 0x1019f25c (424 bytes); DrawMeGraph's callback (the Mac passes its TVector 0x10267ba0 = 1019f25c 10267cc0)
 
-// Unit v5160: CUIGrapher::DrawGrid / DrawGraph (src/ui_cursor_classes_CUIGrapher_DrawGraph.cpp)
+// Unit v5160: CUIGrapher::DrawGrid / DrawGraph (src/game/ui/UIGrapher.cpp)
 // Object offsets (Mac): 0x00 x span, 0x04 y span, 0x08 left, 0x0c top, 0x10 right, 0x14 bottom, 0x1c y min, 0x24 y max,
 // 0x28 columns, 0x2c rows, 0x30 grid label TbColour, 0x3a line TbColour (5 bytes each, read by byte).
 extern char16_t gGrapherNumberFormat[];   // 0x1024f70c: u"%d"
 extern int32_t gGrapherFont;              // 0x102b1558: 10
 
-// Unit v51004 (src/MainWindowCallback_CreateAllItemsPanel_AllStaffPanelMsg.cpp)
+// Unit v51004 (src/game/ui/ui_FinancePanel.cpp)
 int32_t FinancePanelPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x1019f434 (368 bytes)

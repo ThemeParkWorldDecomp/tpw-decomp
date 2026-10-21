@@ -1,5 +1,5 @@
 // Test library for Outbox::Send and Outbox::NextMail (unit v5218; libtpw_unit_Outbox_Send.dylib, tests/test_Outbox_Send.py), main app:
-//   src/email_load_Outbox_Send.cpp   Outbox::Send, Outbox::NextMail
+//   src/game/online/email.cpp   Outbox::Send, Outbox::NextMail
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues: the outbox's
 // ReadMailData / DeleteMail / Save, Email::Send, the constructors, the login getters, operator new / delete, the string and list

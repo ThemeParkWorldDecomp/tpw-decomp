@@ -1,6 +1,6 @@
 """Unit v5671, a person has used a ride or shop (CPerson::WinningMods), against libtpw_unit_CPerson_WinningMods.dylib
 (tests/unit_CPerson_WinningMods.cpp), main app ("SimTheme Park"),
-src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_WinningMods.cpp:
+src/game/people/Person.cpp:
   CPerson::WinningMods 0x1011a570
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,4 +1,4 @@
-// Unit v51042 (src/ui_main_panel_UI_Congratulations_SamsUtilities_UVersion_Dtor_UVersion_2.cpp): UVersion's destructor, the object-state
+// Unit v51042 (src/game/ui/ui_main.cpp, src/game/ui/ui_parkStatus.cpp, src/game/ui/ui_loansPanel.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_Postcard.cpp): UVersion's destructor, the object-state
 // text, the rank text object's Change, the lender list's callbacks, the thought panel's and the name edit's handlers.
 // Mac offsets in the comments.
 #pragma once

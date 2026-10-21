@@ -1,5 +1,5 @@
 """Unit v5012, the address book panel of the postcard screen, against libtpw_unit_CreateAddressBook.dylib (tests/unit_CreateAddressBook.cpp),
-main app ("SimTheme Park"), src/ui_Postcard_panel_CreateAddressBook.cpp:
+main app ("SimTheme Park"), src/game/ui/ui_Postcard.cpp:
   CreateAddressBook 0x101b07a4, RemoveAddressBookEntry 0x101b0420, NewEntryInAddressBook 0x101b0168
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

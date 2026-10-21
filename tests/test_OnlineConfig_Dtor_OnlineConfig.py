@@ -1,5 +1,5 @@
 """Unit v5368, OnlineConfig::~OnlineConfig 0x10003508 (892 B), against libtpw_unit_OnlineConfig_Dtor_OnlineConfig.dylib
-(tests/unit_OnlineConfig_Dtor_OnlineConfig.cpp), main app ("SimTheme Park"), src/FS_Registry_OnlineConfig_Dtor_OnlineConfig.cpp.
+(tests/unit_OnlineConfig_Dtor_OnlineConfig.cpp), main app ("SimTheme Park"), src/game/MslSupport.cpp.
 
 The host OnlineConfig holds real std::strings, so the translation (online_config_mac::Destroy) works on the Mac's object: words of 32-bit
 addresses, built in both memories by one piece of Python code. The world is a fixed pool (allocated once per side, so the addresses are

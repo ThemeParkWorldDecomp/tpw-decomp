@@ -58,28 +58,28 @@ static_assert(sizeof(RegionEffectInfo) == 0xc, "a region effect record is 0xc by
 
 class CMap {
 public:
-    // 0x101016cc (src/MapDelta_map.cpp, unit w145): adds the effect to the region the map cell (the 1 based cell id, by value: the HIGH halfword of the Mac's
+    // 0x101016cc (src/game/park/Map.cpp, unit w145): adds the effect to the region the map cell (the 1 based cell id, by value: the HIGH halfword of the Mac's
     // register) lies in.
     void AddRegionalEffector(RegionEffector effector, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);
-    // 0x1010176c (src/MapDelta_map.cpp, unit w145): takes the effect out of the region the map cell lies in again (CObject::UpdateTurn's fireworks).
+    // 0x1010176c (src/game/park/Map.cpp, unit w145): takes the effect out of the region the map cell lies in again (CObject::UpdateTurn's fireworks).
     void RemoveRegionalEffector(RegionEffector effector, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);
-    void DeleteMapInEngine();   // 0x1010136c (196 bytes, src/MapDelta_map.cpp, unit w145)
+    void DeleteMapInEngine();   // 0x1010136c (196 bytes, src/game/park/Map.cpp, unit w145)
     // 0x1013e5ac (216 bytes, untranslated): loads the level's attribute map file; nonzero when it loaded.
     int32_t LoadAttribMap(const char* path);
-    void Init();   // 0x10100a8c (980 bytes, src/Map_init.cpp, unit w139): numbers the cells and tracks and resets the map (CWorld::SetupNewLevel, unit w117)
+    void Init();   // 0x10100a8c (980 bytes, src/game/park/Map.cpp, unit w139): numbers the cells and tracks and resets the map (CWorld::SetupNewLevel, unit w117)
     // Unit w139 (untranslated callees of the unit's functions, stand-ins in the launcher).
-    // 0x101012f4 (80 bytes, src/MapDelta_map.cpp, unit w145; a static function, no map pointer: r3 = x, r4 = y): 1 when the cell lies inside the level.
+    // 0x101012f4 (80 bytes, src/game/park/Map.cpp, unit w145; a static function, no map pointer: r3 = x, r4 = y): 1 when the cell lies inside the level.
     static int32_t IsXYValid(int32_t x, int32_t y);
-    // 0x101025c4 (src/MapDelta_map.cpp, unit w145): a new time stamp for the map. 0x10102604 (same file): stamps the map cell (the id is the HIGH
+    // 0x101025c4 (src/game/park/Map.cpp, unit w145): a new time stamp for the map. 0x10102604 (same file): stamps the map cell (the id is the HIGH
     // halfword of the Mac's register).
     uint32_t MakeNewTimeStamp();
     void SetTimeStamp(uint32_t stamp, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);
-    // 0x10101ae0 (100 bytes, src/MapDelta_map.cpp, unit w145): the map cell (the 1 based cell id x + y * 128 + 1) of park entrance A (which = 0) or B (which = 1), from
+    // 0x10101ae0 (100 bytes, src/game/park/Map.cpp, unit w145): the map cell (the 1 based cell id x + y * 128 + 1) of park entrance A (which = 0) or B (which = 1), from
     // gMainBalance's EntranceAPosX/Y or EntranceBPosX/Y; the Mac answers it through a hidden result (r3), r4 = the map, r5 = which.
     tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> GetParkEntrancePos(int32_t which) const;
-    // Unit w142: 0x101019bc (100 bytes, src/MapDelta_map.cpp, unit w145), the same for the ticket booth A (0) or B (1).
+    // Unit w142: 0x101019bc (100 bytes, src/game/park/Map.cpp, unit w145), the same for the ticket booth A (0) or B (1).
     tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> GetTicketBoothPos(int32_t which) const;
-    // Unit w145 (src/MapDelta_map.cpp). The id of every map cell argument is the HIGH halfword of the Mac's register (tag_IDX_TYPE).
+    // Unit w145 (src/game/park/Map.cpp). The id of every map cell argument is the HIGH halfword of the Mac's register (tag_IDX_TYPE).
     // 0x10101640 (48 bytes): the five effect halfwords of the region effect cell of the map cell (at map + 0x1b1104, 10 bytes each).
     CRegionEffectCell* GetRegionalEffectCell(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);
     // 0x1010180c (320 bytes): adds (add != 0) or takes out (add == 0) the effector's record of effects around the cell: each cell within
@@ -96,7 +96,7 @@ public:
     uint32_t GetTimeStampCell(uint32_t x, uint32_t y);
     void UpdateMapInEngine();   // 0x10101460 (196 bytes): refreshes the height field tile of every map cell and track cell
     void CleanUpPark();         // 0x10101554 (196 bytes): removes the litter that is not marked for collection from every map cell
-    // Unit w146 (src/MapDelta_save.cpp). 0x10100e80 (1,096 bytes): loads (save == 0) or saves the 0x4000 cells of the three grids (map cells, track cells
+    // Unit w146 (src/game/park/Map.cpp). 0x10100e80 (1,096 bytes): loads (save == 0) or saves the 0x4000 cells of the three grids (map cells, track cells
     // and region effect cells) of the level: one status byte per cell says which of the three differ from a fresh cell and follow. Version 0 and 1 only;
     // 0 on success, 1 at the first failure. The save path also traces how many cells it left out as default (even for a version out of range).
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);
@@ -105,20 +105,20 @@ public:
 extern uint32_t gMapTimeStamp;
 
 // The 150 object controls the world keeps at CWorld + 0x1d943c (0x12cc bytes on the Mac; reached only through CWorld::GetControlManager).
-// Unit w176 (src/ControlManager.cpp) names the whole block: the 0x96 controls, then the count (+0x12c0), the id searched last (+0x12c4, a
+// Unit w176 (src/game/ControlManager.cpp) names the whole block: the 0x96 controls, then the count (+0x12c0), the id searched last (+0x12c4, a
 // halfword and two pad bytes) and the control it found (+0x12c8, a pointer on the Mac). The host keeps a pointer in four bytes as an index:
 // 0 is NULL, else the control's index + 1 (CWorld holds the word as part of mF1DA6FC).
 class CControlManager {
 public:
-    void SetupInitialControls();   // 0x100fa2ac (68 bytes, src/ControlManager_setup.cpp, unit w129): clears the 0x12cc bytes and checks every control was set up
-    // 0x100fa32c (304 bytes, src/ControlManager.cpp, unit w176; SetupInitialControls calls it last): every ride in the ride database that has no control yet
+    void SetupInitialControls();   // 0x100fa2ac (68 bytes, src/game/ControlManager.cpp, unit w129): clears the 0x12cc bytes and checks every control was set up
+    // 0x100fa32c (304 bytes, src/game/ControlManager.cpp, unit w176; SetupInitialControls calls it last): every ride in the ride database that has no control yet
     // gets the next one (id, CostOfUpgrade, FatigueEffect, RipOffOK, researched when CostOfResearch is 0, three zero words).
     void CheckAllControlsInitialised();
-    // 0x100fa0b8 (152 bytes, src/ControlManager.cpp, unit w176): the control of the object type (the id is the HIGH halfword of the Mac's register); the last
+    // 0x100fa0b8 (152 bytes, src/game/ControlManager.cpp, unit w176): the control of the object type (the id is the HIGH halfword of the Mac's register); the last
     // argument is 0 in the callers. The id searched last and its control are cached; a type with no control asserts (flag 0) and answers NULL.
     ObjectControl* GetObjectControl(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> type, int32_t flag);
     const ObjectControl* GetObjectControl(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> type, int32_t flag) const;   // 0x100fa1b8 (140 bytes): the const overload the analyser's queries call; it does not cache
-    // 0x100f9ed0 (432 bytes, src/ControlManager.cpp, unit w176): the 150 controls, the count and the cached id; 1 at the first that fails, else 0.
+    // 0x100f9ed0 (432 bytes, src/game/ControlManager.cpp, unit w176): the 150 controls, the count and the cached id; 1 at the first that fails, else 0.
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);
 
     ObjectControl mControls[0x96];   // 0x0000
@@ -134,20 +134,20 @@ static_assert(offsetof(CControlManager, mNumObjectControls) == 0x12c0 && offseto
 // The world is also the CMacroAI (the staff database, the park time and the arrivals are its first 0x2d8 bytes).
 class CMacroAI {
 public:
-    // Unit w205 (src/World_save.cpp). 0x1013a13c (96 bytes): destroys the staff database at +0 (the Mac's flag, which also deletes the
+    // Unit w205 (src/game/World.cpp). 0x1013a13c (96 bytes): destroys the staff database at +0 (the Mac's flag, which also deletes the
     // object, has no host form).
     ~CMacroAI();
-    void Init();   // 0x1010096c (76 bytes, src/MacroAI.cpp, unit w129): CArrival::Init(+0x2c4), CStaffDB::Init(+0), CParkTime::Init(+0x2a0)
-    // 0x101009dc (136 bytes, src/MacroAI.cpp, unit w129): the arrivals, the staff database and the park clock (CWorld::DoGameTurn calls it); then, when
+    void Init();   // 0x1010096c (76 bytes, src/game/park/Map.cpp, unit w129): CArrival::Init(+0x2c4), CStaffDB::Init(+0), CParkTime::Init(+0x2a0)
+    // 0x101009dc (136 bytes, src/game/park/Map.cpp, unit w129): the arrivals, the staff database and the park clock (CWorld::DoGameTurn calls it); then, when
     // the turn of *gGameWorldRef (not of `this`) is a multiple of 100, the golden ticket check (+0x2c0).
     void Update();
-    // Unit w146 (src/MapDelta_save.cpp). 0x10100890 (172 bytes): the staff database (+0), the park time (+0x2a0) and the arrivals (+0x2c4) serialise in turn;
+    // Unit w146 (src/game/park/Map.cpp). 0x10100890 (172 bytes): the staff database (+0), the park time (+0x2a0) and the arrivals (+0x2c4) serialise in turn;
     // 1 at the first that fails, else 0.
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);
 };
 
-// Vehicle (the ride vehicles' steering state, vehicle.cpp). Unit w203 (src/Vehicle_steer.cpp) translated its geometry helpers, clear_behaviours and the
-// destructor; unit w209 (src/Vehicle_path.cpp) translated the path code (recalc_path, next_step, is_stuck) and split the padding that code reads and writes
+// Vehicle (the ride vehicles' steering state, vehicle.cpp). Unit w203 (src/game/rides/vehicle.cpp) translated its geometry helpers, clear_behaviours and the
+// destructor; unit w209 (src/game/rides/vehicle.cpp) translated the path code (recalc_path, next_step, is_stuck) and split the padding that code reads and writes
 // into named fields (each tagged (w209)); w230 adds Serialise. The Mac object has no vtable and is at most 0xc8 bytes (CStaff holds
 // one at +0xd4, include/ThingReceivers.h). The host keeps every Mac offset up to 0xc8; the spans no translated code touches are padding arrays named
 // by their offsets. The Mac's word 0x30 is a POINTER to the target Vector2d: on the host it is the dead
@@ -155,17 +155,17 @@ public:
 // than the Mac's. Field names are invented.
 class Vehicle {
 public:
-    static void clear_behaviours();   // 0x10133358 (60 bytes, src/Vehicle_steer.cpp, unit w203): empties the behaviour list; takes no argument
-    // 0x101332cc (104 bytes, src/Vehicle_steer.cpp, unit w203): the Mac's DELETING form (the flag is in r4): when `this` is not null it destroys the five
+    static void clear_behaviours();   // 0x10133358 (60 bytes, src/game/rides/vehicle.cpp, unit w203): empties the behaviour list; takes no argument
+    // 0x101332cc (104 bytes, src/game/rides/vehicle.cpp, unit w203): the Mac's DELETING form (the flag is in r4): when `this` is not null it destroys the five
     // waypoints, frees the block when (int16_t)flag > 0 and answers `this`. The host body is empty (Vector2d is trivial) and `delete` frees by itself.
     ~Vehicle();
 
-    // Unit w203 (src/Vehicle_steer.cpp). (mForward, mSide) is the rotation from the world to the vehicle's frame and, transposed, back.
+    // Unit w203 (src/game/rides/vehicle.cpp). (mForward, mSide) is the rotation from the world to the vehicle's frame and, transposed, back.
     Vector2d point_to_local(const Vector2d& p) const;   // 0x101333c4 (168 bytes): (p - mPos) in the vehicle's frame
     Vector2d vec_to_global(const Vector2d& v) const;    // 0x101334a4 (136 bytes): the transposed rotation, no translation
     Vector2d predict_pos(int32_t t) const;              // 0x10133b58 (96 bytes): mPos + mVelocity * t
     Fixed is_finished_path() const;                     // 0x101341a4 (216 bytes): a progress, gVehOne (1.0) when finished; not a bool
-    // Unit w209 (src/Vehicle_path.cpp): the path code.
+    // Unit w209 (src/game/rides/vehicle.cpp): the path code.
     enum RecalcPathMode : int32_t {};
     // 0x10133be4 (1392 bytes): plans the walk from mPos to `target` with the wall hugger (wallhug_tricky on gVehPath, with mNavMode), measures it and stamps it
     // with a new map time stamp; mode 1 puts the vehicle's own square in front of the path. Answers 1, or 0 when there is no path (then the vehicle is
@@ -178,7 +178,7 @@ public:
     // of the last 15 steps that were refused or made no progress, in 16.16 (bits 0 to 14 of mStuckHistory, divided by 15).
     Fixed is_stuck();
 
-    // Unit w230 (src/Vehicle_serialise.cpp).
+    // Unit w230 (src/game/rides/vehicle.cpp).
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused); // 0x10130eb4, 2212 B
 
     uint32_t mF00;                // +0x00 serialized mass, a value rather than a pointer
@@ -228,7 +228,7 @@ static_assert(offsetof(Vehicle, mTarget) == 0xc8 && sizeof(Vehicle) == 0xd0, "Ve
 // The ride vehicles' pilots: a Vehicle that follows a path (Pilot adds no data). CWorld::SetupNewLevel calls the static init_behaviours.
 class Pilot : public Vehicle {
 public:
-    // Unit w203 (src/Vehicle_steer.cpp).
+    // Unit w203 (src/game/rides/vehicle.cpp).
     void reset(int32_t x, int32_t y, int32_t vx, int32_t vy);   // 0x101347b0 (20 bytes): mPos = (x, y), mVelocity = (vx, vy)
     void new_target(int32_t x, int32_t y);                      // 0x101347ec (48 bytes): recalc_path((x, y), mode 0)
     void move();                                                // 0x10134844 (32 bytes): next_step()
@@ -236,7 +236,7 @@ public:
     void set_speed(float speed);                                // 0x101349cc (128 bytes): mMaxForce and mMaxSpeed from the speed, 2.0 at most
     Fixed is_finished_path() const;                             // 0x101348c4 (216 bytes): Vehicle::is_finished_path's code at its own address
 
-    // Unit w209 (src/Vehicle_path.cpp).
+    // Unit w209 (src/game/rides/vehicle.cpp).
     // 0x10134404 (480 bytes): empties the behaviour list and appends "avoid_walls" (weight 0.9), "follow_path" (0.5) and "separation" (0.1), each found by name in
     // gVehBehaviourTable; a name not found (or a full list) appends nothing. Takes no argument.
     static void init_behaviours();
@@ -252,20 +252,20 @@ static_assert(sizeof(Pilot) == sizeof(Vehicle), "Pilot adds no data");
 void BMP_CloseSystem();
 // 0x10025a94 (500 bytes, untranslated): starts the bitmap system (no argument, no answer used).
 void BMP_InitSystem();
-// Unit v5659: 0x10025db8 (264 bytes, src/host_leaves_BMP_InitSystem.cpp): destroys every live ride (state 4 first) and rebuilds the free list of the
+// Unit v5659: 0x10025db8 (264 bytes, src/game/rides/BumperRide.cpp): destroys every live ride (state 4 first) and rebuilds the free list of the
 // 1024 link records at the world's 0x30.
 void BMP_FreeAll();
 
 // The two names SetupNewLevel looks for in the ride database: the "gates" and the "lights" feature (wide strings 0x1034cb18 and
-// 0x1034caf8, built by __sinit_World_cpp 0x10141c14, which is not translated: src/World_setup.cpp defines both with their texts until it is).
+// 0x1034caf8, built by __sinit_World_cpp 0x10141c14, which is not translated: src/game/World.cpp defines both with their texts until it is).
 extern TbDynamicStringTemplate<char16_t> gWorldGatesName;    // 0x1034cb18  "gates"
 extern TbDynamicStringTemplate<char16_t> gWorldLightsName;   // 0x1034caf8  "lights"
-// The three arrival vehicles' feature names (wide strings built by __sinit_World_cpp like the two above; src/World_gates.cpp defines them with
+// The three arrival vehicles' feature names (wide strings built by __sinit_World_cpp like the two above; src/game/World.cpp defines them with
 // their texts until it is translated). Names invented (unit w193).
 extern TbDynamicStringTemplate<char16_t> gArrivalBusName;       // 0x1034cb78  "bus"
 extern TbDynamicStringTemplate<char16_t> gArrivalSeaplaneName;  // 0x1034cb58  "seaplane"
 extern TbDynamicStringTemplate<char16_t> gArrivalFerryName;     // 0x1034cb38  "Ferry"
-// Unit w194 (src/World_sequences.cpp). The id of the thing that plays the winning animation (the "End" feature's object), 0 for none, and the
+// Unit w194 (src/game/World.cpp). The id of the thing that plays the winning animation (the "End" feature's object), 0 for none, and the
 // feature's name in the ride database (a wide string built by __sinit_World_cpp like the names above; defined there with its text until it is
 // translated). Names invented.
 extern uint16_t gWinningAnimThing;                              // 0x1034cad4
@@ -284,7 +284,7 @@ struct CThingArrayEntry {
     CThingArrayEntry* mNextUsed;   // word 2
     CThingArrayEntry* mPrevUsed;   // word 3
     CThingArrayEntry* mNextFree;   // word 4
-    // 0x1013af58 (192 bytes, src/World_turn.cpp, unit w121; the Mac name is CWorld::_CThingArrayEntry::FreeMe, `this` is the entry):
+    // 0x1013af58 (192 bytes, src/game/World.cpp, unit w121; the Mac name is CWorld::_CThingArrayEntry::FreeMe, `this` is the entry):
     // unlinks the entry from the used list, pushes it on the free list and releases the thing with the plain operator delete.
     void FreeMe();
 };
@@ -299,7 +299,7 @@ class CStaffHQ;
 class CMechanicHQ;
 class CWorld {
 public:
-    CWorld();                                   // 0x10139f70 (376 bytes, src/World_init.cpp)
+    CWorld();                                   // 0x10139f70 (376 bytes, src/game/World.cpp)
     // 0x1013a1c0 (124 bytes): builds the thing heap, then registers the world as save block 0 ("World Struture", sic); the error
     // branch (a heap that did not build: CExitError type 8) is dead, AllocateThingHeap always answers 1.
     bool Allocate();
@@ -309,30 +309,30 @@ public:
     void DoOnlineGameTurn();                    // 0x1013b608
     void UpdateThingsInEngine(float step);      // 0x1013de70
     void UpdateBumperCarsInEngine(float step);  // 0x1013e09c
-    // 0x1013ebc8 (96 bytes, src/World_getters.cpp, unit w123b): the analyser of the thing table row in mParkAnalyserThing; the const twin is 0x1013eb38.
+    // 0x1013ebc8 (96 bytes, src/game/World.cpp, unit w123b): the analyser of the thing table row in mParkAnalyserThing; the const twin is 0x1013eb38.
     CParkAnalyser* GetParkAnalyser();
-    // 0x10140fac (316 bytes, src/World_rides.cpp, unit w114): rebuilds gRidesOwned from the ride database (a ride counts when its DownloadedRideNumber
+    // 0x10140fac (316 bytes, src/game/World.cpp, unit w114): rebuilds gRidesOwned from the ride database (a ride counts when its DownloadedRideNumber
     // is not 0 and it is not a preview ride while `previews` is nonzero), then answers 0 when any of the 32 bytes of `required` has bit 0
     // set while the same byte of gRidesOwned has not, else 1. Only bit 0 of each byte is tested (the original's `(mask & r) == 1`).
     // It never reads the world.
     int32_t DoIHaveTheseRides(const char* required, int32_t previews);
-    // 0x1013eab0 (96 bytes, src/World_GetAdvisor.cpp, unit w103): the advisor of the table behind the global at 0x10260728 whose row is the
+    // 0x1013eab0 (96 bytes, src/game/World.cpp, unit w103): the advisor of the table behind the global at 0x10260728 whose row is the
     // world's short at +0x1da71c (five words a row), after a game assertion on the table's first word.
     CAdvisor* GetAdvisor();
-    // 0x10140ee4 (104 bytes, src/World_sequences.cpp, unit w194): marks the ride (by its id) as selected in the park's downloaded ride bitmap.
+    // 0x10140ee4 (104 bytes, src/game/World.cpp, unit w194): marks the ride (by its id) as selected in the park's downloaded ride bitmap.
     void FlagItemAsSelected(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id);
-    // 0x1013a9fc (src/World_exit.cpp): the end of a level: the mouse and the map are given up, every thing deleted, the vehicles'
+    // 0x1013a9fc (src/game/World.cpp): the end of a level: the mouse and the map are given up, every thing deleted, the vehicles'
     // behaviours and the bitmap system closed; mF1DA738 is 2 during and 1 after. CGame::ExitLevel calls it first.
     void ExitLevel();
-    // 0x1013a264 (src/World_exit.cpp): CGame::ExitLevel calls this second; it does FreeThingHeap and nothing else.
+    // 0x1013a264 (src/game/World.cpp): CGame::ExitLevel calls this second; it does FreeThingHeap and nothing else.
     void Free();
-    // 0x1013ac08 (src/World_exit.cpp): the Mac's loop of 0x2800 empty iterations (the per-slot free compiled to nothing).
+    // 0x1013ac08 (src/game/World.cpp): the Mac's loop of 0x2800 empty iterations (the per-slot free compiled to nothing).
     void FreeThingHeap();
-    // 0x1013ac4c (src/World_turn.cpp, unit w121): kills and deletes every thing (and sets mF1DA738 to 2 itself).
+    // 0x1013ac4c (src/game/World.cpp, unit w121): kills and deletes every thing (and sets mF1DA738 to 2 itself).
     void DeleteAllThings();
-    bool IsPlayingWinningAnim();   // 0x1013bdd0 (40 bytes, src/World_sequences.cpp, unit w194)
-    void StartBankruptcySequence();   // 0x1013baa4 (396 bytes, src/World_sequences.cpp, unit w194)
-    // Unit w205 (src/World_save.cpp).
+    bool IsPlayingWinningAnim();   // 0x1013bdd0 (40 bytes, src/game/World.cpp, unit w194)
+    void StartBankruptcySequence();   // 0x1013baa4 (396 bytes, src/game/World.cpp, unit w194)
+    // Unit w205 (src/game/World.cpp).
     enum WorldState : int32_t {};   // the type SAVEVAR<CWorld::WorldState> (0x1014182c, 260 bytes) writes mF1DA738 as
     // 0x1013bf18 (2,740 bytes): writes the world to the save file: a version word (2), 25 fields (the thing table rows of the singleton things, the
     // turn, the start time, ...), the control manager, the macro layer and the map, then every used thing of the thing table by its kind byte.
@@ -342,26 +342,26 @@ public:
     // mStaffHQThing (+0x1da718) and mMechanicHQThing (+0x1da71a).
     CStaffHQ* GetStaffHQ();
     CMechanicHQ* GetMechanicHQ();
-    // Unit w207 (src/World_load.cpp). 0x1013c9f0 (4,756 bytes): reads what Save wrote (a version word, the world's 25 fields, the control manager,
+    // Unit w207 (src/game/World.cpp). 0x1013c9f0 (4,756 bytes): reads what Save wrote (a version word, the world's 25 fields, the control manager,
     // the macro layer and the map), after resetting the thing table, then relinks the used list and makes every used thing of its kind in place
     // before its Serialise reads it. 1 when all of it was read, 0 at the first part that fails (nothing is read after it).
     int32_t Load(void* file);
-    // 0x1013e89c, 0x1013e8dc, 0x1013e91c, 0x1013e95c (12 bytes each, src/LevelInit2.cpp, unit w110): the height field's place and
+    // 0x1013e89c, 0x1013e8dc, 0x1013e91c, 0x1013e95c (12 bytes each, src/game/World.cpp, unit w110): the height field's place and
     // size. They ignore the world: each reads a word of gMainBalance (value slots 334 to 337, the rows "HeightfieldXStart",
     // "HeightfieldYStart", "HeightfieldWidth", "HeightfieldHeight").
     int32_t GetHeightfieldXStart() const;
     int32_t GetHeightfieldYStart() const;
     int32_t GetHeightfieldWidth() const;
     int32_t GetHeightfieldHeight() const;
-    // 0x1013a2ac (1,828 bytes, src/World_setup.cpp, unit w117): the set-up of a new level: the level's balance files into gMainBalance,
+    // 0x1013a2ac (1,828 bytes, src/game/World.cpp, unit w117): the set-up of a new level: the level's balance files into gMainBalance,
     // the map and the macro AI reset, the ten singleton things made (their ids kept in the world), the "gates" and "lights" objects
     // found in the ride database, the research lab, the bitmap system and the pilots started, and the first event message posted.
     // The answer is 0 when the level's first or second balance file did not load (the easy mode file never counts), else 1.
     bool SetupNewLevel(char* levelFolder);
-    // 0x1013ece8 (96 bytes, src/World_getters.cpp, unit w123b; the const twin is 0x1013ec58): the research lab of the thing table row in mResearchLabThing.
+    // 0x1013ece8 (96 bytes, src/game/World.cpp, unit w123b; the const twin is 0x1013ec58): the research lab of the thing table row in mResearchLabThing.
     CResearchLab* GetResearchLab();
 
-    // The thing lists and the world's turn (unit w121, src/World_turn.cpp). The three that answer a thing id return the two byte struct
+    // The thing lists and the world's turn (unit w121, src/game/World.cpp). The three that answer a thing id return the two byte struct
     // through a hidden pointer on the Mac and never read the world.
     tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> GetUsedThingHead() const;                       // 0x1013adb0 (40 bytes)
     tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> GetNextUsedThing(const CThing* thing) const;    // 0x1013ae08 (112 bytes)
@@ -370,7 +370,7 @@ public:
     // 0x1013ff7c (12 bytes): the whole word at +0x1da710, nonzero while the park is closed (World.h keeps the name mF1DA710).
     int32_t IsParkClosed() const;
     int32_t ParkGates_GetStatus() const;                                                             // 0x1013ffb4 (148 bytes)
-    // Unit w193 (src/World_gates.cpp): the park gates and the arrival vehicle (the bus, seaplane or ferry of CArrival::CreatePeople). DoNextLeg answers
+    // Unit w193 (src/game/World.cpp): the park gates and the arrival vehicle (the bus, seaplane or ferry of CArrival::CreatePeople). DoNextLeg answers
     // the vehicle's thing id through a hidden result (CreatePeople ignores it); the status is 2 while the passengers get off, 6 an error, -1 or 0 idle
     // and 4 on its way back.
     void SetParkOpenOrClosed(int32_t open, int32_t gateFlag);                                 // 0x1013fc3c (780 bytes)
@@ -380,7 +380,7 @@ public:
     int32_t ArrivalVehicle_GetStatus();                                                       // 0x101406cc (264 bytes)
     int32_t ArrivalVehicle_CrossingIsClear();                                                 // 0x1014080c (804 bytes)
     int32_t ArrivalVehicle_PeopleWaitingToLeave();                                            // 0x10140b6c (488 bytes)
-    // Unit w194 (src/World_sequences.cpp): the sequences and the thing table helpers.
+    // Unit w194 (src/game/World.cpp): the sequences and the thing table helpers.
     void PopulatePark();                      // 0x1013b6ac (436 bytes): the first people of a park whose gates are open
     void StartingPopulationForOnline();       // 0x1013b88c (476 bytes): 25 people, then a mechanic and an entertainer for every ride
     void StartWinningSequence();              // 0x1013bc68 (308 bytes)
@@ -394,15 +394,15 @@ public:
     int32_t ArrivalVehicle_PeopleLeftToDropOff();                                             // 0x10140d98 (8 bytes)
     int32_t ArrivalVehicle_IsSeagoing();                                                      // 0x10140de0 (76 bytes)
 
-    // 0x1013ed74 (96 bytes, src/World_getters.cpp, unit w123b; unit w120 calls it): the weather thing of the table row in mWeatherThing (word 0 of that row).
+    // 0x1013ed74 (96 bytes, src/game/World.cpp, unit w123b; unit w120 calls it): the weather thing of the table row in mWeatherThing (word 0 of that row).
     CWeather* GetWeather();
-    // Unit w123b (src/World_getters.cpp): the other thing getters, all the same code as GetAdvisor: the world's halfword id is read, the assertion on
+    // Unit w123b (src/game/World.cpp): the other thing getters, all the same code as GetAdvisor: the world's halfword id is read, the assertion on
     // row 0 is made, then word 0 of the id's row is answered (NULL for a free row). The const twins answer pointers to const.
     const CParkAnalyser* GetParkAnalyser() const;   // 0x1013eb38, mParkAnalyserThing
     const CResearchLab* GetResearchLab() const;     // 0x1013ec58, mResearchLabThing
     CBankAccount* GetBankAccount();                 // 0x1013edfc, mBankAccountThing
-    void Register(CObject* object);                 // 0x1013fa10 (src/World_register.cpp, unit w139): the world's list of rides (the CHandyman and CMechanic overloads are 0x1013ef14 and 0x1013f144)
-    // Unit w139 (src/World_register.cpp, 116 bytes each): the five staff overloads put the thing at the head of its list (the head halfword is
+    void Register(CObject* object);                 // 0x1013fa10 (src/game/World.cpp, unit w139): the world's list of rides (the CHandyman and CMechanic overloads are 0x1013ef14 and 0x1013f144)
+    // Unit w139 (src/game/World.cpp, 116 bytes each): the five staff overloads put the thing at the head of its list (the head halfword is
     // the thing id; the old head goes into the thing at +0x20c). Heads: handyman 0x1da73c, mechanic 0x1da73e, entertainer 0x1da740,
     // researcher 0x1da742, guard 0x1da744; the object list head is 0x1da746 (link at +0xc of the object).
     void Register(CHandyman* staff);        // 0x1013ef14
@@ -410,7 +410,7 @@ public:
     void Register(CEntertainer* staff);     // 0x1013f374
     void Register(CGuard* staff);           // 0x1013f5ac
     void Register(CResearcher* staff);      // 0x1013f7d8
-    // Unit w178 (src/World_unregister.cpp, 344 bytes each): takes the thing out of its list again (the inverse of Register above): walks the list
+    // Unit w178 (src/game/World.cpp, 344 bytes each): takes the thing out of its list again (the inverse of Register above): walks the list
     // from the head by the links until the thing's id, asserting that row 0 of the thing table is free at each step, then points the previous
     // thing's link (or the head) at the thing's own link.
     void Unregister(CHandyman* staff);      // 0x1013efb8
@@ -425,14 +425,14 @@ public:
     // The object controls at +0x1d943c (SetupNewLevel reaches them through the global gGameWorld, not through its own `this`).
     CControlManager* GetControlManager() { return reinterpret_cast<CControlManager*>(reinterpret_cast<uintptr_t>(this) + 0x1d943c); }
 
-    // Unit w123c (src/World_death.cpp). 0x1013b154 (48 bytes): queues the id on the global pending-delete list (gPendingDeleteList in
+    // Unit w123c (src/game/World.cpp). 0x1013b154 (48 bytes): queues the id on the global pending-delete list (gPendingDeleteList in
     // WorldThings.h, not a member of the world) with TbTList::AddHead 0x10141ad4; the world is not read. The argument's two bytes are
     // the high halfword of the Mac's register.
     void AddToPendingDeleteList(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> id);
     // 0x1013b1e4 (56 bytes): the world's random generator, state mStartTime (+0x1da708): state = state * 0x19660d + 0x3c6ef35f (32 bits),
     // stored, and the answer is the state's absolute value as a bit image (the state itself stays as it was, a negative one included).
     uint32_t GetRand();
-    // 0x1013b244 (12 bytes, src/World_sequences.cpp, unit w194): seeds the random generator (CMapCell::PlaceLitter passes the cell id, a zero-extended halfword).
+    // 0x1013b244 (12 bytes, src/game/World.cpp, unit w194): seeds the random generator (CMapCell::PlaceLitter passes the cell id, a zero-extended halfword).
     void SeedRand(uint32_t seed);
 
     // Mac offsets in the comments; the constructor writes the members marked "cleared" and the cells, nothing else (a world built over
@@ -454,7 +454,7 @@ public:
     // The thing table rows (thing ids) of the singleton things SetupNewLevel makes, in the order it makes them (unit w117):
     uint16_t mStaffHQThing;       // 0x1da718  CStaffHQ
     uint16_t mMechanicHQThing;    // 0x1da71a  CMechanicHQ
-    uint16_t mAdvisorThing;       // 0x1da71c  the advisor's row in gThingArray (unit w103, src/World_GetAdvisor.cpp)
+    uint16_t mAdvisorThing;       // 0x1da71c  the advisor's row in gThingArray (unit w103, src/game/World.cpp)
     uint16_t mTagSystemThing;     // 0x1da71e  CTagSystem
     uint16_t mParkAnalyserThing;  // 0x1da720  CParkAnalyser (GetParkAnalyser 0x1013ebc8 reads it)
     uint16_t mResearchLabThing;   // 0x1da722  CResearchLab (GetResearchLab reads it)

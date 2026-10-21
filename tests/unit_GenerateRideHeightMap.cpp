@@ -1,5 +1,5 @@
 // Test library for GenerateRideHeightMap (unit v5675; libtpw_unit_GenerateRideHeightMap.dylib, tests/test_GenerateRideHeightMap.py), main app:
-//   src/RideDestroy_LoadFileIntoMemory_GenerateRideHeightMap.cpp   GenerateRideHeightMap and the global gRideHeightRows
+//   src/game/park/TPHField.cpp   GenerateRideHeightMap and the global gRideHeightRows
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The
 // globals other files define (the height map's limits and stride) are defined here, zero at start like the Mac's bss.

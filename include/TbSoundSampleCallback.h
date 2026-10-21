@@ -151,7 +151,7 @@ public:
 };
 
 // ---- the cleanup objects --------------------------------------------------------------------------------------------------------
-// Static objects whose destructors clear the pools at program exit (src/TbSoundSampleCallback.cpp keeps one of each).
+// Static objects whose destructors clear the pools at program exit (src/sound/TbSoundBankInfo.cpp keeps one of each).
 class _CS_TbSoundUserCallback {
 public:
     ~_CS_TbSoundUserCallback();                      // 0x10013f2c (84)

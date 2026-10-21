@@ -1,5 +1,5 @@
 // Test library for SMachineParameters::Return (unit v5730; libtpw_unit_SMachineParameters_Return.dylib), main app:
-//   src/tb_init_SMachineParameters_Output_SMachineParameters_Return.cpp
+//   src/engine/tb_init.cpp
 // Return calls nothing and reads no globals.
 #include <cstddef>
 #include <cstdint>

@@ -1,5 +1,5 @@
 // Test library for the upgrade status panel (unit v5905; libtpw_unit_UpgradeStatusPanel_InitStatusWindow_2.dylib), main app:
-//   src/UpgradeStatusMsg_UpgradeStatusPanel_InitStatusWindow_2.cpp
+//   src/game/ui/ui_upgradeStatus.cpp
 //
 // Every callee is a recording fake with the same event as the PowerPC stub. Windows are named by id (a table the test fills).
 #include <cstddef>

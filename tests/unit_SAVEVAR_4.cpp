@@ -1,5 +1,5 @@
 // Test library for SAVEVAR<CThoughts::ThoughtType> (unit v5643; libtpw_unit_SAVEVAR_4.dylib, tests/test_SAVEVAR_4.py), main app:
-//   src/TrackCell_SAVEVARSTRUCT_SAVEVAR_4.cpp
+//   src/game/buildings/TrainingCentre.cpp
 //
 // Fakes: CSaveLoad::WriteSerialiseLog, GAME_ASSERTMSG, LbFile_Write record their arguments. gSaveLoad is defined here.
 #include <cstddef>

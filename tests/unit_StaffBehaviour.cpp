@@ -1,5 +1,5 @@
 // Test library for the staff member, part 3 (unit w191; libtpw_unit_StaffBehaviour.dylib, tests/test_StaffBehaviour.py), main app:
-//   src/Staff_behaviour.cpp   CStaff: ProcessWalkingToRestArea, ProcessResting, ProcessWalkingToStrike, ProcessStriking, ProcessBeingStunned, GetTiredPatrolling,
+//   src/game/people/staff.cpp   CStaff: ProcessWalkingToRestArea, ProcessResting, ProcessWalkingToStrike, ProcessStriking, ProcessBeingStunned, GetTiredPatrolling,
 //                             GetTiredWorking, FindNearestRestingPlace, DoGeneralStaffThing, GoToRestArea, StopResting, SetPatrolArea, GetPatrolArea,
 //                             CancelPatrolArea, HasPatrolArea, InsidePatrolArea, FindDestInPatrolArea
 //
@@ -89,7 +89,7 @@ CSubscriptionHeader::CSubscriptionHeader() {
 }
 CSubscriptionHeader::~CSubscriptionHeader() {}
 
-// The staff-room event's destructor and GetType belong to src/Staff.cpp (unit w189): silent here.
+// The staff-room event's destructor and GetType belong to src/game/people/staff.cpp (unit w189): silent here.
 CMsgStaffRoomEvent::~CMsgStaffRoomEvent() {}
 int32_t CMsgStaffRoomEvent::GetType() const { return 15; }
 

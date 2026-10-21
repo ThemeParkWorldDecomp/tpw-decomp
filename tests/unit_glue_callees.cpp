@@ -1,4 +1,4 @@
-// Test library for the weak library-glue callees (unit v5L49; libtpw_unit_glue_callees.dylib): src/glue_callees.cpp. No fakes: the
+// Test library for the weak library-glue callees (unit v5L49; libtpw_unit_glue_callees.dylib): src/game/online/online.cpp. No fakes: the
 // definitions under test are the weak ones, and wcslen is platform/msl.cpp's.
 #include <cstdint>
 

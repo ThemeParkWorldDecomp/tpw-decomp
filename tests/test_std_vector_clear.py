@@ -1,7 +1,7 @@
 """Unit v5956: std::vector<Argument>::clear / tear_down, CToken::CToken (copy and string + member pointer), CParser::GetChar,
 COnlinePerson::COnlinePerson and std::list<std::wstring>::insert, against libtpw_unit_std_vector_clear.dylib
 (tests/unit_std_vector_clear.cpp), main app ("SimTheme Park"),
-src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_std_vector_clear.cpp:
+src/game/MslSupport.cpp, src/game/online/OnlineParser.cpp:
   clear 0x102108a4, tear_down 0x10201310, CToken::CToken 0x10210d4c and 0x10211f88, CParser::GetChar 0x10211ef8,
   COnlinePerson::COnlinePerson 0x10212d98, std::list<std::wstring>::insert 0x1020deec
 

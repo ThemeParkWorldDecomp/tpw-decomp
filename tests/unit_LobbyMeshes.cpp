@@ -1,4 +1,4 @@
-// Test library for src/lobby_meshes.cpp and src/Debug.cpp (libtpw_unit_LobbyMeshes.dylib;
+// Test library for src/game/online/LBLobbyMeshes.cpp and src/game/Debug.cpp (libtpw_unit_LobbyMeshes.dylib;
 // see tests/test_LobbyMeshes.py): the lobby's mesh system, its types and instances, driven
 // by scripts over a small world of ride sets the test builds.
 //

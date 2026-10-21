@@ -1,4 +1,4 @@
-// Fakes and driver for the draw primitive buffer unit (src/tb_drawprimitive_buffer.cpp).
+// Fakes and driver for the draw primitive buffer unit (src/engine/DrawPrimitive.cpp).
 //
 // Everything the unit calls is a fake that records its arguments through tests/calllog.h:
 // the render memory (LoadInfo and the rest), the clipper, the light manager, the math

@@ -1,5 +1,5 @@
 // Test library for the research panel's DoScroll, InitAll and ResearchPanelMsg (unit v5097; libtpw_unit_DoScroll.dylib, tests/test_DoScroll.py), main app:
-//   src/DoScroll.cpp   DoScroll, InitAll, ResearchPanelMsg, gResearchScrollSound
+//   src/game/ui/ui_researchPanel.cpp   DoScroll, InitAll, ResearchPanelMsg, gResearchScrollSound
 //
 // The callees outside the unit are recording fakes; the windows are arena blocks whose vtable (built here) answers SetValue with a fake.
 // The globals of other files the unit reads, defined here, zero at start like the Mac's bss.

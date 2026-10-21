@@ -1,7 +1,7 @@
 """Unit v51122: the keyboard action wrappers (context_help, show_version, ToggleHelpText, CamcorderMode, Screen_*), the Remove*Panel
 functions, MainPanel_EnableResearchButton, GameWindowToggle_Hidden and __sinit_ui_mainpanel2_cpp, against
 libtpw_unit_context_help.dylib (tests/unit_context_help.cpp), main app ("SimTheme Park"),
-src/ui_Postcard_panel_win_ticket_1_show_person_history_info_enter_hoarding_mode_context_help.cpp.
+src/game/keyboard.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_loansPanel.cpp, src/game/ui/ui_mainpanel2.cpp, src/game/ui/ui_optionsPanel.cpp, src/game/ui/ui_parkStatus.cpp.
 
 A case is a world and a call. The world is built twice by one piece of Python code (emulator memory for the original, the host library for
 the translation). The callees outside the unit (UIInterface members, GetAdvisor, PlayLastTutorialMessage, UI_SendMessage, the wide string

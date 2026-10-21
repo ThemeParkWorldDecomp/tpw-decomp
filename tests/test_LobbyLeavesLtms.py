@@ -1,4 +1,4 @@
-"""Unit w40, the ltms half: CStaticUnicodeBuffer (src/CStaticUnicodeBuffer.cpp), against libtpw_unit_LobbyLeaves.dylib
+"""Unit w40, the ltms half: CStaticUnicodeBuffer (src/ltms/StaticUnicodeBuffer.cpp), against libtpw_unit_LobbyLeaves.dylib
 (tests/unit_LobbyLeaves.cpp), in the ltms library ("ltms symbols shared"):
   AppendMB(const unsigned char*, unsigned long) 0x100004f0, AppendMB(unsigned short) 0x100006bc, AppendUnicode(const wchar_t*, unsigned long)
   0x10000780, AppendUnicode(wchar_t) 0x10000884, Close 0x10000904, ~CStaticUnicodeBuffer 0x100009d8.
@@ -6,7 +6,7 @@
 The buffer is the original's object in the emulator's memory (its real vtable at TOC + 0xae4, so the virtual AppendUnicode that AppendMB calls
 and the Close that the destructor calls are the original's code) and the host's own over a guarded array of 16-bit cells. The converter is a
 TbIMBToUnicode: on the PowerPC side an object whose first lead byte, count and table the case chooses, with a fake Release at vtable slot 8;
-on the host the real TbIMBToUnicode (src/TbIMBToUnicode.cpp) with a fake Release. TbIMBInfo::GetIndex runs for real on both sides (the original's
+on the host the real TbIMBToUnicode (src/ltms/StaticUnicodeBuffer.cpp, src/ltms/TbFontRenderParams.cpp, src/ltms/TbIResourceIndex.cpp) with a fake Release. TbIMBInfo::GetIndex runs for real on both sides (the original's
 is the ltms image's own). A case is a SCRIPT of operations: the six functions and three direct writes of the object's cursor, overflow flag and
 converter pointer (to keep a long script alive past the end of the buffer). After every operation the cursor (in cells), the end, whether a
 converter is held, the overflow flag and every cell of the array, guards included, are compared; at the end the call log (the converter's

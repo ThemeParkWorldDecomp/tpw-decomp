@@ -1,13 +1,13 @@
 """Differential tests for the window script interpreter and the control setters, against libtpw_unit_UIScript.dylib
 (tests/unit_UIScript.cpp):
 
-  src/InterfaceWindow_script.cpp   InterfaceWindow::Build, ProcessScript, SetDrawObject, SetClientDrawObject, GetVisibility,
+  src/game/ui/InterfaceWindow.cpp   InterfaceWindow::Build, ProcessScript, SetDrawObject, SetClientDrawObject, GetVisibility,
                                    SetCallbackFunction, CaptureKb
-  src/ui_controls_small.cpp        InterfaceKnob::SetMinMaxAngles, InterfaceListBox::SetListRect, InterfaceListControl2::SetListRect,
+  src/game/ui/CoolRegion.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp        InterfaceKnob::SetMinMaxAngles, InterfaceListBox::SetListRect, InterfaceListControl2::SetListRect,
                                    SetColumns, SetColumnPos, CoolCircle::CoolCircle, CoolEllipse::CoolEllipse, CoolPoly::CoolPoly
 
-Real on both sides: those, the window constructor (src/InterfaceWindow.cpp, which builds the test trees and is called by the
-fake factory) and the rectangles (src/UI_Base.cpp). Fakes that record the same event on both sides: InterfaceWindow::CreateObject
+Real on both sides: those, the window constructor (src/game/ui/InterfaceWindow.cpp, which builds the test trees and is called by the
+fake factory) and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Fakes that record the same event on both sides: InterfaceWindow::CreateObject
 (makes a window of the asked kind with the real constructor and links it as the parent's last child; the queue "CreateObject"
 makes a call answer NULL), WhatAmI (answers the kind the window was made with), GetWindow (the queue "GetWindow": 1 answers the
 window itself), DrawObjectLibrary::FindDrawObject (the queue "FindDrawObject": the index of the world's draw object, -1 none),

@@ -1,6 +1,6 @@
 // Test library for the bullfrog LbSCBack.cpp helpers (unit v5284; libtpw_unit_LbApp_GetWindowsScreenMode.dylib,
 // tests/test_LbApp_GetWindowsScreenMode.py):
-//   src/LbFile_LbApp_GetWindowsScreenMode.cpp   LbApp_GetWindowsScreenMode, SetWindowName, EnableWindowsScreenSaver,
+//   src/bullfrog/LbApp.cpp, src/bullfrog/LbSCBack.cpp   LbApp_GetWindowsScreenMode, SetWindowName, EnableWindowsScreenSaver,
 //   ProcessWindowMessages, __sinit_LbSCBack_cpp, and the globals gLbWindowName and gLbSCBack.
 //
 // The NS_MacDoze calls, __construct_array and __register_global_object are fakes that record what the real ones read and answer from the

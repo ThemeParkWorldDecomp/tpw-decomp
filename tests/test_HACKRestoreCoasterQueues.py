@@ -1,5 +1,5 @@
 """Unit v51023, four coaster helpers, against libtpw_unit_HACKRestoreCoasterQueues.dylib (tests/unit_HACKRestoreCoasterQueues.cpp), main app
-("SimTheme Park"), src/LoadCoasters_HACKRestoreCoasterQueues.cpp:
+("SimTheme Park"), src/game/rides/CoasterSounds.cpp, src/game/rides/CoasterTrack.cpp, src/game/rides/CoasterTrain.cpp, src/game/rides/TPCoaster.cpp:
   HACKRestoreCoasterQueues 0x10044b10, NormaliseVectorXZ 0x10045a38, DisableCoasterCarDrawSafe 0x1004a648, IncCoasterConst1 0x10052564
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

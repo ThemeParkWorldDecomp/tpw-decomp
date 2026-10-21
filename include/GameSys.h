@@ -1,4 +1,4 @@
-// GameSys.cpp (main app 0x10233de0..0x10237770): the game system. See src/GameSys.cpp.
+// GameSys.cpp (main app 0x10233de0..0x10237770): the game system. See src/game/GameSys.cpp.
 //
 // GAMESYSTEM_Tick's states (gGameSystemState; the numbers are the original's, the
 // descriptions are ours):
@@ -89,6 +89,6 @@ extern TbDynamicStringTemplate<char> gGameSysTitle;          // 0x103bc400
 extern TbDynamicStringTemplate<char> gGameSysLanguage;       // 0x103bc3e0
 extern TbDynamicStringTemplate<char16_t> gGameSysGmsFile;    // 0x103bc3c0
 
-// Unit v5151 (src/GameSys_GAMESYSTEM_Load.cpp): the clocks in a park file, nine big-endian words each.
+// Unit v5151 (src/game/GameSys.cpp): the clocks in a park file, nine big-endian words each.
 int32_t GAMESYSTEM_Save(void* file);     // 0x1023678c, 1 when every write transferred 4 bytes, else 0
 int32_t GAMESYSTEM_Load(void* file);     // 0x10236b30, 1 when every read transferred 4 bytes, else 0

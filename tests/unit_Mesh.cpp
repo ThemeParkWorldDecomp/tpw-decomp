@@ -1,4 +1,4 @@
-// Test library for src/tb_mesh.cpp (libtpw_unit_Mesh.dylib; see tests/test_Mesh.py): one
+// Test library for src/engine/Mesh.cpp (libtpw_unit_Mesh.dylib; see tests/test_Mesh.py): one
 // CMesh over a mesh image the test lays out in the arena, driven by scripts.
 //
 // Real: CMesh. Fakes that record: the texture object (construction, Load, which also

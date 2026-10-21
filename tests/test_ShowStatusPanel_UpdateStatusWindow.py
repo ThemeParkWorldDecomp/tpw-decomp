@@ -1,5 +1,5 @@
 """Unit v5547, the sideshow status panel, against libtpw_unit_ShowStatusPanel_UpdateStatusWindow.dylib
-(tests/unit_ShowStatusPanel_UpdateStatusWindow.cpp), main app ("SimTheme Park"), src/ShowStatusPanel_UpdateStatusWindow.cpp:
+(tests/unit_ShowStatusPanel_UpdateStatusWindow.cpp), main app ("SimTheme Park"), src/game/ui/ui_showStatus.cpp:
   ShowStatusPanel::UpdateStatusWindow 0x101c1848, ApplyChanges 0x101c2508, applytoallcallback 0x101c261c, Show 0x101c2a38
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,4 +1,4 @@
-// Test library for src/RideAnimInterp.cpp (libtpw_unit_RideAnimInterp.dylib; see
+// Test library for src/game/LMatrix.cpp, src/game/rides/RideAnim.cpp (libtpw_unit_RideAnimInterp.dylib; see
 // tests/test_RideAnimInterp.py): the node animation's fifteen interpolators.
 //
 // The functions call nothing of the game (only the C library's modf, fmod, sqrt and acos, which

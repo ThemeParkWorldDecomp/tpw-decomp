@@ -1,5 +1,5 @@
-// Test library for the advisor's message scoring (libtpw_unit_AdvisorScoring.dylib; see tests/test_AdvisorScoring.py): src/AdvisorScoring.cpp (the
-// constructor, the destructor and the ten queries of CAdvisorScoring), src/AdvisorBalance.cpp and the two generated tables, all real.
+// Test library for the advisor's message scoring (libtpw_unit_AdvisorScoring.dylib; see tests/test_AdvisorScoring.py): src/game/advisor/Advisor.cpp, src/game/advisor/AdvisorScoring.cpp (the
+// constructor, the destructor and the ten queries of CAdvisorScoring), src/game/advisor/Advisor.cpp and the two generated tables, all real.
 //
 // Fakes that record through calllog: CBalanceTable::Init, Load and UnInit (the balance reader has its own test, test_BalanceTable), CTRACE,
 // and the three scorers the table's pointers can name (_ADVISOR_NO_SCORE, _ADVISOR_WELCOME, _ADVISOR_OPEN_PARK). CGameType's constructor is

@@ -1,6 +1,6 @@
 // Test library for RideStatusPanel::Condemned and ::InitStatusWindow (unit v5580; libtpw_unit_RideStatusPanel_Condemned.dylib,
 // tests/test_RideStatusPanel_Condemned.py), main app:
-//   src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Condemned.cpp
+//   src/game/ui/ui_RideStatus.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read; the windows are blocks of memory (never constructed), the
 // globals of other files the unit reads are defined here.

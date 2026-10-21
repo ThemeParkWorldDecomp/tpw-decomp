@@ -1,5 +1,5 @@
 // Test library for std::exception::~exception (unit v5125; libtpw_unit_std_exception_Dtor_exception.dylib), main app:
-//   src/ltms_textformatter_std_exception_Dtor_exception.cpp   LtmsStdExceptionDtor, gLtmsStdExceptionVtbl
+//   src/ltms/MslSupport.cpp   LtmsStdExceptionDtor, gLtmsStdExceptionVtbl
 //
 // operator delete is a fake that records the pointer and frees nothing.
 #include <cstddef>

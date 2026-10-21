@@ -1,5 +1,5 @@
 // Test library for the script interpreter's core (unit w163; libtpw_unit_ScriptInterp.dylib, tests/test_ScriptInterp.py), main app:
-//   src/ScriptInterp.cpp   AssignSlot, InitScript, DoScript, SCR_Error, SCR_Push, SCR_Pop, SCR_SpawnScript, the setters and getters,
+//   src/game/Script.cpp, src/game/ScriptOps.cpp   AssignSlot, InitScript, DoScript, SCR_Error, SCR_Push, SCR_Pop, SCR_SpawnScript, the setters and getters,
 //                          SCR_WhichScriptHasThisSprite, ESP_InitScript, ESP_SpawnScript and PK_GOTO, NOP, END, WAIT, SETTEXT, SETVAR,
 //                          PUSHVAR, POPVAR, GOSUB, RETURN
 //

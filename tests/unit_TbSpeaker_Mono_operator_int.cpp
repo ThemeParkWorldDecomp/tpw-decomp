@@ -1,7 +1,7 @@
 // Test library for small sound functions (unit v51075; libtpw_unit_TbSpeaker_Mono_operator_int.dylib,
 // tests/test_TbSpeaker_Mono_operator_int.py), sound symbols shared:
-//   src/TbSoundCore_TbSpeaker_Mono_operator_int.cpp   the speaker conversions, CBank forwards, cleanup objects, sinit, math
-//   src/TbSoundSampleStore.cpp                        TbSoundSampleStore::operator[] (the other functions of that file are not called)
+//   src/sound/Bank.cpp, src/sound/ChannelState.cpp, src/sound/TbBank.cpp, src/sound/TbSoundSampleWAVFile.cpp, src/sound/TimerCodec.cpp, src/sound/UserCallback.cpp   the speaker conversions, CBank forwards, cleanup objects, sinit, math
+//   src/sound/TbSoundCore.cpp, src/sound/TbSoundSampleStore.cpp                        TbSoundSampleStore::operator[] (the other functions of that file are not called)
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record: the virtual-call glue 0x1002f154 (the speaker
 // and the bank are fake objects whose slots log), the free 0x1002ea94, __register_global_object 0x1002eefc, pow 0x1002ee54, the
@@ -25,7 +25,7 @@
 
 using namespace calllog;
 
-const char* NameText(const TbDynamicStringTemplate<char>& name);   // src/TbSoundCore_TbSpeaker_Mono_operator_int.cpp
+const char* NameText(const TbDynamicStringTemplate<char>& name);   // src/sound/Bank.cpp, src/sound/ChannelState.cpp, src/sound/TbBank.cpp, src/sound/TbSoundSampleWAVFile.cpp, src/sound/TimerCodec.cpp, src/sound/UserCallback.cpp
 
 // ---- globals of other files, defined here
 void* TbSpeaker::AutoDelete::_mpSpeaker = nullptr;
@@ -135,7 +135,7 @@ void SetupBank() {
 }  // namespace
 
 // ---- the fakes
-// Referenced by other functions of src/TbSoundSampleStore.cpp, never called here.
+// Referenced by other functions of src/sound/TbSoundCore.cpp, src/sound/TbSoundSampleStore.cpp, never called here.
 TbError TbSoundCore::StopAndReleasePipe(TbSoundPipeChannel*, bool) { return TbError(0); }
 TbSoundSamplePipe* CCodecFactory::CreateCodec(TbSoundPipeChannel*, TbSoundSampleInfo&) { return nullptr; }
 TbSoundSamplePipe* CCodecFactory::CreateController(TbSoundSampleInfo&) { return nullptr; }

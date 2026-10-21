@@ -1,5 +1,5 @@
 """Unit v5188, the toolbar's jump to the last used panel and the cash window's update, against libtpw_unit_GotoLastUsedPanel.dylib
-(tests/unit_GotoLastUsedPanel.cpp), main app ("SimTheme Park"), src/ui_mainpanel2_msg_GotoLastUsedPanel.cpp:
+(tests/unit_GotoLastUsedPanel.cpp), main app ("SimTheme Park"), src/game/ui/ui_mainpanel2.cpp:
   GotoLastUsedPanel 0x101a587c, DoCashWin 0x101a5ca8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

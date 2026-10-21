@@ -1,5 +1,5 @@
 // Test library for the line of sight and the path smoothing (unit w195; libtpw_unit_LineOfSight.dylib, tests/test_LineOfSight.py), main app:
-//   src/World_sight.cpp   bresenham_start, line_of_sight, line_of_sight_cleanup, wallhug_cleanup, wallhug_tricky and the eight globals.
+//   src/game/park/LineOfSight.cpp   bresenham_start, line_of_sight, line_of_sight_cleanup, wallhug_cleanup, wallhug_tricky and the eight globals.
 //
 // The callees outside the unit are fakes that record what the real ones read: MAP_wall_in_way answers from a wall table of 256 x 256 squares
 // (a byte per square, bit d = a wall in direction d) that the case loads; wallhug_trivial plans a walk (kind 0 to 2: a real walk of adjacent

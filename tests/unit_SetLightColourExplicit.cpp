@@ -1,5 +1,5 @@
 // Test library for the light-node helpers (unit v5272; libtpw_unit_SetLightColourExplicit.dylib), main app:
-//   src/LevelSystems_SetLightColourExplicit.cpp   SetLightColourExplicit, EnableLight, SetLightColourRelative, DisableLight
+//   src/game/TPLevel.cpp   SetLightColourExplicit, EnableLight, SetLightColourRelative, DisableLight
 //
 // CSystem::UpdateLights is a recording fake; gei_System is defined here.
 #include <cstddef>

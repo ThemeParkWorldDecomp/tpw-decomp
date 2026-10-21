@@ -127,7 +127,7 @@ public:
     uint8_t* mCursor;     // +0x14
 };
 
-// Unit w222 (src/bfl_FileSystem_more.cpp): Mac 0x18, vtable 0x10071d60.
+// Unit w222 (src/bullfrog/TbZLibFileAccess.cpp, src/bullfrog/TbWadStorageAccess.cpp, src/bullfrog/FileSystem.cpp, src/bullfrog/LbMaths.cpp, src/bullfrog/TbMemFileAccess.cpp): Mac 0x18, vtable 0x10071d60.
 class _TbZLibFileAccess : public CAccessItem {
 public:
     _TbZLibFileAccess();
@@ -145,7 +145,7 @@ public:
     uint8_t* mCursor;     // +0x14
 };
 
-// Unit w222 (src/bfl_FileSystem_more.cpp), 0x1000a79c.
+// Unit w222 (src/bullfrog/TbZLibFileAccess.cpp), 0x1000a79c.
 int32_t _GetMoreData(void* dest, uint32_t size, void* context);
 
 class _TbWadStorageAccess : public _TbStorageAccess {

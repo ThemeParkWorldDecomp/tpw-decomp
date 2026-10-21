@@ -1,9 +1,9 @@
 // Fakes and test entry points for unit w101, the UI main panel helpers (libtpw_unit_UIMainPanel.dylib, driven by tests/test_UIMainPanel.py;
 // see calllog.h):
-//   src/ui_main_panel.cpp  UIMain_UISound 0x101802cc, UIMain_CheckPanel 0x10180514, UIMain_SetPanel 0x101805a0, UIMain_SetTitleText 0x10180794,
+//   src/game/ui/ui_main.cpp  UIMain_UISound 0x101802cc, UIMain_CheckPanel 0x10180514, UIMain_SetPanel 0x101805a0, UIMain_SetTitleText 0x10180794,
 //                          UIMain_AdvisorMessage 0x101821cc, UIMain_CancelAdvisorMessage 0x1018227c, UIMain_DefaultPanelMsg 0x1018493c,
 //                          UIMain_GetFullyOutOfFirstPerson 0x10187434
-// Real: CoolRect (src/UI_Base.cpp). Every other callee is a fake that records the same event as the PowerPC side's stub: the sound call, the
+// Real: CoolRect (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Every other callee is a fake that records the same event as the PowerPC side's stub: the sound call, the
 // message sender, the keyboard capture decision, the key tables, the mouse and its default mode, the nothrow operator new (its answer comes from
 // the queue "New"), the title text object's constructor, every InterfaceWindow member the title code calls, the advisor and the first-person
 // functions. The objects the cases need have fixed labels (tpw_up_obj below); objects the code makes get labels as they are allocated. The

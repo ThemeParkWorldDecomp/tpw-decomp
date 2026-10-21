@@ -1,5 +1,5 @@
 // Test library for the handyman (unit w184; libtpw_unit_Handyman.dylib, tests/test_Handyman.py), main app:
-//   src/Handyman.cpp   CHandyman (both constructors, Init, FinalDestroy, ReceiveMessage, Serialise, UpdateTurn, ChooseNextAction, SetState, ModelState,
+//   src/game/people/Handyman.cpp   CHandyman (both constructors, Init, FinalDestroy, ReceiveMessage, Serialise, UpdateTurn, ChooseNextAction, SetState, ModelState,
 //                      ProcessPatrolling, ProcessWalkingToLitter, ProcessCleaningLitter, ProcessWalkingToCleanToilet, ProcessCleaningToilet,
 //                      ProcessIdle, FindNearestDirtyToilet) and its four globals
 //
@@ -87,7 +87,7 @@ int32_t CountInts(const char* format) {
 
 // Test-only key function of CMsgRideDeleted (the Mac's is 0x10110f34); TestMessage overrides GetType.
 int32_t CMsgRideDeleted::GetType() const { return 10; }
-// The destructor the vtable names (the Mac's is 0x10107b28, in src/ThingMessages2.cpp).
+// The destructor the vtable names (the Mac's is 0x10107b28, in src/game/Object.cpp).
 CMsgRideDeleted::~CMsgRideDeleted() {}
 
 // ---- the message centre: Subscribe, the 29 headers (the first stands for __construct_array's call) and the nothrow operator new

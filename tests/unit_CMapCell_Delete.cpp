@@ -1,5 +1,5 @@
 // Test library for CMapCell::Delete (unit v5211; libtpw_unit_CMapCell_Delete.dylib, tests/test_CMapCell_Delete.py), main app:
-//   src/MapDelta_map_CMapCell_Delete.cpp   CMapCell::Delete, gDeleteNoParent, gDeleteNoThing
+//   src/game/park/MapCell.cpp   CMapCell::Delete, gDeleteNoParent, gDeleteNoThing
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of other
 // files the unit reads (gGameWorld, gThingArray, gLLCC47E4) are defined here, zero at start like the Mac's bss.

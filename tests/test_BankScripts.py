@@ -1,5 +1,5 @@
 """Differential test for unit w177, the bank account's remaining members, CChallengeBalance's destructor and virtuals and CDelayedScript (main app
-"SimTheme Park"; src/BankAccount_loans.cpp, src/ChallengeBalance.cpp, src/DelayedScript.cpp), against libtpw_unit_BankScripts.dylib
+"SimTheme Park"; src/game/park/BankAccount.cpp, src/game/park/ChallengeHQ.cpp, src/game/DelayedScript.cpp), against libtpw_unit_BankScripts.dylib
 (tests/unit_BankScripts.cpp).
 
 Functions (24, all run real on the PowerPC side): CBankAccount::FinalDestroy 0x100f2cb8, MakeDeposit 0x100f32ec, BeenInTheRedFor 0x100f3490, ReceiveMessage

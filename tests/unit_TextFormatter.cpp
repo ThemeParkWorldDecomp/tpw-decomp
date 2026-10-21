@@ -1,6 +1,6 @@
 // Test library for the ltms text formatter and font renderer (libtpw_unit_TextFormatter.dylib; see tests/test_TextFormatter.py):
-// src/ltms_textformatter.cpp (TbTextFormatter and the three vector tear-downs), src/ltms_fontrender.cpp (TbFontRender and the
-// TbFontRenderParams members, among them operator=, GetStyle and GetType of unit w45a) and the real src/tb_fontrenderparams.cpp (the parameters' constructors and destructor, which the
+// src/ltms/TbTextFormatter.cpp (TbTextFormatter and the three vector tear-downs), src/ltms/TbFontRender.cpp, src/ltms/TbFontRenderParams.cpp (TbFontRender and the
+// TbFontRenderParams members, among them operator=, GetStyle and GetType of unit w45a) and the real src/ltms/TbFontRenderParams.cpp (the parameters' constructors and destructor, which the
 // formatter's render runs).
 //
 // Everything else they call is a fake that records through calllog, the same events as the PowerPC side's fakes:
@@ -29,7 +29,7 @@
 #include "TbResource.h"
 #include "TbTextFormatter.h"
 
-// (unit v5L49) the game's glue to the destructor, weak in src/ltms_textformatter.cpp (declared with its callers in include/ui_DrawObject.h)
+// (unit v5L49) the game's glue to the destructor, weak in src/ltms/TbTextFormatter.cpp (declared with its callers in include/ui_DrawObject.h)
 namespace rank_callee {
 void FormatterDtor(void* self, int16_t deleteFlag);
 }  // namespace rank_callee

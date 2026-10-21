@@ -1,6 +1,6 @@
 """Unit v51027, CMapCell::ConnectionType 0x1009b158 (the legality of placing a mode on a cell), against
 libtpw_unit_CMapCell_ConnectionType.dylib (tests/unit_CMapCell_ConnectionType.cpp), main app ("SimTheme Park"),
-src/MapDelta_map_CMapCell_ConnectionType.cpp:
+src/game/park/MapCell.cpp:
   CMapCell::ConnectionType 0x1009b158
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for the

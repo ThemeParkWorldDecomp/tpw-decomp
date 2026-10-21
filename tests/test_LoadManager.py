@@ -1,5 +1,5 @@
 """CsTexture, CTextureLoadManager::RemoveTexture and SetLoadFlags, DelayedLoad_LoadTextures
-(engine library, 0x1001658c..0x1001722c; src/tb_loadmanager.cpp).
+(engine library, 0x1001658c..0x1001722c; src/engine/CsTexture.cpp, src/engine/TextureLoadManager.cpp).
 
 A case is a script of operations on two CsTexture objects, two texture records with their
 infos, the load manager's table and the delayed-load list. After every operation the test

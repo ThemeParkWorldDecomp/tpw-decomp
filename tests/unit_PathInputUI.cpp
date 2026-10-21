@@ -1,7 +1,7 @@
 // Test library for the build panel's small UI callees (unit v5L06; libtpw_unit_PathInputUI.dylib, tests/test_PathInputUI.py), main app:
-//   src/ui_main_preview_tick.cpp   UIMain_TickRidePreview, UIMain_NotEnoughDough
-//   src/ui_ridepanel_remove.cpp    RemoveRideListPanel
-//   src/ui_window_surface.cpp      InterfaceWindow::FinishWithClientObjectSurface, InterfaceTimer::SetSlice,
+//   src/game/ui/ui_main.cpp   UIMain_TickRidePreview, UIMain_NotEnoughDough
+//   src/game/ui/ui_ridepanel.cpp    RemoveRideListPanel
+//   src/game/ui/InterfaceTimer.cpp, src/game/ui/InterfaceWindow.cpp      InterfaceWindow::FinishWithClientObjectSurface, InterfaceTimer::SetSlice,
 //                                  InterfaceWindow::GetClientObjectSurface (unit v5L16)
 //
 // The callees (TickRidePreview, SOUND_SendEvent, UI_SendMessage, the draw object's Refresh) are fakes that append one event each:
@@ -70,7 +70,7 @@ int32_t UI_SendMessage(InterfaceWindow* window, int32_t message, int32_t a, int3
     Ev({3, L(window), message, a, b});
     return gAnswer;
 }
-// The rectangles inside the fake draw object (src/UI_Base.cpp is not in the unit either).
+// The rectangles inside the fake draw object (src/game/ui/CoolRegion.cpp, src/game/ui/CoolRect.cpp is not in the unit either).
 bool CoolRegion::PointIn(int16_t, int16_t) { return false; }
 void CoolRegion::Middle(int16_t*, int16_t*) {}
 void CoolRegion::Shift(int16_t, int16_t) {}
@@ -83,7 +83,7 @@ bool CoolRect::PointIn(int16_t, int16_t) { return false; }
 void CoolRect::Middle(int16_t*, int16_t*) {}
 void CoolRect::Shift(int16_t, int16_t) {}
 void CoolRect::Adjust(int16_t, int16_t, int16_t, int16_t) {}
-// InterfaceDrawObject's members the fake object's vtable names (src/ui_DrawObject.cpp is not in the unit).
+// InterfaceDrawObject's members the fake object's vtable names (src/game/ui/InterfaceDrawObject.cpp, src/game/ui/InterfaceDrawEngine.cpp is not in the unit).
 InterfaceDrawObject::InterfaceDrawObject(void* data) : mData(data) {}
 InterfaceDrawObject::~InterfaceDrawObject() {}
 void InterfaceDrawObject::Draw(int16_t, CoolRect*, int16_t) {}

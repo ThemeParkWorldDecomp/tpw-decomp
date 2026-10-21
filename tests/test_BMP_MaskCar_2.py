@@ -1,5 +1,5 @@
 """Unit v5926, the bump AI and its helpers, against libtpw_unit_BMP_MaskCar_2.dylib (tests/unit_BMP_MaskCar_2.cpp), main app
-("SimTheme Park"), src/BMP_InsideArea_PointOutAllInverse_BMP_Distance_BMP_MaskCar_2.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_MaskCar 0x1002ae74, BMP_Thrust 0x10029ac8, SetNextBuoyTarget 0x100296f4, BMP_AI 0x10029128
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

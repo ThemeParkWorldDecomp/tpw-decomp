@@ -1,5 +1,5 @@
 // Test library for TbIntegerVTag::Format (unit v5280; libtpw_unit_TbIntegerVTag_Format.dylib), main app:
-//   src/TbUniStringVTag_TbIntegerVTag_Format.cpp
+//   src/ltms/TbVTag.cpp
 //
 // swprintf is a recording fake formatting "%d"; the buffer's AppendUnicode records its arguments.
 #include <cstddef>

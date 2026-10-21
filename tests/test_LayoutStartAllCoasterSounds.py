@@ -1,5 +1,5 @@
 """Unit v5205, a train's sounds started, against libtpw_unit_LayoutStartAllCoasterSounds.dylib (tests/unit_LayoutStartAllCoasterSounds.cpp),
-main app ("SimTheme Park"), src/TPConfig_bend_LayoutStartAllCoasterSounds.cpp:
+main app ("SimTheme Park"), src/game/rides/CoasterSounds.cpp:
   StartTrainSounds 0x10046a18, LayoutStartAllCoasterSounds 0x10046bc0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (Mac layout in the emulator, the host's layout from

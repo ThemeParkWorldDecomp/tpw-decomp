@@ -1,5 +1,5 @@
 // Test library for CTrackCell::CalculateNeighbours (unit v5192; libtpw_unit_CTrackCell_CalculateNeighbours.dylib), main app:
-//   src/TrackCell_flags_CTrackCell_CalculateNeighbours.cpp
+//   src/game/park/TrackCell.cpp
 //
 // The callees outside the unit (GetNeighbouringCell, IsTrack, NumberOfNeighbours, ModifyNeighbours) are recording fakes; a cell is named in the
 // log by the word at +0x1c, which the test sets.

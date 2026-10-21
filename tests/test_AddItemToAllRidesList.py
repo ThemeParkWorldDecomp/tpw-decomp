@@ -1,5 +1,5 @@
 """Unit v5219, the all-kids panel and the rides / sideshows list rows, against libtpw_unit_AddItemToAllRidesList.dylib
-(tests/unit_AddItemToAllRidesList.cpp), main app ("SimTheme Park"), src/AddItemToAllRidesList.cpp:
+(tests/unit_AddItemToAllRidesList.cpp), main app ("SimTheme Park"), src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allKidsPanel.cpp:
   CreateAllKidsPanel 0x101952bc, AllKidsPanel_KidAdded 0x101957b8, AddItemToAllRidesList 0x10195978,
   FillAllSideshowsListCallback 0x10195dc8, UpdateRideListEntries 0x1019600c
 

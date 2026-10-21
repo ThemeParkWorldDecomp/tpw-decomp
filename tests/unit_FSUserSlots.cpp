@@ -1,4 +1,4 @@
-// The fakes and entry points for unit w48 (src/FS_UserInfo_slots.cpp, src/FS_MasterSave_easy.cpp, src/lobby_sendquit.cpp;
+// The fakes and entry points for unit w48 (src/game/save/FS_UserInfo.cpp, src/game/save/FS_MasterSave.cpp, src/game/online/lobby.cpp;
 // libtpw_unit_FSUserSlots.dylib, used by test_FSUserSlots.py). The library is test_FSSystem's: unit_FSSystem.cpp is included
 // whole for the functional bullfrog strings, the faked file system, the master save's recording constructor and destructor,
 // and the real FS_DelTree, UniStringToString and ReturnGameLoginSlotUsersPath behind them. This file adds the callees the

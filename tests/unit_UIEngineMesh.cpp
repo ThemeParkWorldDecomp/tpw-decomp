@@ -1,10 +1,10 @@
 // Test library for the engine mesh draw objects' instancing and changes (libtpw_unit_UIEngineMesh.dylib; see tests/test_UIEngineMesh.py):
 //
-//   src/ui_DrawObjectEngineMesh.cpp   InterfaceDrawEngineMesh: InstanceMe, CalculateFrame, Change; the gradients' Change; the horizontal
+//   src/game/TPMesh.cpp, src/game/ui/InterfaceDrawEngine.cpp   InterfaceDrawEngineMesh: InstanceMe, CalculateFrame, Change; the gradients' Change; the horizontal
 //                                     gradient's CalcVerts; UpdateMeshLocalMatrix
-//   src/ui_matrix.cpp                 GetUIMatrix, CombineMatricesNoWDest1st
+//   src/game/LMatrix.cpp, src/game/ui/InterfaceDrawEngine.cpp                 GetUIMatrix, CombineMatricesNoWDest1st
 //
-// Real here: those, SetMatrixIdentity and VectorThroughLMatrixNoW (src/rsse_matrix.cpp), the rectangles (src/UI_Base.cpp). Fakes that record the same
+// Real here: those, SetMatrixIdentity and VectorThroughLMatrixNoW (src/game/LMatrix.cpp), the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Fakes that record the same
 // event on both sides: InstanceMesh, the engine mesh's SetLocalMatrix, the engine mesh object's constructor (it writes the same recognisable
 // words as the PowerPC side's fake), the vertical gradient's CalcVerts and CalcUVs. The draw object base class and the gradients' constructors,
 // destructors and Show are fakes that record nothing (the unit never calls them).

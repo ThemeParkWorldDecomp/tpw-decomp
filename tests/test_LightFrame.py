@@ -1,5 +1,5 @@
 """The light manager's per-frame lighting and the render memory's small members (engine
-library; src/tb_lightmanager_frame.cpp and src/tb_rendermemory_frame.cpp):
+library; src/engine/LightManager.cpp, src/engine/MapWho.cpp and src/engine/RenderMemory.cpp):
 
   CLightManager::CalcDiffuseColor, PrepareLighting, AddLights, CalcIntensities,
   CalcNodeVertexColors, CalcVertexFogIntensities, SMapLinkType::PrepareLights,

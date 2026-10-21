@@ -1,7 +1,7 @@
 // Test library for the small sound-program functions of unit v51112 (libtpw_unit_LbMaths_RangedRandomSlow.dylib,
 // tests/test_LbMaths_RangedRandomSlow.py), sound program:
-//   src/AudioPlaceHolder_LbMaths_Random_LbMaths_RangedRandomSlow.cpp, src/AudioPlaceHolder_LbMaths_Random.cpp (LbMaths_Random),
-//   src/TbSoundSampleStore.cpp (CChannelIterator::operator++).
+//   src/sound/AudioPlaceHolder.cpp, src/sound/PlaceHolderSentence.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundSampleCallback.cpp, src/sound/TbSoundSampleMPEG2.cpp, src/sound/TbSoundSamplePipe.cpp, src/sound/TbSoundSampleWAV.cpp (LbMaths_Random),
+//   src/sound/TbSoundSampleStore.cpp (CChannelIterator::operator++).
 //
 // Callees outside the unit are recording fakes: the runtime glue (register, seed, new[], delete[], delete), FillWaveFormatEx, the
 // CFileStorage base destructor, the access object's Write. Replaced global operators log only while a wrapper has armed them.

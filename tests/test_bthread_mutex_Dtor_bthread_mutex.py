@@ -1,5 +1,5 @@
 """Unit v5120, bthread_mutex::~bthread_mutex, against libtpw_unit_bthread_mutex_Dtor_bthread_mutex.dylib
-(tests/unit_bthread_mutex_Dtor_bthread_mutex.cpp), main app, src/email_bthread_mutex_Dtor_bthread_mutex.cpp:
+(tests/unit_bthread_mutex_Dtor_bthread_mutex.cpp), main app, src/game/online/email.cpp:
   bthread_mutex::~bthread_mutex 0x10200d04 (host: bthread_mutex::Destroy, the hidden delete flag as a parameter)
 
 A case is a 16-byte mutex object (or NULL) and a delete flag (r4; only its low halfword counts, extsh). NS_MacDoze::DeleteCriticalSection

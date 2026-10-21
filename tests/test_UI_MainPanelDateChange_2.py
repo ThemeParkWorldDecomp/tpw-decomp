@@ -1,6 +1,6 @@
 """Unit v5995: the main panel's date display, the last-panel memory, the loans panel refresh and the slide-out panel's message function,
 against libtpw_unit_UI_MainPanelDateChange_2.dylib (tests/unit_UI_MainPanelDateChange_2.cpp), main app ("SimTheme Park"),
-src/ui_mainpanel2_msg_UI_MainPanelDateChange_2.cpp:
+src/game/ui/ui_loansPanel.cpp, src/game/ui/ui_mainpanel2.cpp:
   UI_MainPanelDateChange 0x101a6234, SetLastPanel 0x101a57fc, UI_LoansPanelDateChange 0x101a577c, RailsCallback 0x101a6f2c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

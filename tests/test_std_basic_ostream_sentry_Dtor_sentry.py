@@ -1,5 +1,5 @@
 """Unit v5251, the ostream sentry destructor, against libtpw_unit_std_basic_ostream_sentry_Dtor_sentry.dylib
-(tests/unit_std_basic_ostream_sentry_Dtor_sentry.cpp), main app ("SimTheme Park"), src/std_basic_ostream_sentry_Dtor_sentry.cpp:
+(tests/unit_std_basic_ostream_sentry_Dtor_sentry.cpp), main app ("SimTheme Park"), src/game/MslSupport.cpp:
   std::basic_ostream<char>::sentry::~sentry 0x1020758c
 
 A case is a world and a call. One block holds the sentry (at +0, done byte at +1, stream pointer at the odd offset +2), the stream

@@ -1,5 +1,5 @@
 """Unit v5262, the main panel's slide-out slot, against libtpw_unit_LinkSlideoutPanel.dylib (tests/unit_LinkSlideoutPanel.cpp), main app
-("SimTheme Park"), src/ui_mainpanel2_window_LinkSlideoutPanel.cpp:
+("SimTheme Park"), src/game/ui/ui_mainpanel2.cpp:
   LinkSlideoutPanel 0x101a82ec, RemoveSlideoutPanel 0x101a83d8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

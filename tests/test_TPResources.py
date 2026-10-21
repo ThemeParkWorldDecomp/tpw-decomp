@@ -1,4 +1,4 @@
-"""Differential tests for TPSettings.cpp's resources (src/TPSettings.cpp, include/TPResource.h;
+"""Differential tests for TPSettings.cpp's resources (src/game/TPResource.cpp, src/game/TPSettings.cpp, include/TPResource.h;
 Milestone 1 unit 6, part 2), against libtpw_unit_TPSettings.dylib (tests/unit_TPSettings.cpp's
 fakes; see calllog.py), with test_FSSystem.py's PowerPC strings.
 

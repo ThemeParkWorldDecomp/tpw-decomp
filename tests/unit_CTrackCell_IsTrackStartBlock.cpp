@@ -1,5 +1,5 @@
 // Test library for four CTrackCell methods (unit v5268; libtpw_unit_CTrackCell_IsTrackStartBlock.dylib), main app:
-//   src/TrackCell_flags_CTrackCell_IsTrackStartBlock.cpp
+//   src/game/park/TrackCell.cpp
 //
 // CCellBase::GetMapCellEquiv and CTrackCell::IsFlag are recording fakes; gGameWorld is defined here.
 #include <cstddef>

@@ -1,5 +1,5 @@
 """Unit v5257, SetCoasterEditState / RejoinTrack / SetPlaceLoop, against libtpw_unit_SetCoasterEditState.dylib
-(tests/unit_SetCoasterEditState.cpp), main app, src/DisableCurrentPylonEditState_SetCoasterEditState.cpp:
+(tests/unit_SetCoasterEditState.cpp), main app, src/game/rides/CoasterEdit.cpp:
   SetCoasterEditState 0x10053de8, RejoinTrack 0x10053eac, SetPlaceLoop 0x10054554
 
 A case is a world and a call, built twice by one piece of Python code (emulator memory big-endian, host library little-endian). The callees

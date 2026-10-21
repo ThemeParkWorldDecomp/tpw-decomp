@@ -28,14 +28,14 @@ public:
     void ReceiveMessage(const CMsg& message);
 
     uint16_t mThingId;   // 0x00
-    uint8_t mKind;       // 0x02  1 CPerson, 3 CObject, 4 CMechanic ... 0x13 CChallengeHQ (see src/Thing_receive.cpp)
+    uint8_t mKind;       // 0x02  1 CPerson, 3 CObject, 4 CMechanic ... 0x13 CChallengeHQ (see src/game/Thing.cpp)
     uint8_t mDead;       // 0x03  1 once CThing::KillMe has run (it also makes the kind 2); the world's walks skip dead things (unit w121)
     void Process();   // 0x1012e230 (536 bytes, untranslated): a table of function pointers (0x102a4280) on the kind byte below 0x14
     void KillMe();    // 0x1012e728 (568 bytes, untranslated)
     void FinalDestroy();   // 0x1012e9f8 (496 bytes, untranslated; CParkAnalyser::FinalDestroy calls it)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x1012e010 (444 bytes, Thing.cpp, untranslated; CParkAnalyser::Serialise calls it first)
 
-    // Unit w122a (src/ThingCtors.cpp). Names are the unit's own: the cell x and y come from the arithmetic of the constructor, the list
+    // Unit w122a (src/game/Thing.cpp). Names are the unit's own: the cell x and y come from the arithmetic of the constructor, the list
     // links from CMapCell::InsertThing (0x10102d34).
     uint8_t mCellX;       // 0x04  the map cell's x: (cell index - 1) & 0x7f
     uint8_t mCellXSub;    // 0x05  0x80 at construction (the middle of the cell?)
@@ -44,12 +44,12 @@ public:
     uint16_t mCellPrev;   // 0x08  the id of the thing before this one in the cell's list (CMapCell::InsertThing writes it); 0 at construction
     uint16_t mCellNext;   // 0x0a  the id of the thing after it (the cell's old head); 0 at construction
     CThing() = default;   // the other units' fakes and the tests' arrays (CThing gThings[64]) need a trivial default constructor
-    // 0x1012de58 (236 bytes, src/ThingCtors.cpp): enters the thing in gThingArray (CWorld::AddThingToThingList on the global world) and in
+    // 0x1012de58 (236 bytes, src/game/Thing.cpp): enters the thing in gThingArray (CWorld::AddThingToThingList on the global world) and in
     // the map cell list of cell `cell` (1 based map cell id: x = (cell - 1) & 0x7f, y = (cell - 1) >> 7; CMapCell::InsertThing).
     CThing(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, ThingModel model);
-    // Unit w205 (src/World_save.cpp). 0x1013dce0 (4 bytes: a bare return): the constructor of a thing the loader fills in; it writes nothing.
+    // Unit w205 (src/game/Thing.cpp). 0x1013dce0 (4 bytes: a bare return): the constructor of a thing the loader fills in; it writes nothing.
     explicit CThing(const CSerialise& serialise);
-    // Unit w207 (src/World_load.cpp). 0x1012dfa8 (16 bytes): stores the thing's id (the loader makes a thing's id from its table row).
+    // Unit w207 (src/game/Thing.cpp). 0x1012dfa8 (16 bytes): stores the thing's id (the loader makes a thing's id from its table row).
     void ForceThingId(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> id);
     // Unit v5281. 0x1012e5b4 (324 bytes, stand-in): moves the thing to a position (two MapPos pairs).
     void Move(MapPos x, MapPos y);
@@ -62,7 +62,7 @@ struct IDXTYPEUniqueNameMapId;
 template<class Tag, class T> struct tag_IDX_TYPE {
     T mIndex;
     // Unit w160: Byteswap exchanges the two bytes in place (lhz; sthbrx). Only two instances are emitted in the binary:
-    // ObjectId 0x100fa688 and ThingId 0x10079a0c (<unsigned short> index); defined in src/Serialise_basic.cpp.
+    // ObjectId 0x100fa688 and ThingId 0x10079a0c (<unsigned short> index); defined in src/game/ControlManager.cpp, src/game/rides/FlyingRide.cpp.
     void Byteswap();
 };
 
@@ -75,11 +75,11 @@ public:
 
     // Unit w123a: direct dispatch callees, untranslated.
     void UpdateTurn();   // 0x100e4188
-    void FinalDestroy();   // 0x100e6fd0 (36 bytes, src/ParkAnalyser_month.cpp, unit w161): CThing::FinalDestroy of its base
-    CParkAnalyser();   // 0x100e2a4c (1,144 bytes, src/ParkAnalyser_ctor.cpp, unit w122b; 0x21c48 bytes on the Mac; CWorld::SetupNewLevel makes the analyser)
-    void ReceiveMessage(const CMsg& message);   // 0x100e41bc (360 bytes, src/ParkAnalyser_month.cpp, unit w161; CThing::ReceiveMessage kind 13)
+    void FinalDestroy();   // 0x100e6fd0 (36 bytes, src/game/park/analyser.cpp, unit w161): CThing::FinalDestroy of its base
+    CParkAnalyser();   // 0x100e2a4c (1,144 bytes, src/game/park/analyser.cpp, unit w122b; 0x21c48 bytes on the Mac; CWorld::SetupNewLevel makes the analyser)
+    void ReceiveMessage(const CMsg& message);   // 0x100e41bc (360 bytes, src/game/park/analyser.cpp, unit w161; CThing::ReceiveMessage kind 13)
 
-    // Unit w152 (src/ParkAnalyser_shops.cpp): the shop and sideshow superlatives. Each walks the used things, tests the objects (kind 3) older than
+    // Unit w152 (src/game/park/analyser.cpp): the shop and sideshow superlatives. Each walks the used things, tests the objects (kind 3) older than
     // 30 and answers the best or worst value (percent of the income history's sum over the 1A4 history's sum, unsigned, kept as a signed word) or
     // customer satisfaction, 0 when no thing matched. The thing id of the winner is written through `id` (cleared first). All answer in r3.
     // The shops of one ShopType (the ride record's slot 86 equals `type`):
@@ -98,13 +98,13 @@ public:
     int32_t GetSideshowWithBestSatisfaction(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t>& id) const;   // 0x100ec014 (416 bytes)
     // 0x100ec228 (488 bytes): the same code as GetSideshowWithWorstValue (an original copy-paste), it answers the value, not the satisfaction.
     int32_t GetSideshowWithWorstSatisfaction(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t>& id) const;
-    // 0x100e5944 (420 bytes, src/ParkAnalyser_readers.cpp, unit w125): half the visitor count, 0 to 100. The count of the kind 1 things inside the park
+    // 0x100e5944 (420 bytes, src/game/park/analyser.cpp, unit w125): half the visitor count, 0 to 100. The count of the kind 1 things inside the park
     // is kept in mVal1F0B8 and recounted when the Val has no value yet or its clock says a second or more has passed; the answer itself is
     // GetVisitorsInPark(0) / 2 (asked up to three times), not the cached count.
     int32_t HowBusyIsPark() const;
     // 0x100e5414 (316 bytes, untranslated: a launcher stand-in answering 0): the visitors in the park; HowBusyIsPark passes 0.
     int32_t GetVisitorsInPark(uint32_t arg) const;
-    // Unit w153 (src/ParkAnalyser_rides.cpp): the ride superlatives. Every walk is the used list of things; a ride is an object (kind 3) whose ride
+    // Unit w153 (src/game/park/analyser.cpp): the ride superlatives. Every walk is the used list of things; a ride is an object (kind 3) whose ride
     // record has mUIType 0. The ThingId& answers write 0 first and then the id of the best ride; ObjectId and ThingId arrive in the high halfword.
     // 0x100ec484 (376 bytes): the go-kart (track type 1) ride with the highest excitement level (unsigned byte compare); 0 when none.
     uint8_t GetMostExcitingGokart(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t>& id) const;
@@ -129,10 +129,10 @@ public:
     uint8_t GetScariestRide(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t>& id) const;
     // 0x100e558c (344 bytes): the number of rides, cached in mVal1F0C4 for `seconds` seconds.
     int32_t GetRidesInPark(uint32_t seconds) const;
-    // 0x100e7278 (240 bytes, src/ParkAnalyser_readers.cpp, unit w125): counts the kind 1 things (the dead flag is not tested) for which CPeep::IsInsidePark
+    // 0x100e7278 (240 bytes, src/game/park/analyser.cpp, unit w125): counts the kind 1 things (the dead flag is not tested) for which CPeep::IsInsidePark
     // answers nonzero.
     int32_t NumberOfVisitorsInPark() const;
-    // Unit w154 (src/ParkAnalyser_visitors.cpp): the visitor counts and opinions. CountNeighboursOfType (below) is translated in src/ParkAnalyser_readers.cpp
+    // Unit w154 (src/game/park/analyser.cpp): the visitor counts and opinions. CountNeighboursOfType (below) is translated in src/game/park/analyser.cpp
     // (unit w125) and GetVisitorsInPark (above) is translated here. The walks of the used things count the kind 1 things for which CPeep::IsInsidePark
     // answers nonzero; a float level of the peep is read as the low byte of its fctiwz.
     void OfferOpinionOn(int32_t opinion, uint8_t value);       // 0x100e4360 (60 bytes): appends `value` to the history of that opinion
@@ -155,11 +155,11 @@ public:
     // 0x100ef00c (372 bytes): the mean happiness byte of the kind 1 things (no IsInsidePark test) in the square of cells within `radius` of `cell`;
     // the low bounds are NOT clamped at 0 (a negative start reads the cells before the row), 0 when none.
     int32_t GetAverageHappinessAroundPoint(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, uint32_t radius) const;
-    // 0x100e6a6c (424 bytes, src/ParkAnalyser_readers.cpp, unit w125; `this` is not used): the things of model `model` in the square of map cells
+    // 0x100e6a6c (424 bytes, src/game/park/analyser.cpp, unit w125; `this` is not used): the things of model `model` in the square of map cells
     // around cell `id` and within `a` cells of it (clamped to the 128 x 128 map): their count, or 1 at the first one when `b` is not 0.
     int32_t CountNeighboursOfType(CThing::ThingModel model, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> id,
                                   int32_t a, int32_t b);
-    // Unit w156 (src/ParkAnalyser_cells.cpp): the cell and map queries. A map cell id is 1 based (x = (id - 1) & 0x7f, y = (id - 1) >> 7); the full-map
+    // Unit w156 (src/game/park/analyser.cpp): the cell and map queries. A map cell id is 1 based (x = (id - 1) & 0x7f, y = (id - 1) >> 7); the full-map
     // loops run x from 0x7f down to 0, y from 0x7f down to 0, and gWorld's map is the 0x4000 cells at gWorld + 0x2d8.
     // AreaType (the mangling says CParkAnalyser::AreaType; the names are mine): the cells PercentageOfAreaPatrolledBy counts.
     enum AreaType : int32_t { kAreaLand = 0, kAreaBuilt = 1, kAreaEntrance = 2, kAreaPath = 3 };
@@ -190,10 +190,10 @@ public:
     // 0x100eeed0 (248 bytes): the cells of gWorld's map that are an entrance, exit, ride, track or coaster pylon.
     int32_t NumberOfCellsCoveredByObjects();
     int32_t Init();   // 0x100e4a44 (456 bytes, untranslated): subscribes and sets up the cells
-    void BuiltSomething();   // 0x100e46a4 (120 bytes, src/Things2_small.cpp, unit w130): stamps mLastObjectBuilt with the park's funny time; CObject::CObject calls it last
-    // 0x100e8144 (404 bytes, src/Things2_small.cpp, unit w130): how many things of kinds 4 to 8 (the staff) of model `model` are alive.
+    void BuiltSomething();   // 0x100e46a4 (120 bytes, src/game/park/analyser.cpp, unit w130): stamps mLastObjectBuilt with the park's funny time; CObject::CObject calls it last
+    // 0x100e8144 (404 bytes, src/game/park/analyser.cpp, unit w130): how many things of kinds 4 to 8 (the staff) of model `model` are alive.
     int32_t NumberOfStaffType(CThing::ThingModel model) const;
-    // Unit w155 (src/ParkAnalyser_staff.cpp): the staff queries. Staff are the things of kinds 4 to 8; the walks are the used list's.
+    // Unit w155 (src/game/park/analyser.cpp): the staff queries. Staff are the things of kinds 4 to 8; the walks are the used list's.
     void HiredSomeone();   // 0x100e4750 (120 bytes): stamps mLastStaffHired with the funny time of the global world gWorld
     // 0x100e4ebc (532 bytes): the mean happiness byte of the staff (0.0f when none), the sum carried through single precision adds; the argument is not used.
     float GetStaffHappinessLevel(uint32_t unused) const;
@@ -210,9 +210,9 @@ public:
     int32_t CurrentNumberOfStaffTypeForHire(StaffType type) const;   // 0x100e8d4c (60 bytes): the staff database's count of that type
     int32_t CurrentResearcherAbility() const;      // 0x100e8dd8 (192 bytes): the balance's research ability of each researcher's grade, summed
     int32_t MaxResearcherAbility() const;          // 0x100e8ed8 (20 bytes): balance slots 172 times 273
-    // Unit w129 (src/ParkAnalyser_gates.cpp). 0x100e7028 (64 bytes): the park's gates are open: CWorld::IsParkClosed() of the world CWorldSavvy answers is 0.
+    // Unit w129 (src/game/park/analyser.cpp). 0x100e7028 (64 bytes): the park's gates are open: CWorld::IsParkClosed() of the world CWorldSavvy answers is 0.
     bool GatesOpen() const;
-    // Unit w159 (src/ParkAnalyser_rating.cpp)
+    // Unit w159 (src/game/park/analyser.cpp)
     // 0x100ed8cc (3,468 bytes): the park rating, the sum of 11 capped terms (visitors, four ride classes, five staff kinds); each term is walked inline and
     // the real counting function is called too when the walk's count is under the cap.
     int32_t GetOverallParkRating() const;
@@ -221,7 +221,7 @@ public:
     // 0x100e5b1c (616 bytes, not const on the Mac): the sum over the rides and shops of the object list of (the attraction value plus the new bonus) divided by their count.
     int32_t GetTotalParkAttractionPoints();
 
-    // Unit w151 (src/ParkAnalyser_objects.cpp): the queries over the park's objects and the ride database. UIObjType is the ride record's mUIType
+    // Unit w151 (src/game/park/analyser.cpp): the queries over the park's objects and the ride database. UIObjType is the ride record's mUIType
     // (names mine). The ObjectId and ThingId arguments are passed by the Mac in the high halfword of a register.
     int32_t NumberOfToiletsInPark() const;                // 0x100e8f28 (268 bytes): the objects with flag 1, kept in mVal1F0DC; answers what Val::Get answers after the Set
     int32_t NumberOfClosedToiletsInPark() const;          // 0x100e9070 (252 bytes): the toilets that are closed
@@ -252,11 +252,11 @@ public:
     // 0x100ea8b8 (100 bytes): the history's value `back` places back (a hidden halfword result, 0 when the history has none)
     tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> LastOfObjectTypeResearched(UIObjType type, int32_t back) const;
     void SetLastOfObjectTypeResearched(UIObjType type, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id);   // 0x100ea968 (64 bytes)
-    // Unit w161 (src/ParkAnalyser_month.cpp).
+    // Unit w161 (src/game/park/analyser.cpp).
     void PersonPaidAdmission(int32_t price);   // 0x100e4470 (216 bytes): counts the visitor, keeps the largest price, posts a CMsgAddToChallenge (type 0xb, value 1)
     void UpdateEndOfMonth();   // 0x100e47fc (528 bytes): the month-end history entries (CMsgEndOfMonth), then the misbehaving counters are cleared
     void GetThreeMostDominantThoughts(uint8_t& first, uint8_t& second, uint8_t& third) const;   // 0x100e5dc8 (576 bytes): the three most common thoughts of the visitors in the park, 0x17 for none
-    // Unit w162 (src/ParkAnalyser_serialise.cpp).
+    // Unit w162 (src/game/park/analyser.cpp).
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x100e3004 (4,432 bytes): CThing::Serialise of the base, then (0 <= version < 2) every saved field loaded or saved in order; the first nonzero answer ends it with 1
 
     CThing mBase;                                   // 0x00  (w122a's CThing, 0xc bytes)
@@ -295,20 +295,20 @@ public:
     int32_t mLongestStay;                           // 0x21c44  "mLongestStay"
 };
 
-void SCR_CloseScriptSystem();      // 0x100d8e4c (148 bytes, src/ScriptTick.cpp, unit w132)
+void SCR_CloseScriptSystem();      // 0x100d8e4c (148 bytes, src/game/Script.cpp, unit w132)
 // The script variable setters (the script object is a handle into the script system's table; nothing happens when the
 // handle is not in it or the system is off). SCR_SetVariable and SCR_SetFloatVariable take an index of 0 to 0x12.
-// 0x100d9478 (116 bytes, src/analyser_kill.cpp, unit w114): when the script system is on and 0 < handle < gScriptTableSize, clears the
+// 0x100d9478 (116 bytes, src/game/Script.cpp, unit w114): when the script system is on and 0 < handle < gScriptTableSize, clears the
 // table entry and frees the script block it held (the entry is cleared first). The table's words are 32 bits (see gScriptTable), so a
 // host pointer cannot be held in them yet.
 void SCR_KillScript(int32_t handle);
-void SCR_SetScriptPosition(int32_t handle, float x, float y, float z, int32_t mode);   // 0x100d932c (92 bytes, src/ScriptInterp.cpp, unit w163)
-void SCR_SetVariable(int32_t handle, uint32_t index, int32_t value);                  // 0x100d9514 (96 bytes, src/ScriptInterp.cpp, unit w163)
-void SCR_SetFloatVariable(int32_t handle, uint32_t index, float value);               // 0x100d95a0 (96 bytes, src/ScriptInterp.cpp, unit w163)
-void SCR_ScriptTick();             // 0x100d907c (224 bytes, src/ScriptTick.cpp, unit w132)
-void SCR_BuildScriptSpriteList();  // 0x100d9184 (152 bytes, src/ScriptTick.cpp, unit w132)
-int32_t DoScript(struct tagSCRIPT* script);  // 0x100d88b4 (276 bytes, src/ScriptInterp.cpp, unit w163: runs one script and answers a count that SCR_ScriptTick sums)
-// ---- Unit w132 (src/ScriptTick.cpp), laid out in full by unit w163 (src/ScriptInterp.cpp): the script block the table words point at
+void SCR_SetScriptPosition(int32_t handle, float x, float y, float z, int32_t mode);   // 0x100d932c (92 bytes, src/game/Script.cpp, unit w163)
+void SCR_SetVariable(int32_t handle, uint32_t index, int32_t value);                  // 0x100d9514 (96 bytes, src/game/Script.cpp, unit w163)
+void SCR_SetFloatVariable(int32_t handle, uint32_t index, float value);               // 0x100d95a0 (96 bytes, src/game/Script.cpp, unit w163)
+void SCR_ScriptTick();             // 0x100d907c (224 bytes, src/game/Script.cpp, unit w132)
+void SCR_BuildScriptSpriteList();  // 0x100d9184 (152 bytes, src/game/Script.cpp, unit w132)
+int32_t DoScript(struct tagSCRIPT* script);  // 0x100d88b4 (276 bytes, src/game/Script.cpp, unit w163: runs one script and answers a count that SCR_ScriptTick sums)
+// ---- Unit w132 (src/game/Script.cpp), laid out in full by unit w163 (src/game/Script.cpp, src/game/ScriptOps.cpp): the script block the table words point at
 // (0x118 bytes; LbMem_Alloc(0x118) in SCR_SpawnScript, SCR_NewScriptBlock here). Code addresses (mCodeBase, the jump operands) are Mac
 // addresses in 32-bit words, see SCR_CodeWord below. Floats live in the variable words: read and write them with std::memcpy.
 struct tagSCRIPT {
@@ -339,7 +339,7 @@ static_assert(offsetof(tagSCRIPT, mSlot) == 0x04 && offsetof(tagSCRIPT, mPos) ==
 static_assert(sizeof(tagSCRIPT) == 0x118, "tagSCRIPT is 0x118 bytes");
 extern int32_t gScriptTickTotal;  // 0x102f7c08  TOC 0x10261110  the sum of the DoScript results of the last tick
 extern int32_t gScriptTickTime;   // 0x102f7c0c  TOC 0x10261114  the clock value read by the last tick
-// ---- Unit w163 (src/ScriptInterp.cpp, src/ScriptBlocks.cpp): the interpreter's core
+// ---- Unit w163 (src/game/Script.cpp, src/game/park/analyser.cpp): the interpreter's core
 // The script code is ONE array of 32-bit words in the Mac's data segment; an instruction is the address of a command descriptor followed by
 // its operands. Code addresses stay Mac addresses (uint32_t) on the host; gScriptCodeWords is the host copy of the array (see SCR_CodeWord).
 constexpr uint32_t kScriptCodeAddress = 0x1029f20c;      // the code array's Mac address (TOC 0x10261140)
@@ -352,7 +352,7 @@ extern const uint32_t gScriptStartAddresses[4];   // 0x1029ffdc  the start addre
 uint32_t SCR_CodeWord(uint32_t address);
 // The Mac code address of a host pointer into gScriptCodeWords, 0 for a pointer outside it.
 uint32_t SCR_CodeAddress(const void* code);
-// Host only (src/ScriptBlocks.cpp): the Mac's LbMem_Alloc(0x118) and LbMem_Free of a script block, which must come from the arena (the
+// Host only (src/game/park/analyser.cpp): the Mac's LbMem_Alloc(0x118) and LbMem_Free of a script block, which must come from the arena (the
 // table's words are Ptr32s). Unit libraries fake the pair.
 tagSCRIPT* SCR_NewScriptBlock();
 void SCR_FreeScriptBlock(tagSCRIPT* script);
@@ -369,49 +369,49 @@ void SCR_SetServiceInterval(int32_t handle, int32_t period);   // 0x100d9630 (80
 int32_t SCR_WhichScriptHasThisSprite(void* sprite);   // 0x100da7e0 (112 bytes)
 void ESP_InitScript(tagSCRIPT* script, void* code, ESP_Sprites set, int32_t index, ACTS acts, float x, float y, float z, int32_t a, int32_t b);   // 0x100da008 (312 bytes)
 // The 42 command functions, in descriptor order (index (descriptor - kScriptCommandAddress) / 8); each is the code address in its descriptor.
-void PK_GOTO();              // 0x100da980  descriptor 0 (src/ScriptInterp.cpp, unit w163)
-void PK_IF();                // 0x100da9d8  descriptor 1 (src/ScriptFlow.cpp, unit w164)
-void PK_ENDIF();             // 0x100dadc8  descriptor 2 (src/ScriptFlow.cpp, unit w164)
-void PK_ELSE();              // 0x100dae38  descriptor 3 (src/ScriptFlow.cpp, unit w164)
-void PK_GOSUB();             // 0x100daea0  descriptor 4 (src/ScriptInterp.cpp, unit w163)
-void PK_RETURN();            // 0x100daf6c  descriptor 5 (src/ScriptInterp.cpp, unit w163)
-void PK_DO();                // 0x100db588  descriptor 6 (src/ScriptFlow.cpp, unit w164)
-void PK_PUSHVAR();           // 0x100db48c  descriptor 7 (src/ScriptInterp.cpp, unit w163)
-void PK_POPVAR();            // 0x100db508  descriptor 8 (src/ScriptInterp.cpp, unit w163)
-void PK_LOOP();              // 0x100db620  descriptor 9 (src/ScriptFlow.cpp, unit w164)
-void PK_REPEAT();            // 0x100daff8  descriptor 10 (src/ScriptFlow.cpp, unit w164)
-void PK_UNTIL();             // 0x100db060  descriptor 11 (src/ScriptFlow.cpp, unit w164)
-void PK_END();               // 0x100db6f0  descriptor 12 (src/ScriptInterp.cpp, unit w163)
-void PK_WAIT();              // 0x100db714  descriptor 13 (src/ScriptInterp.cpp, unit w163)
-void PK_NOP();               // 0x100da95c  descriptor 14 (src/ScriptInterp.cpp, unit w163)
-void PK_SETTEXT();           // 0x100db748  descriptor 15 (src/ScriptInterp.cpp, unit w163)
-void PK_SETVAR();            // 0x100db79c  descriptor 16 (src/ScriptInterp.cpp, unit w163)
-void PK_ADD();               // 0x100db864  descriptor 17 (src/ScriptFlow.cpp, unit w164)
-void PK_SUB();               // 0x100db93c  descriptor 18 (src/ScriptFlow.cpp, unit w164)
-void PK_AND();               // 0x100dbdc0  descriptor 19 (src/ScriptFlow.cpp, unit w164)
-void PK_MUL();               // 0x100dba14  descriptor 20 (src/ScriptFlow.cpp, unit w164)
-void PK_MULVAR();            // 0x100dbaec  descriptor 21 (src/ScriptFlow.cpp, unit w164)
-void PK_DIV();               // 0x100dbba0  descriptor 22 (src/ScriptFlow.cpp, unit w164)
-void PK_DIVVAR();            // 0x100dbc80  descriptor 23 (src/ScriptFlow.cpp, unit w164)
-void PK_MOD();               // 0x100dbd38  descriptor 24 (src/ScriptFlow.cpp, unit w164)
-void PK_MODVAR();            // 0x100dbe5c  descriptor 25 (src/ScriptFlow.cpp, unit w164)
-void PK_ADDVAR();            // 0x100dbeec  descriptor 26 (src/ScriptFlow.cpp, unit w164)
-void PK_COPYVAR();           // 0x100dbf9c  descriptor 27 (src/ScriptFlow.cpp, unit w164)
-void PK_RANDOM();            // 0x100dc01c  descriptor 28 (src/ScriptFlow.cpp, unit w164)
-void PK_SPAWN();             // 0x100dc0e0  descriptor 29 (src/ScriptSprites.cpp, unit w165)
-void PK_SET_OBJ_ID();        // 0x100dc160  descriptor 30 (src/ScriptSprites.cpp, unit w165)
-void PK_SET_OBJ_ACT();       // 0x100dc1b8  descriptor 31 (src/ScriptSprites.cpp, unit w165)
-void PK_PutSpriteVAR();      // 0x100dc214  descriptor 32 (src/ScriptSprites.cpp, unit w165)
-void PK_PutSpriteIM();       // 0x100dc2d0  descriptor 33 (src/ScriptSprites.cpp, unit w165)
-void PK_Put3DSpriteIM();     // 0x100dc384  descriptor 34 (src/ScriptSprites.cpp, unit w165)
-void PK_RemoveSprite();      // 0x100dc418  descriptor 35 (src/ScriptSprites.cpp, unit w165)
-void PK_ResetScale();        // 0x100dc45c  descriptor 36 (src/ScriptSprites.cpp, unit w165)
-void PK_ReduceScale();       // 0x100dc494  descriptor 37 (src/ScriptSprites.cpp, unit w165)
-void PK_IncreaseScale();     // 0x100dc4d8  descriptor 38 (src/ScriptSprites.cpp, unit w165)
-void PK_ResetRotation();     // 0x100dc51c  descriptor 39 (src/ScriptSprites.cpp, unit w165)
-void PK_ReduceRotation();    // 0x100dc558  descriptor 40 (src/ScriptSprites.cpp, unit w165)
-void PK_IncreaseRotation();  // 0x100dc59c  descriptor 41 (src/ScriptSprites.cpp, unit w165)
-// ---- Unit w164 (src/ScriptFlow.cpp): the interpreter's flow and arithmetic
+void PK_GOTO();              // 0x100da980  descriptor 0 (src/game/ScriptOps.cpp, unit w163)
+void PK_IF();                // 0x100da9d8  descriptor 1 (src/game/ScriptOps.cpp, unit w164)
+void PK_ENDIF();             // 0x100dadc8  descriptor 2 (src/game/ScriptOps.cpp, unit w164)
+void PK_ELSE();              // 0x100dae38  descriptor 3 (src/game/ScriptOps.cpp, unit w164)
+void PK_GOSUB();             // 0x100daea0  descriptor 4 (src/game/ScriptOps.cpp, unit w163)
+void PK_RETURN();            // 0x100daf6c  descriptor 5 (src/game/ScriptOps.cpp, unit w163)
+void PK_DO();                // 0x100db588  descriptor 6 (src/game/ScriptOps.cpp, unit w164)
+void PK_PUSHVAR();           // 0x100db48c  descriptor 7 (src/game/ScriptOps.cpp, unit w163)
+void PK_POPVAR();            // 0x100db508  descriptor 8 (src/game/ScriptOps.cpp, unit w163)
+void PK_LOOP();              // 0x100db620  descriptor 9 (src/game/ScriptOps.cpp, unit w164)
+void PK_REPEAT();            // 0x100daff8  descriptor 10 (src/game/ScriptOps.cpp, unit w164)
+void PK_UNTIL();             // 0x100db060  descriptor 11 (src/game/ScriptOps.cpp, unit w164)
+void PK_END();               // 0x100db6f0  descriptor 12 (src/game/ScriptOps.cpp, unit w163)
+void PK_WAIT();              // 0x100db714  descriptor 13 (src/game/ScriptOps.cpp, unit w163)
+void PK_NOP();               // 0x100da95c  descriptor 14 (src/game/ScriptOps.cpp, unit w163)
+void PK_SETTEXT();           // 0x100db748  descriptor 15 (src/game/ScriptOps.cpp, unit w163)
+void PK_SETVAR();            // 0x100db79c  descriptor 16 (src/game/ScriptOps.cpp, unit w163)
+void PK_ADD();               // 0x100db864  descriptor 17 (src/game/ScriptOps.cpp, unit w164)
+void PK_SUB();               // 0x100db93c  descriptor 18 (src/game/ScriptOps.cpp, unit w164)
+void PK_AND();               // 0x100dbdc0  descriptor 19 (src/game/ScriptOps.cpp, unit w164)
+void PK_MUL();               // 0x100dba14  descriptor 20 (src/game/ScriptOps.cpp, unit w164)
+void PK_MULVAR();            // 0x100dbaec  descriptor 21 (src/game/ScriptOps.cpp, unit w164)
+void PK_DIV();               // 0x100dbba0  descriptor 22 (src/game/ScriptOps.cpp, unit w164)
+void PK_DIVVAR();            // 0x100dbc80  descriptor 23 (src/game/ScriptOps.cpp, unit w164)
+void PK_MOD();               // 0x100dbd38  descriptor 24 (src/game/ScriptOps.cpp, unit w164)
+void PK_MODVAR();            // 0x100dbe5c  descriptor 25 (src/game/ScriptOps.cpp, unit w164)
+void PK_ADDVAR();            // 0x100dbeec  descriptor 26 (src/game/ScriptOps.cpp, unit w164)
+void PK_COPYVAR();           // 0x100dbf9c  descriptor 27 (src/game/ScriptOps.cpp, unit w164)
+void PK_RANDOM();            // 0x100dc01c  descriptor 28 (src/game/ScriptOps.cpp, unit w164)
+void PK_SPAWN();             // 0x100dc0e0  descriptor 29 (src/game/ScriptOps.cpp, unit w165)
+void PK_SET_OBJ_ID();        // 0x100dc160  descriptor 30 (src/game/ScriptOps.cpp, unit w165)
+void PK_SET_OBJ_ACT();       // 0x100dc1b8  descriptor 31 (src/game/ScriptOps.cpp, unit w165)
+void PK_PutSpriteVAR();      // 0x100dc214  descriptor 32 (src/game/ScriptOps.cpp, unit w165)
+void PK_PutSpriteIM();       // 0x100dc2d0  descriptor 33 (src/game/ScriptOps.cpp, unit w165)
+void PK_Put3DSpriteIM();     // 0x100dc384  descriptor 34 (src/game/ScriptOps.cpp, unit w165)
+void PK_RemoveSprite();      // 0x100dc418  descriptor 35 (src/game/ScriptOps.cpp, unit w165)
+void PK_ResetScale();        // 0x100dc45c  descriptor 36 (src/game/ScriptOps.cpp, unit w165)
+void PK_ReduceScale();       // 0x100dc494  descriptor 37 (src/game/ScriptOps.cpp, unit w165)
+void PK_IncreaseScale();     // 0x100dc4d8  descriptor 38 (src/game/ScriptOps.cpp, unit w165)
+void PK_ResetRotation();     // 0x100dc51c  descriptor 39 (src/game/ScriptOps.cpp, unit w165)
+void PK_ReduceRotation();    // 0x100dc558  descriptor 40 (src/game/ScriptOps.cpp, unit w165)
+void PK_IncreaseRotation();  // 0x100dc59c  descriptor 41 (src/game/ScriptOps.cpp, unit w165)
+// ---- Unit w164 (src/game/Script.cpp): the interpreter's flow and arithmetic
 // The code end the two finders stop at: a Mac code address (TOC 0x10261128), compared as a signed word.
 constexpr uint32_t kScriptCodeEnd = 0x1029ffd8;
 void SCR_FindNextEndif();        // 0x100d89f4 (432 bytes): moves mPos to the next ENDIF at this nesting
@@ -419,17 +419,17 @@ void SCR_FindNextElseOrEndif();  // 0x100d8bcc (224 bytes): moves mPos to the ne
 void DC_TickDynamicCellMeshes();   // 0x100dfd88
 void STATIC_WhiteOut();            // 0x100e28b4
 
-// ---- the script system and the dynamic cell meshes (src/AnalyserSystems.cpp, unit w111). Names invented; Mac addresses given.
+// ---- the script system and the dynamic cell meshes (src/game/Script.cpp, unit w111). Names invented; Mac addresses given.
 class CDynamicMesh;
 struct sDTextureSet;
 // 0x100d8d94 (140 bytes): once (the first call sets gScriptInitialised): the word at 0x102f7c2c = 0x32, a table of 100 words
 // (400 bytes from LbMem_Alloc, zeroed), then SCR_InitCheckTable.
 void SCR_InitScriptSystem();
-// 0x100d8f0c (212 bytes, src/ScriptCheckTable.cpp, unit w112c): one byte for each code word of the scripts, 1 when the word lies
+// 0x100d8f0c (212 bytes, src/game/Script.cpp, unit w112c): one byte for each code word of the scripts, 1 when the word lies
 // between the smallest and the largest command descriptor (a command), else 0; frees the old table first.
 void SCR_InitCheckTable();
 void SCR_CloseCheckTable();                 // 0x100d900c (68 bytes): frees the table and clears the pointer
-// The script data the table is built from (src/ScriptCheckTable.cpp). The Mac words are addresses in its data segment (the code
+// The script data the table is built from (src/game/Script.cpp). The Mac words are addresses in its data segment (the code
 // array of the compiled scripts and the zero ended list of command descriptors); the host holds the image's words (unit v5L39).
 extern uint8_t* gScriptCheckTable;          // 0x102f7c10  the table (NULL: none)
 extern const uint32_t* gScriptCodeWords;    // 0x1029f20c  the first code word (TOC slot 0x10261140)
@@ -440,7 +440,7 @@ extern uint32_t gScriptInitialised;         // 0x102f7c28
 extern uint32_t gScriptF7C2C;               // 0x102f7c2c  0x32 once the system is on
 extern int32_t gScriptTableSize;            // 0x102f7c14  100
 extern void* gScriptTable;                  // 0x102f7c18  gScriptTableSize words
-// ---- Unit w165 (src/ScriptSprites.cpp, src/ScriptSave.cpp): the script sprites, the save and load
+// ---- Unit w165 (src/game/Script.cpp): the script sprites, the save and load
 // Handles outside 1 to gScriptTableSize - 1 find no script; the ESP_ functions with the system off (gScriptInitialised 0) do nothing.
 // A code argument of 0 to 3 is a custom data block number (see ESP_SpawnScript), any other value a pointer into the code array.
 void ESP_ForceGoto(int32_t handle, void* code);                  // 0x100da318 (300 bytes): restarts a script at a code address or custom block
@@ -448,8 +448,8 @@ int32_t ESP_RURunningThis(int32_t handle, void* code);           // 0x100da46c (
 int32_t ESP_Spawn2DCopyOfScriptAt(int32_t handle, float x, float y, float z, float scale);   // 0x100da590 (276 bytes)
 void ESP_Update2DScript(int32_t handle, int32_t source);         // 0x100da6d8 (220 bytes): copies the sprite fields of `source`
 void ESP_FixSpriteIDsFromDetail();                               // 0x100da884 (164 bytes): sprite number modulo the set's sprite count
-void SCR_SaveAllScripts(void* file);     // 0x100d96b0 (580 bytes, src/ScriptSave.cpp): tag, record size, table size, table, every block
-int32_t SCR_LoadAllScripts(void* file);  // 0x100d9ccc (784 bytes, src/ScriptSave.cpp): 0 when loaded, 1 when not (the table is then fresh or short)
+void SCR_SaveAllScripts(void* file);     // 0x100d96b0 (580 bytes, src/game/Script.cpp): tag, record size, table size, table, every block
+int32_t SCR_LoadAllScripts(void* file);  // 0x100d9ccc (784 bytes, src/game/Script.cpp): 0 when loaded, 1 when not (the table is then fresh or short)
 void DrawHLSprite(tagSCRIPT* script);    // 0x1007b114 (untranslated): draws the script's sprite record
 int32_t ESP_GetNumberOfSprites(ESP_Sprites set);   // 0x1007c8b0 (untranslated): the number of sprites in a set
 // The file swaps of the save and load: the main app's own instances of the SamsUtilities templates (swap on the Mac, no-ops on a
@@ -468,7 +468,7 @@ uint32_t USwap32CharPtr(uint32_t value);                // 0x100d9c70 USwap32<ch
 void DC_SetupDynamicCellMeshes();
 // 0x100e01ac (132 bytes): when the meshes exist, deletes them and frees the textures; clears the flag.
 void DC_FreeDynamicCellMeshes();
-extern sDTextureSet gDynamicCellTextures;   // 0x102a02fc (initialised data, defined in src/LevelLeaves.cpp)
+extern sDTextureSet gDynamicCellTextures;   // 0x102a02fc (initialised data, defined in src/game/DynamicMeshSet.cpp)
 extern int32_t gDynamicCellF9BD4;           // 0x102f9bd4  cleared first
 extern uint32_t gDynamicCellsReady;         // 0x102f9bd8  1 once the meshes exist
 extern uint32_t gDynamicCellRandom[110];    // 0x102f9bdc  rand() % 3 + 15 each
@@ -482,11 +482,11 @@ extern CDynamicMesh* gBlueprintMesh;        // 0x1034c188  "BlueprintMesh"
 extern CDynamicMesh* gWaterMesh;            // 0x1034c184  "WaterMesh"
 extern CDynamicMesh* gFlagsMesh;            // 0x1034c180  "FlagsMesh"
 
-// The water's start position, three floats that CGame::InitLevel_Initialise (src/Game_level.cpp, unit w117) copies from the level's balance
+// The water's start position, three floats that CGame::InitLevel_Initialise (src/game/Game.cpp, unit w117) copies from the level's balance
 // (WaterStartPos X, Y, Z); DC_TickDynamicCellMeshes (0x100dfd88, untranslated) reads them. Global 0x102f9bc8, original name unknown.
 extern s3DPoint gWaterStartPos;
 
-// STATIC_WhiteOut's four RGBA colours (doubles, 32 bytes each), at 0x102a03a4 (initialised data; defined in src/DynamicCells_STATIC_WhiteOut.cpp).
+// STATIC_WhiteOut's four RGBA colours (doubles, 32 bytes each), at 0x102a03a4 (initialised data; defined in src/game/park/DynamicCell.cpp).
 extern double gWhiteOutColors[16];
 // Double-precision immediate mode GL calls STATIC_WhiteOut imports (glue 0x1023b278, 0x1023b290).
 extern "C" void glColor4dv(const double* components);

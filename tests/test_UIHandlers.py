@@ -1,15 +1,15 @@
 """Differential tests for the default window handlers of five controls and their leaves, against libtpw_unit_UIHandlers.dylib
 (tests/unit_UIHandlers.cpp):
 
-  src/ui_handlers_small.cpp     UI_DefaultButtonCallback, UI_DefaultCheckButtonsCallback, UI_DefaultKnobCallback,
+  src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp     UI_DefaultButtonCallback, UI_DefaultCheckButtonsCallback, UI_DefaultKnobCallback,
                                 UI_DefaultTextBoxCallback, UI_DefaultVaryBoxCallback
-  src/InterfaceWindow_focus.cpp InterfaceWindow: CheckFocus, CaptureDevice, UnCaptureDevice, cursorChange, GetID, GetParent
-  src/InterfaceKnob.cpp         InterfaceKnob: DoKnobMove, ChangeAngle
-  src/InterfaceVaryBox.cpp      InterfaceVaryBox: DoVaryBoxButton
+  src/game/ui/InterfaceWindow.cpp InterfaceWindow: CheckFocus, CaptureDevice, UnCaptureDevice, cursorChange, GetID, GetParent
+  src/game/ui/InterfaceKnob.cpp         InterfaceKnob: DoKnobMove, ChangeAngle
+  src/game/ui/InterfaceVaryBox.cpp      InterfaceVaryBox: DoVaryBoxButton
 
-Real on both sides: those, the button (src/InterfaceButton.cpp: the handler reaches CalcFrame, DoTextColour, SetState, HiLight,
-StopHeldTimer and WhatAmI), the controls' constructors (src/ui_controls_create.cpp, which build the test windows), the window's
-constructor (src/InterfaceWindow.cpp), GetWindow (src/InterfaceWindow_show.cpp) and the rectangles (src/UI_Base.cpp). Fakes that
+Real on both sides: those, the button (src/game/ui/InterfaceButton.cpp: the handler reaches CalcFrame, DoTextColour, SetState, HiLight,
+StopHeldTimer and WhatAmI), the controls' constructors (src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp, which build the test windows), the window's
+constructor (src/game/ui/InterfaceWindow.cpp), GetWindow (src/game/ui/InterfaceWindow.cpp) and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Fakes that
 record the same event on both sides: UI_PostMessage, UI_UpdatePointerIn, UI_SetCursor, the UI clock (IveGotTicks answers a clock the
 script sets and moves on by a step at every call, so a missing or extra call changes every later answer), the window's default handler,
 GetAttr and GetChild, the help text handler's Update, OnMouseMoved, OnMouseMovedIn and OnMouseMovedOut, the draw objects (Change records

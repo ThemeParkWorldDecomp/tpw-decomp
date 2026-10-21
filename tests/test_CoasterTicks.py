@@ -1,5 +1,5 @@
 """Unit w137, the coasters' per-frame ticks, against libtpw_unit_CoasterTicks.dylib (tests/unit_CoasterTicks.cpp), main app
-("SimTheme Park"), src/TPCoaster_ticks.cpp: CoasterTickPreRender 0x10043028, CoasterTickPostRender 0x10043200 and CoasterUserInputTick
+("SimTheme Park"), src/game/rides/CoasterEdit.cpp, src/game/rides/TPCoaster.cpp: CoasterTickPreRender 0x10043028, CoasterTickPostRender 0x10043200 and CoasterUserInputTick
 0x100554b4.
 
 Every callee is a recording fake on both sides. The ticks' world is up to four coaster instances (flags, state, the type's word, the id,

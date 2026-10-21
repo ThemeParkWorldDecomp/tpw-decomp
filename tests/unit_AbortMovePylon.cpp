@@ -1,5 +1,5 @@
 // Test library for the pylon-move abort and the small coaster predicates (unit v5967; libtpw_unit_AbortMovePylon.dylib, tests/test_AbortMovePylon.py), main app:
-//   src/Mouse_modes_AbortMovePylon.cpp   AbortMovePylon, SingleHFieldTextureChange, PlacePylon (4 arguments), IsCoasterUseable, IsTrackValid,
+//   src/game/park/TPHField.cpp, src/game/rides/CoasterEdit.cpp, src/game/rides/CoasterTrack.cpp   AbortMovePylon, SingleHFieldTextureChange, PlacePylon (4 arguments), IsCoasterUseable, IsTrackValid,
 //                                        IsTrackClosed (void*), DecCoasterConst2
 //
 // The callees outside the unit are recording fakes; the globals of other files the unit reads are defined here.

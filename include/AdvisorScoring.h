@@ -94,7 +94,7 @@ public:
     int32_t _ADVISOR_WELCOME();       // 0x1001139c
     int32_t _ADVISOR_OPEN_PARK();     // 0x100113dc
 
-    // Unit v5040 (src/AdvisorScoring.cpp). Mac offsets of the balance values read are in the source.
+    // Unit v5040 (src/game/advisor/AdvisorScoring.cpp, src/game/advisor/Advisor.cpp). Mac offsets of the balance values read are in the source.
     int32_t _ADVISOR_TOILETS_CLOSED();      // 0x1001aa20
     int32_t _ADVISOR_STAFFROOM_CLOSED();    // 0x1001aafc
     int32_t _ADVISOR_SIDESHOWS_CLOSED();    // 0x1001a934
@@ -104,7 +104,7 @@ public:
     int32_t _ADVISOR_CONGRAT_PRICING_SIDESHOWS_GREAT_SATISFACTION();   // 0x1001a5e4
     int32_t _ADVISOR_GOLD_TICKET_NEAR_TO_FIRST_ONE();                  // 0x1001aef8
 
-    // Unit v5081 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_FEATURES_DIRTY_TOILETS_.cpp).
+    // Unit v5081 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_FEATURES_DIRTY_TOILETS_1();         // 0x10015628
     int32_t _ADVISOR_FEATURES_DIRTY_TOILETS_2();         // 0x10015798
     int32_t _ADVISOR_FEATURES_DIRTY_TOILETS_3();         // 0x10015908
@@ -112,7 +112,7 @@ public:
     int32_t _ADVISOR_FEATURES_POOR_SELECTION();          // 0x10015018
     int32_t _ADVISOR_SIDESHOWS_BUILD_MORE_SIDESHOWS();   // 0x10014ea0
 
-    // Unit v5106 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_GOLD_TICKET_AMOUNT_VISI.cpp).
+    // Unit v5106 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_TUTORIAL_EXPLAIN_TOOLTIPS();                // 0x1001b604
     int32_t _ADVISOR_GOLD_TICKET_EXPLANATION();                  // 0x1001b6d0
     int32_t _ADVISOR_GOLD_TICKET_AMOUNT_ALL_RIDES_RESEARCHED_a();   // 0x1001b8ec
@@ -122,7 +122,7 @@ public:
     int32_t _ADVISOR_GOLD_TICKET_AMOUNT_VISITORS_b();            // 0x1001bcc0
     int32_t _ADVISOR_GOLD_TICKET_AMOUNT_VISITORS_c();            // 0x1001bdf4
 
-    // Unit v5108 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_MAX_GUARDS_V2.cpp).
+    // Unit v5108 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_MAX_HANDYMEN_V2();        // 0x10016e68
     int32_t _ADVISOR_MAX_ENTERTAINERS();       // 0x10016f2c
     int32_t _ADVISOR_MAX_ENTERTAINERS_V2();    // 0x10016fe8
@@ -132,7 +132,7 @@ public:
     int32_t _ADVISOR_MAX_RESEARCHERS();        // 0x100173a8
     int32_t _ADVISOR_MAX_RESEARCHERS_V2();     // 0x10017460
 
-    // Unit v5118 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_STAFF_ENTERTAINER_COVER.cpp).
+    // Unit v5118 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_STAFF_GUARD_BUILD_CAMERA();          // 0x10012b0c
     int32_t _ADVISOR_STAFF_SET_GUARD_AREA();              // 0x10012bec
     int32_t _ADVISOR_STAFF_SET_ENTERTAINER_AREA();        // 0x10012dd4
@@ -142,7 +142,7 @@ public:
     int32_t _ADVISOR_STAFF_TRAIN_GUARDS();                // 0x10013244
     int32_t _ADVISOR_STAFF_TRAIN_ENTERTAINERS();          // 0x10013340
 
-    // Unit v5122 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.cpp). Limit and multiplier are balance slots at the Mac offsets in the source.
+    // Unit v5122 (src/game/advisor/AdvisorScoring.cpp). Limit and multiplier are balance slots at the Mac offsets in the source.
     int32_t _ADVISOR_CONGRAT_PRICING_DRINKS_GREAT_VALUE();             // 0x1001a010
     int32_t _ADVISOR_CONGRAT_PRICING_SIDESHOWS_GREAT_VALUE();          // 0x1001a104
     int32_t _ADVISOR_CONGRAT_PRICING_RESTAURANT_GREAT_VALUE();         // 0x10019f18
@@ -152,7 +152,7 @@ public:
     int32_t _ADVISOR_CONGRAT_PRICING_SHOPS_GREAT_SATISFACTION();       // 0x1001a2f0
     int32_t _ADVISOR_CONGRAT_PRICING_RESTAURANT_GREAT_SATISFACTION();  // 0x1001a3e8
 
-    // Unit v5136 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_STAFF_HIRE_MECHANICS_3.cpp).
+    // Unit v5136 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_VISITORS_THIRSTY();           // 0x10011640
     int32_t _ADVISOR_VISITORS_HUNGRY();            // 0x100116d8
     int32_t _ADVISOR_STAFF_HIRE_MECHANICS_1();     // 0x1001176c
@@ -162,7 +162,7 @@ public:
     int32_t _ADVISOR_STAFF_HIRE_HANDYMEN_2();      // 0x10011b0c
     int32_t _ADVISOR_STAFF_HIRE_HANDYMEN_3();      // 0x10011c0c
 
-    // Unit v5252 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_IN_THE_RED_SIX_MONTHS.cpp).
+    // Unit v5252 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_IN_THE_RED_SIX_MONTHS();       // 0x10016420
     int32_t _ADVISOR_TAKE_LOAN();                   // 0x1001636c
     int32_t _ADVISOR_IN_THE_RED_THREE_MONTHS();     // 0x10016524
@@ -172,7 +172,7 @@ public:
     int32_t _ADVISOR_LOTS_HANDYMAN();               // 0x100168e8
     int32_t _ADVISOR_LOTS_ENTERTAINERS();           // 0x100169b4
 
-    // Unit v5256 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__2.cpp).
+    // Unit v5256 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_CONGRAT_PRICING_DRINKS_GREAT_SATISFACTION();   // 0x1001a4e8
     int32_t _ADVISOR_PRICING_SIDESHOWS_POOR_SATISFACTION();         // 0x10019c24
     int32_t _ADVISOR_PRICING_DRINKS_POOR_SATISFACTION();            // 0x10019b10
@@ -182,7 +182,7 @@ public:
     int32_t _ADVISOR_PRICING_FOOD_POOR_SATISFACTION();              // 0x100197dc
     int32_t _ADVISOR_PRICING_SIDESHOWS_POOR_VALUE();                // 0x100196d0
 
-    // Unit v5265 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_STAFF_HIRE_GUARDS_3.cpp).
+    // Unit v5265 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_STAFF_HIRE_GUARDS_1();        // 0x10011d4c
     int32_t _ADVISOR_STAFF_HIRE_GUARDS_2();        // 0x10011e64
     int32_t _ADVISOR_STAFF_HIRE_GUARDS_3();        // 0x10011f54
@@ -191,7 +191,7 @@ public:
     int32_t _ADVISOR_STAFF_SET_MECHANIC_AREA();    // 0x1001260c
     int32_t _ADVISOR_STAFF_SET_HANDYMAN_AREA();    // 0x100128a4
 
-    // Unit v5282 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_TRAIN_STAFF_GENERAL.cpp).
+    // Unit v5282 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_TRAIN_STAFF_GENERAL();               // 0x10018f4c
     int32_t _ADVISOR_SET_PATROLS_GENERAL();               // 0x10018e80
     int32_t _ADVISOR_HIRE_STAFF_GENERAL();                // 0x10018d90
@@ -201,13 +201,13 @@ public:
     int32_t _ADVISOR_PRICING_RESTAURANT_POOR_VALUE();     // 0x100194b4
     int32_t _ADVISOR_CONGRAT_COSTUMES();                  // 0x100188f4
 
-    // Unit v5767 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_TUTORIAL_UI_PANEL.cpp).
+    // Unit v5767 (src/game/advisor/AdvisorScoring.cpp).
     int32_t GetFirstResponseFor(AdvisorMessage message) const;     // 0x10010464: the record's first line, 0x266 without a record
     int32_t _ADVISOR_TUTORIAL_UI_PANEL();                          // 0x1001b540
     int32_t _ADVISOR_GOLD_TICKET_NEAR_TO_XPROFIT();                // 0x1001b30c
     int32_t _ADVISOR_PRICING_DRINKS_POOR_VALUE();                  // 0x100195c4
 
-    // Unit v5892 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2.cpp).
+    // Unit v5892 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_GOLD_TICKET_NEAR_TO_XHAPPINESS();        // 0x1001b18c
     int32_t _ADVISOR_CONGRAT_BALLOONS();                      // 0x10018854
     int32_t _ADVISOR_CONGRAT_SEND_POSTCARD();                 // 0x1001873c
@@ -221,7 +221,7 @@ public:
     int32_t _ADVISOR_CONGRAT_STAFF_HAPPY();                   // 0x10017df4
     int32_t _ADVISOR_VISITORS_TOO_SCARED();                   // 0x10017c40
 
-    // Unit v5896 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN.cpp).
+    // Unit v5896 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_WEALTH_HIGH_REPAY_LOAN();              // 0x10016218
     int32_t _ADVISOR_PRICING_TICKET_TOO_CHEAP();            // 0x10015cec
     int32_t _ADVISOR_WAGES_HIGH();                          // 0x10016778
@@ -235,11 +235,11 @@ public:
     int32_t _ADVISOR_FEATURES_NO_TOILETS();                 // 0x100153e0
     int32_t _ADVISOR_FEATURES_BUILD_FEATURES();             // 0x10015298
 
-    // Unit v5937 (src/Serialise_basic_SAVEVARSTRUCT_2.cpp): 0x100102d8, 276 bytes. -1 when the message has no record or is not valid in
+    // Unit v5937 (src/game/advisor/AdvisorScoring.cpp): 0x100102d8, 276 bytes. -1 when the message has no record or is not valid in
     // the current mode; else the scorer's answer. Copies mWord4 / mWord8 out to the two references (not when there is no record).
     int32_t LastMinuteCheck(AdvisorMessage message, tag_IDX_TYPE<struct IDXTYPEUniqueNameThingId, uint16_t>& thingId, uint32_t& value);
 
-    // Unit v5939 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_SHOPS_POOR_SELECTION.cpp).
+    // Unit v5939 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_RIDES_RESEARCH_MORE();        // 0x10013f28
     int32_t _ADVISOR_RIDES_BUILD_RIDES();          // 0x10014078
     int32_t _ADVISOR_RIDES_NO_UPGRADES();          // 0x10014160
@@ -250,7 +250,7 @@ public:
     int32_t _ADVISOR_SHOPS_BUILD_MORE_SHOPS();     // 0x1001493c
     int32_t _ADVISOR_SIDESHOWS_POOR_SELECTION();   // 0x10014aac
 
-    // Unit v5973 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_RIDES_POOR_SELECTION_2.cpp).
+    // Unit v5973 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_RIDES_POOR_SELECTION();         // 0x10013dd8
     int32_t _ADVISOR_SIDESHOWS_RESEARCH_MORE();      // 0x10014c00
     int32_t _ADVISOR_SIDESHOWS_BUILD_SIDESHOWS();    // 0x10014d54
@@ -258,7 +258,7 @@ public:
     int32_t _ADVISOR_HYPE_NEWPARK();                 // 0x10017528
     int32_t _ADVISOR_BIG_BUSLOAD_ARRIVED();          // 0x10017b2c
 
-    // Unit v5971 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.cpp).
+    // Unit v5971 (src/game/advisor/AdvisorScoring.cpp).
     int32_t _ADVISOR_CLOSE_PARK();                    // 0x1001151c
     int32_t _ADVISOR_STAFF_HIRE_RESEARCHERS_1();      // 0x100121b0
     int32_t _ADVISOR_STAFF_HIRE_RESEARCHERS_3();      // 0x10012468
@@ -266,7 +266,7 @@ public:
     int32_t _ADVISOR_STAFF_HANDYMAN_COVERAGE();       // 0x100129e4
     int32_t _ADVISOR_STAFF_TRAIN_RESEARCHERS();       // 0x10013444
 
-    // Unit v51055 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_STAFF_STRIKING_ENTERTAI.cpp):
+    // Unit v51055 (src/game/advisor/AdvisorScoring.cpp):
     // each returns the word at the Mac offset from this (balance values).
     int32_t _ADVISOR_STAFF_UNHAPPY_MECHANICS();            // 0x10013544 +0x1bc
     int32_t _ADVISOR_STAFF_UNHAPPY_HANDYMEN();             // 0x10013594 +0x1c0
@@ -299,7 +299,7 @@ public:
     int32_t _ADVISOR_RIDES_BREAKDOWN_NO_MECHANICS();       // 0x10014450 +0x24c
     int32_t _ADVISOR_RIDES_BREAKDOWN_BUSY_MECHANICS();     // 0x100144a8 +0x250
 
-    // Unit v51068 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_NEW_RESEARCH_GROUP_SIDE.cpp).
+    // Unit v51068 (src/game/advisor/AdvisorScoring.cpp).
     // Each returns the word at the Mac offset from this (balance values), or a constant.
     int32_t _ADVISOR_PRANK_SBOMB();                        // 0x100176b8 +0x3d4
     int32_t _ADVISOR_PRANK_LITTER();                       // 0x100176fc +0x3d8
@@ -332,7 +332,7 @@ public:
     int32_t _ADVISOR_CONGRAT_ALL_COMPLETE();               // 0x10018bd0 returns 0x2710
     int32_t _ADVISOR_CONGRAT_ALL_COMPLETE_LEAVING();       // 0x10018c20 returns 0x270f
 
-    // Unit v51073 (src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_NEW_RESEARCH_GROUP_SIDE_CAdvisorScoring__ADVISOR_GENERAL_WON_FIRST_GOLDE.cpp).
+    // Unit v51073 (src/game/advisor/AdvisorScoring.cpp).
     // Returns 0 unless an offset is given: then the balance word at that Mac offset.
     int32_t _ADVISOR_GENERAL_WON_FIRST_GOLDEN_TICKET();    // 0x1001adf8 +0x5b4
     int32_t _ADVISOR_WELCOME_NAMEENTRY();                  // 0x1001adac
@@ -425,7 +425,7 @@ extern uint16_t gAdvisorNoneRestaurantPoorValue;   // 0x1027df0a
 // Unit v5767: the "no thing" id of the drinks poor value scorer (zero in the original's data).
 extern uint16_t gAdvisorNoneDrinksPoorValue;   // 0x1027df0c
 
-// Unit v5018 (src/sinit_AdvisorScoring_cpp.cpp): the static initialiser 0x1001c34c.
+// Unit v5018 (src/game/advisor/AdvisorScoring.cpp): the static initialiser 0x1001c34c.
 #include "TbDynamicStringTemplate.h"
 extern "C" void __register_global_object(void* object, void* destructor, void* node);   // runtime glue 0x10239940
 extern unsigned char gAdvisorStringStorage[];   // 0x102b4110 the file's global string (TbDynamicStringTemplate<char16_t>)
@@ -434,7 +434,7 @@ extern AdvisorScorer gAdvisorScorerSources[kAdvisorMessageCount];   // 0x1027df3
 void DestroyAdvisorString(void* object, int16_t deleteFlag);
 void __sinit_AdvisorScoring_cpp();   // 0x1001c34c
 
-// Unit v5035 (src/UI_IslandLobby_msg_sinit_ui_cityLobbyController_cpp.cpp): the static initialiser 0x101e0cec.
+// Unit v5035 (src/game/ui/ui_cityLobbyController.cpp): the static initialiser 0x101e0cec.
 extern const char gCityLobbyStringPool[];                 // 0x1024edc2 (literals of ui_cityLobbyController.cpp)
 extern "C" void CityLobbyStringDestructor(void* object, int16_t deleteFlag);   // the string destructor import
 extern "C" void* CityLobbyStringConstruct(void* self, const char16_t* text);   // the string constructor glue

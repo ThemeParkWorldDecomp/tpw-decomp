@@ -1,7 +1,7 @@
 // Test library for the golden ticket control and the advisor message (unit w180; libtpw_unit_GoldenTicket.dylib, tests/test_GoldenTicket.py), main app:
-//   src/GoldenTicket.cpp   CGoldenTicketControl::HowManyTickets, SpendTicketOn, HasBeenBought, CanIAfford, CheckForLocal, CheckForGlobal, CheckForSecret,
+//   src/game/park/GoldenTickets.cpp   CGoldenTicketControl::HowManyTickets, SpendTicketOn, HasBeenBought, CanIAfford, CheckForLocal, CheckForGlobal, CheckForSecret,
 //                          EarnedGoldenTicket (three), TellIfFirst
-//   src/MsgAdvisor.cpp     CMsgAdvisor's constructor, GetType and destructor
+//   src/game/park/GoldenTickets.cpp, src/game/ui/MessageCentre.cpp     CMsgAdvisor's constructor, GetType and destructor
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues: the master save (its constructor
 // and eleven members), the ride database's GetRideInfo (answering one ride record), the game type's constructor, the park analyser (ten questions),
@@ -221,7 +221,7 @@ int32_t CParkAnalyser::PercentageOfParkCoveredByCameras() {
     return static_cast<int32_t>(ret("cameras", 0));
 }
 
-// The advisor request: the six-argument constructor sets the eight fields as src/AdvisorRequest.cpp does; the copy constructor copies the eight fields
+// The advisor request: the six-argument constructor sets the eight fields as src/game/advisor/Advisor.cpp does; the copy constructor copies the eight fields
 // and leaves both padding regions alone (it logs the source's fields).
 CAdvisorRequest::CAdvisorRequest(AdvisorMessage message, tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> thingId, uint32_t secondary, int32_t responseNo,
                                  bool overrideOnlyOnce, int32_t score) {

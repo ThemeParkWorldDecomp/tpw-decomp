@@ -1,5 +1,5 @@
 """Unit v5152, the staff costs panel's cost words and the two panel message functions, against libtpw_unit_UpdateStaffCost.dylib
-(tests/unit_UpdateStaffCost.cpp), main app ("SimTheme Park"), src/CreateStaffCostsPanel_UpdateStaffCost.cpp:
+(tests/unit_UpdateStaffCost.cpp), main app ("SimTheme Park"), src/game/ui/ui_StaffCostsPanel.cpp, src/game/ui/ui_shopStatus.cpp:
   UpdateStaffCost 0x101be030, StaffCostsPanelMsg 0x101be1f4, ShopStatusMsg 0x101bdb8c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

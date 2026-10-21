@@ -1,5 +1,5 @@
 """Unit v5091, the pylon records and the pylon stack's meshes, against libtpw_unit_NewPylon.dylib (tests/unit_NewPylon.cpp), main app
-("SimTheme Park"), src/TPCoaster_loaders_NewPylon.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   NewPylon 0x1003d610, UpdatePylonStackMeshes 0x1003d958
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,4 +1,4 @@
-// The park analyser's messages (main app, unit w161, src/ParkMessages.cpp): CMsgAddToChallenge (type 0x1a, posted by CParkAnalyser::PersonPaidAdmission),
+// The park analyser's messages (main app, unit w161, src/game/ui/MessageCentre.cpp, src/game/buildings/ResearchLab.cpp, src/game/park/analyser.cpp, src/game/buildings/StaffHQ.cpp): CMsgAddToChallenge (type 0x1a, posted by CParkAnalyser::PersonPaidAdmission),
 // CMsgResearchCompleted (type 0x11, handled by CParkAnalyser::ReceiveMessage) and CMsgStaffInfo (type 0x17, the same). Each has the constructor, GetType and
 // destructor of the pattern of include/ThingMessages.h: the Mac constructor stores the base vtable, a zero flags word, the message's own vtable and the payload; the
 // destructor only resets the vtable and, for a positive (signed 16 bit) delete flag, calls operator delete. The Mac vtables (base 0x102a10ec, CMsgAddToChallenge

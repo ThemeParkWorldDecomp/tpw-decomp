@@ -1,5 +1,5 @@
 """The lobby's chat satellite and the world lobby window's messages, against libtpw_unit_ProcessGetChatSatellitePlayers.dylib
-(tests/unit_ProcessGetChatSatellitePlayers.cpp), main app ("SimTheme Park"), src/ProcessGetChatSatellitePlayers.cpp:
+(tests/unit_ProcessGetChatSatellitePlayers.cpp), main app ("SimTheme Park"), src/game/ui/ui_worldLobbyController.cpp:
   ChatServerCallbackFn 0x1022a44c, ProcessGetChatSatellitePlayers 0x1022a668, WorldLobbyControllerMsg 0x1022aa20
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

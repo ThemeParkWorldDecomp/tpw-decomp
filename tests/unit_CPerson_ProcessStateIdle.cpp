@@ -1,5 +1,5 @@
 // Test library for CPerson::ProcessStateIdle (unit v5098; libtpw_unit_CPerson_ProcessStateIdle.dylib, tests/test_CPerson_ProcessStateIdle.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_ProcessStateIdle.cpp   ProcessStateIdle and the globals it defines
+//   src/game/people/PersonQueue.cpp   ProcessStateIdle and the globals it defines
 //
 // Every callee outside the unit is a recording fake with the PowerPC stub's event name and arguments. The globals of other files the unit reads are
 // defined here (the world, the map pointer, the thing array, the message centre, the sound banks, the main balance).
@@ -36,7 +36,7 @@ CMainBalance gMainBalance;
 void CBalanceTable::Init() {}
 const BalanceDescription* CMainBalance::GetBalanceDescription(int32_t) { return nullptr; }
 BalanceValue* CMainBalance::GetBalanceValuesStart() { return nullptr; }
-CMainBalance::~CMainBalance() {}   // the program's is in src/MainBalance.cpp, which this library does not compile
+CMainBalance::~CMainBalance() {}   // the program's is in src/game/balance/MainBalance.cpp, which this library does not compile
 
 namespace {
 void* gAnalyserSlot = nullptr;   // what GetParkAnalyser answers

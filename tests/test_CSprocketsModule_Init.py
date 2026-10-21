@@ -1,8 +1,8 @@
 """Unit v5L24, CSprocketsModule::Init 0x1002b408 (sound symbols shared), against libtpw_unit_CSprocketsModule_Init.dylib
-(tests/unit_CSprocketsModule_Init.cpp), src/CSprocketsModule_Init.cpp.
+(tests/unit_CSprocketsModule_Init.cpp), src/sound/CSprocketsModule.cpp.
 
 A case is a module, a TbSoundSystemInfo and the answers of the fakes. The base's Init (TbSoundSystemModule::Init, 0x10012340 and
-src/TbSoundSystemModule.cpp) and TbError::TbError (0x100015b8) run as themselves on both sides, so the info's mask, maximum and
+src/sound/ServiceQueue.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundSystemModule.cpp) and TbError::TbError (0x100015b8) run as themselves on both sides, so the info's mask, maximum and
 buffers-to-use words decide mBuffers. The callees outside the unit are fakes on both sides that record their arguments: the
 array allocation (0x1002ebfc, AllocBuffer_; recorded in 4-byte slots), the sound library's allocator (0x1002eac4; the size), the
 channel constructor (0x1002a29c; the PowerPC fake also gives the channel a vtable for the virtual send), the three command

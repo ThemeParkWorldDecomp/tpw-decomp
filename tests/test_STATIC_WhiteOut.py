@@ -1,5 +1,5 @@
 """Unit v5651, STATIC_WhiteOut, against libtpw_unit_STATIC_WhiteOut.dylib (tests/unit_STATIC_WhiteOut.cpp), main app
-("SimTheme Park"), src/DynamicCells_STATIC_WhiteOut.cpp:
+("SimTheme Park"), src/game/park/DynamicCell.cpp:
   STATIC_WhiteOut 0x100e28b4
 
 A case is a colour table (16 doubles at 0x102a03a4) and a rand seed. The GL calls and rand are fakes on both sides. The state calls

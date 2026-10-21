@@ -1,6 +1,6 @@
 // Test library for the online islands' small members and the globes' panel members (unit v51106;
 // libtpw_unit_CLBScreenComponentOnlineIslands_StartCurrentIsla.dylib, tests/test_CLBScreenComponentOnlineIslands_StartCurrentIsla.py), main app:
-//   src/CLBScreenComponentOnlineIslands_GotoNextIsland_CLBScreenComponentOnlineIslands_StartCurrentIsla.cpp
+//   src/game/online/lobby_globe.cpp, src/game/online/lobby_island.cpp
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The virtual calls the
 // Mac makes through __ptr_glue are the host's own members: the fakes record "vcall" with the vtable offset. Deleting an object records "free"
@@ -73,7 +73,7 @@ CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
 void CLBScreenComponentOnlineGlobe::Render() {}
 void CLBScreenComponentOnlineGlobe::Close() {}
 uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
-// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp).
+// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 void CLBScreenComponentOnlineGlobe::TickGlobe() { ev("OnlineGlobeTick", {lab(this)}); }

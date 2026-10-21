@@ -1,6 +1,6 @@
 """Unit v5959, the 2D map's sprite list functions and map picture functions, against libtpw_unit_CUI2DMap_UnRegister.dylib
 (tests/unit_CUI2DMap_UnRegister.cpp), main app ("SimTheme Park"),
-src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister.cpp:
+src/game/ui/ui_2dmap.cpp:
   UnRegister 0x10230cd4, DeleteSpriteListEntries 0x10230bd4, UpdateAllSpritePositions 0x10230974, CloseSprites 0x102307ec,
   Zoom 0x1022fa1c, LoadMap 0x1022dbdc, UpdateMap 0x1022db4c
 

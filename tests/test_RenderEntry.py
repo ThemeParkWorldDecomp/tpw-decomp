@@ -1,4 +1,4 @@
-"""SRenderListEntry::CalcRenderEntry (src/tb_renderentry.cpp), original versus translation.
+"""SRenderListEntry::CalcRenderEntry (src/engine/RenderList.cpp), original versus translation.
 
 Everything CalcRenderEntry calls is a fake on both sides (tests/unit_RenderEntry.cpp has the host's):
 DotProduct, CCompBase::AverageColor (virtual), ColorVertices, CClipping::CPP_TestData and ClipPoly
@@ -18,7 +18,7 @@ memory (the face set's texture coordinates with NaNs as one value), the whole in
 nine facing values.
 
 The environment-mapped texture coordinates (entry flag 0x8000000) end in a loop over 0xffffffff
-vertices in the original (src/tb_renderentry.cpp, QUIRK), so a case that reaches them names the
+vertices in the original (src/engine/RenderList.cpp, QUIRK), so a case that reaches them names the
 DotProduct call that ends it on both sides (the host throws, the PowerPC side stops the emulator)
 and the state is compared at that point.
 

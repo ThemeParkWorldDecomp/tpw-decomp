@@ -1,6 +1,6 @@
 // Test library for nine advisor scorers (unit v5939; libtpw_unit_CAdvisorScoring__ADVISOR_SHOPS_POOR_SELECTION.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_SHOPS_POOR_SELECTION.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_SHOPS_POOR_SELECTION.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The callees outside the unit (the world's getters, the analyser's counts, the research lab, the bank account, the park time) are fakes that
 // record the arguments the real ones read and answer from the test's queues. gGameWorld and its reference are defined here.

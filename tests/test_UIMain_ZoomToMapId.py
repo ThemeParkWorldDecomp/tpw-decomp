@@ -1,5 +1,5 @@
 """Unit v5723, seven small ui_main functions, against libtpw_unit_UIMain_ZoomToMapId.dylib (tests/unit_UIMain_ZoomToMapId.cpp), main app
-("SimTheme Park"), src/ui_main_kbcapture_UIMain_ShowRidePreview_UIMain_GotoStatusPanelForThing_UIMain_ZoomToMapId.cpp:
+("SimTheme Park"), src/game/ui/ui_main.cpp:
   UIMain_ZoomToMapId 0x10181d34, UIMain_ZoomToPeep 0x10181c70, UIMain_GetShiftKeyState 0x10182088, UIMain_DestroySpritePreview 0x10181864,
   UIMain_UpdateSpritePreview 0x101817e4, UIMain_MidWindowParticles 0x10182404, UIMain_DestroyRidePreview 0x101815d4
 

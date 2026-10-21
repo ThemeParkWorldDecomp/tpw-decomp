@@ -1,9 +1,9 @@
 // Test library for unit w27 (libtpw_unit_CursorClasses.dylib; see tests/test_CursorClasses.py and calllog.h):
 //
-//   src/ui_cursor_classes.cpp  InterfaceBFCursor's destructor, GetVisible, Show, Hide and Use
-//   src/ui_DrawObject.cpp      InterfaceCursor and CursorTable (unit w21's translation, tested here again)
-//   src/ui_cursors.cpp         InterfaceBFCursor::LoadData (the real cursor loader on top of the picture loader)
-//   src/bfl_graphicfile.cpp    TbRenderArea, TbGraphicFileLoader, TbTGALoader, _TgaGLL, _AndyGLL, LbPalette_FromCompact
+//   src/game/ui/InterfaceBFCursor.cpp  InterfaceBFCursor's destructor, GetVisible, Show, Hide and Use
+//   src/game/ui/InterfaceCursor.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceDrawObject.cpp      InterfaceCursor and CursorTable (unit w21's translation, tested here again)
+//   src/game/ui/InterfaceBFCursor.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_main.cpp         InterfaceBFCursor::LoadData (the real cursor loader on top of the picture loader)
+//   src/bullfrog/AndyGLL.cpp, src/bullfrog/LbDrawText.cpp, src/bullfrog/Lbgfsave.cpp, src/bullfrog/TbRenderArea.cpp    TbRenderArea, TbGraphicFileLoader, TbTGALoader, _TgaGLL, _AndyGLL, LbPalette_FromCompact
 //
 // Everything they call that is not part of the unit is a fake that records through calllog: the file layer (one byte
 // stream the test sets, served by every file object), the library's heap (blocks filled with 0xa5 and a margin),

@@ -1,6 +1,6 @@
 // Test library for std::basic_ostream<char> ctor and dtor (unit v5116; libtpw_unit_std_basic_ostream_Dtor_basic_ostream.dylib,
 // tests/test_std_basic_ostream_Dtor_basic_ostream.py), main app:
-//   src/RideInstance_std_basic_ostream_Dtor_basic_ostream.cpp   BasicOstreamCtor, BasicOstreamDtor and the three vtable data blocks
+//   src/game/MslSupport.cpp   BasicOstreamCtor, BasicOstreamDtor and the three vtable data blocks
 //
 // The callees (ios_base::~ios_base, ios_base::init, basic_ios::widen, operator delete) are recording fakes.
 #include <cstddef>

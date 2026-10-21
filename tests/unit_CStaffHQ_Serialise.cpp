@@ -1,6 +1,6 @@
 // Test library for CStaffHQ::Serialise, ReceiveMessage, UpdateMonthly and FindNearestAvailableGuard (unit v5918; libtpw_unit_CStaffHQ_Serialise.dylib,
 // tests/test_CStaffHQ_Serialise.py), main app:
-//   src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_Serialise.cpp   the four functions and the halfwords 0x102a11bc.. they compare with
+//   src/game/buildings/StaffHQ.cpp   the four functions and the halfwords 0x102a11bc.. they compare with
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The globals of other
 // files (gWorld, gWorldMap, gThingArray) are defined here.

@@ -1,5 +1,5 @@
 """Unit v5769, DeInitOnlineUI, against libtpw_unit_DeInitOnlineUI.dylib (tests/unit_DeInitOnlineUI.cpp), main app
-("SimTheme Park"), src/UI_pump_DeInitOnlineUI.cpp:
+("SimTheme Park"), src/game/ui/ui_main.cpp:
   DeInitOnlineUI 0x10186620
 
 A case is a world and a call. The world is built in emulator memory (Mac addresses, big-endian) for the original and in the host

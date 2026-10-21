@@ -1,5 +1,5 @@
 // Test library for std::basic_streambuf<char> base functions (unit v5104; libtpw_unit_std_basic_streambuf_uflow.dylib), main app:
-//   src/std_basic_streambuf_uflow.cpp   uflow, imbue, getloc, destructor
+//   src/game/MslSupport.cpp   uflow, imbue, getloc, destructor
 // The callees (underflow virtual, locale copy/assign/destroy, delete) are recording fakes.
 #include <cstddef>
 #include <cstdint>

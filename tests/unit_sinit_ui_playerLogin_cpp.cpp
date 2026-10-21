@@ -1,5 +1,5 @@
 // Test library for ui_playerLogin.cpp's static initialiser (unit v5726; libtpw_unit_sinit_ui_playerLogin_cpp.dylib), main app:
-//   src/ui_newname_AddressBookMsg_sinit_ui_playerLogin_cpp.cpp
+//   src/game/ui/ui_playerLogin.cpp
 //
 // The wide string constructor and __register_global_object are fakes recording their arguments.
 #include <cstddef>

@@ -1,7 +1,7 @@
 """Unit v51032: CSprocketsChannelMac::SetDescription, the UReferenceCounter<USoundDescription> copy constructor and destructor,
 TbMapStreamer::CCatFixupTable::Unload / LoadCatgoryFixupTable / SetDroppable and TbStaticFileBank's destructor and Deregister,
 against libtpw_unit_CSprocketsChannel_SetDescription_2.dylib (tests/unit_CSprocketsChannel_SetDescription_2.cpp), sound program
-("sound symbols shared"), src/TbSysCommand_TpBody_Load_CSprocketsChannel_SetDescription_2.cpp:
+("sound symbols shared"), src/sound/TbMapStreamer.cpp, src/sound/TimerCodec.cpp:
   SetDescription 0x1002a9f8, UReferenceCounter copy 0x1002ad08, ~UReferenceCounter 0x1002ae58, CCatFixupTable::Unload 0x10023a78,
   LoadCatgoryFixupTable 0x1002370c, SetDroppable 0x100231fc, ~TbStaticFileBank 0x10013350, TbStaticFileBank::Deregister 0x10013278
 

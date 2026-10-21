@@ -1,4 +1,4 @@
-// Fakes and entry points for the render list entry's primitive set-up (src/tb_renderentry_setup.cpp:
+// Fakes and entry points for the render list entry's primitive set-up (src/engine/RenderList.cpp:
 // SRenderListEntry::GetFaceSetBlendMode and SetupPrimitive; the test is tests/test_RenderEntrySetup.py).
 //
 // The one callee outside the unit that is a fake is CDrawPrimitive::GetNextPrimitive: the real one
@@ -7,7 +7,7 @@
 // primitive of the case, whose bytes were all 0xa5 before the call, so a stray write shows).
 //
 // Run as they are, as the original's out-of-line copies are on the PowerPC side:
-// CTextureEntry::GetBlendingMode and StoreAsWrapping (the library holds src/tb_textureentry.cpp for
+// CTextureEntry::GetBlendingMode and StoreAsWrapping (the library holds src/engine/TextureEntry.cpp for
 // them; everything else that file calls is an inert stand-in below, since nothing here reaches it)
 // and CsTexture::GetTextureEntry and CTextureEntry::GetTexture (inline).
 #include <cstdint>
@@ -90,7 +90,7 @@ CDrawPrimitive* gei_DrawPrimitive = &gDraw;
 CDrawPrimitive::CDrawPrimitive() {}
 CDrawPrimitive::~CDrawPrimitive() {}
 
-// ---- what src/tb_textureentry.cpp links against and the unit never reaches
+// ---- what src/engine/TextureEntry.cpp links against and the unit never reaches
 TbMallocFn gMalloc = nullptr;
 TbFreeFn gFree = nullptr;
 uint8_t* gProcTextureBuffer = nullptr;

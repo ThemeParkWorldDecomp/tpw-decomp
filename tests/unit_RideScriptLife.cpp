@@ -1,5 +1,5 @@
 // Test library for the life of a ride script (unit w169; libtpw_unit_RideScriptLife.dylib, tests/test_RideScriptLife.py), main app:
-//   src/rsse_script_life.cpp   RSSE_InitScript, KillScript, RSSE_KillScript
+//   src/game/rides/rsse.cpp   RSSE_InitScript, KillScript, RSSE_KillScript
 //
 // The callees outside the unit are fakes that record the arguments the real ones read (the same event names and arguments as the
 // module's PowerPC stubs) and answer from the test's queues. The globals of other files are defined here. The script records, their

@@ -1,6 +1,6 @@
 // Test library for the Metrowerks exception destructors, the char ref-counted pointer and the 3D line blend (unit v5949;
 // libtpw_unit_std_logic_error_Dtor_logic_error.dylib, tests/test_std_logic_error_Dtor_logic_error.py), main app:
-//   src/TPMain_std_logic_error_Dtor_logic_error.cpp
+//   src/game/MslSupport.cpp, src/game/ui/3DFont.cpp
 //
 // Fakes: operator new / delete / delete[], CColour::GetFormattedValue and IntensifyPix<2>, each recording what the real one reads.
 #include <cstddef>

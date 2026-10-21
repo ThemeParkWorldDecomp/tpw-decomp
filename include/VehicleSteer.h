@@ -1,4 +1,4 @@
-// The ride vehicles' steering behaviours and vector helpers (vehicle.cpp, main app, SimTheme Park 2.04b3; unit w203, src/Vehicle_steer.cpp).
+// The ride vehicles' steering behaviours and vector helpers (vehicle.cpp, main app, SimTheme Park 2.04b3; unit w203, src/game/rides/vehicle.cpp).
 // The Vehicle and Pilot classes are in World.h (the world's setup and exit code call them); everything else of vehicle.cpp that unit translated is
 // here, so that a class named Arrival (CArrival's header is a World.h include) and a global truncate (POSIX has one) stay away from the
 // files that include World.h. Names are invented except those the original's symbols give.
@@ -45,7 +45,7 @@ public:
 
 class Avoid_Walls : public Behaviour {
 public:
-    // 0x10132298 (2648 bytes, unit w218, src/Vehicle_walls.cpp): keeps the vehicle off the map's walls. Looks at the walls of the square it stands on in the
+    // 0x10132298 (2648 bytes, unit w218, src/game/rides/vehicle.cpp): keeps the vehicle off the map's walls. Looks at the walls of the square it stands on in the
     // directions the predicted position (predict_pos by gVehOne) lies in: a wall the prediction has come within the radius of gives a push straight back,
     // twice the overlap; else a wall corner of the diagonal square that the move's line passes within the radius of gives the push away from the corner;
     // else (0, 0).
@@ -90,7 +90,7 @@ void do_separation(const Vehicle& me, const Vehicle* other);                 // 
 void do_repel_obstacle(const Vehicle& vehicle, const Obstacle* obstacle);    // 0x10131dcc (256 bytes)
 void do_avoid_obstacle(const Vehicle& vehicle, const Obstacle* obstacle);    // 0x10131fc8 (220 bytes)
 
-// ---- Unit w209 (src/Vehicle_path.cpp, src/VehicleCallbacks_map.cpp): the path following. Names invented except those the original's symbols give.
+// ---- Unit w209 (src/game/rides/vehicle.cpp, src/game/rides/VehicleCallbacks.cpp): the path following. Names invented except those the original's symbols give.
 struct wallhug_path;       // include/TPCamera.h
 enum NavMode : int32_t;    // include/TPCamera.h (declared in World.h too)
 
@@ -103,20 +103,20 @@ public:
     Vector2d calculate(Vehicle& vehicle) override;
 };
 
-// The two functions next_step hands the nav rules (the original's VehicleCallbacks.cpp; src/VehicleCallbacks_map.cpp).
+// The two functions next_step hands the nav rules (the original's VehicleCallbacks.cpp; src/game/rides/VehicleCallbacks.cpp).
 Vector2d map_global_to_local(uint32_t x, uint32_t y);   // 0x101359e8 (20 bytes): the map square of a position, (x >> 16, y >> 16), logical shifts. The answer type is a guess
 int32_t map_fn(int32_t x, int32_t y, void* data);       // 0x10135fd4 (108 bytes): the square's number, (x + (y << 7) + 1) & 0xffff, or -1 when CMap::IsXYValid refuses it; data is not used
 
 using VehNavRulesFn = int32_t (*)(int32_t, int32_t, NavMode);
 
-// The globals of vehicle.cpp that unit w209 meets (src/Vehicle_path.cpp defines them).
+// The globals of vehicle.cpp that unit w209 meets (src/game/rides/vehicle.cpp defines them).
 extern wallhug_path gVehPath;                     // 0x1034c708 (BSS, 0x208 bytes): the buffer recalc_path hands the wall hugger and reads the path from
 extern void* gVehMapData;                         // 0x1034ca94 (BSS): map_fn's third argument
 extern VehNavRulesFn gVehNavRules;                // 0x102a45a0: the nav rules, called through this pointer (host: &implement_nav_rulesA2B)
 extern Behaviour* gVehBehaviourTable[8];          // 0x102a4478: the behaviours Pilot::init_behaviours searches by name (Mac: seven objects, 0x30 bytes apart, from
                                                   // 0x1034c908 up to 0x1034ca28 and a null eighth word; native typed objects in Vehicle_serialise.cpp)
 
-// ---- Unit w218 (src/Vehicle_walls.cpp, src/VehicleCallbacks_nav.cpp): the wall avoidance and the callbacks of the vehicles' walks and nav rules. Names
+// ---- Unit w218 (src/game/rides/vehicle.cpp, src/game/rides/VehicleCallbacks.cpp): the wall avoidance and the callbacks of the vehicles' walks and nav rules. Names
 // invented except those the original's symbols give.
 // The candidate walks: each calls the function with the vehicle and each candidate within the radius.
 // 0x101356b8 (636 bytes): the things of the map squares within the radius, (radius + 0xffff) >> 16 squares around the vehicle's, that are vehicles (kinds 1, 4
@@ -137,7 +137,7 @@ int32_t implement_nav_rulesA2B(int32_t from, int32_t to, NavMode mode);
 extern uint8_t gVehNavRulesInit;       // 0x1034ca98 (BSS): the guard byte of the function's static below; 0 until the first call, which clears the static and sets it
 extern int32_t gVehNavRulesAsserted;   // 0x1034ca9c (BSS): 1 once a step the rules refuse has asserted, so that each assert is shown once
 
-// Unit w230 (src/Vehicle_serialise.cpp).
+// Unit w230 (src/game/rides/vehicle.cpp).
 void InitVehicleGlobals(); // 0x10134f5c, 616 B (__sinit_vehicle_cpp), invented native spelling
 
 // HOST SUPPORT: runtime boundaries, logical callback identities, and independent registration nodes. No original functions.
@@ -150,7 +150,7 @@ BehaviourEntry* VehicleRuntimeConstruct(void* raw, VehicleRuntimeCallback constr
 void VehicleRuntimeRegister(void* object, VehicleRuntimeCallback destructor, VehicleRegistrationNode* node);
 char* VehicleRuntimeCopyName(char* destination, const char* source);
 
-// ---- Unit v5733 (src/VehicleCallbacks_nav_FixedSizeArray_Dtor_FixedSizeArray.cpp)
+// ---- Unit v5733 (src/game/rides/VehicleCallbacks.cpp)
 // The array of behaviour entries the vehicle code keeps (the rest of the layout is unknown).
 template <class T> struct FixedSizeArray {
     T* mData;   // +0x00: the new[] block the destructor destroys

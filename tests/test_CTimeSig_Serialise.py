@@ -1,5 +1,5 @@
 """Unit v5117, CTimeSig::Serialise and CTimeSig::SecondsSinceLastUpdate, against libtpw_unit_CTimeSig_Serialise.dylib
-(tests/unit_CTimeSig_Serialise.cpp), main app, src/TPOptions_CTimeSig_Serialise.cpp:
+(tests/unit_CTimeSig_Serialise.cpp), main app, src/game/TPOptions.cpp:
   CTimeSig::Serialise 0x1015ef5c, CTimeSig::SecondsSinceLastUpdate 0x1015f124
 
 A case is an object and a call. The object (one word) and a world block (mTurn at 0x1da70c) are built by one piece of Python code in both

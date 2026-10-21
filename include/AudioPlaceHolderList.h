@@ -1,5 +1,5 @@
 // AudioPlaceHolderList.h: CAudioPlaceHolderList, the owner of every CAudioPlaceHolder (unit w79g1, "sound symbols shared", Code at
-// 0x10000000, TOC r2 = 0x1003abf0; the library's file is CSprocketsModule.cpp). The functions are in src/AudioPlaceHolderList.cpp
+// 0x10000000, TOC r2 = 0x1003abf0; the library's file is CSprocketsModule.cpp). The functions are in src/sound/AudioPlaceHolderList.cpp
 // with their addresses. This header REPLACES unit w79f's placeholder of the same name and keeps every name w79f uses (the
 // constructor, the virtual destructor, FindPlaceHolder, CreatePlaceHolder, UpdatePlaceHolder and UpdatePlaceHolderParameter).
 //

@@ -1,5 +1,5 @@
 """Unit v5567, email.cpp's static initialiser, against libtpw_unit_sinit_email_cpp.dylib (tests/unit_sinit_email_cpp.cpp), main app,
-src/FTPClient_RecvData_sinit_email_cpp.cpp:
+src/game/online/email.cpp:
   __sinit_email_cpp 0x1020afc0
 
 The call builds 16 language name strings, the app name, the "Language" key and one wide string (each through the string constructor

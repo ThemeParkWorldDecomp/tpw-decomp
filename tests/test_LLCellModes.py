@@ -1,5 +1,5 @@
 """Unit w185, the cell system's modes, ride words, costs, cursor, click stack and first block fix up, against libtpw_unit_LLCellModes.dylib
-(tests/unit_LLCellModes.cpp), main app ("SimTheme Park"): src/LLCellSystem_modes.cpp, the 23 functions of LLCellSystem.cpp's range
+(tests/unit_LLCellModes.cpp), main app ("SimTheme Park"): src/game/park/LLCellSystem.cpp, the 23 functions of LLCellSystem.cpp's range
 0x10090d40 to 0x10092254 (SetRideRotation .. FixFirstBlock).
 
 A case is the cell system's words (every global the 23 functions touch, random with the edge values), the click stack and its copy (filled
@@ -8,7 +8,7 @@ with a pattern), the mouse (gMouse, gMouseMode, the two mouse words), the world 
 addresses (big-endian) and in the host library's memory (little-endian). Every callee outside the unit is a fake on both sides that records
 its arguments and answers from the case's queues: the action recorder (both overloads), the advisor (GetAdvisor, CancelMessage, the request
 constructor, QueueRequest), the cursor, AbortMovePylon, the illegal placement pair, SetCoasterEdit, FlagItemAsSelected, IsXYValid, the track
-cell and cell base members, CTRACE, GAME_ASSERTMSG, the nothrow operator new and a fake current mouse mode. The landed src/Mouse.cpp
+cell and cell base members, CTRACE, GAME_ASSERTMSG, the nothrow operator new and a fake current mouse mode. The landed src/game/Mouse.cpp
 (AssignMouseMode, CMMDefault) runs for real on both sides, as do OPPOSITE and ADD_DIRECTION (the host copies their bodies).
 
 What is compared: the answer, the event log, every word the functions can store, both click arrays and the mouse state.
@@ -44,7 +44,7 @@ FN = dict(
     FixFirstBlock=(0x10091F5C, "FixFirstBlock"),
 )
 OWN = {a for a, _ in FN.values()}
-# the landed originals of src/Mouse.cpp that run for real, and OPPOSITE / ADD_DIRECTION
+# the landed originals of src/game/Mouse.cpp that run for real, and OPPOSITE / ADD_DIRECTION
 LANDED = {0x1007E2E0, 0x1007EA78, 0x100813E8, 0x10081468, 0x1007EAC4, 0x1007EAF8, 0x1007EB2C}
 REAL_OTHER = {0x10102500, 0x1010254C}
 

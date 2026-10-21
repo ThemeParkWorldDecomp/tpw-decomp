@@ -1,5 +1,5 @@
 """Unit v5298, the CPeep destructor, HideMySprite, DrawMySpriteAt and FinalDestroy, against libtpw_unit_CPeep_Dtor_CPeep.dylib
-(tests/unit_CPeep_Dtor_CPeep.cpp), main app ("SimTheme Park"), src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_Dtor_CPeep.cpp:
+(tests/unit_CPeep_Dtor_CPeep.cpp), main app ("SimTheme Park"), src/game/people/Peep.cpp, src/game/people/Person.cpp:
   CPeep::~CPeep 0x10116d18, CPeep::HideMySprite 0x10114758, CPeep::DrawMySpriteAt 0x10114624, CPeep::FinalDestroy 0x101130ac
 
 A case is a peep block (0x300 bytes of random words with the kind byte, the script handle and the +0x210 word steered over the branches)

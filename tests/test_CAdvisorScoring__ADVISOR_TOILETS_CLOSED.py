@@ -1,5 +1,5 @@
 """Unit v5040, eight advisor scorers, against libtpw_unit_CAdvisorScoring__ADVISOR_TOILETS_CLOSED.dylib
-(tests/unit_CAdvisorScoring__ADVISOR_TOILETS_CLOSED.cpp), main app ("SimTheme Park"), src/AdvisorScoring.cpp:
+(tests/unit_CAdvisorScoring__ADVISOR_TOILETS_CLOSED.cpp), main app ("SimTheme Park"), src/game/advisor/AdvisorScoring.cpp, src/game/advisor/Advisor.cpp:
   _ADVISOR_TOILETS_CLOSED 0x1001aa20, _ADVISOR_STAFFROOM_CLOSED 0x1001aafc, _ADVISOR_SIDESHOWS_CLOSED 0x1001a934,
   _ADVISOR_LOTS_OF_PRANKS 0x1001abdc, _ADVISOR_SHOPS_CLOSED 0x1001a84c, _ADVISOR_RIDES_CLOSED 0x1001a728,
   _ADVISOR_CONGRAT_PRICING_SIDESHOWS_GREAT_SATISFACTION 0x1001a5e4, _ADVISOR_GOLD_TICKET_NEAR_TO_FIRST_ONE 0x1001aef8

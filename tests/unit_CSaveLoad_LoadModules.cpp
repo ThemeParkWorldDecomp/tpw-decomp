@@ -1,11 +1,11 @@
 // Test library for CSaveLoad::LoadModules (unit v5206; libtpw_unit_CSaveLoad_LoadModules.dylib, tests/test_CSaveLoad_LoadModules.py), main app:
-//   src/SaveLoad_CSaveLoad_LoadModules.cpp   CSaveLoad::LoadModules
+//   src/game/save/SaveLoad.cpp   CSaveLoad::LoadModules
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue. The globals of
 // other files the function reads or writes are defined here (zero at start like the Mac's bss). The message centre is made by
 // `new CMessageCentre` (as the other sources do): the Mac's operator new and __construct_array are faked on the PowerPC side so that
 // they log the 29 header constructions, which the fake CSubscriptionHeader constructor logs here. TheScoring() is the shared
-// singleton of src/AdvisorQueue.cpp; its fake here does what the Mac code inlined in LoadModules does (constructor and registration
+// singleton of src/game/advisor/Advisor.cpp; its fake here does what the Mac code inlined in LoadModules does (constructor and registration
 // behind the guard byte).
 #include <cstdarg>
 #include <cstddef>

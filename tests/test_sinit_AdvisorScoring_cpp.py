@@ -1,5 +1,5 @@
 """Unit v5018, the static initialiser of AdvisorScoring.cpp, against libtpw_unit_sinit_AdvisorScoring_cpp.dylib
-(tests/unit_sinit_AdvisorScoring_cpp.cpp), main app ("SimTheme Park"), src/sinit_AdvisorScoring_cpp.cpp:
+(tests/unit_sinit_AdvisorScoring_cpp.cpp), main app ("SimTheme Park"), src/game/advisor/AdvisorScoring.cpp:
   __sinit_AdvisorScoring_cpp 0x1001c34c
 
 A case is a world and a call. The world: the 351 scorer sources (3 words each on the Mac, a 16-byte pointer to member on the host) and the

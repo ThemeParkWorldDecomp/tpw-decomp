@@ -1,7 +1,7 @@
 """Unit v51115, the number-window text objects' constructors and destructors, UIMenu::UIMenu, InterfaceDrawEngineHGradient::Show and a few
 one-liners, against libtpw_unit_InterfacePasswordTextObject_InterfacePasswordTex.dylib
 (tests/unit_InterfacePasswordTextObject_InterfacePasswordTex.cpp), main app ("SimTheme Park"),
-src/ui_TextObjects_InterfacePasswordTextObject_InterfacePasswordTex.cpp:
+src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp:
   constructors 0x1018dc38 (password), 0x1018e594 (null cash), 0x1018e874 (percent), 0x1018eb38 (visitor number), 0x1018edf4 (visitor time),
   0x1018f93c (rank), 0x1018de60 (cash, unit v5L16); destructors 0x1018df3c (cash), 0x1018e674, 0x1018e950, 0x1018ec18, 0x1018eed4;
   UIMenu::UIMenu 0x1018ac44;

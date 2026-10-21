@@ -1,7 +1,7 @@
 // Test library for the small CFSOnlineSystem members, the park/server/theme CompleteGetList instances, two std::__tree helpers and two
 // status panel members (unit v51123; libtpw_unit_CFSOnlineSystem_GotoPlayerByIDFTPPostLoginCallba.dylib,
 // tests/test_CFSOnlineSystem_GotoPlayerByIDFTPPostLoginCallba.py), main app:
-//   src/FS_Online_init_CFSOnlineSystem_GotoPlayerByIDFTPPostLoginCallba.cpp
+//   src/game/online/FS_Online.cpp, src/game/save/FS_MasterSave.cpp, src/game/ui/ui_FeatureStatus.cpp, src/game/ui/ui_bogStatus.cpp
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The globals of
 // other files (gOnlineSystem, gOnlineListCallbackCaller) are defined here. Every object the host side builds lives in static buffers,

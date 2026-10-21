@@ -1,5 +1,5 @@
 """Unit v5274, CFormat::FillWaveFormatEx 0x100021b0, against libtpw_unit_CFormat_FillWaveFormatEx.dylib
-(tests/unit_CFormat_FillWaveFormatEx.cpp), sound library, src/TbMpegBase_CFormat_FillWaveFormatEx.cpp.
+(tests/unit_CFormat_FillWaveFormatEx.cpp), sound library, src/sound/FileAccess.cpp.
 
 A case is a CFormat object (0x18 bytes of fields plus the stream info pointer) and optionally a stream info block, built twice by one
 piece of code: big-endian in emulator memory, little-endian on the host. No callees, no fused operations. Compared: the 0x18 bytes of

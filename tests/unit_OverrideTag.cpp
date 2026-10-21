@@ -1,6 +1,6 @@
 // Test library for OverrideTag 0x10191d7c and TagDlgCallback 0x10191628 (unit v5531; libtpw_unit_OverrideTag.dylib,
 // tests/test_OverrideTag.py), main app:
-//   src/ui_StatusPanel_FindStaticTag_OverrideTag.cpp   OverrideTag, TagDlgCallback, gTagPanelPending, gTagSlideAnim
+//   src/game/ui/ui_tags.cpp   OverrideTag, TagDlgCallback, gTagPanelPending, gTagSlideAnim
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues. The windows are
 // plain blocks of the arena with a hand-made vtable (Enable and SetText record; the Mac's slots 0x1c and 0x2c). The globals of other

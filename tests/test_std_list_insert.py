@@ -1,5 +1,5 @@
 """Unit v5069, std::list<CToken>::insert 0x10210b44, against libtpw_unit_std_list_insert.dylib (tests/unit_std_list_insert.cpp), main app
-("SimTheme Park"), src/COnlineParser_ParseGoto_std_list_insert.cpp:
+("SimTheme Park"), src/game/online/OnlineParser.cpp:
   std::list<CToken,std::allocator<CToken>>::insert 0x10210b44
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory at the Mac's addresses, big-endian;

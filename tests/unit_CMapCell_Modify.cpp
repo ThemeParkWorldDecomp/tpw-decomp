@@ -1,5 +1,5 @@
 // Test library for CMapCell::Modify (unit v5637; libtpw_unit_CMapCell_Modify.dylib, tests/test_CMapCell_Modify.py), main app:
-//   src/MapDelta_map_CMapCell_Modify.cpp   CMapCell::Modify, and the globals gModifyLastMode, gModifyTypeRefused, gModifyPylonIndex,
+//   src/game/park/MapCell.cpp   CMapCell::Modify, and the globals gModifyLastMode, gModifyTypeRefused, gModifyPylonIndex,
 //                                          gModifyNoParent and gModifyNoThing
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue; the cells the

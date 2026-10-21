@@ -1,5 +1,5 @@
 // Test library for GenerateExtrusions (unit v5557; libtpw_unit_GenerateExtrusions.dylib, tests/test_GenerateExtrusions.py), main app:
-//   src/TPConfig_extrude_GetCrossSectionFromParams_GenerateExtrusions.cpp   GenerateExtrusions and gExtrudeBlendMin/Max, gExtrudeParamsBuf
+//   src/game/rides/CoasterExtrude.cpp   GenerateExtrusions and gExtrudeBlendMin/Max, gExtrudeParamsBuf
 //
 // The callees outside the unit (SetInitialCoasterInterpParams, IsEndOfSampleBuffer, InterpolateCoasterSpline, GetCrossSectionFromParams, fmod,
 // modf) are fakes that record the arguments the real ones read and answer from the test's queues. The globals of other files the unit

@@ -1,7 +1,7 @@
 """w131: the park's UI panel message functions. MainPanelButtonsMsg, HappyBarMsg, CashWindowCallback, BobbleCallback and GoldenStuffMsg
-(src/ui_mainpanel2_msg.cpp), CashPanelMsg and ControlPanelMsg (src/ui_entryPricePanel_msg.cpp), StaffPanelMsg, StaffLocMsg and
-ModifiedCheckButtonsCallback (src/ui_staffPanel_msg.cpp), UIInterface::CheckMouseContext (src/UIInterface_context.cpp) and
-CIntrface::Process (src/intrface_process.cpp) run for real on both sides (tests/unit_UIPanels.cpp, cmake/units/UIPanels.cmake). Every callee
+(src/game/ui/ui_mainpanel2.cpp), CashPanelMsg and ControlPanelMsg (src/game/ui/ui_cashPanel.cpp, src/game/ui/ui_controlPanel.cpp), StaffPanelMsg, StaffLocMsg and
+ModifiedCheckButtonsCallback (src/game/ui/ui_staffPanel.cpp), UIInterface::CheckMouseContext (src/game/ui/UIInterface.cpp) and
+CIntrface::Process (src/game/ui/intrface.cpp) run for real on both sides (tests/unit_UIPanels.cpp, cmake/units/UIPanels.cmake). Every callee
 outside the unit records the same event on both sides: the window members, the panels the handlers open, the master save, the park analyser,
 the advisor and the status panels. swprintf is the platform's on the host and a stub that formats "%d  x" (any other format shows) on the
 PowerPC side.

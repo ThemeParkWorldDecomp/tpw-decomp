@@ -1,5 +1,5 @@
 """Unit v5722, AddressBook::Add and AddressBook::Remove, against libtpw_unit_AddressBook_Add.dylib (tests/unit_AddressBook_Add.cpp), main app
-("SimTheme Park"), src/email_load_AddressBook_Save_AddressBook_Add.cpp:
+("SimTheme Park"), src/game/online/email.cpp:
   AddressBook::Add 0x102065f8, AddressBook::Remove 0x10206728
 
 A case is a list of strings and a call. The PowerPC side builds the Mac list (count, sentinel at +4, nodes prev/next/string word, the string

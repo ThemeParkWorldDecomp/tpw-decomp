@@ -1,9 +1,9 @@
 // Test library for the start of the interface (libtpw_unit_UIStart.dylib; see
-// tests/test_UIStart.py): src/UI_Base.cpp (rectangles, the name hash), src/ui_DrawObject.cpp
-// (cursors, draw objects, the library, the engine mesh objects), src/ui_main_meshes.cpp
-// (the interface's meshes, InitGeneralUI) and src/TPAdvisor.cpp (the text file reader).
+// tests/test_UIStart.py): src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp (rectangles, the name hash), src/game/ui/InterfaceCursor.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceDrawObject.cpp
+// (cursors, draw objects, the library, the engine mesh objects), src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_main.cpp
+// (the interface's meshes, InitGeneralUI) and src/game/TextureTable.cpp (the text file reader).
 //
-// Real: all of those, and the game's default names (src/TPGlobals.cpp). Functional and
+// Real: all of those, and the game's default names (src/game/TPGlobals.cpp). Functional and
 // unrecorded: the bullfrog strings, TPStrEq. Everything else the unit calls is a fake that
 // records. Objects the unit makes with operator new get a label as they are allocated, and
 // their memory is filled with 0xa5 first, so a field no constructor sets shows as that.

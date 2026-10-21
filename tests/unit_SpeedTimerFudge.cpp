@@ -1,6 +1,6 @@
 // Test library for the research panel's SpeedTimerFudge, PercentComplete and ResearchSpeed (unit v5184; libtpw_unit_SpeedTimerFudge.dylib,
 // tests/test_SpeedTimerFudge.py), main app:
-//   src/SpeedTimerFudge.cpp   the three functions and gResearchProjectNone
+//   src/game/ui/ui_researchPanel.cpp   the three functions and gResearchProjectNone
 //
 // The callees outside the unit are recording fakes (window members, the research lab, the world, the tick clock, the sound call); the
 // virtual SetValue is a fake in a hand-made vtable of the fake windows. Globals of other files are defined here.

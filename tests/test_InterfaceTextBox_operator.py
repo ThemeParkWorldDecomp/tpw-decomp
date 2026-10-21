@@ -1,5 +1,5 @@
 """Unit v5712, InterfaceTextBox::operator-, against libtpw_unit_InterfaceTextBox_operator.dylib
-(tests/unit_InterfaceTextBox_operator.cpp), main app ("SimTheme Park"), src/ui_handlers_small_InterfaceTextBox_operator.cpp:
+(tests/unit_InterfaceTextBox_operator.cpp), main app ("SimTheme Park"), src/game/ui/InterfaceTextBox.cpp:
   InterfaceTextBox::operator- 0x101d8034
 
 A case is two windows (this and other) built twice by one piece of Python: the Mac's vtable pointer at +0x118 leads (slot +0x14) to a

@@ -1,7 +1,7 @@
 // Test library for the entertainer and the world's unregister (unit w178; libtpw_unit_Entertainer.dylib, tests/test_Entertainer.py), main app:
-//   src/Entertainer.cpp      CEntertainer (both constructors, Init, ReceiveMessage, Serialise, FinalDestroy, UpdateTurn, ChooseNextAction, SetState,
+//   src/game/people/Entertainer.cpp      CEntertainer (both constructors, Init, ReceiveMessage, Serialise, FinalDestroy, UpdateTurn, ChooseNextAction, SetState,
 //                            ModelState), CStaff::~CStaff and the globals (the constructor's two statics, __sinit_Entertainer_cpp's two words)
-//   src/World_unregister.cpp CWorld::Unregister for the six kinds
+//   src/game/World.cpp CWorld::Unregister for the six kinds
 //
 // The callees outside them are fakes that record the same events as the PowerPC stubs: the CStaff and CPeep members the entertainer calls, the delayed
 // script, CWorld::Register / GetRand / GetParkAnalyser, the map's effectors, the park analyser, the sound and script calls, the string table's

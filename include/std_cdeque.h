@@ -26,7 +26,7 @@ struct __cdeque<const void*, allocator<const void*>> {
     uint32_t mWord8;  // 0x8
     uint32_t mWordC;  // 0xc
     void swap(__cdeque& other);
-    // Unit v5149 (src/std___cdeque_erase.cpp): word0 capacity, word4 size, word8 start, wordC block of 4-byte elements.
+    // Unit v5149 (src/game/MslSupport.cpp): word0 capacity, word4 size, word8 start, wordC block of 4-byte elements.
     MslCdequeIter erase(MslCdequeIter first, MslCdequeIter last);  // 0x101f3704 (856); answers first
     void resize(uint32_t n, const void* value);                    // 0x101f2a10 (396)
     void push_back(const void* const& value);                      // 0x101f459c (828)

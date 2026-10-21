@@ -1,5 +1,5 @@
 """Unit w189, against libtpw_unit_Staff.dylib (tests/unit_Staff.cpp), main app ("SimTheme Park"):
-  src/Staff.cpp   CStaff::CStaff (cell, model) 0x1012482c and (cell, model, grade, costume) 0x10124908, Init 0x10124a08, FinalDestroy 0x10124b88,
+  src/game/people/staff.cpp   CStaff::CStaff (cell, model) 0x1012482c and (cell, model, grade, costume) 0x10124908, Init 0x10124a08, FinalDestroy 0x10124b88,
                   ReceiveMessage 0x10124bd8, Serialise 0x10124ce8, UpdateTurn 0x10125208, SetState 0x101252a8, ModelState 0x101254f4, UpdateMonthly
                   0x10125598, LOADVAR / SAVEVAR of CStaff::PayGrade 0x10127e38 / 0x101280ac and of CStaff::StaffState 0x10127f70 / 0x101281fc,
                   CMsgStaffRoomEvent::~CMsgStaffRoomEvent 0x1012622c and GetType 0x10127dfc, __sinit_staff_cpp 0x10128350

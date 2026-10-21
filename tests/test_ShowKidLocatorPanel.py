@@ -1,5 +1,5 @@
 """Unit v5343, the staff and kid locator slide-out panels, against libtpw_unit_ShowKidLocatorPanel.dylib (tests/unit_ShowKidLocatorPanel.cpp),
-main app ("SimTheme Park"), src/ui_staffPanel_ShowKidLocatorPanel.cpp:
+main app ("SimTheme Park"), src/game/ui/ui_staffPanel.cpp:
   ShowStaffPanel 0x101c0690, ShowKidLocatorPanel 0x101c0a38
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory for the original, host memory for the

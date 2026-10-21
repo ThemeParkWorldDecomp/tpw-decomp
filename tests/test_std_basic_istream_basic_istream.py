@@ -1,5 +1,5 @@
 """Unit v51047, nine functions of the main app, against libtpw_unit_std_basic_istream_basic_istream.dylib
-(tests/unit_std_basic_istream_basic_istream.cpp), src/std_basic_istream_basic_istream.cpp:
+(tests/unit_std_basic_istream_basic_istream.cpp), src/game/save/FS_LoadSave.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/UIGrapher.cpp, src/game/ui/ui_2dmap.cpp:
   std::basic_istream<char>::basic_istream 0x1020a4c0, CUIGrapher::Clear 0x101fd9d0, CUIGrapher::CUIGrapher 0x101fd6e8,
   CFSLoadSave::GetNextSaveFileDetails 0x101fcd08, CUI2DMapSprite::~CUI2DMapSprite 0x10230ea4, SetVisibility 0x10230f78,
   SetScale 0x10231094, entry 0x102381a4, InterfaceKnob::operator- 0x101d038c.

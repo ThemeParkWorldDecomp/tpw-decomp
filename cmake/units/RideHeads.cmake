@@ -1,3 +1,32 @@
 # TickRideHeads with the matrix functions it calls linked for real (the originals run on the PowerPC side too);
 # BuildGeometryTables fills the sine table on the host side, the script setters are recorded.
-set(TPW_UNIT_RideHeads src/TPEmbed_heads.cpp src/rsse_matrix.cpp src/RideAnimInterp.cpp src/rsse.cpp platform/arena.cpp)
+set(TPW_UNIT_RideHeads src/game/TPEmbed.cpp src/game/LMatrix.cpp src/game/rides/RideAnim.cpp platform/arena.cpp)
+set(TPW_UNIT_RideHeads_KEEP
+  __Z11LUBackSubstR7sMatrixPiPf   # LUBackSubst(sMatrix&, int*, float*)
+  __Z12InvertMatrixP7sMatrixPKS_   # InvertMatrix(sMatrix*, sMatrix const*)
+  __Z13TickRideHeadsRP9tag_sMesh   # TickRideHeads(tag_sMesh*&)
+  __Z16RAGetUVFrameDataRP16sAnimTimeControlRPtjRjRf   # RAGetUVFrameData(sAnimTimeControl*&, unsigned short*&, unsigned int, unsigned int&, float&)
+  __Z17SetMatrixIdentityP7sMatrix   # SetMatrixIdentity(sMatrix*)
+  __Z19BuildGeometryTablesj   # BuildGeometryTables(unsigned int)
+  __Z19RAInterpPosnAtFramePfjfS_i   # RAInterpPosnAtFrame(float*, unsigned int, float, float*, int)
+  __Z19RAQuaternionToLAxisP11sQuaternionP7s3DAxis   # RAQuaternionToLAxis(sQuaternion*, s3DAxis*)
+  __Z19ScaleLMatrixNoTransP7sMatrixP8s3DPoint   # ScaleLMatrixNoTrans(sMatrix*, s3DPoint*)
+  __Z21SetLMatrixOrientationP7sMatrixP8s3DPointS2_S2_   # SetLMatrixOrientation(sMatrix*, s3DPoint*, s3DPoint*, s3DPoint*)
+  __Z22RAAnimateTextureCoordsP16sAnimTimeControlP13tag_sNodeAnimi   # RAAnimateTextureCoords(sAnimTimeControl*, tag_sNodeAnim*, int)
+  __Z22RABezierInterFromShapeP10tag_sShapeP8s3DPointjfS2_   # RABezierInterFromShape(tag_sShape*, s3DPoint*, unsigned int, float, s3DPoint*)
+  __Z22RACatmulInterFromShapeP10tag_sShapeP8s3DPointjfS2_   # RACatmulInterFromShape(tag_sShape*, s3DPoint*, unsigned int, float, s3DPoint*)
+  __Z22RALinearInterFromShapeP10tag_sShapeP8s3DPointjfS2_   # RALinearInterFromShape(tag_sShape*, s3DPoint*, unsigned int, float, s3DPoint*)
+  __Z22SetLMatrixScaleNoTransP7sMatrixRfS1_S1_   # SetLMatrixScaleNoTrans(sMatrix*, float&, float&, float&)
+  __Z23SetLMatrixXZOrientationP7sMatrixP8s3DPoint   # SetLMatrixXZOrientation(sMatrix*, s3DPoint*)
+  __Z23VectorThroughLMatrixNoWP7sMatrixP8s3DPoint   # VectorThroughLMatrixNoW(sMatrix*, s3DPoint*)
+  __Z24RABezierTangentFromShapeP10tag_sShapeP8s3DPointjfS2_   # RABezierTangentFromShape(tag_sShape*, s3DPoint*, unsigned int, float, s3DPoint*)
+  __Z24RALinearTangentFromShapeP10tag_sShapeP8s3DPointjfS2_   # RALinearTangentFromShape(tag_sShape*, s3DPoint*, unsigned int, float, s3DPoint*)
+  __Z25CombineMatricesNoWDest2ndP7s3DAxisP7sMatrix   # CombineMatricesNoWDest2nd(s3DAxis*, sMatrix*)
+  __Z25CombineMatricesNoWDest2ndP7sMatrixS0_   # CombineMatricesNoWDest2nd(sMatrix*, sMatrix*)
+  __Z28RASphericalLinearInterpolateP11sQuaternionS0_fS0_   # RASphericalLinearInterpolate(sQuaternion*, sQuaternion*, float, sQuaternion*)
+  __Z34GetLMatrixRotationAroundZAxisYOnlyP7sMatrix   # GetLMatrixRotationAroundZAxisYOnly(sMatrix*)
+  __Z37RACalcOrientationBetweenControlPointsP8sQuatKeyjfP7s3DAxis   # RACalcOrientationBetweenControlPoints(sQuatKey*, unsigned int, float, s3DAxis*)
+  __Z8LUDecompR7sMatrixPiPf   # LUDecomp(sMatrix&, int*, float*)
+  _gRideHeadsVariable8
+  _gRideHeadsVariable8Set
+)

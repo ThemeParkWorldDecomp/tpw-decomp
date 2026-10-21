@@ -1,5 +1,5 @@
 """Unit v5289, the version number tag and the delme dialog handler, against libtpw_unit_ShowVersionNumberTag.dylib
-(tests/unit_ShowVersionNumberTag.cpp), main app ("SimTheme Park"), src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_ShowVersionNumberTag.cpp:
+(tests/unit_ShowVersionNumberTag.cpp), main app ("SimTheme Park"), src/game/ui/ui_StatusPanel.cpp, src/game/ui/ui_tags.cpp:
   ShowVersionNumberTag 0x101928dc, delme 0x10193084
 
 A case is a world and a call, built by one piece of Python code on both sides. The callees outside the unit (swprintf, AddATag, ShowTagPanel,

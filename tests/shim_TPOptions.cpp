@@ -61,7 +61,7 @@ void* tpw_Text_destroy(CText* p, int16_t flag, uint32_t* out) {
     return p;
 }
 void tpw_Text_release(void* p) { std::free(p); }
-// The worlds are raw storage: CWorld has a constructor (src/World_init.cpp, unit w113) that the shim does not link.
+// The worlds are raw storage: CWorld has a constructor (src/game/World.cpp, unit w113) that the shim does not link.
 alignas(CWorld) static unsigned char testGlobalWorldBytes[sizeof(CWorld)], testReturnedWorldBytes[sizeof(CWorld)];
 static CWorld& testGlobalWorld = *reinterpret_cast<CWorld*>(testGlobalWorldBytes);
 static CWorld& testReturnedWorld = *reinterpret_cast<CWorld*>(testReturnedWorldBytes);

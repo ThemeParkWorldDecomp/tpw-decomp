@@ -1,5 +1,5 @@
 // Test library for RecalcBraceTangents (unit v5673; libtpw_unit_RecalcBraceTangents.dylib, tests/test_RecalcBraceTangents.py), main app:
-//   src/GetActualBraceTrackPositions_RecalcBraceTangents.cpp   RecalcBraceTangents
+//   src/game/rides/CoasterPylon.cpp   RecalcBraceTangents
 //
 // The callees outside the unit are recording fakes; the globals of other files the unit reads are defined here.
 #include <cstddef>

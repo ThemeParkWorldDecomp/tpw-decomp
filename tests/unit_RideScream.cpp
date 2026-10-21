@@ -1,5 +1,5 @@
 // Test library for a ride script's screams and DrawPeep (unit w171; libtpw_unit_RideScream.dylib, tests/test_RideScream.py), main app:
-//   src/rsse_scream.cpp   SCREAM_Start, SCREAM_SetLevel, SCREAM_Move, SCREAM_Stop, SCREAM_Single, SCREAM_SingleSad,
+//   src/game/rides/RideEffects.cpp, src/game/rides/rsse.cpp   SCREAM_Start, SCREAM_SetLevel, SCREAM_Move, SCREAM_Stop, SCREAM_Single, SCREAM_SingleSad,
 //                         TriggerRepairParticleEffect, DrawPeep, RSSE_GetSoundEventCode, RSSE_GetCoasterHandle
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues: the sound events,

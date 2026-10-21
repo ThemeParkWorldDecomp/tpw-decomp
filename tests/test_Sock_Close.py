@@ -1,5 +1,5 @@
 """Unit v5765, Sock::Close, against libtpw_unit_Sock_Close.dylib (tests/unit_Sock_Close.cpp), main app
-("SimTheme Park"), src/COnlineParser_ParseGoto_COnlineParser_ParseIgnore_Sock_Close.cpp:
+("SimTheme Park"), src/game/online/IPBase.cpp:
   Sock::Close 0x1020e358
 
 A case is a Sock object (vtable word, socket handle at +4) and a call. shutdown, recv and closesocket are fakes on both sides that record

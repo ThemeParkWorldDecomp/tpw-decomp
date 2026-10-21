@@ -1,6 +1,6 @@
 // Test library for the online lobby's interface set-up and the bankrupt window's message function (unit v5060;
 // libtpw_unit_InitOnlineUI.dylib, tests/test_InitOnlineUI.py), main app:
-//   src/lobby_exit_InitOnlineUI.cpp   InitOnlineUI, BankruptWindowMsg
+//   src/game/ui/ui_main.cpp   InitOnlineUI, BankruptWindowMsg
 //
 // Every callee outside the unit is a recording fake; the globals of other files are defined here.
 #include <cstddef>

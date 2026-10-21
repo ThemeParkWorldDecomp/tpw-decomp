@@ -1,6 +1,6 @@
 """Unit v51045, against libtpw_unit_TbStaticFileBank_RegisterBank.dylib (tests/unit_TbStaticFileBank_RegisterBank.cpp), sound library
-("sound symbols shared"), src/TbSysCommand_TpBody_Load_CSprocketsChannel_SetDescription_2_TbStaticFileBank_RegisterBank.cpp and
-src/TbSoundSampleStore.cpp:
+("sound symbols shared"), src/sound/StreamableMpeg2.cpp, src/sound/TbMMFileBank.cpp, src/sound/TbSoundSamplePipe.cpp and
+src/sound/TbSoundCore.cpp, src/sound/TbSoundSampleStore.cpp:
   TbStaticFileBank::RegisterBank 0x100130e8, TbSoundSampleStore::operator[] 0x100100e8, __sinit_TbSoundSamplePipe_cpp 0x1000f8d4,
   __sinit_TbMMFileBank_cpp 0x10009934, __sinit_StreamableMpeg2_cpp 0x10008760
 

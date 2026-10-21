@@ -1,5 +1,5 @@
 """Unit v5661, the online park find panel, against libtpw_unit_CreateOnlineParkFindPanel.dylib (tests/unit_CreateOnlineParkFindPanel.cpp), main app
-("SimTheme Park"), src/OnlineParkInfoPanelMsg_CreateOnlineParkFindPanel.cpp:
+("SimTheme Park"), src/game/ui/ui_onlineParkFindPanel.cpp:
   CreateOnlineParkFindPanel 0x101e9ff8, ShowFindListSearching 0x101e9f28
 
 A case is a world and a call. The world is built on both sides: the Mac's globals in emulator memory, the host's through one setter of the

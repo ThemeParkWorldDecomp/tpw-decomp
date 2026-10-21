@@ -1,5 +1,5 @@
 """Unit v5186, the pylon abort, the ride-movable test and the blend table, against libtpw_unit_LLCC_AbortPylonMove.dylib
-(tests/unit_LLCC_AbortPylonMove.cpp), main app ("SimTheme Park"), src/LLCC_Kill_Them_KILL_THEM_ALL_LLCC_AbortPylonMove.cpp:
+(tests/unit_LLCC_AbortPylonMove.cpp), main app ("SimTheme Park"), src/game/park/LLCellRide.cpp:
   LLCC_AbortPylonMove 0x1008f1a4, LLCC_IsRideMovable 0x1008f330, LLCC_GetRideBlendInfo 0x1008f574
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

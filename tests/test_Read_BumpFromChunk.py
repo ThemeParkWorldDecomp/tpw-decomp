@@ -1,5 +1,5 @@
 """Unit v51017, the advisor save's chunk reader, against libtpw_unit_Read_BumpFromChunk.dylib (tests/unit_Read_BumpFromChunk.cpp), main app
-("SimTheme Park"), src/host_leaves_Write_BumpToChunk_BMP_Save_Read_BumpFromChunk.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   Read_OpenChunk 0x10021fac, Read_DataFromChunk 0x100220bc, Read_BumpFromChunk 0x100221d4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory, big-endian, for the original; the host

@@ -1,5 +1,5 @@
 """Unit w145, the map half of MapDelta.cpp (main app, "SimTheme Park"), against libtpw_unit_MapDelta.dylib (tests/unit_MapDelta.cpp),
-src/MapDelta_map.cpp (with src/MapDelta.cpp for the compass offsets):
+src/game/park/Map.cpp, src/game/park/MapDelta.cpp (with src/game/park/MapDelta.cpp for the compass offsets):
   IsXYValid 0x101012f4, GetRegionalEffectCell 0x10101640, AddRegionalEffector 0x101016cc, RemoveRegionalEffector 0x1010176c,
   ModifyRegionalEffector 0x1010180c, GetTicketBoothPos 0x101019bc, GetBusStopPos 0x10101a50, GetParkEntrancePos 0x10101ae0,
   GetCrossingParkSidePos 0x10101b74, GetCrossingBSSidePos 0x10101c0c, MakeNewTimeStamp 0x101025c4, SetTimeStamp 0x10102604,

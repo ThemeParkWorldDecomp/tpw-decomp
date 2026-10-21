@@ -1,5 +1,5 @@
 """Unit v5365, DestroyTrackBrace and PlaceEntrancePylons, against libtpw_unit_DestroyTrackBrace.dylib (tests/unit_DestroyTrackBrace.cpp), main app
-("SimTheme Park"), src/TPCoaster_instances_DestroyTrackBrace.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   DestroyTrackBrace 0x1004094c, PlaceEntrancePylons 0x10040acc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian, 4-byte

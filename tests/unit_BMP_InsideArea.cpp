@@ -1,5 +1,5 @@
 // Test library for the bump area functions (unit v5050; libtpw_unit_BMP_InsideArea.dylib, tests/test_BMP_InsideArea.py), main app:
-//   src/BMP_InsideArea.cpp   BMP_InsideArea, BMP_OutsideArea
+//   src/game/rides/BumperRide.cpp   BMP_InsideArea, BMP_OutsideArea
 //
 // PointInColObject is a fake that records (x, y, object label) and answers from the test's queue. atan2, sqrt and labs are the C library's
 // on both sides. The sine table and the collision list are globals of other files, defined here.

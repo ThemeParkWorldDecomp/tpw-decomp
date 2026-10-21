@@ -1,6 +1,6 @@
 // Test library for the save and load panels' openers and list fills (unit v5969; libtpw_unit_CreateLoadPanel_2.dylib,
 // tests/test_CreateLoadPanel_2.py), main app:
-//   src/ui_allKidsPanel_AllKidsPanelMsg_LoansPanelMsg_CreateLoadPanel_2.cpp   CreateLoadPanel, CreateSavePanel, FillLoadList,
+//   src/game/ui/ui_loadSavePanel.cpp   CreateLoadPanel, CreateSavePanel, FillLoadList,
 //   FillSaveList, LoadSaveLCPostFormat (the Mac's LCPostFormat 0x101a3258) and the globals gLoadSaveScript, gLoadSaveHilight,
 //   gLoadSaveFormat.
 //

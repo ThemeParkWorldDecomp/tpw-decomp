@@ -1,5 +1,5 @@
 // Test library for CreateRestartParkSaveGame (unit v5549; libtpw_unit_CreateRestartParkSaveGame.dylib, tests/test_CreateRestartParkSaveGame.py), main app:
-//   src/GameSys_CreateRestartParkSaveGame.cpp   CreateRestartParkSaveGame
+//   src/game/GameSys.cpp   CreateRestartParkSaveGame
 //
 // The callees outside the unit (the file, the string and the user info classes, UniStringToString, SaveHidden) are recording fakes that
 // log the same events as the module's PowerPC stubs. The globals of other files are defined here.

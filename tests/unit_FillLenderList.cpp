@@ -1,5 +1,5 @@
 // Test library for the lenders list of the bank panel (unit v5145; libtpw_unit_FillLenderList.dylib, tests/test_FillLenderList.py), main app:
-//   src/FillLenderList.cpp   FillLenderList, LenderLCFormat (LCFormat 0x101a44b8), LenderLCPostFormat (LCPostFormat 0x101a4660)
+//   src/game/ui/ui_loansPanel.cpp   FillLenderList, LenderLCFormat (LCFormat 0x101a44b8), LenderLCPostFormat (LCPostFormat 0x101a4660)
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The objects of
 // the case (the list, the world, the bank account, the string table, the font, the six windows) are static blocks that are only ever

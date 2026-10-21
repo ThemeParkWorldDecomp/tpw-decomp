@@ -1,6 +1,6 @@
 // Test library for rsse.cpp's matrix and vector helpers and FloatSortByArray (unit w170; libtpw_unit_RsseMath.dylib,
 // tests/test_RsseMath.py), main app:
-//   src/rsse_math.cpp   sixteen functions of 0x100c0eac to 0x100c3198
+//   src/game/LMatrix.cpp   sixteen functions of 0x100c0eac to 0x100c3198
 //
 // The unit calls nothing outside the C library (atan2, sqrt are the host's libm), so there are no fakes and no globals. Every wrapper takes
 // matrices as 16 words and points as 3 words (the bits of the floats), copies them in, calls the function and copies them back, so a

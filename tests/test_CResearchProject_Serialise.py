@@ -1,5 +1,5 @@
 """Unit v5654, CResearchProject::Serialise 0x10123af0, against libtpw_unit_CResearchProject_Serialise.dylib
-(tests/unit_CResearchProject_Serialise.cpp), main app, src/ResearchLab_projects_CResearchProject_Serialise.cpp.
+(tests/unit_CResearchProject_Serialise.cpp), main app, src/game/buildings/ResearchLab.cpp.
 
 A case is a project object (20 bytes, random contents) and a call (save flag, version). The eight SAVEVAR / LOADVAR callees are fakes on both
 sides that record the event name, the field offset in the object, a hash of the name string and the noLog flag; they answer from a queue

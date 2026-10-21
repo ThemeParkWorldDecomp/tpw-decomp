@@ -1,6 +1,6 @@
 // Test library for the advisor scorers of unit v5971 (libtpw_unit_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_STAFF_HIRE_RESEARCHERS_.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The callees outside the unit (the world's getters, the park analyser's queries, the park time, the advisor's CanIQueueThis, the
 // game type's constructor, CTRACE and the scorer every record points at) are recording fakes answering from the test's queues.

@@ -1,5 +1,5 @@
 // Test library for CBankContainer::~CBankContainer (unit v5573; libtpw_unit_CBankContainer_Dtor_CBankContainer.dylib), main app:
-//   src/TbMapStreamer_TbMapStreamer_CCatFixupTable_Load_CBankContainer_Dtor_CBankContainer.cpp
+//   src/sound/CSprocketsModule.cpp
 //
 // The member destructors (CFileStorage, TbDynamicStringTemplate<char>) and the base TbRefRelease destructor are recording fakes.
 // Each records whether `this` is the expected subobject of the object under test. The deleting tail is done by the wrapper.

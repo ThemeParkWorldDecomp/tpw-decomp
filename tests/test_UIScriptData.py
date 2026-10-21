@@ -1,14 +1,14 @@
 """Differential tests for unit w36 (the lobby's window scripts as data, the island controller's message handler and the small window
 virtuals), against libtpw_unit_UIScriptData.dylib (tests/unit_UIScriptData.cpp):
 
-  src/UI_IslandLobby_msg.cpp   IslandLobbyControllerMsg, RemoveIslandLobbyController, HideIslandLobbyController, UpdateKeyParticles
-  src/ui_whatami.cpp           the eleven WhatAmI members of InterfaceWindow, InterfaceBar, InterfaceCheckButtons, InterfaceEditBox,
+  src/game/ui/ui_islandLobbyController.cpp   IslandLobbyControllerMsg, RemoveIslandLobbyController, HideIslandLobbyController, UpdateKeyParticles
+  src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp           the eleven WhatAmI members of InterfaceWindow, InterfaceBar, InterfaceCheckButtons, InterfaceEditBox,
                                InterfaceImage, InterfaceKnob, InterfaceLightPanel, InterfaceListBox, InterfaceListControl2,
                                InterfaceTextBox and InterfaceVaryBox; InterfaceWindow::CalcClientArea and CallDefaultWindowHandler
-  src/ui_helptext.cpp          InterfaceHelpText (constructor, destructor, the 15 other members), UI_SetHelpTextHandler,
+  src/game/ui/InterfaceHelpText.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp          InterfaceHelpText (constructor, destructor, the 15 other members), UI_SetHelpTextHandler,
                                InterfaceTimer::InterfaceTimer
-  src/ui_loginpanel_data.cpp   the login panel's script (371 words); the lobby's (38) and the island controller's (269) are
-                               src/lobby.cpp's and src/UI_IslandLobby.cpp's, read from libtpw_unit_Lobby and libtpw_unit_IslandLobby
+  src/game/ui/ui_playerLogin.cpp   the login panel's script (371 words); the lobby's (38) and the island controller's (269) are
+                               src/game/online/lobby.cpp's and src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_onlineOutbox.cpp's, read from libtpw_unit_Lobby and libtpw_unit_IslandLobby
 
 Three tests.
 

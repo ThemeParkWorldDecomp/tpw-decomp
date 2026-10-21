@@ -1,6 +1,6 @@
 """Unit v5519, the status window of the bog (ride) status panel, against libtpw_unit_BogStatusPanel_UpdateStatusWindow.dylib
 (tests/unit_BogStatusPanel_UpdateStatusWindow.cpp), main app ("SimTheme Park"),
-src/BogStatusPanel_InitViewWindow_BogStatusPanel_UpdateStatusWindow.cpp:
+src/game/ui/ui_bogStatus.cpp:
   BogStatusPanel::InitStatusWindow 0x1019a12c, BogStatusPanel::UpdateStatusWindow 0x1019a504
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

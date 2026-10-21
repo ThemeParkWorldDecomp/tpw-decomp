@@ -1,4 +1,4 @@
-"""Differential test for src/RideAnimInterp.cpp, the node animation's fifteen interpolators:
+"""Differential test for src/game/LMatrix.cpp, src/game/rides/RideAnim.cpp, the node animation's fifteen interpolators:
 RAInterpPosnAtFrame, RABezierInterFromShape, RABezierTangentFromShape, RALinearInterFromShape,
 RALinearTangentFromShape, RACatmulInterFromShape, SetLMatrixOrientation, SetLMatrixScaleNoTrans,
 SetLMatrixXZOrientation, CombineMatricesNoWDest2nd (the s3DAxis form at 0x100c37a4),

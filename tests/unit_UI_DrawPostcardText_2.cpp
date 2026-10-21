@@ -1,5 +1,5 @@
 // Test library for the ui_utils helpers (unit v51012; libtpw_unit_UI_DrawPostcardText_2.dylib, tests/test_UI_DrawPostcardText_2.py), main app:
-//   src/ui_loginpanel_UI_DrawPostcardText_2.cpp   UI_DrawPostcardText, __sinit_ui_utils_cpp, MakeRenderAreaFromRAW,
+//   src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_utils.cpp   UI_DrawPostcardText, __sinit_ui_utils_cpp, MakeRenderAreaFromRAW,
 //   InterfaceDrawEngineHGradient::CalcUVs, InterfaceVisitorTimeTextObject::Change
 //
 // The callees outside the unit are recording fakes (UI_DrawText, LbPalette_FindColour, the font parameters' two calls, the render

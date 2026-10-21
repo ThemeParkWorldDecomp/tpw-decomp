@@ -1,4 +1,4 @@
-// Unit v5145 (src/FillLenderList.cpp): the lenders list of the bank panel (ui_mainpanel2.cpp and its neighbours): the list fill, and the row
+// Unit v5145 (src/game/ui/ui_loansPanel.cpp): the lenders list of the bank panel (ui_mainpanel2.cpp and its neighbours): the list fill, and the row
 // format and row attach functions of the lenders list control. The Mac offsets are in the comments.
 #pragma once
 #include <cstdint>
@@ -40,7 +40,7 @@ void WindowCtor(void* mem, InterfaceWindow* parent, int32_t attributes, int32_t 
 void WindowSetValue(InterfaceWindow* window, int32_t value);            // the virtual SetValue (slot 0x24 of the table at +0x118)
 }  // namespace lender_callee
 
-// Unit v5698 (src/FillLenderList_CreateLoansPanel.cpp): CreateLoansPanel 0x101a4de4 (ui_main.h).
+// Unit v5698 (src/game/ui/ui_loansPanel.cpp): CreateLoansPanel 0x101a4de4 (ui_main.h).
 extern int16_t gLoansScript[];          // 0x102aa4a4: the loans panel's window script (the image's words, generated at configure time)
 extern int32_t gLenderColumnColour;      // 0x102aa83c: the lender list's column button colour (8 at start)
 // 0x101a4bec (untranslated; its TVector is 0x10267bf8): the message function of the lender list.

@@ -1,6 +1,6 @@
 // Test library for OnlineConfig::~OnlineConfig (unit v5368; libtpw_unit_OnlineConfig_Dtor_OnlineConfig.dylib,
 // tests/test_OnlineConfig_Dtor_OnlineConfig.py), main app:
-//   src/FS_Registry_OnlineConfig_Dtor_OnlineConfig.cpp   online_config_mac::Destroy
+//   src/game/MslSupport.cpp   online_config_mac::Destroy
 //
 // operator delete (0x10238218) is a fake that records the pointer as a label.
 #include <cstddef>

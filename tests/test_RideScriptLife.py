@@ -1,5 +1,5 @@
 """The life of a ride script (unit w169), against libtpw_unit_RideScriptLife.dylib (tests/unit_RideScriptLife.cpp), main app
-("SimTheme Park"), src/rsse_script_life.cpp:
+("SimTheme Park"), src/game/rides/rsse.cpp:
   RSSE_InitScript 0x100d37b4, KillScript 0x100d2ecc, RSSE_KillScript 0x100d42d0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

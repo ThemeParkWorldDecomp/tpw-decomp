@@ -1,5 +1,5 @@
 // Test library for the ride upgrade effect (unit v5020; libtpw_unit_RSSE_UpgradeRideEffect.dylib, tests/test_RSSE_UpgradeRideEffect.py), main app:
-//   src/rsse_objects_RSSE_UpgradeRideEffect.cpp   RSSE_UpgradeRideEffect and gRSSEUpgradeSkipThing
+//   src/game/rides/rsse.cpp   RSSE_UpgradeRideEffect and gRSSEUpgradeSkipThing
 //
 // The callees outside the unit (GAME_ASSERTMSG, CRideDatabase::GetRideInfo, GetRideMasterBoundArea, PAR_InitEmitter,
 // PAR_SetEmitterRandomPos, SOUND_SendEvent) are recording fakes; the globals of other files the unit reads are defined here.

@@ -2,7 +2,7 @@
 
 Shared wavelet helpers initialize and compare all five full planes, coefficients,
 LZSS state and the unpacked workspace. The real bullfrog unpacker runs in a second
-emulator with its original zlib via zlib_bridge; the host uses src/lb_zlib.cpp.
+emulator with its original zlib via zlib_bridge; the host uses src/bullfrog/LbZLib.cpp.
 Only platform allocator calls are functional recording fakes. Its opaque state and
 zlib's private arena bytes are not compared. Fused instructions use fmaf hooks.
 """

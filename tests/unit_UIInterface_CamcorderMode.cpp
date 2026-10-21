@@ -1,6 +1,6 @@
 // Test library for UIInterface's mouse, research, kid and staff room events and the error dialog queue (unit v51038;
 // libtpw_unit_UIInterface_CamcorderMode.dylib, tests/test_UIInterface_CamcorderMode.py), main app:
-//   src/UI_pump_UIInterface_CamcorderMode.cpp
+//   src/game/ui/UIInterface.cpp, src/game/ui/ui_ErrorDisplay.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read; the globals of other files are defined here.
 #include <cstddef>

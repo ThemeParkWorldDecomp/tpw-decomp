@@ -1,9 +1,9 @@
 // Test library for the ride's open, close, upgrade and setting steps, the blocked-exit message and the ride messages (unit w200;
 // libtpw_unit_ObjectOpening.dylib, tests/test_ObjectOpening.py), main app:
-//   src/Object_opening.cpp   CObject::IsOpenable, IsCloseable, CloseObject, Reopen, IsRunning, IsAvailableToChoose, RequestUpgrade, SetUpgradeParent,
+//   src/game/Object.cpp   CObject::IsOpenable, IsCloseable, CloseObject, Reopen, IsRunning, IsAvailableToChoose, RequestUpgrade, SetUpgradeParent,
 //                            GetUpgradeParent, NotifyExitBlocked, GetDBInfo, SetOperatingSpeed, SetOperatingDuration, SetOperatingCapacity, ReceiveMessage
-//   src/ThingMessages2.cpp   the constructors, GetType functions and destructors of the ride messages (CMsgNewRide ... CMsgBlockedExit)
-//   src/RideDB_lookup.cpp    CRideDatabase::GetRideInfo (it runs for real: the test builds the ride database it walks)
+//   src/game/Object.cpp, src/game/ui/MessageCentre.cpp   the constructors, GetType functions and destructors of the ride messages (CMsgNewRide ... CMsgBlockedExit)
+//   src/game/rides/RideDB.cpp    CRideDatabase::GetRideInfo (it runs for real: the test builds the ride database it walks)
 //
 // Every other callee is a fake that records what the real one reads and answers from the test's queue: the ride questions (IsBrokenDown, IsClosed,
 // IsCondemned, IsFlaggedForMaintenance, RequiresUpgrade, IsBOQConnected, IsCoaster, IsCoasterUseable, GetBackOfQueue, HasFreeQueueSpace), SetState,
@@ -144,7 +144,7 @@ RideInfo* RideAt(uint64_t address) { return reinterpret_cast<RideInfo*>(static_c
 
 }  // namespace
 
-// ---- the key function and destructor of CMsgDeath (src/MsgDeath.cpp is not compiled here): TestMessage derives from it
+// ---- the key function and destructor of CMsgDeath (src/game/ui/MessageCentre.cpp, src/game/Thing.cpp is not compiled here): TestMessage derives from it
 int32_t CMsgDeath::GetType() const { return 0x1b; }
 CMsgDeath::~CMsgDeath() {}
 

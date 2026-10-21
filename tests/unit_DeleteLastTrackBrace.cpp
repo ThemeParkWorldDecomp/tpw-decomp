@@ -1,6 +1,6 @@
 // Test library for DeleteTrackBrace and DeleteLastTrackBrace (unit v5337; libtpw_unit_DeleteLastTrackBrace.dylib,
 // tests/test_DeleteLastTrackBrace.py), main app:
-//   src/LayoutSetRotatePylon_DeleteLastTrackBrace.cpp
+//   src/game/rides/CoasterEdit.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read. The globals of other files the unit reads are
 // defined here, zero at start like the Mac's bss.

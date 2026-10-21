@@ -1,8 +1,8 @@
 // Test library for the control factory, the control constructors and the button (libtpw_unit_UIControls.dylib; see
-// tests/test_UIControls.py): src/ui_controls_create.cpp (InterfaceWindow::CreateObject and the constructors of the bar, check
-// buttons, edit box, image, knob, light panel, list box, list control, text box and vary box), src/InterfaceButton.cpp (the
-// button's constructor and 14 members), and under them the real window constructor (src/InterfaceWindow.cpp) and the real
-// rectangles (src/UI_Base.cpp).
+// tests/test_UIControls.py): src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp (InterfaceWindow::CreateObject and the constructors of the bar, check
+// buttons, edit box, image, knob, light panel, list box, list control, text box and vary box), src/game/ui/InterfaceButton.cpp (the
+// button's constructor and 14 members), and under them the real window constructor (src/game/ui/InterfaceWindow.cpp) and the real
+// rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp).
 //
 // Everything else the unit reaches is a fake that records through calllog: the message poster and the pointer update, the
 // timer table's UI_AddTimer, the window's untranslated virtual members and its SetCallbackFunction, CaptureKb and Show, the
@@ -156,7 +156,7 @@ InterfaceScrollBar::InterfaceScrollBar(InterfaceWindow* parent, int32_t attribut
     ev("ScrollBar.ctor", {lab(this), lab(parent), attributes, id, left, top, right, bottom});
 }
 void InterfaceScrollBar::SetMinMax(int32_t a, int32_t b) { ev("ScrollBar.SetMinMax", {lab(this), a, b}); }
-// the scroll bar's virtual members (unit w30b's, translated in src/InterfaceScrollBar.cpp, which this library does not link). Each
+// the scroll bar's virtual members (unit w30b's, translated in src/game/ui/InterfaceScrollBar.cpp, src/game/ui/InterfaceDrawEngine.cpp, which this library does not link). Each
 // does what the window's fake above does, which is what the scroll bar had before its own class was declared (the Mac side of the
 // test maps the scroll bar's Enable to the same "Window.Enable" event); they only give the vtable its definitions.
 void InterfaceScrollBar::DrawFunction() { InterfaceWindow::DrawFunction(); }

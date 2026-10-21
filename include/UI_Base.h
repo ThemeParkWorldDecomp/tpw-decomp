@@ -1,6 +1,6 @@
 // UI_Base.cpp range (main app): the UI system's start-up, message queues, pointer and
-// cursors (src/UI_init.cpp), its rectangles and its name hash, and the message pump
-// (src/UI_pump.cpp). PARTIAL: the device input (buttons, keys, wheel) is untranslated.
+// cursors (src/game/ui/UI_Base.cpp, src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp), its rectangles and its name hash, and the message pump
+// (src/game/ui/UI_Base.cpp, src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/ui_ErrorDisplay.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_main.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UIInterface.cpp). PARTIAL: the device input (buttons, keys, wheel) is untranslated.
 // The UI works in a 2048 x 1536 virtual screen (ThemeParkWorld::GetUIMousePos).
 #pragma once
 #include <cstdint>
@@ -97,21 +97,21 @@ class LbTimeClockTickFunction : public clockTickFunction {
 public:
     uint32_t tickyticky() override;
 };
-// The third one, 0x101cab58 (src/GameClock.cpp): the platform timer's microseconds / 1000
+// The third one, 0x101cab58 (src/game/ui/UI_Base.cpp): the platform timer's microseconds / 1000
 // (timeGetTime on Windows). Nothing translated installs it yet.
 class timeGetTimeClockTickFunction : public clockTickFunction {
 public:
     uint32_t tickyticky() override;
 };
 
-// The start of the interface (src/UI_init.cpp), called by InitGeneralUI. The Mac's
+// The start of the interface (src/game/ui/UI_Base.cpp), called by InitGeneralUI. The Mac's
 // UI_InitSystem answers 1 when everything was made and 0 when an allocation failed, and
 // UI_DevicePointerMove answers 1 when the pointer was handled; no caller reads either, so
 // the declarations (older than the translation) stay void.
 class CursorTable;
 class InterfaceWindow;
 void UI_InitSystem(int32_t unused, int32_t queueSize, bool hebrew);                         // 0x101c8a5c: `unused` is never read
-// 0x101c8c2c (236 bytes, src/UI_close.cpp): the end of the UI system UI_InitSystem started; DeInitGeneralUI calls it. 0 when there is no
+// 0x101c8c2c (236 bytes, src/game/ui/UI_Base.cpp): the end of the UI system UI_InitSystem started; DeInitGeneralUI calls it. 0 when there is no
 // root window (nothing is done), else 1.
 int32_t UI_CloseSystem();
 // The cursors the UI keeps in a list of its own (the Mac's namespace-scoped CursorLibrary).
@@ -124,7 +124,7 @@ public:
         uint8_t mF04[0xc];          // 0x04
         Node* mNext;                // 0x10
     };
-    // 0x101cc8ec (120 bytes, src/ui_progress_cursor.cpp): walks the list, deleting each cursor (through its virtual destructor with the
+    // 0x101cc8ec (120 bytes, src/game/ui/InterfaceCursor.cpp): walks the list, deleting each cursor (through its virtual destructor with the
     // deleting flag) and freeing the node. The head is left as it was, pointing at the freed first node. UI_CloseSystem calls it.
     static void RemoveAll();
 };
@@ -134,30 +134,30 @@ void UI_SetPeekCallBack(int32_t (*callback)(InterfaceWindow*, int32_t, int32_t, 
 void UI_UseCursorTable(CursorTable* table);                                                  // 0x101ca170
 void UI_SetStandardCursor(uint16_t cursor);                                                  // 0x101ca078
 void UI_SetCursor(int16_t cursor);                                                           // 0x101c9f68
-int32_t UI_SendMessage(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);       // 0x101c9518 (src/UI_pump.cpp)
+int32_t UI_SendMessage(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);       // 0x101c9518 (src/game/ui/UI_Base.cpp, src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/ui_ErrorDisplay.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_main.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UIInterface.cpp)
 class InterfaceStringHeap {
 public:
-    // 0x101d7808 (312 bytes, src/lobby_start_leaves.cpp): makes the heap's two tables: a rows of ... see AllocateResult.
+    // 0x101d7808 (312 bytes, src/game/ui/InterfaceStringHeap.cpp): makes the heap's two tables: a rows of ... see AllocateResult.
     // The original answers 1 when it made them and 0 when it could not (a size is 0, 4 < c < a does not hold, or an
     // allocation failed); the declaration stays void because the unit libraries of the callers fake it as void.
     static void Allocate(int32_t a, int32_t b, int32_t c, int32_t d);
-    // 0x101d7978 (60 bytes, src/lobby_start_leaves.cpp): gives the heap's tables back, table A then table B (delete[]); the pointers and the
+    // 0x101d7978 (60 bytes, src/game/ui/InterfaceStringHeap.cpp): gives the heap's tables back, table A then table B (delete[]); the pointers and the
     // sizes are left as they were. DeInitGeneralUI calls it (no `this`, nothing read).
     static void DeAllocate();
     // 0x101d7808, the translation (what it answers is described above): table A is b rows of a 16-bit entries, table B
     // d rows of c; the first word of each row is set to -1 (the second table's loop runs b times).
     static int32_t AllocateResult(int32_t a, int32_t b, int32_t c, int32_t d);
-    // 0x101d7b10 (src/lobby_start_leaves.cpp, unit w54): gives a string of the heap back (the button's destructor does, for its text):
+    // 0x101d7b10 (src/game/ui/InterfaceStringHeap.cpp, unit w54): gives a string of the heap back (the button's destructor does, for its text):
     // its first two characters become 0xffff, which is how the heap tells a free string.
     static void ReleaseString(char16_t* text);
-    // Unit v5975 (src/ui_whatami_InterfaceTextBox_CalcTextPos_2.cpp): 0x101d79ec (236): a free string of at least `length` characters
+    // Unit v5975 (src/game/ui/InterfaceStringHeap.cpp): 0x101d79ec (236): a free string of at least `length` characters
     // (first word -1) from table B then table A, its first character set to 0; NULL when none or no tables.
     static char16_t* GetString(int32_t length);
     // 0x101d7b60 (88): GetString(wcslen(text)) and a copy of the text into it; the string or NULL.
     static char16_t* GetAndCopy(const char16_t* text);
 };
 
-// unit w50 (src/UI_init.cpp): each posts one key message to the key capture (0x1000a down, 0x1000b up, 0x1000c typed) while the UI
+// unit w50 (src/game/ui/UI_Base.cpp): each posts one key message to the key capture (0x1000a down, 0x1000b up, 0x1000c typed) while the UI
 // is active, and answers whether it was (the Mac's r3: gUIActive != 0).
 bool UI_Keydown(int16_t key, int32_t flags);          // 0x101c929c
 bool UI_Keyup(int16_t key, int32_t flags);            // 0x101c9314
@@ -168,7 +168,7 @@ void UI_DeviceButtonUp(int16_t button, int16_t x, int16_t y);     // 0x101c9100
 void UI_DeviceMouseWheel(int32_t delta, int16_t x, int16_t y, int16_t modifiers);  // 0x101c91cc
 void UI_Activate();                                   // 0x101ca5e0
 void UI_DeActivate();                                 // 0x101ca658
-void activateUI(InterfaceWindow* window, int32_t active); // 0x101ca30c (src/UI_activate.cpp): posts 0x21 (active) or 0x22 to the window and its descendants
+void activateUI(InterfaceWindow* window, int32_t active); // 0x101ca30c (src/game/ui/UI_Base.cpp): posts 0x21 (active) or 0x22 to the window and its descendants
 void UI_SetRealScreenRez(int16_t width, int16_t height);   // 0x101c9ed8
 void UI_HideCursor();                                 // 0x101ca0b0: hides the current cursor, if there is one
 void UI_ShowCursor();                                 // 0x101ca110
@@ -180,7 +180,7 @@ extern InterfaceWindow* gUIRootWindow; // 0x10395c24
 extern int32_t gUIActive;              // 0x102af924, starts at 1
 extern int16_t gUIButtonFlags;         // 0x10395bbe, cleared on deactivation
 
-// ---- the default window handler's state (src/InterfaceWindow_draw.cpp unless said otherwise; original names unknown)
+// ---- the default window handler's state (src/game/ui/InterfaceWindow.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTimer.cpp unless said otherwise; original names unknown)
 
 // The state of one mouse button as the handler follows it. Mac 0xc bytes (the table is three of them at 0x10395bd0).
 struct UIButtonState {
@@ -196,12 +196,12 @@ extern int32_t gUIAutoRedraw;            // 0x10395c28, set elsewhere: when nonz
 extern int32_t gUIHelpTextResult;        // 0x10395c60, message 0xc stores the window's help text number here and answers the address
                                          // (the word after it, 0x10395c64, is the help text's string, filled in by others)
 // The word after gUIHelpTextResult on the Mac (0x10395c64): the help text's string, NULL unless some code sets it. CUIHelpWindow::ShowHelpText
-// (src/ui_tooltip.cpp, unit w56) reads it as the second word of message 0xc's answer. Defined in src/ui_tooltip.cpp.
+// (src/game/ui/ui_tooltip.cpp, unit w56) reads it as the second word of message 0xc's answer. Defined in src/game/ui/ui_tooltip.cpp.
 extern char16_t* gUIHelpTextString;      // 0x10395c64
-extern InterfaceWindow* gUIFocusWindow;  // 0x10395c20, the window that has the focus (CheckFocus); NULL (src/UI_pump.cpp, unit w29)
-uint32_t IveGotTicks();                  // 0x101cac3c (src/UI_pump.cpp, unit w29): the UI clock's tick
+extern InterfaceWindow* gUIFocusWindow;  // 0x10395c20, the window that has the focus (CheckFocus); NULL (src/game/ui/InterfaceMessageQueue.cpp, unit w29)
+uint32_t IveGotTicks();                  // 0x101cac3c (src/game/ui/UI_Base.cpp, unit w29): the UI clock's tick
 
-// ---- message queues (src/UI_init.cpp; the range is UI_Base.cpp's 0x101c7ad8..0x101c85f0)
+// ---- message queues (src/game/ui/InterfaceMessageQueue.cpp; the range is UI_Base.cpp's 0x101c7ad8..0x101c85f0)
 
 // A queued message. Mac 0x10 bytes; the window is 0 in a free slot.
 struct InterfaceMessage {
@@ -216,13 +216,13 @@ struct InterfaceMessage {
 class InterfaceMessageQueue {
 public:
     InterfaceMessageQueue();                                                           // 0x101c7ad8
-    ~InterfaceMessageQueue();                                                          // 0x101c7b24 (src/UI_close.cpp): frees and clears mEntries
+    ~InterfaceMessageQueue();                                                          // 0x101c7b24 (src/game/ui/InterfaceMessageQueue.cpp): frees and clears mEntries
     // Makes `count` slots, all free. 1 when it did, 0 when it already had slots or the allocation failed
     // (a `short` on the Mac).
     int16_t Initialise(int32_t count);                                                 // 0x101c7bc4
     // Queues a message in the slot at mTail when that slot is free and the window is not NULL; 1 when it did.
     int16_t Add(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);       // 0x101c7c98
-    // Hands the message at mHead to its window's handler (src/UI_pump.cpp; the key messages 0x1000a to 0x1000c go to the
+    // Hands the message at mHead to its window's handler (src/game/ui/InterfaceMessageQueue.cpp; the key messages 0x1000a to 0x1000c go to the
     // key capture's, the keyboard or the focus window instead) and frees the slot; 1 when there was one, 0 when the slot
     // at mHead is free. A message with 0x80808080 in any of its three words (what InvalidateMsgs leaves) is dropped
     // without a call.
@@ -230,7 +230,7 @@ public:
     // The message at mHead, or NULL when there is none (no slots, a free slot or an invalidated message).
     InterfaceMessage* Peek();                                                          // 0x101c7fa8
     // -1 when there are no slots; else the slots of this window get 0x80808080 in the message and both arguments, and the answer is how
-    // many (as a short). (src/UI_invalidate.cpp, unit w51)
+    // many (as a short). (src/game/ui/InterfaceMessageQueue.cpp, unit w51)
     int32_t InvalidateMsgs(InterfaceWindow* window);                                   // 0x101c8038
     void Flush();                                                                      // 0x101c80fc: all slots free again
     int32_t GetNumQd();                                                                // 0x101c8190: mQueued
@@ -255,12 +255,12 @@ struct InterfaceTimedMessage {
 class InterfaceTimedMessages {
 public:
     InterfaceTimedMessages();                                                          // 0x101c81d0
-    ~InterfaceTimedMessages();                                                         // 0x101c8214 (src/UI_close.cpp): frees mEntries (not cleared)
+    ~InterfaceTimedMessages();                                                         // 0x101c8214 (src/game/ui/InterfaceMessageQueue.cpp): frees mEntries (not cleared)
     int16_t Add(InterfaceWindow* window, int32_t message, int32_t a, int32_t b, uint32_t time);   // 0x101c82ac (untranslated)
     // Delivers every message whose time has come (the clock is IveGotTicks) to its window's handler and frees its slot;
     // answers how many it delivered. (Declared void before the pump was translated: the Mac's answer is a `short`.)
     int16_t Process();                                                                 // 0x101c83d4
-    // -1 when there are no slots; else the slots of this window get time 0, and the answer is how many (as a short). (src/UI_invalidate.cpp)
+    // -1 when there are no slots; else the slots of this window get time 0, and the answer is how many (as a short). (src/game/ui/InterfaceMessageQueue.cpp)
     int32_t InvalidateMsgs(InterfaceWindow* window);                                   // 0x101c84d8
     void Flush();                                                                      // 0x101c8580: all times 0
     // Makes `count` slots (fewer than 0x200) with a time of 0, and leaves the rest of each as the allocation was.
@@ -275,18 +275,18 @@ public:
 class InterfaceTimer {
 public:
     InterfaceTimer();                                           // 0x101d819c
-    // 0x101d830c (src/UI_timers_remove.cpp, unit w54): takes the timer out of its list (its own links are left). The class has no vtable.
+    // 0x101d830c (src/game/ui/InterfaceTimer.cpp, unit w54): takes the timer out of its list (its own links are left). The class has no vtable.
     ~InterfaceTimer();
     // The tail of the same Mac function, which only runs for the deleting form: the timers are in the table, so nothing is freed; the
     // slot is checked to lie in the table (an assertion that goes on) and marked free. `delete timer` is then the Mac's deleting call.
     static void operator delete(void* object);                  // 0x101d830c, the deleting flag's half
-    // Unit v5975 (src/ui_whatami_InterfaceTextBox_CalcTextPos_2.cpp): 0x101d822c (180), the class's own operator delete (name
+    // Unit v5975 (src/game/ui/InterfaceTextBox.cpp): 0x101d822c (180), the class's own operator delete (name
     // given here to keep it apart): asserts the slot lies in the table (msl_assertion_failed, goes on), then marks it free (+0x14).
     static void OperatorDelete(void* object);
     void Stop();                                                // 0x101d8428
     void Start();                                               // 0x101d8460
-    void SetSlice(int32_t slice);                               // 0x101d84c8 (src/ui_window_surface.cpp, unit v5L06): mSlice = slice
-    // The LAST timer of the list from this one on with that window and id, or NULL (src/UI_timers_remove.cpp, unit w51).
+    void SetSlice(int32_t slice);                               // 0x101d84c8 (src/game/ui/InterfaceTimer.cpp, unit v5L06): mSlice = slice
+    // The LAST timer of the list from this one on with that window and id, or NULL (src/game/ui/InterfaceTimer.cpp, unit w51).
     InterfaceTimer* FindTimer(InterfaceWindow* window, int32_t id);   // 0x101d8500
 
     InterfaceWindow* mWindow;   // 0x00
@@ -299,11 +299,11 @@ public:
     InterfaceTimer* mPrevious;  // 0x1c
 };
 void UI_InitTimerSystem(int32_t count);   // 0x101d86c4: a table of `count` timers, none in use, none running
-// 0x101d8c2c (60 bytes, src/UI_close.cpp): destroys the table (each timer's destructor unlinks it, last timer first, then the array is
+// 0x101d8c2c (60 bytes, src/game/ui/InterfaceTimer.cpp): destroys the table (each timer's destructor unlinks it, last timer first, then the array is
 // freed) and forgets the list of timers in use; the table's pointer and count are left as they were.
 void UI_CloseTimerSystem();
 
-// The messages (src/UI_init.cpp). Messages 1 to 3 go to the draw queue and every other to the general queue, except
+// The messages (src/game/ui/UI_Base.cpp). Messages 1 to 3 go to the draw queue and every other to the general queue, except
 // that 0x1000a to 0x1000c go there without any test (NULL window or queue included) and answer 0. For the rest the
 // answer is 1 when the queue exists and the window is neither NULL nor being destroyed (even if the queue was full
 // and dropped the message), else 0.
@@ -311,11 +311,11 @@ int32_t UI_PostMessage(InterfaceWindow* window, int32_t message, int32_t a, int3
 void UI_FlushAllMessages();                                       // 0x101c9e48
 int32_t UI_UpdatePointerIn();                                     // 0x101c8f18: 1 when there is a root window and nobody has captured the device
 
-// ---- pointer, cursors and help text (src/UI_init.cpp)
+// ---- pointer, cursors and help text (src/game/ui/UI_Base.cpp, src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp)
 class InterfaceCursor;
 class InterfaceHelpText {
 public:
-    InterfaceHelpText();            // 0x101cf8fc (src/ui_helptext.cpp, unit w36)
+    InterfaceHelpText();            // 0x101cf8fc (src/game/ui/InterfaceHelpText.cpp, unit w36)
     virtual void ShowHelpText();    // 0x101cf874
     virtual void HideHelpText();    // 0x101cf8b8
     virtual ~InterfaceHelpText();   // 0x101cf954
@@ -329,11 +329,11 @@ public:
     virtual void OnMouseMovedOut();                           // 0x101cfc04
     virtual void OnMouseDown();                               // 0x101cfc8c
     virtual void OnFrame();                                   // 0x101cfd10 (the base does nothing)
-    // Told by InterfaceWindow::Show when a window is hidden (src/InterfaceWindow_show.cpp, unit w30b).
+    // Told by InterfaceWindow::Show when a window is hidden (src/game/ui/InterfaceWindow.cpp, unit w30b).
     virtual void OnHideOrDelete(InterfaceWindow* window);     // 0x101cfdb0
     virtual void Init();                                      // 0x101cfd48 (the base does nothing)
     virtual void DeInit();                                    // 0x101cfd7c (the base does nothing)
-    // All of the class is translated in src/ui_helptext.cpp (unit w36). The Mac's vtable is 0x102afa88, its slots in the order of
+    // All of the class is translated in src/game/ui/InterfaceHelpText.cpp (unit w36). The Mac's vtable is 0x102afa88, its slots in the order of
     // the declarations above (8 bytes of header, then 4 bytes a slot; HideHelpText is slot 0xc). The Mac's object is 0x18 bytes
     // with the vtable pointer at +0x10; the data members below are named from the base class's members (original names unknown).
     int16_t mEnabled;           // 0x00  1 after the constructor (Enable and Disable)
@@ -344,12 +344,12 @@ public:
     uint32_t mMovedInTicks;     // 0x0c  the tick OnMouseMovedIn ran at
     InterfaceWindow* mWindow;   // 0x14  the window the pointer is in (OnMouseMovedIn), NULL after OnMouseMovedOut or OnMouseDown
 };
-// Makes `handler` the help text handler, or the default one for NULL (0x101ca978, src/ui_helptext.cpp, unit w36).
+// Makes `handler` the help text handler, or the default one for NULL (0x101ca978, src/game/ui/UI_Base.cpp, unit w36).
 void UI_SetHelpTextHandler(InterfaceHelpText* handler);
 void UI_DisableHelpText();   // 0x101caa4c: the handler's Disable
 void UI_EnableHelpText();    // 0x101caaac: the handler's Enable
 
-// Unit v5295 (src/UI_pump_sinit_UI_Base_cpp.cpp)
+// Unit v5295 (src/game/ui/UI_Base.cpp)
 // Calls the handler's Disable when its mEnabled is not 0, else its Enable (vtable offsets 0x18 and 0x14 on the Mac).
 void UI_ToggleHelpText();    // 0x101ca9d0
 // UI_Base.cpp's static initialiser: constructs gUIDefaultHelpText, registers it for destruction (destructor TVector 0x10268238,
@@ -365,10 +365,10 @@ struct UIKeyCapture {
     InterfaceWindow* mWindow;      // 0x04
 };
 
-// The UI's state (original names unknown). Defined in src/UI_init.cpp unless said otherwise.
+// The UI's state (original names unknown). Defined in src/game/ui/UI_Base.cpp unless said otherwise.
 extern InterfaceWindow* gUIPointerIn;            // 0x10395c1c, the window the pointer is in (set by UI_InitSystem to the root)
 extern InterfaceWindow* gUICaptureDevice;        // 0x10395c14, the window that has captured the pointer (CaptureDevice); NULL
-extern InterfaceWindow* gUILastWindow;           // 0x10395c18, the window the last constructor made (src/InterfaceWindow.cpp)
+extern InterfaceWindow* gUILastWindow;           // 0x10395c18, the window the last constructor made (src/game/ui/InterfaceWindow.cpp)
 extern UIKeyCapture gUIKeyCapture;               // 0x10395c08
 extern InterfaceMessageQueue* gUIDrawQueue;      // 0x10395c00, messages 1 to 3
 extern InterfaceMessageQueue* gUIMessageQueue;   // 0x10395c04, the others
@@ -385,7 +385,7 @@ extern InterfaceCursor* gUICursor;               // 0x10395bb0, the cursor in us
 extern CursorTable* gUICursorTable;              // 0x10395bb4, UI_UseCursorTable
 extern uint16_t gUIStandardCursor;               // 0x10395bb8, UI_SetStandardCursor: what UI_SetCursor(-1) and a missing cursor become
 extern int16_t gUICursorNumber;                  // 0x102af920, the number of the cursor in use; -1 at first
-extern InterfaceHelpText* gUIHelpText;           // 0x102af928, the help text handler (UI_SetHelpTextHandler, src/ui_helptext.cpp); starts as gUIDefaultHelpText
+extern InterfaceHelpText* gUIHelpText;           // 0x102af928, the help text handler (UI_SetHelpTextHandler, src/game/ui/InterfaceHelpText.cpp); starts as gUIDefaultHelpText
 extern InterfaceHelpText gUIDefaultHelpText;     // 0x10395b8c, the handler before one is set (made by InterfaceHelpText's constructor, 0x101cf8fc: enabled)
 extern clockTickFunction* gUIClock;              // 0x102af92c, UI_SetClockTickFunction; starts as gUIDefaultClock
 extern clockTickFunction gUIDefaultClock;        // 0x10395b74, what UI_SetClockTickFunction(NULL) installs
@@ -395,7 +395,7 @@ extern InterfaceTimer* gUITimerList;             // 0x10395c58, the timers in us
 extern int32_t gUITimersPaused;                  // 0x10395c4c
 
 
-// ---- the message pump (src/UI_pump.cpp): what UIInterface::Process does once a pass
+// ---- the message pump (src/game/ui/UIInterface.cpp): what UIInterface::Process does once a pass
 
 // A key a window asked for (InterfaceWindow::CaptureKeys): the list ends with the entry whose modifier is -1.
 struct captureKeyList {
@@ -403,7 +403,7 @@ struct captureKeyList {
     int16_t mModifiers;   // 0x02  compared with bits 16 to 23 of the message's second argument
 };
 
-// The pump's state (original names unknown). Defined in src/UI_pump.cpp.
+// The pump's state (original names unknown). Defined in src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/UI_Base.cpp.
 extern InterfaceWindow* gUIKeyboardWindow;   // 0x10395c10, the window that has captured the keyboard (CaptureKb); NULL
 extern int32_t gUIOnFrameCount;              // 0x10395b84, the windows onframe has visited this pass
 
@@ -423,11 +423,11 @@ int32_t UI_SendOnFrameMessages();                  // 0x101c9c2c
 // The UI's clock (gUIClock).
 // The depth highestZ works out for a window (the root when NULL) and a rectangle (none when NULL); -1 when there is no window.
 int32_t UI_GetHighestZ(InterfaceWindow* window, CoolRect* rect);   // 0x101ca880
-// 0x101ca6dc (unit w50, src/UI_Base_highestz.cpp): the Z one above the highest visible descendant of the window that the rectangle
+// 0x101ca6dc (unit w50, src/game/ui/UI_Base.cpp): the Z one above the highest visible descendant of the window that the rectangle
 // touches (any, when the rectangle is NULL). The running answer lives in a static word that only the root resets: a window
 // that is not the root starts from what the last call left (see the file).
 int32_t highestZ(InterfaceWindow* window, CoolRect* rect);
-extern int32_t gUIHighestZ;        // 0x10395b80  highestZ's running answer (names unknown for the three; src/UI_Base_highestz.cpp)
+extern int32_t gUIHighestZ;        // 0x10395b80  highestZ's running answer (names unknown for the three; src/game/ui/UI_Base.cpp)
 extern int32_t gUIHighestZAttr;    // 0x10395b78  the attribute word of the child highestZ looked at last
 extern int32_t gUIHighestZChildZ;  // 0x10395b7c  the Z of that child (or of its first item, for a list control)
 
@@ -440,7 +440,7 @@ extern int32_t gUIHighestZChildZ;  // 0x10395b7c  the Z of that child (or of its
 InterfaceTimer* UI_AddTimer(InterfaceWindow* window, int32_t slice, int32_t id);   // 0x101d878c
 void UI_ServiceAllTimers();                                                       // 0x101d88e4
 
-// ---- ui_utils.cpp / ui_main.cpp: drawing text (src/UI_drawtext.cpp, unit w35b). UI text is 16-bit (the Mac wchar_t).
+// ---- ui_utils.cpp / ui_main.cpp: drawing text (src/game/ui/ui_utils.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/ui_main.cpp, unit w35b). UI text is 16-bit (the Mac wchar_t).
 struct TbRect;
 struct TbColour;
 struct TbRenderArea;
@@ -450,7 +450,7 @@ struct TbRenderArea;
 extern TbRenderArea gUIRenderArea;           // 0x1038cd00 (name invented)
 extern int32_t gUIRenderAreaInUse;           // 0x1038cd28 (name invented)
 // The multibyte text UIMain_ConvertString converts into: 0x4000 bytes (the converter is told 0x3fff), no other size is known.
-extern uint8_t gUIMainMBBuffer[0x4000];      // 0x10388c48 (name invented; defined in src/ui_main.cpp)
+extern uint8_t gUIMainMBBuffer[0x4000];      // 0x10388c48 (name invented; defined in src/game/ui/ui_main.cpp)
 
 // 0x1018b578: draws `text` in `rect` with the font number `font` (0 to 12 of the current resolution group), `colour`, and the
 // justifications (horizontal 0 left, 1 centre, 2 right; vertical 0 top, 1 centre, 2 bottom; the Hebrew languages swap left
@@ -463,7 +463,7 @@ void UI_DrawText(const char16_t* text, const TbRect& rect, const TbColour& colou
 // 0x1018b360: makes `area` describe `width` x `height` pixels at `pixels` in the engine's texture format (the masks, depth
 // and palette flag of gei_TextureSettings' pixel format; the stride is the bytes of a pixel times the width). NULL: nothing.
 void MakeRenderArea(uint8_t* pixels, TbRenderArea* area, int32_t width, int32_t height);
-// Unit v51012 (src/ui_loginpanel_UI_DrawPostcardText_2.cpp): raw pixel data. The mangled name passes the type as an enum word.
+// Unit v51012 (src/game/ui/ui_utils.cpp): raw pixel data. The mangled name passes the type as an enum word.
 enum RAWSurfaceType : int32_t {kRAWSurface24 = 0, kRAWSurface32A = 2, kRAWSurface32B = 3 };
 void MakeRenderAreaFromRAW(void* pixels, int32_t width, int32_t height, RAWSurfaceType type, TbRenderArea* area);   // 0x1018b434
 extern uint8_t gUIUtilsColour[5];   // 0x1038cd2c, original name unknown: opaque black (alpha 0xff, 0, 0, 0) and its palette index
@@ -472,9 +472,9 @@ void __sinit_ui_utils_cpp();        // 0x1018bda8
 void AdjustJustificationForHebrew(int32_t& justification);
 // 0x10181a7c: the text as multibyte in gUIMainMBBuffer, converted only when the language has a Unicode to multibyte
 // converter (otherwise the buffer is left as it was); answers the buffer either way.
-// The original has ONE such function, taking a char16_t* (declared in ui_DrawObject.h, defined in src/ui_main.cpp); this const overload
-// forwards to it (src/UI_drawtext.cpp).
-uint8_t* UIMain_ConvertString(char16_t* text);                 // 0x10181a7c (src/ui_main.cpp, unit w44; also declared in ui_DrawObject.h)
+// The original has ONE such function, taking a char16_t* (declared in ui_DrawObject.h, defined in src/game/ui/ui_main.cpp); this const overload
+// forwards to it (src/game/ui/ui_utils.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/ui_main.cpp).
+uint8_t* UIMain_ConvertString(char16_t* text);                 // 0x10181a7c (src/game/ui/ui_main.cpp, unit w44; also declared in ui_DrawObject.h)
 uint8_t* UIMain_ConvertString(const char16_t* text);
 
 // unit w37b: Bullfrog drawing calls used by the list box.
@@ -484,16 +484,16 @@ void LbDraw_RectangleFilled(const TbRect* rect, TbColour colour); // bullfrog 0x
 void LbDraw_Text(int32_t x, int32_t y, const char* text, TbColour colour); // bullfrog 0x1001b6a8
 
 // unit w37c
-// Takes the window's timer with that id out of the list of timers in use and frees it (src/UI_timers_remove.cpp, unit w51). The Mac
+// Takes the window's timer with that id out of the list of timers in use and frees it (src/game/ui/InterfaceTimer.cpp, unit w51). The Mac
 // answers 1 when it did and 0 when there was none; the declaration stays void because the callers' unit libraries fake it as void, and
 // UI_RemoveTimerResult is the translation that answers.
 void UI_RemoveTimer(InterfaceWindow* window, int32_t id); // 0x101d8a00
 int32_t UI_RemoveTimerResult(InterfaceWindow* window, int32_t id);
 
-// unit w46: the mouse button entry points (src/UI_init.cpp). Both answer gUIActive != 0 on the Mac; no caller reads it.
+// unit w46: the mouse button entry points (src/game/ui/UI_Base.cpp). Both answer gUIActive != 0 on the Mac; no caller reads it.
 extern InterfaceWindow* gUIButtonWindow[3];   // 0x10395bc4, the window each button went down in (set by UI_DeviceButtonDown, cleared by Up)
 
-// unit w51 (src/UI_invalidate.cpp): forgetting a window that is going.
+// unit w51 (src/game/ui/UI_Base.cpp): forgetting a window that is going.
 // Clears the globals that hold the window: the pointer's window, the focus, the device capture and the three buttons' windows.
 void ClearAllPointers(InterfaceWindow* window);   // 0x101ca254
 // -1 when the queue (the general one, the draw one, the timed one) does not exist or the window is NULL; else the queue's InvalidateMsgs.

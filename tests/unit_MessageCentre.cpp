@@ -1,5 +1,5 @@
-// Test library for the message centre's post and the subscription tree (unit w107): src/MessageCentre_post.cpp, src/Thing_receive.cpp,
-// src/msl_tree_subscription.cpp and src/msl_red_black_tree.cpp. Real on both sides: the tree code, the headers' constructor and
+// Test library for the message centre's post and the subscription tree (unit w107): src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/save/BlockSave.cpp, src/game/ui/MessageCentre.cpp, src/game/Thing.cpp,
+// src/game/MslSupport.cpp. Real on both sides: the tree code, the headers' constructor and
 // destructor, CThing::ReceiveMessage's switch. Recording fakes: GAME_ASSERTMSG, the message's GetType (a test subclass whose answer
 // the case chooses) and the eighteen ReceiveMessage targets. Operator delete records through calllog.cpp for every labelled block.
 //
@@ -318,5 +318,5 @@ int32_t tpw_mc_post(int32_t type, int32_t dyingId) {
 
 // Unit w123a: test-only key function for canonical CMsgDeath; TestMessage overrides it.
 int32_t CMsgDeath::GetType() const { return 0x1b; }
-// Unit w123c: the death destructor is out of line now (src/MsgDeath.cpp); this library keeps its own empty one.
+// Unit w123c: the death destructor is out of line now (src/game/Thing.cpp); this library keeps its own empty one.
 CMsgDeath::~CMsgDeath() {}

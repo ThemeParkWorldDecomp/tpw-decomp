@@ -1,6 +1,6 @@
 // Test library for the main panel date change, the last panel memory, the loans panel refresh and the slide-out panel's message function
 // (unit v5995; libtpw_unit_UI_MainPanelDateChange_2.dylib, tests/test_UI_MainPanelDateChange_2.py), main app:
-//   src/ui_mainpanel2_msg_UI_MainPanelDateChange_2.cpp   UI_MainPanelDateChange, SetLastPanel, UI_LoansPanelDateChange, RailsCallback
+//   src/game/ui/ui_loansPanel.cpp, src/game/ui/ui_mainpanel2.cpp   UI_MainPanelDateChange, SetLastPanel, UI_LoansPanelDateChange, RailsCallback
 //
 // Every callee is a fake that records the arguments the real one reads and answers from the test's queues; the globals of other files
 // the unit reads are defined here (zero at start like the Mac's bss).

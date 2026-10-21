@@ -1,6 +1,6 @@
 // Test library for base64enc, Email::Attachment::Attachment, Connection::Connection, Connection::SendCommandLine and CUIGrapher::DrawAxes
 // (unit v51015; libtpw_unit_base64enc.dylib, tests/test_base64enc.py), main app:
-//   src/Email_Send_CSock_SendData_base64enc.cpp
+//   src/game/online/Connection.cpp, src/game/online/EmailMessage.cpp, src/game/ui/UIGrapher.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues: the string
 // constructor and assign, the C library file calls, new[] and delete[], CSock::CSock, CSock::SendData and the two LbDraw lines.

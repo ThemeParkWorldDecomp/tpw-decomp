@@ -1,5 +1,5 @@
 // Test library for LLCR_FixBridgesReverse (unit v51010; libtpw_unit_LLCR_FixBridgesReverse.dylib, tests/test_LLCR_FixBridgesReverse.py), main app:
-//   src/LLCR_FixBridgesReverse.cpp   LLCR_FixBridgesReverse
+//   src/game/park/LLCellRide.cpp   LLCR_FixBridgesReverse
 //
 // Every callee (the CTrackCell predicates and setters, OPPOSITE, LLCR_OffsetEndOfTrack, SetCurRideAnim, Start/StopFlashingObject) is a fake
 // that records its arguments (cells as their index in the world's track grid, ride sets as labels) and answers from the test's queues.

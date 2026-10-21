@@ -1,6 +1,6 @@
 // Test library for the park darkening and the poly search vertices (unit v5902; libtpw_unit_RecalculateParkDarkening.dylib,
 // tests/test_RecalculateParkDarkening.py), main app:
-//   src/LevelSystems_RecalculateParkDarkening.cpp   RecalculateParkDarkening, UpdateHFieldDarkeningNormals, SetupMeshForPolySearchSimple
+//   src/game/park/TPHField.cpp   RecalculateParkDarkening, UpdateHFieldDarkeningNormals, SetupMeshForPolySearchSimple
 //
 // The callees outside the unit (IsFlag, SetMatrixIdentity, CombineMatricesNoWDest2nd, GetNodeWorldVertPosnsIntoGeomBuffer,
 // GetNodePositionSimple, FloatToCell, UpdateLights) are recording fakes that answer from the test's queues. The globals of other

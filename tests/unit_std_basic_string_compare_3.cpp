@@ -1,6 +1,6 @@
 // Test library for the nocase wide string compare and substring constructor (unit v5229; libtpw_unit_std_basic_string_compare_3.dylib,
 // tests/test_std_basic_string_compare_3.py), main app:
-//   src/std_basic_string_compare_3.cpp   online_callee::NocaseWStringCompare (0x10225a5c), NocaseWStringCopy (0x1022213c)
+//   src/game/MslSupport.cpp   online_callee::NocaseWStringCompare (0x10225a5c), NocaseWStringCopy (0x1022213c)
 //
 // The callees outside the unit are fakes that record what the real ones read as integers (texts as a checksum, pointers into the
 // case's strings as byte offsets from the base the test set) and answer from the queues. The globals of other files are defined here.

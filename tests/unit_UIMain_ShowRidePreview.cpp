@@ -1,6 +1,6 @@
 // Test library for the ride and sprite previews, MAKECOLUMNBUTTON and UIMain_ZoomToThing (unit v5013; libtpw_unit_UIMain_ShowRidePreview.dylib,
 // tests/test_UIMain_ShowRidePreview.py), main app:
-//   src/ui_main_kbcapture_UIMain_ShowRidePreview.cpp
+//   src/game/ui/ui_main.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read; the globals of other files (gText, gThingArray) are defined here.
 #include <cstddef>

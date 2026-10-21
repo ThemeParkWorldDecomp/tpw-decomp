@@ -1,5 +1,5 @@
 """Unit v5112, the point tests over the collision list, against libtpw_unit_PointOutAllInverse.dylib (tests/unit_PointOutAllInverse.cpp),
-main app ("SimTheme Park"), src/BMP_InsideArea_PointOutAllInverse.cpp:
+main app ("SimTheme Park"), src/game/rides/BumperRide.cpp:
   PointOutAllInverse 0x1002bb64, PointInAnyColObject 0x1002ba94, NavPointInArea 0x1002b408
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian, host memory little-endian).

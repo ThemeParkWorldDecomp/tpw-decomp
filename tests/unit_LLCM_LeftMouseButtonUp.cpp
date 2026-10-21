@@ -1,6 +1,6 @@
 // Test library for the cell system's left button release (unit v5883; libtpw_unit_LLCM_LeftMouseButtonUp.dylib,
 // tests/test_LLCM_LeftMouseButtonUp.py), main app:
-//   src/LLCM_LeftMouseButtonDown_LLCM_LeftMouseButtonUp.cpp   LLCM_LeftMouseButtonUp and the words gLLCC9F28, gLLCC9F2C, gLLCC9F44,
+//   src/game/park/LLCellMouse.cpp   LLCM_LeftMouseButtonUp and the words gLLCC9F28, gLLCC9F2C, gLLCC9F44,
 //   gLLCC9F48, gLLCCDB30, gLLCCDB44, gLLCCDB4C, gLLCCDB64
 //
 // Every callee is a fake that records what the real one reads and answers from the case's queues (cells are named by their offset

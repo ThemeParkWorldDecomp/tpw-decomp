@@ -1,5 +1,5 @@
 """Unit v5630, the advisor save BMP_Save (writes the bump world as chunks to a file), against libtpw_unit_BMP_Save.dylib
-(tests/unit_BMP_Save.cpp), main app ("SimTheme Park"), src/host_leaves_Write_BumpToChunk_BMP_Save.cpp:
+(tests/unit_BMP_Save.cpp), main app ("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_Save 0x10022464
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

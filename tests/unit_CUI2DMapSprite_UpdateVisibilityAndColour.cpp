@@ -1,5 +1,5 @@
 // Test library for CUI2DMapSprite::UpdateVisibilityAndColour (unit v5652; libtpw_unit_CUI2DMapSprite_UpdateVisibilityAndColour.dylib), main app:
-//   src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMapSprite_UpdateVisibilityAndColour.cpp
+//   src/game/ui/ui_2dmap.cpp
 //
 // Fakes: CEZSprite::GetSpriteDetails (logs the instance, answers a block the test allocates) and UI2DMReturnScaleColour (logs the index and
 // the offsets of the three colours inside the table, answers a colour word from the queue "Scale").

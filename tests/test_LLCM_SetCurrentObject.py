@@ -1,5 +1,5 @@
 """Unit v5182, the current object's track end and the track edit mode's start, against libtpw_unit_LLCM_SetCurrentObject.dylib
-(tests/unit_LLCM_SetCurrentObject.cpp), main app ("SimTheme Park"), src/LLCellMouse_LLCM_SetCurrentObject.cpp:
+(tests/unit_LLCM_SetCurrentObject.cpp), main app ("SimTheme Park"), src/game/park/LLCellMouse.cpp:
   LLCM_SetCurrentObject 0x10088590, LLCM_StartTrackEditMode 0x10088a64
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

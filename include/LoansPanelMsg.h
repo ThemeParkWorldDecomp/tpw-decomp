@@ -1,5 +1,5 @@
 // Unit v5195: the loans panel's message function, the payback dialog and the lender list headings
-// (main app, src/ui_allKidsPanel_AllKidsPanelMsg_LoansPanelMsg.cpp).
+// (main app, src/game/ui/ui_loansPanel.cpp).
 #pragma once
 #include <cstdint>
 

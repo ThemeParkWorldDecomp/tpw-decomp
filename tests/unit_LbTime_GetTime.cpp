@@ -1,5 +1,5 @@
 // Test library for LbTime_GetTime and LbTime_GetDate (unit v5309; libtpw_unit_LbTime_GetTime.dylib), main app:
-//   src/LbTime_LbTime_GetTime.cpp
+//   src/bullfrog/LbTime.cpp
 //
 // NS_MacDoze::GetLocalTime is a fake: it writes eight 16-bit words taken from the case's queues "st:0".."st:7".
 #include <cstddef>

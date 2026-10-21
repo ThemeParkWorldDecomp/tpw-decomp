@@ -1,6 +1,6 @@
 """Unit v5224: CActionRecorder::ReplayRecording, EndReplay and three RecordAction overloads, against
 libtpw_unit_CActionRecorder_ReplayRecording.dylib (tests/unit_CActionRecorder_ReplayRecording.cpp), main app ("SimTheme Park"),
-src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ReplayRecording.cpp:
+src/game/ActionRecorder.cpp:
   ReplayRecording 0x10144e2c, EndReplay 0x10144ce4, RecordAction(float, ushort) 0x10144704,
   RecordAction(float, float, ushort) 0x10144868, RecordAction(ushort, uchar, wchar_t*) 0x10144a00
 

@@ -1,5 +1,5 @@
 // Test library for the FLY base accessors (unit v5277; libtpw_unit_FLY_SetNumberOfCars.dylib, tests/test_FLY_SetNumberOfCars.py), main app:
-//   src/FLY_SetNumberOfCars.cpp   seven functions on gFlyBases; no callees.
+//   src/game/rides/FlyingRide.cpp   seven functions on gFlyBases; no callees.
 // gFlyBases is defined here (the program's definition is in a file this library does not compile).
 #include <cstddef>
 #include <cstdint>

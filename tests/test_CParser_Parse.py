@@ -1,5 +1,5 @@
 """Unit v5911, the chat line parser's base class CParser, against libtpw_unit_CParser_Parse.dylib (tests/unit_CParser_Parse.cpp), main app
-("SimTheme Park"), src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_cmp_nocase_CParser_CParser_CParser_Parse.cpp:
+("SimTheme Park"), src/game/online/Parser.cpp:
   SetupForParsing 0x102113dc, Parse 0x102114f8, Match 0x10211630, ~CParser 0x102111d4, SkipWhitespace 0x10211860,
   SkipWhitespaceAndSeparator 0x1021193c, CountNonWhitespace 0x10211a60, GetString 0x10211b3c, GetRemainingString 0x10211d2c
 

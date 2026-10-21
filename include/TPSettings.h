@@ -91,7 +91,7 @@ public:
     eGAME_CONTINUE_STATE mGameContinueState; // 0x94
     uint32_t mGameRefreshState;              // 0x98
 };
-extern CPlayerSettings gPlayerSettings;   // 0x1038071c, original name unknown (src/TPSettings.cpp)
+extern CPlayerSettings gPlayerSettings;   // 0x1038071c, original name unknown (src/game/TPSettings.cpp, src/game/TPResource.cpp)
 // The strings __sinit_TPSettings_cpp constructs before it (the same set as TPMain.cpp's).
 extern TbDynamicStringTemplate<char> gTPSettingsLanguages[16];   // 0x10380804
 extern TbDynamicStringTemplate<char> gTPSettingsTitle;           // 0x103807e4

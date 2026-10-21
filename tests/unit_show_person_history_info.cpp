@@ -1,5 +1,5 @@
 // Test library for show_person_history_info (libtpw_unit_show_person_history_info.dylib), main app:
-//   src/ui_Postcard_panel_win_ticket_1_show_person_history_info.cpp
+//   src/game/keyboard.cpp
 // CPeep::ReportAllEvents is a recording fake; gIntrface is defined here.
 #include <cstddef>
 #include <cstdint>

@@ -1,4 +1,35 @@
 # Unit v51119: the world globe's camera steps, list registration and small destructors and byte swaps
-# (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Show_2_CLBScreenComponentOnlineGlobe_GlobeRight.cpp). The callees outside the
+# (src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/park/LLCellMouse.cpp, src/game/park/TPHField.cpp, src/game/rides/RideAnim.cpp). The callees outside the
 # unit are recording fakes in tests/unit_CLBScreenComponentOnlineGlobe_GlobeRight.cpp, which also defines the globals of other files.
-set(TPW_UNIT_CLBScreenComponentOnlineGlobe_GlobeRight src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Show_2_CLBScreenComponentOnlineGlobe_GlobeRight.cpp platform/arena.cpp)
+set(TPW_UNIT_CLBScreenComponentOnlineGlobe_GlobeRight src/game/HLSprite.cpp src/game/online/lobby_globe.cpp
+    src/game/park/LLCellMouse.cpp src/game/park/TPHField.cpp src/game/rides/RideAnim.cpp platform/arena.cpp)
+set(TPW_UNIT_CLBScreenComponentOnlineGlobe_GlobeRight_KEEP
+  __Z14Bitmap_DtorMacP6Bitmaps   # Bitmap_DtorMac(Bitmap*, short)
+  __Z16MapDelta_DtorMacP8MapDeltas   # MapDelta_DtorMac(MapDelta*, short)
+  __Z18Bitmap_DeleteArrayPv   # Bitmap_DeleteArray(void*)
+  __Z19CLightPoint_DtorMacP11CLightPoints   # CLightPoint_DtorMac(CLightPoint*, short)
+  __Z20BasicIosChar_DtorMacPvs   # BasicIosChar_DtorMac(void*, short)
+  __Z24BasicFilebufChar_DtorMacP16BasicFilebufChars   # BasicFilebufChar_DtorMac(BasicFilebufChar*, short)
+  __ZN11v51119_swap26USwapBlock32_long_100799b0EPii   # v51119_swap::USwapBlock32_long_100799b0(int*, int)
+  __ZN11v51119_swap27USwapInplace32_int_1006b668ERi   # v51119_swap::USwapInplace32_int_1006b668(int&)
+  __ZN11v51119_swap28USwapInplace32_long_10079a64ERi   # v51119_swap::USwapInplace32_long_10079a64(int&)
+  __ZN11v51119_swap28USwapInplace32_long_100de448ERi   # v51119_swap::USwapInplace32_long_100de448(int&)
+  __ZN11v51119_swap29USwapInplace16_short_100de404ERs   # v51119_swap::USwapInplace16_short_100de404(short&)
+  __ZN11v51119_swap29USwapInplace32_ulong_1006b6acERj   # v51119_swap::USwapInplace32_ulong_1006b6ac(unsigned int&)
+  __ZN11v51119_swap29USwapInplace32_ulong_10079968ERj   # v51119_swap::USwapInplace32_ulong_10079968(unsigned int&)
+  __ZN11v51119_swap30USwapInplace16_ushort_1006b620ERt   # v51119_swap::USwapInplace16_ushort_1006b620(unsigned short&)
+  __ZN29CLBScreenComponentOnlineGlobe10GlobeRightEv   # CLBScreenComponentOnlineGlobe::GlobeRight()
+  __ZN29CLBScreenComponentOnlineGlobe10UnRegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::UnRegister(CLBGlobe*)
+  __ZN29CLBScreenComponentOnlineGlobe13ProcessCancelEv   # CLBScreenComponentOnlineGlobe::ProcessCancel()
+  __ZN29CLBScreenComponentOnlineGlobe4InitEv   # CLBScreenComponentOnlineGlobe::Init()
+  __ZN29CLBScreenComponentOnlineGlobe6RenderEv   # CLBScreenComponentOnlineGlobe::Render()
+  __ZN29CLBScreenComponentOnlineGlobe7GlobeUpEv   # CLBScreenComponentOnlineGlobe::GlobeUp()
+  __ZN29CLBScreenComponentOnlineGlobe8RegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::Register(CLBGlobe*)
+  __ZN29CLBScreenComponentOnlineGlobe9GlobeDownEv   # CLBScreenComponentOnlineGlobe::GlobeDown()
+  __ZN29CLBScreenComponentOnlineGlobe9GlobeLeftEv   # CLBScreenComponentOnlineGlobe::GlobeLeft()
+  TPW_GLOBE_INIT_REAL@game/HLSprite.cpp   # the #define TPW_GLOBE_INIT_REAL of src/game/HLSprite.cpp (a guard macro; src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/park/LLCellMouse.cpp, src/game/park/TPHField.cpp, src/game/rides/RideAnim.cpp had it)
+  TPW_GLOBE_INIT_REAL@game/online/lobby_globe.cpp   # the #define TPW_GLOBE_INIT_REAL of src/game/online/lobby_globe.cpp (a guard macro; src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/park/LLCellMouse.cpp, src/game/park/TPHField.cpp, src/game/rides/RideAnim.cpp had it)
+  TPW_GLOBE_INIT_REAL@game/park/LLCellMouse.cpp   # the #define TPW_GLOBE_INIT_REAL of src/game/park/LLCellMouse.cpp (a guard macro; src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/park/LLCellMouse.cpp, src/game/park/TPHField.cpp, src/game/rides/RideAnim.cpp had it)
+  TPW_GLOBE_INIT_REAL@game/park/TPHField.cpp   # the #define TPW_GLOBE_INIT_REAL of src/game/park/TPHField.cpp (a guard macro; src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/park/LLCellMouse.cpp, src/game/park/TPHField.cpp, src/game/rides/RideAnim.cpp had it)
+  TPW_GLOBE_INIT_REAL@game/rides/RideAnim.cpp   # the #define TPW_GLOBE_INIT_REAL of src/game/rides/RideAnim.cpp (a guard macro; src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/park/LLCellMouse.cpp, src/game/park/TPHField.cpp, src/game/rides/RideAnim.cpp had it)
+)

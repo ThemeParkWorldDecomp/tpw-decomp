@@ -1,6 +1,6 @@
 // Test library for the congratulations and bankrupt windows of the main app (unit v5022; libtpw_unit_UI_Congratulations.dylib,
 // tests/test_UI_Congratulations.py), main app:
-//   src/ui_main_panel_UI_Congratulations.cpp   UI_Congratulations, UI_Bankrupt, CongratsWindowMsg, __sinit_ui_main_cpp and the
+//   src/game/ui/ui_main.cpp   UI_Congratulations, UI_Bankrupt, CongratsWindowMsg, __sinit_ui_main_cpp and the
 //                                              file's globals (scripts, animations, nodes, the ticks word)
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The

@@ -1,4 +1,4 @@
-// Entry points for the ride animation set unit (src/RideAnimInit.cpp). The file records are
+// Entry points for the ride animation set unit (src/game/rides/RideAnim.cpp, src/game/rides/TPRide.cpp). The file records are
 // built in the arena, since their Ptr32 fields need it; the set and the records the code
 // builds use native pointers, as in the game. Each entry point frees the blocks of the
 // previous call first.
@@ -12,7 +12,7 @@
 #include <cstring>
 #include <vector>
 
-// TPGlobals is defined in src/TPGlobals.cpp, which this unit does not link: the constructors are
+// TPGlobals is defined in src/game/TPGlobals.cpp, which this unit does not link: the constructors are
 // empty and the object is zeroed, and the test writes the two words the time set-up reads.
 TPGlobals::TPGlobals() {}
 TPGlobals::~TPGlobals() {}

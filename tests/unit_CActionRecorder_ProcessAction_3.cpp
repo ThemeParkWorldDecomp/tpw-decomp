@@ -1,6 +1,6 @@
 // Test library for the recorder / visitor panel / destructor stand-ins of unit v51072 (libtpw_unit_CActionRecorder_ProcessAction_3.dylib,
 // tests/test_CActionRecorder_ProcessAction_3.py), main app:
-//   src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ProcessAction_3.cpp
+//   src/game/ActionRecorder.cpp, src/game/ExitErr.cpp, src/game/InGame.cpp, src/game/keyboard.cpp, src/game/ui/ui_visitorStatus.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read. Pointers into the case's block are recorded as the
 // offset from the block (gBase), the others as labels.

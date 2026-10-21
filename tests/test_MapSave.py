@@ -1,5 +1,5 @@
 """Unit w146, the save and litter half of MapDelta.cpp, against libtpw_unit_MapSave.dylib (tests/unit_MapSave.cpp), main app ("SimTheme Park"),
-src/MapDelta_save.cpp (and src/MapDelta.cpp for the static construction):
+src/game/park/Map.cpp, src/game/park/MapDelta.cpp (and src/game/park/MapDelta.cpp for the static construction):
   CMapCell::PlaceLitter 0x10103010, CMap::Serialise 0x10100e80, CMapCell::Serialise 0x10102a10, LOADVAR<CMapCell::LitterType> 0x10103af0,
   SAVEVAR<CMapCell::LitterType> 0x10103c30, CMacroAI::Serialise 0x10100890, __sinit_MapDelta_cpp 0x10103ec0 (the instances over the basic
   loaders are covered here through CMapCell::Serialise and in test_Serialise.py directly)

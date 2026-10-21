@@ -1,6 +1,6 @@
 // Test library for the online system's chat satellite, publishing, upload and FTP download entry points and AreWeProcessing (unit v5130;
 // libtpw_unit_CFSOnlineSystem_EnterChatSatellite.dylib, tests/test_CFSOnlineSystem_EnterChatSatellite.py), main app:
-//   src/FS_Online_init_CFSOnlineSystem_EnterChatSatellite.cpp   the eight CFSOnlineSystem members
+//   src/game/online/FS_Online.cpp   the eight CFSOnlineSystem members
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the PowerPC stubs). The virtual calls (the
 // string's operator= and the globe's slot 0x50) go through hand-made vtables whose slot is found from a pointer to the member. A callback

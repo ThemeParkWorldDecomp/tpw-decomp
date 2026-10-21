@@ -1,5 +1,5 @@
 """Unit v5548, the upgrade status panel's window handler and the staff status static initialiser, against
-libtpw_unit_UpgradeStatusMsg.dylib (tests/unit_UpgradeStatusMsg.cpp), main app ("SimTheme Park"), src/UpgradeStatusMsg.cpp:
+libtpw_unit_UpgradeStatusMsg.dylib (tests/unit_UpgradeStatusMsg.cpp), main app ("SimTheme Park"), src/game/ui/ui_staffStatus.cpp, src/game/ui/ui_upgradeStatus.cpp:
   UpgradeStatusMsg 0x101c63b4, __sinit_ui_staffStatus_cpp 0x101c5bec
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

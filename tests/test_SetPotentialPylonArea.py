@@ -1,5 +1,5 @@
 """Unit v5190, the editor's pylon placement, against libtpw_unit_SetPotentialPylonArea.dylib (tests/unit_SetPotentialPylonArea.cpp), main app
-("SimTheme Park"), src/TPCoaster_trains_SetPotentialPylonArea.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   SetPotentialPylonArea 0x10041a58, PlacePylon 0x10041c5c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian,

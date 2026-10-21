@@ -1,5 +1,5 @@
 """Unit v5893, the pylon edit helpers, against libtpw_unit_DeletePylon.dylib (tests/unit_DeletePylon.cpp), main app
-("SimTheme Park"), src/DisableCurrentPylonEditState_SetCoasterEditState_DeletePylon.cpp:
+("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   RemoveTrackBraceFromPylon 0x10054640, DeletePylon 0x10054814, MoveBrace 0x10054978
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,5 +1,5 @@
 """Unit v5666, the user interface's message receiver, against libtpw_unit_CUIMsgReceiver_ReceiveMessage.dylib
-(tests/unit_CUIMsgReceiver_ReceiveMessage.cpp), main app, src/vector2d_CUIMsgReceiver_ReceiveMessage.cpp:
+(tests/unit_CUIMsgReceiver_ReceiveMessage.cpp), main app, src/game/ui/vector2d.cpp:
   CUIMsgReceiver::ReceiveMessage 0x10130998
 
 A case is a message (its type from GetType, a word at +8 and one at +0xc) and a call. On the PowerPC side the message has a vtable whose

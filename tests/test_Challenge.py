@@ -1,4 +1,4 @@
-"""Unit w174, one challenge, against libtpw_unit_Challenge.dylib (tests/unit_Challenge.cpp), main app ("SimTheme Park"), src/Challenge.cpp:
+"""Unit w174, one challenge, against libtpw_unit_Challenge.dylib (tests/unit_Challenge.cpp), main app ("SimTheme Park"), src/game/park/ChallengeHQ.cpp:
   CChallenge::CChallenge 0x100f5a78, CChallenge::Serialise 0x100f5b80, CChallenge::DidThisWinIt 0x100f60d8, GetOfferId 0x100f8d7c,
   GetActiveId 0x100f8ee4, GetWinId 0x100f904c, GetLoseId 0x100f91b0, LOADVAR<ChallengeType> 0x100f93e8, LOADVAR<StaffType> 0x100f9518,
   SAVEVAR<ChallengeType> 0x100f9640, SAVEVAR<StaffType> 0x100f9788

@@ -1,6 +1,6 @@
 """Unit v5122, the eight CONGRAT_PRICING great value / great satisfaction scorers, against
 libtpw_unit_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.dylib (tests/unit_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.cpp), main app
-("SimTheme Park"), src/AdvisorScoring_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.cpp:
+("SimTheme Park"), src/game/advisor/AdvisorScoring.cpp:
   DRINKS_GREAT_VALUE 0x1001a010, SIDESHOWS_GREAT_VALUE 0x1001a104, RESTAURANT_GREAT_VALUE 0x10019f18, SHOPS_GREAT_VALUE 0x10019e28,
   FOOD_GREAT_SATISFACTION 0x1001a1f8, FOOD_GREAT_VALUE 0x10019d34, SHOPS_GREAT_SATISFACTION 0x1001a2f0, RESTAURANT_GREAT_SATISFACTION 0x1001a3e8
 

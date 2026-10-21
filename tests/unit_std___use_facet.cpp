@@ -1,5 +1,5 @@
 // Test library for std::__use_facet<F> (unit v5665; libtpw_unit_std___use_facet.dylib, tests/test_std___use_facet.py), main app:
-//   src/GetNextWaypoint_HeightAtPos_NAV_std___use_facet.cpp   the four functions UseFacet*; the id globals are defined here.
+//   src/game/MslSupport.cpp   the four functions UseFacet*; the id globals are defined here.
 //
 // The callees outside the unit are recording fakes: operator new, the facet constructors, the vector resize/insert/erase and
 // the facet delete through __ptr_glue. The vector fakes only change the count (they do not fill the new slots), so a stale

@@ -1,5 +1,5 @@
 """Unit v5664, LinearSampleTrack, against libtpw_unit_LinearSampleTrack.dylib (tests/unit_LinearSampleTrack.cpp), main app
-("SimTheme Park"), src/DestroyCoasterPylons_CalcNumTrackSamples_LinearSampleTrack.cpp:
+("SimTheme Park"), src/game/rides/CoasterTrack.cpp:
   LinearSampleTrack 0x10051770
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

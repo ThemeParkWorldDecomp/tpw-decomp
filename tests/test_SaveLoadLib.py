@@ -1,6 +1,6 @@
 """Differential tests for the three small bullfrog functions unit w108 translated for the save file reader and the most-recent-save
-loader: LbFile_CompareFileStamps (0x10000520, src/LbFile_stamp.cpp), CZLib::DecompressedSize (0x1002512c) and
-LbZLib_MemDecompressedSize (0x100258a0, both src/lb_zlib_size.cpp), against libtpw_unit_SaveLoadLib.dylib (tests/unit_SaveLoadLib.cpp).
+loader: LbFile_CompareFileStamps (0x10000520, src/bullfrog/LbFile.cpp), CZLib::DecompressedSize (0x1002512c) and
+LbZLib_MemDecompressedSize (0x100258a0, both src/bullfrog/LbZLib.cpp), against libtpw_unit_SaveLoadLib.dylib (tests/unit_SaveLoadLib.cpp).
 
 NS_MacDoze::CompareFileTime (a platform function; the original's is and
 platform/tests/platform_tests.cpp) is a fake on both sides that records the four words and answers a queue. The size functions run

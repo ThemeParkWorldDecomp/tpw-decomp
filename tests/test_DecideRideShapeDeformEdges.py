@@ -1,5 +1,5 @@
 """Unit v5915, the ride highlight and flash functions and the shape edge marker, against libtpw_unit_DecideRideShapeDeformEdges.dylib
-(tests/unit_DecideRideShapeDeformEdges.cpp), main app ("SimTheme Park"), src/Debug_overlays_DecideRideShapeDeformEdges.cpp:
+(tests/unit_DecideRideShapeDeformEdges.cpp), main app ("SimTheme Park"), src/game/park/SkirtDeform.cpp, src/game/rides/RidePreview.cpp:
   UnhighlightRide 0x1006d0f8, StartFlashingObject 0x1006d2f8, StopFlashingObject 0x1006d430, DecideRideShapeDeformEdges 0x1006d76c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

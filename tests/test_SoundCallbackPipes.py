@@ -1,7 +1,7 @@
 """Unit w79i, the sound library's sample callback pipes, against libtpw_unit_SoundCallbackPipes.dylib
 (tests/unit_SoundCallbackPipes.cpp), in the program "sound symbols shared" (the Mac's sound library, Code at 0x10000000, TOC base
 r2 = 0x1003abf0):
-  src/TbSoundSampleCallback.cpp
+  src/game/advisor/AdvisorScoring.cpp, src/sound/TbSoundBankInfo.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleCallback.cpp, src/sound/TbSoundSampleCodec.cpp, src/sound/TbSoundSamplePipe.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/UserCallback.cpp
     TbSoundUserCallback: constructors 0x10000d20 and 0x100002c8, destructor 0x100001b0, SetInfo 0x10013d78, GetInfo 0x10013e4c,
                          operator new 0x10013ae0, operator delete 0x10013bb0, TopUp 0x10013c54, SetLevel 0x10013d38, ClearCache
                          0x10013a4c, the cleanup destructor 0x10013f2c;

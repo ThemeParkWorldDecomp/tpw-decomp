@@ -34,7 +34,7 @@ public:
     int32_t Close();                                   // 0x10015ef4
     CTextureEntry* LoadFile(char* name);                // 0x10015f9c
     CTextureEntry* LoadTexture(char* folder, char* name);// 0x10016324
-    int32_t RemoveTexture(CTextureEntry* texture);       // 0x1001658c (src/tb_loadmanager.cpp)
+    int32_t RemoveTexture(CTextureEntry* texture);       // 0x1001658c (src/engine/TextureLoadManager.cpp)
     void SetLoadFlags(int32_t flags) { mLoadFlags = static_cast<uint32_t>(flags); }   // 0x100166c8
     STextureLoad mLoads[4096];                          // 0x00000
     int32_t mCount;                                    // 0x10000

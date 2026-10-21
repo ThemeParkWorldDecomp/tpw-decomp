@@ -1,11 +1,11 @@
-"""SRenderListEntry::GetFaceSetBlendMode and SetupPrimitive (src/tb_renderentry_setup.cpp), original
+"""SRenderListEntry::GetFaceSetBlendMode and SetupPrimitive (src/engine/RenderList.cpp), original
 versus translation.
 
 The one callee that is a fake on both sides is CDrawPrimitive::GetNextPrimitive (tests/unit_RenderEntrySetup.cpp
 has the host's): it records every argument and answers the case's queue "Prim" (0: NULL, else the one
 primitive of the case, whose bytes are all 0xa5 before the call, so a stray write shows). The real one reaches
 into the render memory's tables and has its own test (tests/test_PrimitiveBuffer.py). CTextureEntry::GetBlendingMode
-and StoreAsWrapping run as they are on both sides (the unit library holds src/tb_textureentry.cpp), and so do
+and StoreAsWrapping run as they are on both sides (the unit library holds src/engine/TextureEntry.cpp), and so do
 CsTexture::GetTextureEntry and CTextureEntry::GetTexture (inline in the translation, real on the PowerPC side).
 
 A case is a world: the render list entry's flags, the node (its flags, its face sets with their four flag bytes

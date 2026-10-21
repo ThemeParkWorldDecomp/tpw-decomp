@@ -4,8 +4,8 @@
 
 class CInGame {
 public:
-    static void Init();   // 0x1014b2bc (called with no object): Start, nothing else (src/InGame.cpp)
-    // 0x1014b304 (676 bytes, src/InGame_start.cpp): fills eight colours of gColours from the global palette (see there).
+    static void Init();   // 0x1014b2bc (called with no object): Start, nothing else (src/game/InGame.cpp)
+    // 0x1014b304 (676 bytes, src/game/InGame.cpp): fills eight colours of gColours from the global palette (see there).
     static void Start();
 };
 

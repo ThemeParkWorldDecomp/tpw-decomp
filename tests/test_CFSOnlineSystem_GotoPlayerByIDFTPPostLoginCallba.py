@@ -1,7 +1,7 @@
 """Unit v51123: the FTP post-login callbacks, the login getters, Login, Logout, the park/server/theme CompleteGetList instances, two
 std::__tree<unsigned short> helpers and two status panel members, against libtpw_unit_CFSOnlineSystem_GotoPlayerByIDFTPPostLoginCallba.dylib
 (tests/unit_CFSOnlineSystem_GotoPlayerByIDFTPPostLoginCallba.cpp), main app ("SimTheme Park"),
-src/FS_Online_init_CFSOnlineSystem_GotoPlayerByIDFTPPostLoginCallba.cpp:
+src/game/online/FS_Online.cpp, src/game/save/FS_MasterSave.cpp, src/game/ui/ui_FeatureStatus.cpp, src/game/ui/ui_bogStatus.cpp:
   GotoPlayerByIDFTPPostLoginCallback 0x10176180, LoggedInGotoPlayerRequestFTPDownloadByID 0x10176390, RequestFTPPostLoginCallback 0x10175f24,
   GetChildLock 0x10171980, GetLoginCustomerID 0x1017193c, GetLoginPlayerID 0x101718fc, GetLoginEmailAddress 0x101718b8,
   GetLoginPassword 0x10171878, GetLoginCustomerName 0x10171834, CanWeSendEmail 0x101717cc, Logout 0x10171398, LoginRASCancelled 0x10171114,

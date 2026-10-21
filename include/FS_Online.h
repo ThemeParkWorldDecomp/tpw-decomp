@@ -1,5 +1,5 @@
 // FS_Online.cpp (main app): the online system and the game type. PARTIAL; mostly
-// untranslated (the OnlineConfig constructor is in src/FS_Online.cpp).
+// untranslated (the OnlineConfig constructor is in src/game/online/FS_Online.cpp).
 #pragma once
 #include <cstdint>
 #include <string>
@@ -109,13 +109,13 @@ public:
     int32_t mTotal;              // 0x18  size of the download
     int32_t mDone;               // 0x1c  received so far
 
-    // Unit v5101 (src/FTPClient_RecvData.cpp). The Mac object is 0x2773 bytes and derives from Connection/CSock; the host's layout
+    // Unit v5101 (src/game/online/FTPClient.cpp). The Mac object is 0x2773 bytes and derives from Connection/CSock; the host's layout
     // differs (the vtable pointer is 8 bytes), so these members keep the Mac offsets in the comments only.
     int32_t RecvData(bool save, int32_t count);         // 0x1020b59c: 0 ok, 1 file not opened, 2 recv failed, 3 accept failed
     FTPClient* Destruct(int16_t deleteFlag);            // 0x1020b46c: the body of the destructor (deleting form when the flag is > 0)
     int32_t Connect(char* a, char* b, char* c, char* server);   // 0x1020b730
     int32_t _EnterPassiveMode();                        // 0x1020b904: 0 ok, 0x38/0x34/0x43 errors
-    int32_t _Connect();                                 // 0x1020bbe8 (unit v5227, src/FTPClient_RecvData_FTPClient__Download.cpp)
+    int32_t _Connect();                                 // 0x1020bbe8 (unit v5227, src/game/online/FTPClient.cpp)
     int32_t _Download();                                // 0x1020c228 (unit v5227): 0 ok, 0x38 closed, 0x34/0x40 socket, 0x43/0x44 answers
     static void* _threadfn(void* self);                 // 0x1020c860 (untranslated; a fake in the test)
 
@@ -139,7 +139,7 @@ public:
     uint8_t mThreadStarted;      // 0x2771
     uint8_t mThreaded;           // 0x2772
 
-    // Unit v5273 (src/FTPClient_RecvData_FTPClient_ParseFileSize.cpp). Construct is the body of the constructor (the vptr is stored by the
+    // Unit v5273 (src/game/online/FTPClient.cpp). Construct is the body of the constructor (the vptr is stored by the
     // caller's construction here); the data member keeps the end of the class so no earlier member moves.
     FTPClient* Construct(CFTPControl* control, bool threaded);   // 0x1020b368 (208)
     int32_t Disconnect();                                        // 0x1020beb8 (176)
@@ -207,7 +207,7 @@ struct UshortSetTree {
     Iterator find(const uint16_t& key);                     // 0x1016d1f8
     InsertResult insert_one(const uint16_t& key);           // 0x1016e9c4
     node* insert_node_at(node* parent, bool left, bool leftmost, const uint16_t& value);   // 0x1016f164
-    // Unit v51125 (src/std_exception_what.cpp): 0x1016e65c (448): frees the subtree under `subtree` and `subtree` itself.
+    // Unit v51125 (src/game/MslSupport.cpp): 0x1016e65c (448): frees the subtree under `subtree` and `subtree` itself.
     void destroy(node* subtree);
 };
 namespace v5917_callee {
@@ -221,7 +221,7 @@ class IPBase {
 public:
     void ShowError();   // 0x1020cac8 (stand-in elsewhere)
 };
-// Unit v51009 (defined in src/COnlinePerson_SetDest_VoteNotifyCallback.cpp): ShowError's tables, Mac pointer words (original names unknown).
+// Unit v51009 (defined in src/game/online/IPBase.cpp): ShowError's tables, Mac pointer words (original names unknown).
 extern const int16_t* gIPErrorCodes;         // 0x10396d1c: the int16 error numbers, ended by 0 (a native pointer here, a word on the Mac)
 extern const char* const* gIPErrorTexts;     // 0x10396d18: the texts, one per number (the ending 0 has one too; the Mac's entries are words)
 namespace ip_callee {
@@ -259,9 +259,9 @@ public:
     char* ReturnFTPDownloadLocalPath();         // 0x10177608
     void StopProcessing();   // 0x10171404: the lobby's island screens call it as they open; resets news, city, upload and FTP download, then removes the progress bar
     // 0x1017178c (8 bytes; unit w40's mail icon handler asks): the word at 0x60, nonzero when the player is logged in.
-    int32_t AreWeLoggedIn();   // 0x1017178c (src/FS_Online_tick.cpp, unit w69)
+    int32_t AreWeLoggedIn();   // 0x1017178c (src/game/online/FS_Online.cpp, unit w69)
 
-    // Back to the start state of one online job (src/FS_Online_init.cpp): each releases its connection first.
+    // Back to the start state of one online job (src/game/online/FS_Online.cpp): each releases its connection first.
     void InitLogin();                       // 0x101719f8
     void ReleaseLoginConnection();          // 0x10171b68
     void InitNews();                        // 0x10172238
@@ -273,10 +273,10 @@ public:
     void InitFTPDownload();                 // 0x10176cec
     void ReleaseFTPDownloadServerConnection();   // 0x101770dc
     void TickLogin();                       // 0x10171adc: when connected and the login finished, CompleteLogin(0) and the flag cleared
-    // The login job's end (src/FS_Online_tick.cpp, unit w69): clears a pending error id, then either finishes the login (error 0) or reports
+    // The login job's end (src/game/online/FS_Online.cpp, unit w69): clears a pending error id, then either finishes the login (error 0) or reports
     // the error to the caller's callback and puts the login words back.
     void CompleteLogin(int32_t result);     // 0x10171c08 (444)
-    // The state tickers (src/FS_Online_tick.cpp, unit w69): each follows its job's progress bar and completes the job when it is done.
+    // The state tickers (src/game/online/FS_Online.cpp, unit w69): each follows its job's progress bar and completes the job when it is done.
     void TickNews();           // 0x1017232c (320)
     void TickCity();           // 0x10173afc (1132)
     void TickUpload();         // 0x10175b00 (236)
@@ -285,7 +285,7 @@ public:
     void CompleteNews();                    // 0x1017253c (648)
     void LoggedInGetNews();                 // 0x10171eb8 (320)
     void CompleteUpload(int32_t failed);    // 0x10175c20 (228): 1 when the upload word at 0x32c was 0
-    // Unit v5043 (src/FS_Online_init_CFSOnlineSystem_LoggedInRequestUpload.cpp).
+    // Unit v5043 (src/game/online/FS_Online.cpp).
     void UnpublishPark(int32_t park);                       // 0x10174ca0 (372)
     void RequestUpload(const char* file, int32_t f344, const char16_t* name, const char16_t* description, int32_t f370,
                        void (*callback)(int32_t, const void*), const void* context);   // 0x10174fe8 (288)
@@ -303,7 +303,7 @@ public:
     // Unit v5113 (stand-ins, fakes in the test).
     void LoginRASCancelled();                                           // 0x10171114 (40)
     void LoginConnectionCallback(int32_t a, int32_t b, void* c, void* d);   // 0x101715a0 (392)
-    // Unit v5924 (src/FS_Online_init_CFSOnlineSystem_LoginConnectionCallback.cpp): the news job's callback.
+    // Unit v5924 (src/game/online/FS_Online.cpp): the news job's callback.
     void NewsConnectionCallback(int32_t a, int32_t b, void* c, void* d);   // 0x10172030 (452)
     // Unit v5271 (stand-in, a fake in the test): 0x101727f8 (2252).
     void CityServerConnectionCallback(int32_t a, int32_t b, void* c, void* d);
@@ -326,7 +326,7 @@ public:
     uint32_t GetChildLock();
     // Unit v51110: 0x101719bc (8), the word at 0x5c (inside mF54).
     uint32_t GetAvatarID();
-    // Unit v5655 (src/FS_Online_init_CFSOnlineSystem_CompleteFTPDownload.cpp): the FTP download job's callback and next-file request.
+    // Unit v5655 (src/game/online/FS_Online.cpp): the FTP download job's callback and next-file request.
     void FTPDownloadCallbackFn(int32_t state, int32_t error);   // 0x101771a4 (264)
     void RequestNextFileForFTPDownload();                       // 0x101772ec (724)
 
@@ -405,7 +405,7 @@ public:
     int32_t mFTPParkPending;                    // 0x3f0  a downloaded park waits to be played
     uint8_t mF3F4[0x404 - 0x3f4];               // 0x404 bytes on the Mac
 
-    // Unit v51123 (src/FS_Online_init_CFSOnlineSystem_GotoPlayerByIDFTPPostLoginCallba.cpp): the login getters read the strings' data words.
+    // Unit v51123 (src/game/online/FS_Online.cpp): the login getters read the strings' data words.
     const char16_t* GetLoginCustomerName();   // 0x10171834: the word at 0x14 (mLoginName + 8)
     const char16_t* GetLoginPassword();       // 0x10171878: the word at 0x28
     const char16_t* GetLoginEmailAddress();   // 0x101718b8: the word at 0x44
@@ -461,7 +461,7 @@ public:
 // Unit v5063 (untranslated): the park lists' login callback (the Mac passes the address of its TVector); the context is the list.
 void PostLoginCallbackFn_Park(int32_t error, const void* context);   // 0x10178c74 (60)
 
-// Unit v5935 (src/FS_Online_init_CFSOnlineSystem_ConnectUploadServer.cpp): callees of ConnectUploadServer and LoggedInRequestFTPDownload
+// Unit v5935 (src/game/online/FS_Online.cpp): callees of ConnectUploadServer and LoggedInRequestFTPDownload
 // that no unit has translated (fakes in the test). Addresses are the Mac's.
 class CFSUserInfo;
 namespace ftpreq_callee {
@@ -486,7 +486,7 @@ extern uint8_t gOnlineListNode2[];   // 0x10380b08, the exit registration node o
 void sinit_FS_OnlineList_cpp();      // 0x1017ddb4
 extern "C" void __register_global_object(void* object, void* destructor, void* node);   // runtime glue 0x10239940
 
-// Unit v5100 (src/UI_IslandLobby_UpdateOnlineCityInfoOverlay.cpp): the online city info overlay and the login panel's message function.
+// Unit v5100 (src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineLogin.cpp): the online city info overlay and the login panel's message function.
 class InterfaceWindow;
 // A city record, only the two members the overlay reads (the Mac's offsets in the comments; the rest is not known).
 class CFSOnlineCity {
@@ -538,7 +538,7 @@ enum GameType : int32_t {
 
 class CGameType {
 public:
-    // 0x1016f5d8 (src/FS_Online_gametype.cpp, unit w40): the type is read back from the gGameOptions bits kGameOptionEasyGame,
+    // 0x1016f5d8 (src/game/online/FS_Online.cpp, unit w40): the type is read back from the gGameOptions bits kGameOptionEasyGame,
     // kGameOptionOnlineGame and kGameOptionNormalGame (the first set one in that order wins; none set makes the normal game),
     // through SetGameType, which then rewrites all three bits.
     CGameType();
@@ -578,7 +578,7 @@ struct OnlineConfig {
     std::string mComplainEmail;  // 0x24
 };
 
-// Unit v5368: OnlineConfig::~OnlineConfig (0x10003508, 892) over the Mac's object (string words, src/FS_Registry_OnlineConfig_Dtor_OnlineConfig.cpp).
+// Unit v5368: OnlineConfig::~OnlineConfig (0x10003508, 892) over the Mac's object (string words, src/game/MslSupport.cpp).
 namespace online_config_callee {
 void OperatorDelete(void* p);   // 0x10238218
 }
@@ -594,7 +594,7 @@ void CreateOnlineParkInfoPanel(const CFSOnlinePark* park, InterfaceWindow* paren
                                void (*onDownload)(int32_t, const void*), void* context);   // 0x101eabb4 (3660)
 void SatelliteOnlineParkInfoPanelCancelCallback();                      // 0x10174b6c
 void GeneralParkDownloadCompleteCallback(int32_t, const void*);         // 0x101ea734
-// Unit v5537 (src/CreateOnlineParkInfoPanel.cpp): the info panel's globals, its message function (untranslated; the Mac passes the address of
+// Unit v5537 (src/game/ui/ui_onlineParkInfoPanel.cpp): the info panel's globals, its message function (untranslated; the Mac passes the address of
 // its TVector at 0x10268588) and the two callees the panel calls that no header declared.
 extern InterfaceWindow* gOnlineParkInfoPanel;                      // 0x103961e4, NULL when no panel is open
 extern CFSOnlinePark gOnlineParkInfoPark;                          // 0x10396118, the copy of the park the panel shows
@@ -609,7 +609,7 @@ CFSOnlineCity* ReturnCityInfo(CFSOnlineSystemCityList* list, int32_t city);   //
 void RequestFTPPostLoginCallbackFn(int32_t error, void* context);       // 0x10175d3c
 void GotoPlayerByIDFTPPostLoginCallbackFn(int32_t error, void* context);   // 0x10175fac
 
-// Unit v5550 (src/OnlineParkInfoPanelMsg.cpp): the park info panel's messages and
+// Unit v5550 (src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_onlineParkFindPanel.cpp): the park info panel's messages and
 // the park find panel.
 int32_t OnlineParkInfoPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101ea7f0 (896)
 void VisitParkPostDownloadCallbackFn(int32_t error, const void* context);   // 0x101ea684 (116); the Mac passes its TVector at 0x10268598
@@ -626,7 +626,7 @@ extern uint8_t gOnlineParkFindStringA[];                // 0x103960cc (a wide st
 extern uint8_t gOnlineParkFindNodeA[];                  // 0x103960e0 (its __register_global_object record)
 extern uint8_t gOnlineParkFindStringB[];                // 0x103960ec
 extern uint8_t gOnlineParkFindNodeB[];                  // 0x10396100
-// Unit v51037 (src/OnlineParkFindPanelMsg_ContactMenu_ButtonsUnderlayMsg_2.cpp): the static initialisers of ui_onlineParkInfoPanel.cpp (0x101ebae0)
+// Unit v51037 (src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_onlineParkListPanel.cpp): the static initialisers of ui_onlineParkInfoPanel.cpp (0x101ebae0)
 // and ui_onlineParkListPanel.cpp (0x101ec90c); names invented. Strings are raw storage (the Mac's are 0x14 bytes), nodes the exit records.
 void __sinit_ui_onlineParkInfoPanel_cpp();   // 0x101ebae0 (144)
 void __sinit_ui_onlineParkListPanel_cpp();   // 0x101ec90c (116)
@@ -640,7 +640,7 @@ extern uint8_t gOnlineParkListStringA[];     // 0x10396258
 extern uint8_t gOnlineParkListNodeA[];       // 0x1039626c
 extern uint8_t gOnlineParkListStringB[];     // 0x10396238
 extern uint8_t gOnlineParkListNodeB[];       // 0x1039624c
-// Virtual calls on lobby screens the host cannot make as the Mac does (weak definitions in src/OnlineParkInfoPanelMsg.cpp, fakes in the
+// Virtual calls on lobby screens the host cannot make as the Mac does (weak definitions in src/game/ui/ui_onlineParkInfoPanel.cpp, fakes in the
 // test library).
 namespace parkinfo_callee {
 void OnlineIslandsSlot30(void* screen);                      // slot 0x30 of the online islands screen (identity unknown; untranslated)
@@ -667,7 +667,7 @@ void CloseDSocket(FTPClient* self, int32_t* sock);                          // 0
 int32_t ParseFileSize(FTPClient* self, char* text);                         // 0x1020c744
 }  // namespace ftp_callee
 
-// Unit v5962 (src/advisor_leaves_CountDataNodesByType.cpp): bthread_cond, one word on the Mac (the event handle; a native pointer here).
+// Unit v5962 (src/game/online/bthread.cpp, src/game/TPEmbed.cpp): bthread_cond, one word on the Mac (the event handle; a native pointer here).
 namespace NS_MacDoze {
 struct InternalHandle;
 // CreateEvent(security, manualReset, initialState, name) glue 0x1023a8e8; WaitForSingleObject(handle, ms) glue 0x1023a6f0 (0: signalled).
@@ -706,7 +706,7 @@ char* Strncpy(char* dest, const char* src, int32_t n);                      // 0
 int32_t Atoi(const char* text);                                             // 0x10238590
 }  // namespace ftp_callee
 
-// Unit v5655 (src/FS_Online_init_CFSOnlineSystem_CompleteFTPDownload.cpp): the characters the FTP download paths append (the Mac's
+// Unit v5655 (src/game/online/FS_Online.cpp, src/game/online/FS_OnlineList.cpp): the characters the FTP download paths append (the Mac's
 // 0x102a72a4, 0x102a72a6, 0x102a72a8; one literal of slashes there) and two callees (weak defaults in the source, fakes in the test).
 extern char16_t gFTPDownloadSlashA;   // 0x102a72a4
 extern char16_t gFTPDownloadSlashB;   // 0x102a72a6
@@ -716,7 +716,7 @@ CFSOnlineServer* ReturnFTPDownloadServer(CFSOnlineSystemServerList* list);   // 
 TbDynamicStringTemplate<char16_t>* RemoveHead(TbPtrList<TbDynamicStringTemplate<char16_t>>* list);   // 0x10178114
 }  // namespace ftpdl_callee
 
-// Unit v5371 (src/Email_Send_CSock_SendData_Connection_RecvResponse.cpp): the connection base class's receive buffer and local address.
+// Unit v5371 (src/game/online/Connection.cpp): the connection base class's receive buffer and local address.
 // The Mac object has the vtable at 0; the host's class keeps a 4 byte stand-in there so the Mac offsets hold.
 class Connection {
 public:
@@ -728,7 +728,7 @@ public:
 
     int32_t RecvResponse(char* out, int32_t size, bool flag);   // 0x10201bb4 (408): the reply code 100..599, or 0 when recv fails
     uint32_t GetLocalIPAddress();                               // 0x10201d80 (268): a word whose bytes are in network order
-    // Unit v51015 (src/Email_Send_CSock_SendData_base64enc.cpp)
+    // Unit v51015 (src/game/online/Connection.cpp)
     Connection();                          // 0x10201a84 (104): CSock::CSock, then the vptr word 0x102b1610, the words at 0x18, 0x1c and 0x420 cleared, mBuf cleared
     void SendCommandLine(char* line);      // 0x10201b14 (108): adds strlen to the word at 0x18, then CSock::SendData(line, strlen)
     // Unit v51056: ~Connection 0x10201ec0 with the hidden flag: NULL does nothing; else the vptr word 0x102b1610, ~CSock (flag 0), and the
@@ -740,7 +740,7 @@ int32_t Memmove(void* dest, const void* src, int32_t n);                    // 0
 int32_t Gethostname(char* name, int32_t size);                              // 0x1023a7f8
 }  // namespace conn_callee
 
-// Unit v5567 (src/FTPClient_RecvData_sinit_email_cpp.cpp): email.cpp's static initialiser. The strings are TbDynamicStringTemplate
+// Unit v5567 (src/game/online/email.cpp): email.cpp's static initialiser. The strings are TbDynamicStringTemplate
 // objects (0x14 bytes on the Mac, the host's own size here); the nodes are the __register_global_object records.
 void __sinit_email_cpp();                              // 0x1020afc0 (856)
 extern uint8_t gEmailLanguageStrings[];                // 0x10396af8: 16 narrow strings, "English" .. "American"
@@ -759,14 +759,14 @@ struct EmailBlob {
 };
 extern uint32_t gEmailBlob;                            // 0x10396aa8: Ptr32 to the EmailBlob
 
-// Unit v5697 (src/InterfaceWindow_virtuals_CreateUIProgressBar.cpp): the progress bar window.
+// Unit v5697 (src/game/ui/ui_progressBar.cpp): the progress bar window.
 void CreateUIProgressBar(char16_t* text);   // 0x101dffd8 (492): makes the bar window (or sets the text of the one that exists)
 int32_t ProgBarMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101dff64, untranslated (the Mac passes its TVector at 0x10268490)
 extern int16_t gProgBarScript[];     // 0x102afe24, initialised data of the window script (not defined by this unit)
 extern char gProgBarMeshName[];      // 0x1024eda3, "progress.wct" (not defined by this unit)
 extern int32_t gUIProgressBarText;   // 0x10395c68, the string id the bar shows now (original name unknown)
 
-// Unit v5726 (src/ui_newname_AddressBookMsg_sinit_ui_playerLogin_cpp.cpp): ui_playerLogin.cpp's static initialiser.
+// Unit v5726 (src/game/ui/ui_playerLogin.cpp): ui_playerLogin.cpp's static initialiser.
 void __sinit_ui_playerLogin_cpp();                 // 0x101afa90 (116)
 extern const char16_t gPlayerLoginStrings[];       // 0x1024e19e: strings at +0x14 and +0x22 (bytes)
 extern uint8_t gPlayerLoginStringA[];              // 0x10394ae4: wide string (text at +0x14), node 0x10394af8
@@ -774,11 +774,11 @@ extern uint8_t gPlayerLoginStringB[];              // 0x10394ac4: wide string (t
 extern uint8_t gPlayerLoginNodeA[];                // 0x10394af8
 extern uint8_t gPlayerLoginNodeB[];                // 0x10394ad8
 
-// Unit v5924 (src/FS_Online_init_CFSOnlineSystem_LoginConnectionCallback.cpp).
+// Unit v5924 (src/game/online/FS_Online.cpp).
 extern NS_MacDoze::_GUID gOnlineNewsGuid;   // 0x102a7248 (the news requests' GUID; the Mac's first word is 0x5c200a41, the rest was not read)
 void FSOnlineNewsConnectionCallback(int32_t, int32_t, void*, void*);   // 0x10171dfc (the TVector at 0x102674a0)
 void CreateOnlineNewsPanel();                                          // 0x101e3264 (820)
-// Unit v51117 (src/FS_Online_gametype_std___tree_insert_node_at_3_sinit_FS_MasterSave_cpp.cpp)
+// Unit v51117 (src/game/save/FS_MasterSave.cpp, src/game/online/FS_Online.cpp)
 void __sinit_FS_MasterSave_cpp();                                      // 0x1016f35c (64)
 void FSOnlineUploadServerConnectionCallback(int32_t, int32_t, void*, void*);   // 0x10175748 (124)
 extern char16_t gMasterSaveWideText[];  // 0x1024c95e: the wide text is at +0x5f bytes
@@ -788,14 +788,14 @@ namespace online_callee {
 void Free(void* p);   // 0x10238a70, the C library's free (weak in the source, a fake in the tests)
 }
 
-// Unit v5765 (src/COnlineParser_ParseGoto_COnlineParser_ParseIgnore_Sock_Close.cpp): the socket base class.
+// Unit v5765 (src/game/online/IPBase.cpp): the socket base class.
 struct Sock {
     uint32_t mVtable;     // 0x00 (the Mac's vtable word)
     int32_t mSocket;      // 0x04 the socket handle, -1 when closed
     void Close();         // 0x1020e358 (132): shutdown, drain with recv, closesocket
 };
 
-// Unit v51070 (src/FTPClient_RecvData_FTPClient_ParseFileSize_FTPClient__threadfn.cpp): small library functions on the Mac's layouts.
+// Unit v51070 (src/game/online/FTPClient.cpp): small library functions on the Mac's layouts.
 // Objects are Mac words (uint32_t, 32-bit arena addresses); lists are { size 0x0, sentinel prev 0x4, sentinel next 0x8 } with nodes
 // { prev 0x0, next 0x4, data 0x8 }; a wide string is one word pointing to { size 0x0, ..., refs 0x8, data 0xc }.
 extern uint8_t gIPSystemVtableBlock[16];       // 0x102b1938 (the objects hold the address of +8, 0x102b1940)

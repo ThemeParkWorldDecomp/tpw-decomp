@@ -1,7 +1,7 @@
 // Test library for unit v51125 (libtpw_unit_std_exception_what.dylib, tests/test_std_exception_what.py), main app:
-//   src/std_exception_what.cpp  small leaves: the exception what()s, three destructors with a delete flag, byte swaps, the ushort set tree's
+//   src/game/MslSupport.cpp, src/game/online/FS_Online.cpp, src/game/park/TPHField.cpp, src/game/ui/ui_FeatureStatus.cpp  small leaves: the exception what()s, three destructors with a delete flag, byte swaps, the ushort set tree's
 //                               destroy, three online list destructors, std::list<std::string>::clear, FeatureStatusPanel::DeInitViewWindow
-//   src/m3d2_load.cpp           sAlignedBox::Byteswap (tested where it is)
+//   src/engine/EngineUtil.cpp, src/engine/M3D2Load.cpp, src/game/park/TPHField.cpp           sAlignedBox::Byteswap (tested where it is)
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the PowerPC stubs of the module); the globals of
 // other files the unit writes are defined here. Objects are raw arena blocks written by the test with Mac offsets or the host's.
@@ -38,7 +38,7 @@ TbReadClockFn gReadClock;
 TbUpdateMouseFn gUpdateMouse;
 TbMallocFn gMalloc;
 TbFreeFn gFree;
-TbFileCloseFn gFileClose;  // 0x101735e0: src/m3d2_load.cpp's loaders close their file through it (never run here)
+TbFileCloseFn gFileClose;  // 0x101735e0: src/engine/EngineUtil.cpp, src/engine/M3D2Load.cpp, src/game/park/TPHField.cpp's loaders close their file through it (never run here)
 void (*gCityRecordDeleter)(CFSOnlineCity* city);   // FS_OnlineList.h: the hook the weak DestroyCityRecord calls (never run here)
 
 namespace {
@@ -94,7 +94,7 @@ namespace msl_char_string {
 MslCharString* destroy(MslCharString* self, int16_t) { return self; }
 }
 
-// src/m3d2_load.cpp's other functions need the platform's block swap; never run here
+// src/engine/EngineUtil.cpp, src/engine/M3D2Load.cpp, src/game/park/TPHField.cpp's other functions need the platform's block swap; never run here
 namespace SamsUtilities {
 // (the platform's are no-ops on a little-endian host; the original swaps, so the fakes swap, which is what the Mac's call does)
 void _USwapBlock16(uint16_t* words, int32_t count) {

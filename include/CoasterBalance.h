@@ -4,7 +4,7 @@
 
 class CCoasterBalance : public CBalanceTable {
 public:
-    ~CCoasterBalance();   // 0x10039b30, nonvirtual (src/CoasterBalance.cpp)
+    ~CCoasterBalance();   // 0x10039b30, nonvirtual (src/game/rides/CoasterType.cpp, src/game/rides/TPCoaster.cpp)
     const BalanceDescription* GetBalanceDescription(int32_t row) override; // 0x1004595c
     BalanceValue* GetBalanceValuesStart() override; // 0x100459ac
     BalanceValue mValues[3806];

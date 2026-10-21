@@ -1,6 +1,6 @@
 """Unit v51046, nine small lobby, interface and ESP sprite functions, against libtpw_unit_OnlineIslandParkDownloadCompleteCallback_2.dylib
 (tests/unit_OnlineIslandParkDownloadCompleteCallback_2.cpp), main app ("SimTheme Park"),
-src/CLBScreenComponentOnlineIslands_GotoNextIsland_OnlineIslandParkDownloadCompleteCallback_2.cpp:
+src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/online/lobby_island.cpp, src/game/online/lobby_parser.cpp, src/game/ui/intrface.cpp:
   OnlineIslandParkDownloadCompleteCallback 0x100b4420, PostGetTop10ParksListCallbackFunction 0x100b3e28,
   CLBScreenComponentIslands::ProcessCancel 0x100b1f3c, __sinit_lobby_parser_cpp 0x100b6ae4,
   CLBScreenComponentDownloadGlobe::Show 0x100ae590, CLBScreenComponentDownloadGlobe::ProcessCancel 0x100ae46c,

@@ -1,5 +1,5 @@
 // Test library for NameWindow and TankButton (unit v5539; libtpw_unit_NameWindow.dylib, tests/test_NameWindow.py), main app:
-//   src/DoScroll_NameWindow.cpp, src/CreateResearchPanel_RideMsg.cpp
+//   src/game/ui/ui_researchPanel.cpp
 //
 // The callees outside the unit are recording fakes; the globals of other files are defined here.
 #include <cstdarg>

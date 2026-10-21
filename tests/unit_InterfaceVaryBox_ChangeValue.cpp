@@ -1,5 +1,5 @@
 // Test library for InterfaceVaryBox::ChangeValue and SetMinMaxValues (unit v5266; libtpw_unit_InterfaceVaryBox_ChangeValue.dylib), main app:
-//   src/ui_whatami_InterfaceVaryBox_ChangeValue.cpp
+//   src/game/ui/InterfaceVaryBox.cpp
 //
 // InterfaceWindow::SetValue and UI_PostMessage are recording fakes.
 #include <cstddef>

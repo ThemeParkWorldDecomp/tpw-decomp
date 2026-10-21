@@ -1,5 +1,5 @@
 """Unit v51026, CreateFinancePanel 0x101a001c, against libtpw_unit_CreateFinancePanel_2.dylib (tests/unit_CreateFinancePanel_2.cpp), main app
-("SimTheme Park"), src/CreateFinancePanel_2.cpp.
+("SimTheme Park"), src/game/ui/ui_FinancePanel.cpp.
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian) for the translation. Every callee outside the unit (the window methods,

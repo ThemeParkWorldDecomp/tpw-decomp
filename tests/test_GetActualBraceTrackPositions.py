@@ -1,5 +1,5 @@
 """Unit v5562: the brace placement of the track editor, against libtpw_unit_GetActualBraceTrackPositions.dylib
-(tests/unit_GetActualBraceTrackPositions.cpp), main app ("SimTheme Park"), src/GetActualBraceTrackPositions.cpp:
+(tests/unit_GetActualBraceTrackPositions.cpp), main app ("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   GetActualBraceTrackPositions 0x1003cc34, GetActualBraceTangents 0x1003c950, GetTangentLengths 0x1003c59c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,5 +1,5 @@
 """Unit v5083, the 2D map's MoveCentre, InitSprites and UpdateMapZoom, against libtpw_unit_CUI2DMap_MoveCentre.dylib
-(tests/unit_CUI2DMap_MoveCentre.cpp), main app ("SimTheme Park"), src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre.cpp:
+(tests/unit_CUI2DMap_MoveCentre.cpp), main app ("SimTheme Park"), src/game/ui/ui_2dmap.cpp:
   CUI2DMap::MoveCentre 0x1022f8a4, CUI2DMap::InitSprites 0x1022fad0, CUI2DMap::UpdateMapZoom 0x1022f4d4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

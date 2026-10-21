@@ -1,5 +1,5 @@
 """Unit v5538, leaving the coaster edit mode and enabling its buttons, against libtpw_unit_EndCoasterEditMode.dylib
-(tests/unit_EndCoasterEditMode.cpp), main app ("SimTheme Park"), src/ui_coasteredit_kb_EndCoasterEditMode.cpp:
+(tests/unit_EndCoasterEditMode.cpp), main app ("SimTheme Park"), src/game/ui/ui_coasterPanel.cpp:
   EndCoasterEditMode 0x1019cad0, CoasterButtonsEnabled 0x1019cd6c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

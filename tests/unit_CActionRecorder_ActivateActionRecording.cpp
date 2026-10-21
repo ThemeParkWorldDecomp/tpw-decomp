@@ -1,6 +1,6 @@
 // Test library for CActionRecorder::ActivateActionRecording and the RecordAction / ProcessAction overloads taking a RecordedAction
 // (unit v51041; libtpw_unit_CActionRecorder_ActivateActionRecording.dylib, tests/test_CActionRecorder_ActivateActionRecording.py), main app:
-//   src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ProcessAction_CActionRecorder_ActivateActionRecording.cpp
+//   src/game/ActionRecorder.cpp
 //
 // The callees outside the unit are fakes recording what the real ones read: CTRACE (a format id, the level and the %d arguments), the
 // file's virtual Write (which file, the size and a hash of the bytes) and CMemFile::Open (which file and the size).

@@ -1,6 +1,6 @@
 // Test library for CFSOnlineTheme's constructor and destructor (unit v5670; libtpw_unit_CFSOnlineTheme_CFSOnlineTheme.dylib,
 // tests/test_CFSOnlineTheme_CFSOnlineTheme.py), main app:
-//   src/CFSOnlineTheme_CFSOnlineTheme.cpp
+//   src/game/online/FS_OnlineList.cpp
 //
 // Fakes: the string classes (constructors, destructors, operator=) and UniStringToString record events. The list members run for real.
 #include <cstddef>

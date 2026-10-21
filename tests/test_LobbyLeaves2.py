@@ -1,10 +1,10 @@
 """Differential test for the lobby's small leaves (unit w58), against libtpw_unit_LobbyLeaves2.dylib (tests/unit_LobbyLeaves2.cpp):
 
-  src/rsse_normals.cpp  RecalculateInvalidNodeFaceNormals 0x100c7224, RecalculateInvalidFaceNormals 0x100c7418
-  src/rsse_rotate.cpp   XRotateLMatrixNoTrans 0x100c13bc, YRotateLMatrixNoTrans 0x100c1698, ZRotateLMatrixNoTrans 0x100c15f0,
+  src/game/rides/RideAnim.cpp  RecalculateInvalidNodeFaceNormals 0x100c7224, RecalculateInvalidFaceNormals 0x100c7418
+  src/game/LMatrix.cpp   XRotateLMatrixNoTrans 0x100c13bc, YRotateLMatrixNoTrans 0x100c1698, ZRotateLMatrixNoTrans 0x100c15f0,
                         RotateLMatrixXYZNoTrans 0x100c174c, RotateLMatrixXYZNoTransHi 0x100c1944
-  src/bfl_tbrect.cpp    TbRect::Bounding 0x1002a110 (the bullfrog library's program, not the main app's)
-  src/ui_main_meshes.cpp  DeInitGeneralUI 0x10185d64, UIInterface::DeInitGeneral 0x101ef64c
+  src/bullfrog/LbRect.cpp    TbRect::Bounding 0x1002a110 (the bullfrog library's program, not the main app's)
+  src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_main.cpp  DeInitGeneralUI 0x10185d64, UIInterface::DeInitGeneral 0x101ef64c
 
 The functions run as the original on the PowerPC side. The normals and the rotations call nothing but the C library (sqrt, cos, sin, and
 the class code function __fpclassifyf, which stubs here: NaN is class 1), whose host side is the host's libm: the cos and sin stubs are

@@ -1,5 +1,5 @@
 """Unit v5750, TbRect::Intersects 0x1002a06c (bullfrog), and unit v5L16, TbRect::Normalise 0x1002a1d4, against
-libtpw_unit_TbRect_Intersects.dylib (src/bfl_tbrect_TbRect_Intersects.cpp).
+libtpw_unit_TbRect_Intersects.dylib (src/bullfrog/LbRect.cpp).
 
 Intersects: two rectangles are built in each memory (four signed words each); the answer (low byte) and both rectangles are compared.
 Normalise: one rectangle and the word after it; the five words are compared. No callees, no fused operations.

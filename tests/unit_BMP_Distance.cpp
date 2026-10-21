@@ -1,5 +1,5 @@
 // Test library for the bump sound and distance helpers (unit v5706; libtpw_unit_BMP_Distance.dylib, tests/test_BMP_Distance.py), main app:
-//   src/BMP_InsideArea_PointOutAllInverse_BMP_Distance.cpp   BMP_Distance, PossitionSound1, SingleSoundAtBump, MineToSystemCords, NormaliseVector
+//   src/game/rides/BumperRide.cpp   BMP_Distance, PossitionSound1, SingleSoundAtBump, MineToSystemCords, NormaliseVector
 //
 // SOUND_MoveSoundEffect and SOUND_SendEvent are recording fakes; gSoundBanks (other file's global) is defined here.
 #include <cstddef>

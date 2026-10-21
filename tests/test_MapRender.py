@@ -1,4 +1,4 @@
-"""The engine's frame (src/tb_map_render.cpp and its helpers): CMapWho::Render,
+"""The engine's frame (src/engine/Gamut.cpp, src/engine/MapWho.cpp and its helpers): CMapWho::Render,
 RenderWindow, PrepareWorldspace, ALTTAB_RestoreState, the render option accessors,
 CGamut::GetQuads, CMeshDelay's Reset and Prepare, CLoadSurface::Display and the three FPU
 switches, against the original. Every callee outside the unit is a fake on both sides

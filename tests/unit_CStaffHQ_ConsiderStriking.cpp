@@ -1,5 +1,5 @@
 // Test library for CStaffHQ::ConsiderStriking (unit v5681; libtpw_unit_CStaffHQ_ConsiderStriking.dylib, tests/test_CStaffHQ_ConsiderStriking.py), main app:
-//   src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_ConsiderStriking.cpp
+//   src/game/buildings/StaffHQ.cpp
 //
 // The callees outside the unit are recording fakes: CTRACE, CParkTime::GetFunnyTimeSinceSessionStart, StaffTypeHasAGrievance,
 // StopStrikeInProgress, the CMsgStaffInfo constructor, CMessageCentre::PostMessage and the two allocation helpers.

@@ -1,6 +1,6 @@
-// Test library for the map reset and the attribute map (libtpw_unit_MapReset.dylib; see tests/test_MapReset.py): src/MapReset.cpp
-// (LLCC_ResetMap, the two cell resets, HFieldCellStatus, RemoveNeighbour, ModifyDirection), src/ChunkFile.cpp (the chunk file reader,
-// its two handler classes, the list members and CMap::LoadAttribMap) and src/ScriptCheckTable.cpp, all real.
+// Test library for the map reset and the attribute map (libtpw_unit_MapReset.dylib; see tests/test_MapReset.py): src/game/park/CellBase.cpp, src/game/park/LLCellSystem.cpp, src/game/park/MapCell.cpp, src/game/park/TPHField.cpp, src/game/park/TrackCell.cpp
+// (LLCC_ResetMap, the two cell resets, HFieldCellStatus, RemoveNeighbour, ModifyDirection), src/game/World.cpp, src/game/park/Map.cpp, src/game/save/ChunkFileReader.cpp (the chunk file reader,
+// its two handler classes, the list members and CMap::LoadAttribMap) and src/game/Script.cpp, all real.
 //
 // Everything they call outside those files is a fake that records through calllog: the three untranslated cell members
 // (CalculateNeighbours, SetHFieldTile, ModifyType; each records the cell and a hash of its bytes at the call, and may write into

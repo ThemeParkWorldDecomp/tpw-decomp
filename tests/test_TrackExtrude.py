@@ -1,5 +1,5 @@
 """Unit w213: the coaster track's mesh, against libtpw_unit_TrackExtrude.dylib (tests/unit_TrackExtrude.cpp), main app ("SimTheme Park"),
-src/TPConfig_extrude.cpp:
+src/game/rides/CoasterExtrude.cpp, src/game/rides/CoasterSpline.cpp:
   ExtrudeTrackSection 0x1004f628, ExtrudeCrossSectionVertices 0x1004ed8c, GetNewTrackMeshSet 0x1004ea30,
   SkinCrossSectionFaces 0x1004f410, LinkFEStoreToFETextureCont 0x1004e790, CopyExtrudedFaceData 0x1004e6a0,
   InterpolateCoasterSpline 0x1004e318 (the sTrackSample overload)

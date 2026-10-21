@@ -1,9 +1,9 @@
-"""Differential test for src/RideAnimChange.cpp (IsValidAnimation, SetupAnimationFlags,
+"""Differential test for src/game/rides/RideAnim.cpp (IsValidAnimation, SetupAnimationFlags,
 ResetRideAnimationSingleChannel, SetNewAnim, SetCurRideAnim, InterpolateCMorphData,
 InterpolateCMorphBoundData and RADecompressMorph), against libtpw_unit_RideAnimChange.dylib.
 
 The eight functions run as the original on the PowerPC side, and so does ResetAnimTimeStats (0x100c5a90,
-src/RideAnimInit.cpp on the host), which SetNewAnim calls for the control's clock words. The one other
+src/game/rides/RideAnim.cpp, src/game/rides/TPRide.cpp on the host), which SetNewAnim calls for the control's clock words. The one other
 callee, the matrix form of EnableMeshDraw, is a fake on both sides that records its arguments and the
 matrix it is given. tests/unit_RideAnimChange.cpp is the host's half, the Stubs below the PowerPC's.
 
@@ -1204,7 +1204,7 @@ REAL_MORPH_FILES = [
 
 def read_morph(data, offset):
     """The morph set at a file offset of a mesh (little-endian) as a morph_record, the vertex words rewritten
-    the way the loader does (src/m3d2_load.cpp: the file's three 10-bit fields to the top of the word)."""
+    the way the loader does (src/engine/M3D2Load.cpp, src/engine/EngineUtil.cpp, src/game/park/TPHField.cpp: the file's three 10-bit fields to the top of the word)."""
     flags, count = struct.unpack_from("<HH", data, offset)
     keys_at = struct.unpack_from("<I", data, offset + 0xC)[0]
     offset_xyz = struct.unpack_from("<3f", data, offset + 0x14)

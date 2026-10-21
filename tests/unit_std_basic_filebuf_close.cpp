@@ -1,6 +1,6 @@
 // Test library for std::basic_filebuf<wchar_t> close, underflow, pbackfail, imbue (unit v5137;
 // libtpw_unit_std_basic_filebuf_close.dylib, tests/test_std_basic_filebuf_close.py), main app:
-//   src/std_basic_filebuf_close.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues.
 #include <cstddef>

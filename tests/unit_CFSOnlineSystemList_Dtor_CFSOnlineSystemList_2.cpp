@@ -1,6 +1,6 @@
 // Test library for three destructors of the online system (unit v5921; libtpw_unit_CFSOnlineSystemList_Dtor_CFSOnlineSystemList_2.dylib,
 // tests/test_CFSOnlineSystemList_Dtor_CFSOnlineSystemList_2.py), main app:
-//   src/CFSOnlineSystemList_Dtor_CFSOnlineSystemList_2.cpp   the park list's, ccCityInfo's and CFSOnlineSystem's destructors
+//   src/game/online/FS_Online.cpp   the park list's, ccCityInfo's and CFSOnlineSystem's destructors
 //
 // The callees outside the unit are fakes that record the same events as the module's PowerPC stubs. Objects the destructors delete through
 // a virtual call (lists, the FTP park) are "Fake" objects whose deleting destructor logs "vdel"; every operator delete is logged, and

@@ -1,5 +1,5 @@
 // Test library for std::basic_streambuf<char>::xsgetn / xsputn (unit v5147; tests/test_std_basic_streambuf_xsgetn.py), main app:
-//   src/std_basic_streambuf_xsgetn.cpp
+//   src/game/MslSupport.cpp
 // The virtual uflow and overflow are recording fakes answering from the test's queues.
 #include <cstddef>
 #include <cstdint>

@@ -1,5 +1,5 @@
 """Unit v5551, IsValidPylonPosition, against libtpw_unit_IsValidPylonPosition.dylib (tests/unit_IsValidPylonPosition.cpp), main app
-("SimTheme Park"), src/TPCoaster_instances_IsValidPylonPosition.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   IsValidPylonPosition 0x100411e4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

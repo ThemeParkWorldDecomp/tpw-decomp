@@ -1,5 +1,5 @@
 """Unit v5197, AnimatingPumpMsg 0x101b49d0, against libtpw_unit_AnimatingPumpMsg.dylib (tests/unit_AnimatingPumpMsg.cpp), main app
-("SimTheme Park"), src/CreateResearchPanel_RideMsg_AnimatingPumpMsg.cpp.
+("SimTheme Park"), src/game/ui/ui_researchPanel.cpp.
 
 A case is a call with a fake window address (never dereferenced). The callees getExtraParam, setExtraParam, GetWindow, SetFrame,
 IveGotTicks and CallDefaultWindowHandler are fakes on both sides that record every argument; getExtraParam, IveGotTicks and the default

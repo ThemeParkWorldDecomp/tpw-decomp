@@ -1,4 +1,4 @@
-// Test library for __sinit_tb_printf_opengl_cpp (src/tb_printf_opengl_sinit_tb_printf_opengl_cpp.cpp).
+// Test library for __sinit_tb_printf_opengl_cpp (src/engine/tb_printf_opengl.cpp).
 // __register_global_object is a recording fake; the globals are defined here.
 #include <cstddef>
 #include <cstdint>

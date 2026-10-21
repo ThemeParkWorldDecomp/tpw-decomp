@@ -1,5 +1,5 @@
 """Unit w127, the dynamic face list and the water, against libtpw_unit_DynamicFaces.dylib (tests/unit_DynamicFaces.cpp), main app
-("SimTheme Park"), src/DynamicFaces.cpp:
+("SimTheme Park"), src/game/park/DynamicCell.cpp:
   sort 0x100DFB68, DC_ResetSquareFaceListPtr 0x100E0260, DC_AddSquareFaceToList 0x100E02A0, DC_AddPolyFaceToList 0x100E03F0,
   HDZ_RotatePointZ 0x100E0544, DC_AnimateWater 0x100E10F4, DC_DrawWater 0x100E060C.
 

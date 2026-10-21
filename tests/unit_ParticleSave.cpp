@@ -1,11 +1,11 @@
 // Test library for unit w168 (libtpw_unit_ParticleSave.dylib and, built with TPW_SWAP_FILE_WORDS, libtpw_unit_ParticleSwap.dylib; see
 // tests/test_ParticleSave.py and tests/test_ParticleSwap.py): the particle system's save and load and their swap helpers
-// (src/rsse_particles_save.cpp) over the real state and library (src/rsse_particles_state.cpp).
+// (src/game/Particles.cpp) over the real state and library (src/game/rides/rsse.cpp).
 //
 // Fakes that record on both sides (same event name and arguments as the PowerPC stubs): LbMem_Alloc (the queue "alloc" can make it
 // fail; a block starts as 0xa5 bytes), LbMem_Free (records only), LbFile_Read (serves the case's stream, zero past its end),
 // LbFile_Write (appends to the written stream), _USwapBlock32, _USwapCopy32, _USwapDelete and GAME_ASSERTMSG. The four swap helpers of
-// the main app (src/rsse_particles_init.cpp, not linked here) are copied below, with the same rule: they swap only when
+// the main app (src/game/Particles.cpp, not linked here) are copied below, with the same rule: they swap only when
 // TPW_SWAP_FILE_WORDS is defined (the Swap library), so that the Save library, which does not swap, compares files byte for byte with
 // the original's little-endian ones while the Swap library shows every field list.
 #include <cstdint>

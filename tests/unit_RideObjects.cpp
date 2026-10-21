@@ -1,5 +1,5 @@
 // Test library for the script objects of the ride scripts (unit w150; libtpw_unit_RideObjects.dylib, tests/test_RideObjects.py), main app:
-//   src/rsse_objects.cpp   ExtractData, CreateObject, KillObject, KillLinkedObject, SetObjParam, StartEvent, InitObject, ProcessObjects,
+//   src/game/rides/RideEffects.cpp, src/game/rides/rsse.cpp   ExtractData, CreateObject, KillObject, KillLinkedObject, SetObjParam, StartEvent, InitObject, ProcessObjects,
 //                          ReadScript, Push, Pop, RSSE_Setvar, RSSE_SetRideSpeed, RSSE_GetRideSpeed, RSSE_GetTourBaseID, GetRidePosition,
 //                          GetRideCentrePosition
 //

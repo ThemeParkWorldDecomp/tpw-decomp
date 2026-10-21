@@ -1,6 +1,42 @@
 # The lobby's small leaves part 8 (unit w88): CRideDatabase::DeleteCustomEffects, PauseUI, TogglePauseUI, ShowPauseWindow, TogglePauseWindow and
 # PauseWindowMsg (with the pause window's script and animation, and the real gPauseWindow of ui_mainpanel2_pause.cpp). The emitter and sound
 # calls, the timers, Dialog, the default dialog callback, the window's GetPosition, setPivot and startAnim, the key table's Search and the
-# game's TogglePause are fakes in the unit file; the rectangle the message function builds is the real CoolRect (src/UI_Base.cpp).
-set(TPW_UNIT_LobbyLeaves8 src/RideDB_effects.cpp src/ui_main_pause.cpp src/ui_mainpanel2_window.cpp src/ui_pause_data.cpp
-    src/ui_mainpanel2_pause.cpp src/UI_Base.cpp platform/arena.cpp)
+# game's TogglePause are fakes in the unit file; the rectangle the message function builds is the real CoolRect (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp).
+set(TPW_UNIT_LobbyLeaves8 src/game/rides/RideDB.cpp src/game/ui/ui_main.cpp src/game/ui/ui_mainpanel2.cpp
+    src/game/ui/CoolRect.cpp src/game/ui/CoolRegion.cpp src/game/ui/UI_Base.cpp platform/arena.cpp)
+set(TPW_UNIT_LobbyLeaves8_KEEP
+  __Z13TogglePauseUIv   # TogglePauseUI()
+  __Z13UI_hash_cakesPKcj   # UI_hash_cakes(char const*, unsigned int)
+  __Z14PauseWindowMsgP15InterfaceWindowiii   # PauseWindowMsg(InterfaceWindow*, int, int, int)
+  __Z15HidePauseWindowv   # HidePauseWindow()
+  __Z15ShowPauseWindowv   # ShowPauseWindow()
+  __Z17TogglePauseWindowv   # TogglePauseWindow()
+  __Z19UI_SetRealScreenRezss   # UI_SetRealScreenRez(short, short)
+  __Z7PauseUIv   # PauseUI()
+  __ZN10CoolRegion5ShiftEss   # CoolRegion::Shift(short, short)
+  __ZN10CoolRegion6AdjustEssss   # CoolRegion::Adjust(short, short, short, short)
+  __ZN10CoolRegion6MiddleEPsS0_   # CoolRegion::Middle(short*, short*)
+  __ZN10CoolRegion7PointInEss   # CoolRegion::PointIn(short, short)
+  __ZN10CoolRegionD1Ev   # CoolRegion::~CoolRegion()
+  __ZN10CoolRegioneqERS_   # CoolRegion::operator==(CoolRegion&)
+  __ZN13CRideDatabase19DeleteCustomEffectsEv   # CRideDatabase::DeleteCustomEffects()
+  __ZN8CoolRect14RectIntersectsEPS_   # CoolRect::RectIntersects(CoolRect*)
+  __ZN8CoolRect3GetEPsS0_S0_S0_   # CoolRect::Get(short*, short*, short*, short*)
+  __ZN8CoolRect3SetEssss   # CoolRect::Set(short, short, short, short)
+  __ZN8CoolRect5ShiftEss   # CoolRect::Shift(short, short)
+  __ZN8CoolRect6AdjustEssss   # CoolRect::Adjust(short, short, short, short)
+  __ZN8CoolRect6MiddleEPsS0_   # CoolRect::Middle(short*, short*)
+  __ZN8CoolRect7GetDimsEPsS0_   # CoolRect::GetDims(short*, short*)
+  __ZN8CoolRect7PointInEss   # CoolRect::PointIn(short, short)
+  __ZN8CoolRectC1Essss   # CoolRect::CoolRect(short, short, short, short)
+  __ZN8CoolRectC1Ev   # CoolRect::CoolRect()
+  __ZN8CoolRectD1Ev   # CoolRect::~CoolRect()
+  _gPauseAnim
+  _gPauseDialogDescription
+  _gPauseWindow
+  _gUIHighPresets
+  _gUIRealScreenHeight
+  _gUIRealScreenWidth
+  _gUIUnitWidth
+  _gUIWideAspect
+)

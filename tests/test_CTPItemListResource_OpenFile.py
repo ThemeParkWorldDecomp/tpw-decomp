@@ -1,5 +1,5 @@
 """Unit v5375, the item list resource's two OpenFile overrides and its destructor, against
-libtpw_unit_CTPItemListResource_OpenFile.dylib (tests/unit_CTPItemListResource_OpenFile.cpp), main app, src/TPSettings_itemres_CTPItemListResource_OpenFile.cpp:
+libtpw_unit_CTPItemListResource_OpenFile.dylib (tests/unit_CTPItemListResource_OpenFile.cpp), main app, src/game/TPResource.cpp:
   CTPItemListResource::OpenFile 0x10163b90 (name, mode), CTPItemListResource::OpenFile 0x101639f0 (name, storage, mode),
   CTPItemListResource::~CTPItemListResource 0x101621f4
 

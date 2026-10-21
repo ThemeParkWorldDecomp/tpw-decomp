@@ -1,4 +1,4 @@
-// Test library for src/FS_Online_init.cpp and src/FS_OnlineList.cpp (libtpw_unit_OnlineInit.dylib; see tests/test_OnlineInit.py):
+// Test library for src/game/online/FS_Online.cpp and src/game/online/FS_OnlineList.cpp (libtpw_unit_OnlineInit.dylib; see tests/test_OnlineInit.py):
 // the online system's constructor, its Init* and Release*Connection members, TickLogin, the theme, server and ride list constructors
 // and the online park's default constructor.
 //

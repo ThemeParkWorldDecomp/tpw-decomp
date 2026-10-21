@@ -1,5 +1,5 @@
 // Test library for cmp_nocase (unit v5568; libtpw_unit_cmp_nocase.dylib, tests/test_cmp_nocase.py), main app:
-//   src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_cmp_nocase.cpp   cmp_nocase
+//   src/game/online/Parser.cpp   cmp_nocase
 //
 // No callees. The global of another file the unit reads (__wupper_map) is defined here, zero at start.
 #include <cstddef>

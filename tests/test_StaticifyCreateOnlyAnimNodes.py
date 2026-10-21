@@ -1,5 +1,5 @@
 """Unit v5288, StaticifyCreateOnlyAnimNodes, against libtpw_unit_StaticifyCreateOnlyAnimNodes.dylib
-(tests/unit_StaticifyCreateOnlyAnimNodes.cpp), main app ("SimTheme Park"), src/RideAnimTick_StaticifyCreateOnlyAnimNodes.cpp:
+(tests/unit_StaticifyCreateOnlyAnimNodes.cpp), main app ("SimTheme Park"), src/game/rides/RideAnim.cpp:
   StaticifyCreateOnlyAnimNodes 0x100c6b54
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

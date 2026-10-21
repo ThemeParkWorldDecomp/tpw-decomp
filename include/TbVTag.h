@@ -18,7 +18,7 @@ public:
 class TbUniStringVTag : public TbVTag {
 public:
     TbUniStringVTag(uint32_t id, const char16_t* text) : mText(text) { mMagic = 0x5641524d; mId = id; }
-    int32_t Format(CStaticBuffer&, TbVarFormat&) override;   // ltms 0x100092f0, src/TbUniStringVTag.cpp
+    int32_t Format(CStaticBuffer&, TbVarFormat&) override;   // ltms 0x100092f0, src/ltms/TbVTag.cpp
     const char16_t* mText;   // Mac 0x0c
 };
 

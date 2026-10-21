@@ -1,5 +1,5 @@
-// Unit w92: the lifetime of the IME classes (src/TPEmbed_ime.cpp: IME::CIME::CIME, ~CIME and the candidate vector's tear_down;
-// src/ui_ime_lifetime.cpp: list_cand_data_t::~list_cand_data_t, the string vector's tear_down, CUIIME::~CUIIME).
+// Unit w92: the lifetime of the IME classes (src/game/ui/IME.cpp: IME::CIME::CIME, ~CIME and the candidate vector's tear_down;
+// src/game/ui/ui_graph.cpp, src/game/ui/ui_iterators.cpp: list_cand_data_t::~list_cand_data_t, the string vector's tear_down, CUIIME::~CUIIME).
 // The only boundaries are the string library's constructor and destructor (MslWideString, Mac 0x101e0b84 and 0x101468f8) and
 // operator delete (recorded by calllog.cpp for every labelled block). The constructor fake gives each string a token word
 // (0x7000 + its ordinal) so that the test sees which strings were built and which words the destructors find.

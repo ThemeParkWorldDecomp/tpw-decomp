@@ -1,5 +1,5 @@
 // Test library for DoMeshSkirtDeform (unit v5693; libtpw_unit_DoMeshSkirtDeform.dylib, tests/test_DoMeshSkirtDeform.py), main app:
-//   src/Debug_blendflags_DoMeshSkirtDeform.cpp   DoMeshSkirtDeform
+//   src/game/park/SkirtDeform.cpp   DoMeshSkirtDeform
 //
 // DoOrSetupSkirtDeform is a recording fake (every argument; the by-value matrix in two events). SetMatrixIdentity is the real one.
 #include <cstddef>

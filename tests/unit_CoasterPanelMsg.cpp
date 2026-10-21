@@ -1,5 +1,5 @@
 // Test library for the coaster edit panel's message handler (unit v5540; libtpw_unit_CoasterPanelMsg.dylib, tests/test_CoasterPanelMsg.py), main app:
-//   src/ui_entryPricePanel_CoasterPanelMsg.cpp   CoasterPanelMsg
+//   src/game/ui/ui_coasterPanel.cpp   CoasterPanelMsg
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of
 // other files the function reads or writes are defined here.

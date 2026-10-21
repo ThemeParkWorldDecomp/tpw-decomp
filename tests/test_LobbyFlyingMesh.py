@@ -1,9 +1,9 @@
-"""Differential test for src/lobby_flyingmesh.cpp (the lobby's flying meshes: CLBFlyingMeshInstance,
+"""Differential test for src/game/Particles.cpp, src/game/online/LBFlyingMesh.cpp, src/game/online/lobby.cpp (the lobby's flying meshes: CLBFlyingMeshInstance,
 CLBFlyingMeshGroup, CLBFlyingMeshSystem's constructor, destructor and lists, CLBLobby::WindowMessagesFn and
 PAR_GetEmitterParticleCount), against libtpw_unit_LobbyFlyingMesh.dylib (tests/unit_LobbyFlyingMesh.cpp).
 
 A case is a world and a script. The world is the lobby (its generator's state and step), the LOBBYOBJECTS
-option, and 27 ride sets whose meshes each hold a matrix; the lobby's real mesh system (src/lobby_meshes.cpp on
+option, and 27 ride sets whose meshes each hold a matrix; the lobby's real mesh system (src/game/online/LBLobbyMeshes.cpp on
 the host, the original on the PowerPC side) is built over them, so an instance's mesh is a real mesh instance and
 its place and direction end up in a ride set's matrix, which the test reads. Only the ride and height field
 loaders under the mesh system are fakes (they would load files). A script is a list of operations: make the

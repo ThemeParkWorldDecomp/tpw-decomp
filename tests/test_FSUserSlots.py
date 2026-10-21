@@ -1,4 +1,4 @@
-"""Differential tests for unit w48 (src/FS_UserInfo_slots.cpp, src/FS_MasterSave_easy.cpp, src/lobby_sendquit.cpp):
+"""Differential tests for unit w48 (src/game/save/FS_UserInfo.cpp, src/game/save/FS_MasterSave.cpp, src/game/online/lobby.cpp):
 creating and deleting a player on disk, the user folders, the global master save's write-back, SetEasyModeUser and the
 lobby's SendQuit, against libtpw_unit_FSUserSlots.dylib (tests/unit_FSUserSlots.cpp).
 

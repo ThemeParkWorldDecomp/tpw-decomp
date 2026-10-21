@@ -1,7 +1,7 @@
 // Test library for the master save's ticket bookkeeping, the current theme and the park sign names (libtpw_unit_MasterSaveTickets.dylib;
-// see tests/test_MasterSaveTickets.py): src/FS_MasterSave_tickets.cpp and src/FS_MasterSave_signs.cpp (unit w89), with the master
-// save and the park record of unit w32 (src/FS_MasterSave_global.cpp, src/FS_MasterSave_global_ctor.cpp) and the ride names
-// (src/RideDB_names.cpp) under them. Real: the bullfrog strings (the theme map's keys), the 16-bit C library (swprintf, wcslen,
+// see tests/test_MasterSaveTickets.py): src/game/save/FS_MasterSave.cpp (unit w89), with the master
+// save and the park record of unit w32 (src/game/save/FS_MasterSave.cpp) and the ride names
+// (src/game/rides/RideDB.cpp, src/game/save/SaveLoad.cpp) under them. Real: the bullfrog strings (the theme map's keys), the 16-bit C library (swprintf, wcslen,
 // wcsncpy), the std containers of the master save.
 //
 // Fakes that record through calllog: the balance table (Init, UnInit and Load, whose answer and values the world scripts per theme),

@@ -1,5 +1,5 @@
 """Unit v5689, a bridge taken away and the thing under the pointer, against libtpw_unit_RemoveBridge.dylib (tests/unit_RemoveBridge.cpp), main app
-("SimTheme Park"), src/LLCellSystem_hoardimage_RemoveBridge.cpp:
+("SimTheme Park"), src/game/park/LLCellSystem.cpp, src/game/park/MapCell.cpp:
   RemoveBridge 0x1009722c, LLCC_SystemGetPointedPeepThing 0x10096bc8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

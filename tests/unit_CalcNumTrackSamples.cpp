@@ -1,5 +1,5 @@
 // Test library for CalcNumTrackSamples (unit v5524; libtpw_unit_CalcNumTrackSamples.dylib), main app:
-//   src/DestroyCoasterPylons_CalcNumTrackSamples.cpp
+//   src/game/rides/CoasterTrack.cpp
 //
 // The callees (GetTrackPosition, DistanceBetweenPoints, FloatToCell, IncrementTrackPosnControl) are recording fakes.
 #include <cstddef>

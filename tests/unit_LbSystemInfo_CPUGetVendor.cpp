@@ -1,6 +1,6 @@
 // Test library for the small bullfrog functions of unit v51071 (libtpw_unit_LbSystemInfo_CPUGetVendor.dylib,
 // tests/test_LbSystemInfo_CPUGetVendor.py), bullfrog:
-//   src/CreateDirectDrawObject_RegisterBullfrogWindowClass_2_LbSystemInfo_CPUGetVendor.cpp
+//   src/bullfrog/Draw.cpp, src/bullfrog/LbApp.cpp, src/bullfrog/LbMaths.cpp, src/bullfrog/LbRect.cpp, src/bullfrog/LbTime.cpp, src/bullfrog/TbJPEGSaver.cpp, src/bullfrog/TbSystemInfo.cpp, src/bullfrog/WinScrn.cpp
 //
 // Callees outside the unit are recording fakes: CPU::clocks_per_millisec, NS_MacDoze::Sleep, IDirectDraw::WaitForVerticalBlank.
 // The globals of other files are defined here.

@@ -1,5 +1,5 @@
 """Unit v5647, the editor's multi pylon delete, against libtpw_unit_DoDeleteMultiPylons.dylib (tests/unit_DoDeleteMultiPylons.cpp), main app
-("SimTheme Park"), src/DisableCurrentPylonEditState_SetCoasterEditState_DoDeleteMultiPylons.cpp:
+("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   DoDeleteMultiPylons 0x10053f98
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

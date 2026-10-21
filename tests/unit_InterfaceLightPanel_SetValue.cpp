@@ -1,5 +1,5 @@
 // Test library for InterfaceLightPanel::SetValue (unit v5770; libtpw_unit_InterfaceLightPanel_SetValue.dylib), main app:
-//   src/ui_whatami_InterfaceLightPanel_SetValue.cpp
+//   src/game/ui/InterfaceLightPanel.cpp
 //
 // InterfaceWindow::GetWindow, SetFrame and SetValue are recording fakes.
 #include <cstddef>

@@ -1,5 +1,5 @@
 // Test library for the status panel's handlers (unit v5910; libtpw_unit_DefaultStatusPanelMsg.dylib, tests/test_DefaultStatusPanelMsg.py), main app:
-//   src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_ViewWindowCallback_DefaultStatusPanelMsg.cpp
+//   src/game/ui/ui_StatusPanel.cpp
 //   UIStatusPanel::DisplayStatusText, DefaultStatusPanelMsg, UIStatusPanel::InitEditBox, TwoEditsMsgStatus (the Mac's TwoEditsMsg at 0x10193fac)
 //
 // Every callee outside the unit is a recording fake with the event name and arguments of the PowerPC stub. The objects (window, thing,

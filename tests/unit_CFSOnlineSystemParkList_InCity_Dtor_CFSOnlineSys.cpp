@@ -1,7 +1,7 @@
 // Test library for the InCity park list's destructor and RequestListFromServer (unit v5532;
 // libtpw_unit_CFSOnlineSystemParkList_InCity_Dtor_CFSOnlineSys.dylib, tests/test_CFSOnlineSystemParkList_InCity_Dtor_CFSOnlineSys.py), main app:
 //   src/FS_Online_..._CFSOnlineSystemParkList_InCity_Dtor_CFSOnlineSys.cpp (the derived destructor, RequestListFromServer)
-//   src/FS_Online_gametype_CFSOnlineSystemParkList_Dtor_CFSOnlineSystemPark.cpp (the base destructor that does the Mac's inlined work)
+//   src/game/online/FS_Online.cpp (the base destructor that does the Mac's inlined work)
 //
 // Fakes: UDebug, City::GetParkInCityList, the park's constructor and destructor, the park info destructor (each records an event).
 #include <cstddef>

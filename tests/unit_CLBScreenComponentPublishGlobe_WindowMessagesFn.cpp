@@ -1,6 +1,6 @@
 // Test library for the publish and download globes' members (unit v5957; libtpw_unit_CLBScreenComponentPublishGlobe_WindowMessagesFn.dylib,
 // tests/test_CLBScreenComponentPublishGlobe_WindowMessagesFn.py), main app:
-//   src/lobby_globe_CLBScreenComponentPublishGlobe_WindowMessagesFn.cpp   Publish: WindowMessagesFn, Show, Hide, CreateCities,
+//   src/game/online/lobby_globe.cpp   Publish: WindowMessagesFn, Show, Hide, CreateCities,
 //   HandleOnlineBacktrack; Download: CreateCities, HandleOnlineBacktrack
 //
 // Every callee outside the unit is a recording fake with the PowerPC stub's event name and arguments; the virtual members the
@@ -49,7 +49,7 @@ CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
 void CLBScreenComponentOnlineGlobe::Render() {}
 void CLBScreenComponentOnlineGlobe::Close() {}
 uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
-// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp).
+// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 void CLBScreenComponentOnlineGlobe_WindowMessagesFn(CLBScreenComponentOnlineGlobe* globe, int32_t message, int32_t a, int32_t b) {

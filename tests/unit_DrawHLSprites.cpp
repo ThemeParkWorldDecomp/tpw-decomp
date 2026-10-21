@@ -1,5 +1,5 @@
 // Test library for the script sprites' reset and draw (unit v5114; libtpw_unit_DrawHLSprites.dylib, tests/test_DrawHLSprites.py), main app:
-//   src/ESP_sprites_DrawHLSprites.cpp   ResetHLSprites, DrawHLSprites and gHLSpritesEnabled
+//   src/game/HLSprite.cpp   ResetHLSprites, DrawHLSprites and gHLSpritesEnabled
 //
 // The callees outside the unit (LLCC_SystemGetPointedPeepThing, CIntrface::SetCurrentThing, GetLMatrixRotationAroundYAxis) are recording
 // fakes. The globals of other files are defined here, zero at start. The two CSpriteList arrays are plain zeroed storage under the

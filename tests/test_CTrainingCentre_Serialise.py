@@ -1,5 +1,5 @@
 """CTrainingCentre::Serialise and UpdateMonthly, against libtpw_unit_CTrainingCentre_Serialise.dylib
-(tests/unit_CTrainingCentre_Serialise.cpp), main app, src/TrackCell_CTrainingCentre_Serialise.cpp:
+(tests/unit_CTrainingCentre_Serialise.cpp), main app, src/game/buildings/TrainingCentre.cpp:
   CTrainingCentre::Serialise 0x10130008, CTrainingCentre::UpdateMonthly 0x1013018c
 
 A case is an object and a call, built twice by one piece of Python code (emulator memory and host memory). The callees outside the unit

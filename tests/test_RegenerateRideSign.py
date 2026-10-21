@@ -1,5 +1,5 @@
 """Unit v5934: the ride sign regeneration and the object instance table, against libtpw_unit_RegenerateRideSign.dylib
-(tests/unit_RegenerateRideSign.cpp), main app ("SimTheme Park"), src/RideInstance_RegenerateRideSign.cpp:
+(tests/unit_RegenerateRideSign.cpp), main app ("SimTheme Park"), src/game/rides/RidePlacement.cpp:
   RegenerateRideSign 0x101eeb9c, RegenerateRideSigns 0x101eeeb4, SetRideScriptID 0x101eefd0, GetAnimStats 0x101ef044,
   AllocateObjectInstanceToTable 0x101ef1f4, RemoveObjectInstanceFromTable 0x101ef310
 

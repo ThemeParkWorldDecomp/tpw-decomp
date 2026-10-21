@@ -39,9 +39,20 @@ float SoundModulePowf(float a, float b) {
 }
 #define TbError LoggedError
 #define powf SoundModulePowf
-#include "../src/TbSoundSystemModule.cpp"
+// src/TbSoundSystemModule.cpp of before the regroup: the definitions it had, in sliced copies of the files that hold them (TPW_UNIT_SoundModule_INCLUDED).
+#include "src/sound/ServiceQueue.cpp"
+#include "src/sound/TbSoundCore.cpp"
+#include "src/sound/TbSoundSystemModule.cpp"
 #undef powf
-#include "../src/snd_handles.cpp"
+// src/snd_handles.cpp of before the regroup: the definitions it had, in sliced copies of the files that hold them (TPW_UNIT_SoundModule_INCLUDED).
+#include "src/sound/AudioComponent.cpp"
+#include "src/sound/ChannelState.cpp"
+#include "src/sound/SystemCommand.cpp"
+#include "src/sound/TbSoundCodecLoop.cpp"
+#include "src/sound/TbSoundPipe.cpp"
+#include "src/sound/TbSoundPipeChannel.cpp"
+#include "src/sound/TbSoundSampleStore.cpp"
+#include "src/sound/TbSoundSampleWAV.cpp"
 #undef TbError
 
 // The four device operations are pure in the base and are never called by these tests.

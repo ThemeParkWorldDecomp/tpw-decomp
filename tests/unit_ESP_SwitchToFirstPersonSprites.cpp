@@ -1,6 +1,6 @@
 // Test library for the sprite switches and ESP_AddHLSpriteFromScript (unit v5027; libtpw_unit_ESP_SwitchToFirstPersonSprites.dylib,
 // tests/test_ESP_SwitchToFirstPersonSprites.py), main app:
-//   src/ESP_sprites_ESP_SwitchToFirstPersonSprites.cpp   the three functions and the globals only they use
+//   src/game/HLSprite.cpp   the three functions and the globals only they use
 //
 // The callees outside the unit (string objects, the resource manager, the file objects, CSpriteFileIO's Free/Load/Flag,
 // operator delete, DetermineHFieldHeightQuick) are fakes that record what the PowerPC stubs record. The globals of other files

@@ -1,5 +1,5 @@
 // Test library for the theme map's pair copy constructor (unit v5719; libtpw_unit_std_pair_pair.dylib, tests/test_std_pair_pair.py), main app:
-//   src/FS_Online_gametype_std_pair_pair.cpp   ParkThemeTreeCallee::PairCopy
+//   src/game/MslSupport.cpp   ParkThemeTreeCallee::PairCopy
 //
 // The key's copy constructor (0x10238308) is a fake recording this and the source.
 #include <cstddef>

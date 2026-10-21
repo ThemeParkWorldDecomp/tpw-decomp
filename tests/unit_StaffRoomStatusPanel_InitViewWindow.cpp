@@ -1,6 +1,6 @@
 // Test library for the staff, show and upgrade status panels' view-window functions (unit v51051;
 // libtpw_unit_StaffRoomStatusPanel_InitViewWindow.dylib, tests/test_StaffRoomStatusPanel_InitViewWindow.py), main app:
-//   src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_StaffRoomStatusPanel_InitViewWindow.cpp
+//   src/game/ui/ui_showStatus.cpp, src/game/ui/ui_staffPanel.cpp, src/game/ui/ui_staffRoomStatus.cpp, src/game/ui/ui_staffStatus.cpp, src/game/ui/ui_upgradeStatus.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues; the globals of other
 // files the unit reads are defined here.

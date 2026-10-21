@@ -1,5 +1,5 @@
 """Unit v5895, the options panel's DoScroll and StartScroll, against libtpw_unit_DoScroll_3.dylib (tests/unit_DoScroll_3.cpp), main app:
-  DoScroll 0x101a8fb8, StartScroll 0x101a96f8 (src/ui_mainpanel2_window_bumhole_DoScroll_3.cpp)
+  DoScroll 0x101a8fb8, StartScroll 0x101a96f8 (src/game/ui/ui_parkStatus.cpp)
 
 The callees are fakes on both sides that record their arguments: GetWindow, UIMain_GetString (writes a marker string into the
 convert buffer), the virtual SetText and SetValue (through __ptr_glue), SetResolution, SetGraphicsDetail, SetSoundQuality, the three

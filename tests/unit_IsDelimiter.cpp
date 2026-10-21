@@ -1,8 +1,8 @@
 // Test library for the small ltms functions (unit v51120; libtpw_unit_IsDelimiter.dylib, tests/test_IsDelimiter.py), main app:
-//   src/ltms_textformatter_rest_IsDelimiter.cpp   the destructors, smart pointers, swaps, what()s, Format and the static initialiser
-//   src/ltms_textformatter_rest.cpp               IsDelimiter (tested where it is)
-//   src/ltms_textformatter.cpp                    SetHorizontalJustification and the vectors' tear_down (the real ones run on both sides)
-//   src/TbITableResource.cpp                      TbITable::AddRef
+//   src/ltms/MslSupport.cpp, src/ltms/TbIResourceIndex.cpp, src/ltms/TbVTag.cpp   the destructors, smart pointers, swaps, what()s, Format and the static initialiser
+//   src/ltms/TbTextFormatter.cpp, src/engine/tb_depthoffield.cpp               IsDelimiter (tested where it is)
+//   src/ltms/TbTextFormatter.cpp                    SetHorizontalJustification and the vectors' tear_down (the real ones run on both sides)
+//   src/ltms/TbITable.cpp                      TbITable::AddRef
 //
 // The callees outside the unit are recording fakes: operator delete and delete[] (the global ones, so the real tear_down is seen),
 // TbResource::Release / AddRef, TbIFont::~TbIFont and the fake CStaticBuffer. The destructors that the compiler writes with the
@@ -22,13 +22,15 @@
 #include "TbTextFormatter.h"
 
 // IsDelimiter has internal linkage in its file, so the file is compiled into this translation unit (it is not in the cmake list).
-#include "../src/ltms_textformatter_rest.cpp"
+// src/ltms_textformatter_rest.cpp of before the regroup: the definitions it had, in sliced copies of the files that hold them (TPW_UNIT_IsDelimiter_INCLUDED).
+#include "src/engine/tb_depthoffield.cpp"
+#include "src/ltms/TbTextFormatter.cpp"
 
 using namespace calllog;
 
 // ---- the global operator delete, recording (the memory comes from calloc and is never freed)
 
-// ---- TbResource (src/TbResource.cpp is not compiled here)
+// ---- TbResource (src/ltms/TbResource.cpp is not compiled here)
 int32_t TbResource::Release() {
     ev("Release", {lab(this)});
     return 0;
@@ -49,7 +51,7 @@ namespace NS_MacDoze {
 int32_t InterlockedDecrement(int*) { return 0; }   // TbITable::Release's (in the same file as AddRef); never called here
 }
 
-// TbFontRender (the formatter's members in src/ltms_textformatter.cpp use it; never called here)
+// TbFontRender (the formatter's members in src/ltms/TbTextFormatter.cpp use it; never called here)
 
 TbError TbFontRender::Initialise(const TbFontRenderParams&) { return TbError(-1); }
 TbError TbFontRender::DrawChar(const TbPoint&, uint16_t, TbRect&) { return TbError(-1); }
@@ -65,10 +67,10 @@ TbFontRender::~TbFontRender() {}
 void TbResource::ManagerAddRef() {}
 int32_t TbResource::ManagerRelease() { return 0; }
 
-// TbIFont::~TbIFont and TbIMBInfo::~TbIMBInfo are now defined in src/TbIRLE4bitFont.cpp and src/TbIMBToUnicode.cpp.
+// TbIFont::~TbIFont and TbIMBInfo::~TbIMBInfo are now defined in src/ltms/TbFontRenderParams.cpp, src/ltms/TbIRLE4bitFont.cpp and src/ltms/StaticUnicodeBuffer.cpp, src/ltms/TbIResourceIndex.cpp.
 
 // The font's other virtuals (the vtable of the destructor's class needs them).
-// (now defined by src/TbIRLE4bitFont.cpp, which the unit compiles)
+// (now defined by src/ltms/TbFontRenderParams.cpp, src/ltms/TbIRLE4bitFont.cpp, which the unit compiles)
 
 namespace {
 

@@ -1,5 +1,5 @@
 """Unit v5528, the Bullfrog JPEG loader's three functions, against libtpw_unit_TbJPEGLoader_ReadHeaderInfo.dylib
-(tests/unit_TbJPEGLoader_ReadHeaderInfo.cpp), bullfrog, src/Lbgfsave_iffgiftim_TbJPEGLoader_ReadHeaderInfo.cpp:
+(tests/unit_TbJPEGLoader_ReadHeaderInfo.cpp), bullfrog, src/bullfrog/TbJPEGSaver.cpp:
   TbJPEGLoader::ReadHeaderInfo 0x10024324, TbJPEGLoader::ReadData 0x100244c0, TbJPEGLoader::ValidImage 0x100248b8
 
 A case is a world and a call. The world is built twice by one piece of Python code: in emulator memory (big-endian) for the original and in

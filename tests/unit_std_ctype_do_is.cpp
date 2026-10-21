@@ -1,5 +1,5 @@
 // Test library for std::ctype<wchar_t>::do_is (unit v5735; libtpw_unit_std_ctype_do_is.dylib, tests/test_std_ctype_do_is.py), main app:
-//   src/std_ctype_do_is.cpp   do_is
+//   src/game/MslSupport.cpp   do_is
 //
 // classify is a recording fake answering from the test's queue.
 #include <cstddef>

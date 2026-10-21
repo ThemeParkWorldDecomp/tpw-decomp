@@ -1174,7 +1174,7 @@ def divw(a, b):
 
 
 def simulate(c):
-    """The unpacking's reads and writes for case `c` (the algorithm of src/tb_rleload.cpp in Python, a guard and not the oracle): raises
+    """The unpacking's reads and writes for case `c` (the algorithm of src/engine/RLELoad.cpp in Python, a guard and not the oracle): raises
     Unsafe when the original would read outside the stream's room, write outside the buffer, read the stack's garbage or overrun its
     row buffer, which the two sides could not agree on. Returns (lowest write, highest write + 1)."""
     bpp = BPP[c["fmt"]]

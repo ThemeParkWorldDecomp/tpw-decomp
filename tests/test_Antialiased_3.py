@@ -1,5 +1,5 @@
 """Unit v5940, the antialiased 3D line for four and three bytes per pixel, against libtpw_unit_Antialiased_3.dylib
-(tests/unit_Antialiased_3.cpp), main app ("SimTheme Park"), src/TPString_Antialiased_3.cpp:
+(tests/unit_Antialiased_3.cpp), main app ("SimTheme Park"), src/game/ui/3DFont.cpp:
   Antialiased<CTraits<4>> 0x100058c0, Antialiased<CTraits<3>> 0x10005e30
 
 A case is a render area (format words, data pointer, stride), a clip rectangle, a colour and two points. The world is written to emulator

@@ -1,6 +1,6 @@
 // Test library for the online contacts and messages list functions (unit v5279; libtpw_unit_ContactsLCFormat.dylib,
 // tests/test_ContactsLCFormat.py), main app:
-//   src/ContactsLCFormat.cpp   the seven functions and the four globals it defines
+//   src/game/ui/ui_onlinePanel.cpp   the seven functions and the four globals it defines
 //
 // The callees outside the unit are recording fakes that answer from the test's queues; the globals of other files are defined here.
 #include <cstddef>

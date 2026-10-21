@@ -1,5 +1,5 @@
 """The coaster's track statistics (unit w212), against libtpw_unit_CoasterStats.dylib (tests/unit_CoasterStats.cpp), main app
-("SimTheme Park"), src/TPConfig_stats.cpp:
+("SimTheme Park"), src/game/rides/CoasterQueue.cpp, src/game/rides/CoasterTrain.cpp:
   CalculateTrackGForcesSpeedAndExcitement 0x1004ba48, UpdateExcitementAtSample 0x1004d424, SpreadTrainsOnTrack 0x1004b6c4,
   UpdateCoasterTrainPosns 0x1004b4ac, UpdateCoasterTrainsActive 0x1004b320, CollateCoasterStats 0x1004d7c8,
   SetInitialExcitementValues 0x1004d338, SetCoasterCapacity 0x1004a248, ModF 0x1004a75c

@@ -1,6 +1,6 @@
 // Test entry points for the lobby frame's last engine stand-ins (library unit_FrameStandins:
-// src/tb_opengl_texture_download.cpp, src/tb_texturecache_helpers.cpp, src/tb_particle_frame.cpp and
-// src/tb_rain_frame.cpp): COpenGLTexture::Download, COpenGLDrawPrimitive's destructor,
+// src/engine/DrawPrimitiveOpenGL.cpp, src/engine/OpenGLTexture.cpp, src/engine/TextureCache.cpp, src/engine/tb_profiler.cpp and
+// src/engine/Rain.cpp): COpenGLTexture::Download, COpenGLDrawPrimitive's destructor,
 // CTextureCache::Entry_Specific_Compress and BalanceCache_ClearTexture, CParticle::Prepare and
 // PlotParticles, CRain::Prepare, Render and RenderLightning2.
 //

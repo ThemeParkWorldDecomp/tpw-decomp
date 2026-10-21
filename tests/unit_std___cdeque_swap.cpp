@@ -1,5 +1,5 @@
 // Test library for std::__cdeque<const void*>::swap (unit v5105; libtpw_unit_std___cdeque_swap.dylib), main app:
-//   src/UI_pump_std___cdeque_swap.cpp
+//   src/game/MslSupport.cpp
 // No callees, no globals.
 #include <cstddef>
 #include <cstdint>

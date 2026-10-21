@@ -1,16 +1,16 @@
 // The save-file serialisation templates (LOADVAR, SAVEVAR, LOADVARSTRUCT, SAVEVARSTRUCT).
 // The instances for the basic types are in the Advisor.cpp range of the inventory and
-// elsewhere. Translated in src/Serialise_basic.cpp: LOADVAR and SAVEVAR of int (0x1000ef18,
+// elsewhere. Translated in src/game/advisor/Advisor.cpp, src/game/park/analyser.cpp, src/game/ControlManager.cpp, src/game/Object.cpp, src/game/park/BankAccount.cpp, src/game/save/FS_MasterSave.cpp, src/game/rides/FlyingRide.cpp: LOADVAR and SAVEVAR of int (0x1000ef18,
 // 0x1000f4b0), bool (0x1000f144, 0x1000f70c), unsigned int (0x100f44a4, 0x100f45bc),
 // unsigned short (0x100f5074, 0x100f5530), char (0x1016d2c8, 0x1016d3d4) and wchar_t, which
 // is char16_t here (0x10111844, 0x10111a98); unit w146 adds unsigned char (0x100f17c8, 0x100f1a04),
 // short (0x100f518c, 0x100f5658) and LOADVARSTRUCT / SAVEVARSTRUCT of the thing id
 // (tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t>: 0x1000eb4c, 0x1000e9d4); CMapCell::LitterType
-// (0x10103af0, 0x10103c30) is in src/MapDelta_save.cpp. Unit w160 adds LOADVAR / SAVEVAR of the Mac's long
+// (0x10103af0, 0x10103c30) is in src/game/park/MapDelta.cpp, src/game/park/Map.cpp. Unit w160 adds LOADVAR / SAVEVAR of the Mac's long
 // (MacLong: 0x1000ee04, 0x1000f384) and unsigned long (MacULong: 0x1000f02c, 0x1000f5dc), LOADVARSTRUCT /
 // SAVEVARSTRUCT of the object id (0x100f1300, 0x100f1188), the map id (0x100f53cc, 0x100f58c0) and TbTimeStamp
 // (0x100f1468, 0x100f1b1c); unit w179 adds LOADVAR / SAVEVAR of CELL_MODES (0x100f52a0, 0x100f577c) and LOADVARSTRUCT / SAVEVARSTRUCT of
-// CCellBase::CELL_IndexType (0x100f4f0c, 0x100f4d70) in src/CellBase.cpp; files that use their
+// CCellBase::CELL_IndexType (0x100f4f0c, 0x100f4d70) in src/game/park/CellBase.cpp; files that use their
 // own types instantiate them (TPSettings.cpp). The shared bodies are the serialise::
 // templates below; an instance is an explicit specialization calling them, so the
 // instances stay separate symbols.
@@ -123,7 +123,7 @@ template<class Struct> int32_t SaveStruct(void* file, Struct* value, const char*
 
 }  // namespace serialise
 
-// Unit w230 (src/Vehicle_serialise.cpp).
+// Unit w230 (src/game/rides/vehicle.cpp).
 struct Vector2d;
 enum NavMode : int32_t;
 template<> int32_t SAVEVARSTRUCT<Vector2d>(void*, Vector2d*, const char*, int32_t); // 0x10134a74, 268 B
@@ -131,7 +131,7 @@ template<> int32_t LOADVARSTRUCT<Vector2d>(void*, Vector2d*, const char*, int32_
 template<> int32_t LOADVAR<NavMode>(void*, NavMode*, const char*, int32_t); // 0x10134cfc, 236 B
 template<> int32_t SAVEVAR<NavMode>(void*, NavMode*, const char*, int32_t); // 0x10134e20, 260 B
 
-// Unit v5045 (src/ParkMessages_SAVEVAR.cpp).
+// Unit v5045 (src/game/buildings/ResearchLab.cpp).
 enum ResearchCat : int32_t;
 template<> int32_t SAVEVAR<ResearchCat>(void*, ResearchCat*, const char*, int32_t); // 0x10124680, 260 B
 template<> int32_t LOADVAR<ResearchCat>(void*, ResearchCat*, const char*, int32_t); // 0x10124554, 236 B (unit v51002 tests it)

@@ -1,5 +1,5 @@
 """Unit v5032, TbITable::FormatString (the multibyte overload), against libtpw_unit_TbITable_FormatString.dylib
-(tests/unit_TbITable_FormatString.cpp), main app, src/TbITable_TbITable_FormatString.cpp:
+(tests/unit_TbITable_FormatString.cpp), main app, src/ltms/TbITable.cpp:
   TbITable::FormatString 0x10004e30
 
 A case is a table (only its converter at +0x14 is read), a converter or none, an output pointer and size (never dereferenced), an id and

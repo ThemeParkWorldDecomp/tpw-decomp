@@ -1,5 +1,5 @@
 // Test library for the UCommandLoadSound constructor and destructor (unit v5758), main app:
-//   src/SamsUtilities_UCommandLoadSound_UCommandLoadSoun.cpp
+//   src/sound/SprocketsChannel.cpp
 //
 // The callees are recording fakes; each also leaves a marker word in memory so the offsets the code passes are compared.
 #include <cstddef>

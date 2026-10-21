@@ -1,5 +1,5 @@
 // Test library for the advisor chunk writer (unit v5247; libtpw_unit_Write_BumpToChunk.dylib, tests/test_Write_BumpToChunk.py), main app:
-//   src/host_leaves_Write_BumpToChunk.cpp   Write_BumpToChunk, Write_CloseChunk
+//   src/game/rides/BumperRide.cpp   Write_BumpToChunk, Write_CloseChunk
 //
 // The callees outside the unit are fakes recording what the real ones read: LbFile_Write (also keeps the buffer), LbFile_GetPosition,
 // LbFile_Seek, TRACE, NS_MacDoze::GlobalFree.

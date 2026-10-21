@@ -1,12 +1,12 @@
 """Differential tests for the park entry leaves (unit w114), against libtpw_unit_ParkEntryLeaves.dylib (tests/unit_ParkEntryLeaves.cpp):
 
-  src/World_rides.cpp       CWorld::DoIHaveTheseRides 0x10140fac
-  src/RideDB_walk.cpp       CRideDatabase::GetFirstRide 0x101547b4, GetNextRide 0x10154800
-  src/hlsprite_flybase.cpp  FLY_RemoveBase 0x100781f4
-  src/TPEmbed_destroy.cpp   DisableRideHead 0x1020039c, TPDestroyEmbeddedData 0x101ffa58
-  src/analyser_kill.cpp     SCR_KillScript 0x100d9478
-  src/TPRide_proctex.cpp    LoadProceduralTextureSet 0x1005b8fc
-  src/rsse_proctex.cpp      CorrectOrientationFlagsForDiffProceduralMode 0x100b7fa0
+  src/game/World.cpp       CWorld::DoIHaveTheseRides 0x10140fac
+  src/game/rides/RideDB.cpp       CRideDatabase::GetFirstRide 0x101547b4, GetNextRide 0x10154800
+  src/game/rides/FlyingRide.cpp  FLY_RemoveBase 0x100781f4
+  src/game/TPEmbed.cpp   DisableRideHead 0x1020039c, TPDestroyEmbeddedData 0x101ffa58
+  src/game/Script.cpp     SCR_KillScript 0x100d9478
+  src/game/park/TPHField.cpp    LoadProceduralTextureSet 0x1005b8fc
+  src/game/MeshLoad.cpp      CorrectOrientationFlagsForDiffProceduralMode 0x100b7fa0
 
 The nine functions run as the original on the PowerPC side and as src/ on the host; where one calls another (the walk under DoIHaveTheseRides,
 DisableRideHead and SCR_KillScript under FLY_RemoveBase, the corrector under LoadProceduralTextureSet) the callee is real on both sides.

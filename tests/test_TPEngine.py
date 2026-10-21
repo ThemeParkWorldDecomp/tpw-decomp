@@ -1,4 +1,4 @@
-"""Differential tests for the engine start-up glue (src/TPEngine.cpp, Milestone 1 unit 3),
+"""Differential tests for the engine start-up glue (src/game/TPEngine.cpp, src/game/TPInstance.cpp, src/game/TPMesh.cpp, src/game/park/TPHField.cpp, src/game/rides/TPRide.cpp, Milestone 1 unit 3),
 against libtpw_unit_TPEngine.dylib (tests/unit_TPEngine.cpp's fakes; see calllog.py).
 
 Every translated function is called directly. A case sets the same globals, engine

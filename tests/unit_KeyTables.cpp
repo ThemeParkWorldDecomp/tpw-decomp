@@ -1,4 +1,4 @@
-// Fakes for the key tables unit (src/keytables_keys.cpp): the three actions an entry can hold. Each records its call (which action,
+// Fakes for the key tables unit (src/game/keyboard.cpp): the three actions an entry can hold. Each records its call (which action,
 // its argument) and answers from the case's queue; the third also moves the table's entries to a second block, to show that the
 // state is stored through the table after the call.
 #include "keyboard.h"

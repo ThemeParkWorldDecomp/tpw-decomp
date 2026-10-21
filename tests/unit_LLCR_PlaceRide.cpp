@@ -1,5 +1,5 @@
 // Test library for LLCR_PlaceRide (unit v5635; libtpw_unit_LLCR_PlaceRide.dylib, tests/test_LLCR_PlaceRide.py), main app:
-//   src/LLCC_DrawKartBlock_LLCR_PlaceRide.cpp   LLCR_PlaceRide, gLLCRPlacement, gLLCRPlaceRotation, gLLCRPlaceY, gLLCRPlaceX
+//   src/game/park/LLCellRide.cpp   LLCR_PlaceRide, gLLCRPlacement, gLLCRPlaceRotation, gLLCRPlaceY, gLLCRPlaceX
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queues: cells
 // as their byte offset from the map grid (world + 0x2d8), track cells from the track grid (world + 0x2d8 + 0x110000), NULL as

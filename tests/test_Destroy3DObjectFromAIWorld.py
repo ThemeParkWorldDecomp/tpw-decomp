@@ -1,5 +1,5 @@
 """Unit v5901, the AI-world cell helpers of the level code, against libtpw_unit_Destroy3DObjectFromAIWorld.dylib
-(tests/unit_Destroy3DObjectFromAIWorld.cpp), main app ("SimTheme Park"), src/LevelSystems_Destroy3DObjectFromAIWorld.cpp:
+(tests/unit_Destroy3DObjectFromAIWorld.cpp), main app ("SimTheme Park"), src/game/park/TPHField.cpp:
   Destroy3DObjectFromAIWorld 0x1005f3fc, Assign3DObjectToAIWorld 0x1005f53c, GetWorldGSquareHeight 0x1005f160,
   DetermineInnerBaseInsets 0x1005f738, GetRideIDAtCell 0x1005f080
 

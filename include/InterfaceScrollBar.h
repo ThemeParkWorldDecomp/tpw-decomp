@@ -1,6 +1,6 @@
 // InterfaceScrollBar (main app, UI toolkit 0x101d6280..0x101d72fc, DrawFunction and ClientDraw 0x1018a328/0x1018a364 in the
 // ui_utils range): the interface's scroll bar, an InterfaceWindow with a value between two ends and a thumb. Mac 0x15c bytes (what
-// InterfaceWindow::CreateObject allocates; the members below end at 0x14e), vtable 0x102a7d5c. src/InterfaceScrollBar.cpp
+// InterfaceWindow::CreateObject allocates; the members below end at 0x14e), vtable 0x102a7d5c. src/game/ui/InterfaceScrollBar.cpp
 // (unit w30b) has all 18 functions below; the buttons and the thumb it makes through InterfaceWindow::CreateObject (unit w31b) are
 // children with the ids 1 (the increment button), 2 (the decrement button) and 3 (the thumb, whose handler is
 // UI_DefaultThumbtrackCallback).
@@ -64,7 +64,7 @@ public:
     int16_t mStyle;                                // 0x14c  1 vertical, 2 horizontal (the constructor's attribute 0x10 or not), | 4 no buttons
 };
 
-// The scroll bar's message function (0x101d70ec, src/InterfaceScrollBar.cpp): 3 draws the client and the thumb (and answers 0
+// The scroll bar's message function (0x101d70ec, src/game/ui/InterfaceScrollBar.cpp): 3 draws the client and the thumb (and answers 0
 // without the default handler); -1 (when the global auto-redraw is on) posts the thumb a draw message and draws the client; the
 // button messages 0x100, 0x10008 and 0x10009 with 2 or 1 in the first argument step the value down or up; 0x1000d (the wheel)
 // subtracts its first argument from the value; 0x11006 (a click) is ClientClick with the point; and everything goes on to

@@ -1,5 +1,5 @@
 """Unit v5014, std::basic_istream<char>::read and ::getline, against libtpw_unit_std_basic_istream_read.dylib
-(tests/unit_std_basic_istream_read.cpp), main app, src/std_basic_istream_read.cpp:
+(tests/unit_std_basic_istream_read.cpp), main app, src/game/MslSupport.cpp:
   read 0x1020d6b4, getline 0x102079f8
 
 A case is a world and a call. The world (an istream, its ios part, a stream buffer with a vtable and a get area, a destination buffer)

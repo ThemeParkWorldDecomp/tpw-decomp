@@ -1,8 +1,8 @@
 // Test library for the park analyser's messages, month end, admissions, thoughts and cell save (unit w161; libtpw_unit_ParkMonth.dylib,
 // tests/test_ParkMonth.py), main app:
-//   src/ParkAnalyser_month.cpp   CParkAnalyser::ReceiveMessage, PersonPaidAdmission, UpdateEndOfMonth, GetThreeMostDominantThoughts, FinalDestroy,
+//   src/game/park/analyser.cpp   CParkAnalyser::ReceiveMessage, PersonPaidAdmission, UpdateEndOfMonth, GetThreeMostDominantThoughts, FinalDestroy,
 //                                CParkAnalyserCell::Serialise and the two start-up words of __sinit_analyser_cpp
-//   src/ParkMessages.cpp         the constructors, GetType and destructors of CMsgAddToChallenge, CMsgResearchCompleted and CMsgStaffInfo, and
+//   src/game/buildings/ResearchLab.cpp, src/game/buildings/StaffHQ.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/ui/MessageCentre.cpp         the constructors, GetType and destructors of CMsgAddToChallenge, CMsgResearchCompleted and CMsgStaffInfo, and
 //                                CBankAccount::GetBalance
 //
 // Every callee outside those is a fake that records the same event as the module's PowerPC stub, in the same order: CThing::FinalDestroy, the asserts, the

@@ -1,6 +1,6 @@
 // Test library for CPerson::UpdateTurn and CPerson::FindNearestFireworks (unit v5217; libtpw_unit_CPerson_UpdateTurn.dylib,
 // tests/test_CPerson_UpdateTurn.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_UpdateTurn.cpp   (the two functions; gThingListEnd, gQueueLinkA/B)
+//   src/game/people/PersonQueue.cpp   (the two functions; gThingListEnd, gQueueLinkA/B)
 //
 // The callees outside the unit are fakes that record what the real ones read ("this" as an offset from the person) and answer from the
 // test's queues. The globals of other files the unit reads are defined here (gWorld, gWorldMap, gThingArray, gPersonTable).

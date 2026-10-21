@@ -1,6 +1,6 @@
 // UIInterface (main app 0x101ef5a8..0x101ef8a0; the inventory files it under
 // ui_ErrorDisplay.cpp): switches the UI between the front end, the lobby and the park.
-// PARTIAL: InitLobby (src/ui_cursors.cpp) is translated.
+// PARTIAL: InitLobby (src/game/ui/UIInterface.cpp) is translated.
 #pragma once
 #include <cstdint>
 
@@ -17,17 +17,17 @@ public:
     void Load(void* file);  // 0x101f0284 (60 bytes, stand-in; unit v5206): the answer is not read
     void Process();         // 0x101ef5a8
     void InitGeneral();     // 0x101ef5f8
-    void DeInitGeneral();   // 0x101ef64c: DeInitGeneralUI (src/ui_main_meshes.cpp)
+    void DeInitGeneral();   // 0x101ef64c: DeInitGeneralUI (src/game/ui/UIInterface.cpp)
     void InitGame();        // 0x101ef6a4
     void DeInitGame();      // 0x101ef6fc
     void InitLobby();       // 0x101ef750: InitLobbyUI
     void DeInitLobby();     // 0x101ef7a4
     void InitOnline();      // 0x101ef7f8
     void DeInitOnline();    // 0x101ef84c
-    void Pause();           // 0x101ef8a0, src/UI_pause.cpp: calls PauseUI
-    void UnPause();         // 0x101ef8f0, src/UI_pump.cpp: calls UnPauseUI
-    void DoPostcard();      // 0x101efb6c, src/ui_Postcard_panel.cpp: calls UI_DoPostcard
-    void CheckMouseContext(int context);   // 0x101efb0c, src/UIInterface_context.cpp (unit w131): ContextMouse(context)
+    void Pause();           // 0x101ef8a0, src/game/ui/UIInterface.cpp: calls PauseUI
+    void UnPause();         // 0x101ef8f0, src/game/ui/UIInterface.cpp: calls UnPauseUI
+    void DoPostcard();      // 0x101efb6c, src/game/ui/UIInterface.cpp: calls UI_DoPostcard
+    void CheckMouseContext(int context);   // 0x101efb0c, src/game/ui/UIInterface.cpp (unit w131): ContextMouse(context)
     void CamcorderMode();   // 0x101f0ffc (200 bytes), untranslated
     // Unit w129 (both untranslated, called by CParkTime::Update and CStaffDB::Update): 0x101efe60 takes the whole nine word date block by value (seven
     // words in registers r4 to r10, two on the stack); 0x101efe04 tells the staff panel that record `slot` changed.
@@ -82,7 +82,7 @@ public:
     void Screen_Finance();      // 0x101f0650
     void Screen_Loans();        // 0x101f06a8
     void Screen_StaffCosts();   // 0x101f06fc
-    // Unit v51076 (src/UI_pump_std___cdeque_pop_front.cpp): one-call forwarders.
+    // Unit v51076 (src/game/ui/UIInterface.cpp): one-call forwarders.
     void ShowVersionTag();                                  // 0x101f1270
     void EndCoasterEdit();                                  // 0x101f0ed4
     void OnlineUpdateBuddy(char16_t* name, int32_t data);   // 0x101f0bc8
@@ -97,7 +97,7 @@ public:
     void Screen_EntryPrice();                               // 0x101f0758
     void SwitchGameWindow();                                // 0x101ef9fc
 };
-extern ParkDate gUIPostLoadDate;       // 0x1039641c (defined in src/UI_pump_UIInterface_SetGameWindowCursor.cpp)
+extern ParkDate gUIPostLoadDate;       // 0x1039641c (defined in src/game/ui/UIInterface.cpp)
 extern UIInterface gUIInterface;   // 0x10396440, original name unknown
-// Unit v51038: the main panel's research button (0x101a7830, 16 bytes, untranslated; a weak stand-in in src/UI_pump_UIInterface_CamcorderMode.cpp).
+// Unit v51038: the main panel's research button (0x101a7830, 16 bytes, untranslated; a weak stand-in in src/game/ui/UIInterface.cpp, src/game/ui/ui_mainpanel2.cpp).
 void MainPanel_EnableResearchButton(bool on);

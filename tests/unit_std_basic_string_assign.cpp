@@ -1,6 +1,6 @@
 // Test library for std::basic_string<char> assign(str, pos, n) and change_size (unit v5376; libtpw_unit_std_basic_string_assign.dylib,
 // tests/test_std_basic_string_assign.py), main app:
-//   src/TPMain_std_basic_string_assign.cpp   msl_char_string::assign, msl_char_string::change_size
+//   src/game/MslSupport.cpp   msl_char_string::assign, msl_char_string::change_size
 //
 // The callees outside the unit are fakes that record what the real ones read (pointers of the world as labels, copied bytes and message
 // texts as checksums); the fake __throw returns. The globals of other files the unit reads are defined here.

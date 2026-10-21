@@ -1,5 +1,5 @@
 """Unit v51024, GetRequiredBraceTangents, against libtpw_unit_GetRequiredBraceTangents_2.dylib (tests/unit_GetRequiredBraceTangents_2.cpp), main app
-("SimTheme Park"), src/LevelSystems_GetRequiredBraceTangents_2.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   GetRequiredBraceTangents 0x1003aef4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's offsets (big-endian,

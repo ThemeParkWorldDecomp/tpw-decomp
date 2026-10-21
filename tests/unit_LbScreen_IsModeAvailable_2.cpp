@@ -1,6 +1,6 @@
 // Test library for the screen mode lookup, palette fade and OS_dd_error (unit v5945; libtpw_unit_LbScreen_IsModeAvailable_2.dylib,
 // tests/test_LbScreen_IsModeAvailable_2.py), bullfrog:
-//   src/LbSurface_LbScreen_IsModeAvailable_2.cpp
+//   src/bullfrog/LbSurface.cpp, src/bullfrog/WinScrn.cpp
 //
 // The callees outside the unit are recording fakes answering from the test's queues.
 #include <cstddef>

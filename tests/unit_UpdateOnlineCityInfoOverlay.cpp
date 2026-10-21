@@ -1,6 +1,6 @@
 // Test library for the online city info overlay and the online login panel's message function (unit v5100;
 // libtpw_unit_UpdateOnlineCityInfoOverlay.dylib, tests/test_UpdateOnlineCityInfoOverlay.py), main app:
-//   src/UI_IslandLobby_UpdateOnlineCityInfoOverlay.cpp   UpdateOnlineCityInfoOverlay, CreateOnlineCityInfoOverlay, OnlineLoginPanelDlgMsg
+//   src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineLogin.cpp   UpdateOnlineCityInfoOverlay, CreateOnlineCityInfoOverlay, OnlineLoginPanelDlgMsg
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The windows
 // the fakes hand out are arena blocks with a fake vtable whose slot 10 is SetText (the virtual the overlay calls).

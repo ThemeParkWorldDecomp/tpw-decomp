@@ -1,5 +1,5 @@
 // Test library for the mechanic HQ (unit v5889; libtpw_unit_CMechanicHQ_GetNewJob.dylib, tests/test_CMechanicHQ_GetNewJob.py), main app:
-//   src/Mechanic_CMechanicHQ_GetNewJob.cpp   CMechanicHQ::GetNewJob, Serialise, ReassignJobsAfterDrop, ReceiveMessage; the eleven id constants
+//   src/game/buildings/MechanicHQ.cpp   CMechanicHQ::GetNewJob, Serialise, ReassignJobsAfterDrop, ReceiveMessage; the eleven id constants
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues or from the objects' own
 // fields (the ride's state, flags, staff member, the mechanic's staff state). Texts are recorded as a 32 bit FNV hash. The globals gWorld and

@@ -1,5 +1,5 @@
 """Unit v5913, CreateYearEndPanel, against libtpw_unit_CreateYearEndPanel.dylib (tests/unit_CreateYearEndPanel.cpp), main app
-("SimTheme Park"), src/UpgradeStatusMsg_UpgradeStatusPanel_InitStatusWindow_2_CreateYearEndPanel.cpp:
+("SimTheme Park"), src/game/ui/ui_yearEndPanel.cpp:
   CreateYearEndPanel 0x101c68d0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

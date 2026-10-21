@@ -1,8 +1,8 @@
 // Test library for the resizable frame and slider draw objects and TbColour's constructor (libtpw_unit_UIResizable.dylib; see
 // tests/test_UIResizable.py):
 //
-//   src/ui_DrawObjectResizable.cpp   InterfaceDrawEngineResizableFrame and ...Slider: InstanceMe and Change
-//   src/TbColour.cpp                 TbColour::TbColour
+//   src/game/ui/InterfaceDrawEngine.cpp   InterfaceDrawEngineResizableFrame and ...Slider: InstanceMe and Change
+//   src/game/ui/intrface.cpp                 TbColour::TbColour
 //
 // Fakes that record the same event on both sides: InstanceMesh, the engine mesh object's constructor (a new label, the mesh; it writes
 // recognisable words in the frame fields), the engine mesh's CalculateFrame (records the flags and the change's frame words, answers the node
@@ -170,7 +170,7 @@ void InterfaceDrawEngineMesh::Change(uint32_t flags, DOChange* change) {
     ev("BaseChange2", {mRect2.mTop, mRect2.mRight, mRect2.mBottom});
 }
 
-// The frame's and the slider's constructors and destructors (src/ui_DrawObject.cpp, not linked here): the base class's work only.
+// The frame's and the slider's constructors and destructors (src/game/ui/InterfaceDrawEngine.cpp, not linked here): the base class's work only.
 InterfaceDrawEngineResizableFrame::InterfaceDrawEngineResizableFrame(void* mesh) : InterfaceDrawEngineMesh(mesh) {}
 InterfaceDrawEngineResizableFrame::~InterfaceDrawEngineResizableFrame() {}
 InterfaceDrawEngineResizableSlider::InterfaceDrawEngineResizableSlider(void* mesh) : InterfaceDrawEngineMesh(mesh) {}

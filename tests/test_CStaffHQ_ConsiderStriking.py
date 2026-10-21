@@ -1,5 +1,5 @@
 """Unit v5681, CStaffHQ::ConsiderStriking, against libtpw_unit_CStaffHQ_ConsiderStriking.dylib (tests/unit_CStaffHQ_ConsiderStriking.cpp), main app
-("SimTheme Park"), src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_ConsiderStriking.cpp:
+("SimTheme Park"), src/game/buildings/StaffHQ.cpp:
   CStaffHQ::ConsiderStriking 0x1012b084
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

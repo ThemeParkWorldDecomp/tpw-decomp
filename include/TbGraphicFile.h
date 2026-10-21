@@ -1,7 +1,7 @@
 // The picture loaders of the Bullfrog library (bullfrog symbols shared): TbRenderArea (TbRaConvert.cpp range
 // 0x10016560..0x10016ad0), TbGraphicFileLoader (0x10022870..0x100230cc), its TGA subclass TbTGALoader
 // (0x10023a80..0x10023f30) and the readers under them: _TgaGLL (0x10021228..0x10021d28) and _AndyGLL, the line
-// reader they share (0x1001de44, 0x1001e2f4). InterfaceBFCursor::LoadData (src/ui_cursors.cpp) reads a cursor's
+// reader they share (0x1001de44, 0x1001e2f4). InterfaceBFCursor::LoadData (src/game/ui/InterfaceBFCursor.cpp) reads a cursor's
 // TGA through them. Mac offsets are in the comments; the host classes have their own layout.
 //
 // Host design. The Mac loaders have virtual members and TbGraphicFileLoader is abstract (ReadHeaderInfo, ReadData
@@ -41,17 +41,17 @@ struct TbRect {
     int32_t top;      // 0x04
     int32_t right;    // 0x08
     int32_t bottom;   // 0x0c
-    // bullfrog 0x1002a110 (LbDraw.cpp, an import of ltms; 148 bytes, src/bfl_tbrect.cpp, unit w58): the smallest rectangle holding
+    // bullfrog 0x1002a110 (LbDraw.cpp, an import of ltms; 148 bytes, src/bullfrog/LbRect.cpp, unit w58): the smallest rectangle holding
     // both (the lower of the lefts and tops, the higher of the rights and bottoms, no test for an empty or an inverted one).
     // Unit w35a's DrawText calls it.
     TbRect Bounding(const TbRect& other) const;
-    // bullfrog 0x10029f8c (LbDraw.cpp, 172 bytes, an import of ltms; unit w45a, src/bfl_tbrect.cpp): the larger of the lefts and tops
+    // bullfrog 0x10029f8c (LbDraw.cpp, 172 bytes, an import of ltms; unit w45a, src/bullfrog/LbRect.cpp): the larger of the lefts and tops
     // and the smaller of the rights and bottoms, where a right or bottom that comes out below its left or top is raised to it (so
     // the answer is never inverted: an empty one has right == left or bottom == top).
     TbRect Intersection(const TbRect& other) const;
     // Unit v5750: bullfrog 0x1002a06c (112 bytes): true when the rectangles overlap or touch (inclusive compares on all four sides).
     bool Intersects(const TbRect& other) const;
-    // Unit v5L16: bullfrog 0x1002a1d4 (116 bytes, src/bfl_tbrect_TbRect_Intersects.cpp): left and right swapped when left is the greater
+    // Unit v5L16: bullfrog 0x1002a1d4 (116 bytes, src/bullfrog/LbRect.cpp): left and right swapped when left is the greater
     // (signed), then top and bottom the same way; a member twin of LbRect_Normalise.
     void Normalise();
 };
@@ -117,7 +117,7 @@ class IDirectDrawSurface;
 // A drawing surface (WinScrn.cpp), 0x50 bytes on the Mac.
 class TbSurface {
 public:
-    // Unit w231 (src/LbSurface.cpp)
+    // Unit w231 (src/bullfrog/LbSurface.cpp)
     const TbRenderArea& GetRenderArea() const;   // bullfrog 0x10066e84, 204 B
     void CalculateSurfaceArea(DDSURFACEDESC&) const; // bullfrog 0x10066dcc, 112 B
 
@@ -307,7 +307,7 @@ public:
     TgaHeader mHeader;        // 0x30  the file's header
 };
 
-// Unit w223 (src/Lbgfsave_iffgiftim.cpp)
+// Unit w223 (src/bullfrog/AndyGLL.cpp)
 class TbIFFLoader;
 class TbGIFLoader;
 class TbTIMLoader;

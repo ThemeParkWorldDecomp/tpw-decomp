@@ -1,5 +1,5 @@
 // Test library for CFSOnlineRide::~CFSOnlineRide (unit v5741; libtpw_unit_CFSOnlineRide_Dtor_CFSOnlineRide.dylib), main app:
-//   src/CFSOnlineRide_Dtor_CFSOnlineRide.cpp
+//   src/game/online/FS_OnlineList.cpp
 //
 // The string destructor and operator delete are recording fakes (the same events as the PowerPC stubs). The list is the real TbTList code
 // on native nodes; the ride objects are zeroed arena blocks (the destructor never reads the vtable).

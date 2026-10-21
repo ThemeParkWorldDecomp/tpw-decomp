@@ -1,4 +1,4 @@
-// Test library for FindDataNodeIndexByDisableCode and CTRACE (unit v5L21). The other functions of src/advisor_leaves.cpp
+// Test library for FindDataNodeIndexByDisableCode and CTRACE (unit v5L21). The other functions of src/game/TPEmbed.cpp, src/game/TPMesh.cpp, src/game/rides/RideAnim.cpp
 // are linked but not called; NS_MacDoze::_stricmp (FindDataNodeIndexByIDAdvisorTempHack's) is a fake that is never reached.
 #include <cstddef>
 #include <cstdint>

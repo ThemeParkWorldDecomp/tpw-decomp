@@ -1,5 +1,5 @@
 """Unit v5302, LayoutReplayCoasterSpeed against libtpw_unit_LayoutReplayCoasterSpeed.dylib (tests/unit_LayoutReplayCoasterSpeed.cpp), main app
-("SimTheme Park"), src/TPConfig_LayoutReplayCoasterSpeed.cpp:
+("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   LayoutReplayCoasterSpeed 0x10059120
 
 A case is a world and a call. The world is built twice by one piece of Python code. CoasterSetSpeed is a fake on both sides that records its

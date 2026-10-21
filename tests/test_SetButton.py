@@ -1,5 +1,5 @@
 """Unit v5240, the status panel's button helpers, against libtpw_unit_SetButton.dylib (tests/unit_SetButton.cpp), main app
-("SimTheme Park"), src/ui_StatusPanel_SetButton.cpp:
+("SimTheme Park"), src/game/ui/ui_tags.cpp:
   SetButton 0x101904f8, DoButton 0x10190a60
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

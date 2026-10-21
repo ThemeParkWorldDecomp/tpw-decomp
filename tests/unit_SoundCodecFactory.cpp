@@ -1,8 +1,8 @@
 // Fakes and test entry points for unit w80b, the sound library's codec factory, bank file wrapper and MPEG sample codecs
 // (libtpw_unit_SoundCodecFactory.dylib, driven by tests/test_SoundCodecFactory.py in the program "sound symbols shared"; see
 // calllog.h):
-//   src/CCodecFactory.cpp          CCodecFactory (the four functions, constructor, destructor) and _CFileAccess
-//   src/TbSoundSampleMPEG2.cpp     _TbSoundSampleMPEG2, _TbSoundSampleMPEG2File, their pools and the two cleanup objects
+//   src/sound/FileAccess.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleStore.cpp          CCodecFactory (the four functions, constructor, destructor) and _CFileAccess
+//   src/game/advisor/AdvisorScoring.cpp, src/sound/StreamableMpeg2.cpp, src/sound/TbBank.cpp, src/sound/TbSoundSampleMPEG2.cpp, src/sound/TbSoundSamplePipe.cpp     _TbSoundSampleMPEG2, _TbSoundSampleMPEG2File, their pools and the two cleanup objects
 // Real: those, the WAV codecs, the loop and the pipe base of units w80 and w78, the critical sections of w79a, and Bank::CBank
 // with the bank base TbBank (unit w72: RetrieveSample, the file conversion and the three members unit w80b added). Fakes, each
 // recording what the original's callee would be given (the PowerPC side records the same from its stubs):

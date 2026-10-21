@@ -1,7 +1,7 @@
 """Unit v51120, twenty small ltms functions, against libtpw_unit_IsDelimiter.dylib (tests/unit_IsDelimiter.cpp), main app
-("SimTheme Park"), src/ltms_textformatter_rest_IsDelimiter.cpp (and, tested where they are, IsDelimiter in
-src/ltms_textformatter_rest.cpp, SetHorizontalJustification and the vectors' tear_down in src/ltms_textformatter.cpp, TbITable::AddRef
-in src/TbITableResource.cpp):
+("SimTheme Park"), src/ltms/MslSupport.cpp, src/ltms/TbIResourceIndex.cpp, src/ltms/TbVTag.cpp (and, tested where they are, IsDelimiter in
+src/ltms/TbTextFormatter.cpp, src/engine/tb_depthoffield.cpp, SetHorizontalJustification and the vectors' tear_down in src/ltms/TbTextFormatter.cpp, TbITable::AddRef
+in src/ltms/TbITable.cpp):
   IsDelimiter 0x100068c4, __sinit_TbIResourceIndex_cpp 0x10004068, TbTextFormatter::SetHorizontalJustification 0x1000632c,
   the destructors of the three vectors 0x100060ec 0x10005fb0 0x10005e7c, CCharInfoList 0x10006060, TbIUnicodeToMB 0x10005674,
   TbIMBToUnicode 0x100032a8, TbIRLE4bitFont 0x10004150, the two TbRefReleaseSmartPtr 0x1000514c 0x10004f64, std::_MSLstring 0x10008274,
@@ -86,7 +86,7 @@ def stub_res_addref(e):
 
 
 def stub_font_dtor(e):
-    # The host links the real TbIFont::~TbIFont (src/TbIRLE4bitFont.cpp), which records nothing, so the stub records nothing either.
+    # The host links the real TbIFont::~TbIFont (src/ltms/TbFontRenderParams.cpp, src/ltms/TbIRLE4bitFont.cpp), which records nothing, so the stub records nothing either.
     pass
 
 

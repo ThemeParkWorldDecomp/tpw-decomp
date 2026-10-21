@@ -1,6 +1,6 @@
 // Fakes and test entry points for unit w79e, the sound manager (libtpw_unit_SoundManager.dylib, driven by tests/test_SoundManager.py
 // in the program "sound symbols shared"; see calllog.h):
-//   src/TbSoundManager.cpp  TbSoundManager (the unit under test)
+//   src/sound/AudioPlaceHolder.cpp, src/sound/TbAudioBody.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSysCommand.cpp  TbSoundManager (the unit under test)
 // Real: the core (w79b: TbSoundCore, CAudioComponent and the SystemCommand constructors), the info records (w77), TbRefRelease
 // (w78), the handle values (w79a) and the bullfrog strings. Fakes, each recording what the original's callee is given (the
 // PowerPC side records the same from its stubs):

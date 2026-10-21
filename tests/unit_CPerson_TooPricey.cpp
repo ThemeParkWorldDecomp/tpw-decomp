@@ -1,5 +1,5 @@
 // Test library for CPerson::TooPricey and CPerson::ExtraExcitementEffects (unit v5238; libtpw_unit_CPerson_TooPricey.dylib, tests/test_CPerson_TooPricey.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_TooPricey.cpp
+//   src/game/people/Person.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The ride record blocks
 // (GetDBInfo: the first call answers block A, every later call block B) and the control block are set by the test; gMainBalance is raw bytes here

@@ -1,8 +1,8 @@
 // Test library for the brace info and brace/pylon link functions (unit v5731; libtpw_unit_SetupBraceInfo.dylib, tests/test_SetupBraceInfo.py), main app:
-//   src/GetNewBraceLoftInterval_SetupBraceInfo.cpp   SetupBraceInfo, DestroyBraceInfo, LinkPylon, LinkBrace, UnLinkBrace
+//   src/game/rides/CoasterPylon.cpp   SetupBraceInfo, DestroyBraceInfo, LinkPylon, LinkBrace, UnLinkBrace
 //
 // The callees outside the unit (MReleaseAllocF, MReleaseFreeF, FindDataNodeIndexByID, GetRideRequiredYOffset, CorrectBraceNumbering) are
-// recording fakes; gRideTypes (src/RideTypes.cpp) is defined here.
+// recording fakes; gRideTypes (src/game/rides/TPRide.cpp) is defined here.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

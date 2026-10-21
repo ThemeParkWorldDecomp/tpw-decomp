@@ -1,6 +1,6 @@
 // Test library for the item list resource's OpenFile (two overloads) and destructor (unit v5375;
 // libtpw_unit_CTPItemListResource_OpenFile.dylib, tests/test_CTPItemListResource_OpenFile.py), main app:
-//   src/TPSettings_itemres_CTPItemListResource_OpenFile.cpp
+//   src/game/TPResource.cpp
 //
 // Strings are tagged: the fakes keep a tag in mData (a new one for every string built), so events name their strings by tag.
 // The base destructors (inlined in the original's destructor) are written here as fakes that make the events the original's code

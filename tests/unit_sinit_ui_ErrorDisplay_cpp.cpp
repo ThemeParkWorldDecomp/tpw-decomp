@@ -1,5 +1,5 @@
 // Test library for ui_ErrorDisplay.cpp's static initialiser (unit v5134; libtpw_unit_sinit_ui_ErrorDisplay_cpp.dylib).
-//   src/sinit_ui_ErrorDisplay_cpp.cpp   __sinit_ui_ErrorDisplay_cpp
+//   src/game/ui/ui_ErrorDisplay.cpp   __sinit_ui_ErrorDisplay_cpp
 // The deque and mutex constructors, tear_down, operator delete and __register_global_object are recording fakes.
 #include <cstddef>
 #include <cstdint>

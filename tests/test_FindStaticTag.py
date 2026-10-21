@@ -1,5 +1,5 @@
 """Unit v5249, FindStaticTag and AddTag, against libtpw_unit_FindStaticTag.dylib (tests/unit_FindStaticTag.cpp), main app,
-src/ui_StatusPanel_FindStaticTag.cpp:
+src/game/ui/ui_tags.cpp:
   FindStaticTag 0x10191cf4, AddTag 0x101921f4
 
 A case: the ten static tags' windows are written (gStaticTags, stride 0x208 on the Mac, an array of structs on the host) and the function

@@ -1,4 +1,4 @@
-// RideHeads differential library: TickRideHeads (src/TPEmbed_heads.cpp) with the matrix functions it calls linked for
+// RideHeads differential library: TickRideHeads (src/game/TPEmbed.cpp) with the matrix functions it calls linked for
 // real; the script setters record every argument (floats as bits). The mesh, its header with full nodes and mini nodes,
 // the embedded set and the head blocks are built here from the case's numbers.
 #include <cstdint>

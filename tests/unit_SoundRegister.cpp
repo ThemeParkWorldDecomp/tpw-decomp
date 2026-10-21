@@ -1,9 +1,9 @@
 // Fakes and test entry points for unit w65, the sound registration layer (libtpw_unit_SoundRegister.dylib, driven by
 // tests/test_SoundRegister.py; see calllog.h):
-//   src/SoundRegister.cpp  SOUND_Malloc 0x100dc5e4, SOUND_Free 0x100dc64c, SOUND_RegisterCatagory (both forms) 0x100dc6ac and
+//   src/game/Sound.cpp, src/game/park/ParkSound.cpp  SOUND_Malloc 0x100dc5e4, SOUND_Free 0x100dc64c, SOUND_RegisterCatagory (both forms) 0x100dc6ac and
 //                          0x100dc74c, SOUND_FreeCatagory 0x100dc89c, SND_RegisterGlobalSounds 0x100df310 and the other
 //                          SND_Register*/SND_Free* functions (0x100def68 to 0x100df778)
-//   src/TPSound.cpp        the state they work on (the flags, the audio object, the banks, the island table)
+//   src/game/Sound.cpp, src/game/park/ParkSound.cpp        the state they work on (the flags, the audio object, the banks, the island table)
 // Real: those and the bullfrog strings. Fakes, each recording what the original's callee would be given (the PowerPC side
 // records the same from its stubs): the audio object (a TbAudioSystem whose RegisterCatagory answers the handles of the case's
 // queue "Handle" and whose SystemCommand records the command's kind and category), the resource manager's FindResource (the
@@ -175,7 +175,7 @@ int32_t CTPSoundResource::FindSoundFile(const String& name, String& path) const 
     return static_cast<int32_t>(answer);
 }
 
-// src/Advisor.cpp's (the unit does not link it).
+// src/game/advisor/Advisor.cpp's (the unit does not link it).
 int32_t gAdvisorThemeSoundBank;
 
 extern "C" {

@@ -1,7 +1,7 @@
 // The rsse.cpp range of the inventory (main app 0x100b8...-0x100d6...): the mesh paths,
 // the particle system (PAR_*), the ride animations, the geometry tables and the 3D sound
 // environment (RSSE_*). The movie player of the same range is in TPMovie.h. PARTIAL:
-// src/rsse.cpp translates BuildGeometryTables; the rest is untranslated.
+// src/game/LMatrix.cpp translates BuildGeometryTables; the rest is untranslated.
 #pragma once
 #include <cstddef>
 #include <cstdint>
@@ -17,17 +17,17 @@ struct PARPOINT3D;
 struct PTCL;
 struct tag_sRideAnimSet;
 
-// 0x100b9dd4 (880 bytes, src/rsse_tick.cpp, unit w26c): the drawing list of emitter `list`: one PTCL per particle of its chain (the
+// 0x100b9dd4 (880 bytes, src/game/Particles.cpp, unit w26c): the drawing list of emitter `list`: one PTCL per particle of its chain (the
 // emitter's own records: x, y, z in 1/1024 world unit, the colour word turned left by a byte, the sprite from ESP_GetParticleSprite
 // or ParticleNoTexture(), the size, the turn and the flags), in the system's 100-record block (gParDrawingList) while it is free and
 // there are 100 or fewer, else in a PAR_Malloc'd block. NULL while the system is not running, for an emitter not in use, without
 // particles, or masked. The caller gives the list back with PAR_FreeDrawingList. (A PTCL is bigger on the host than on the Mac, so
 // the blocks are sized by sizeof(PTCL); see kParDrawingListRecords.)
 PTCL* PAR_BuildDrawingList(int32_t list);
-// 0x100ba170 (src/lobby_flyingmesh.cpp): the particles an emitter has now: 0 while the particle system is not
+// 0x100ba170 (src/game/Particles.cpp): the particles an emitter has now: 0 while the particle system is not
 // running (gParSystemRunning) or the emitter is not in use. Its answer is a 16-bit count.
 int32_t PAR_GetEmitterParticleCount(uint32_t emitter);
-// ---- the particle system's state (src/rsse_particles_state.cpp)
+// ---- the particle system's state (src/game/rides/rsse.cpp)
 // The main app keeps the particle system in one run of globals from 0x102e49f4 to 0x102f7bd0: a table of 512 sines, three
 // words of the library, the running flag, the drawing list's busy flag and block, the LIBRARY (0x8b60 bytes: 105 emitter
 // definitions of 0x140 bytes and 20 effecter definitions of 0x68, as Data:Particle:Tp2.plb gives them) and the STATE
@@ -38,7 +38,7 @@ int32_t PAR_GetEmitterParticleCount(uint32_t emitter);
 // (PAR_Tick walks the emitters from the head at +0x9e4c as state + index * 0x140 + 0xfc and tests the paused halfword at +0x2e; the
 // in-use flag at +0x2c is PAR_GetEmitterParticleCount's: the same records, indexed from the start of the block instead of from +0x2c.)
 // A particle of the pool (tagPARTICLE, 0x34 bytes; the pool is PAR_Malloc'd with the system's maximum). The fields DoAParticle
-// (unit w26c, src/rsse_tick.cpp) and PAR_BuildDrawingList use are named, and SpawnParticle (unit w26b, src/rsse_spawn.cpp) fills them;
+// (unit w26c, src/game/Particles.cpp) and PAR_BuildDrawingList use are named, and SpawnParticle (unit w26b, src/game/Particles.cpp) fills them;
 // positions are in 1/64 world unit (the drawing list shifts them left by 4).
 struct tagPARTICLE {
     int32_t mPos[3];                 // 0x00  x, y, z
@@ -54,14 +54,14 @@ struct tagPARTICLE {
     uint16_t mSpin;                  // 0x2e  the sprite's turn, in 1/65536 of a turn (a random 15-bit number at the start when the emitter spins its particles, else 0; DoAParticle adds the emitter's turn each tick)
     int16_t mNext;                   // 0x30  the next particle of the chain it is in (the free chain, or an emitter's), -1 at the end
     int16_t mPrev;                   // 0x32  the one before, -1 at the start
-    void Byteswap();                 // 0x100bb110 (src/rsse_particles_save.cpp): every field turned in place (a file's little-endian field)
+    void Byteswap();                 // 0x100bb110 (src/game/Particles.cpp): every field turned in place (a file's little-endian field)
 };
 static_assert(sizeof(tagPARTICLE) == 0x34 && __builtin_offsetof(tagPARTICLE, mVel) == 0x0c &&
                   __builtin_offsetof(tagPARTICLE, mLifeLeft) == 0x20 && __builtin_offsetof(tagPARTICLE, mSize) == 0x28 &&
                   __builtin_offsetof(tagPARTICLE, mSpin) == 0x2e && __builtin_offsetof(tagPARTICLE, mNext) == 0x30,
               "a particle is 0x34 bytes");
-// The fields DoEmitters, MoveEmitter, DoAParticle and PAR_BuildDrawingList (unit w26c, src/rsse_tick.cpp) and the spawning functions
-// (unit w26b, src/rsse_spawn.cpp) use are named; the rest is padding. A live emitter is a copy of its library definition
+// The fields DoEmitters, MoveEmitter, DoAParticle and PAR_BuildDrawingList (unit w26c, src/game/Particles.cpp) and the spawning functions
+// (unit w26b, src/game/Particles.cpp) use are named; the rest is padding. A live emitter is a copy of its library definition
 // (PARLibraryEmitter), so the offsets are the same. Positions and the box are in 1/64 world unit.
 struct PAREmitter {
     int16_t mInUse;                  // 0x00  nonzero while the emitter exists
@@ -393,7 +393,7 @@ void USwapInplace16(uint16_t& value);                 // 0x100bab6c (USwapInplac
 void USwapInplace32(int32_t& value);                  // 0x100bab28 (USwapInplace32<long>)
 void USwapBlock32(int32_t* words, int32_t count);     // 0x100baacc (USwapBlock32<long>): _USwapBlock32 on `count` words
 }  // namespace SamsUtilities
-// ---- Unit w168 (src/rsse_particles_save.cpp): the particle system's save and load and their swap helpers
+// ---- Unit w168 (src/game/Particles.cpp): the particle system's save and load and their swap helpers
 namespace SamsUtilities {
 void USwapBlockStruct(PARLibraryEmitter* records, uint32_t count);    // 0x100bb3b8 (USwapBlockStruct<tagEMITTER>)
 void USwapBlockStruct(PARLibraryEffecter* records, uint32_t count);   // 0x100bb260 (USwapBlockStruct<tagEFFECTER>)
@@ -406,14 +406,14 @@ uint32_t USwap32LongPtr(uint32_t word);                               // 0x100bb
 int32_t PAR_SaveStatus(void* file, int32_t withParticles);
 // 0x100bb7d8 (1108 bytes): the reverse; answers 1 when the state's or the library's size word is not the one it knows, else 0.
 int32_t PAR_LoadStatus(void* file);
-// 0x100ba1e0 (108 bytes, src/rsse_particles.cpp): while the system runs, writes the emitter's box times 16 (min.x, y, z, then max.x, y, z).
+// 0x100ba1e0 (108 bytes, src/game/Particles.cpp): while the system runs, writes the emitter's box times 16 (min.x, y, z, then max.x, y, z).
 // There is no range or in-use check: any index below 126 reads a record of the state (a live or dead emitter, or the effecters after the
 // 120th); the original indexes with all 32 bits.
 void PAR_GetEmitterBoundingBox(uint32_t emitter, PARPOINT3D* min, PARPOINT3D* max);
 // 0x100ba298 (92 bytes): while the system runs and `list` is not NULL: the system's own block (gParDrawingList) is marked free
 // (gParDrawingListBusy 0), any other block is freed with PAR_Free.
 void PAR_FreeDrawingList(PTCL* list);
-// 0x100ba3e0 (1,732 bytes, src/rsse_particles_init.cpp): loads the particle library `path` (Data:Particle:Tp2.plb): a count and a
+// 0x100ba3e0 (1,732 bytes, src/game/Particles.cpp): loads the particle library `path` (Data:Particle:Tp2.plb): a count and a
 // record size, that many records of 0x140 bytes (the first 105; a longer list is skipped over, by (count - 20) records of the
 // size, where the original means (count - 105): its bug), a count and a size and the effecter records (the first 20, the
 // same skip), then two words (the first kept in 10 to 500). The records are put in the host's order field by field. Then
@@ -423,7 +423,7 @@ void PAR_FreeDrawingList(PTCL* list);
 // void, and PAR_LoadLibraryResult is the translation.
 void PAR_LoadLibrary(char* path);
 int32_t PAR_LoadLibraryResult(char* path);                          // 0x100ba3e0
-// 0x100bdc24 (272 bytes, src/rsse_particles_init.cpp): once only (while gParSystemRunning is 0): clears the state, sets
+// 0x100bdc24 (272 bytes, src/game/Particles.cpp): once only (while gParSystemRunning is 0): clears the state, sets
 // the density (0 becomes 1) and the maximum number of particles (kept in 100 to 0x7fff), makes the table of sines, takes
 // `owner` (the function that answers the ground height; NULL: DummyHeightCallBack) and the pool of particles, marks the
 // system running, resets it and makes the drawing list's block.
@@ -434,12 +434,12 @@ void PAR_ResetParticleSystem();
 int32_t* PAR_SetupSin();                                            // 0x100ba324 (152 bytes): fills gParSinTable, answers it
 void* PAR_Malloc(int32_t size);                                     // 0x100babf8 (68 bytes): LbMem_Alloc; 0 asserts and answers NULL
 int32_t DummyHeightCallBack(int32_t x, int32_t z);                  // 0x100bdbf0 (8 bytes): 0
-// 0x100bdf84 (136 bytes, src/rsse_particles.cpp): while the system runs: clears the state's first word, frees the pool, marks the
+// 0x100bdf84 (136 bytes, src/game/Particles.cpp): while the system runs: clears the state's first word, frees the pool, marks the
 // system not running, frees the drawing list's block and asserts when gParAllocBalance is not 0. Nothing else is cleared: the state's
 // pool and the drawing list's pointers stay as they were.
 void PAR_CloseParticleSystem();
 void PAR_SetLowSpec(int32_t on);                                    // 0x100be03c (12 bytes): the state's low-spec word
-// ---- the rest of the particle system's core (src/rsse_particles.cpp, unit w26a)
+// ---- the rest of the particle system's core (src/game/Particles.cpp, unit w26a)
 // The word before the table of sines (0x102e49f0), which only PAR_CloseParticleSystem (asserts when it is not 0) and PAR_Tick (answers
 // it) read: its one table-of-contents slot (0x102610ec) is loaded by those two functions and nothing else, so it stays 0.
 extern int32_t gParAllocBalance;
@@ -448,7 +448,7 @@ void PAR_Free(void* block);                                         // 0x100bac6
 // the host's order (PAR_SwapLibraryEmitter); answers the slot's number, or -1 when the system is not running or no slot is free.
 // Unlike PAR_LoadLibrary it does not clear the definition's first halfword or default a zero scale to 1000.
 int32_t PAR_LoadLibEmitter(bfl::FileSystem::CFile* file);
-// The loader's field-by-field swap of one library emitter (src/rsse_particles_init.cpp). The original has it inline in PAR_LoadLibrary
+// The loader's field-by-field swap of one library emitter (src/game/Particles.cpp). The original has it inline in PAR_LoadLibrary
 // and in PAR_LoadLibEmitter, in the same order.
 void PAR_SwapLibraryEmitter(PARLibraryEmitter& emitter);
 void PAR_KillLibEmitter(uint32_t slot);                             // 0x100bbf78 (48 bytes): empties the name of a library slot below 105
@@ -466,13 +466,13 @@ void PAR_SetEmitterMask(int32_t handle, int32_t mask);              // 0x100be26
 void PAR_SetEmitterLife(int32_t handle, int32_t life);              // 0x100be2e8 (88 bytes)
 void PAR_SetEmitterScale(int32_t handle, int32_t scale);            // 0x100be36c (92 bytes)
 void PAR_SetEmitterRandomPos(int32_t handle, int32_t x, int32_t y, int32_t z);      // 0x100be3f4 (108 bytes)
-// 0x100be564 (208 bytes, src/rsse_particles.cpp): while the system runs, counts a tick; from the second one on it has DoEmitters and
+// 0x100be564 (208 bytes, src/game/Particles.cpp): while the system runs, counts a tick; from the second one on it has DoEmitters and
 // DoEffecters work and then DoAParticle on every particle of every emitter that is not paused (the next particle is read before
 // the call, since DoAParticle may free the one it is given). The original leaves the word at 0x102e49f0 in r3 (gParAllocBalance);
 // PAR_TickResult answers it and PAR_Tick, which the callers declare void, drops it.
 int32_t PAR_TickResult();
 void PAR_Tick();
-// ---- the particle system's tick and drawing list, and what they call (src/rsse_tick.cpp, unit w26c)
+// ---- the particle system's tick and drawing list, and what they call (src/game/Particles.cpp, unit w26c)
 // The emitters' turn, the effecters' turn and one particle's: PAR_Tick calls them (see PAR_Tick).
 // 0x100bcbb4 (1,108 bytes): for each emitter of the used chain that is not paused: counts its life down, restarts its bounding box
 // (unless 2D), and while it is alive follows a linked emitter or effecter, turns its offset angle, moves it, and makes its
@@ -499,7 +499,7 @@ struct PTCLTexture;
 // 0x1007cefc (HLSprite.cpp range, untranslated): the sprite record of particle sprite `sprite` at animation frame `frame`
 // (`variant` is 0 here; the original masks it with 7 for sprites that vary).
 PTCLTexture* ESP_GetParticleSprite(int32_t sprite, int32_t frame, int32_t variant);
-// ---- the particle system's spawning (src/rsse_spawn.cpp, unit w26b)
+// ---- the particle system's spawning (src/game/Particles.cpp, unit w26b)
 // 0x100bec30 (1,204 bytes): starts an emitter of the particle library (type below 105) at (a, b, c) = (x, y, z) in 1/1024 world unit (the
 // callers multiply by 1024.0; the emitter keeps them shifted right by 4, in 1/64). The answer is its handle (the emitter's serial in the
 // high half, its number in the low half), 0xffffffff when the system is not running, the type is out of range or no emitter is free, and
@@ -520,7 +520,7 @@ void DoSpecialEmitter(int32_t emitter, int32_t start);                         /
 // emitter's mVelSpread and, while it is in use, spawns a ring of particles at that radius.
 void SpecialEmitter1(int32_t emitter, int32_t start);                          // 0x100bf490
 void TickRideAnims();                                               // 0x100c6964
-// 0x100c74d4 (600 bytes, src/RideTick.cpp): moves a set's animations on by the frame's time. The
+// 0x100c74d4 (600 bytes, src/game/rides/RideAnim.cpp): moves a set's animations on by the frame's time. The
 // original returns 1 (0 for no set) and no caller reads it, so the declaration stays void.
 // `a` goes to DoAnimateRideSet (nonzero: the nodes are animated); `flags` goes to SetCurRideAnim as
 // the loop word, and with bit 3 (8) the embedded data waits for a header that animates (flag 4).
@@ -529,25 +529,25 @@ struct sAnimTimeControl;
 struct tag_sAnimHeader;
 struct tag_sNode;
 struct tag_sM3D2Header;
-// What AnimateRideSet calls (TickRideAnimSet and DoAnimateRideSet are in src/RideAnimTick.cpp, the
-// others in src/RideAnimChange.cpp or still untranslated; the unit's fakes stand in for them).
-// 0x100c7a74 (src/advisor_leaves.cpp): the animation queued behind a time control's playing one (kind 12: none; its
+// What AnimateRideSet calls (TickRideAnimSet and DoAnimateRideSet are in src/game/rides/RideAnim.cpp, the
+// others in src/game/rides/RideAnim.cpp or still untranslated; the unit's fakes stand in for them).
+// 0x100c7a74 (src/game/rides/RideAnim.cpp): the animation queued behind a time control's playing one (kind 12: none; its
 // place in the kind); either pointer may be NULL.
 void GetDeferredAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control);   // 0x100c7a74
-// 0x100c7bb4 (src/advisor_leaves.cpp): the length in milliseconds (frames * 1000 / 30) of animation `index` of the
+// 0x100c7bb4 (src/game/rides/RideAnim.cpp): the length in milliseconds (frames * 1000 / 30) of animation `index` of the
 // group `kind`; 0 when the group has no entries (flags 1 or 2), has fewer, or is kind 12.
 uint32_t GetAnimLength(tag_sRideAnimSet* set, uint32_t kind, uint32_t index);                  // 0x100c7bb4
 int32_t TickRideAnimSet(tag_sRideAnimSet* set);                                       // 0x100c6a20
 void DoAnimateRideSet(tag_sRideAnimSet* set, sAnimTimeControl* control, int32_t a);   // 0x100c6c2c
-// 0x100c5054 (1,068 bytes, src/RideAnimChange.cpp): takes the set's mesh out of the state `animation` (the one that
+// 0x100c5054 (1,068 bytes, src/game/rides/RideAnim.cpp): takes the set's mesh out of the state `animation` (the one that
 // has been playing) left it in, before `other` (the one that takes over, may be NULL) starts: the nodes it animated
 // and disabled lose their animation flags and are shown again, and the nodes it animated that `other` does not get
 // their matrices, vertices, boxes and texture coordinates back from the type's mesh (the set's mSelf).
 void ResetRideAnimationSingleChannel(tag_sRideAnimSet* set, tag_sAnimHeader* animation, tag_sAnimHeader* other);   // 0x100c5054
-// 0x100c54ec (1,372 bytes, src/RideAnimChange.cpp): restores all channels in two ordered passes,
+// 0x100c54ec (1,372 bytes, src/game/rides/RideAnim.cpp): restores all channels in two ordered passes,
 // then reapplies each current group animation's node flags.
 void ResetRideAnimationAllChannels(tag_sRideAnimSet* set);
-// 0x100c7224 (432 bytes, src/rsse_normals.cpp): gives each of the node's faces (mFaces, mF5C of them) its normal in mPoints
+// 0x100c7224 (432 bytes, src/game/rides/RideAnim.cpp): gives each of the node's faces (mFaces, mF5C of them) its normal in mPoints
 // (the face's index >> 1): the cross product of the edge from the vertex of the face's second slot to the vertex of its
 // third and the edge from the same vertex to the first slot's (the vertices are found through the node's remap table
 // mF94), made unit length; a face whose normal comes out as a NaN (a face with no area) gets (0, -1, 0). Clears flag
@@ -556,21 +556,21 @@ void RecalculateInvalidNodeFaceNormals(tag_sNode* node);                        
 // 0x100c7418 (116 bytes, same file): RecalculateInvalidNodeFaceNormals for each of the header's nodes (mNodeCount, the
 // full ones) that has flag 0x10000, then clears flag 0x40000 of the header.
 void RecalculateInvalidFaceNormals(tag_sM3D2Header* header);                          // 0x100c7418
-// 0x100c5d3c (60 bytes, src/RideAnimChange.cpp): 1 when `kind` (12 is none) has entries (the group's flags 1 or 2)
+// 0x100c5d3c (60 bytes, src/game/rides/RideAnim.cpp): 1 when `kind` (12 is none) has entries (the group's flags 1 or 2)
 // and `index` is below their count.
 int32_t IsValidAnimation(tag_sRideAnimSet*& set, uint32_t a, uint32_t b);             // 0x100c5d3c
 void SetWorldBoundingArea(tag_sM3D2Header* a, tag_sM3D2Header* b);                    // 0x100b9180
-// 0x100c6670 (692 bytes, src/RideAnimChange.cpp): starts animation `anim` of kind `a` on time control `b` of the set,
+// 0x100c6670 (692 bytes, src/game/rides/RideAnim.cpp): starts animation `anim` of kind `a` on time control `b` of the set,
 // or, when the control is playing an animation that has not run out and neither the control nor `loop` (bit 1: now)
 // forbids it, queues it behind the one playing (kind 0xd and 0xe, the two special kinds, are never queued). `loop` is
 // SetNewAnim's flags word. The original returns the time in milliseconds the control's animations will take (r3) and
 // three untranslated callers read it, but three unit libraries fake this function as void, so the declaration stays
 // void; SetCurRideAnimDuration (below) is the translation and this one only drops its answer.
 void SetCurRideAnim(tag_sRideAnimSet* set, uint32_t a, uint32_t anim, uint32_t loop, float speed, uint32_t b);   // 0x100c6670
-// 0x100c7930 (136 bytes, src/RideAnimStep.cpp): remaining milliseconds, truncated and saturated
+// 0x100c7930 (136 bytes, src/game/rides/RideAnim.cpp): remaining milliseconds, truncated and saturated
 // by CodeWarrior's unsigned conversion; each optional output describes the selected control.
 uint32_t GetCurrentAnimStats(tag_sRideAnimSet* set, uint32_t* a, uint32_t* b, uint32_t* c, uint32_t d);
-// ---- the animation tick (src/RideAnimTick.cpp)
+// ---- the animation tick (src/game/rides/RideAnim.cpp, src/game/TPEmbed.cpp, src/game/TPMesh.cpp)
 struct sMatrix;
 struct sQuatKey;
 struct sMorphSet;
@@ -595,7 +595,7 @@ void RAAnimateTextureFrames(tag_sM3D2Header* header, tag_sAnimHeader* animation,
 // texture coordinates. Answers 0 when the frame is past the animation's length, else 1.
 int32_t AnimateNode(sAnimTimeControl* control, tag_sM3D2Header* header, tag_sAnimHeader* animation, tag_sNode* node,
                     tag_sNodeAnim* nodeAnim);
-// What those call (SetNewAnim and RADecompressMorph are in src/RideAnimChange.cpp, the rest in src/RideAnimInterp.cpp;
+// What those call (SetNewAnim and RADecompressMorph are in src/game/rides/RideAnim.cpp, the rest in src/game/rides/RideAnim.cpp, src/game/LMatrix.cpp;
 // the unit's fakes stand in for them).
 // 0x100c60fc (1,208 bytes): puts animation `index` of kind `kind` on the control (kind 0xc: none; 0xd: hold at frame 0;
 // 0xe: hold at the end) and brings the control's clock words and the mesh's nodes into the matching state. `flags` bit 1
@@ -605,12 +605,12 @@ int32_t AnimateNode(sAnimTimeControl* control, tag_sM3D2Header* header, tag_sAni
 // libraries of the callers fake it as void) and SetNewAnimDuration (below) is the translation.
 void SetNewAnim(tag_sRideAnimSet* set, uint32_t kind, uint32_t index, sAnimTimeControl* control, uint32_t flags,
                 float speed);                                                                // 0x100c60fc
-// 0x100c40dc (1,196 bytes, src/RideAnimChange.cpp): decompresses the node's morph at `frame`. `morph` is the node
+// 0x100c40dc (1,196 bytes, src/game/rides/RideAnim.cpp): decompresses the node's morph at `frame`. `morph` is the node
 // animation's compressed morph (the mangled name says sCompressedMorph; sMorphSet is that record). `a` is not used
 // (the original compares it with the frame's integer part and then does nothing with the result); `b` nonzero adds
 // the points to what the node holds instead of replacing it.
 void RADecompressMorph(tag_sNode* node, sMorphSet* morph, float frame, uint32_t a, int32_t b);   // 0x100c40dc
-// ---- the node animation's interpolators (src/RideAnimInterp.cpp)
+// ---- the node animation's interpolators (src/game/rides/RideAnim.cpp)
 struct sQuaternion;
 // 0x100c8054 (248 bytes): the orientation between key `index` and the next one (or the same key after
 // the last: TPGlobals' word 0x401c holds the track's key count) at `fraction`. TPGlobals' engine flags
@@ -657,7 +657,7 @@ void RAGetUVFrameData(sAnimTimeControl*& control, uint16_t*& frames, uint32_t co
 // replacing them, or with `additive` nonzero adding to them.
 void RAAnimateTextureCoords(sAnimTimeControl* control, tag_sNodeAnim* nodeAnim, int32_t additive);
 struct sMatrix;
-// The index into the table of axis orders at 0x1029ebdc (src/rsse_rotate.cpp): the string at that index lists the axes to
+// The index into the table of axis orders at 0x1029ebdc (src/game/LMatrix.cpp): the string at that index lists the axes to
 // turn about, in order, one angle each ("FUK", the entry for 0, has none: every character that is not X, Y or Z is skipped).
 enum eRotateParams : int32_t {
     kRotateNone = 0,   // "FUK"
@@ -678,10 +678,10 @@ enum eRotateParams : int32_t {
     kRotateZYX = 15,
 };
 void SetMatrixIdentity(sMatrix* matrix);                                      // 0x100c0e28
-// 0x100c0fc8 (52 bytes, src/rsse_matrix.cpp): atan2(-m[1][0], m[1][1]) of the matrix, in double precision rounded to single: the turn about
+// 0x100c0fc8 (52 bytes, src/game/LMatrix.cpp): atan2(-m[1][0], m[1][1]) of the matrix, in double precision rounded to single: the turn about
 // the z axis that the matrix's second row makes with the y axis.
 float GetLMatrixRotationAroundZAxisYOnly(sMatrix* matrix);
-float GetVectorRotationAroundYAxisFromZ(s3DPoint& point);   // 0x100c10b8 (48 bytes, src/rsse_math.cpp, unit w170); the pointer form is 0x100c121c below
+float GetVectorRotationAroundYAxisFromZ(s3DPoint& point);   // 0x100c10b8 (48 bytes, src/game/LMatrix.cpp, unit w170); the pointer form is 0x100c121c below
 void LUDecomp(sMatrix& matrix, int32_t* indices, float* parity);                // 0x100c2230
 void LUBackSubst(sMatrix& matrix, int32_t* indices, float* values);             // 0x100c210c
 void InvertMatrix(sMatrix* destination, const sMatrix* source);                // 0x100c249c (r4 was missed by Ghidra)
@@ -691,29 +691,29 @@ void VectorThroughLMatrixNoW(sMatrix* matrix, s3DPoint* point);
 // 0x100c28fc: destination = source * destination for the 3x3 part and row 3, which also adds
 // the destination's own translation; the fourth column of the destination is left alone.
 void CombineMatricesNoWDest2nd(sMatrix* source, sMatrix* destination);
-// 0x100c2694 (src/ui_matrix.cpp, 548 bytes): the same product the other way round, destination = destination * source for the 3 x 3 part and
+// 0x100c2694 (src/game/LMatrix.cpp, 548 bytes): the same product the other way round, destination = destination * source for the 3 x 3 part and
 // row 3 (which adds the source's own translation); the fourth column of the destination is left alone. The elements are made row by row
 // and each one reads the source again, so a source that is the destination changes under it.
 void CombineMatricesNoWDest1st(sMatrix* destination, sMatrix* source);
-// 0x100c13bc, 0x100c1698, 0x100c15f0 (src/rsse_rotate.cpp): turn the three rows of the matrix's 3 x 3 part (row 3, the
+// 0x100c13bc, 0x100c1698, 0x100c15f0 (src/game/LMatrix.cpp): turn the three rows of the matrix's 3 x 3 part (row 3, the
 // translation, is left alone) about an axis, by the angle whose cosine and sine are `c` and `s`; the products are rounded
 // to single and each sum is fused with the product before it, as the listings have them.
 void XRotateLMatrixNoTrans(sMatrix* matrix, float c, float s);                      // 0x100c13bc
 void YRotateLMatrixNoTrans(sMatrix* matrix, float c, float s);                      // 0x100c1698
 void ZRotateLMatrixNoTrans(sMatrix* matrix, float c, float s);                      // 0x100c15f0
-// 0x100c174c (432 bytes, src/rsse_rotate.cpp): for each X, Y or Z of the order's string (an eRotateParams) takes the next of
+// 0x100c174c (432 bytes, src/game/LMatrix.cpp): for each X, Y or Z of the order's string (an eRotateParams) takes the next of
 // the angles (radians) and turns the matrix about that axis. The sine and cosine come from gTPGlobals' table (entries per
 // radian mSinTableScale; the cosine is the entry of angle + pi / 2), the index truncated as fctiwz does and masked.
 void RotateLMatrixXYZNoTrans(sMatrix* matrix, eRotateParams axis, float* angle);   // 0x100c174c
 // 0x100c1944 (296 bytes, same file): the same walk with the C library's cos and sin of each angle (as doubles, rounded to
 // single).
 void RotateLMatrixXYZNoTransHi(sMatrix* matrix, eRotateParams axis, float* angle);   // 0x100c1944
-// 0x100c1c3c (src/rsse_matrix.cpp): the three rows of the 3 x 3 part times the point's x, y and z; row 3 is left alone.
+// 0x100c1c3c (src/game/LMatrix.cpp): the three rows of the 3 x 3 part times the point's x, y and z; row 3 is left alone.
 void ScaleLMatrixNoTrans(sMatrix* matrix, s3DPoint* scale);                    // 0x100c1c3c
-// 0x100c1db4 (192 bytes, src/rsse_orientation.cpp, unit w135): the 3 x 3 part from a pitch about X (the C library's sin and cos of the pitch) and
+// 0x100c1db4 (192 bytes, src/game/LMatrix.cpp, unit w135): the 3 x 3 part from a pitch about X (the C library's sin and cos of the pitch) and
 // then a yaw about Y (YRotateLMatrixNoTrans with the cos and sin of the yaw); row 3 is left alone.
 void SetLMatrixOrientationHi(sMatrix* matrix, float pitch, float yaw);   // 0x100c1db4
-// Unit w170 (src/rsse_math.cpp): the matrix and vector helpers of rsse.cpp that had no translation.
+// Unit w170 (src/game/LMatrix.cpp): the matrix and vector helpers of rsse.cpp that had no translation.
 void SetLMatrixIdentityNoTrans(sMatrix* matrix);                                   // 0x100c0eac (64 bytes): 1.0 on the diagonal, 0.0 in the rest of the 3 x 4 block; m30..m32 untouched
 float GetLMatrixRotationAroundYAxis(sMatrix* matrix);                              // 0x100c0f24 (104 bytes): atan2 by m[2][1] against +-0.9
 float GetVectorRotationAroundXAxisFromZ(s3DPoint& point);                          // 0x100c1040 (52 bytes): atan2(-y, z)
@@ -729,29 +729,29 @@ void CombineMatricesNoWNoTransDest2nd(sMatrix* first, sMatrix* second);         
 // 0x100c2d50 (360 bytes): merge sort of `count` object pointers by the float at byte `offset` of each object; the result is in `scratch`
 // at an even depth and in `source` at an odd one (callers pass depth 0).
 void FloatSortByArray(int32_t count, void** source, void** scratch, int32_t depth, int32_t offset);
-// 0x100b7fa0 (156 bytes, src/rsse_proctex.cpp, unit w114): walks the height field's quads (gHeightfieldHeader->mHField->mQuads): procedural
+// 0x100b7fa0 (156 bytes, src/game/MeshLoad.cpp, unit w114): walks the height field's quads (gHeightfieldHeader->mHField->mQuads): procedural
 // textures on (nonzero) clears the orientation bits 0x78 of each quad whose flags have neither 0x81 bit; off (0) clears 0xf8 and puts back
 // the same bits of gHeightfieldCopy's quad. Both pointers are read in both modes.
 void CorrectOrientationFlagsForDiffProceduralMode(int32_t procedural);
 void RSSE_Init();                                                   // 0x100d32e8
-// 0x100d33dc (632 bytes, src/rsse_ride_tick.cpp, unit w132): one tick of every script; answers gRSSEF7BE0 (also when the system is not on).
+// 0x100d33dc (632 bytes, src/game/rides/rsse.cpp, unit w132): one tick of every script; answers gRSSEF7BE0 (also when the system is not on).
 int32_t RSSE_Tick();
-void RSSE_RenderTick();   // 0x100d3674 (108 bytes, src/rsse_ride_tick.cpp, unit w132): BOUNCE_Tick and WALKNODE_Tick of every script
-// 0x100d3708 (src/rsse_close.cpp): kills the live scripts, marks the system closed and asserts that the scripts freed what they
+void RSSE_RenderTick();   // 0x100d3674 (108 bytes, src/game/rides/rsse.cpp, unit w132): BOUNCE_Tick and WALKNODE_Tick of every script
+// 0x100d3708 (src/game/rides/rsse.cpp): kills the live scripts, marks the system closed and asserts that the scripts freed what they
 // malloced.
 void RSSE_Close();
 struct RSSE_SCRIPT;
-RSSE_SCRIPT* RSSE_GetScriptPointer(int32_t script);   // 0x100d668c (124 bytes, src/rsse_ride_tick.cpp, unit w132)
-int32_t RSSE_Getvar(RSSE_SCRIPT* script, int32_t index);   // 0x100d6c58 (124 bytes, src/rsse_ride_tick.cpp, unit w132)
-void RSSE_Setvar(RSSE_SCRIPT* script, int32_t index, int32_t value);   // 0x100d6734 (src/rsse_objects.cpp, unit w150; unit w126: CObject::SetState sets variable 6)
+RSSE_SCRIPT* RSSE_GetScriptPointer(int32_t script);   // 0x100d668c (124 bytes, src/game/rides/rsse.cpp, unit w132)
+int32_t RSSE_Getvar(RSSE_SCRIPT* script, int32_t index);   // 0x100d6c58 (124 bytes, src/game/rides/rsse.cpp, unit w132)
+void RSSE_Setvar(RSSE_SCRIPT* script, int32_t index, int32_t value);   // 0x100d6734 (src/game/rides/rsse.cpp, unit w150; unit w126: CObject::SetState sets variable 6)
 // 0x100614a0 (untranslated; unit w126): the ride's hoardings (the ride anim set of gRideAnimSets); CObject::SetState calls it with 1.
 void ActivateHoardings(tag_sRideAnimSet* set, uint32_t flag);
 // 0x100617cc (untranslated; unit w199): the hoardings of the anim set off again (RepairFully and RequestMaintenance open the ride with it).
 void DeActivateHoardings(tag_sRideAnimSet* set);
 // 0x100d67e0 (untranslated; unit w199): the upgrade effect of the ride script (RepairFully).
 void RSSE_UpgradeRideEffect(int32_t handle);
-extern uint16_t gRSSEUpgradeSkipThing;   // 0x1029f152: the thing id whose scripts RSSE_UpgradeRideEffect skips (src/rsse_objects_RSSE_UpgradeRideEffect.cpp)
-// 0x100d2ecc (1,004 bytes, src/rsse_script_life.cpp, unit w169): kills one script (bit 4 of `flag` also turns its ride heads off) and answers the next live one, or NULL.
+extern uint16_t gRSSEUpgradeSkipThing;   // 0x1029f152: the thing id whose scripts RSSE_UpgradeRideEffect skips (src/game/rides/rsse.cpp)
+// 0x100d2ecc (1,004 bytes, src/game/rides/rsse.cpp, unit w169): kills one script (bit 4 of `flag` also turns its ride heads off) and answers the next live one, or NULL.
 RSSE_SCRIPT* KillScript(RSSE_SCRIPT* script, int32_t flag);
 // The script system's state: five words at 0x102f7bec that RSSE_Init sets (the original names are unknown).
 struct RSSEState {
@@ -763,9 +763,9 @@ struct RSSEState {
 };
 extern RSSEState gRSSEState;           // 0x102f7bec
 extern int32_t gRSSEMallocCount;       // 0x102f7bdc  blocks the scripts malloced and did not free yet
-void RSSE_SetReverbOnEax();   // 0x100d6e7c (140 bytes, src/rsse_ride_tick.cpp, unit w132)
+void RSSE_SetReverbOnEax();   // 0x100d6e7c (140 bytes, src/game/rides/rsse.cpp, unit w132)
 
-// ---- Unit w132 (src/rsse_ride_tick.cpp): the ride scripts' list, their tick and the reverb.
+// ---- Unit w132 (src/game/rides/rsse.cpp): the ride scripts' list, their tick and the reverb.
 // One script record of the list gRSSEState.mScripts heads (0xf4 bytes on the Mac; the names are mine, fields RSSE_Tick and its neighbours do not
 // read are fillers). Its three links and the variable array are 32-bit fields, as the Mac's: a Ptr32 (arena offsets, platform/arena.h), so a record
 // and its variable array must come from the arena; the list head in gRSSEState stays a native pointer. The program is only tested for "has one".
@@ -849,21 +849,21 @@ static_assert(offsetof(RSSE_SCRIPT, mBounceBase) == 0x70 && offsetof(RSSE_SCRIPT
 extern int32_t gRSSEF7BE0;
 // The callees of the tick and the reverb, untranslated (each answers 0 in the launcher).
 void ProcessInstruction(RSSE_SCRIPT* script);   // 0x100cfdf4 (12,340 bytes): runs one instruction of the script (gRSSEF7BE4 nonzero keeps the countdown)
-void ProcessObjects(RSSE_SCRIPT* script);       // 0x100cf884 (src/rsse_objects.cpp, unit w150)
-void BOUNCE_Tick(RSSE_SCRIPT* script);          // 0x100ce740 (src/rsse_peeps.cpp, unit w149)
-void WALKNODE_Tick(RSSE_SCRIPT* script);        // 0x100cd928 (src/rsse_peeps.cpp, unit w149)
-void RSSE_KillScript(int32_t handle, int32_t flag);   // 0x100d42d0 (696 bytes, src/rsse_script_life.cpp, unit w169)
+void ProcessObjects(RSSE_SCRIPT* script);       // 0x100cf884 (src/game/rides/rsse.cpp, unit w150)
+void BOUNCE_Tick(RSSE_SCRIPT* script);          // 0x100ce740 (src/game/rides/RideEffects.cpp, unit w149)
+void WALKNODE_Tick(RSSE_SCRIPT* script);        // 0x100cd928 (src/game/rides/RideEffects.cpp, unit w149)
+void RSSE_KillScript(int32_t handle, int32_t flag);   // 0x100d42d0 (696 bytes, src/game/rides/rsse.cpp, unit w169)
 void UpdateRideAnimSpeedAllChannels(tag_sRideAnimSet* set, float speed);   // 0x100c7ae4
 void FLY_SetRunTime(int32_t fly, int32_t time);   // 0x10078958
 void FLY_SetRunSpeed(int32_t fly, int32_t speed); // 0x100789ec
 void CoasterSetSpeed(uint32_t coaster, uint32_t speed);   // 0x10049630
 void BMP_SetRidePerformance(int32_t ride, int32_t speed); // 0x10026c98
 uint32_t GetFirstPersonRideID();                // 0x10032b64
-// 0x100d37b4 (2,756 bytes, src/rsse_script_life.cpp, unit w169): creates a script from the file `path`; the thing id travels in the HIGH halfword of the second word (a tag_IDX_TYPE by value),
+// 0x100d37b4 (2,756 bytes, src/game/rides/rsse.cpp, unit w169): creates a script from the file `path`; the thing id travels in the HIGH halfword of the second word (a tag_IDX_TYPE by value),
 // the third argument is 1 when the action recorder is recording. Answers the new script's handle (0: none).
 int32_t RSSE_InitScript(const char* path, uint32_t thing, int32_t recording);
 
-// ---- Unit w149 (src/rsse_peeps.cpp): the peep tables of a ride script (the walk nodes, the bounce and limbo tables, GetNodePos).
+// ---- Unit w149 (src/game/rides/RideEffects.cpp): the peep tables of a ride script (the walk nodes, the bounce and limbo tables, GetNodePos).
 // Plain records (no pointers) in the arena tables of RSSE_SCRIPT; the struct and field names are mine.
 struct JCPOINT3D {   // the Mac's name (a mangled argument type); three floats
     float x, y, z;
@@ -894,13 +894,13 @@ struct RSSE_WALK {       // 32 bytes
     int16_t mState;      // 0x18  0 free, 1 walking in, 2 waiting, 3 walking out, 4 done
     int16_t mLast;       // 0x1a  Trigger's last argument
     uint32_t mF1C;       // 0x1c
-    void Byteswap();     // 0x100d65a8 (unit w167, src/rsse_save.cpp): reverses the bytes of every field but +0x1c, with no condition
+    void Byteswap();     // 0x100d65a8 (unit w167, src/game/rides/rsse.cpp): reverses the bytes of every field but +0x1c, with no condition
 };
 static_assert(sizeof(RSSE_WALK) == 32, "RSSE_WALK layout");
 struct sAlignedBox;
 struct tag_sMesh;
 struct tag_sRideAnimSet;
-// 0x100cc888 (608 bytes, src/rsse_peeps.cpp): the position (and, when `dir` is not NULL, the facing) of node `node` of the script's ride;
+// 0x100cc888 (608 bytes, src/game/rides/RideEffects.cpp): the position (and, when `dir` is not NULL, the facing) of node `node` of the script's ride;
 // answers 1, or 0 (after the assertion "RSSE: Invalid Node ID") when the ride has no such node.
 int32_t GetNodePos(RSSE_SCRIPT* script, JCPOINT3D* pos, JCPOINT3D* dir, int32_t node, int32_t mask);
 void WALKNODE_Trigger(RSSE_SCRIPT* script, uint32_t peep, int32_t from, int32_t to, int32_t outFrom, int32_t outTo, int32_t kind, int32_t last);   // 0x100cdd4c
@@ -914,7 +914,7 @@ int32_t LIMBO_Put(RSSE_SCRIPT* script, uint32_t peep, int32_t time);  // 0x100ce
 uint32_t LIMBO_Get(RSSE_SCRIPT* script);                              // 0x100ceb90
 uint32_t LIMBO_ForceGet(RSSE_SCRIPT* script);                         // 0x100cec58
 // Untranslated callees of this unit (each answers 0 or does nothing in the launcher).
-// 0x100cd388 (1,380 bytes, src/rsse_scream.cpp, unit w171): draws a peep between two nodes; `mode` 0 walk, 1 and 2 head states; `fraction` 0 to 1000.
+// 0x100cd388 (1,380 bytes, src/game/rides/RideEffects.cpp, unit w171): draws a peep between two nodes; `mode` 0 walk, 1 and 2 head states; `fraction` 0 to 1000.
 void DrawPeep(RSSE_SCRIPT* script, RSSE_WALK* walk, int32_t from, int32_t to, int32_t mode, int32_t fraction);
 void SetRideSpritePosnFocus(tag_sMesh* mesh);                         // 0x1005cc10 (TPRide.cpp, untranslated)
 // 0x101ed058 (ui_ErrorDisplay.cpp, untranslated): the ride's bounding box; the Mac answers nonzero when it filled `box` (return type chosen: int32_t).
@@ -924,11 +924,11 @@ float* GetDataNodeWorldMatrix(tag_sMesh*& mesh, uint32_t& index);
 tag_sRideAnimSet** GetRideFromID(uint32_t& id);                       // 0x1002ae38 (TPAdvisor.cpp, untranslated; the answer is dereferenced once)
 void NormaliseVector(s3DPoint* vector);                               // 0x1002ad34 (TPAdvisor.cpp, untranslated)
 
-// ---- src/rsse.cpp
+// ---- src/game/LMatrix.cpp
 // 0x100c30a8: fills gTPGlobals' sine table with `size` entries (a power of two).
 void BuildGeometryTables(uint32_t size);
 
-// ---- loading meshes and the mesh paths (src/MeshLoad.cpp)
+// ---- loading meshes and the mesh paths (src/game/MeshLoad.cpp)
 struct tag_sM3D2Header;
 struct tag_sMesh;
 // 0x100b7d04: loads a mesh file (with `oneFrame` its animated textures are cut to one
@@ -950,7 +950,7 @@ void DestroyPathAllocs();                   // 0x100b8df4: frees every table and
 void OverrideTexturePaths(tag_sM3D2Header* header, int32_t checkFiles, int32_t unused);
 struct sDTextureSet;
 struct tag_sDMeshSet;
-// 0x100b8710 (324 bytes, src/DynamicMesh.cpp; rsse.cpp on the Mac): looks for the dynamic textures' first file in the texture set's folder (then
+// 0x100b8710 (324 bytes, src/game/MeshLoad.cpp; rsse.cpp on the Mac): looks for the dynamic textures' first file in the texture set's folder (then
 // with its extension replaced by ".wct"), takes the search path it is found in (or the last name tried) as the root of the mesh paths
 // (SetNewMeshPaths with the set's two folders) and points the textures of the set's mesh at them (OverrideTexturePaths).
 void CorrectDTexturePaths(sDTextureSet* textures, tag_sDMeshSet* set);
@@ -963,7 +963,7 @@ extern int32_t gTexturePathIndex;    // 0x1029eb70
 extern int32_t gSharedPathIndex;     // 0x1029eb74
 int32_t CheckFileExists(char* name);        // 0x100b98a4: 1 when TPFile_Open opens it
 
-// ---- the animation changes and the morph decoder (src/RideAnimChange.cpp)
+// ---- the animation changes and the morph decoder (src/game/rides/RideAnim.cpp)
 struct sCMKeyData;
 struct sAlignedBox;
 struct sVertexPosnSet;
@@ -984,7 +984,7 @@ void InterpolateCMorphBoundData(sMorphSet* morph, sAlignedBox* box, sCMKeyData* 
 // node's vertex sets in its table) at the fraction `t` between the current row and the next, set or (`add`) added.
 void InterpolateCMorphData(sMorphSet* morph, sVertexPosnSet* positions, sCMKeyData* key, float t, int32_t add);   // 0x100c390c
 
-// ---- the ride sign's image filters (src/rsse_sign_filters.cpp, unit w84; the shaders that use them are in PlasticShader.h)
+// ---- the ride sign's image filters (src/game/rides/RideSign.cpp, unit w84; the shaders that use them are in PlasticShader.h)
 class Bitmap;
 // 0x100c8e40 (596 bytes): one round of erosion of `work` (two bytes per pixel: the current value, then the next): each pixel's next
 // byte is the smallest current byte among itself and the neighbours the edge tests let it see (the right edge tests `col < width - 2`
@@ -1006,7 +1006,7 @@ int32_t erode(Bitmap& bitmap, int32_t radius);
 // columns. Answers 1, or 0 when the line buffer's new[] fails (the kernel leaks then).
 int32_t blur(Bitmap& bitmap, double sigma);
 
-// ---- Unit w150 (src/rsse_objects.cpp): a script's emitter and sound objects, its stack and the small getters.
+// ---- Unit w150 (src/game/rides/rsse.cpp): a script's emitter and sound objects, its stack and the small getters.
 // One object of the list RSSE_SCRIPT::mObjects heads: 0x1c bytes on the Mac (LbMem_Alloc; here the arena, since the links are Ptr32).
 // The names are mine.
 struct RSSE_OBJECT {
@@ -1049,7 +1049,7 @@ void GetRidePosition(tag_sRideAnimSet* set, float& x, float& y, float& z);
 // 0x100cc778 (220 bytes): the centre of the ride's bounding box (y from the ride's node); answers 0 when it found it, else 1 with all zeros.
 int32_t GetRideCentrePosition(uint32_t& ride, float& x, float& y, float& z);
 
-// ---- Unit w166 (src/rsse_save.cpp): the ride scripts' save and rsse.cpp's swap helpers
+// ---- Unit w166 (src/game/rides/rsse.cpp): the ride scripts' save and rsse.cpp's swap helpers
 // 0x100d45b0 (3,408 bytes): writes the script system to a file: the tag "RSSE", 0x14, the state's five words (the list head as its Ptr32 word) and,
 // when the system is initialised, "PAD_" five times, the script count, 0xf4 and each script: its record, its tables, its objects. Answers 0.
 int32_t RSSE_Save(void* file);   // 0x100d45b0
@@ -1069,13 +1069,13 @@ void USwapInplace32Long(int32_t& word);         // 0x100d561c  USwapInplace32<lo
 uint32_t USwap32VoidPtr(uint32_t value);        // 0x100d5660  USwap32<void*>
 }  // namespace RsseSwap
 
-// ---- Unit w167 (src/rsse_save.cpp): the ride scripts' load
+// ---- Unit w167 (src/game/rides/rsse.cpp): the ride scripts' load
 // 0x100d56bc (3,784 bytes): reads what RSSE_Save wrote. Kills the live scripts and restarts the system (RSSE_Init) first; answers 1 on a wrong
 // tag ("RSSE", or "OBJ " after a script's tables: the script stays in the list, half loaded), else 0. The scripts are linked at the head of the
 // list as they are read, so the list ends up in the reverse of the saved order.
 int32_t RSSE_Load(void* file);   // 0x100d56bc
 
-// ---- Unit w171 (src/rsse_scream.cpp): a ride script's screams, the repair particle effect, DrawPeep and two getters of rsse.cpp.
+// ---- Unit w171 (src/game/rides/RideEffects.cpp): a ride script's screams, the repair particle effect, DrawPeep and two getters of rsse.cpp.
 // The screams: the sound bank is gSoundBanks[1]; the handle is SOUND_SendEvent's answer. A negative count takes the group of 2 and 3.
 int32_t SCREAM_Start(int32_t handle, int32_t count, int32_t a, int32_t b, int32_t p, int32_t q, int32_t r);   // 0x100ccb30 (356 bytes)
 // 0x100cccc0 (84 bytes): the level (a + b) / 2 clamped to 0..100. Answers 0 for handle 0 (r3 is the handle), else
@@ -1094,7 +1094,7 @@ uint32_t RSSE_GetCoasterHandle(int32_t handle);   // 0x100d6f34 (140 bytes): the
 // 0x1005d198 (316 bytes, TPRide.cpp, untranslated): the height of the ride's ground at (x, z), written to y.
 void GetRideHeightAtPoint(float x, float z, float& y);
 
-// ---- Unit w172 (src/rsse_commands.cpp): a ride script's ride-specific commands (the original's rsse.cpp).
+// ---- Unit w172 (src/game/rides/rsse.cpp): a ride script's ride-specific commands (the original's rsse.cpp).
 static_assert(offsetof(RSSE_SCRIPT, mCommandAnswer) == 0x48, "RSSE_SCRIPT layout (unit w172)");
 // Each reads the command word from the program (ReadScript), switches on it (unsigned; 0 and anything above the bound assert) and calls one ride function.
 void ExecuteTourSpecificCommand(RSSE_SCRIPT* script);      // 0x100d6fec (2,240 bytes): the tour (fly) ride's commands 1 to 18
@@ -1141,7 +1141,7 @@ int32_t FLY_SetMotionScale(int32_t fly, int32_t a);                // 0x10079168
 int32_t FLY_SetNumberOfCars(int32_t fly, int32_t a);               // 0x10078ee4
 int32_t FLY_SetOpenClosed(int32_t fly, int32_t a);                 // 0x10078a58
 int32_t FLY_SetRepairState(int32_t fly, int32_t a);                // 0x10078b40
-// Unit v5980: 0x1007861c (384 bytes, src/hlsprite_flies_FLY_ForceExtractPeep.cpp): takes the peep of the first slot of the fly base that
+// Unit v5980: 0x1007861c (384 bytes, src/game/rides/FlyingRide.cpp): takes the peep of the first slot of the fly base that
 // has a positive count (active or not); answers it, or 0.
 int32_t FLY_ForceExtractPeep(int32_t fly);
 int32_t FLY_SetRunway(int32_t fly, int32_t a);                     // 0x100790c0
@@ -1149,14 +1149,14 @@ class CObject;
 void LLCC_SetTrackAnim(CObject* object, bool flag);                // 0x1008c7b0
 void LLCC_SetTrackAnimReverse(CObject* object, bool flag);         // 0x1008cad8
 
-// ---- Unit v5308 (src/RideAnimChange_RATick.cpp)
+// ---- Unit v5308 (src/game/rides/RideAnim.cpp)
 // 0x100c4e20 (172 bytes): runs AnimateNode for each node animation of `animation` (mesh->mHeader), then RAAnimateTextureFrames
 // when the animation has flag 2 and the engine flags lack 8. Answers 1; NULL animation: nothing.
 int32_t RATick(sAnimTimeControl* control, tag_sMesh* mesh, tag_sAnimHeader* animation);
 // 0x100c4f18 (240 bytes): copies the vertices and bounding box of `from`'s nodes into `to`'s nodes that have vertices and flag 0x200000 (or any when `force`).
 void QuickCopyUnmaskedMeshVertices(tag_sMesh* from, tag_sMesh* to, int32_t force);
 
-// ---- Unit v5882 (src/rsse_objects_ProcessInstruction.cpp): the script interpreter's callees that have no declaration or no returning form.
+// ---- Unit v5882 (src/game/rides/rsse.cpp): the script interpreter's callees that have no declaration or no returning form.
 struct sNodeLightParams;
 // 0x100647ec (56 bytes, untranslated): the light of the ride `ride`'s data node `index` (FindDataNodeIndexByID's answer for mask 0x20000).
 sNodeLightParams* GetLightsourceHandle(uint32_t ride, uint32_t index);

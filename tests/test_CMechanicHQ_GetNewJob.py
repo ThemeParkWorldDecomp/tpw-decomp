@@ -1,5 +1,5 @@
 """Unit v5889, the mechanic HQ, against libtpw_unit_CMechanicHQ_GetNewJob.dylib (tests/unit_CMechanicHQ_GetNewJob.cpp), main app
-("SimTheme Park"), src/Mechanic_CMechanicHQ_GetNewJob.cpp:
+("SimTheme Park"), src/game/buildings/MechanicHQ.cpp:
   CMechanicHQ::GetNewJob 0x10105450, CMechanicHQ::Serialise 0x10105348, CMechanicHQ::ReassignJobsAfterDrop 0x10105818,
   CMechanicHQ::ReceiveMessage 0x10105988
 

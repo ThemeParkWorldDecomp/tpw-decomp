@@ -104,12 +104,12 @@ public:
     uint8_t mF11[0xe8c - 0x11];  // 0xe8c bytes on the Mac
 };
 extern COnlineControl* gOnlineControl;   // 0x10396d28, created on first use (original name unknown)
-// Unit v5919 (src/LCPostFormat_2_ChatPrePostCard_ChatBackToThirdPerson_2.cpp): the first-person bookkeeping of the chat panel (names invented).
+// Unit v5919 (src/game/ui/ui_onlinePanel.cpp): the first-person bookkeeping of the chat panel (names invented).
 extern int32_t gOnlineFirstPersonCountdown;   // 0x10395e6c, set to 5 on entering first person, counts down in UpdateAvatarPos
 extern uint32_t gOnlineSavedFlags;            // 0x10395e70, the last gFirstPersonFlags UpdateAvatarPos saw
 extern uint8_t gOnlineMapZ[2];                // 0x10395e74, MapPos of the avatar's z: cell, offset
 extern uint8_t gOnlineMapX[2];                // 0x10395e76, MapPos of the avatar's x: cell, offset
-// Unit v5907: online.cpp's static initialiser 0x1022a06c (src/ProcessGetChatSatellitePlayers_sinit_online_cpp.cpp). Storage is raw bytes
+// Unit v5907: online.cpp's static initialiser 0x1022a06c (src/game/online/online.cpp). Storage is raw bytes
 // (the Mac objects are 0x14 bytes each, the host's larger); the narrow strings 0..15 are the language names (Mac 0x10396dac + 0x14 * i),
 // 16 is "Theme Park World" (0x10396d8c), 17 is "Language" (0x10396d6c); the wide strings are 0x10396d4c and 0x10396d2c.
 void __sinit_online_cpp();                                  // 0x1022a06c (720)
@@ -118,7 +118,7 @@ alignas(16) extern uint8_t gOnlineSinitWide[2][64];
 extern uint8_t gOnlineSinitNodes[20][16];                   // the registration records (12 bytes each on the Mac)
 extern int32_t gOnlineSinitZero;                            // 0x10396fb0, set to 0
 extern int32_t gOnlineSinitMask;                            // 0x10396fac, set to 0x10000
-// Unit v5276 (src/COnlinePerson_SetDest_GotoPark_OK.cpp)
+// Unit v5276 (src/game/online/online.cpp)
 int32_t GotoPark_OK(void* context);                      // 0x10213728
 void GotoCallbackFn(int32_t status, const void* data);   // 0x102137bc
 // Unit v5725: std::queue<std::vector<Argument>, std::deque<...>> destructor. The queue is its deque: the deque's block table pointer
@@ -135,7 +135,7 @@ MslArgumentQueue* ArgumentQueueDestruct(MslArgumentQueue* self, int16_t deleteFl
 #include <string>
 class CFSOnlineSystem;
 namespace online_callee {
-uint32_t PointerToHandle(const void* p);   // the host's stand-in for a 32-bit pointer word: index + 1 into a table, 0 for NULL (src/COnlineControl_COnlineControl.cpp)
+uint32_t PointerToHandle(const void* p);   // the host's stand-in for a 32-bit pointer word: index + 1 into a table, 0 for NULL (src/game/online/online.cpp)
 void* HandleToPointer(uint32_t handle);
 void* OperatorNew(uint32_t size);                                // 0x102384b8
 void OperatorDelete(void* p);                                       // 0x10238218
@@ -309,7 +309,7 @@ void InitTokenList(void* parser);           // 0x1020e898
 // ---- Unit v5212: ChatCallbackFn(int, void*, std::vector<Argument>&) 0x10214a0c (the vector passed as its address; the void* is unused).
 void ChatCallbackFn(int32_t id, void* unused, void* arguments);
 
-// ---- Unit v5181: std::vector<Argument> copy constructor 0x10227200 and push_back 0x10201478 (src/std_vector_vector.cpp).
+// ---- Unit v5181: std::vector<Argument> copy constructor 0x10227200 and push_back 0x10201478 (src/game/MslSupport.cpp).
 class Argument;
 struct ArgumentVector {
     uint32_t mCapacity;   // 0x00
@@ -323,7 +323,7 @@ void ArgumentCopy(Argument* self, const Argument* other);        // 0x10201878 A
 void ArgumentDestroyRange(Argument* first, Argument* last);      // 0x10201744 / 0x102013c0 / 0x10222458 std::__destroy<Argument*>
 }  // namespace std_vector_callee
 
-// ---- Unit v5310: std::__destroy<Argument*> 0x10201744 / 0x102013c0 and std::__destroy<Argument> 0x102017d4 (src/std___destroy.cpp).
+// ---- Unit v5310: std::__destroy<Argument*> 0x10201744 / 0x102013c0 and std::__destroy<Argument> 0x102017d4 (src/game/MslSupport.cpp).
 namespace std_destroy {
 void DestroyOne(Argument* argument);                       // 0x102017d4
 void DestroyRange(Argument* first, Argument* last);        // 0x10201744
@@ -331,7 +331,7 @@ void DestroyRangeTagged(Argument* first, Argument* last);  // 0x102013c0 (random
 }  // namespace std_destroy
 
 // ---- Unit v5229: std::basic_string<wchar_t, nocase_wchar_traits> compare 0x10225a5c and substring constructor 0x1022213c
-// (src/std_basic_string_compare_3.cpp). The string is one pointer to an IME::MslWideStringRep (length 0, capacity 4, refs 8, data 0xc;
+// (src/game/MslSupport.cpp). The string is one pointer to an IME::MslWideStringRep (length 0, capacity 4, refs 8, data 0xc;
 // native pointer at 0x10 here). NocaseWStringCopy (declared above) is the constructor.
 namespace online_callee {
 int32_t NocaseWStringCompare(const void* self, uint32_t pos, uint32_t n1, const char16_t* s, uint32_t n2);   // 0x10225a5c
@@ -339,7 +339,7 @@ int32_t NocaseWStringCompare(const void* self, uint32_t pos, uint32_t n1, const 
 void NocaseWStringInit(void* self, const char16_t* first, const char16_t* last);
 }  // namespace online_callee
 
-// ---- Unit v5756: std::operator< on two nocase wide strings 0x10225d2c (src/lt__3stdFRCQ23std58basic_stringRCQ23std58basic_s.cpp)
+// ---- Unit v5756: std::operator< on two nocase wide strings 0x10225d2c (src/game/MslSupport.cpp)
 namespace online_lt {
 uint32_t NocaseWStringSize(const void* self);                 // 0x10226134 size() const
 const char16_t* NocaseWStringBegin(const void* self);         // 0x102260c8 begin() const
@@ -500,7 +500,7 @@ namespace WcharTreeCallee {
 void BalanceInsert(WcharSetTree::node* node, WcharSetTree::node* root);   // 0x10153b24 __red_black_tree::balance_insert
 }
 
-// ---- Unit v5242: Argument::Argument(const Argument&) 0x10201878 (src/Argument_Argument_2.cpp).
+// ---- Unit v5242: Argument::Argument(const Argument&) 0x10201878 (src/game/MslSupport.cpp).
 namespace argument_callee {
 void StringInit(void* self, const char* first, const char* last);   // 0x10002b8c std::string init(first, last, allocator, tag): the test library fakes it
 }  // namespace argument_callee
@@ -555,12 +555,12 @@ public:
     static OnlineChatData* Destruct(OnlineChatData* self, int16_t deleteFlag); // 0x10213cac (destructor)
 };
 
-// ---- Unit v5568: cmp_nocase 0x10210e68 (src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_cmp_nocase.cpp).
+// ---- Unit v5568: cmp_nocase 0x10210e68 (src/game/online/Parser.cpp).
 namespace IME { struct MslWideString; }
 extern uint16_t gWUpperMap[256];   // 0x103bd0a0 (data import c/c++_shared::__wupper_map): the upper-case map of the characters below 0x100
 int32_t cmp_nocase(const IME::MslWideString& a, const IME::MslWideString& b, bool prefix);   // 0x10210e68
 
-// ---- Unit v5640: operator<<(wostream&, const wchar_t*) 0x1021f374 (src/std_operator.cpp; declared above as ignore_callee::OstreamWrite).
+// ---- Unit v5640: operator<<(wostream&, const wchar_t*) 0x1021f374 (src/game/MslSupport.cpp; declared above as ignore_callee::OstreamWrite).
 // Callees (the test library fakes them). The ios is the ignore_callee::IgnoreIos, the iterator is the stream buffer address.
 namespace wostream_callee {
 bool Good(void* ios);                       // 0x102079b4 ios_base::good
@@ -632,7 +632,7 @@ void ArgumentDequePopFront(void* deque);                                       /
 }  // namespace online_callee
 
 // ---- Unit v5899: std::__tree<nocase_string, std::less<nocase_string>, std::allocator<nocase_string>> (a std::set<nocase_string>),
-// src/std___tree_erase_2.cpp. Mac offsets in comments; the host's words are native. A nocase_string is one word: a pointer to its rep.
+// src/game/MslSupport.cpp. Mac offsets in comments; the host's words are native. A nocase_string is one word: a pointer to its rep.
 struct NocaseRep {
     uint32_t mLength;     // 0x00
     uint32_t mCapacity;   // 0x04
@@ -673,7 +673,7 @@ void UIOnlineRemoveBuddy(void* ui, const char16_t* text);     // 0x101f0b68 UIIn
 // Unit v5903: std::pair<const nocase_string, BuddyInfo>::~pair (the entry's first word is the key).
 BuddyEntry* BuddyEntryDestruct(BuddyEntry* self, int16_t flag);   // 0x1021bd24
 
-// ---- Unit v5938: std::deque<std::vector<Argument>> of the Metrowerks library (src/std_deque_std_vector_std_allocator_std_vector_pu.cpp).
+// ---- Unit v5938: std::deque<std::vector<Argument>> of the Metrowerks library (src/game/MslSupport.cpp).
 // All words are the Mac's 32-bit words (the host's heap addresses are truncated to 32 bits: the arena is 32-bit addressable).
 // The elements are 0xc bytes (the Mac's std::vector<Argument>). push_back 0x10224a3c, pop_front 0x1022488c and the copy
 // constructor 0x10224fbc are online_callee::ArgumentDequePushBack, ArgumentDequePopFront and DequeCopy (declared above).
@@ -716,7 +716,7 @@ void IterInc(MslArgumentDequeIter* it);                                      // 
 bool IterNotEqual(const MslArgumentDequeIter* a, const MslArgumentDequeIter* b);   // 0x102255a0
 }  // namespace argdeque_callee
 
-// ---- Unit v5976 (src/std_deque_std_vector_std_allocator_std_vector_gr.cpp): grow_buf_back 0x102287e4 is
+// ---- Unit v5976 (src/game/MslSupport.cpp): grow_buf_back 0x102287e4 is
 // argdeque_callee::GrowBufBack (declared above; the Mac returns the "swapped the block table" flag in r3), destroy 0x10228fd4 and the
 // destructor 0x10213b80. Words are the Mac's 32-bit words; a host pointer is (gMslMacAddressHigh << 32) | word.
 extern uint32_t gArgDequeGrowFill;   // 0x102b2088 (0): the word whose address grow_buf_back passes to the block table's push_back
@@ -778,7 +778,7 @@ namespace COnlinePersonV51059 {
 void FinalDestroy(COnlinePerson* self);   // see COnlinePerson::FinalDestroy 0x10212f58
 }
 
-// ---- Unit v51126 (src/std___tree_std_pair_std_map_nocase_string_BuddyI.cpp): tree constructors and insert_one of the nocase set, the
+// ---- Unit v51126 (src/game/MslSupport.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_FeatureStatus.cpp): tree constructors and insert_one of the nocase set, the
 // wstring set and the buddy map, the Argument destroyers, the nocase wstring destructor, the deque<vector<Argument>> tear_down.
 // The structures keep the Mac's 32-bit words (the arena is 32-bit addressable: a host pointer is converted to its word).
 namespace v51126 {

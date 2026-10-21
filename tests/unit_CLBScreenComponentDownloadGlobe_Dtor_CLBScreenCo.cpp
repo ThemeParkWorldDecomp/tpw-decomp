@@ -1,6 +1,6 @@
 // Test library for the online download globe's destructor and Hide (unit v5553; libtpw_unit_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo.dylib,
 // tests/test_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo.py), main app:
-//   src/lobby_globe_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo.cpp   ~CLBScreenComponentDownloadGlobe, Hide
+//   src/game/online/lobby_globe.cpp   ~CLBScreenComponentDownloadGlobe, Hide
 //
 // The callees outside the unit are recording fakes: the base classes' constructors and destructors, IsVisible, the globes' and flags'
 // destructors, operator delete (it frees nothing: the world's blocks are static or leaked), the controllers, the meshes, the sound.
@@ -39,7 +39,7 @@ CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
 void CLBScreenComponentOnlineGlobe::Render() {}
 void CLBScreenComponentOnlineGlobe::Close() {}
 uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
-// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp).
+// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 

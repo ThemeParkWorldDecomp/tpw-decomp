@@ -1,5 +1,5 @@
 // Test library for the staff status panel's message functions (unit v5364; libtpw_unit_StaffStatusMsg.dylib, tests/test_StaffStatusMsg.py), main app:
-//   src/StaffStatusPanel_FireMe_StaffStatusPanel_UpdateStatusWindow_StaffStatusMsg.cpp   StaffStatusMsg, OneEditMsg
+//   src/game/ui/ui_staffStatus.cpp   StaffStatusMsg, OneEditMsg
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue. The globals of
 // other files the unit reads are defined here. The panel object is raw bytes (the class has no members in the header).

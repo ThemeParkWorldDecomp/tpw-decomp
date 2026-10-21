@@ -1,5 +1,5 @@
-// Fakes for the sky's per-frame unit (src/tb_sky_render.cpp: CSky::Prepare, RenderAdd and Render).
-// The math unit is a real CMatrixPowerPC (src/MatrixPowerPC.cpp is part of the unit, as for
+// Fakes for the sky's per-frame unit (src/engine/tb_sky.cpp: CSky::Prepare, RenderAdd and Render).
+// The math unit is a real CMatrixPowerPC (src/engine/MatrixPowerPC.cpp is part of the unit, as for
 // tests/unit_MeshMatrix.cpp), so the sky's multiplies and vertex transforms are the original's.
 // Everything else the sky calls records an event through tests/calllog.h, and the larger things
 // (matrices, vertices, primitives) go to a dump of words that the PowerPC side builds the same

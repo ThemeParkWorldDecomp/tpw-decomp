@@ -1,6 +1,6 @@
 """Unit w71a, the MPEG audio decoder object CMpegBase, part 1, against libtpw_unit_MpegBase.dylib (tests/unit_MpegBase.cpp), in the
 sound library ("sound symbols shared", Code at 0x10000000, TOC r2 = 0x1003abf0):
-  src/TbMpegBase.cpp  the pool (CMpegBase::operator new 0x10002398, operator delete 0x1000245c, TopUp 0x100024f4, SetLevel
+  src/sound/FileAccess.cpp, src/sound/LbMpeg.cpp, src/sound/MpegDecode.cpp  the pool (CMpegBase::operator new 0x10002398, operator delete 0x1000245c, TopUp 0x100024f4, SetLevel
                       0x100025cc, ClearCache 0x10002310), the constructor 0x10002604 and destructor 0x10002640, the two static
                       objects (_CS_CMpegBase's destructor 0x10004110, CMpegBase_DecodeMethod's constructor 0x1000422c and
                       destructor 0x10004190), OpenSynth 0x100026d8, CloseSynth 0x100027f0, OpenLayer 0x10002bb4, CloseLayer

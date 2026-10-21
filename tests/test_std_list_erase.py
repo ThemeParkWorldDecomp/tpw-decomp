@@ -1,5 +1,5 @@
 """Unit v5305, std::list<unsigned int>::erase and clear, against libtpw_unit_std_list_erase.dylib (tests/unit_std_list_erase.cpp), main app,
-src/std_list_erase.cpp:
+src/game/MslSupport.cpp:
   erase 0x1020919c (188), clear 0x102090dc (124)
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian, host memory little-endian).

@@ -1,6 +1,6 @@
 // Test library for the small panel functions (unit v51121; libtpw_unit_RideStatusPanel_UpgradePanelByeBye.dylib,
 // tests/test_RideStatusPanel_UpgradePanelByeBye.py), main app:
-//   src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Upgrade_RideStatusPanel_UpgradePanelByeBye.cpp
+//   src/game/ui/ui_RideStatus.cpp, src/game/ui/ui_StaffCostsPanel.cpp, src/game/ui/ui_researchPanel.cpp, src/game/ui/ui_ridepanel.cpp, src/game/ui/ui_shopStatus.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read (windows by the tag word at +0x3f0 of their block) and answer
 // from the test's queues; the globals of other files the unit uses are defined here, zero at start like the Mac's bss.

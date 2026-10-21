@@ -1,5 +1,5 @@
 """Unit v51063, small accessors, static initialisers and the track animation walk, against libtpw_unit_LLCR_GetRideCell.dylib
-(tests/unit_LLCR_GetRideCell.cpp), main app ("SimTheme Park"), src/LLCR_OverRide_LLCR_OverRide_3_LLCR_GetRideCell.cpp:
+(tests/unit_LLCR_GetRideCell.cpp), main app ("SimTheme Park"), src/game/HLSprite.cpp, src/game/park/LLCellMouse.cpp, src/game/park/LLCellRide.cpp, src/game/rides/FlyingRide.cpp, src/game/ui/intrface.cpp:
   LLCR_GetRideCell 0x1008bccc, LLCR_GetRideCellDirection 0x1008bd14, LLCR_SetTopLeft 0x1008bd68, LLCR_GetWidthHeight 0x1008bdcc,
   LLCC_SetTrackAnim 0x1008c7b0, __sinit_LLCellMouse_cpp 0x10088ff4, LLCM_GetIllegalPlacement 0x10088970, LLCM_GetCurrentObject 0x100888fc,
   LLCCM_DestroyHoardingMesh 0x1008288c, LLCCM_DestroyWTrackMesh 0x10082508, LLCCM_DestroyKTrackMesh 0x10082120, LLCCM_DestroyQMesh 0x10081d80,

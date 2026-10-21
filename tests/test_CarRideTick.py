@@ -1,5 +1,5 @@
 """Unit w215, a coaster car's ride along the track, against libtpw_unit_CarRideTick.dylib (tests/unit_CarRideTick.cpp), main app
-("SimTheme Park"), src/TPConfig_ridetick.cpp:
+("SimTheme Park"), src/game/rides/CoasterExtrude.cpp, src/game/rides/CoasterSounds.cpp, src/game/rides/CoasterTrain.cpp:
   CoasterCarRideTrackTick 0x1004C4F0, SetCarOrientation 0x1004AB8C, SetTrainSoundState 0x100473E4, HandleCollisions 0x1004C3C0,
   InterpolateCoasterSpline (the instance overload) 0x1004B0B0, PlayCollisionSound 0x10047510, GetLinearSamplePosn 0x1004AFA4,
   DistanceBetweenPoints (the reference overload) 0x1004F374

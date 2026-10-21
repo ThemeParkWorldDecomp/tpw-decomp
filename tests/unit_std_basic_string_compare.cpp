@@ -1,6 +1,6 @@
 // Test library for std::basic_string<wchar_t> compare / assign / substring constructor (unit v5008;
 // libtpw_unit_std_basic_string_compare.dylib, tests/test_std_basic_string_compare.py), main app:
-//   src/UI_Base_std_basic_string_compare.cpp   IME::MslWideString_compare, _assign, _construct
+//   src/game/MslSupport.cpp   IME::MslWideString_compare, _assign, _construct
 //
 // The callees outside the unit are fakes that record the arguments the real ones read (strings and character runs as FNV hashes,
 // the same on the PowerPC side) and answer from the test's queue. __throw returns, like the PowerPC fake.

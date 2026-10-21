@@ -1,4 +1,4 @@
-// Test library for the postcard composer (libtpw_unit_Postcard.dylib; see tests/test_Postcard.py): src/Postcard.cpp, the 14
+// Test library for the postcard composer (libtpw_unit_Postcard.dylib; see tests/test_Postcard.py): src/game/ui/Postcard.cpp, the 14
 // functions of PostcardBitmap and Postcard.
 //
 // Everything the unit calls is a fake that records through calllog: the TGA loader and its render area, FindFilePath, the

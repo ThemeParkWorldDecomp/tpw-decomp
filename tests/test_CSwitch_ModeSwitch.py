@@ -1,5 +1,5 @@
 """Unit v51066, thirteen small functions against libtpw_unit_CSwitch_ModeSwitch.dylib (tests/unit_CSwitch_ModeSwitch.cpp), engine program,
-src/tb_capture_ConvertSquareFrom32_CSwitch_ModeSwitch.cpp:
+src/engine/DirectDraw.cpp, src/engine/DrawPrimitiveOpenGL.cpp, src/engine/EngineUtil.cpp, src/engine/Switch.cpp, src/engine/tb_hfield.cpp, src/engine/tb_init.cpp:
   CSwitch::ModeSwitch 0x10032aa4, CSwitch::RezSwitch 0x10032b00, ToggleFullScreen 0x1003281c, IsAlignedTo64Bit 0x100391c8,
   SamsUtilities::UDebug 0x10043b20, SOldCsTexture::SOldCsTexture 0x1001eb94, COpenGLPrintf::~COpenGLPrintf 0x10046bdc,
   __sinit_tb_init_cpp 0x100141bc, __sinit_tb_hfield_cpp 0x1001271c, PT_Disable 0x1000be98, PT_Enable 0x1000be5c,

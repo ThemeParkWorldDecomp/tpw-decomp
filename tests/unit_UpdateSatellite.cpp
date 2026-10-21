@@ -1,5 +1,5 @@
 // Test library for UpdateSatellite and UI2DMReturnScaleColour (unit v5193; libtpw_unit_UpdateSatellite.dylib, tests/test_UpdateSatellite.py), main app:
-//   src/UpdateSatellite.cpp   both functions and gUISatelliteParent
+//   src/game/ui/ui_2dmap.cpp, src/game/ui/ui_worldLobbyController.cpp   both functions and gUISatelliteParent
 //
 // InterfaceWindow::GetWindow and the virtual SetValue are recording fakes (the other virtuals and the constructor are empty definitions so the
 // class has a vtable here). The windows GetWindow answers are six static objects, one per id 0x16007..0x1600c.

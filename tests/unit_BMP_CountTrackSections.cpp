@@ -1,6 +1,6 @@
 // Test library for the ride track counting, performance and teardown (unit v5344; libtpw_unit_BMP_CountTrackSections.dylib,
 // tests/test_BMP_CountTrackSections.py), main app:
-//   src/BMP_FixRide_BMP_CountTrackSections.cpp   BMP_CountTrackSections, BMP_FreeTrack, BMP_SetRidePerformance, BMP_DestroyRide;
+//   src/game/rides/BumperRide.cpp   BMP_CountTrackSections, BMP_FreeTrack, BMP_SetRidePerformance, BMP_DestroyRide;
 //                                                and the globals gRidePerfMax, gRidePerfMin
 //
 // The callees outside the unit (BMP_DOCK, BMP_CloseRide, TRACE, FreeBuoysForRide, FreeTrackForRide, FreeColObjectsForRide) are fakes

@@ -1,6 +1,6 @@
 // Test library for FTPClient::_threadfn and small library functions on the Mac's word layouts (unit v51070;
 // libtpw_unit_FTPClient__threadfn.dylib, tests/test_FTPClient__threadfn.py), main app:
-//   src/FTPClient_RecvData_FTPClient_ParseFileSize_FTPClient__threadfn.cpp
+//   src/game/MslSupport.cpp, src/game/online/FTPClient.cpp
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). Pointers are
 // logged relative to the case's world block (gW), anything else as -1.

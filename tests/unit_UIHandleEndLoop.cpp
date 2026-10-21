@@ -1,5 +1,5 @@
 // Test library for UIHandleEndLoop, UIHandleMidLoop and SetPylonType (unit v5707; libtpw_unit_UIHandleEndLoop.dylib, tests/test_UIHandleEndLoop.py), main app:
-//   src/LayoutSetRotatePylon_DeleteLastTrackBrace_UIHandleEndLoop.cpp
+//   src/game/rides/CoasterEdit.cpp
 //
 // The callees outside the unit are fakes recording their arguments; the globals of other files are defined here.
 #include <cstddef>

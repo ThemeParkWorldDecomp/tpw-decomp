@@ -1,5 +1,5 @@
 """Unit v5094, the swear filter, against libtpw_unit_SwearFilter_Filter.dylib (tests/unit_SwearFilter_Filter.cpp), main app
-("SimTheme Park"), src/SwearFilter_Filter.cpp:
+("SimTheme Park"), src/game/online/IPBase.cpp:
   SwearFilter::Filter 0x1020d2cc, SwearFilter::LoadWordList 0x1020cd08
 
 A case is a world and a call. The original runs in the emulator on Mac-layout lists and strings (a list is {size, sentinel prev, sentinel

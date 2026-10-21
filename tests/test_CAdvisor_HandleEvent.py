@@ -1,5 +1,5 @@
 """Unit v5679, CAdvisor::HandleEvent, against libtpw_unit_CAdvisor_HandleEvent.dylib (tests/unit_CAdvisor_HandleEvent.cpp), main app
-("SimTheme Park"), src/AdvisorQueue_CAdvisor_HandleEvent.cpp:
+("SimTheme Park"), src/game/advisor/Advisor.cpp:
   CAdvisor::HandleEvent 0x1000ba18
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

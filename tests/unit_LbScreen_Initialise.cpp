@@ -1,6 +1,6 @@
 // Test library for WinScrn.cpp's LbScreen_Initialise, ReleaseMode and WindowProc (unit v5056; libtpw_unit_LbScreen_Initialise.dylib,
 // tests/test_LbScreen_Initialise.py), main app:
-//   src/LbScreen_Initialise.cpp   the three functions and the new window globals
+//   src/bullfrog/WinScrn.cpp   the three functions and the new window globals
 //
 // The callees outside the unit are recording fakes; the objects they get are fake addresses never dereferenced. The globals of
 // CreateDirectDrawObject.cpp (window, palette, surfaces, FPU handler) are defined here.

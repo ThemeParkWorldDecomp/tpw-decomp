@@ -1,5 +1,5 @@
 // Test library for the eight _ADVISOR_MAX_* scorers (unit v5108; libtpw_unit_CAdvisorScoring__ADVISOR_MAX_GUARDS_V2.dylib), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_MAX_GUARDS_V2.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // Callees outside the unit: CWorld::GetParkAnalyser and CParkAnalyser::NumberOfStaffType, fakes that record the arguments the real ones read and
 // answer from the test's queue. gGameWorld and gMainBalance (other files' globals) are defined here; the balance table's reader is faked empty

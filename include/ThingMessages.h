@@ -1,4 +1,4 @@
-// The weather and challenge messages (unit w124, src/ThingMessages.cpp): CMsgWeather (type 1), CMsgWeatherWarning (type 2) and CMsgChallenge (type 0x19),
+// The weather and challenge messages (unit w124, src/game/ui/MessageCentre.cpp, src/game/park/Weather.cpp, src/game/park/ChallengeHQ.cpp): CMsgWeather (type 1), CMsgWeatherWarning (type 2) and CMsgChallenge (type 0x19),
 // made by CWeather::UpdateTurn and CChallengeHQ::UpdateTurn. Each has the constructor, GetType and destructor of CMsgDeath (include/CMsgDeath.h): the
 // Mac's destructor only stores the vtable and, for a positive (signed 16 bit) delete flag, calls operator delete. The Mac vtables (base 0x102a10ec,
 // CMsgWeather 0x102a45ec, CMsgWeatherWarning 0x102a45c8, CMsgChallenge 0x102a08d4) are never used by the host. The payload names are inferred.

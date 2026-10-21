@@ -1,5 +1,5 @@
 """Unit v5193, UpdateSatellite and UI2DMReturnScaleColour, against libtpw_unit_UpdateSatellite.dylib (tests/unit_UpdateSatellite.cpp), main app
-("SimTheme Park"), src/UpdateSatellite.cpp:
+("SimTheme Park"), src/game/ui/ui_2dmap.cpp, src/game/ui/ui_worldLobbyController.cpp:
   UpdateSatellite 0x1022b8d0, UI2DMReturnScaleColour 0x1022bb44
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (PowerPC memory big-endian, host little-endian). The callees

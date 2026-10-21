@@ -1,6 +1,6 @@
 // Test library for the MSL std::list<std::string> members (unit v5086; libtpw_unit_std_list_std_basic_string_std_allocator_std_basi.dylib,
 // tests/test_std_list_std_basic_string_std_allocator_std_basi.py), main app:
-//   src/ui_Postcard_panel_std_list_std_basic_string_std_allocator_std_basi.cpp   insert, sort, erase (two), merge
+//   src/game/MslSupport.cpp   insert, sort, erase (two), merge
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record: operator new and new[] hand out blocks of a pool the test
 // allocated, delete, throw, the _RefCountedPtr constructor, the string copy constructor, operator<, list clear and splice. The globals of

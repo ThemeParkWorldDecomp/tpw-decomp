@@ -185,7 +185,7 @@ struct RideInfo {
     int32_t mLoadFailed; // 0x804
 };
 
-// The ride masks (32 bytes, bit n - 1 of the record's DownloadedRideNumber balance value is ride n; unit w114, defined in src/World_rides.cpp): the rides the
+// The ride masks (32 bytes, bit n - 1 of the record's DownloadedRideNumber balance value is ride n; unit w114, defined in src/game/World.cpp): the rides the
 // ride database has (CWorld::DoIHaveTheseRides rebuilds it on every call) and the rides the park being loaded needs (CSaveLoad::LoadHeader
 // copies the first 0x20 bytes of the file's ride record here). Names invented; they sit just before gThingArray (0x1034cbfc).
 extern uint8_t gRidesOwned[0x20];          // 0x1034cb98

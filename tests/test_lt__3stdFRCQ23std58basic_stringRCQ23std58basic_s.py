@@ -1,5 +1,5 @@
 """Unit v5756, std::operator< on two nocase wide strings, against libtpw_unit_lt__3stdFRCQ23std58basic_stringRCQ23std58basic_s.dylib
-(tests/unit_lt__3stdFRCQ23std58basic_stringRCQ23std58basic_s.cpp), main app, src/lt__3stdFRCQ23std58basic_stringRCQ23std58basic_s.cpp:
+(tests/unit_lt__3stdFRCQ23std58basic_stringRCQ23std58basic_s.cpp), main app, src/game/MslSupport.cpp:
   __lt<nocase wide string> 0x10225d2c
 
 The callees size (0x10226134), begin (0x102260c8) and compare (0x10225a5c) are fakes on both sides that record their arguments (objects as

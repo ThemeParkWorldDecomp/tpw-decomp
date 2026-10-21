@@ -1,6 +1,6 @@
 // Test library for the ride status panel's window functions (unit v51011; libtpw_unit_RideStatusPanel_InitKnobsWindow.dylib,
 // tests/test_RideStatusPanel_InitKnobsWindow.py), main app:
-//   src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Upgrade_RideStatusPanel_InitKnobsWindow.cpp
+//   src/game/ui/ui_RideStatus.cpp
 //   InitWindow, UpdateWindow, InitKnobsWindow, UpdateKnobsTitles and gRideStatusMeshNames.
 //
 // The callees outside the unit are fakes that record what the real ones read, the same event names and arguments as the Python stubs.

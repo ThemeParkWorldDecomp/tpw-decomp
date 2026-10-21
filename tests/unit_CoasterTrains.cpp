@@ -1,5 +1,5 @@
 // Test library for the coaster trains (unit w192; libtpw_unit_CoasterTrains.dylib, tests/test_CoasterTrains.py), main app:
-//   src/TPCoaster_trains.cpp   InstanceCoasterTrains, DestroyCoasterTrains, GetCoaster1stPersonCar, SaveTrainsAndCars, LoadTrainsAndCars and the
+//   src/game/rides/BumperRide.cpp, src/game/rides/TPCoaster.cpp   InstanceCoasterTrains, DestroyCoasterTrains, GetCoaster1stPersonCar, SaveTrainsAndCars, LoadTrainsAndCars and the
 //                              four swap instances (the plain library does not swap, so that its files compare byte for byte with the original's
 //                              little-endian ones; tests/unit_CoasterTrainsSwap.cpp is this file built with TPW_SWAP_FILE_WORDS)
 //

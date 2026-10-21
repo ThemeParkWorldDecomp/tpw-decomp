@@ -1,5 +1,5 @@
 // Test library for SetNavRoute and BumpToPoint (unit v5656; libtpw_unit_SetNavRoute.dylib, tests/test_SetNavRoute.py), main app:
-//   src/BMP_Move_SetNavRoute.cpp   both functions and the two thrust limit globals.
+//   src/game/rides/BumperRide.cpp   both functions and the two thrust limit globals.
 //
 // The callees outside the unit are recording fakes; the collision objects they answer are set by tpw_snr_objs.
 #include <cstddef>

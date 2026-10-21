@@ -1,10 +1,10 @@
 // Test library for the window's animation starters and the check buttons' destructor (libtpw_unit_UIWindowAnim.dylib; see
-// tests/test_UIWindowAnim.py): src/InterfaceWindow_anim.cpp (setPivot, startAnim, startAnimTimer) and
-// src/InterfaceCheckButtons_dtor.cpp (unit w91).
+// tests/test_UIWindowAnim.py): src/game/ui/InterfaceWindow.cpp (setPivot, startAnim, startAnimTimer) and
+// src/game/ui/InterfaceButton.cpp (unit w91).
 //
-// Linked real next to them: src/InterfaceWindow_draw.cpp (SetPosition, which startAnim calls, and the rest of unit w30's functions),
-// the real window constructor (src/InterfaceWindow.cpp, which builds the test trees), the real rectangles (src/UI_Base.cpp) and
-// InterfaceTimer::Start (src/InterfaceTimer_start.cpp).
+// Linked real next to them: src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/InterfaceWindow.cpp (SetPosition, which startAnim calls, and the rest of unit w30's functions),
+// the real window constructor (src/game/ui/InterfaceWindow.cpp, which builds the test trees), the real rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp) and
+// InterfaceTimer::Start (src/game/ui/InterfaceTimer.cpp).
 //
 // Everything else the unit reaches is a fake that records through calllog, as in tests/unit_UIWindowDraw.cpp (this file is its
 // copy with the operations of unit w91): the message senders, UI_UpdatePointerIn, UI_SetCursor, the UI clock IveGotTicks, the window's
@@ -119,7 +119,7 @@ void InterfaceHelpText::OnMouseMovedOut() {}
 void InterfaceHelpText::OnMouseDown() {}
 void InterfaceHelpText::OnFrame() {}
 void InterfaceHelpText::OnHideOrDelete(InterfaceWindow*) {}
-// The constructor and the two virtuals unit w36 added to the class (src/ui_helptext.cpp; the vtable must link here too).
+// The constructor and the two virtuals unit w36 added to the class (src/game/ui/InterfaceHelpText.cpp; the vtable must link here too).
 InterfaceHelpText::InterfaceHelpText() {}
 void InterfaceHelpText::Init() {}
 void InterfaceHelpText::DeInit() {}

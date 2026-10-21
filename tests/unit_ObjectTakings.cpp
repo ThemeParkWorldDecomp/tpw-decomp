@@ -1,6 +1,6 @@
 // Test library for a ride's takings, costs, prizes and satisfaction (unit w198; libtpw_unit_ObjectTakings.dylib, tests/test_ObjectTakings.py), main app:
-//   src/Object_takings.cpp   the 29 CObject members; real under them: src/ParkAnalyser_history.cpp (the history sums and averages) and
-//   src/WorldSavvy.cpp (GetWorld).
+//   src/game/Object.cpp   the 29 CObject members; real under them: src/game/park/analyser.cpp (the history sums and averages) and
+//   src/game/ui/ui_visitorStatus.cpp (GetWorld).
 //
 // The callees outside the unit are fakes that record the same event as the PowerPC stubs and answer from the test's queues: GAME_ASSERTMSG, CTRACE, the
 // ride database's GetRideInfo (answers one block the module fills), the world's three accessors, the bank account's deposit and withdrawal, the

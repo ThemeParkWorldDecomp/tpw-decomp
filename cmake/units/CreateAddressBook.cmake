@@ -1,3 +1,12 @@
-# Unit v5012: the address book panel (CreateAddressBook, RemoveAddressBookEntry, NewEntryInAddressBook; src/ui_Postcard_panel_CreateAddressBook.cpp).
+# Unit v5012: the address book panel (CreateAddressBook, RemoveAddressBookEntry, NewEntryInAddressBook; src/game/ui/ui_Postcard.cpp).
 # The callees outside the unit are recording fakes in tests/unit_CreateAddressBook.cpp, which also defines the globals of other files.
-set(TPW_UNIT_CreateAddressBook src/ui_Postcard_panel_CreateAddressBook.cpp platform/arena.cpp)
+set(TPW_UNIT_CreateAddressBook src/game/ui/ui_Postcard.cpp platform/arena.cpp)
+set(TPW_UNIT_CreateAddressBook_KEEP
+  __Z17CreateAddressBookv   # CreateAddressBook()
+  __Z21NewEntryInAddressBookv   # NewEntryInAddressBook()
+  __Z22RemoveAddressBookEntryv   # RemoveAddressBookEntry()
+  _gAddressBookDescription
+  _gAddressBookPanel
+  _gAddressEditText
+  _gAddressRemoveName
+)

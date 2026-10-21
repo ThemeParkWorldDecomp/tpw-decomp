@@ -1,5 +1,5 @@
 // Test library for the save panel's row maker and OK handler (unit v5702; libtpw_unit_LCFormat_5.dylib, tests/test_LCFormat_5.py), main app:
-//   src/LoadPanelMsg_LCFormat_5.cpp   SavePanelLCFormat (LCFormat 0x101a3154), SaveCallback_OK 0x101a2d74, gSavePanelListFormat
+//   src/game/ui/ui_loadSavePanel.cpp   SavePanelLCFormat (LCFormat 0x101a3154), SaveCallback_OK 0x101a2d74, gSavePanelListFormat
 //
 // The callees outside the unit are recording fakes: GetFontTableEntry, the font's height virtual (InterfaceFont::GetHeight stands in for the
 // __ptr_glue call), the InterfaceWindow constructor and CreateObject, CFSLoadSave::Save, RemoveSavePanel and the string constructor and

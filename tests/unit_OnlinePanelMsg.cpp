@@ -1,5 +1,5 @@
 // Test library for the online panel's message function (unit v5079; libtpw_unit_OnlinePanelMsg.dylib, tests/test_OnlinePanelMsg.py), main app:
-//   src/OnlinePanelMsg.cpp   OnlinePanelMsg and the globals nobody else names (gOnline*)
+//   src/game/ui/ui_onlinePanel.cpp   OnlinePanelMsg and the globals nobody else names (gOnline*)
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queues; the globals of
 // other files the unit reads, defined here, zero at start like the Mac's bss.

@@ -1,5 +1,5 @@
 """Unit v5943: the track editor's brace cost, the editor switch and the left click, against libtpw_unit_CalculateBraceCost.dylib
-(tests/unit_CalculateBraceCost.cpp), main app ("SimTheme Park"), src/TPConfig_LayoutSetMovePylon_SetCoasterEdit_CalculateBraceCost.cpp:
+(tests/unit_CalculateBraceCost.cpp), main app ("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   CalculateBraceCost 0x10058924, SetCoasterEdit 0x100585f4 (the tag_sCoasterInstance* overload), CoasterAcceptLeftMouseClick 0x10057f80
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian,

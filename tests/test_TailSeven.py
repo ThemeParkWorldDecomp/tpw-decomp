@@ -1,4 +1,4 @@
-"""Unit v5L16, two leaves of the main app, against libtpw_unit_TailSeven.dylib (tests/unit_TailSeven.cpp), src/TailSeven.cpp:
+"""Unit v5L16, two leaves of the main app, against libtpw_unit_TailSeven.dylib (tests/unit_TailSeven.cpp), src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/ui_main.cpp:
   UIMain_GetObjectName 0x101810fc, CalcZTrans 0x101879d0.
 
 UIMain_GetObjectName: CObject::GetUIName (0x10110690) is a fake on both sides that records the object (a 32-bit label, never

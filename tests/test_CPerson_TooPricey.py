@@ -1,5 +1,5 @@
 """Unit v5238, what a person thinks of a ride, against libtpw_unit_CPerson_TooPricey.dylib (tests/unit_CPerson_TooPricey.cpp), main app
-("SimTheme Park"), src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_TooPricey.cpp:
+("SimTheme Park"), src/game/people/Person.cpp:
   CPerson::TooPricey 0x10119eec, CPerson::ExtraExcitementEffects 0x10119c0c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

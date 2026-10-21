@@ -1,4 +1,4 @@
-"""Differential tests for unit w159, the park rating, the park value and the attraction points (src/ParkAnalyser_rating.cpp). See difftest.py and tpwtest.py.
+"""Differential tests for unit w159, the park rating, the park value and the attraction points (src/game/park/analyser.cpp). See difftest.py and tpwtest.py.
 
 CParkAnalyser::GetOverallParkRating (0x100ed8cc), GetParkValue (0x100e5110) and GetTotalParkAttractionPoints (0x100e5b1c). The real functions that run besides
 them: NumberOfVisitorsInPark, NumberOfObjectTypeInPark, NumberOfObjectInPark, NumberOfStaffType, SecondsSinceLastUpdate and the 64 bit divide helper. Every

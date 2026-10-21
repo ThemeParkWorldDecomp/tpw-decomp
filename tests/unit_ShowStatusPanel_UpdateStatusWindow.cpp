@@ -1,6 +1,6 @@
 // Test library for the sideshow status panel (unit v5547; libtpw_unit_ShowStatusPanel_UpdateStatusWindow.dylib,
 // tests/test_ShowStatusPanel_UpdateStatusWindow.py), main app:
-//   src/ShowStatusPanel_UpdateStatusWindow.cpp   UpdateStatusWindow, ApplyChanges, applytoallcallback, Show; gShowStatusThing, gShowStatusScript
+//   src/game/ui/ui_showStatus.cpp   UpdateStatusWindow, ApplyChanges, applytoallcallback, Show; gShowStatusThing, gShowStatusScript
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The windows are fake
 // objects whose virtual SetValue is a hand-made vtable slot. The globals of other files the unit reads are defined here.

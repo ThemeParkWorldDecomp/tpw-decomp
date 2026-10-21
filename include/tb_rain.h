@@ -1,8 +1,8 @@
 // tb_rain.cpp (engine library). Mac offsets below; 0xa1cc bytes on the Mac.
-// Pointer members grow on a native host. The rendering members are in src/tb_rain_frame.cpp
-// (Prepare, Render, RenderLightning2) and src/tb_rain_render.cpp (the flash, the lightning, the
+// Pointer members grow on a native host. The rendering members are in src/engine/Rain.cpp
+// (Prepare, Render, RenderLightning2) and src/engine/Rain.cpp, src/engine/EngineUtil.cpp (the flash, the lightning, the
 // rain and the snow); the bolts' own members AddLightning and SLightning::Init are in
-// src/tb_rain_lightning.cpp, along with NewRenderLightning, AddLightningSection and GeneratePoint.
+// src/engine/Rain.cpp, along with NewRenderLightning, AddLightningSection and GeneratePoint.
 #pragma once
 #include <cstdint>
 #include <cstddef>
@@ -13,7 +13,7 @@ struct SLightning {
     D3DVECTOR mStart, mEnd, mDirection; // 0x00, 0x0c, 0x18
     int32_t mTime;                    // 0x24
     uint32_t mF28, mSeed;              // 0x28, 0x2c
-    // 0x100244a0 (src/tb_rain_lightning.cpp): sets the bolt up. `seeded` non-zero stamps the cycle
+    // 0x100244a0 (src/engine/Rain.cpp): sets the bolt up. `seeded` non-zero stamps the cycle
     // counter ORed with 1 as the seed (an integer word), zero clears it.
     void Init(D3DVECTOR start, D3DVECTOR end, int32_t time, int32_t seeded);
 };
@@ -33,22 +33,22 @@ public:
     void SetWindParameters(float direction, float speed);  // 0x100210c4
     void SetVelocity(float speed);                         // 0x100214d0
     void LightningFlash();                                 // 0x1002151c
-    // 0x100243cc (src/tb_rain_lightning.cpp): a bolt between two points, dropped when the 16 slots
+    // 0x100243cc (src/engine/Rain.cpp): a bolt between two points, dropped when the 16 slots
     // are full; answers 1. The lobby passes the point on the ground first, then the one at height
     // 500 above it, and then 500 and 1.
     int32_t AddLightning(D3DVECTOR start, D3DVECTOR end, int32_t a, int32_t b);
     void SetSnowCubicParameters(float a, float b, float c); // 0x100233ac
-    // The frame's members (src/tb_rain_frame.cpp); Render returns 0 on failure.
+    // The frame's members (src/engine/Rain.cpp); Render returns 0 on failure.
     int32_t Prepare();                                     // 0x10021554
     int32_t Render();                                      // 0x10023f40
     // One lightning bolt from `from` to `to` (a primitive of its own); 1 when the draw primitive
     // has no room for one.
     int32_t RenderLightning2(D3DVECTOR* from, D3DVECTOR* to);   // 0x1002294c
-    // RenderLightning2's subdivision and textured quad builder (src/tb_rain_lightning.cpp).
+    // RenderLightning2's subdivision and textured quad builder (src/engine/Rain.cpp).
     int32_t AddLightningSection(D3DVECTOR* from, D3DVECTOR* to);    // 0x1002163c
     int32_t NewRenderLightning(D3DVECTOR* from, D3DVECTOR* to);     // 0x100223d8
 
-    // Render's callees (src/tb_rain_render.cpp). All answer 0 when drawing fails.
+    // Render's callees (src/engine/Rain.cpp). All answer 0 when drawing fails.
     // The white flash of a strike: clears mLightningFlash and draws a sprite over the screen;
     // answers DrawSprite's.
     int32_t __LightningFlash();                                     // 0x10022b20
@@ -112,12 +112,12 @@ static_assert(offsetof(CRain, mFA1C8) - offsetof(CRain, mF3354) == 0xa1c8 - 0x33
 extern CRain* gei_Rain;               // 0x100b1628
 
 // The low 32 bits of the platform timer's cycle counter (the Mac's time base), which
-// __RenderLightning stamps a bolt without a seed with (src/tb_rain_render.cpp).
+// __RenderLightning stamps a bolt without a seed with (src/engine/EngineUtil.cpp).
 uint32_t GetCycleCount();             // 0x10038b14
 // The engine imports Random from the C library; 0x1004c5e8 is its glue stub. The Mac's
 // generator is not in the dump; the launcher interim returns 15-bit values like rand().
 int32_t Random();
-// 0x10021f48: randomly displaced midpoint (src/tb_rain_lightning.cpp).
+// 0x10021f48: randomly displaced midpoint (src/engine/Rain.cpp).
 void GeneratePoint(D3DVECTOR* out, D3DVECTOR* a, D3DVECTOR* b, float scale);
 int32_t Rain_Init();                  // 0x10020458
 int32_t Rain_Close();                 // 0x1002051c

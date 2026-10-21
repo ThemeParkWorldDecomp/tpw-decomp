@@ -1,5 +1,5 @@
 // Test library for the keyboard actions win_ticket_0..6 and enter_area_delete_mode (unit v5030), main app:
-//   src/ui_Postcard_panel_win_ticket_1.cpp
+//   src/game/keyboard.cpp
 //
 // Callees outside the unit are recording fakes; the globals of other files are defined here.
 #include <cstddef>

@@ -1,11 +1,11 @@
 // Test library for the click stacks (unit w204; libtpw_unit_ClickStacks.dylib, tests/test_ClickStacks.py), main app:
-//   src/LLCellSystem_clickstacks.cpp  LLCC_SystemBacktrack, the queue walk and the two track walks
-//   src/TrackCell_shape.cpp           CTrackCell::IsCrossRoad, IsStraight
-//   src/MapCell_corner.cpp            CMapCell::IsCorner
-//   src/LLCellRide_offsets.cpp        LLCR_OffsetStartOfTrack, LLCR_OffsetEndOfTrack
-// Run for real: src/CellBase.cpp (GetNeighbours, NumberOfNeighbours, NumberOfHVNeighbours, GetDirection, SetOverlapCounter), src/MapReset.cpp
-// (CCellBase::RemoveNeighbour only), src/MapDelta_map.cpp (OPPOSITE, ADD_DIRECTION, IsXYValid, CMapCell::GetNeighbouringCell), src/TrackCell.cpp
-// (CTrackCell::GetNeighbouringCell) and src/TrackCell_flags.cpp (CTrackCell::IsCorner). Every other callee is a fake that records the event the
+//   src/game/park/LLCellSystem.cpp  LLCC_SystemBacktrack, the queue walk and the two track walks
+//   src/game/park/TrackCell.cpp           CTrackCell::IsCrossRoad, IsStraight
+//   src/game/park/MapCell.cpp            CMapCell::IsCorner
+//   src/game/park/LLCellRide.cpp        LLCR_OffsetStartOfTrack, LLCR_OffsetEndOfTrack
+// Run for real: src/game/park/CellBase.cpp (GetNeighbours, NumberOfNeighbours, NumberOfHVNeighbours, GetDirection, SetOverlapCounter), src/game/park/CellBase.cpp, src/game/park/LLCellSystem.cpp, src/game/park/MapCell.cpp, src/game/park/TPHField.cpp, src/game/park/TrackCell.cpp
+// (CCellBase::RemoveNeighbour only), src/game/park/Map.cpp, src/game/park/MapDelta.cpp (OPPOSITE, ADD_DIRECTION, IsXYValid, CMapCell::GetNeighbouringCell), src/game/buildings/TrainingCentre.cpp
+// (CTrackCell::GetNeighbouringCell) and src/game/park/TrackCell.cpp (CTrackCell::IsCorner). Every other callee is a fake that records the event the
 // PowerPC stub records; cells are named in the log by their id (from the address), their answers come from one byte of the cell. The globals
 // of other files are defined here. What the real files drag along but the walks never call is a no-op (LbFile_Read ... GetWorld).
 #include <cstdarg>
@@ -36,7 +36,7 @@
 
 using namespace calllog;
 
-// ---- globals of other files: the world, the cell system's words (src/LLCellSystem*.cpp, src/LLCellClicks.cpp) and the compass offsets (MapDelta)
+// ---- globals of other files: the world, the cell system's words (src/LLCellSystem*.cpp, src/game/park/LLCellSystem.cpp) and the compass offsets (MapDelta)
 CWorld* gGameWorld;
 CWorld* gWorld;
 CMap* gWorldMap;

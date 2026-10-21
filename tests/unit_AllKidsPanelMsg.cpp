@@ -1,5 +1,5 @@
 // Test library for the all-kids panel (unit v5078; libtpw_unit_AllKidsPanelMsg.dylib, tests/test_AllKidsPanelMsg.py), main app:
-//   src/ui_allKidsPanel_AllKidsPanelMsg.cpp   FillAllKidsListCallback, AllKids::UpdateListEntries, AllKidsPanelMsg, LCFormat
+//   src/game/ui/ui_allKidsPanel.cpp   FillAllKidsListCallback, AllKids::UpdateListEntries, AllKidsPanelMsg, LCFormat
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues.
 #include <cstddef>
@@ -25,7 +25,7 @@
 
 using namespace calllog;
 
-// ---- the unit's own entry points and globals (src/ui_allKidsPanel_AllKidsPanelMsg.cpp)
+// ---- the unit's own entry points and globals (src/game/ui/ui_allKidsPanel.cpp)
 void RemoveAllKidsPanel();
 int32_t FillAllKidsListCallback(CThing* thing);
 int32_t AllKidsPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);

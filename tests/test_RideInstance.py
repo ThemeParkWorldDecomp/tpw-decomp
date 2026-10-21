@@ -1,4 +1,4 @@
-"""Differential test for src/RideInstance.cpp: InstanceRideAnimSet, InstanceMesh, InstanceAnim,
+"""Differential test for src/engine/EngineUtil.cpp, src/game/Debug.cpp, src/game/TPEmbed.cpp, src/game/TPInstance.cpp, src/game/rides/RideAnim.cpp, src/game/rides/RidePlacement.cpp, src/game/rides/TPRide.cpp: InstanceRideAnimSet, InstanceMesh, InstanceAnim,
 InstanceDynamicMeshSet, DisableDataNodesRender, DisableDataNodesRenderExcept, SetupRideHeads,
 CorrectFaceFlags1, CorrectNodeFlags2, OverrideActiveChannels, GetFontPath and ERRORBox, against
 libtpw_unit_RideInstance.dylib (tests/unit_RideInstance.cpp).

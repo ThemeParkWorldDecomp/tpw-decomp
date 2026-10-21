@@ -1,5 +1,5 @@
 // Test library for the researcher (unit w188; libtpw_unit_Researcher.dylib, tests/test_Researcher.py), main app:
-//   src/Researcher.cpp   CResearcher (both constructors, Init, Serialise, FinalDestroy, ReceiveMessage, UpdateTurn, ModelState, ChooseNextAction,
+//   src/game/people/Researcher.cpp   CResearcher (both constructors, Init, Serialise, FinalDestroy, ReceiveMessage, UpdateTurn, ModelState, ChooseNextAction,
 //                        ProcessPatrolling, ProcessResearching, ProcessIdle, DoSomeResearch), CRegionEffectCell::operator== and Serialise, and the
 //                        two words of __sinit_Researcher_cpp
 //

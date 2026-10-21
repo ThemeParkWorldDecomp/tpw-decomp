@@ -1,6 +1,6 @@
 // Test library for the status panel's small members, the SamsUtilities swaps and the rank text object's destructor (unit v51114;
 // libtpw_unit_UIStatusPanel_EnableNameClick.dylib, tests/test_UIStatusPanel_EnableNameClick.py), main app:
-//   src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_UIStatusPanel_EnableNameClick.cpp
+//   src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_StatusPanel.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The panel's
 // table calls (__ptr_glue) are three function blocks the test builds; the window's Enable is a mock window with the real window's vtable
@@ -90,7 +90,7 @@ void DrawObjectDtor(void* self, int16_t flag) { ev("DrawObjectDtor", {lab(self),
 void Delete(void* self) { ev("Delete", {lab(self)}); }
 }  // namespace rank_callee
 
-// The tables the static initialisers store (src/ui_StatusPanel_tables.cpp, unit v5L31): blocks of the arena made on first use; the test
+// The tables the static initialisers store (src/game/ui/ui_StatusPanel.cpp, unit v5L31): blocks of the arena made on first use; the test
 // compares only where they are stored.
 uint32_t* UIStatusPanelTable() {
     static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));

@@ -1,4 +1,4 @@
-// Differential library for unit w152, the park analyser's shop and sideshow superlatives (src/ParkAnalyser_shops.cpp): the twelve
+// Differential library for unit w152, the park analyser's shop and sideshow superlatives (src/game/park/analyser.cpp): the twelve
 // CParkAnalyser::GetShopWith... and GetSideshowWith... queries.
 //
 // Every callee is a fake that records the same event as the PowerPC side's stub: GAME_ASSERTMSG (the condition and the text), the world accessor (its

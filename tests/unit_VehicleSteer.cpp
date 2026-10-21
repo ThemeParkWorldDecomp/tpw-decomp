@@ -1,5 +1,5 @@
 // Test library for the ride vehicles' steering code (unit w203; libtpw_unit_VehicleSteer.dylib, tests/test_VehicleSteer.py), main app:
-//   src/Vehicle_steer.cpp   the 23 functions of vehicle.cpp from perp to Pilot::is_finished_path, and the six globals it defines
+//   src/game/rides/vehicle.cpp   the 23 functions of vehicle.cpp from perp to Pilot::is_finished_path, and the six globals it defines
 //
 // The callees outside the unit are fakes that record what the real ones read: the two candidate walks (0x101356b8, 0x1013598c), Vehicle::recalc_path
 // (0x10133be4) and Vehicle::next_step (0x10133564). A walk does not call the callback it is given (the module tests the three callbacks directly): it

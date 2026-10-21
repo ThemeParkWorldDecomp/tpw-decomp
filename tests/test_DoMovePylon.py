@@ -1,5 +1,5 @@
 """Unit v5026, dragging a pylon of the track editor, against libtpw_unit_DoMovePylon.dylib (tests/unit_DoMovePylon.cpp), main app
-("SimTheme Park"), src/DoMovePylon.cpp:
+("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   StartMovePylon 0x10057738, DoMovePylon 0x100579cc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

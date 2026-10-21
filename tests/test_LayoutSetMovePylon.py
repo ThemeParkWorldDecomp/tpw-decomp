@@ -1,5 +1,5 @@
 """Unit v5261, the editor coaster's layout commands, against libtpw_unit_LayoutSetMovePylon.dylib (tests/unit_LayoutSetMovePylon.cpp), main app,
-src/TPConfig_LayoutSetMovePylon.cpp:
+src/game/rides/CoasterEdit.cpp:
   LayoutStackPylonUp 0x10058c08, LayoutStackPylonDown 0x10058c80, LayoutDeleteMultiPylons 0x10058cf8, LayoutSetMovePylon 0x10058da4,
   LayoutRegenerateTrack 0x10058e48 and 0x10058ec0, LayoutSetCoasterEditOld 0x10058fa0, LayoutSetCoasterEdit 0x1005901c
 

@@ -1,4 +1,4 @@
-"""Differential test for src/lobby_islands_rest.cpp (the lobby's island screen, part 3: the theme
+"""Differential test for src/game/online/LBFlyingMesh.cpp, src/game/online/lobby_island.cpp, src/game/online/lobby_parser.cpp (the lobby's island screen, part 3: the theme
 descriptor parser and the rest of the island and theme island members), against
 libtpw_unit_LobbyIslandsRest.dylib (tests/unit_LobbyIslandsRest.cpp).
 
@@ -51,7 +51,7 @@ M = dict(parse=0x100B5D54, island_show=0x100B01C0, island_dtor=0x100B0108, get_r
          set_current=0x100B3540, enter=0x100B346C, select=0x100B3218, zoom=0x100B33E8, reset_current=0x100B3760,
          reset_timeout=0x100B3854, update_signs=0x100B38D4, theme_dtor=0x100B4CEC, goto_next=0x100B35AC,
          goto_previous=0x100B3684, window=0x100B2AF8, cancel=0x100B2C00, read_uni=0x100B69F8)
-READ_STRING = 0x100B5C78       # LB_ReadTbStringUntilNext (src/lobby_parser.cpp), the original's code here too
+READ_STRING = 0x100B5C78       # LB_ReadTbStringUntilNext (src/game/online/lobby_parser.cpp), the original's code here too
 U = LI.U
 G = dict(LI.G, game_type=0x102B3AA0, game_guard=0x102B3AA4, user=0x10380B34, master=0x10380A8C, theme=0x102E48F8,
          folder=0x102E4978)
@@ -106,7 +106,7 @@ def build_stubs(emu):
     S = LI.build_stubs(emu)
     R = CL.recorder
     # The unit's functions run as the original's code; so do the parser's string reader and everything
-    # src/lobby_islands.cpp has.
+    # src/game/online/lobby_island.cpp has.
     for address in list(M.values()) + [READ_STRING]:
         S.internals.pop(address, None)
         S.real.add(address)

@@ -1,5 +1,5 @@
 """Unit v5339, CreateOnlineLoginPanel (makes the online login dialog and fits its controls), against libtpw_unit_CreateOnlineLoginPanel.dylib
-(tests/unit_CreateOnlineLoginPanel.cpp), main app ("SimTheme Park"), src/UI_IslandLobby_UpdateOnlineCityInfoOverlay_CreateOnlineLoginPanel.cpp:
+(tests/unit_CreateOnlineLoginPanel.cpp), main app ("SimTheme Park"), src/game/ui/ui_onlineLogin.cpp:
   CreateOnlineLoginPanel 0x101e27bc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory for the original, host memory for the

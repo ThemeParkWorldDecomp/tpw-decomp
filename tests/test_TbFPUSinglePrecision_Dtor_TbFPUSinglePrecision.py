@@ -1,5 +1,5 @@
 """Unit v5740, the TbFPUSinglePrecision destructor, against libtpw_unit_TbFPUSinglePrecision_Dtor_TbFPUSinglePrecision.dylib
-(tests/unit_TbFPUSinglePrecision_Dtor_TbFPUSinglePrecision.cpp), bullfrog, src/CreateDirectDrawObject_TbFPUSinglePrecision_Dtor_TbFPUSinglePrecision.cpp:
+(tests/unit_TbFPUSinglePrecision_Dtor_TbFPUSinglePrecision.cpp), bullfrog, src/bullfrog/WinScrn.cpp:
   TbFPUSinglePrecision::~TbFPUSinglePrecision 0x1006ab38
 
 The world: an object of 12 bytes with mSaved, mSet, mClear (offsets 4, 6, 8), or a NULL this. TbFPUFlag::Reset (0x1001611c) and

@@ -1,6 +1,6 @@
 // Test library for the embedded-entry counters, EnableRideHead, bthread_cond and CalculateOrientFromTrackMorph (unit v5962;
 // libtpw_unit_CountDataNodesByType.dylib, tests/test_CountDataNodesByType.py), main app:
-//   src/advisor_leaves_CountDataNodesByType.cpp
+//   src/game/TPEmbed.cpp, src/game/online/bthread.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The world's tables
 // (gThingArray, gTPGlobals) are defined here, zero at start like the Mac's bss.

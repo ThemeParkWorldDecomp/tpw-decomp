@@ -1,6 +1,6 @@
 // The library's TbSysCommand Execute bodies for the unit libraries that build the game's commands but do not run them (unit w79h moved the
-// Execute bodies out of include/TbAudioSystem.h into src/TbSysCommand.cpp, so a command's vtable needs them at link time). Each answers
-// 0, as the header's inline bodies did; the units that run the real bodies (tests/unit_SysCommands.cpp) link src/TbSysCommand.cpp instead.
+// Execute bodies out of include/TbAudioSystem.h into src/sound/TpBody.cpp, src/sound/TbSysCommand.cpp, so a command's vtable needs them at link time). Each answers
+// 0, as the header's inline bodies did; the units that run the real bodies (tests/unit_SysCommands.cpp) link src/sound/TbSysCommand.cpp, src/sound/TpBody.cpp instead.
 #include "TbAudioSystem.h"
 
 #define TPW_FAKE_EXECUTE(cls) \

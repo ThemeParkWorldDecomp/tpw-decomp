@@ -1,4 +1,4 @@
-// Harness for the height field's view gamut (src/tb_hfield_gamut.cpp, src/tb_polygon.cpp):
+// Harness for the height field's view gamut (src/engine/Gamut.cpp):
 // CGamut::CalculateGamut, CGamut::GetHFieldIntersection, the three CPolygon members and the two
 // clip vectors, against the original (tests/test_HFieldGamut.py).
 //

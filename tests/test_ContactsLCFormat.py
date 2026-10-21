@@ -1,5 +1,5 @@
 """Unit v5279, the online contacts and messages lists, against libtpw_unit_ContactsLCFormat.dylib (tests/unit_ContactsLCFormat.cpp), main app
-("SimTheme Park"), src/ContactsLCFormat.cpp:
+("SimTheme Park"), src/game/ui/ui_onlinePanel.cpp:
   ContactsLCEntryHandler 0x101e7648, MessagesLCEntryHandler 0x101e776c, ContactsLCFormat 0x101e7a58, ContactsLCPostFormat 0x101e7b34,
   _OnlineAddContact 0x101e8068, _OnlineRemoveContact 0x101e812c, _OnlineUpdateContact 0x101e81f4
 

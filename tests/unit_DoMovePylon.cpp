@@ -1,5 +1,5 @@
 // Test library for the pylon drag of the track editor (unit v5026; libtpw_unit_DoMovePylon.dylib, tests/test_DoMovePylon.py), main app:
-//   src/DoMovePylon.cpp   StartMovePylon, DoMovePylon
+//   src/game/rides/CoasterEdit.cpp   StartMovePylon, DoMovePylon
 //
 // The callees outside the unit are recording fakes that answer from the test's queues. The globals of other files the unit reads are
 // defined here, zero at start like the Mac's bss.

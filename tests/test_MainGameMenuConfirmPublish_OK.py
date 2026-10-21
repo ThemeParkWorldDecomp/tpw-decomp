@@ -1,5 +1,5 @@
 """Unit v5522, the game and lobby menus' handlers, against libtpw_unit_MainGameMenuConfirmPublish_OK.dylib
-(tests/unit_MainGameMenuConfirmPublish_OK.cpp), main app ("SimTheme Park"), src/ui_iterators_MainGameMenuConfirmPublish_OK.cpp:
+(tests/unit_MainGameMenuConfirmPublish_OK.cpp), main app ("SimTheme Park"), src/game/ui/ui_mainmenu.cpp:
   MainGameMenuConfirmPublish_OK 0x101fabd8, MainGameMenuCB 0x101fae30, MainLobbyMenuConfirmLogout_OK 0x101fb258,
   MainLobbyMenuCB 0x101fb354
 

@@ -1,5 +1,5 @@
 // Test library for the ride mesh helpers (unit v5338; libtpw_unit_CalculateRootNodeFaceNormals.dylib, tests/test_CalculateRootNodeFaceNormals.py), main app:
-//   src/RideTypes_CalculateRootNodeFaceNormals.cpp   CalculateRootNodeFaceNormals, GetBlendedBaseTextures, GetNodeWorldVertPosnsIntoGeomBuffer
+//   src/game/rides/TPRide.cpp   CalculateRootNodeFaceNormals, GetBlendedBaseTextures, GetNodeWorldVertPosnsIntoGeomBuffer
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues:
 // FloatToIntGlue (0x10237cd8), CMesh::GenerateRideBase, ERRORBox, CombineMatricesNoWDest1st (dest += source, word by word).

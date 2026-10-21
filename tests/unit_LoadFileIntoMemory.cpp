@@ -1,5 +1,5 @@
 // Test library for the ride height map loaders (unit v5127; libtpw_unit_LoadFileIntoMemory.dylib, tests/test_LoadFileIntoMemory.py), main app:
-//   src/RideDestroy_LoadFileIntoMemory.cpp   LoadFileIntoMemory, LoadRideHeightMap, GetRideHeightMap
+//   src/game/park/TPHField.cpp   LoadFileIntoMemory, LoadRideHeightMap, GetRideHeightMap
 //
 // The file system, the allocator, the byte swaps, the Byteswap of a box, GenerateRideHeightMap and SaveRideHeightMap are fakes that record
 // what the real ones read; the file, the block and the generated map are kept in globals set by the test.

@@ -1,6 +1,6 @@
 """Unit w66, the sound runtime, against libtpw_unit_SoundRuntime.dylib (tests/unit_SoundRuntime.cpp), in the main app
 ("SimTheme Park"):
-  src/SoundRuntime.cpp  SOUND_Init 0x100dc940, SOUND_Close 0x100dccd4, SOUND_SetChannels 0x100dcd80, SOUND_SetSoundQuality
+  src/game/Sound.cpp  SOUND_Init 0x100dc940, SOUND_Close 0x100dccd4, SOUND_SetChannels 0x100dcd80, SOUND_SetSoundQuality
                         0x100dcf0c, the volume setters 0x100dd1b4 to 0x100dd278, SOUND_SetParamValue 0x100dd380, StopAllSfx
                         0x100dd41c, FadeOutAllSfx 0x100dd4b0, Pause 0x100dd548, UnPause 0x100dd5d8, SOUND_Tick 0x100dd668,
                         SOUND_SendEvent 0x100dd9fc, PauseSound 0x100ddb18, UnpauseSound 0x100ddbb8, SetVolumeOnSound 0x100ddc5c,
@@ -9,7 +9,7 @@
                         GetCurrentSampleLengthInMilliseconds 0x100de758, AddObject 0x100de8e4, DelObject 0x100de918,
                         SetOcclusionProcessing 0x100de944, SetReverbLevel 0x100de97c, SetDroppableLevel 0x100de9ac
   include/TbAudioSystem.h  the TbAudioEvent getters 0x100de9e0, 0x100dea18, 0x100dea54, 0x100dea8c
-  src/TPSound.cpp       the state (the status setters and SND_DuckVolume are called by the scripts but are not part of the unit)
+  src/game/Sound.cpp, src/game/park/ParkSound.cpp       the state (the status setters and SND_DuckVolume are called by the scripts but are not part of the unit)
 
 The functions run as the original, one script of operations per case, with the state (the three flags, the allocation counter,
 the bank block, the settings block and the keyboard) read after every operation. Every callee outside the unit is a fake that
@@ -93,7 +93,7 @@ COMMANDS = {
 }
 KIND_OF_WORD = {}      # filled by setup: the vtable word of each command class -> its kind
 
-# the value slots of gSoundBalance the unit reads (see src/SoundRuntime.cpp)
+# the value slots of gSoundBalance the unit reads (see src/game/Sound.cpp)
 S_QSOUND, S_REAR, S_CROSSOVER, S_EAX, S_MPEG, S_DUCK, S_DROPPABLE, S_FADE = 1, 2, 3, 4, 6, 7, 8, 10
 S_CH0, S_SW0, S_CH1, S_SW1, S_CH2, S_SW2 = 16, 17, 18, 19, 20, 21
 BALANCE_SLOTS = [S_QSOUND, S_REAR, S_CROSSOVER, S_EAX, S_MPEG, S_DUCK, S_DROPPABLE, S_FADE, S_CH0, S_SW0, S_CH1, S_SW1, S_CH2, S_SW2]

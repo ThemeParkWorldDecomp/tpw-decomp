@@ -1,6 +1,6 @@
 // Test library for unit w26c (libtpw_unit_ParticleTick.dylib; see tests/test_ParticleTick.py): the particle system's per-tick
-// functions (DoEmitters, DoEffecters, DoAParticle, MoveEmitter, MoveEffecter, PAR_BuildDrawingList; src/rsse_tick.cpp) and the effect
-// manager (src/effect_manager.cpp), over the particle system's real state block (src/rsse_particles_state.cpp).
+// functions (DoEmitters, DoEffecters, DoAParticle, MoveEmitter, MoveEffecter, PAR_BuildDrawingList; src/game/Particles.cpp) and the effect
+// manager (src/game/HLSprite.cpp), over the particle system's real state block (src/game/rides/rsse.cpp).
 //
 // Fakes that record on both sides (name, then every argument): the spawning and core functions the tick calls (PAR_InitEmitter,
 // PAR_InitEffecter, SpawnParticle, DoSpecialEmitter, PAR_GetEmitterStatus, PAR_GetEffecterStatus, PAR_KillEmitter,

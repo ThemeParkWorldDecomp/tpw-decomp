@@ -1,5 +1,5 @@
 """Unit v5241, the ride list panel's info window, against libtpw_unit_UpdateInfoWindow.dylib (tests/unit_UpdateInfoWindow.cpp), main app
-("SimTheme Park"), src/ChangeInfoWindow_UpdateInfoWindow.cpp:
+("SimTheme Park"), src/game/ui/ui_ridepanel.cpp:
   InitInfoWindow 0x101b6500, UpdateInfoWindow 0x101b6a5c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

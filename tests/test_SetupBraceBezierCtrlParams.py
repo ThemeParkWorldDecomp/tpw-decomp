@@ -1,5 +1,5 @@
 """Unit v5992, SetupBraceBezierCtrlParams and GenerateTrack, against libtpw_unit_SetupBraceBezierCtrlParams.dylib
-(tests/unit_SetupBraceBezierCtrlParams.cpp), main app ("SimTheme Park"), src/DestroyCoasterPylons_SetupBraceBezierCtrlParams.cpp:
+(tests/unit_SetupBraceBezierCtrlParams.cpp), main app ("SimTheme Park"), src/game/rides/CoasterTrack.cpp:
   SetupBraceBezierCtrlParams 0x10050a3c, GenerateTrack 0x10050fcc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

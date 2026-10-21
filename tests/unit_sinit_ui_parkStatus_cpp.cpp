@@ -1,5 +1,5 @@
 // Test library for the park status panel (unit v5142; libtpw_unit_sinit_ui_parkStatus_cpp.dylib, tests/test_sinit_ui_parkStatus_cpp.py), main app:
-//   src/ui_loginpanel_msg_sinit_ui_parkStatus_cpp.cpp   UI_ParkStatusPanelDateChange, __sinit_ui_parkStatus_cpp and their globals
+//   src/game/ui/ui_parkStatus.cpp   UI_ParkStatusPanelDateChange, __sinit_ui_parkStatus_cpp and their globals
 //
 // The callees outside the unit are recording fakes: CWorld::GetParkAnalyser, both MaxAnalyserValue, InterfaceWindow::GetWindow,
 // CUIGrapher::SetYRange, CUIGrapher_Construct, DrawMeGraph, LbPalette_FindColour.

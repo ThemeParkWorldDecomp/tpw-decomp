@@ -1,6 +1,6 @@
 // Test library for the save-file instances and PayPricePerUseForObject (unit v51002; libtpw_unit_SAVEVARSTRUCT_3.dylib,
 // tests/test_SAVEVARSTRUCT_3.py), main app:
-//   src/ParkMessages_SAVEVARSTRUCT_3.cpp, src/ResearchLab_projects_CResearchProject_Serialise.cpp (LOADVAR<ResearchCat>)
+//   src/game/buildings/ResearchLab.cpp, src/game/buildings/StaffHQ.cpp, src/game/people/Person.cpp (LOADVAR<ResearchCat>)
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues: WriteSerialiseLog,
 // GAME_ASSERTMSG, LbFile_Read, LbFile_Write, CObject::GetPricePerUse, CObject::RecordNewTakings, CPeep::PlaySound. The globals of other

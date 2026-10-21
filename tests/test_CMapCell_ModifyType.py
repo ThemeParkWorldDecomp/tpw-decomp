@@ -1,5 +1,5 @@
 """Unit v5535, CMapCell::ModifyType and CMapCell::GetTile, against libtpw_unit_CMapCell_ModifyType.dylib (tests/unit_CMapCell_ModifyType.cpp), main app
-("SimTheme Park"), src/MapDelta_map_CMapCell_ModifyType.cpp:
+("SimTheme Park"), src/game/park/MapCell.cpp:
   CMapCell::ModifyType 0x10099614, CMapCell::GetTile 0x1009bc54
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for the

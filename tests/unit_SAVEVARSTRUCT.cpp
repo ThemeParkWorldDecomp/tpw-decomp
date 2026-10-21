@@ -1,5 +1,5 @@
 // Test library for SAVEVARSTRUCT<CThoughts::EventHistType> (unit v5067; libtpw_unit_SAVEVARSTRUCT.dylib, tests/test_SAVEVARSTRUCT.py), main app:
-//   src/TrackCell_SAVEVARSTRUCT.cpp
+//   src/game/buildings/TrainingCentre.cpp
 //
 // Callees: CSaveLoad::WriteSerialiseLog, GAME_ASSERTMSG, LbFile_Write are recording fakes; gSaveLoad is defined here.
 #include <cstddef>

@@ -1,6 +1,6 @@
 // Test library for eight advisor scorers (unit v5282; libtpw_unit_CAdvisorScoring__ADVISOR_TRAIN_STAFF_GENERAL.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_TRAIN_STAFF_GENERAL.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_TRAIN_STAFF_GENERAL.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The callees outside the unit (world getters, analyser counts, the worst value query, the park time, CTRACE) are fakes that record the
 // arguments the real ones read and answer from the test's queues. gGameWorld and gGameWorldRef are defined here.

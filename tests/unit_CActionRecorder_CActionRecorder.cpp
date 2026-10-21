@@ -1,6 +1,6 @@
 // Test library for CActionRecorder's constructor, destructor, Serialise and RecordAction (unit v5075;
 // libtpw_unit_CActionRecorder_CActionRecorder.dylib, tests/test_CActionRecorder_CActionRecorder.py), main app:
-//   src/ActionRecorder_CActionRecorder_CActionRecorder.cpp
+//   src/game/ActionRecorder.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read: CTRACE, SAVEVAR / LOADVAR of int and unsigned int,
 // LbFile_Read / LbFile_Write, the bullfrog CFile (constructor, destructor, Close, Seek, GetSize; Read and Write of the FakeFile),

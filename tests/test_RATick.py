@@ -1,5 +1,5 @@
 """Unit v5308, the ride animation tick and the quick vertex copy, against libtpw_unit_RATick.dylib (tests/unit_RATick.cpp), main app
-("SimTheme Park"), src/RideAnimChange_RATick.cpp:
+("SimTheme Park"), src/game/rides/RideAnim.cpp:
   RATick 0x100c4e20, QuickCopyUnmaskedMeshVertices 0x100c4f18
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

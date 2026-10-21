@@ -1,5 +1,5 @@
 // Test library for HideIfUnder and AerialCallback (unit v5979; libtpw_unit_HideIfUnder.dylib, tests/test_HideIfUnder.py), main app:
-//   src/ui_mainpanel2_msg_HideIfUnder.cpp   HideIfUnder, AerialCallback, gAerialSlide
+//   src/game/ui/ui_mainpanel2.cpp   HideIfUnder, AerialCallback, gAerialSlide
 //
 // The InterfaceWindow members and CoolRect pieces the two functions call are recording fakes (no window is ever built: the test
 // allocates zeroed blocks and the fakes only use the address as a label). The window tree and every answer come from the test's queues.

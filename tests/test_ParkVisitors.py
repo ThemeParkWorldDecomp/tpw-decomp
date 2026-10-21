@@ -1,4 +1,4 @@
-"""Differential tests for unit w154, the park analyser's visitor counts and opinions (src/ParkAnalyser_visitors.cpp). See difftest.py and tpwtest.py.
+"""Differential tests for unit w154, the park analyser's visitor counts and opinions (src/game/park/analyser.cpp). See difftest.py and tpwtest.py.
 
 CParkAnalyser::OfferOpinionOn, IveMisbehaved, PersonLeftPark, GetHappinessLevel, GetVisitorsInPark, NumberOfVisitorsOutsidePark, NumberOfVisitorsNeedingToilet,
 NumberOfHungryVisitors, NumberOfThirstyVisitors, MisbehavingVisitorsLastMonth, NumberOfVisitorsSinceBeginning, NumberOfVisitorsInLastMonths,

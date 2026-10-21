@@ -197,7 +197,7 @@ public:
 // ---- Bank::CBank (0xc bytes) -------------------------------------------------------------------------------------------
 namespace Bank {
 // What the codecs hold: a reference counted handle on a TbBank. The remaining members of the class (IsType,
-// GetNumberOfSamples, GetSampleLength, GetSampleName at 0x1001463c..0x10014810) are in src/TbSoundCore_TbSpeaker_Mono_operator_int.cpp
+// GetNumberOfSamples, GetSampleLength, GetSampleName at 0x1001463c..0x10014810) are in src/sound/Bank.cpp
 // (units v51075, v5L21); unit w80b added the three
 // the codec factory calls.
 class CBank : public TbRefRelease {
@@ -222,7 +222,7 @@ public:
 }  // namespace Bank
 
 // ---- the sample info the codecs fill ---------------------------------------------------------------------------------------
-// TbSoundSampleInfo (SetBank at 0x1000df50 is in src/TbSoundBank.cpp) is declared in TbSoundInfo.h (unit w77); that header
+// TbSoundSampleInfo (SetBank at 0x1000df50 is in src/sound/TbSoundSampleInfo.cpp) is declared in TbSoundInfo.h (unit w77); that header
 // does not include this one.
 
 // ---- CAudioComponent and CAudioFileSystem (sound library, other units) -------------------------------------------------

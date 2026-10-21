@@ -1,5 +1,5 @@
 // Unit v5L31: a recording table for the status panels. The Mac keeps a vtable pointer at +0x20 of a panel; the host keeps the arena
-// offset of a table made by UIStatusPanel_MakeTable (include/ui_main.h, src/ui_StatusPanel_tables.cpp). A test library includes this
+// offset of a table made by UIStatusPanel_MakeTable (include/ui_main.h, src/game/ui/ui_StatusPanel.cpp). A test library includes this
 // after ui_main.h and gives a hook: every slot of FakeStatusPanelTable<Hook>() calls Hook(panel, Mac slot offset, argument) and answers
 // what the hook answers, so the library logs the slot reached as the Mac's __ptr_glue fake logs the entry's offset.
 #pragma once

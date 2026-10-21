@@ -1,5 +1,5 @@
 """Unit v5336, bfl::draw::CDraw::SetSpritePalette 0x10065a7c, against libtpw_unit_bfl_draw_CDraw_SetSpritePalette.dylib
-(tests/unit_bfl_draw_CDraw_SetSpritePalette.cpp), src/Draw_state_bfl_draw_CDraw_SetSpritePalette.cpp.
+(tests/unit_bfl_draw_CDraw_SetSpritePalette.cpp), src/bullfrog/Draw.cpp.
 
 A case is a CDraw block (0x870 bytes, random fill, current pixel format at +8), a 256-word palette and an optional pixel
 format. TbMaskRotates::Init (0x10065e7c) is a fake on both sides that logs both formats and writes the rotates from the

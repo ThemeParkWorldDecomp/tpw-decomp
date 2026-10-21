@@ -1,5 +1,5 @@
 """Unit v5011, GetTangentsFromZVector, against libtpw_unit_GetTangentsFromZVector.dylib (tests/unit_GetTangentsFromZVector.cpp), main app
-("SimTheme Park"), src/GetTangentsFromZVector.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   GetTangentsFromZVector 0x1003be20
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

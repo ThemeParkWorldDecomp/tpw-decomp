@@ -1,4 +1,4 @@
-// Unit v5041 (src/CreateDirectDrawObject.cpp), bullfrog WinScrn.cpp: DirectDraw object creation, display-mode enumeration,
+// Unit v5041 (src/bullfrog/WinScrn.cpp), bullfrog WinScrn.cpp: DirectDraw object creation, display-mode enumeration,
 // the global palette and the static initialiser of the file's surfaces. Mac offsets are in the comments.
 #pragma once
 #include <cstdint>
@@ -68,7 +68,7 @@ extern uint8_t gScreenFPUHandlerNode[];          // 0x1007510c: the registration
 extern const void* const kScreenFPUHandlerVtable[];   // 0x10073a84
 extern uint8_t kScreenFPUHandlerDtorVector[];    // 0x10070e1c: the TVector of _ScreenFPUHandler::~_ScreenFPUHandler
 
-// Unit v5056 (src/LbScreen_Initialise.cpp), bullfrog WinScrn.cpp.
+// Unit v5056 (src/bullfrog/WinScrn.cpp), bullfrog WinScrn.cpp.
 namespace SamsUtilities { class UCursor; }
 struct GrafPort;
 namespace NS_MacDoze {
@@ -110,7 +110,7 @@ extern int32_t gWinScrnModeFlag;                // 0x10073a48
 extern uint8_t gWinScrnFocus;                   // 0x10073df8
 extern _LbSystemEventCallback gLbSystemEventCallback;   // 0x10073e0c
 
-// Unit v5334 (src/CreateDirectDrawObject_LbScreen_PartSwap.cpp), bullfrog WinScrn.cpp.
+// Unit v5334 (src/bullfrog/WinScrn.cpp), bullfrog WinScrn.cpp.
 namespace NS_MacDoze {
 struct tagPOINT;
 void ClientToScreen(GrafPort* window, tagPOINT* point);   // glue 0x1006bdcc
@@ -130,7 +130,7 @@ extern int32_t gWinScrnModeGate;         // 0x10073a64 (name invented)
 extern TbList gWinScrnModeList;          // 0x10075128 (name invented): the TbDisplayModes
 extern int32_t gWinScrnClientOrigin[2];  // 0x10073a4c (name invented): the point ClientToScreen starts from
 
-// Unit v5737 (src/LbScreen_Initialise_LbScreen_Terminate.cpp), bullfrog WinScrn.cpp.
+// Unit v5737 (src/bullfrog/WinScrn.cpp), bullfrog WinScrn.cpp.
 struct TbScreenMode;
 // The find state of the mode enumeration. Mac: the cursor (a TbDisplayMode node) at 0x0c; the rest is not used here.
 struct TbScreenModeFind {
@@ -149,7 +149,7 @@ IDirectDraw* LbScreen_GetDirectDraw(int32_t addRef);        // 0x100687a8, 72 B
 TbResult LbScreen_ModeFindFirst(TbScreenModeFind* find, TbScreenMode* mode);   // 0x10068f70, 100 B
 TbResult LbScreen_ModeFindNext(TbScreenModeFind* find, TbScreenMode* mode);    // 0x10069024, 72 B
 
-// Unit v51000 (src/LbScreen_Initialise_LbScreen_Terminate_LbScreen_SetMode_2.cpp), bullfrog WinScrn.cpp.
+// Unit v51000 (src/bullfrog/WinScrn.cpp), bullfrog WinScrn.cpp.
 struct DDSCAPS { uint32_t dwCaps; };   // 0x00 (the Mac's DDSCAPS is this one word)
 namespace NS_MacDoze {
 void Sleep(uint32_t ms);   // glue 0x1006bc1c
@@ -166,7 +166,7 @@ int32_t IDirectDrawSurface_SetPalette(IDirectDrawSurface* self, IDirectDrawPalet
 // bullfrog 0x10069100, 2928 B: the Mac passes the result in a hidden pointer (r3), the parameters start at r4.
 TbResult LbScreen_SetMode(uint32_t width, uint32_t height, uint32_t bpp, uint32_t flags, const TbPalette* palette);
 
-// Unit v5963 (src/CreateDirectDrawObject_RegisterBullfrogWindowClass_2.cpp), bullfrog WinScrn.cpp, TbSystemInfo.cpp, LbDraw.cpp.
+// Unit v5963 (src/bullfrog/TbSystemInfo.cpp, src/bullfrog/FileSystem.cpp, src/bullfrog/WinScrn.cpp, src/bullfrog/LbRect.cpp), bullfrog WinScrn.cpp, TbSystemInfo.cpp, LbDraw.cpp.
 #include "bullfrog_CPU.h"
 namespace NS_MacDoze {
 // WNDCLASSA. The Mac struct is 0x28 bytes (ten words: style 0, wndproc 4 (a TVector), extra 8, 0xc, instance 0x10, icon 0x14,
@@ -206,7 +206,7 @@ void LbRect_Bounding(TbRect* rect, const TbRect* other);
 uint8_t* Refpack_NewArray(uint32_t size);
 void Refpack_DeleteArray(void* block);
 
-// Unit v51071 (src/CreateDirectDrawObject_RegisterBullfrogWindowClass_2_LbSystemInfo_CPUGetVendor.cpp), bullfrog TbSystemInfo.cpp, LbDraw.cpp,
+// Unit v51071 (src/bullfrog/TbSystemInfo.cpp, src/bullfrog/LbTime.cpp), bullfrog TbSystemInfo.cpp, LbDraw.cpp,
 // WinScrn.cpp, LbMaths.cpp, TbJPEGSaver.cpp, Draw.cpp.
 struct TbSize;
 void LbSystemInfo_CPUGetVendor(char* out);      // 0x10043bcc, 40 B: the 13 bytes of the CPU name

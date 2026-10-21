@@ -1,8 +1,8 @@
 """Unit v5L09, the advisor load, against libtpw_unit_BMP_Load.dylib (tests/unit_BMP_Load.cpp), main app ("SimTheme Park"),
-src/BMP_Load.cpp:
+src/game/rides/BumperRide.cpp:
   BMP_Load 0x10023850
 with the chunk reader of unit v51017 (Read_OpenChunk, Read_DataFromChunk, Read_BumpFromChunk and the swap helpers), which runs as the
-original on the PowerPC side and as src/host_leaves_Write_BumpToChunk_BMP_Save_Read_BumpFromChunk.cpp on the host.
+original on the PowerPC side and as src/game/rides/BumperRide.cpp on the host.
 
 A case is a world, a save file and a call. The world is built twice by ONE piece of Python code (emulator memory, big-endian, at the
 Mac's addresses for the original; the host library's memory for the translation): the bump world at 0x102b56c0 (its magic, the ride

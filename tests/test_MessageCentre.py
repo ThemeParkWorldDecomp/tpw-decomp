@@ -1,5 +1,5 @@
-"""w107: the message centre's post and the subscription tree, original code on one side and src/MessageCentre_post.cpp,
-src/Thing_receive.cpp, src/msl_tree_subscription.cpp and src/msl_red_black_tree.cpp on the other (tests/unit_MessageCentre.cpp).
+"""w107: the message centre's post and the subscription tree, original code on one side and src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/save/BlockSave.cpp, src/game/ui/MessageCentre.cpp,
+src/game/Thing.cpp, src/game/MslSupport.cpp on the other (tests/unit_MessageCentre.cpp).
 
 Functions (main app): CMsgEvent constructor 0x10151df8, destructor 0x100f39cc and GetType 0x100f4470; CSubscriptionHeader constructor
 0x1000a3f8 and destructor 0x101522e0; CMessageCentre::PostMessage 0x1015256c; CThing::ReceiveMessage 0x1012e470 and GetThingId 0x1012e1f8;

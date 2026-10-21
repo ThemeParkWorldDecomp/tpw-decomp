@@ -1,5 +1,5 @@
 """Unit v5990, CTrackCell::Delete, against libtpw_unit_CTrackCell_Delete.dylib (tests/unit_CTrackCell_Delete.cpp), main app
-("SimTheme Park"), src/TrackCell_flags_CTrackCell_Delete.cpp:
+("SimTheme Park"), src/game/park/TrackCell.cpp:
   CTrackCell::Delete 0x100a40c4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

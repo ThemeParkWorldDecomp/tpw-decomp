@@ -1,5 +1,5 @@
 """Unit v5107, the staff status panel's FireMe, Show, InitWindow and UpdateViewWindow, against libtpw_unit_StaffStatusPanel_FireMe.dylib
-(tests/unit_StaffStatusPanel_FireMe.cpp), main app, src/StaffStatusPanel_FireMe.cpp:
+(tests/unit_StaffStatusPanel_FireMe.cpp), main app, src/game/ui/ui_staffStatus.cpp:
   StaffStatusPanel::FireMe 0x101c5400, Show 0x101c54f0, InitWindow 0x101c4c34, UpdateViewWindow 0x101c423c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

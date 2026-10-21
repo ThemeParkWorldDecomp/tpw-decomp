@@ -1,7 +1,7 @@
 """Unit w86, against libtpw_unit_WaveletLoad.dylib (tests/unit_WaveletLoad.cpp), in the program
 "engine symbols shared":
-  src/Bitmap.cpp          Bitmap::load_wavelet 0x10047294
-  src/Wavelet_decode.cpp  CWaveletImp::Decompress 0x10039694 (the fast-decoder dispatcher)
+  src/engine/Bitmap.cpp          Bitmap::load_wavelet 0x10047294
+  src/engine/EngineUtil.cpp, src/engine/Wavelet.cpp  CWaveletImp::Decompress 0x10039694 (the fast-decoder dispatcher)
 
 load_wavelet runs as the original in the emulator and as the host's translation over a bitmap (a size, a depth and an
 old pixel buffer, or none) and a scripted file: three little-endian header words, then the planes' floats and sizes and

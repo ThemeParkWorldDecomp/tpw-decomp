@@ -1,5 +1,5 @@
 // Test library for CServiceQueue (unit v5739; libtpw_unit_CServiceQueue_CServiceQueue.dylib, tests/test_CServiceQueue_CServiceQueue.py):
-//   src/TbSoundSampleMPEG2_CServiceQueue_CServiceQueue.cpp
+//   src/sound/ServiceQueue.cpp
 //
 // The glue imports (wait, set event, free event, free storage) and TbSoundPipeChannel::FillServiceBuffer are recording fakes.
 #include <cstddef>

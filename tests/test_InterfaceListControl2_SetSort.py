@@ -1,5 +1,5 @@
 """Unit v5908, six InterfaceListControl2 members, against libtpw_unit_InterfaceListControl2_SetSort.dylib
-(tests/unit_InterfaceListControl2_SetSort.cpp), main app ("SimTheme Park"), src/InterfaceListControl2_items_InterfaceListControl2_SetSort.cpp:
+(tests/unit_InterfaceListControl2_SetSort.cpp), main app ("SimTheme Park"), src/game/ui/InterfaceListControl2.cpp:
   FindData 0x101d4384, PropagateMessage 0x101d4650, SelectClick 0x101d4a50, SetCurrent 0x101d4c64, SetSort 0x101d4db8,
   ColumnButtonClick 0x101d4fa4
 

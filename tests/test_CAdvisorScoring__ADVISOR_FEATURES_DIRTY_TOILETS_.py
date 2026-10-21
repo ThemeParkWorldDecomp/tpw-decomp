@@ -1,5 +1,5 @@
 """Unit v5081, six advisor scorers, against libtpw_unit_CAdvisorScoring__ADVISOR_FEATURES_DIRTY_TOILETS_.dylib
-(tests/unit_CAdvisorScoring__ADVISOR_FEATURES_DIRTY_TOILETS_.cpp), main app, src/AdvisorScoring_CAdvisorScoring__ADVISOR_FEATURES_DIRTY_TOILETS_.cpp:
+(tests/unit_CAdvisorScoring__ADVISOR_FEATURES_DIRTY_TOILETS_.cpp), main app, src/game/advisor/AdvisorScoring.cpp:
   _ADVISOR_FEATURES_DIRTY_TOILETS_1 0x10015628, _2 0x10015798, _3 0x10015908, _4 0x10015a64,
   _ADVISOR_FEATURES_POOR_SELECTION 0x10015018, _ADVISOR_SIDESHOWS_BUILD_MORE_SIDESHOWS 0x10014ea0
 

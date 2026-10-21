@@ -25,7 +25,7 @@ public:
     // 0x10149a74 (untranslated, 212 bytes; the pause window's key handler calls it with false).
     void TogglePause(bool allSounds);
     int32_t GetCurrentTheme() const;            // 0x10149b70
-    // 0x10149ba8, 0x10149c7c, 0x1014a08c (src/Game_theme_set.cpp): the index (or the name, ignoring case) of the current theme, which
+    // 0x10149ba8, 0x10149c7c, 0x1014a08c (src/game/Game.cpp): the index (or the name, ignoring case) of the current theme, which
     // the master save follows; SetCurrentThemeName copies the name of theme number mCurrentTheme out of mThemes.
     void SetCurrentTheme(int32_t theme);
     void SetCurrentTheme(const TbDynamicStringTemplate<char>& name);
@@ -34,12 +34,12 @@ public:
     void AddThemeName(const TbDynamicStringTemplate<char>& name);       // 0x10149e54
     void ClearThemeNames();                     // 0x10149fcc
     const TbDynamicStringTemplate<char>& GetCurrentThemeName();         // 0x1014a058
-    // 0x1014a768 (src/Game_theme.cpp): the names, in the player's language, of the two gates of the theme
+    // 0x1014a768 (src/game/Game.cpp): the names, in the player's language, of the two gates of the theme
     // whose unicode folder name is `theme` (the lobby's signs): the two sign texts of the theme's gate ride type from the ride
     // database. A theme that is none of the four leaves both names as the frame's uninitialised buffers hold them.
     void GetLocalisedThemeGateNames(const TbDynamicStringTemplate<char16_t>& theme, TbDynamicStringTemplate<char16_t>& gate1,
                                     TbDynamicStringTemplate<char16_t>& gate2) const;
-    // 0x1014a570 (src/Game_level_CGame_GetLocalisedThemeName.cpp): sets `out` to the player's-language name of the theme whose
+    // 0x1014a570 (src/game/Game.cpp): sets `out` to the player's-language name of the theme whose
     // unicode folder name is `theme` (fantasy, hallow, jungle, space); any other theme leaves `out` alone.
     void GetLocalisedThemeName(const TbDynamicStringTemplate<char16_t>& theme, TbDynamicStringTemplate<char16_t>& out) const;
     // Unit v5064: the label of 0x1014a478 names the theme argument as a TbDynamicStringTemplate<char> (what GetCurrentThemeName answers);
@@ -47,7 +47,7 @@ public:
     void GetLocalisedThemeName(const TbDynamicStringTemplate<char>& theme, TbDynamicStringTemplate<char16_t>& out) const;
     void InitThemeResources(const TbDynamicStringTemplate<char>& path); // 0x10148c3c
     int32_t InitWorld();                        // 0x10147e34: creates gGameWorld; nonzero on success
-    // 0x10147ee4 (src/Game_level.cpp, unit w117): the park's theme and level: the ride database for the theme, the new level (the world's
+    // 0x10147ee4 (src/game/Game.cpp, unit w117): the park's theme and level: the ride database for the theme, the new level (the world's
     // SetupNewLevel), the quick save the command line names (its answer changes nothing) and the level's objects and settings.
     // 1 on success, 0 when LoadTheme, SetupNewLevel or InitLevel answered 0.
     int32_t InitTheme(char* path);
@@ -55,11 +55,11 @@ public:
     int32_t InitLevel();                        // 0x10148028: InitLevel_Load, then InitLevel_Initialise when it answered nonzero; 0 or 1
     int32_t InitLevel_Load();                   // 0x1014809c: the theme's objects, sky, sky objects and the two hoardings tables; 0 when a table failed
     int32_t InitLevel_Initialise();             // 0x101482bc: the theme's fog, light, procedural texturing, advisor costumes and cell costs; 1
-    // 0x101496ec (src/Game_exit.cpp): the end of a level: the world is exited, freed and deleted, the ride database emptied, the sky closed, the
+    // 0x101496ec (src/game/Game.cpp): the end of a level: the world is exited, freed and deleted, the ride database emptied, the sky closed, the
     // sky objects (when the display has flag 0x400000) and the message centre deleted, the theme's resources cleared. The Mac answers 1 (r3;
     // the callers ignore it).
     void ExitLevel();
-    // 0x10149334 (src/Game_theme_clear.cpp): takes the current theme's resource and thirteen standing ones out of gGame's resource manager.
+    // 0x10149334 (src/game/Game.cpp): takes the current theme's resource and thirteen standing ones out of gGame's resource manager.
     void ClearThemeResources();
     void Iterate();                             // 0x10149838
     void DeInit();                              // 0x1014965c
@@ -77,7 +77,7 @@ public:
 extern CGame gGame;   // 0x1037f134, original name unknown
 
 // Unit w129: CGame::Iterate's function-local static (value 0x1037f130, guard byte 0x1037f12c): 1 from the first call, then whether bit 8 of gTPWFlags
-// was set at the start of the last call (src/Game_iterate.cpp).
+// was set at the start of the last call (src/game/Game.cpp).
 extern int32_t gGameIterateFlag;
 
 // The four theme folder names the gate names compare with (Game.cpp's static initialiser builds them; the original names are
@@ -87,7 +87,7 @@ extern TbDynamicStringTemplate<char16_t> gGameThemeHallow;    // 0x1037f0ec "hal
 extern TbDynamicStringTemplate<char16_t> gGameThemeJungle;    // 0x1037f0cc "jungle"
 extern TbDynamicStringTemplate<char16_t> gGameThemeSpace;     // 0x1037f0ac "space"
 
-// 0x1014a10c (src/Game_theme_set.cpp): makes `theme` (an old theme number of the settings file) the current theme (ends in
+// 0x1014a10c (src/game/Game.cpp): makes `theme` (an old theme number of the settings file) the current theme (ends in
 // CFSGlobalMasterSave::ChangeCurrentTheme).
 void ConverttoCurrentTheme(int32_t theme);
 

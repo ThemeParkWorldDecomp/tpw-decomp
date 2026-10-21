@@ -1,5 +1,5 @@
 // Test library for the finance graph panel message handler (unit v5073; libtpw_unit_FinanceGraphPanelMsg.dylib, tests/test_FinanceGraphPanelMsg.py), main app:
-//   src/FinanceGraphPanelMsg.cpp   FinanceGraphPanelMsg and the globals it defines
+//   src/game/ui/ui_FinancePanel.cpp   FinanceGraphPanelMsg and the globals it defines
 //
 // The callees outside the unit are recording fakes. Window pointers are opaque numbers (never dereferenced): the fakes log the low 32 bits.
 #include <cstddef>

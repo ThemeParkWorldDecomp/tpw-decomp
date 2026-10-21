@@ -1,4 +1,4 @@
-// Test library for src/RideTypes.cpp and src/RideTick.cpp (libtpw_unit_RideTypes.dylib; see
+// Test library for src/game/rides/TPRide.cpp and src/game/rides/RideAnim.cpp (libtpw_unit_RideTypes.dylib; see
 // tests/test_RideTypes.py): LoadRideType, InstanceRide, DestroyRideInstance, DestroyAllRideTypes,
 // AnimateRideSet and TickRideAnims.
 //

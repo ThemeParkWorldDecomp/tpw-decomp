@@ -1,5 +1,5 @@
 """Unit v5369, the trains' distances from the centre car, capacity and activation, against libtpw_unit_RecalcDistancesFromCentreCar.dylib
-(tests/unit_RecalcDistancesFromCentreCar.cpp), main app ("SimTheme Park"), src/TPConfig_stats_RecalcDistancesFromCentreCar.cpp:
+(tests/unit_RecalcDistancesFromCentreCar.cpp), main app ("SimTheme Park"), src/game/rides/CoasterQueue.cpp, src/game/rides/CoasterTrain.cpp:
   RecalcDistancesFromCentreCar 0x1004a4e8, SetTrainCapacity 0x1004a328, ActivateCoasterTrain 0x1004a8a0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

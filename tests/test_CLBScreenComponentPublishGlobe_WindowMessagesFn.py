@@ -1,6 +1,6 @@
 """Unit v5957, the publish and download globes' members, against libtpw_unit_CLBScreenComponentPublishGlobe_WindowMessagesFn.dylib
 (tests/unit_CLBScreenComponentPublishGlobe_WindowMessagesFn.cpp), main app ("SimTheme Park"),
-src/lobby_globe_CLBScreenComponentPublishGlobe_WindowMessagesFn.cpp:
+src/game/online/lobby_globe.cpp:
   CLBScreenComponentPublishGlobe::WindowMessagesFn 0x100aeb6c, Show 0x100aec3c, Hide 0x100aece8, CreateCities 0x100aef90,
   HandleOnlineBacktrack 0x100af094; CLBScreenComponentDownloadGlobe::HandleOnlineBacktrack 0x100ae9c0, CreateCities 0x100ae8a0
 

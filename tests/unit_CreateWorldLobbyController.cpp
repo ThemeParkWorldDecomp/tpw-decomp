@@ -1,5 +1,5 @@
 // Test library for the world lobby controller (unit v5948; libtpw_unit_CreateWorldLobbyController.dylib, tests/test_CreateWorldLobbyController.py), main app:
-//   src/ProcessGetChatSatellitePlayers_CreateWorldLobbyController.cpp   CreateWorldLobbyController, SatelliteMsg; defines gWorldLobbyScript
+//   src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_worldLobbyController.cpp   CreateWorldLobbyController, SatelliteMsg; defines gWorldLobbyScript
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The windows are plain
 // blocks (no vtable): the two virtual calls (Enable, SetValue) go through WindowEnable and WindowSetValue, which are fakes too.

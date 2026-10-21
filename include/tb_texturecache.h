@@ -6,13 +6,13 @@
 // list of texture entries placed on it (CTextureLink). The cache keeps up to 256 pages of
 // each of six sizes, 256 down to 8 pixels.
 //
-// PARTIAL: start-up, shutdown, Flush and Remove are translated (src/tb_texturecache.cpp);
+// PARTIAL: start-up, shutdown, Flush and Remove are translated (src/engine/TextureCache.cpp);
 // the frame's calls Prepare, UploadToVRAM, GenerateTexturePages, PageUpdated and ReInitialize
-// are in src/tb_texturecache_frame2.cpp; the sorting and the entry lists are in
-// src/tb_texturecache_sort.cpp (with CQSort, include/tb_qsort.h); the packing between them
+// are in src/engine/TextureCache.cpp; the sorting and the entry lists are in
+// src/engine/TextureCache.cpp (with CQSort, include/tb_qsort.h); the packing between them
 // is still to do.
-// are in src/tb_texturecache_frame2.cpp, the packing (PackTextures, ArrangeNonwrappingTextures)
-// in src/tb_texturecache_pack.cpp; the sorting between them is still to do.
+// are in src/engine/TextureCache.cpp, the packing (PackTextures, ArrangeNonwrappingTextures)
+// in src/engine/TextureCache.cpp; the sorting between them is still to do.
 // Mac offsets in the comments; the pointers make the host objects larger.
 #pragma once
 #include <cstdint>
@@ -63,9 +63,9 @@ class CTextureLink {
 public:
     CTextureLink() : mTexture(nullptr), mEntries(nullptr), mF08(0), mF0C(0), mF14(-1) {}   // 0x100385a8
     // The page's image changed: counts it, notes the frame in mF14 and sends the upload buffer
-    // to the page. Answers what the texture's UnlockSurface answers (src/tb_texturecache_frame2.cpp).
+    // to the page. Answers what the texture's UnlockSurface answers (src/engine/TextureCache.cpp).
     int32_t PageUpdated();                           // 0x100385f4
-    // Works out what is on the page (src/tb_texturecache_balance.cpp; SortTextures calls it with the
+    // Works out what is on the page (src/engine/TextureCache.cpp; SortTextures calls it with the
     // cache's flags, which it does not read):
     // mF08 the pixels left free, mF0C the pixels of the entries asked for this frame, mF10 a
     // weighted score of what the page holds (the cost of freeing it), mF1C the pixels of locked
@@ -130,7 +130,7 @@ public:
     // Asks for the entry to be on a page this frame: an entry that is on none is queued for
     // GenerateTexturePages (mF18AC) with `distance` as its priority, one that is on a page or
     // queued already keeps the smaller distance. An entry flagged kNextIsPlane takes the next
-    // entry of its array along. (src/tb_texturecache_frame2.cpp)
+    // entry of its array along. (src/engine/TextureCache.cpp)
     void Prepare(CTextureEntry* entry, float distance);   // 0x10032ddc
     // Texture settings flag 0x80 writes the cache's requests to the file "tcache.log": Prepare
     // appends one record per entry (the first call also writes the settings), Execute a marker.
@@ -146,9 +146,9 @@ public:
     // Puts the entries at the front of the queue `*list` on one page (the first page of the first
     // size from the entry's own that still has one to fill) and takes them off the queue: -1 when
     // the first entry fits nowhere, 0 on a failure (GenerateTexturePages stops), else what
-    // PageUpdated answers. (src/tb_texturecache_pack.cpp)
+    // PageUpdated answers. (src/engine/TextureCache.cpp)
     int32_t PackTextures(CTextureEntry** list);   // 0x1003678c
-    // The sorting (src/tb_texturecache_sort.cpp). SortTextures puts the pages of each size in
+    // The sorting (src/engine/TextureCache.cpp). SortTextures puts the pages of each size in
     // order, SortEntries the queue (mF18AC), the others work on a list of entries chained
     // through their mNext (a list head, or an array).
     // Per size: the pages that are not position locked first, in increasing mF0C (the pixels
@@ -181,7 +181,7 @@ public:
     // into the array `out`, ending it with null. Skips what is stored as wrapping and what
     // on the page was not asked for. Answers the sum of the cache sizes' areas.
     int32_t CreateNonWrappingTextureList(CTextureEntry** out, CTextureEntry* entries, CTextureLink* page);   // 0x10035e6c
-    // Called by SortEntries (src/tb_texturecache_balance.cpp): shrinks entries by the mipmap steps
+    // Called by SortEntries (src/engine/TextureCache.cpp): shrinks entries by the mipmap steps
     // the cache allows (AutoMipmap: levels 0 to mF18E0 - 1, each with no limit), and the compression
     // that follows when the pages cannot hold them all (Entry_Compress: from level mF18E0 up to 11,
     // while the entries' area mF18C4 is over the pixels left, mF18C0 - mF18BC, or over the limit
@@ -201,17 +201,17 @@ public:
     // page `page` with a guillotine packer: `quads` gets one SAvailableQuad per entry placed, ending
     // with a null entry (room for 128), `count` the number placed. Answers whether the whole list
     // was placed. A first entry that fits nowhere is cut down a size at a time (when mFlags has
-    // kReshuffle). The last argument is not used. (src/tb_texturecache_pack.cpp)
+    // kReshuffle). The last argument is not used. (src/engine/TextureCache.cpp)
     bool ArrangeNonwrappingTextures(CTextureEntry** list, SAvailableQuad* quads, int32_t* count, CTextureBase* page,
                                     int32_t unused);   // 0x10036100
     int32_t Refresh();                  // 0x10034204
     // Places the entries asked for since Refresh on pages; pushes error 0xb0754011 and answers 0
-    // when no page could be generated (src/tb_texturecache_frame.cpp).
+    // when no page could be generated (src/engine/TextureCache.cpp).
     int32_t Execute();                  // 0x10033688
     // Closes the cache when it is up, sets the texture format (-1: keeps it) and makes the pages
-    // again; answers what AutoCreateSurfaces answers (src/tb_texturecache_frame2.cpp).
+    // again; answers what AutoCreateSurfaces answers (src/engine/TextureCache.cpp).
     int32_t ReInitialize(int32_t format);   // 0x1003447c
-    // Execute's balancing steps (src/tb_texturecache_balance.cpp). Execute calls FreeLockedTextureSpace
+    // Execute's balancing steps (src/engine/TextureCache.cpp, src/engine/Gamut.cpp). Execute calls FreeLockedTextureSpace
     // only when the view or the lights changed: size by size it clears up to mF1860 (at most 16)
     // pages that hold some locked entries (less than a quarter of the page) and little that the
     // frame asked for (under half), the ones asked for least first. LevelSurfaceUsage compares the
@@ -272,14 +272,14 @@ public:
 // 0x1910 bytes on the Mac.
 extern CTextureCache* gei_TCache;   // engine export
 // How many times a page's image was sent to the card: CTextureLink::PageUpdated counts them.
-// Engine BSS 0x10173194 (not exported; name invented); defined in src/tb_texturecache_frame2.cpp.
+// Engine BSS 0x10173194 (not exported; name invented); defined in src/engine/TextureCache.cpp.
 extern int32_t gTexturePageUpdates;
 // Counters of the packing, none read anywhere else: gTextureQuadsPending is zeroed by every
 // ArrangeNonwrappingTextures and counts its quads, PackTextures counts each placed entry off again
 // (and puts the value back after a trial that failed); gTextureQuadsPlaced counts every quad ever
 // made; gTextureSizeSteps counts the packing's moves to the next smaller page size; gTextureCutDowns
 // counts the cuts of a whole-page entry. Engine BSS 0x1017318c, 0x10173190, 0x10173198 and 0x10173188
-// (not exported; names invented); defined in src/tb_texturecache_pack.cpp.
+// (not exported; names invented); defined in src/engine/TextureCache.cpp.
 extern int32_t gTextureQuadsPending;
 extern int32_t gTextureQuadsPlaced;
 extern int32_t gTextureSizeSteps;
@@ -289,10 +289,10 @@ extern int32_t gTextureCutDowns;
 void InitFrequencyTable();          // 0x1000967c
 extern int32_t gFrequencyTable[16]; // engine data 0x10052d78 (not exported; name invented)
 // Every frame CTextureCache::Refresh calls this first: it writes the display's frame count & 15
-// to gFrequencyIndex and refills gFrequencyTable starting there (src/tb_texturecache_balance.cpp).
+// to gFrequencyIndex and refills gFrequencyTable starting there (src/engine/Gamut.cpp).
 void CycleFrequencyTable();         // 0x10009770
 // Which byte of an entry's place record belongs to this frame (0..15). Engine data 0x10052d74
-// (not exported; name invented); defined in src/tb_texturecache_frame.cpp.
+// (not exported; name invented); defined in src/engine/TextureCache.cpp.
 extern uint32_t gFrequencyIndex;
 
 int32_t TCache_Init(int32_t format);   // 0x1003377c

@@ -1,5 +1,5 @@
-// Fakes for the engine's CMesh::SetLocalMatrix unit (src/tb_mesh_matrix.cpp): the math unit
-// is a real CMatrixPowerPC (src/MatrixPowerPC.cpp is part of the unit), the mesh is one
+// Fakes for the engine's CMesh::SetLocalMatrix unit (src/engine/Mesh.cpp): the math unit
+// is a real CMatrixPowerPC (src/engine/MatrixPowerPC.cpp is part of the unit), the mesh is one
 // static object with a fake constructor, and nothing is recorded.
 #include "MatrixPowerPC.h"
 #include "tb_mesh.h"

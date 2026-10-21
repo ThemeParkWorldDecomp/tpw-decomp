@@ -1,8 +1,8 @@
 """Unit w64, the lobby's small leaves part 5, against libtpw_unit_LobbyLeaves5.dylib (tests/unit_LobbyLeaves5.cpp), in the main app
 ("SimTheme Park"):
-  src/ui_mainpanel2_pause.cpp  HidePauseWindow 0x101a8744
-  src/lobby_start_leaves.cpp   InterfaceStringHeap::DeAllocate 0x101d7978
-  src/UI_close.cpp             UI_CloseSystem 0x101c8c2c, UI_CloseTimerSystem 0x101d8c2c, InterfaceMessageQueue::~InterfaceMessageQueue
+  src/game/ui/ui_mainpanel2.cpp  HidePauseWindow 0x101a8744
+  src/game/rides/RidePlacement.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/InterfaceStringHeap.cpp   InterfaceStringHeap::DeAllocate 0x101d7978
+  src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp             UI_CloseSystem 0x101c8c2c, UI_CloseTimerSystem 0x101d8c2c, InterfaceMessageQueue::~InterfaceMessageQueue
                                0x101c7b24, InterfaceTimedMessages::~InterfaceTimedMessages 0x101c8214
 
 A case is a world and an operation, built twice from one description: in emulator memory at the Mac's sizes for the original and through

@@ -1,5 +1,5 @@
 """Unit v5147, std::basic_streambuf<char>::xsgetn and xsputn, against libtpw_unit_std_basic_streambuf_xsgetn.dylib
-(tests/unit_std_basic_streambuf_xsgetn.cpp), main app, src/std_basic_streambuf_xsgetn.cpp:
+(tests/unit_std_basic_streambuf_xsgetn.cpp), main app, src/game/MslSupport.cpp:
   xsgetn 0x10070974, xsputn 0x10070808
 
 A case builds a streambuf object (get and put area pointers into a 128-byte block), a source or destination block and a call. The world is

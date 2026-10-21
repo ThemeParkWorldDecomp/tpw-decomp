@@ -1,5 +1,5 @@
 """Unit v5286, NewsPanelMsg and RemoveOnlineLoginPanel against libtpw_unit_NewsPanelMsg.dylib (tests/unit_NewsPanelMsg.cpp), main app,
-src/UI_IslandLobby_TextPanelMsg_NewsPanelMsg.cpp:
+src/game/ui/ui_onlineLogin.cpp, src/game/ui/ui_onlineNewsPanel.cpp:
   NewsPanelMsg 0x101e2f84, RemoveOnlineLoginPanel 0x101e2be4
 
 A case is a world and a call. UI_SendMessage, UIMain_DecideKbCapture, RemoveOnlineNewsPanel, DefaultDialogCallback and the glue

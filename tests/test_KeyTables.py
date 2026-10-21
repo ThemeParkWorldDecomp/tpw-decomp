@@ -1,4 +1,4 @@
-"""Differential tests for the key tables' KeyDown and KeyUp (src/keytables_keys.cpp, unit w50), against
+"""Differential tests for the key tables' KeyDown and KeyUp (src/game/keyboard.cpp, unit w50), against
 libtpw_unit_KeyTables.dylib (tests/unit_KeyTables.cpp).
 
   CKeyTable::KeyDown 0x1014fdec, CKeyTable::KeyUp 0x1014fef0

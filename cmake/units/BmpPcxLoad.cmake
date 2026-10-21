@@ -1,2 +1,62 @@
 # Unit w220: BMP and PCX readers and loaders, with the existing picture pipeline and recording fakes.
-set(TPW_UNIT_BmpPcxLoad src/Lbgfsave_bmppcx.cpp src/bfl_graphicfile.cpp src/TbPixFmt.cpp)
+set(TPW_UNIT_BmpPcxLoad src/bullfrog/AndyGLL.cpp src/bullfrog/Lbgfsave.cpp src/bullfrog/LbDrawText.cpp
+    src/bullfrog/TbRenderArea.cpp src/bullfrog/TbPixFmt.cpp)
+set(TPW_UNIT_BmpPcxLoad_KEEP
+  _TbPixFormat16
+  _TbPixFormat24
+  _TbPixFormat32
+  _TbPixFormat8
+  __Z21LbPalette_FromCompactP9TbPalettePKhj   # LbPalette_FromCompact(TbPalette*, unsigned char const*, unsigned int)
+  __ZN10TbMaskInfo3SetEjj   # TbMaskInfo::Set(unsigned int, unsigned int)
+  __ZN11TbBMPLoader10ValidImageERN3bfl10FileSystem5CFileE   # TbBMPLoader::ValidImage(bfl::FileSystem::CFile&)
+  __ZN11TbBMPLoader14ReadHeaderInfoERN3bfl10FileSystem5CFileER12TbRenderArea   # TbBMPLoader::ReadHeaderInfo(bfl::FileSystem::CFile&, TbRenderArea&)
+  __ZN11TbBMPLoader8ReadDataERK12TbRenderAreaRN3bfl10FileSystem5CFileERS0_   # TbBMPLoader::ReadData(TbRenderArea const&, bfl::FileSystem::CFile&, TbRenderArea&)
+  __ZN11TbBMPLoaderC1Ev   # TbBMPLoader::TbBMPLoader()
+  __ZN11TbBMPLoaderD1Ev   # TbBMPLoader::~TbBMPLoader()
+  __ZN11TbPCXLoader10ValidImageERN3bfl10FileSystem5CFileE   # TbPCXLoader::ValidImage(bfl::FileSystem::CFile&)
+  __ZN11TbPCXLoader14ReadHeaderInfoERN3bfl10FileSystem5CFileER12TbRenderArea   # TbPCXLoader::ReadHeaderInfo(bfl::FileSystem::CFile&, TbRenderArea&)
+  __ZN11TbPCXLoader8ReadDataERK12TbRenderAreaRN3bfl10FileSystem5CFileERS0_   # TbPCXLoader::ReadData(TbRenderArea const&, bfl::FileSystem::CFile&, TbRenderArea&)
+  __ZN11TbPCXLoaderC1Ev   # TbPCXLoader::TbPCXLoader()
+  __ZN11TbPCXLoaderD1Ev   # TbPCXLoader::~TbPCXLoader()
+  __ZN11TbPixelCaps3SetERK11TbPixFormat   # TbPixelCaps::Set(TbPixFormat const&)
+  __ZN11TbTGALoader10ValidImageERN3bfl10FileSystem5CFileE   # TbTGALoader::ValidImage(bfl::FileSystem::CFile&)
+  __ZN11TbTGALoader14ReadHeaderInfoERN3bfl10FileSystem5CFileER12TbRenderArea   # TbTGALoader::ReadHeaderInfo(bfl::FileSystem::CFile&, TbRenderArea&)
+  __ZN11TbTGALoader8ReadDataERK12TbRenderAreaRN3bfl10FileSystem5CFileERS0_   # TbTGALoader::ReadData(TbRenderArea const&, bfl::FileSystem::CFile&, TbRenderArea&)
+  __ZN11TbTGALoaderC1Ev   # TbTGALoader::TbTGALoader()
+  __ZN11TbTGALoaderD1Ev   # TbTGALoader::~TbTGALoader()
+  __ZN11_AndyBMPGLL10BMPLoadRLEERN3bfl10FileSystem5CFileE   # _AndyBMPGLL::BMPLoadRLE(bfl::FileSystem::CFile&)
+  __ZN11_AndyBMPGLL11sFileHeaderE   # _AndyBMPGLL::sFileHeader
+  __ZN11_AndyBMPGLL12ReadNextLineERN3bfl10FileSystem5CFileE   # _AndyBMPGLL::ReadNextLine(bfl::FileSystem::CFile&)
+  __ZN11_AndyBMPGLL13ReadFirstLineERN3bfl10FileSystem5CFileE   # _AndyBMPGLL::ReadFirstLine(bfl::FileSystem::CFile&)
+  __ZN11_AndyBMPGLL14ReadHeaderInfoERN3bfl10FileSystem5CFileEP11TbBMPLoader   # _AndyBMPGLL::ReadHeaderInfo(bfl::FileSystem::CFile&, TbBMPLoader*)
+  __ZN11_AndyBMPGLL19GetSourceLineLengthEv   # _AndyBMPGLL::GetSourceLineLength()
+  __ZN11_AndyBMPGLL8ReadDataERK12TbRenderAreaRN3bfl10FileSystem5CFileEP11TbBMPLoader   # _AndyBMPGLL::ReadData(TbRenderArea const&, bfl::FileSystem::CFile&, TbBMPLoader*)
+  __ZN11_AndyPCXGLL12ReadNextLineERN3bfl10FileSystem5CFileE   # _AndyPCXGLL::ReadNextLine(bfl::FileSystem::CFile&)
+  __ZN11_AndyPCXGLL13ReadFirstLineERN3bfl10FileSystem5CFileE   # _AndyPCXGLL::ReadFirstLine(bfl::FileSystem::CFile&)
+  __ZN11_AndyPCXGLL14ReadHeaderInfoERN3bfl10FileSystem5CFileEP11TbPCXLoader   # _AndyPCXGLL::ReadHeaderInfo(bfl::FileSystem::CFile&, TbPCXLoader*)
+  __ZN11_AndyPCXGLL19GetSourceLineLengthEv   # _AndyPCXGLL::GetSourceLineLength()
+  __ZN11_AndyPCXGLL8ReadDataERK12TbRenderAreaRN3bfl10FileSystem5CFileEP11TbPCXLoader   # _AndyPCXGLL::ReadData(TbRenderArea const&, bfl::FileSystem::CFile&, TbPCXLoader*)
+  __ZN12TbRenderArea10FreeMemoryEv   # TbRenderArea::FreeMemory()
+  __ZN12TbRenderArea11AllocMemoryEv   # TbRenderArea::AllocMemory()
+  __ZN12TbRenderAreaC1EPK9TbSurface   # TbRenderArea::TbRenderArea(TbSurface const*)
+  __ZN12TbRenderAreaC1ERK6TbSizeRK11TbPixFormatPhj   # TbRenderArea::TbRenderArea(TbSize const&, TbPixFormat const&, unsigned char*, unsigned int)
+  __ZN12TbRenderAreaC1Ev   # TbRenderArea::TbRenderArea()
+  __ZN19TbGraphicFileLoader10ReadHeaderEPKcS1_P12TbRenderArea   # TbGraphicFileLoader::ReadHeader(char const*, char const*, TbRenderArea*)
+  __ZN19TbGraphicFileLoader10ReadHeaderERN3bfl10FileSystem5CFileEP12TbRenderArea   # TbGraphicFileLoader::ReadHeader(bfl::FileSystem::CFile&, TbRenderArea*)
+  __ZN19TbGraphicFileLoader4LoadERK12TbRenderAreaPKcS4_PS0_   # TbGraphicFileLoader::Load(TbRenderArea const&, char const*, char const*, TbRenderArea*)
+  __ZN19TbGraphicFileLoader4LoadERK12TbRenderAreaRN3bfl10FileSystem5CFileEPS0_   # TbGraphicFileLoader::Load(TbRenderArea const&, bfl::FileSystem::CFile&, TbRenderArea*)
+  __ZN19TbGraphicFileLoader7IsValidERN3bfl10FileSystem5CFileE   # TbGraphicFileLoader::IsValid(bfl::FileSystem::CFile&)
+  __ZN3bfl10FileSystem15_TbBufferedFileD1Ev   # bfl::FileSystem::_TbBufferedFile::~_TbBufferedFile()
+  __ZN7_TgaGLL10TGALoadRLEERN3bfl10FileSystem5CFileE   # _TgaGLL::TGALoadRLE(bfl::FileSystem::CFile&)
+  __ZN7_TgaGLL12ReadNextLineERN3bfl10FileSystem5CFileE   # _TgaGLL::ReadNextLine(bfl::FileSystem::CFile&)
+  __ZN7_TgaGLL13ReadFirstLineERN3bfl10FileSystem5CFileE   # _TgaGLL::ReadFirstLine(bfl::FileSystem::CFile&)
+  __ZN7_TgaGLL14ReadHeaderInfoERN3bfl10FileSystem5CFileEP11TbTGALoader   # _TgaGLL::ReadHeaderInfo(bfl::FileSystem::CFile&, TbTGALoader*)
+  __ZN7_TgaGLL15ReverseScanLineEPh   # _TgaGLL::ReverseScanLine(unsigned char*)
+  __ZN7_TgaGLL19GetSourceLineLengthEv   # _TgaGLL::GetSourceLineLength()
+  __ZN7_TgaGLL8ReadDataERK12TbRenderAreaRN3bfl10FileSystem5CFileEP11TbTGALoader   # _TgaGLL::ReadData(TbRenderArea const&, bfl::FileSystem::CFile&, TbTGALoader*)
+  __ZN8_AndyGLL6DoReadERK12TbRenderAreaRN3bfl10FileSystem5CFileEP19TbGraphicFileLoader   # _AndyGLL::DoRead(TbRenderArea const&, bfl::FileSystem::CFile&, TbGraphicFileLoader*)
+  __ZN8_AndyGLL9WriteLineEv   # _AndyGLL::WriteLine()
+  __ZNK12TbRenderArea10GetMemSizeEv   # TbRenderArea::GetMemSize() const
+  __ZNK12TbRenderArea13SetupClientRAERS_RK6TbRect   # TbRenderArea::SetupClientRA(TbRenderArea&, TbRect const&) const
+  __ZNK12TbRenderArea13SetupClientRAERS_RK7TbPointRK6TbSize   # TbRenderArea::SetupClientRA(TbRenderArea&, TbPoint const&, TbSize const&) const
+)

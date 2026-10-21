@@ -1,5 +1,5 @@
 // Test library for the collision object tests (unit v5367; libtpw_unit_PointInColObject.dylib, tests/test_PointInColObject.py), main app:
-//   src/BMP_InsideArea_PointOutAllInverse_PointInColObject.cpp   PointInColObject, DoAreasIntersect, ClosestIntersectingColObjectToPoint
+//   src/game/rides/BumperRide.cpp   PointInColObject, DoAreasIntersect, ClosestIntersectingColObjectToPoint
 //
 // PointOutAllInverse is a fake recording its arguments and answering from the queue "PointOut". gColList (main app data) is defined here.
 #include <cstddef>

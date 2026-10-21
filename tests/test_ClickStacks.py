@@ -1,7 +1,7 @@
 """Unit w204, the click stacks of the queue and track tools, against libtpw_unit_ClickStacks.dylib (tests/unit_ClickStacks.cpp), main app
-("SimTheme Park"): src/LLCellSystem_clickstacks.cpp (LLCC_SystemBacktrack 0x10092280, LLCC_SystemConstructQueueClickStack 0x10092644,
-LLCC_SystemConstructTrackClickStack 0x10092e44, LLCC_SystemConstructReverseTrackClickStack 0x10093280), src/TrackCell_shape.cpp (IsStraight
-0x100a3868, IsCrossRoad 0x100a3914), src/MapCell_corner.cpp (CMapCell::IsCorner 0x1009c7fc) and src/LLCellRide_offsets.cpp (LLCR_OffsetStartOfTrack
+("SimTheme Park"): src/game/park/LLCellSystem.cpp (LLCC_SystemBacktrack 0x10092280, LLCC_SystemConstructQueueClickStack 0x10092644,
+LLCC_SystemConstructTrackClickStack 0x10092e44, LLCC_SystemConstructReverseTrackClickStack 0x10093280), src/game/park/TrackCell.cpp (IsStraight
+0x100a3868, IsCrossRoad 0x100a3914), src/game/park/MapCell.cpp (CMapCell::IsCorner 0x1009c7fc) and src/game/park/LLCellRide.cpp (LLCR_OffsetStartOfTrack
 0x1008c620, LLCR_OffsetEndOfTrack 0x1008c6d8).
 
 A case is a world block (the map cells at world + 0x2d8, 0x44 each; the track cells at world + 0x1102d8, 0x28 each; the first 40 rows of both

@@ -1,6 +1,6 @@
 // Test library for the tag system's text formatter (unit v5626; libtpw_unit_CTagSystem_FormatTagText.dylib,
 // tests/test_CTagSystem_FormatTagText.py), main app:
-//   src/ThingLoop_CTagSystem_FormatTagText.cpp   CTagSystem::FormatTagText, gTagNoThingId, gTagNoRideType
+//   src/game/Thing.cpp   CTagSystem::FormatTagText, gTagNoThingId, gTagNoRideType
 //
 // The callees outside the unit are fakes that record what the real one reads and answer from the test's queues:
 // TbITable::FormatString (the table, the buffer, the size, the text id, then each tag it takes: as many as the queue

@@ -1,5 +1,5 @@
 """Unit w187, against libtpw_unit_Mechanic.dylib (tests/unit_Mechanic.cpp), main app ("SimTheme Park"):
-  src/Mechanic.cpp   CMechanic::CMechanic (cell) 0x1010409c and (cell, grade, flag, name) 0x10104170, Init 0x10104284, FinalDestroy 0x101043b0,
+  src/game/people/mechanic.cpp   CMechanic::CMechanic (cell) 0x1010409c and (cell, grade, flag, name) 0x10104170, Init 0x10104284, FinalDestroy 0x101043b0,
                      ReceiveMessage 0x10104508, Serialise 0x101045e8, SetState 0x1010478c, ModelState 0x10104928, UpdateTurn 0x101049e0,
                      ChooseNextAction 0x10104a30, ProcessPatrolling 0x10104ca4, ProcessWalkingToBreakdown 0x10104d64, ProcessRepairing 0x10104fd4,
                      ProcessIdle 0x10105114, __sinit_mechanic_cpp 0x101051d8

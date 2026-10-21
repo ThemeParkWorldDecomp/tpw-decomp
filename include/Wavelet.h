@@ -61,8 +61,8 @@ extern float gSineTable[256];   // engine data 0x101731c0 (not exported; name in
 // (CWaveletImp, 0x18 bytes on the Mac: +0 the pointer to the CWavelet at +0x10, +4 the
 // vtable). The engine keeps one instance; Instance() makes it on first use and counts a
 // reference each time. The version 0x13 decoder and the two dispatching overloads are in
-// src/Wavelet_decode.cpp, the version 0x12 decoder in src/Wavelet_decode_v12.cpp, and the
-// fast decoders and their transforms in src/Wavelet_fast.cpp (0x10039894..0x1003b0d4).
+// src/engine/Wavelet.cpp, src/engine/EngineUtil.cpp, the version 0x12 decoder in src/engine/Wavelet.cpp, and the
+// fast decoders and their transforms in src/engine/Wavelet.cpp (0x10039894..0x1003b0d4).
 class CWavelet {
 public:
     virtual int32_t Decompress(uint32_t width, uint32_t height, bool colour, const uint8_t* source, uint8_t* dest,
@@ -118,7 +118,7 @@ private:
     void ConvertAndBlend(uint32_t width, uint32_t height, uint32_t stride, uint8_t* dest);     // 0x1003af4c
 };
 
-// ---- The version 0x13 decoder's statics (src/Wavelet_decode.cpp; none has a symbol, the
+// ---- The version 0x13 decoder's statics (src/engine/Wavelet.cpp, src/engine/EngineUtil.cpp; none has a symbol, the
 // names are invented) ---------------------------------------------------------------------
 // Five planes of 256 x 256 floats, contiguous in engine data from 0x10173614 in this order;
 // the fast decoders share them through the same TOC entries (0x1004fb24, 0x1004fb3c,

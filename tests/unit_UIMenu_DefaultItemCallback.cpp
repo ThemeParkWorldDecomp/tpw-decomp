@@ -1,5 +1,5 @@
 // Test library for UIMenu_DefaultItemCallback and UIMenu_DefaultCallback (unit v5575), main app:
-//   src/InterfaceWindow_virtuals_UIMenu_DefaultItemCallback.cpp
+//   src/game/ui/UIMenu.cpp
 // The callees are recording fakes.
 #include <cstddef>
 #include <cstdint>

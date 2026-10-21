@@ -1,10 +1,10 @@
 """The walk planner (unit w196), against libtpw_unit_WallhugPlanner.dylib (tests/unit_WallhugPlanner.cpp), main app ("SimTheme Park"),
-src/World_wallhug.cpp:
+src/game/park/LineOfSight.cpp:
   wallhug_continue_trivial 0x10136f04, wallhug_trivial 0x10137d04
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for
 the original, and in the host library's memory (little-endian) for the translation. Real on both sides: the planner's two functions and w195's
-bresenham_start, line_of_sight and line_of_sight_cleanup (src/World_sight.cpp on the host, the original code on the PowerPC side). Fakes on both
+bresenham_start, line_of_sight and line_of_sight_cleanup (src/game/park/LineOfSight.cpp on the host, the original code on the PowerPC side). Fakes on both
 sides that record every argument: MAP_wall_in_way 0x10101ca4 (answers from the case's WALL TABLE: a fill mask for every square plus single
 squares' masks; bit d of a mask is a wall in direction d; bit 8 of the fill word silences the wall calls in the log for the long walks, the log
 holds 4096 events) and SamsUtilities::UDebug 0x10000e40. labs and abs are Python's.

@@ -1,9 +1,9 @@
 // Fakes and test entry points for unit w74, the park sound wrappers (libtpw_unit_SoundPark.dylib, driven by
 // tests/test_SoundPark.py; see calllog.h):
-//   src/SoundPark.cpp  SND_DipMusic 0x100deb04, SND_StartParkMusic 0x100deb40, SND_StopParkMusic 0x100debd4, SND_SetParkMusicLevel
+//   src/game/Sound.cpp, src/game/park/ParkSound.cpp  SND_DipMusic 0x100deb04, SND_StartParkMusic 0x100deb40, SND_StopParkMusic 0x100debd4, SND_SetParkMusicLevel
 //                      0x100dec30, SND_SetChatterLevel 0x100dec9c, SND_SetChatterOnOff 0x100deda4, SND_SetRainLevel 0x100dee84,
 //                      SND_SendIndirectedEvent 0x100df858, SOUND_SaveStatus 0x100de1a0, SOUND_LoadStatus 0x100de48c
-//   src/TPSound.cpp    the state (gSoundSettings, the flags, the banks)
+//   src/game/Sound.cpp, src/game/park/ParkSound.cpp    the state (gSoundSettings, the flags, the banks)
 // Fakes, each recording what the original's callee would be given (the PowerPC side records the same from its stubs): the runtime
 // wrappers SOUND_SendEvent, SOUND_SetParamValue and SOUND_FadeSoundEffect (the queues "Event" and "Param" are their answers),
 // RSSE_GetSoundEventCode (the queue "Code"), LbFile_Read/Write/Seek over one file the case sets up (a byte string and a position;

@@ -1,5 +1,5 @@
 // Test entry point for the texture cache's packing (library unit_TexturePack:
-// src/tb_texturecache_pack.cpp): CTextureCache::ArrangeNonwrappingTextures and PackTextures.
+// src/engine/TextureCache.cpp): CTextureCache::ArrangeNonwrappingTextures and PackTextures.
 //
 // A case is one call on a world that tests/test_TexturePack.py describes as a flat list of
 // numbers (the order is World below): a few globals, the cache's scalars and page counts, 24

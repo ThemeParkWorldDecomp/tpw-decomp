@@ -1,5 +1,5 @@
 """Unit v5333, CoasterPanelEndTrack, against libtpw_unit_CoasterPanelEndTrack.dylib (tests/unit_CoasterPanelEndTrack.cpp), main app
-("SimTheme Park"), src/ui_entryPricePanel_CoasterPanelEndTrack.cpp:
+("SimTheme Park"), src/game/ui/ui_coasterPanel.cpp:
   CoasterPanelEndTrack 0x1019c158
 
 A case is a world and a call. Callees outside the unit are fakes on both sides that record their events: operator new (size), the

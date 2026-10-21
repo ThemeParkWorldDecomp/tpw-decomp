@@ -1,4 +1,4 @@
-// Test library for __sinit_Colour_cpp (unit v5L21): the 13 records of src/bfl_Colour.cpp, six words each, in address order.
+// Test library for __sinit_Colour_cpp (unit v5L21): the 13 records of src/bullfrog/Colour.cpp, six words each, in address order.
 #include <cstdint>
 
 #include "TbPixFmt.h"

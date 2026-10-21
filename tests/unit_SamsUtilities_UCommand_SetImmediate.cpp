@@ -1,6 +1,6 @@
 // Test library for the small Sound Sprockets pieces of CSprocketsModule.cpp (unit v51107; libtpw_unit_SamsUtilities_UCommand_SetImmediate.dylib,
 // tests/test_SamsUtilities_UCommand_SetImmediate.py), main app:
-//   src/TbAudioBody_create_SamsUtilities_UCommand_SetImmediate.cpp   the flag helpers, the command constructors, the channel accessors, ...
+//   src/sound/CSprocketsModule.cpp, src/sound/SprocketsChannel.cpp   the flag helpers, the command constructors, the channel accessors, ...
 //
 // Callees outside the unit: UManager<UAllocator>::Allocate and the base destructor TbSoundSystemModule::~TbSoundSystemModule are recording
 // fakes. The base class's other virtuals are empty definitions here so that CSprocketsModule's vtable links.

@@ -1,5 +1,5 @@
 // Test library for NewPylon and UpdatePylonStackMeshes (unit v5091; libtpw_unit_NewPylon.dylib, tests/test_NewPylon.py), main app:
-//   src/TPCoaster_loaders_NewPylon.cpp   NewPylon, UpdatePylonStackMeshes and the global gPylonStackSkip
+//   src/game/rides/CoasterPylon.cpp   NewPylon, UpdatePylonStackMeshes and the global gPylonStackSkip
 //
 // The callees outside the unit are recording fakes (MReleaseAllocF, GetRideRequiredYOffset, FloatToCell, FlagCollisionUpdateTrackAroundBrace,
 // AnimateRideSet, DoMeshSkirtDeform); the globals of other files are defined here, zero at start like the Mac's bss.

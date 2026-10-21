@@ -1,5 +1,5 @@
 """Unit v5575, the menu callbacks, against libtpw_unit_UIMenu_DefaultItemCallback.dylib, main app,
-src/InterfaceWindow_virtuals_UIMenu_DefaultItemCallback.cpp:
+src/game/ui/UIMenu.cpp:
   UIMenu_DefaultItemCallback 0x1018aa48, UIMenu_DefaultCallback 0x1018ab78
 
 Callees (getExtraParam, ReleaseString, UIMain_UISound, GetID, GetParent, UI_SendMessage, CallDefaultWindowHandler) are fakes on

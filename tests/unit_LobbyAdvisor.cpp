@@ -1,4 +1,4 @@
-// Test library for src/lobby_advisor.cpp (libtpw_unit_LobbyAdvisor.dylib; see
+// Test library for src/game/online/LBScreenComponentAdvisor.cpp (libtpw_unit_LobbyAdvisor.dylib; see
 // tests/test_LobbyAdvisor.py): the lobby's advisor screen, driven by scripts over two such
 // screens (the timeout line goes to the screen system's advisor, which the test can make
 // the other one).

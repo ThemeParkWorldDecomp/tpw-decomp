@@ -1,5 +1,5 @@
 """Unit v5888, CThoughts (thought bubble and event history), against libtpw_unit_CThoughts_Serialise.dylib
-(tests/unit_CThoughts_Serialise.cpp), main app ("SimTheme Park"), src/MsgDeath_CThoughts_Serialise.cpp:
+(tests/unit_CThoughts_Serialise.cpp), main app ("SimTheme Park"), src/game/people/Thoughts.cpp:
   Serialise 0x1012ede4, CThoughts 0x1012ec88, ProcessThoughtBubbles 0x1012f058, ShowThoughtBubble 0x1012f0d8,
   RemoveThoughtBubble 0x1012f35c, RecordEvent 0x1012f3d4, GetRecentEvent 0x1012f4ec
 

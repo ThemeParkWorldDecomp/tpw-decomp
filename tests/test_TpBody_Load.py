@@ -1,6 +1,6 @@
 """Unit v51014: TpBody::Load 0x1002e6ec, TpBody::Save 0x1002e57c, the Sound Sprockets command constructors (SpeakerType 0x1002d7cc,
 Volume 0x1002cdcc, ListenerScale 0x1002b788, CPULoad 0x1002b700, SoundType 0x1002b158) and UReferenceCounted::RemoveReference 0x1002af28,
-against libtpw_unit_TpBody_Load.dylib (tests/unit_TpBody_Load.cpp), src/TbSysCommand_TpBody_Load.cpp.
+against libtpw_unit_TpBody_Load.dylib (tests/unit_TpBody_Load.cpp), src/sound/CSprocketsModule.cpp, src/sound/SprocketsChannel.cpp, src/sound/TpBody.cpp.
 
 A case is a world and a call, built on both sides: a body (list pointer at +0x28), a fake file whose Read/Write/Seek (the glue
 0x1002f154 / 0x1002f07c on the Mac, told apart by the vtable slot in r12) record their arguments, a fake list (Load/Save record),

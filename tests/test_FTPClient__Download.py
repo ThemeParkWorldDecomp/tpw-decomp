@@ -1,5 +1,5 @@
 """Unit v5227, FTPClient::_Connect and FTPClient::_Download, against libtpw_unit_FTPClient__Download.dylib
-(tests/unit_FTPClient__Download.cpp), main app ("SimTheme Park"), src/FTPClient_RecvData_FTPClient__Download.cpp:
+(tests/unit_FTPClient__Download.cpp), main app ("SimTheme Park"), src/game/online/FTPClient.cpp:
   FTPClient::_Connect 0x1020bbe8, FTPClient::_Download 0x1020c228
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's offsets (big-endian)

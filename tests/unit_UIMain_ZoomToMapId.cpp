@@ -1,5 +1,5 @@
 // Test library for seven small ui_main functions (unit v5723; libtpw_unit_UIMain_ZoomToMapId.dylib, tests/test_UIMain_ZoomToMapId.py), main app:
-//   src/ui_main_kbcapture_UIMain_ShowRidePreview_UIMain_GotoStatusPanelForThing_UIMain_ZoomToMapId.cpp
+//   src/game/ui/ui_main.cpp
 //
 // The callees outside the unit (SetCameraPOI, CPeep::GetInterpolatedPeepPosition, SCR_KillScript, ESP_Update2DScript, PAR_InitEmitter,
 // DestroyRidePreview, InterfaceWindow::GetVisibility / GetPosition, CoolRect and CoolRegion, UKeyboard) are recording fakes. The globals of other

@@ -1,5 +1,5 @@
 // Test library for the online outbox panel (unit v5096; libtpw_unit_LCPostFormat_2.dylib, tests/test_LCPostFormat_2.py), main app:
-//   src/LCPostFormat_2.cpp   OutboxLCFormat 0x101e4bdc, OutboxLCPostFormat 0x101e4d20, CreateOnlineOutboxPanel 0x101e4f28
+//   src/game/ui/ui_onlineOutbox.cpp   OutboxLCFormat 0x101e4bdc, OutboxLCPostFormat 0x101e4d20, CreateOnlineOutboxPanel 0x101e4f28
 //
 // Every callee outside the unit is a fake that records what the real one reads (windows are plain numbers the fakes make up, never
 // dereferenced; the objects the code makes are labelled by their constructor fakes). The globals of other files are defined here.

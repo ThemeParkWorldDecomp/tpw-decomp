@@ -1,5 +1,5 @@
 """CMesh's per-frame members and two small engine functions (engine library;
-src/tb_mesh_frame.cpp): CMesh::Prepare 0x1001df78, Preprocess 0x1001dccc, PreprocessTextures
+src/engine/DirectDraw.cpp, src/engine/Mesh.cpp, src/engine/RenderList.cpp): CMesh::Prepare 0x1001df78, Preprocess 0x1001dccc, PreprocessTextures
 0x1001db1c, StaticCalculateLights 0x1001e26c, ColorVertices 0x10003570 and DotProduct
 0x10025cac.
 

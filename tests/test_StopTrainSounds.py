@@ -1,5 +1,5 @@
 """Unit v5728, StopTrainSounds and RestoreCoasterSounds, against libtpw_unit_StopTrainSounds.dylib (tests/unit_StopTrainSounds.cpp), main app
-("SimTheme Park"), src/TPConfig_bend_StopTrainSounds.cpp:
+("SimTheme Park"), src/game/rides/CoasterSounds.cpp:
   StopTrainSounds 0x100471bc, RestoreCoasterSounds 0x100472c4
 
 A case is a world and a call. The world is built twice by one piece of Python code: in emulator memory at the Mac's addresses (big-endian)

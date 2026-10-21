@@ -1,5 +1,5 @@
 // Test library for the staff member, part 1 (unit w189; libtpw_unit_Staff.dylib, tests/test_Staff.py), main app:
-//   src/Staff.cpp   CStaff (both constructors, Init, FinalDestroy, ReceiveMessage, Serialise, UpdateTurn, SetState, ModelState, UpdateMonthly), the
+//   src/game/people/staff.cpp   CStaff (both constructors, Init, FinalDestroy, ReceiveMessage, Serialise, UpdateTurn, SetState, ModelState, UpdateMonthly), the
 //                   four PayGrade / StaffState serialise instances, CMsgStaffRoomEvent's destructor and GetType, and the two words of the static initialiser
 //
 // The callees outside it are fakes that record the same events as the PowerPC stubs: the CPeep members, the thoughts, the delayed script, the seven
@@ -107,7 +107,7 @@ std::string Hex(const void* data, uint32_t length) {
 
 // Test-only key function of CMsgRideDeleted (the Mac's is 0x10110f34); TestMessage overrides GetType.
 int32_t CMsgRideDeleted::GetType() const { return 10; }
-// The destructor the vtable names (the Mac's is 0x10107b28, in src/ThingMessages2.cpp).
+// The destructor the vtable names (the Mac's is 0x10107b28, in src/game/Object.cpp).
 CMsgRideDeleted::~CMsgRideDeleted() {}
 
 // ---- the message centre: Subscribe, the 29 headers (the first stands for __construct_array's call) and the nothrow operator new

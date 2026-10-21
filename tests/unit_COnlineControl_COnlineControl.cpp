@@ -1,6 +1,6 @@
 // Test library for the online client's object (unit v5016; libtpw_unit_COnlineControl_COnlineControl.dylib,
 // tests/test_COnlineControl_COnlineControl.py), main app:
-//   src/COnlineControl_COnlineControl.cpp   COnlineControl::COnlineControl, ~COnlineControl, InitClient, InitGameWorld
+//   src/game/online/online.cpp   COnlineControl::COnlineControl, ~COnlineControl, InitClient, InitGameWorld
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue: the string,
 // deque, set, mutex and chat library, the online system's getters, the mouse modes, the map's entrance and TeleportAvatar. The globals of

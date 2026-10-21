@@ -1,5 +1,5 @@
 // Test library for bthread_mutex::~bthread_mutex (unit v5120; libtpw_unit_bthread_mutex_Dtor_bthread_mutex.dylib), main app:
-//   src/email_bthread_mutex_Dtor_bthread_mutex.cpp   bthread_mutex::Destroy
+//   src/game/online/email.cpp   bthread_mutex::Destroy
 //
 // DeleteCriticalSection and operator delete are recording fakes (the delete does not free: the blocks come from the arena).
 #include <cstddef>

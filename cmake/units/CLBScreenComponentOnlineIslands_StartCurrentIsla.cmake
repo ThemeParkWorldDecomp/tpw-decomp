@@ -1,3 +1,26 @@
-# Unit v51106: the online islands' small members and the globes' panel members (src/CLBScreenComponentOnlineIslands_GotoNextIsland_CLBScreenComponentOnlineIslands_StartCurrentIsla.cpp).
+# Unit v51106: the online islands' small members and the globes' panel members (src/game/online/lobby_globe.cpp, src/game/online/lobby_island.cpp).
 # The callees outside the unit are recording fakes in tests/unit_CLBScreenComponentOnlineIslands_StartCurrentIsla.cpp, which also defines the globals of other files.
-set(TPW_UNIT_CLBScreenComponentOnlineIslands_StartCurrentIsla src/CLBScreenComponentOnlineIslands_GotoNextIsland_CLBScreenComponentOnlineIslands_StartCurrentIsla.cpp platform/arena.cpp)
+set(TPW_UNIT_CLBScreenComponentOnlineIslands_StartCurrentIsla src/game/online/lobby_globe.cpp
+    src/game/online/lobby_island.cpp platform/arena.cpp)
+set(TPW_UNIT_CLBScreenComponentOnlineIslands_StartCurrentIsla_KEEP
+  __ZN25CLBScreenComponentIslands23WindowMessagesFnIslandsEiii   # CLBScreenComponentIslands::WindowMessagesFnIslands(int, int, int)
+  __ZN29CLBScreenComponentOnlineGlobe8RegisterEP16CLBGlobeCityFlag   # CLBScreenComponentOnlineGlobe::Register(CLBGlobeCityFlag*)
+  __ZN30CLBScreenComponentPublishGlobe10HidePanelsEv   # CLBScreenComponentPublishGlobe::HidePanels()
+  __ZN30CLBScreenComponentPublishGlobe10ShowPanelsEv   # CLBScreenComponentPublishGlobe::ShowPanels()
+  __ZN30CLBScreenComponentPublishGlobe11IsCityValidEPK13CFSOnlineCity   # CLBScreenComponentPublishGlobe::IsCityValid(CFSOnlineCity const*)
+  __ZN30CLBScreenComponentPublishGlobe4TickEv   # CLBScreenComponentPublishGlobe::Tick()
+  __ZN30CLBScreenComponentPublishGlobeD1Ev   # CLBScreenComponentPublishGlobe::~CLBScreenComponentPublishGlobe()
+  __ZN31CLBScreenComponentDownloadGlobe10HidePanelsEv   # CLBScreenComponentDownloadGlobe::HidePanels()
+  __ZN31CLBScreenComponentDownloadGlobe10ShowPanelsEv   # CLBScreenComponentDownloadGlobe::ShowPanels()
+  __ZN31CLBScreenComponentDownloadGlobe11IsCityValidEPK13CFSOnlineCity   # CLBScreenComponentDownloadGlobe::IsCityValid(CFSOnlineCity const*)
+  __ZN31CLBScreenComponentDownloadGlobe4TickEv   # CLBScreenComponentDownloadGlobe::Tick()
+  __ZN31CLBScreenComponentOnlineIslands10HidePanelsEv   # CLBScreenComponentOnlineIslands::HidePanels()
+  __ZN31CLBScreenComponentOnlineIslands10ShowPanelsEv   # CLBScreenComponentOnlineIslands::ShowPanels()
+  __ZN31CLBScreenComponentOnlineIslands16SetCurrentIslandEPK9CLBIsland   # CLBScreenComponentOnlineIslands::SetCurrentIsland(CLBIsland const*)
+  __ZN31CLBScreenComponentOnlineIslands16WindowMessagesFnEiii   # CLBScreenComponentOnlineIslands::WindowMessagesFn(int, int, int)
+  __ZN31CLBScreenComponentOnlineIslands18GotoPreviousIslandEv   # CLBScreenComponentOnlineIslands::GotoPreviousIsland()
+  __ZN31CLBScreenComponentOnlineIslands20ShowInfoOverlayPanelEv   # CLBScreenComponentOnlineIslands::ShowInfoOverlayPanel()
+  __ZN31CLBScreenComponentOnlineIslands22StartCurrentIslandZoomEv   # CLBScreenComponentOnlineIslands::StartCurrentIslandZoom()
+  __ZN31CLBScreenComponentOnlineIslands4HideEv   # CLBScreenComponentOnlineIslands::Hide()
+  __ZN31CLBScreenComponentOnlineIslandsD1Ev   # CLBScreenComponentOnlineIslands::~CLBScreenComponentOnlineIslands()
+)

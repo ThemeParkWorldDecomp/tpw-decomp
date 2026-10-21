@@ -1,4 +1,4 @@
-"""Differential test for unit w133 (src/LevelLights_tick.cpp, Debug_overlays.cpp, Debug_blendflags.cpp, LLCellSystem_hoarding.cpp,
+"""Differential test for unit w133 (src/game/TPLevel.cpp, Debug_overlays.cpp, Debug_blendflags.cpp, LLCellSystem_hoarding.cpp,
 intrface_pointed.cpp, hlsprite_zone.cpp, ActionRecorder.cpp): TickLevelLights, TickFlashObjects, TickRideHighlights, SetBaseBlendFlags,
 LLCC_DrawInitialHoarding, CIntrface::DoPointedThingComputations, FLY_SetFlyZone, CActionRecorder::DoTick and ResetActionRecording,
 against libtpw_unit_ParkTicks.dylib (tests/unit_ParkTicks.cpp is the host's half).

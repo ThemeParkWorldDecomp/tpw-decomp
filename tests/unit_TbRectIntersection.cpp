@@ -1,4 +1,4 @@
-// Test entry point for TbRect::Intersection (src/bfl_tbrect.cpp, libtpw_unit_TbRectIntersection.dylib; see
+// Test entry point for TbRect::Intersection (src/bullfrog/LbRect.cpp, libtpw_unit_TbRectIntersection.dylib; see
 // tests/test_TbRectIntersection.py). The function calls nothing.
 #include <cstdint>
 

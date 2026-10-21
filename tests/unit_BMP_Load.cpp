@@ -1,6 +1,6 @@
 // Test library for the advisor load (unit v5L09; libtpw_unit_BMP_Load.dylib, tests/test_BMP_Load.py), main app:
-//   src/BMP_Load.cpp   BMP_Load
-// with the chunk reader of unit v51017 (src/host_leaves_Write_BumpToChunk_BMP_Save_Read_BumpFromChunk.cpp) as the original runs it.
+//   src/game/rides/BumperRide.cpp   BMP_Load
+// with the chunk reader of unit v51017 (src/game/rides/BumperRide.cpp) as the original runs it.
 //
 // The callees outside the unit are recording fakes answering from the test's queues. The file functions share one byte stream
 // (the test sets it): BMPFile_Read copies from it (a 4-byte read at a position the test marks fails), LbFile_GetPosition answers

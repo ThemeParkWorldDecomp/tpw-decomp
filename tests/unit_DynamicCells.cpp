@@ -1,6 +1,6 @@
 // Test library for the dynamic cell meshes in the frame (unit w120; libtpw_unit_DynamicCells.dylib, tests/test_DynamicCells.py), main app:
-//   src/DynamicCells.cpp   DC_TickDynamicCellMeshes, CDynamicMesh::DrawAll, CDynamicMesh::DC_CreatePolyFace (and the three arrays it defines)
-//   src/LLCellMeshes.cpp   LLCCM_CreateQMesh, LLCCM_CreateKTrackMesh, LLCCM_CreateWTrackMesh, LLCCM_CreateHoardingMesh
+//   src/game/park/DynamicCell.cpp   DC_TickDynamicCellMeshes, CDynamicMesh::DrawAll, CDynamicMesh::DC_CreatePolyFace (and the three arrays it defines)
+//   src/game/park/LLCellMouse.cpp   LLCCM_CreateQMesh, LLCCM_CreateKTrackMesh, LLCCM_CreateWTrackMesh, LLCCM_CreateHoardingMesh
 //
 // Every callee outside the two files is a fake that records the same event on both sides: CClock::GetPauseFlag, CVariableTime::GetTimeRate,
 // CDynamicMesh::DC_CreateSquareFace and DC_SetVertex (both advance the mesh's counters by the amounts the case's queues say), HDZ_RotatePointZ

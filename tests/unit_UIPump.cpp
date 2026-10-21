@@ -1,8 +1,8 @@
-// Test library for the interface's message pump (libtpw_unit_UIPump.dylib; see tests/test_UIPump.py): src/UI_pump.cpp
+// Test library for the interface's message pump (libtpw_unit_UIPump.dylib; see tests/test_UIPump.py): src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/UIInterface.cpp, src/game/ui/UI_Base.cpp, src/game/ui/ui_ErrorDisplay.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_main.cpp
 // (UIInterface::Process, ProcessUI, the dispatch, onframe, the queues' Post and Peek, the timers, the window accessors,
-// TickUIErrors), and under it the real src/UI_init.cpp (the queues' Add and Flush, UI_PostMessage, UI_FlushAllMessages),
-// src/InterfaceWindow.cpp (the window constructor), src/UI_Base.cpp (rectangles), src/UI_focus.cpp (the globals) and
-// src/ui_DrawObject.cpp.
+// TickUIErrors), and under it the real src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp (the queues' Add and Flush, UI_PostMessage, UI_FlushAllMessages),
+// src/game/ui/InterfaceWindow.cpp (the window constructor), src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp (rectangles), src/game/ui/UI_Base.cpp (the globals) and
+// src/game/ui/InterfaceCursor.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceDrawObject.cpp.
 //
 // Everything else the unit calls is a fake that records through calllog: the window handlers (four of them, which also do
 // what the case's script says: destroy a window, unlink one, post, flush), the peek callbacks, the clock, highestZ,
@@ -190,7 +190,7 @@ void InterfaceHelpText::OnMouseMovedOut() {}
 void InterfaceHelpText::OnMouseDown() {}
 void InterfaceHelpText::OnFrame() {}
 void InterfaceHelpText::OnHideOrDelete(InterfaceWindow*) {}
-// The constructor and the two virtuals unit w36 added to the class (src/ui_helptext.cpp; the vtable must link here too).
+// The constructor and the two virtuals unit w36 added to the class (src/game/ui/InterfaceHelpText.cpp; the vtable must link here too).
 InterfaceHelpText::InterfaceHelpText() {}
 void InterfaceHelpText::Init() {}
 void InterfaceHelpText::DeInit() {}

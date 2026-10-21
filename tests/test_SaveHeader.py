@@ -1,6 +1,6 @@
 """Differential tests for the save file header (unit w114), against libtpw_unit_SaveHeader.dylib (tests/unit_SaveHeader.cpp):
 
-  src/SaveLoadHeader.cpp  CSaveLoad::LoadHeader 0x10159e50, CSaveLoadHeader::Serialise 0x1015b8b0 and the static initialisation of
+  src/game/park/SkyObjects.cpp, src/game/save/SaveLoad.cpp  CSaveLoad::LoadHeader 0x10159e50, CSaveLoadHeader::Serialise 0x1015b8b0 and the static initialisation of
                           SaveLoad.cpp (__sinit_SaveLoad_cpp 0x1015b484: the seven legal texts and four words of gSaveLoad)
 
 LoadHeader and Serialise run as the original on the PowerPC side. What they call is a fake that records the same event on both sides:

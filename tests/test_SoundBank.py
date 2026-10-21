@@ -1,6 +1,6 @@
 """Unit w72, the sound library's sample banks, against libtpw_unit_SoundBank.dylib (tests/unit_SoundBank.cpp), in the program
 "sound symbols shared" (the Mac's sound library, Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/TbSoundBank.cpp   TbBank 0x100088a8 (ctor), 0x10008c28 (dtor), GetNumberOfSamples 0x10008ac0, GetSampleLength 0x100089bc,
+  src/sound/Bank.cpp, src/sound/ListSentence.cpp, src/sound/TbBank.cpp, src/sound/TbMMFileBank.cpp, src/sound/TbSoundBankInfo.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundSampleInfo.cpp   TbBank 0x100088a8 (ctor), 0x10008c28 (dtor), GetNumberOfSamples 0x10008ac0, GetSampleLength 0x100089bc,
                         GetSampleName 0x10008af8, GetSamplePosition 0x10008b2c, GetHandle 0x10008b64, IsStreaming 0x10008b94,
                         Initialise 0x10008bc8; CRefManager 0x10008940 and 0x10000ec0; TbFileBank 0x10008cc0 0x10008e0c 0x10008e94
                         0x100090cc 0x10009108 0x10009144; TbMMFileBank 0x100091f4 0x100095d0 0x100096c8 0x10009780 0x100097bc

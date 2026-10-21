@@ -1,3 +1,17 @@
-# Unit v5892: twelve advisor scorers (src/AdvisorScoring_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2.cpp). The callees outside the unit are
+# Unit v5892: twelve advisor scorers (src/game/advisor/AdvisorScoring.cpp). The callees outside the unit are
 # recording fakes in tests/unit_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2.cpp, which also defines the globals of other files.
-set(TPW_UNIT_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2 src/AdvisorScoring_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2.cpp platform/arena.cpp)
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2 src/game/advisor/AdvisorScoring.cpp platform/arena.cpp)
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_GOLD_TICKET_NEAR_TO_XHA_2_KEEP
+  __ZN15CAdvisorScoring25_ADVISOR_CONGRAT_BALLOONSEv   # CAdvisorScoring::_ADVISOR_CONGRAT_BALLOONS()
+  __ZN15CAdvisorScoring28_ADVISOR_CONGRAT_STAFF_HAPPYEv   # CAdvisorScoring::_ADVISOR_CONGRAT_STAFF_HAPPY()
+  __ZN15CAdvisorScoring28_ADVISOR_VISITORS_TOO_SCAREDEv   # CAdvisorScoring::_ADVISOR_VISITORS_TOO_SCARED()
+  __ZN15CAdvisorScoring29_ADVISOR_CONGRAT_PUBLISH_PARKEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PUBLISH_PARK()
+  __ZN15CAdvisorScoring30_ADVISOR_CONGRAT_SEND_POSTCARDEv   # CAdvisorScoring::_ADVISOR_CONGRAT_SEND_POSTCARD()
+  __ZN15CAdvisorScoring31_ADVISOR_CONGRAT_VISITORS_HAPPYEv   # CAdvisorScoring::_ADVISOR_CONGRAT_VISITORS_HAPPY()
+  __ZN15CAdvisorScoring33_ADVISOR_CONGRAT_HANDYMEN_TRAINEDEv   # CAdvisorScoring::_ADVISOR_CONGRAT_HANDYMEN_TRAINED()
+  __ZN15CAdvisorScoring33_ADVISOR_CONGRAT_SECURITY_TRAINEDEv   # CAdvisorScoring::_ADVISOR_CONGRAT_SECURITY_TRAINED()
+  __ZN15CAdvisorScoring34_ADVISOR_CONGRAT_MECHANICS_TRAINEDEv   # CAdvisorScoring::_ADVISOR_CONGRAT_MECHANICS_TRAINED()
+  __ZN15CAdvisorScoring36_ADVISOR_CONGRAT_RESEARCHERS_TRAINEDEv   # CAdvisorScoring::_ADVISOR_CONGRAT_RESEARCHERS_TRAINED()
+  __ZN15CAdvisorScoring37_ADVISOR_CONGRAT_ENTERTAINERS_TRAINEDEv   # CAdvisorScoring::_ADVISOR_CONGRAT_ENTERTAINERS_TRAINED()
+  __ZN15CAdvisorScoring39_ADVISOR_GOLD_TICKET_NEAR_TO_XHAPPINESSEv   # CAdvisorScoring::_ADVISOR_GOLD_TICKET_NEAR_TO_XHAPPINESS()
+)

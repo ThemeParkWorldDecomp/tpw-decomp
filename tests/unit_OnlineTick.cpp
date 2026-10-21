@@ -1,4 +1,4 @@
-// Test library for src/FS_Online_tick.cpp (libtpw_unit_OnlineTick.dylib; see tests/test_OnlineTick.py): CFSOnlineSystem's TickNews,
+// Test library for src/game/online/FS_Online.cpp (libtpw_unit_OnlineTick.dylib; see tests/test_OnlineTick.py): CFSOnlineSystem's TickNews,
 // TickCity, TickUpload, TickFTPDownload, CompleteLogin and AreWeLoggedIn.
 //
 // The object harness is unit w68's (tests/unit_OnlineInit.cpp, included below: the online system over filler bytes, a randomised state

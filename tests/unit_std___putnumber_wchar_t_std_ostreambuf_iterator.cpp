@@ -1,6 +1,6 @@
 // Test library for std::__putnumber<wchar_t>, basic_ios<wchar_t>::widen and deque<vector<Argument>>::const_iterator::operator++
 // (unit v5996; libtpw_unit_std___putnumber_wchar_t_std_ostreambuf_iterator.dylib), main app:
-//   src/std___putnumber_wchar_t_std_ostreambuf_iterator.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are recording fakes: the streambuf overflow and the ctype widen (both __ptr_glue on the Mac), getloc,
 // use_facet and the locale destructor.

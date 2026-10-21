@@ -1,10 +1,10 @@
 """Differential tests for the lobby's small leaves, part 3 (unit w59), against libtpw_unit_LobbyLeaves3.dylib
 (tests/unit_LobbyLeaves3.cpp):
 
-  src/RideDB_names.cpp    CRideDatabase::GetTypeName(id) 0x10154a10, GetSignNameA 0x10154c24, GetSignNameB 0x10154d68
-  src/Game_theme.cpp      CGame::GetLocalisedThemeGateNames 0x1014a768 (and the four theme strings it compares with)
-  src/hlsprite_flies.cpp  FLY_Close 0x100783ec
-  src/rsse_close.cpp      RSSE_Close 0x100d3708
+  src/game/rides/RideDB.cpp, src/game/save/SaveLoad.cpp    CRideDatabase::GetTypeName(id) 0x10154a10, GetSignNameA 0x10154c24, GetSignNameB 0x10154d68
+  src/game/Game.cpp      CGame::GetLocalisedThemeGateNames 0x1014a768 (and the four theme strings it compares with)
+  src/game/rides/FlyingRide.cpp  FLY_Close 0x100783ec
+  src/game/rides/rsse.cpp      RSSE_Close 0x100d3708
 
 Six groups of cases, one operation per case:
 

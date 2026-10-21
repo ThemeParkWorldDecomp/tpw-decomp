@@ -1,6 +1,6 @@
 """Unit v5965, CUI2DMap::UpdateAllDrawRelated 0x1022e2c4 (3688 bytes), against libtpw_unit_CUI2DMap_UpdateAllDrawRelated_2.dylib
 (tests/unit_CUI2DMap_UpdateAllDrawRelated_2.cpp), main app ("SimTheme Park"),
-src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister_CUI2DMap_UpdateAllDrawRelated_2.cpp:
+src/game/ui/ui_2dmap.cpp:
   CUI2DMap::UpdateAllDrawRelated
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

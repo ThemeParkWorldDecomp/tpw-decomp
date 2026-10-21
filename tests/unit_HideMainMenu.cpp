@@ -1,5 +1,5 @@
 // Test library for CreateMainMenu and HideMainMenu (unit v5303; libtpw_unit_HideMainMenu.dylib, tests/test_HideMainMenu.py), main app:
-//   src/ui_main_kbcapture_HideMainMenu.cpp   CreateMainMenu, HideMainMenu, gMainMenuPauseFlag
+//   src/game/ui/ui_mainmenu.cpp   CreateMainMenu, HideMainMenu, gMainMenuPauseFlag
 //
 // The callees are recording fakes (the menus' makers set gMainMenu to the menu the test allocated; UIMenu::~UIMenu logs and the real
 // delete then frees the menu the test made with new). gMainMenu and gGame are defined here.

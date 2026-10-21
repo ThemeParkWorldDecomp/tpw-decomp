@@ -1,5 +1,5 @@
 // Test library for FindStaticTag and AddTag (unit v5249; libtpw_unit_FindStaticTag.dylib, tests/test_FindStaticTag.py), main app:
-//   src/ui_StatusPanel_FindStaticTag.cpp
+//   src/game/ui/ui_tags.cpp
 //
 // AddATag and ShowTagPanel are recording fakes; gStaticTags is defined here.
 #include <cstddef>

@@ -1,5 +1,5 @@
 // Test library for the ride animation time statistics (unit v5576; libtpw_unit_GetAnimTimeStats.dylib, tests/test_GetAnimTimeStats.py), main app:
-//   src/RideAnimInit_GetAnimTimeStats.cpp   GetAnimTimeStats, RestoreAnimTimeStats, GetNumActiveChannels
+//   src/game/rides/RideAnim.cpp   GetAnimTimeStats, RestoreAnimTimeStats, GetNumActiveChannels
 //
 // No callees and no globals of other files.
 #include <cstddef>

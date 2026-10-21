@@ -1,5 +1,5 @@
 // Test library for the park name panel (unit v5057; libtpw_unit_ShowEditParkNamePanel.dylib, tests/test_ShowEditParkNamePanel.py), main app:
-//   src/ShowEditParkNamePanel.cpp   ShowEditParkNamePanel, TwoEditsMsg and the unit's globals (the panel, the two text areas, the cheat texts)
+//   src/game/ui/ui_entryPricePanel.cpp   ShowEditParkNamePanel, TwoEditsMsg and the unit's globals (the panel, the two text areas, the cheat texts)
 //
 // The callees outside the unit are fakes that record what the real ones read, under the same event names as the module's PowerPC stubs.
 // A window is identified by the tag the test puts in its id (mId); a thing by the word at its start. The windows are blocks of

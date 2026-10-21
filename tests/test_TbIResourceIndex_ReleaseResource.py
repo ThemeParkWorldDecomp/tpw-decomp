@@ -1,5 +1,5 @@
 """Unit v5260, TbIResourceIndex::ReleaseResource and ReleaseItem, against libtpw_unit_TbIResourceIndex_ReleaseResource.dylib
-(tests/unit_TbIResourceIndex_ReleaseResource.cpp), ltms, src/TbIResourceIndex_TbIResourceIndex_ReleaseResource.cpp:
+(tests/unit_TbIResourceIndex_ReleaseResource.cpp), ltms, src/ltms/TbIResourceIndex.cpp:
   ReleaseResource 0x100036d8, ReleaseItem 0x1000362c
 
 A case is an item (or NULL) whose resource slot (Mac +8) is NULL or a fake object. The virtual call (vtable +0x14, through __ptr_glue) is

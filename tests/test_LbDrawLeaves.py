@@ -1,6 +1,6 @@
 """Unit w35b, the Bullfrog half: the rectangle, viewport, clip and palette leaves, against libtpw_unit_LbDrawLeaves.dylib
 (tests/unit_LbDrawLeaves.cpp), all in the bullfrog library ("bullfrog symbols shared"):
-  src/bfl_lbdraw_leaves.cpp   LbRect_Intersection 0x10029ad0, LbRect_Empty 0x10029cd4, LbRect_Normalise 0x10029d14,
+  src/bullfrog/LbDraw.cpp, src/bullfrog/LbDrawText.cpp, src/bullfrog/LbRect.cpp   LbRect_Intersection 0x10029ad0, LbRect_Empty 0x10029cd4, LbRect_Normalise 0x10029d14,
                               LbDraw_SetViewPort 0x1002b1c0, LbDraw_SetClipRect 0x1002b2c4, LbDraw_SetCurrent 0x1002b588 (the
                               TbRenderArea overload), LbPalette_FindColour 0x1001a5c8
 

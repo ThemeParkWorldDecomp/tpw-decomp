@@ -1,5 +1,5 @@
 // Test library for the online panel's message functions (unit v5658; libtpw_unit_OnlineEditMsg.dylib, tests/test_OnlineEditMsg.py), main app:
-//   src/ContactsLCFormat_OnlineEditMsg.cpp   OnlineEditMsg, OnlinePanelSubPanelMsg
+//   src/game/ui/ui_onlinePanel.cpp   OnlineEditMsg, OnlinePanelSubPanelMsg
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The globals of
 // other files are defined here, zero at start like the Mac's bss. The three virtual calls and the allocator are the weak helpers of

@@ -1,4 +1,4 @@
-"""The version 0x12 wavelet texture decoder (engine, src/Wavelet_decode_v12.cpp):
+"""The version 0x12 wavelet texture decoder (engine, src/engine/Wavelet.cpp):
 CWaveletImp::Decompress_v12, called directly and through the version dispatch.
 
 The decoder runs on REAL version 0x12 files read at run time from ROOT/extracted/wads

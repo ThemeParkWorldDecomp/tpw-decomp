@@ -1,5 +1,5 @@
 // Test library for the editor coaster's layout commands (unit v5261; libtpw_unit_LayoutSetMovePylon.dylib, tests/test_LayoutSetMovePylon.py):
-//   src/TPConfig_LayoutSetMovePylon.cpp   LayoutStackPylonUp/Down, LayoutDeleteMultiPylons, LayoutSetMovePylon, LayoutRegenerateTrack x2,
+//   src/game/rides/CoasterEdit.cpp   LayoutStackPylonUp/Down, LayoutDeleteMultiPylons, LayoutSetMovePylon, LayoutRegenerateTrack x2,
 //                                         LayoutSetCoasterEditOld, LayoutSetCoasterEdit
 //
 // The callees are fakes that record the arguments (objects as their index in the test's registry, -2 for NULL, -1 for unknown) and answer

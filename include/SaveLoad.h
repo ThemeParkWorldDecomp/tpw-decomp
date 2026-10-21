@@ -1,6 +1,6 @@
 // SaveLoad.cpp (main app): CSaveLoad, the park file reader and writer. PARTIAL: Load is
-// translated (src/SaveLoad.cpp, unit w108) and LoadHeader with the header's Serialise
-// (src/SaveLoadHeader.cpp, unit w114); LoadModules and the Pre and PostLoadOperations are
+// translated (src/game/save/SaveLoad.cpp, unit w108) and LoadHeader with the header's Serialise
+// (src/game/save/SaveLoad.cpp, src/game/park/SkyObjects.cpp, unit w114); LoadModules and the Pre and PostLoadOperations are
 // declared for Load but not translated.
 #pragma once
 #include <cstddef>
@@ -15,7 +15,7 @@ class CFile;
 // A save file's header, filled by Load (0x3d4 bytes; no pointers, so the host layout is the Mac's). The names are invented from the
 // strings Serialise passes to LOADVAR (unit w114); the file holds only the first 50 units of the park description.
 struct CSaveLoadHeader {
-    // 0x1015b8b0 (1,412 bytes, src/SaveLoadHeader.cpp): reads (save == 0) or writes (any other value) the fields in the order of the
+    // 0x1015b8b0 (1,412 bytes, src/game/park/SkyObjects.cpp): reads (save == 0) or writes (any other value) the fields in the order of the
     // members below, 282 values in all; 0 on success, 1 at the first value that fails. A version other than 0 or 1 (signed compares)
     // does nothing and answers 0. `unused` is ignored.
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);
@@ -44,11 +44,11 @@ static_assert(offsetof(CSaveLoadHeader, mParkDatePublishedDay) == 0x3ce, "CSaveL
 static_assert(offsetof(CSaveLoadHeader, mParkDatePublishedYear) == 0x3d2, "CSaveLoadHeader layout");
 
 // The save file key LoadHeader compares the file's key word with (0x102a6cb4, initialised 0x01221985; defined in
-// src/SaveLoadHeader.cpp). The saver writes the word as it is in memory, so the Mac's files hold the bytes 01 22 19 85.
+// src/game/save/SaveLoad.cpp). The saver writes the word as it is in memory, so the Mac's files hold the bytes 01 22 19 85.
 extern uint32_t gSaveFileKey;
 // The legal text of the save file, one per language in the order of the language byte the saver chooses (0 English, 1 Spanish,
 // 2 Italian, 3 Swedish, 4 German, 5 French, 6 Japanese), built by the static initialisation of SaveLoad.cpp (0x1015b484,
-// src/SaveLoadHeader.cpp). 0x1037fe1c on the Mac, 0x14 bytes each there. LoadHeader compares the file's text with one of them.
+// src/game/save/SaveLoad.cpp). 0x1037fe1c on the Mac, 0x14 bytes each there. LoadHeader compares the file's text with one of them.
 extern TbDynamicStringTemplate<char16_t> gSaveLegalText[7];
 
 // The debug switch of the file open test in CSaveLoad::Load (the word at 0x102a6cb8, 0 in the binary, nothing writes it; its
@@ -80,7 +80,7 @@ public:
     int32_t Load(const char* path, CSaveLoadHeader* header, LoadType type);
     // 0x10157868 (1,844 bytes, untranslated; unit v5034): writes the park; 1 on success, else 0.
     int32_t Save(const char* path, CSaveLoadHeader* header, LoadType type);
-    // 0x10159e50 (748 bytes, src/SaveLoadHeader.cpp, unit w114): reads what follows the version word, answers 1 or 0: the language byte,
+    // 0x10159e50 (748 bytes, src/game/save/SaveLoad.cpp, unit w114): reads what follows the version word, answers 1 or 0: the language byte,
     // the legal text (compared with gSaveLegalText), the 0x100-byte ride record (the park's needed rides, 0x20 bytes of it kept in
     // gParkRequiredRides), the key word, the flag word and, when the flag is 1, the header (Serialise). A failed read, a text that
     // differs and a failing Serialise answer 0 and leave mError alone; a ride the database lacks sets 8 and a wrong key 6.
@@ -93,10 +93,10 @@ public:
     void WriteSerialiseLog(int32_t size, const char* name, LogfileState state);
     void OpenLogfile(int32_t state);   // 0x1015b370 (8 bytes, stand-in; LoadModules calls it with 0 on the global gSaveLoad)
     void CloseLogfile();               // 0x1015b3a4 (8 bytes, stand-in)
-    // 0x1015a190 (4,508 bytes, src/SaveLoad_CSaveLoad_SaveModules.cpp, unit v5628): writes the modules to `file`, each followed by its
+    // 0x1015a190 (4,508 bytes, src/game/save/SaveLoad.cpp, unit v5628): writes the modules to `file`, each followed by its
     // four-character tag; 1 on success, else 0. Type 1 writes the action recorder only. `this` is not used (the log is gSaveLoad's).
     int32_t SaveModules(void* file, LoadType type);
-    // Unit v51006: 0x10159a08 (1,032 bytes, src/SaveLoad_CSaveLoad_SaveHeader_2.cpp): writes what LoadHeader reads (language byte, legal
+    // Unit v51006: 0x10159a08 (1,032 bytes, src/game/save/SaveLoad.cpp): writes what LoadHeader reads (language byte, legal
     // text, ride record, key, flag word, header when given); 1 on success, else 0. `this` is not used.
     int32_t SaveHeader(void* file, CSaveLoadHeader* header);
     // Unit v51020: 0x1015b428 (40 bytes, stand-in): called by Save before the modules are written.
@@ -121,14 +121,14 @@ int32_t LoadCamera(void* file);           // 0x10036218: 1 when loaded
 void SOUND_LoadStatus(void* file);        // 0x100de48c
 int32_t GAMESYSTEM_Load(void* file);      // 0x10236b30 (stand-in): 0 when it failed
 int32_t LoadRides(void* file);            // 0x1006b878 (stand-in): 0 when it failed
-// Unit v5890 (src/RestoreAnimTime_LoadRides_2.cpp): what LoadRides needs.
+// Unit v5890 (src/game/rides/TPRide.cpp): what LoadRides needs.
 struct tag_sRideAnimSet;
 struct sAnimTimeControl;
 void ReactivateHoardings(tag_sRideAnimSet* set);                              // 0x10061840 (344 bytes, untranslated)
 void OutputAnimTimeStats(sAnimTimeControl* control, tag_sRideAnimSet* set);   // 0x1006aa70 (568 bytes, untranslated)
 extern int32_t gLoadRidesTbErrorZero;     // 0x1029d054, the zero word the compiler keeps for LoadRides' TbError comparison (names invented)
 extern int32_t gLoadRidesShape[2];        // 0x102c6d04, the two words LoadRides builds a ride's shape from when the database has no record
-int32_t BMP_Load(void* file);             // 0x10023850 (src/BMP_Load.cpp): 0 when it failed
+int32_t BMP_Load(void* file);             // 0x10023850 (src/game/rides/BumperRide.cpp): 0 when it failed
 int32_t FLY_Load(void* file);             // 0x10079aa8 (stand-in): 0 when loaded
 int32_t LoadCoasters(void* file);         // 0x10044d68 (stand-in): 0 when it failed
 void ADV_Load(void* file);                // 0x10009cb8 (stand-in): the answer is not read
@@ -143,9 +143,9 @@ int32_t SaveCoasters(void* file);         // 0x10044280 (stand-in): 0 when it fa
 void ADV_Save(void* file);                // 0x10009788 (stand-in): the answer is not read
 // The constants SaveModules compares the result of each tag's write with (0x102a6cbc to 0x102a6cfc, one word per tag in the order
 // of the writes: WRLD SPSC PART MESS CLOK VANT GSYS RSYS TRAK FLYR RSSE KAME COAS ADVS SOUN CHTS ADSC; 0 in the binary and nothing
-// writes them; defined in src/SaveLoad_CSaveLoad_SaveModules.cpp). Each comparison is (result >= 0) == (word == 0), see TbError.h.
+// writes them; defined in src/game/save/SaveLoad.cpp). Each comparison is (result >= 0) == (word == 0), see TbError.h.
 extern uint32_t gSaveModulesTagTestWords[17];
-// Unit v51028 (src/RideTypes_OutputAnimTimeStats_SaveRides_2.cpp): the zero word the compiler keeps for SaveRides' TbError comparison.
+// Unit v51028 (src/game/rides/TPRide.cpp): the zero word the compiler keeps for SaveRides' TbError comparison.
 extern uint32_t gSaveRidesTbErrorZero;    // 0x1029d050 (name invented; nothing writes it)
 
 // Unit v51006: what PreLoadOperations calls first.

@@ -1,5 +1,5 @@
 """Unit v5536, LLCC_DrawKartBlock 0x10089cfc, against libtpw_unit_LLCC_DrawKartBlock.dylib (tests/unit_LLCC_DrawKartBlock.cpp), main app
-("SimTheme Park"), src/LLCC_DrawKartBlock.cpp.
+("SimTheme Park"), src/game/park/LLCellRide.cpp.
 
 A case is a call. The callees CMap::IsXYValid, LLCC_SystemGetRideTrack, ADD_DIRECTION and CMapCell::Modify are fakes on both sides that
 record their arguments (Modify's cell as its index from the map base) and answer from the case's queues. gGameWorld points at a small

@@ -1,6 +1,6 @@
 // Test library for the rides upgrades / shops / features list rows, AllKidsPanel_KidGone and the kids list's LCPostFormat (unit v5952;
 // libtpw_unit_FillAllRidesListCallback_Upgrades.dylib, tests/test_FillAllRidesListCallback_Upgrades.py), main app:
-//   src/AddItemToAllRidesList_FillAllRidesListCallback_Upgrades.cpp
+//   src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allKidsPanel.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The objects
 // the functions are given are 16 arena blocks the test sets (tpw_fav_setblock); a pointer is logged as its block's number.

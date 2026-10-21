@@ -1,5 +1,5 @@
-// The fakes for TPSettings.cpp's player settings (src/TPSettings.cpp with
-// src/OptionsBalance.cpp and src/SoundBalance.cpp; libtpw_unit_TPSettings.dylib; see
+// The fakes for TPSettings.cpp's player settings (src/game/TPResource.cpp, src/game/TPSettings.cpp with
+// src/game/balance/OptionsBalance.cpp and src/game/balance/SoundBalance.cpp; libtpw_unit_TPSettings.dylib; see
 // calllog.h) and the test entry points. Strings are functional and unrecorded; the file
 // functions work on one fake file (its bytes to read come from the test, what is written is
 // recorded as hex); the serialisation instances of other files (bool and 32-bit integers)

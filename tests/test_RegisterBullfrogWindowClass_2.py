@@ -1,5 +1,5 @@
 """Unit v5963, six bullfrog functions, against libtpw_unit_RegisterBullfrogWindowClass_2.dylib
-(tests/unit_RegisterBullfrogWindowClass_2.cpp), main app ("SimTheme Park"), src/CreateDirectDrawObject_RegisterBullfrogWindowClass_2.cpp:
+(tests/unit_RegisterBullfrogWindowClass_2.cpp), main app ("SimTheme Park"), src/bullfrog/FileSystem.cpp, src/bullfrog/LbRect.cpp, src/bullfrog/TbSystemInfo.cpp, src/bullfrog/WinScrn.cpp:
   RegisterBullfrogWindowClass 0x1006a824, _ScreenFPUHandler::~_ScreenFPUHandler 0x1006aa8c, __sinit_TbSystemInfo_cpp 0x10043d04,
   LbRect_Contains 0x10029bcc, LbRect_Bounding 0x10029a04, bfl::compress::CRefpack::MemCompress 0x1000d53c
 

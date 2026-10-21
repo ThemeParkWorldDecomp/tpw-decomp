@@ -1,6 +1,6 @@
 // Test library for the online park info panel's messages and the park find panel (unit v5550; libtpw_unit_OnlineParkInfoPanelMsg.dylib,
 // tests/test_OnlineParkInfoPanelMsg.py), main app:
-//   src/OnlineParkInfoPanelMsg.cpp   OnlineParkInfoPanelMsg, GeneralParkDownloadCompleteCallback, VisitParkPostDownloadCallbackFn,
+//   src/game/ui/ui_onlineParkFindPanel.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp   OnlineParkInfoPanelMsg, GeneralParkDownloadCompleteCallback, VisitParkPostDownloadCallbackFn,
 //                                    __sinit_ui_onlineParkFindPanel_cpp, UpdateParkFindPanelProgress, RemoveOnlineParkFindPanel
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of

@@ -1,6 +1,6 @@
 // Test library for the map half of MapDelta.cpp (unit w145; libtpw_unit_MapDelta.dylib, tests/test_MapDelta.py), main app:
-//   src/MapDelta_map.cpp   the 29 functions of the unit, the six halfword sentinels, the time stamp counter and five compass offsets
-//   src/MapDelta.cpp       (unit w139) the other three compass offsets
+//   src/game/park/Map.cpp, src/game/park/MapDelta.cpp   the 29 functions of the unit, the six halfword sentinels, the time stamp counter and five compass offsets
+//   src/game/park/MapDelta.cpp       (unit w139) the other three compass offsets
 //
 // Every callee outside them is a fake that records the same event as the PowerPC side's stub: GAME_ASSERTMSG, TRACE (the format and one
 // unsigned argument per % of the format), wallhug_trivial (the mode and the path's bytes 2 to 5; answers from the case's queues), the four

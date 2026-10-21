@@ -1,9 +1,9 @@
 """Differential tests for the twelve textured glyph writers (unit w45c), against libtpw_unit_FontRenderTextured.dylib
 (tests/unit_FontRenderTextured.cpp), all in the ltms library ("ltms symbols shared"):
 
-  src/ltms_fontrender_textured.cpp          TbTextured4BitFontRenderMethod::DrawCharTo555 0x1000a1dc, To565 0x1000a6f4, To4444 0x1000aba0,
+  src/ltms/TbTextured4BitFontRenderMethod.cpp          TbTextured4BitFontRenderMethod::DrawCharTo555 0x1000a1dc, To565 0x1000a6f4, To4444 0x1000aba0,
                                             To8888 0x1000b02c, ToBGRA 0x1000b4b8, ToAny 0x1000b944 (they blend the texel into the destination)
-  src/ltms_fontrender_textured_noblend.cpp  TbTexturedNoBlend4BitFontRenderMethod::DrawCharTo555 0x1000baf4, To565 0x1000bf28,
+  src/ltms/TbTexturedNoBlend4BitFontRenderMethod.cpp  TbTexturedNoBlend4BitFontRenderMethod::DrawCharTo555 0x1000baf4, To565 0x1000bf28,
                                             To4444 0x1000c2e0, To8888 0x1000c718, ToBGRA 0x1000cb58, ToAny 0x1000cf98 (they copy it)
   include/TbFontRender.h                    (inline) TextureOf, TextureIsA8R8G8B8, QuotientBy15Signed and Unsigned, WalkTexturedGlyph:
                                             the loop the writers inline

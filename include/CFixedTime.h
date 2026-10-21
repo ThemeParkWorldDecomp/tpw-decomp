@@ -1,5 +1,5 @@
 // CFixedTime (main app, the inventory's Game.cpp range): the constructor at 0x10147bdc
-// (src/CFixedTime.cpp) and ReadFixedTime at 0x10147c18 (src/GameClock.cpp). The Mac packs
+// (src/game/FixableTime.cpp) and ReadFixedTime at 0x10147c18 (src/game/FixableTime.cpp). The Mac packs
 // the class to 4 bytes, so the double sits at +4 and is not 8-aligned; the host packs the
 // same way and keeps every offset.
 #pragma once

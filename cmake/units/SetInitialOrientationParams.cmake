@@ -1,3 +1,30 @@
-# Unit v51074: small coaster, heightfield and mesh helpers (src/DestroyCoasterPylons_SetupBraceBezierCtrlParams_SetInitialOrientationParams.cpp).
+# Unit v51074: small coaster, heightfield and mesh helpers (src/game/TPLevel.cpp, src/game/TPMesh.cpp, src/game/park/TPHField.cpp, src/game/park/TPHoardings.cpp, src/game/rides/CoasterEdit.cpp, src/game/rides/CoasterSpline.cpp, src/game/rides/CoasterTrack.cpp).
 # The callees outside the unit are recording fakes in tests/unit_SetInitialOrientationParams.cpp, which also defines the globals of other files.
-set(TPW_UNIT_SetInitialOrientationParams src/DestroyCoasterPylons_SetupBraceBezierCtrlParams_SetInitialOrientationParams.cpp platform/arena.cpp)
+set(TPW_UNIT_SetInitialOrientationParams src/game/TPLevel.cpp src/game/TPMesh.cpp src/game/park/TPHField.cpp
+    src/game/park/TPHoardings.cpp src/game/rides/CoasterEdit.cpp src/game/rides/CoasterSpline.cpp
+    src/game/rides/CoasterTrack.cpp platform/arena.cpp)
+set(TPW_UNIT_SetInitialOrientationParams_KEEP
+  __Z13GetTrackBraceP19sCoasterTrackParamsj   # GetTrackBrace(sCoasterTrackParams*, unsigned int)
+  __Z13IsTrackClosedP20tag_sCoasterInstance   # IsTrackClosed(tag_sCoasterInstance*)
+  __Z15SetMeshPositionP9tag_sMeshfff   # SetMeshPosition(tag_sMesh*, float, float, float)
+  __Z16IncCoasterConst2v   # IncCoasterConst2()
+  __Z17IsCoasterLoftModev   # IsCoasterLoftMode()
+  __Z17RecalcTrackParamsP20tag_sCoasterInstance   # RecalcTrackParams(tag_sCoasterInstance*)
+  __Z19ClearCoasterButtonsv   # ClearCoasterButtons()
+  __Z19DeActivateHoardingsP16tag_sRideAnimSet   # DeActivateHoardings(tag_sRideAnimSet*)
+  __Z19OutputCoasterValuesv   # OutputCoasterValues()
+  __Z19SetPlaceNormalPylonv   # SetPlaceNormalPylon()
+  __Z20GetLightsourceHandlejj   # GetLightsourceHandle(unsigned int, unsigned int)
+  __Z20SetPlaceSpecialPylonv   # SetPlaceSpecialPylon()
+  __Z23GetWrappedTrackPositionP17sTrackPosnControlP15tag_sTrackBracefP8s3DPoint   # GetWrappedTrackPosition(sTrackPosnControl*, tag_sTrackBrace*, float, s3DPoint*)
+  __Z23RestoreLevelHeightfieldv   # RestoreLevelHeightfield()
+  __Z24GetCurSelectedTrackBracev   # GetCurSelectedTrackBrace()
+  __Z24LayoutRecordCoasterSpeedP20tag_sCoasterInstancej   # LayoutRecordCoasterSpeed(tag_sCoasterInstance*, unsigned int)
+  __Z24SetCurSelectedTrackBraceP15tag_sTrackBrace   # SetCurSelectedTrackBrace(tag_sTrackBrace*)
+  __Z25GetHFieldMaxVertexIndicesPjS_   # GetHFieldMaxVertexIndices(unsigned int*, unsigned int*)
+  __Z26LayoutDeleteLastTrackBracev   # LayoutDeleteLastTrackBrace()
+  __Z27SetInitialOrientationParamsP19sCoasterOrientationP19sCoasterTrackParamsi   # SetInitialOrientationParams(sCoasterOrientation*, sCoasterTrackParams*, int)
+  __Z29GetCoasterInstanceFromCObjectPv   # GetCoasterInstanceFromCObject(void*)
+  __Z29SetInitialCoasterInterpParamsP19sCoasterTrackParams   # SetInitialCoasterInterpParams(sCoasterTrackParams*)
+  __Z9ScaleMeshP9tag_sMeshP8s3DPoint   # ScaleMesh(tag_sMesh*, s3DPoint*)
+)

@@ -1,8 +1,8 @@
 // Test entry point for the weather's drawing and the draw primitive's polygon adder and sprite
-// (library unit_RainRender: src/tb_drawprimitive_sprite.cpp, src/tb_rain_render.cpp, and the
-// real clipper src/tb_clipping.cpp and src/tb_clipping_edges.cpp): CDrawPrimitive::AddPoly_TLCTEX
+// (library unit_RainRender: src/engine/DrawPrimitive.cpp, src/engine/EngineUtil.cpp, src/engine/Rain.cpp, and the
+// real clipper src/engine/Clipping.cpp): CDrawPrimitive::AddPoly_TLCTEX
 // and DrawSprite, CRain::__LightningFlash, __RenderLightning, __RenderRain and __RenderSnow, and
-// GetCycleCount, CRain::AddLightning and SLightning::Init (src/tb_rain_lightning.cpp).
+// GetCycleCount, CRain::AddLightning and SLightning::Init (src/engine/Rain.cpp).
 //
 // tests/test_RainRender.py builds one world twice from one description, in emulator memory for the
 // original and through tpw_rr_run for the translation, runs one function on both and compares the

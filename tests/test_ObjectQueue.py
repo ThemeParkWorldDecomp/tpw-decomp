@@ -1,4 +1,4 @@
-"""Differential tests for unit w197, the ride's queue (src/Object_queue.cpp). See difftest.py and tpwtest.py.
+"""Differential tests for unit w197, the ride's queue (src/game/Object.cpp). See difftest.py and tpwtest.py.
 
 The fifteen CObject members AddPersonToQueue, RemovePersonFromQueue, GetNumPeopleInQueue, GetPositionInQueue, GetFrontOfPhysicalQueue,
 GetBackOfPhysicalQueue, GetBackOfVirtualQueue, GetBackOfQueue, RecalculateBackOfQueue, IsBOQConnected, IsExitCellConnected, GetQCellBehind and the three

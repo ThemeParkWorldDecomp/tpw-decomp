@@ -1,6 +1,6 @@
 // Test library for HACKRestoreCoasterQueues, NormaliseVectorXZ, DisableCoasterCarDrawSafe and IncCoasterConst1 (unit v51023;
 // libtpw_unit_HACKRestoreCoasterQueues.dylib, tests/test_HACKRestoreCoasterQueues.py), main app:
-//   src/LoadCoasters_HACKRestoreCoasterQueues.cpp
+//   src/game/rides/CoasterSounds.cpp, src/game/rides/CoasterTrack.cpp, src/game/rides/CoasterTrain.cpp, src/game/rides/TPCoaster.cpp
 //
 // The callees are recording fakes; the globals of other files are defined here.
 #include <cstdarg>

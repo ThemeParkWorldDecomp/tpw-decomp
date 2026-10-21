@@ -20,7 +20,7 @@
 
 using namespace calllog;
 
-// The two CPerson members SetState reaches (declared against their Mac names in src/Object.cpp).
+// The two CPerson members SetState reaches (declared against their Mac names in src/game/Object.cpp).
 void ObjectForceRideAdmittance(CPerson*) __asm__("__ZN7CPerson19ForceRideAdmittanceEv");
 void ObjectDismissFromQueue(CPerson*) __asm__("__ZN7CPerson16DismissFromQueueEv");
 
@@ -99,7 +99,7 @@ int32_t CMessageCentre::PostMessage(const CMsg& message) {
     ev("PostMessage", {lab(this), message.GetType(), message.mFlags, id, Snap()});
     return 0;
 }
-// The four ride messages: the unit's tests fake what the constructors write (the real ones are in src/ThingMessages2.cpp, unit w200).
+// The four ride messages: the unit's tests fake what the constructors write (the real ones are in src/game/ui/MessageCentre.cpp, src/game/Object.cpp, unit w200).
 CMsgNewRide::CMsgNewRide(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> id) {
     ev("CMsgNewRide", {id.mIndex, Snap()});
     mFlags = 0;
@@ -128,7 +128,7 @@ CMsgRideWantsUpgrade::CMsgRideWantsUpgrade(tag_IDX_TYPE<IDXTYPEUniqueNameThingId
     if (ret("clear_msg", 0)) gMessageCentre = nullptr;
 }
 int32_t CMsgRideWantsUpgrade::GetType() const { return 9; }
-// The destructors the vtables name (the Mac's, which reset the vtable and delete the object for a positive flag, are in src/ThingMessages2.cpp).
+// The destructors the vtables name (the Mac's, which reset the vtable and delete the object for a positive flag, are in src/game/Object.cpp).
 CMsgNewRide::~CMsgNewRide() {}
 CMsgRideBrokenDown::~CMsgRideBrokenDown() {}
 CMsgRideCondemned::~CMsgRideCondemned() {}

@@ -1,6 +1,6 @@
 """Unit v5629, CTrackCell::ConnectionType (how a cell of a mode would join a track cell: the cell system's placement test), against
 libtpw_unit_CTrackCell_ConnectionType.dylib (tests/unit_CTrackCell_ConnectionType.cpp), main app ("SimTheme Park"),
-src/TrackCell_flags_CTrackCell_ConnectionType.cpp:
+src/game/park/TrackCell.cpp:
   CTrackCell::ConnectionType 0x100a1594
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,6 +1,6 @@
 // Test library for GetNodePositionSimple, SetRideSpritePosnFocus and GetMeshPtrAtHFieldCell (unit v5258;
 // libtpw_unit_GetNodePositionSimple.dylib, tests/test_GetNodePositionSimple.py), main app:
-//   src/LevelSystems_GetNodePositionSimple.cpp
+//   src/game/park/TPHField.cpp
 //
 // The callees SetupMeshForPolySearchSimple and GetRideIDAtCell are fakes that record their arguments; the globals of other files the
 // unit reads or writes are defined here.

@@ -1,5 +1,5 @@
 """Unit w148: the coaster type's remaining loaders, against libtpw_unit_CoasterLoaders.dylib (tests/unit_CoasterLoaders.cpp), main app
-("SimTheme Park"), src/TPCoaster_loaders.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp, src/game/rides/CoasterType.cpp:
   CreateTrackSectionMesh 0x10036564, SetupTrainType 0x1003a150, SetupCarType 0x10039bc0, LoadCoasterPylons 0x1003a9a8,
   SetupPylonData 0x1003a28c, CreateCrossSectionSelectsFromSamFile 0x1003851c, SetCrossSectionSelectDefaults 0x100369d8,
   OptimiseCrossSections 0x100388cc, RepackCrossSection 0x100387b4, GetTempFixedRideParams 0x1003d5b0

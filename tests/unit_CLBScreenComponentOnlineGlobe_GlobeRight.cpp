@@ -1,6 +1,6 @@
 // Test library for the world globe's camera steps, list registration, small destructors and byte swaps (unit v51119;
 // libtpw_unit_CLBScreenComponentOnlineGlobe_GlobeRight.dylib, tests/test_CLBScreenComponentOnlineGlobe_GlobeRight.py), main app:
-//   src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Show_2_CLBScreenComponentOnlineGlobe_GlobeRight.cpp
+//   src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/park/LLCellMouse.cpp, src/game/park/TPHField.cpp, src/game/rides/RideAnim.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read: operator delete, operator delete[],
 // ios_base::~ios_base, basic_filebuf::close, the locale pointer's destructor and _USwapBlock32. The globe list is the real inline

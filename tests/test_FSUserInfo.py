@@ -1,4 +1,4 @@
-"""Differential tests for FS_UserInfo.cpp's start-up path (src/FS_UserInfo.cpp; Milestone 1
+"""Differential tests for FS_UserInfo.cpp's start-up path (src/game/save/FS_UserInfo.cpp; Milestone 1
 unit 5, part 2), against libtpw_unit_FSSystem.dylib (tests/unit_FSSystem.cpp's fakes),
 with test_FSSystem.py's PowerPC strings, vtables and file-system fakes.
 

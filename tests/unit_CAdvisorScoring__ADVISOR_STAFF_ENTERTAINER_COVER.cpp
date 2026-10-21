@@ -1,6 +1,6 @@
 // Test library for the advisor's staff scorers (unit v5118; libtpw_unit_CAdvisorScoring__ADVISOR_STAFF_ENTERTAINER_COVER.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_STAFF_ENTERTAINER_COVER.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_STAFF_ENTERTAINER_COVER.cpp   the eight _ADVISOR_STAFF_* scorers
+//   src/game/advisor/AdvisorScoring.cpp   the eight _ADVISOR_STAFF_* scorers
 //
 // The callees outside the unit (the world's getters, the analyser's staff queries, the session time) are fakes that record the arguments the
 // real ones read and answer from the test's queues. gGameWorld and gGameWorldRef are defined here.

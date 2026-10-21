@@ -1,5 +1,5 @@
 // Test library for std::list<unsigned int>::erase and clear (unit v5305; libtpw_unit_std_list_erase.dylib, tests/test_std_list_erase.py), main app:
-//   src/std_list_erase.cpp   Erase, Clear
+//   src/game/MslSupport.cpp   Erase, Clear
 //
 // operator delete (0x10238218) is a fake that records the data word of the node (nodes live in the 32-bit arena); other pointers are freed.
 #include <cstddef>

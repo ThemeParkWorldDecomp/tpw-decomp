@@ -1,6 +1,6 @@
 // Test library for the 2D map's sprite list and map picture functions (unit v5959; libtpw_unit_CUI2DMap_UnRegister.dylib,
 // tests/test_CUI2DMap_UnRegister.py), main app:
-//   src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister.cpp
+//   src/game/ui/ui_2dmap.cpp
 //   UnRegister, DeleteSpriteListEntries, UpdateAllSpritePositions, CloseSprites, Zoom, LoadMap, UpdateMap.
 //
 // The callees outside the unit (UpdateSpritePosition, UpdateMapZoom, UpdateAllDrawRelated, the EZSprite and map zoom engine calls, the

@@ -1,4 +1,4 @@
-// Test library for src/lobby_islands.cpp (libtpw_unit_LobbyIslands.dylib; see
+// Test library for src/game/online/lobby_island.cpp (libtpw_unit_LobbyIslands.dylib; see
 // tests/test_LobbyIslands.py): the lobby's island screen, its set-up, island list, show and hide,
 // driven by scripts over two theme-island screens and up to eight islands.
 //
@@ -126,8 +126,8 @@ CLBScreenComponentThemeIslands::~CLBScreenComponentThemeIslands() {}
 void CLBScreenComponentThemeIslands::Tick() {}
 void CLBScreenComponentThemeIslands::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 uint32_t CLBScreenComponentThemeIslands::ProcessCancel() { return 0; }
-void CLBScreenComponentThemeIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/lobby_islands_rest.cpp)
-// (The theme islands' own copy of SetCurrentIsland, src/lobby_islands_rest.cpp: the same text as the base class's.)
+void CLBScreenComponentThemeIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/game/online/lobby_island.cpp)
+// (The theme islands' own copy of SetCurrentIsland, src/game/online/lobby_island.cpp: the same text as the base class's.)
 void CLBScreenComponentThemeIslands::SetCurrentIsland(const CLBIsland* island) { CLBScreenComponentIslands::SetCurrentIsland(island); }
 
 // What the theme islands do after the parser (not translated): the current island is the one at list

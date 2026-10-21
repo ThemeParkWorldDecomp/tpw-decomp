@@ -1,5 +1,5 @@
 """Unit v5202, the finance/park graph helpers, against libtpw_unit_SetupGraph.dylib (tests/unit_SetupGraph.cpp), main app
-("SimTheme Park"), src/MinAnalyserValue_SetupGraph.cpp:
+("SimTheme Park"), src/game/ui/ui_graph.cpp:
   SetupGraph 0x101f6480, GraphLine 0x101f62cc (float history), DrawMeGraph 0x101f66c0, GraphLine 0x101f6124 (int history)
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

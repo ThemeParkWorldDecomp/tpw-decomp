@@ -1,5 +1,5 @@
 """Unit v5303, the main menu's creation and removal, against libtpw_unit_HideMainMenu.dylib (tests/unit_HideMainMenu.cpp), main app
-("SimTheme Park"), src/ui_main_kbcapture_HideMainMenu.cpp:
+("SimTheme Park"), src/game/ui/ui_mainmenu.cpp:
   CreateMainMenu 0x101fc05c, HideMainMenu 0x101fc140
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

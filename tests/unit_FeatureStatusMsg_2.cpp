@@ -1,6 +1,6 @@
 // Test library for the feature status panel's message function, its static initialiser and the finance graph's two loops (unit v5904;
 // libtpw_unit_FeatureStatusMsg_2.dylib, tests/test_FeatureStatusMsg_2.py), main app:
-//   src/FeatureStatusPanel_UpdateStatusWindow_FeatureStatusMsg_2.cpp   FeatureStatusMsg, __sinit_ui_FeatureStatus_cpp, GetMaxYValue, KissMyLines
+//   src/game/ui/ui_FeatureStatus.cpp, src/game/ui/ui_FinancePanel.cpp   FeatureStatusMsg, __sinit_ui_FeatureStatus_cpp, GetMaxYValue, KissMyLines
 //
 // The callees outside the unit are recording fakes (the same events as the module's PowerPC stubs). The windows are FakeWin blocks:
 // a vtable whose SetValue slot records, an id, and the two children GetWindow answers. The globals of other files are defined here.
@@ -144,7 +144,7 @@ void GraphLine(CUIGrapher& grapher, CHistory<int32_t, 144>* history, TbColour& c
     ev("GraphLine", {Addr(&grapher), Addr(history), index, step, mode});
 }
 
-// The table the static initialiser stores (src/ui_StatusPanel_tables.cpp, unit v5L31): a block of the arena made on first use; the test
+// The table the static initialiser stores (src/game/ui/ui_StatusPanel.cpp, unit v5L31): a block of the arena made on first use; the test
 // compares only where it is stored.
 uint32_t* FeatureStatusPanelTable() {
     static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));

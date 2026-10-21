@@ -1,6 +1,6 @@
 """Unit v5997, CSprocketsModule's constructor, Close, Tick, StreamData, SetChannelInfo and SetListenerDirection, against
 libtpw_unit_CSprocketsModule_SetListenerDirection_2.dylib (tests/unit_CSprocketsModule_SetListenerDirection_2.cpp), "sound symbols shared",
-src/TbSoundPipeChannel_CSprocketsModule_SetChannelVolume_CSprocketsModule_SetListenerDirection_2.cpp:
+src/sound/CSprocketsModule.cpp:
   CSprocketsModule::CSprocketsModule 0x1002b234, Tick 0x1002b8c4, Close 0x1002bde8, StreamData 0x1002bf20,
   SetChannelInfo 0x1002c820, SetListenerDirection 0x1002d220
 

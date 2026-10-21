@@ -1,6 +1,6 @@
 """Unit w79e, the sound manager, against libtpw_unit_SoundManager.dylib (tests/unit_SoundManager.cpp), in the program "sound symbols
 shared" (the Mac's sound library, Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/TbSoundManager.cpp  TbSoundManager: constructor 0x10026e30, destructor 0x10027f20, Init 0x10026fa4, GetSoundPath 0x10016a48,
+  src/sound/AudioPlaceHolder.cpp, src/sound/TbAudioBody.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSysCommand.cpp  TbSoundManager: constructor 0x10026e30, destructor 0x10027f20, Init 0x10026fa4, GetSoundPath 0x10016a48,
                           SetListenerPosition 0x1001670c, GetListenerPosition 0x10017cf4, SetAudioSystem 0x100167b4,
                           SetDistanceMapping 0x10027274, GetDistanceMultiplier 0x1001966c, IsQSoundOn 0x1001954c,
                           GetRolloffFactorToMinMaxDistance 0x1001960c, GetVolumeControl 0x10019758, GetVolume 0x1002a080,
@@ -215,7 +215,7 @@ def setup(runner):
     e.stub("__nw__FUl", stub_new)
     e.stub("__dl__FPv", stub_delete)
 
-    # ---- the TbRefRelease imports of the bullfrog library (src/TbRefRelease.cpp): the count is the word after the vptr
+    # ---- the TbRefRelease imports of the bullfrog library (src/bullfrog/TbRefRelease.cpp): the count is the word after the vptr
     def ref_ctor(e):
         e.write(e.r(3) + 4, pack([1]))
 

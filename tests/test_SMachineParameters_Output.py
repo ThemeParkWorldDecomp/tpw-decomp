@@ -1,5 +1,5 @@
 """Unit v5092, the engine's machine detection, against libtpw_unit_SMachineParameters_Output.dylib
-(tests/unit_SMachineParameters_Output.cpp), engine program, src/tb_init_SMachineParameters_Output.cpp:
+(tests/unit_SMachineParameters_Output.cpp), engine program, src/engine/tb_init.cpp:
   SMachineParameters::Output 0x10013d3c, SMachineParameters::Suggest 0x10013eec
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

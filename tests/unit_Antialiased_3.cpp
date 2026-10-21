@@ -1,6 +1,6 @@
 // Test library for the antialiased 3D line for 3 and 4 bytes per pixel (unit v5940; libtpw_unit_Antialiased_3.dylib,
 // tests/test_Antialiased_3.py), main app:
-//   src/TPString_Antialiased_3.cpp   Antialiased<CTraits<4>> 0x100058c0, Antialiased<CTraits<3>> 0x10005e30
+//   src/game/ui/3DFont.cpp   Antialiased<CTraits<4>> 0x100058c0, Antialiased<CTraits<3>> 0x10005e30
 //
 // The callees outside the unit are recording fakes: CColour::GetFormattedValue and IntensifyPix<N>. sqrt is the real one on both sides.
 #include <cstddef>

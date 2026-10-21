@@ -1,5 +1,5 @@
 // Test library for the small functions of unit v51052 (libtpw_unit_CStaffHQ_PickUpStaff.dylib, tests/test_CStaffHQ_PickUpStaff.py), main app:
-//   src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_Serialise_CStaffHQ_PickUpStaff.cpp
+//   src/game/Thing.cpp, src/game/buildings/ResearchLab.cpp, src/game/buildings/StaffHQ.cpp, src/game/buildings/TrainingCentre.cpp, src/game/people/Thoughts.cpp, src/game/ui/vector2d.cpp
 //
 // The callees outside the unit are recording fakes: CThing::FinalDestroy, CThing::Serialise, SCR_KillScript, operator delete, the wide string
 // constructor and __register_global_object. One dispatcher (tpw_v51052_call) reaches every function of the unit by number.

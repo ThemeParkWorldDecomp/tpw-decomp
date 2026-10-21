@@ -1,4 +1,4 @@
-// Differential library for unit w156, the park analyser's cell and map queries (src/ParkAnalyser_cells.cpp): the three counters of CParkAnalyserCell, the
+// Differential library for unit w156, the park analyser's cell and map queries (src/game/park/analyser.cpp): the three counters of CParkAnalyserCell, the
 // park sums, GetAnalyserCell, IsNearbyThingOfType, GetNearbyLitteredCell, GetPercentageLitteredCells, ClearMapData, MarkAreaPatrolledBy,
 // PercentageOfAreaPatrolledBy, PercentageOfParkCoveredByCameras and NumberOfCellsCoveredByObjects.
 //

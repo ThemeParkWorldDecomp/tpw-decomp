@@ -1,8 +1,8 @@
 """Unit w178, against libtpw_unit_Entertainer.dylib (tests/unit_Entertainer.cpp), main app ("SimTheme Park"):
-  src/Entertainer.cpp      CEntertainer::CEntertainer (cell) 0x100fb094 and (cell, grade, costume, name) 0x100fb224, CStaff::~CStaff 0x100fb194,
+  src/game/people/Entertainer.cpp      CEntertainer::CEntertainer (cell) 0x100fb094 and (cell, grade, costume, name) 0x100fb224, CStaff::~CStaff 0x100fb194,
                            Init 0x100fb33c, ReceiveMessage 0x100fb448, Serialise 0x100fb4a8, FinalDestroy 0x100fb600, UpdateTurn 0x100fb6b0,
                            ChooseNextAction 0x100fb7a4, SetState 0x100fb934, ModelState 0x100fba44, __sinit_Entertainer_cpp 0x100fbc84
-  src/World_unregister.cpp CWorld::Unregister for CHandyman 0x1013efb8, CMechanic 0x1013f1e8, CEntertainer 0x1013f41c, CGuard 0x1013f650,
+  src/game/World.cpp CWorld::Unregister for CHandyman 0x1013efb8, CMechanic 0x1013f1e8, CEntertainer 0x1013f41c, CGuard 0x1013f650,
                            CResearcher 0x1013f880 and CObject 0x1013fab4
 
 A case is an entertainer (0x214 bytes of seeded fill between two 0x40 byte guards, the fields the code reads set from the case), the world's tail

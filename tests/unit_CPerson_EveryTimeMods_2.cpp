@@ -1,6 +1,6 @@
 // Test library for CPerson::EveryTimeMods, UpdateTemporaryHistory, UseObject, GetTimeInPark and LookForMinorDest (unit v51016;
 // libtpw_unit_CPerson_EveryTimeMods_2.dylib, tests/test_CPerson_EveryTimeMods_2.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_EveryTimeMods_2.cpp
+//   src/game/people/Person.cpp
 //   (it defines the five gMinor* halfwords).
 //
 // The callees outside the unit are recording fakes; objects are named by their offset in the case's heap block (0xFFFFFFFF for NULL), so the

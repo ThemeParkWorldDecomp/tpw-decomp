@@ -1,5 +1,5 @@
 """Unit v5L17, the online list destructors of the online system's teardown, against libtpw_unit_FS_OnlineList_dtors.dylib
-(tests/unit_FS_OnlineList_dtors.cpp), main app ("SimTheme Park"), src/FS_OnlineList_dtors.cpp:
+(tests/unit_FS_OnlineList_dtors.cpp), main app ("SimTheme Park"), src/game/online/FS_Online.cpp:
   CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList>::~CFSOnlineSystemList 0x101701c8,
   CFSOnlineSystemParkList_InWorldByParkID::~ 0x10170834, CFSOnlineSystemParkList_InCityTop10::~ 0x10170ca8
 and, for the chain, CFSOnlineSystemCityList::~ 0x10170e20 (unit v51065, whose module tests it with the base faked out).

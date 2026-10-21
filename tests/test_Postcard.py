@@ -1,4 +1,4 @@
-"""Differential tests for the postcard composer, against libtpw_unit_Postcard.dylib (tests/unit_Postcard.cpp): src/Postcard.cpp,
+"""Differential tests for the postcard composer, against libtpw_unit_Postcard.dylib (tests/unit_Postcard.cpp): src/game/ui/Postcard.cpp,
 the 14 functions of PostcardBitmap (0x100bf7c4..0x100c0050 and 0x100c0050 resize) and Postcard (0x100c03a4..0x100c0ac4).
 
 One world per case: a Postcard (seven bitmaps with their pixels), the call's arguments, an output buffer, the display size, the

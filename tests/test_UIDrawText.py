@@ -1,6 +1,6 @@
 """Unit w35b, the main-app half: the interface's text drawing, against libtpw_unit_UIDrawText.dylib (tests/unit_UIDrawText.cpp), in the
 main app ("SimTheme Park"):
-  src/UI_drawtext.cpp   UI_DrawText 0x1018b578, MakeRenderArea 0x1018b360, AdjustJustificationForHebrew 0x1018b2c8 (ui_utils.cpp),
+  src/game/ui/InterfaceFont.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_utils.cpp   UI_DrawText 0x1018b578, MakeRenderArea 0x1018b360, AdjustJustificationForHebrew 0x1018b2c8 (ui_utils.cpp),
                         UIMain_ConvertString 0x10181a7c (ui_main.cpp), InterfaceFont::GetWidth 0x1016915c, GetCharWidth 0x10169264 and
                         LastCharIn 0x101692d4
 

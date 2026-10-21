@@ -1,6 +1,6 @@
 // Test library for the small sound-library functions of unit v51113 (libtpw_unit_TbMapStreamer_FixUpCatagoryIndex.dylib,
 // tests/test_TbMapStreamer_FixUpCatagoryIndex.py), sound library:
-//   src/TbMapStreamer_TbMapStreamer_FixUpCatagoryIndex.cpp
+//   src/sound/CSprocketsModule.cpp, src/sound/TbMapStreamer.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/TpBody.cpp
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs of the module record and answer from the test's queues.
 #include <cstddef>

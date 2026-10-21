@@ -1,6 +1,6 @@
 """Unit v51074, 23 small coaster, heightfield and mesh helpers, against libtpw_unit_SetInitialOrientationParams.dylib
 (tests/unit_SetInitialOrientationParams.cpp), main app ("SimTheme Park"),
-src/DestroyCoasterPylons_SetupBraceBezierCtrlParams_SetInitialOrientationParams.cpp:
+src/game/TPLevel.cpp, src/game/TPMesh.cpp, src/game/park/TPHField.cpp, src/game/park/TPHoardings.cpp, src/game/rides/CoasterEdit.cpp, src/game/rides/CoasterSpline.cpp, src/game/rides/CoasterTrack.cpp:
   SetInitialOrientationParams 0x1005092c, SetInitialCoasterInterpParams 0x100509bc, RecalcTrackParams 0x10050f88,
   GetWrappedTrackPosition 0x1005158c, GetCurSelectedTrackBrace 0x10052290, SetCurSelectedTrackBrace 0x100522cc,
   IncCoasterConst2 0x100526d4, IsTrackClosed 0x10052780, GetCoasterInstanceFromCObject 0x100527e0, GetTrackBrace 0x1004de40,

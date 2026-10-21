@@ -1,5 +1,5 @@
 """Unit v5884, the postcard panel's sending half, against libtpw_unit_SendPostcard.dylib (tests/unit_SendPostcard.cpp), main app
-("SimTheme Park"), src/ui_Postcard_panel_SendPostcard.cpp:
+("SimTheme Park"), src/game/ui/ui_Postcard.cpp:
   IllCallYouBack 0x101b0ca4, AddressesValid 0x101b0d88, AddToAddressField 0x101b0e98, SendPostcard 0x101b0f9c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

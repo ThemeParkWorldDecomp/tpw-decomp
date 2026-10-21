@@ -1,15 +1,15 @@
 """Differential tests for the interface's start-up, against libtpw_unit_UIInit.dylib
 (tests/unit_UIInit.cpp):
 
-  src/UI_init.cpp          UI_InitSystem, the message queues (InterfaceMessageQueue, InterfaceTimedMessages),
+  src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp          UI_InitSystem, the message queues (InterfaceMessageQueue, InterfaceTimedMessages),
                            UI_InitTimerSystem, UI_PostMessage, UI_FlushAllMessages, UI_DevicePointerMove,
                            UI_UpdatePointerIn, the peek, clock, cursor and help text switches
-  src/InterfaceWindow.cpp  InterfaceWindow's constructor, PointIn, MakeRectAbsolute
-  src/ui_cursors.cpp       InitialiseCOLOURCursors, LoadBFCurs, InterfaceBFCursor's constructor and LoadData,
+  src/game/ui/InterfaceWindow.cpp  InterfaceWindow's constructor, PointIn, MakeRectAbsolute
+  src/game/ui/InterfaceBFCursor.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_main.cpp       InitialiseCOLOURCursors, LoadBFCurs, InterfaceBFCursor's constructor and LoadData,
                            InitLobbyUI, UIInterface::InitLobby
 
-Real on both sides: those, the rectangles (src/UI_Base.cpp), the cursor base class and the cursor table
-(src/ui_DrawObject.cpp) and the UI globals (src/UI_focus.cpp). Fakes that record the same event on both
+Real on both sides: those, the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp), the cursor base class and the cursor table
+(src/game/ui/InterfaceCursor.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceDrawObject.cpp) and the UI globals (src/game/ui/UI_Base.cpp). Fakes that record the same event on both
 sides: the window's untranslated virtual members, the timers' constructor, the picture loaders, the
 platform's pixel and cursor classes, FindFilePath, TRACE, the engine's light and map.
 

@@ -1,5 +1,5 @@
 """Unit v5275, RoundUp and GetCoasterTrackStats, against libtpw_unit_RoundUp.dylib (tests/unit_RoundUp.cpp), main app
-("SimTheme Park"), src/TPConfig_stats_RoundUp.cpp:
+("SimTheme Park"), src/game/rides/CoasterSpline.cpp, src/game/rides/CoasterTrain.cpp:
   RoundUp 0x1004da1c, GetCoasterTrackStats 0x1004d970
 
 A case is a call. RoundUp: modf is the C library's on both sides (math.modf in the PowerPC fake, the glue import), the answer is compared.

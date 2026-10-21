@@ -1,5 +1,5 @@
 """Differential tests for TPConfig.cpp, the quickload indexes and BuildGeometryTables
-(src/TPConfig.cpp, src/Quickload.cpp, src/rsse.cpp; Milestone 1 unit 4), against
+(src/game/TPConfig.cpp, src/game/rides/TPRide.cpp, src/game/save/TPQuickload.cpp, src/game/LMatrix.cpp; Milestone 1 unit 4), against
 libtpw_unit_TPConfig.dylib (tests/unit_TPConfig.cpp's fakes; see calllog.py).
 
 Every translated function is called directly; the unit's own callees run as themselves on

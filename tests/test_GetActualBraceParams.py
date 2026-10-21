@@ -1,5 +1,5 @@
 """Unit v5278: the brace walk and the pylon stack update, against libtpw_unit_GetActualBraceParams.dylib
-(tests/unit_GetActualBraceParams.cpp), main app ("SimTheme Park"), src/TPCoaster_loaders_GetActualBraceParams.cpp:
+(tests/unit_GetActualBraceParams.cpp), main app ("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   GetActualBraceParams 0x1003d4cc, UpdatePylonStackStructures 0x1003d844
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory, big-endian, 4-byte pointers; host

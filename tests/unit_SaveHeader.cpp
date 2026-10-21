@@ -1,6 +1,6 @@
 // Test library for the save file header (libtpw_unit_SaveHeader.dylib; see tests/test_SaveHeader.py, unit w114): CSaveLoad::LoadHeader,
 // CSaveLoadHeader::Serialise and the static initialisation of SaveLoad.cpp (gSaveLegalText, gSaveLoad's words), all in
-// src/SaveLoadHeader.cpp.
+// src/game/park/SkyObjects.cpp, src/game/save/SaveLoad.cpp.
 //
 // Real: those three, the Bullfrog strings (the legal text table is built with them) and the real gSaveLoad. Fakes that record through
 // calllog: LbFile_Read (one fake file made of the case's bytes, read in order), GAME_ASSERTMSG, SamsUtilities::_USwapBlock16 (a no-op on

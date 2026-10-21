@@ -1,4 +1,4 @@
-// The rest of what the interface does once a pass (src/UI_pump.cpp): ProcessUI (ui_main.cpp), the error display's tick
+// The rest of what the interface does once a pass (src/game/ui/ui_main.cpp, src/game/ui/UIInterface.cpp): ProcessUI (ui_main.cpp), the error display's tick
 // (ui_ErrorDisplay.cpp) and the postcard test (ui_Postcard.cpp). The pass itself is UIInterface::Process (include/UIInterface.h).
 // The message queues, the timers and the dispatch are in include/UI_Base.h; the window members in include/InterfaceWindow.h.
 #pragma once
@@ -34,7 +34,7 @@ struct errorthingy {
 };
 
 // The bullfrog thread library's mutex (the Mac's is 16 bytes at 0x10396444). Only its handle word is used here. lock and unlock are
-// translated in src/email.cpp (unit w62; the inventory files them there).
+// translated in src/game/online/bthread.cpp (unit w62; the inventory files them there).
 class bthread_mutex {
 public:
     // lock enters the critical section whose handle is the object's first word (NS_MacDoze::EnterCriticalSection(&mHandle)), unlock
@@ -52,7 +52,7 @@ public:
 
 // The errors waiting (the Mac's std::deque<errorthingy>, 0x10396454, is the C++ runtime's: this is the host's), the mutex that
 // guards them and the dialog showing one (NULL when there is none; ErrorMessageCallback clears it when the dialog closes).
-// Original names unknown. Defined in src/UI_pump.cpp until ui_ErrorDisplay.cpp is translated.
+// Original names unknown. Defined in src/game/ui/ui_ErrorDisplay.cpp until ui_ErrorDisplay.cpp is translated.
 extern std::deque<errorthingy> gUIErrorQueue;   // 0x10396454
 extern bthread_mutex gUIErrorMutex;             // 0x10396444
 extern InterfaceWindow* gUIErrorDialog;         // 0x1039647c
@@ -78,7 +78,7 @@ void DequeCopy(void* self, const void* other);      // 0x101f4d14 std::deque<err
 void* BthreadMutexCtor(void* self);                 // 0x10200ca4 bthread_mutex::bthread_mutex(); answers its r3
 }  // namespace errsinit_callee
 
-// Unit v51076 (src/UI_pump_std___cdeque_pop_front.cpp).
+// Unit v51076 (src/game/ui/UIInterface.cpp).
 extern uint32_t gMslErrorDequeMapSize;   // 0x102b1428 (initial word 0x40), original name unknown: the first word of a new deque
 bool UI_HelpTextEnabled();               // 0x101cab08 (stand-in)
 void CoasterButtonsDown(uint32_t mask);  // 0x1019cd00 (64 bytes, stand-in)

@@ -1,9 +1,9 @@
 """Unit w74, the park sound wrappers, against libtpw_unit_SoundPark.dylib (tests/unit_SoundPark.cpp), in the main app
 ("SimTheme Park"):
-  src/SoundPark.cpp  SND_DipMusic 0x100deb04, SND_StartParkMusic 0x100deb40, SND_StopParkMusic 0x100debd4, SND_SetParkMusicLevel
+  src/game/Sound.cpp, src/game/park/ParkSound.cpp  SND_DipMusic 0x100deb04, SND_StartParkMusic 0x100deb40, SND_StopParkMusic 0x100debd4, SND_SetParkMusicLevel
                      0x100dec30, SND_SetChatterLevel 0x100dec9c, SND_SetChatterOnOff 0x100deda4, SND_SetRainLevel 0x100dee84,
                      SND_SendIndirectedEvent 0x100df858, SOUND_SaveStatus 0x100de1a0, SOUND_LoadStatus 0x100de48c
-  src/TPSound.cpp    the state they work on
+  src/game/Sound.cpp, src/game/park/ParkSound.cpp    the state they work on
 
 The functions run as the original, one script of operations per case, with the state (the two flags, the audio object, the
 settings block and the file position) read after every operation. Every callee outside the unit is a fake that records the same event

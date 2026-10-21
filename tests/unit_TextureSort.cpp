@@ -1,5 +1,5 @@
 // Test entry points for the texture cache's sorting and lists (library unit_TextureSort:
-// src/tb_texturecache_sort.cpp and src/tb_qsort.cpp): CQSort's eight sorts, and the cache's
+// src/engine/TextureCache.cpp and src/engine/QSort.cpp): CQSort's eight sorts, and the cache's
 // Textures_QSort, Textures_QSortFree, SortTextures, Entry_QSortInit, SortEntries,
 // SortByCriteria, SortByAddress, MergeListsConditional and CreateNonWrappingTextureList.
 //
@@ -49,7 +49,7 @@ float from_bits(uint32_t bits) {
 }  // namespace
 
 // ---- The engine around the unit ---------------------------------------------------------------
-uint32_t gFrequencyIndex = 0;   // defined in src/tb_texturecache_frame.cpp (another unit)
+uint32_t gFrequencyIndex = 0;   // defined in src/engine/TextureCache.cpp (another unit)
 CTextureEntry::CTextureEntry() {}
 CTextureEntry::~CTextureEntry() {}
 void msl_assertion_failed(const char* condition, const char* file, int32_t line) { ev("assert", {line}, {condition, file}); }

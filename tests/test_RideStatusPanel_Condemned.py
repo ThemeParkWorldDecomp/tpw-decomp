@@ -1,5 +1,5 @@
 """Unit v5580, RideStatusPanel::Condemned and RideStatusPanel::InitStatusWindow, against libtpw_unit_RideStatusPanel_Condemned.dylib
-(tests/unit_RideStatusPanel_Condemned.cpp), main app ("SimTheme Park"), src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Condemned.cpp:
+(tests/unit_RideStatusPanel_Condemned.cpp), main app ("SimTheme Park"), src/game/ui/ui_RideStatus.cpp:
   RideStatusPanel::Condemned 0x101bc2f0, RideStatusPanel::InitStatusWindow 0x101b9340
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

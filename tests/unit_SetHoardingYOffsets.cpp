@@ -1,5 +1,5 @@
 // Test library for the ride hoardings' height offsets (unit v5674; libtpw_unit_SetHoardingYOffsets.dylib, tests/test_SetHoardingYOffsets.py), main app:
-//   src/LevelSystems_SetHoardingYOffsets.cpp   SetHoardingYOffsets, GetRotatedHFieldCoord
+//   src/game/park/TPHoardings.cpp   SetHoardingYOffsets, GetRotatedHFieldCoord
 //
 // The callee outside the unit is FloatToCell (0x10237cd8), a fake that records its argument and answers from the test's queue.
 // gHeightfieldHeader (another file's global) is defined here.

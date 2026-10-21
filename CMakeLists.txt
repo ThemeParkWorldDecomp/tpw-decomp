@@ -10,7 +10,7 @@ endif()
 
 add_compile_options(-Wall -Wextra -Wno-unused-parameter -ffp-contract=off -fwrapv)
 
-# The bullfrog library's zlib unpacker (src/lb_zlib.cpp) inflates with the host's zlib, always present on macOS.
+# The bullfrog library's zlib unpacker (src/bullfrog/LbZLib.cpp) inflates with the host's zlib, always present on macOS.
 find_package(ZLIB REQUIRED)
 
 # Four data tables of the original program (the advisor's response, message and balance description tables and the save
@@ -41,11 +41,24 @@ include_directories(${TPW_GENERATED_DIR})   # SaveLegalText.inc
 set(TPW_GENERATED_SOURCES ${TPW_GENERATED_DIR}/advisor_lines.cpp ${TPW_GENERATED_DIR}/AdvisorScoring_table.cpp
     ${TPW_GENERATED_DIR}/AdvisorBalance_table.cpp ${TPW_GENERATED_DIR}/AdvisorScorerSources.cpp)
 
-file(GLOB TPW_SOURCES CONFIGURE_DEPENDS src/*.cpp)
+file(GLOB_RECURSE TPW_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 list(APPEND TPW_SOURCES ${TPW_GENERATED_SOURCES})
 add_library(tpw STATIC ${TPW_SOURCES})
 target_include_directories(tpw PUBLIC include)
 target_link_libraries(tpw PUBLIC ZLIB::ZLIB)
+# Copies of src files with only some of their definitions, for the test libraries (cmake/slicer.cmake).
+include(cmake/slicer.cmake)
+# The platform layer's sound module (platform/sound_module.cpp) defines these CSprocketsModule methods for the launcher,
+# so the game library builds src/sound/CSprocketsModule.cpp without them.
+tpw_slice(TARGET tpw NAME tpw SOURCES sound/CSprocketsModule.cpp DROP
+  __ZN16CSprocketsModule11GetPositionEjR15TbSoundPosition   # CSprocketsModule::GetPosition(unsigned int, TbSoundPosition&)
+  __ZN16CSprocketsModule11StopChannelEj   # CSprocketsModule::StopChannel(unsigned int)
+  __ZN16CSprocketsModule12PauseChannelEj   # CSprocketsModule::PauseChannel(unsigned int)
+  __ZN16CSprocketsModule16SetChannelVolumeEjR17TbSoundSampleInfo   # CSprocketsModule::SetChannelVolume(unsigned int, TbSoundSampleInfo&)
+  __ZN16CSprocketsModule16SetSpeakerConfigERKN9TbSpeaker6ConfigE   # CSprocketsModule::SetSpeakerConfig(TbSpeaker::Config const&)
+  __ZN16CSprocketsModule19SetListenerPositionERK15TbSoundPosition   # CSprocketsModule::SetListenerPosition(TbSoundPosition const&)
+  __ZN16CSprocketsModule7StopAllEv   # CSprocketsModule::StopAll()
+  __ZN16CSprocketsModule8PauseAllEv)   # CSprocketsModule::PauseAll()
 
 # The differential tests' libraries (tests/, cmake/units/); tpw-port turns them off when it builds this tree as a subproject.
 option(TPW_BUILD_TESTS "Build the differential tests' libraries" ON)
@@ -53,15 +66,22 @@ if(TPW_BUILD_TESTS)
 # Shared library with extern "C" wrappers for the Python differential tests (ctypes).
 file(GLOB TPW_TEST_SHIMS CONFIGURE_DEPENDS tests/shim_*.cpp)
 if(TPW_TEST_SHIMS)
+  # The game functions the wrappers use, without the callees only the launcher provides (cmake/testshim.cmake). It is
+  # an object library, so the wrappers' library links every kept function: a src file holds the functions of several
+  # files of before the regroup, and an archive would give it only the copies something calls.
+  include(cmake/testshim.cmake)
+  include(cmake/legacy.cmake)
+  add_library(tpw_testshim_game OBJECT ${TPW_TESTSHIM_SOURCES})
+  tpw_slice(TARGET tpw_testshim_game NAME testshim KEEP ${TPW_TESTSHIM_KEEP})
+  target_include_directories(tpw_testshim_game PUBLIC include)
+  target_link_libraries(tpw_testshim_game PUBLIC ZLIB::ZLIB)
   add_library(tpw_testshim SHARED ${TPW_TEST_SHIMS})
-  target_link_libraries(tpw_testshim PRIVATE tpw)
+  target_link_libraries(tpw_testshim PRIVATE tpw_testshim_game)
   # Older main-app tests exercise import fakes with their original call-log protocol.
-  # Keep those fakes isolated once the real bullfrog string methods enter libtpw.
-  set(TPW_LEGACY_SOURCES ${TPW_SOURCES})
-  list(FILTER TPW_LEGACY_SOURCES EXCLUDE REGEX "/TbString(List|Buffer)?\\.cpp$")
-  list(FILTER TPW_LEGACY_SOURCES EXCLUDE REGEX "/Lb(File|Time)\\.cpp$")
-  list(FILTER TPW_LEGACY_SOURCES EXCLUDE REGEX "/bfl_FileSystem\\.cpp$")
-  add_library(tpw_legacy STATIC ${TPW_LEGACY_SOURCES})
+  # Keep those fakes isolated once the real bullfrog string methods enter libtpw (cmake/legacy.cmake).
+  # An object library too, for the same reason.
+  add_library(tpw_legacy OBJECT ${TPW_LEGACY_SOURCES})
+  tpw_slice(TARGET tpw_legacy NAME legacy KEEP ${TPW_LEGACY_KEEP})
   target_include_directories(tpw_legacy PUBLIC include)
   target_link_libraries(tpw_legacy PUBLIC ZLIB::ZLIB)
   set(TPW_LEGACY_SHIMS ${TPW_TEST_SHIMS})
@@ -110,7 +130,7 @@ endif()
 if(TARGET tpw_unit_ParticleSwap)
   target_compile_definitions(tpw_unit_ParticleSwap PRIVATE TPW_SWAP_FILE_WORDS=1)
 endif()
-# Unit v5L44: the ride height map's three byte swaps (src/std_exception_what.cpp) really swap in the test library, as the Mac's do.
+# Unit v5L44: the ride height map's three byte swaps (src/game/MslSupport.cpp, src/game/online/FS_Online.cpp, src/game/park/TPHField.cpp, src/game/ui/ui_FeatureStatus.cpp) really swap in the test library, as the Mac's do.
 if(TARGET tpw_unit_std_exception_what)
   target_compile_definitions(tpw_unit_std_exception_what PRIVATE TPW_SWAP_FILE_WORDS=1)
 endif()
@@ -118,5 +138,7 @@ endif()
 if(TARGET tpw_unit_CoasterTrainsSwap)
   target_compile_definitions(tpw_unit_CoasterTrainsSwap PRIVATE TPW_SWAP_FILE_WORDS=1)
 endif()
+# Each unit library compiles a copy of its src files with only its kept definitions (cmake/slicer.cmake).
+cmake_language(DEFER CALL tpw_slice_unit_sources)
 endif()   # TPW_BUILD_TESTS
 

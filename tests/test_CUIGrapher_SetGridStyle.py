@@ -1,5 +1,5 @@
 """Unit v51056: 23 small functions, against libtpw_unit_CUIGrapher_SetGridStyle.dylib (tests/unit_CUIGrapher_SetGridStyle.cpp), main app
-("SimTheme Park"), src/ui_cursor_classes_CUIGrapher_DrawGraph_CUIGrapher_SetGridStyle.cpp:
+("SimTheme Park"), src/game/TPEmbed.cpp, src/game/online/bthread.cpp, src/game/save/FS_LoadSave.cpp, src/game/ui/UIGrapher.cpp, src/game/ui/ui_mainmenu.cpp:
   CUIGrapher::SetXRange 0x101fd798, SetYRange 0x101fd7d8, SetDrawArea 0x101fd818, SetXAxisStyle 0x101fd880, SetYAxisStyle 0x101fd8d4,
   SetGridStyle 0x101fd928, SetBGStyle 0x101fd97c; CFSLoadSave::LoadHidden 0x101fc47c, Save 0x101fc4f4, SaveHidden 0x101fc568, ~CFSLoadSave
   0x101fc374; __sinit_ui_mainmenu_cpp 0x101fc260; MainLobbyMenuPostOnlineLoginCallbackFn 0x101fb310, MainLobbyMenuConfirmQuit_OK 0x101fb1f4,

@@ -1,7 +1,7 @@
 // TbSoundPosition.h: the sound library's coordinate record and the distance record (unit w77, "sound symbols shared"). Both
 // are plain value classes: three 32-bit words, no virtuals (12 bytes on the Mac and on the host).
 //
-// The functions are in src/TbSoundInfo.cpp, with their addresses in the sound library (Code at 0x10000000). Two stay inline:
+// The functions are in src/sound/TbSoundPosition.cpp, src/sound/TbSoundSampleInfo.cpp, src/sound/TbSoundSystemInfo.cpp, src/sound/SystemCommand.cpp, src/sound/AudioPlaceHolder.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/TbSysCommand.cpp, with their addresses in the sound library (Code at 0x10000000). Two stay inline:
 // the (float, float, float) constructor, because the game's main program has its own inlined copy of it and builds positions
 // on the stack with it (the sound library's copy of it, an unnamed inline, is not a function of its own), and the copy
 // constructor and assignment, because several units hold positions by value (TbAudioEvent) and link without TbSoundInfo.cpp.

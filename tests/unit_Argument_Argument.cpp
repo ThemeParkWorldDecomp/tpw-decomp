@@ -1,5 +1,5 @@
 // Test library for Argument::Argument and Argument::~Argument (unit v5138; libtpw_unit_Argument_Argument.dylib,
-// tests/test_Argument_Argument.py), main app: src/email_Argument_Argument.cpp.
+// tests/test_Argument_Argument.py), main app: src/game/online/email.cpp.
 // The callees (string constructors and destructors, wide string copy, operator delete) are fakes that record their arguments;
 // pointers are recorded as the offset from the test's block so both sides log the same numbers.
 #include <cstddef>

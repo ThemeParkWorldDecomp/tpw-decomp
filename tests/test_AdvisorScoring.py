@@ -1,6 +1,6 @@
 """Differential tests for the advisor's message scoring (unit w95), against libtpw_unit_AdvisorScoring.dylib (tests/unit_AdvisorScoring.cpp):
 
-  src/AdvisorScoring.cpp   CAdvisorScoring: the constructor (0x10010054), the destructor (0x1000adb0), GetScoreFor (0x1001019c),
+  src/game/advisor/Advisor.cpp, src/game/advisor/AdvisorScoring.cpp   CAdvisorScoring: the constructor (0x10010054), the destructor (0x1000adb0), GetScoreFor (0x1001019c),
                            GetNumResponsesFor, GetMaxDuplicatesInQueueFor, GetMinTimeFor, SayOnlyOnce, GetCyclingFor, GetMessageCategory,
                            HasThisBeenKilledTooManyTimes, IsThisValidInTheCurrentMode and IsThisATutorialMessage (0x1001055c..0x10010f38)
 

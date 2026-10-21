@@ -1,5 +1,5 @@
 // Test library for CParkTime::Serialise (unit v5222; libtpw_unit_CParkTime_Serialise.dylib, tests/test_CParkTime_Serialise.py), main app:
-//   src/ParkTime_update_CParkTime_Serialise.cpp
+//   src/game/people/ParkTime.cpp
 //
 // The six callees (SAVEVAR / LOADVAR of int and MacULong, SAVEVARSTRUCT / LOADVARSTRUCT of TbTimeStamp) are fakes that record the file, the offset of
 // the value inside the object, the name (as its index in the five names) and the no-log flag, and answer from a queue.

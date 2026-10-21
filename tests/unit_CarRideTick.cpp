@@ -1,5 +1,5 @@
 // Test library for a coaster car's ride along the track (unit w215; libtpw_unit_CarRideTick.dylib, tests/test_CarRideTick.py), main app:
-//   src/TPConfig_ridetick.cpp   CoasterCarRideTrackTick, SetCarOrientation, SetTrainSoundState, HandleCollisions,
+//   src/game/rides/CoasterExtrude.cpp, src/game/rides/CoasterSounds.cpp, src/game/rides/CoasterTrain.cpp   CoasterCarRideTrackTick, SetCarOrientation, SetTrainSoundState, HandleCollisions,
 //                               InterpolateCoasterSpline (the instance overload), PlayCollisionSound, GetLinearSamplePosn,
 //                               DistanceBetweenPoints (the reference overload)
 //

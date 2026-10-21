@@ -1,5 +1,5 @@
-"""The regular sprite draw path (engine library, src/tb_sprites_draw.cpp, src/tb_rotatevertex.cpp and
-src/tb_drawprimitive_addsprite.cpp), original versus translation: SSpriteGameData::Prepare (0x1002f3d0),
+"""The regular sprite draw path (engine library, src/engine/SpriteData.cpp, src/engine/EngineUtil.cpp and
+src/engine/DrawPrimitive.cpp, src/engine/tb_error.cpp), original versus translation: SSpriteGameData::Prepare (0x1002f3d0),
 SetupVertices (0x1002f688), CalcRegular (0x1003042c), DrawRegular (0x10030a38) and AddRegular (0x10030ac0),
 RotateVertex_Y (0x10038cd0) and RotateVertex_Z (0x10038e9c), CDrawPrimitive::AddSprite (0x10008230) and the
 vertex record's ReturnPtr (0x100087e8), SetUV (0x10008824), SetDiffuse (0x10008864) and SetVertex (0x1000889c).
@@ -1201,7 +1201,7 @@ class WorldTest:
 
 # ----------------------------------------------------------------- generators
 
-# Sprite flags (SSpriteGameData::mF10; src/tb_sprites_draw.cpp, src/tb_sprites.cpp)
+# Sprite flags (SSpriteGameData::mF10; src/engine/SpriteData.cpp, src/engine/SpriteManager.cpp)
 F_HIDDEN, F_OWN_BLEND, F_FLIPX, F_FLIPY_A, F_FLIPY_B, F_ROTATE, F_HOT, F_TERRAIN = 0x1, 0x4, 0x10, 0x20, 0x40, 0x80, 0x200, 0x400
 F_TURN, F_ADDITIVE, F_FLIPV, F_NOCLIP, F_GROUND, F_LISTED = 0x1000, 0x2000, 0x8000, 0x40000, 0x80000, 0x10000000
 F_KEYS = (0x200000, 0x20000, 0x4000, 0x10000)

@@ -25,15 +25,15 @@ uint8_t LbFile_Exists(const char* name);
 const char* LbFile_GetProjectDir();                 // the directory set by LbFile_SetProjectDir
 TbError LbFile_Open(void*& file, const char* name, uint32_t mode);   // bullfrog import
 TbError LbFile_Close(void* file);                   // bullfrog import
-// 0x100004c8 (src/LbFile_more.cpp): the open file's position (CFile::GetPos, vtable offset 0x20).
+// 0x100004c8 (src/bullfrog/LbFile.cpp): the open file's position (CFile::GetPos, vtable offset 0x20).
 int32_t LbFile_GetPosition(void* file);
-int32_t LbFile_GetSize(void* file);                 // 0x10000840 (44 bytes, src/LbFile.cpp): the open file's size in bytes (CFile::GetSize, vtable offset 0x1c)
+int32_t LbFile_GetSize(void* file);                 // 0x10000840 (44 bytes, src/bullfrog/LbFile.cpp): the open file's size in bytes (CFile::GetSize, vtable offset 0x1c)
 TbError LbFile_CreateDirectory(const char* name);   // bullfrog import
 TbError LbFile_DeleteDirectory(const char* name);   // bullfrog import (an empty directory)
 TbError LbFile_SetAttributes(const char* name, uint32_t attributes);   // 0x10000798
 TbError LbFile_GetAttributes(const char* name, uint32_t* attributes);  // 0x100006f0
 TbError LbFile_Rename(const char* from, const char* to);               // 0x10000d5c
-// unit w48: 0x10000ddc, 128 bytes (src/LbFile.cpp, unit w90): copies the project file `from` over `to` (both names go through
+// unit w48: 0x10000ddc, 128 bytes (src/bullfrog/LbFile.cpp, unit w90): copies the project file `from` over `to` (both names go through
 // LbFile_ToProjectFilename; NS_MacDoze::CopyFile overwrites); the answer is 0 whether or not the copy worked.
 TbError LbFile_Copy(const char* from, const char* to);
 int32_t LbFile_Seek(void* file, int32_t offset, uint32_t whence);
@@ -46,14 +46,14 @@ struct TbFileStamp {
     uint32_t mLow;
     uint32_t mHigh;
 };
-// 0x10000520 (bullfrog, 92 bytes, src/LbFile_stamp.cpp): 1, 0 or -1 for the stamp `a` newer than, the same as, or older than `b`
+// 0x10000520 (bullfrog, 92 bytes, src/bullfrog/LbFile.cpp): 1, 0 or -1 for the stamp `a` newer than, the same as, or older than `b`
 // (to the second: NS_MacDoze::CompareFileTime); a NULL stamp is older than any (two NULLs are the same).
 int32_t LbFile_CompareFileStamps(const TbFileStamp* a, const TbFileStamp* b);
 // LbMem: the library's heap (bullfrog imports).
 void* LbMem_Alloc(uint32_t size);
 void LbMem_Free(void* block);
 
-// Unit w221 (src/LbFile_more.cpp). Field names are invented.
+// Unit w221 (src/bullfrog/LbFile.cpp, src/bullfrog/LbApp.cpp). Field names are invented.
 struct TbDriveInfo {
     uint32_t mTotalClusters;       // 0x00
     uint32_t mFreeClusters;        // 0x04
@@ -85,4 +85,4 @@ TbError LbFile_Save(const char*, void*, uint32_t); // 0x10001b78
 TbError LbFile_Open(void**, const char*, uint32_t); // 0x10001e04
 void* LbMem_ReAlloc(void*, uint32_t, uint32_t); // 0x10013dec
 char* const& LbMaxPointer(char* const&, char* const&); // 0x10001520, invented spelling of LB_MAX
-extern char gProcessPath[261]; // 0x10073ba0 (src/LbFile.cpp)
+extern char gProcessPath[261]; // 0x10073ba0 (src/bullfrog/LbFile.cpp)

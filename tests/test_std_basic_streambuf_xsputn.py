@@ -1,5 +1,5 @@
 """Unit v5185, basic_streambuf<wchar_t>::xsputn and xsgetn, against libtpw_unit_std_basic_streambuf_xsputn.dylib
-(tests/unit_std_basic_streambuf_xsputn.cpp), main app ("SimTheme Park"), src/std_basic_streambuf_xsputn.cpp:
+(tests/unit_std_basic_streambuf_xsputn.cpp), main app ("SimTheme Park"), src/game/MslSupport.cpp:
   xsputn 0x1021feac, xsgetn 0x10220024
 
 A case is a stream buffer object (vtable with uflow at 0x2c and overflow at 0x38) whose put or get area lies in a 32 character region R,

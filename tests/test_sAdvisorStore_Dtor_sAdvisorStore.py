@@ -1,5 +1,5 @@
 """Unit v5704, sAdvisorStore::~sAdvisorStore 0x10032358, against libtpw_unit_sAdvisorStore_Dtor_sAdvisorStore.dylib, main app,
-src/TPAdvisor_model_sAdvisorStore_Dtor_sAdvisorStore.cpp.
+src/game/TPCamera.cpp.
 
 The original is called with a NULL or a built object (the CLight part holds valid pointers so its vtable stores land in blocks)
 and the hidden short flag. The only callee, operator delete, is a fake on both sides recording "delete"; it runs when the

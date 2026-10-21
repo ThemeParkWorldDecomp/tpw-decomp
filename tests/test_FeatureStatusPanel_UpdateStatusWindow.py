@@ -1,5 +1,5 @@
 """Unit v5311, the feature status panel, against libtpw_unit_FeatureStatusPanel_UpdateStatusWindow.dylib
-(tests/unit_FeatureStatusPanel_UpdateStatusWindow.cpp), main app ("SimTheme Park"), src/FeatureStatusPanel_UpdateStatusWindow.cpp:
+(tests/unit_FeatureStatusPanel_UpdateStatusWindow.cpp), main app ("SimTheme Park"), src/game/ui/ui_FeatureStatus.cpp:
   UpdateStatusWindow 0x1019e728, InitWindow 0x1019e85c, UpdateWindow 0x1019e958, RideIt 0x1019ea60, UpdateViewWindow 0x1019e374,
   Show 0x1019edc4
 

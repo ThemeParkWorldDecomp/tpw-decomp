@@ -1,4 +1,4 @@
-"""w211: the research lab's projects, efforts and outputs, original code on one side and src/ResearchLab_projects.cpp on the other
+"""w211: the research lab's projects, efforts and outputs, original code on one side and src/game/buildings/ResearchLab.cpp on the other
 (tests/unit_ResearchProjects.cpp).
 
 Functions (main app): CResearchLab::FinalDestroy 0x10121b7c, ContributeResearch 0x101222ac, NextProject 0x101223e8, PreviousProject 0x101225f0, GetEffort

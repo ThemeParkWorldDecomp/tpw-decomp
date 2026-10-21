@@ -1,5 +1,5 @@
 // Test library for the ride hoardings (unit v5987; libtpw_unit_SetRideHoardingLevel.dylib, tests/test_SetRideHoardingLevel.py), main app:
-//   src/LevelSystems_SetRideHoardingLevel.cpp   SetRideHoardingLevel, EnableRideHoardings, ActivateHoardings, ReactivateHoardings
+//   src/game/park/TPHoardings.cpp   SetRideHoardingLevel, EnableRideHoardings, ActivateHoardings, ReactivateHoardings
 //
 // The callees outside the unit are recording fakes; gTPGlobals (another file's) is defined here.
 #include <cstddef>

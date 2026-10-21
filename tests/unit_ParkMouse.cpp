@@ -1,6 +1,6 @@
 // Test library for the park pointer (unit w142; libtpw_unit_ParkMouse.dylib, tests/test_ParkMouse.py), main app:
-//   src/ui_main_context.cpp   ContextMouse 0x10182548
-//   src/Mouse_handlers.cpp    CMouse::ImmediateMouseHandler 0x1007e094, CMouse::ProcessIngameMouse 0x1007de84, CMouse::DoubleClick 0x1007e248
+//   src/game/ui/ui_main.cpp   ContextMouse 0x10182548
+//   src/game/Mouse.cpp    CMouse::ImmediateMouseHandler 0x1007e094, CMouse::ProcessIngameMouse 0x1007de84, CMouse::DoubleClick 0x1007e248
 //                             and the two button flags gMouseLeftDown 0x102dc1ec, gMouseRightDown 0x102dc1e8
 // Every callee outside the unit is a fake that records the event the PowerPC stub records: the mouse and its modes (a fake mode object whose
 // virtuals record), the cell predicates, the object, staff and map members, the text table (GetConstString, FormatString), the help text, the

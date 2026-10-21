@@ -1,14 +1,14 @@
 """Differential tests for the master save's ticket bookkeeping, the current theme and the park sign names (unit w89), against
 libtpw_unit_MasterSaveTickets.dylib (tests/unit_MasterSaveTickets.cpp):
 
-  src/FS_MasterSave_tickets.cpp   CFSGlobalMasterSave: ~CFSGlobalMasterSave, HowManyTickets, HowManyTicketsIncludingSecrets,
+  src/game/save/FS_MasterSave.cpp   CFSGlobalMasterSave: ~CFSGlobalMasterSave, HowManyTickets, HowManyTicketsIncludingSecrets,
                                   SpendingPower, SpendTicketOn, HasBeenBought, HaveTicket (local, secret), EarnedTicket (local,
                                   global, secret), ChangeCurrentTheme, SetSignNameA, SetSignNameB, SetSwearFilter, IsSwearFilterOn,
                                   ClearThemeMap, CheckTicketTypeWon, HasAllResearchBeenCompleted,
                                   SetAllResearchCompletedInCurrentTheme, IsFirstTimePlayer, ClearFirstTimePlayer;
                                   CFSGlobalParkData: ~CFSGlobalParkData, HaveTicket, EarnedTicket, AwardInThisPark, ScoreForAward,
                                   ClearAward, SetAward
-  src/FS_MasterSave_signs.cpp     CFSGlobalParkData: GetSignNameA, GetSignNameB, SetSignNameA, SetSignNameB
+  src/game/save/FS_MasterSave.cpp     CFSGlobalParkData: GetSignNameA, GetSignNameB, SetSignNameA, SetSignNameB
 
 A case is a world and a script. The world: eight themes whose balance files the world scripts (Load's answer, the key cost and the
 gate object's number), a ride database with the rides the case gives (an id and two sign texts) and the ride name table's strings

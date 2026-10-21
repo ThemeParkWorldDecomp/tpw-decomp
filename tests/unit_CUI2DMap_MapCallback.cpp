@@ -1,5 +1,5 @@
 // Test library for CUI2DMap::MapCallback (unit v5526; libtpw_unit_CUI2DMap_MapCallback.dylib, tests/test_CUI2DMap_MapCallback.py), main app:
-//   src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_MapCallback.cpp   CUI2DMap::MapCallback
+//   src/game/ui/ui_2dmap.cpp   CUI2DMap::MapCallback
 //
 // Every callee is a fake that records the arguments the real one reads and answers from the test's queue; the globals of other files the
 // unit reads (gGame, gPlayerSettings, gei_Display, gei_MapWho, gGameWindow) are defined here, zero at start like the Mac's bss.

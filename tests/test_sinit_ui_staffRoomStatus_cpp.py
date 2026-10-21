@@ -1,7 +1,7 @@
 """Unit v5951: the staff room / show status static initialisers, the staff room list filler and row maker, the staff status view
 window callback and the staff name edit panel, against libtpw_unit_sinit_ui_staffRoomStatus_cpp.dylib
 (tests/unit_sinit_ui_staffRoomStatus_cpp.cpp), main app ("SimTheme Park"),
-src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_sinit_ui_staffRoomStatus_cpp.cpp:
+src/game/ui/ui_showStatus.cpp, src/game/ui/ui_staffRoomStatus.cpp, src/game/ui/ui_staffStatus.cpp:
   __sinit_ui_staffRoomStatus_cpp 0x101c40f0, LCFormat 0x101c3360, StaffStatusViewWindowCallback 0x101c4ec0, StaffRoomListFiller 0x101c30fc,
   __sinit_ui_showStatus_cpp 0x101c2b10, StaffStatusPanel::ShowEditNamePanel 0x101c5878
 

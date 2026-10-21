@@ -1,11 +1,11 @@
 """Differential tests for the resizable frame and slider draw objects and TbColour's constructor, against libtpw_unit_UIResizable.dylib
 (tests/unit_UIResizable.cpp):
 
-  src/ui_DrawObjectResizable.cpp  InterfaceDrawEngineResizableFrame::InstanceMe 0x10188a68 and Change 0x101887f0,
+  src/game/ui/InterfaceDrawEngine.cpp  InterfaceDrawEngineResizableFrame::InstanceMe 0x10188a68 and Change 0x101887f0,
                                   InterfaceDrawEngineResizableSlider::InstanceMe 0x10188ed0 and Change 0x10188cf0
-  src/TbColour.cpp                TbColour::TbColour 0x1007d9d4
+  src/game/ui/intrface.cpp                TbColour::TbColour 0x1007d9d4
 
-UIMain_ConvertString (0x10181a7c, now in src/ui_main.cpp) is tested in test_UIDrawText.py, whose library links ui_main.cpp since unit w44
+UIMain_ConvertString (0x10181a7c, now in src/game/ui/ui_main.cpp) is tested in test_UIDrawText.py, whose library links ui_main.cpp since unit w44
 moved the body there (NULL, empty and long texts, with and without the converter, the buffer's bytes).
 
 Real on both sides: the four members and the constructor. Fakes that record the same event on both sides: InstanceMesh, the engine mesh

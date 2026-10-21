@@ -21,7 +21,7 @@
 // 0x10007b0c), +0x68 CloseMpegFile (0x1000eb44 / 0x10008304) and +0x6c GetMpegBlock (0x1000ebe4 / 0x1000828c). Read and Seek of
 // the file codec are not virtual: the decoder's file player calls them.
 // The static cleanup objects _CS__TbSoundSampleMPEG2 (0x1000ed30) and _CS__TbSoundSampleMPEG2File (0x1000881c) clear the pools at
-// exit; src/TbSoundSampleMPEG2.cpp keeps one of each, as src/TbMpegBase.cpp does for CMpegBase.
+// exit; src/sound/StreamableMpeg2.cpp, src/sound/TbSoundSampleMPEG2.cpp, src/game/advisor/AdvisorScoring.cpp, src/sound/TbBank.cpp, src/sound/TbSoundSamplePipe.cpp keeps one of each, as src/sound/LbMpeg.cpp does for CMpegBase.
 #pragma once
 #include <cstddef>
 #include <cstdint>

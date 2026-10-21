@@ -1,5 +1,5 @@
 """Unit v5920, the coaster editor's button functions, against libtpw_unit_GetCoasterEditDefaultButtons.dylib
-(tests/unit_GetCoasterEditDefaultButtons.cpp), main app, src/LayoutSetRotatePylon_DeleteLastTrackBrace_SetCoasterButtonState_GetCoasterEditDefaultButtons.cpp:
+(tests/unit_GetCoasterEditDefaultButtons.cpp), main app, src/game/rides/CoasterEdit.cpp:
   HandleCoasterButtonDown 0x10056d7c, GetCoasterEditDefaultButtons 0x10057120, GetCoasterEditAvailableButtons 0x10057278
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian at the Mac offsets,

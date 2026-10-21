@@ -1,6 +1,6 @@
 """The constructors of the things a new level makes (unit w122a, main app), against libtpw_unit_ThingCtors.dylib (tests/unit_ThingCtors.cpp):
 
-  src/ThingCtors.cpp   CThing::CThing (0x1012de58), CStaffHQ::CStaffHQ (0x1012a7fc), CMechanicHQ::CMechanicHQ (0x1010521c),
+  src/game/Thing.cpp, src/game/advisor/Advisor.cpp, src/game/buildings/MechanicHQ.cpp, src/game/buildings/ResearchLab.cpp, src/game/buildings/StaffHQ.cpp, src/game/park/Weather.cpp, src/game/ui/vector2d.cpp   CThing::CThing (0x1012de58), CStaffHQ::CStaffHQ (0x1012a7fc), CMechanicHQ::CMechanicHQ (0x1010521c),
                        CAdvisor::CAdvisor (0x10009f9c), CTagSystem::CTagSystem (0x1012c57c), CResearchLab::CResearchLab (0x10121ad0),
                        CWeather::CWeather (0x10137da0), CUIMsgReceiver::CUIMsgReceiver (0x101305b0)
   include/ThingParts.h, include/ThingReceivers.h (inline)   the six leaf part constructors: CTrainingCentre (0x1012ffb0), CWeatherForecast

@@ -1,6 +1,6 @@
 // Test library for the ride preview's destroy, tick and the ride highlight (unit v5977; libtpw_unit_DestroyRidePreview.dylib,
 // tests/test_DestroyRidePreview.py), main app:
-//   src/Debug_overlays_DestroyRidePreview.cpp   DestroyRidePreview, HighlightRide, TickRidePreview
+//   src/game/rides/RidePreview.cpp   DestroyRidePreview, HighlightRide, TickRidePreview
 //
 // The callees outside the unit (DestroyRideInstance, UnhighlightRide, CClock::Read, YRotateLMatrix, XRotateLMatrix) are fakes that record
 // their arguments; the rotations also write two words of the matrix so that the code after them has something to work on. The globals of

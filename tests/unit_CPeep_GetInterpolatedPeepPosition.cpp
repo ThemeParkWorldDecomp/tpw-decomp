@@ -1,6 +1,6 @@
 // Test library for CPeep::GetInterpolatedPeepPosition and CPeep::Serialise (unit v5533; libtpw_unit_CPeep_GetInterpolatedPeepPosition.dylib,
 // tests/test_CPeep_GetInterpolatedPeepPosition.py), main app:
-//   src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_GetInterpolatedPeepPosition.cpp
+//   src/game/people/Peep.cpp
 //
 // Every callee is a fake that records the arguments the real one reads (a pointer into the peep as its offset from the peep) and answers from
 // the test's queues.

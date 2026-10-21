@@ -1,5 +1,5 @@
 """Unit v5097, the research panel's DoScroll, InitAll and ResearchPanelMsg, against libtpw_unit_DoScroll.dylib (tests/unit_DoScroll.cpp), main app
-("SimTheme Park"), src/DoScroll.cpp:
+("SimTheme Park"), src/game/ui/ui_researchPanel.cpp:
   DoScroll 0x101b42d0, InitAll 0x101b4000, ResearchPanelMsg 0x101b45e0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

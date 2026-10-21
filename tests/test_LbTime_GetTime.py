@@ -1,5 +1,5 @@
 """Unit v5309, LbTime_GetTime and LbTime_GetDate, against libtpw_unit_LbTime_GetTime.dylib (tests/unit_LbTime_GetTime.cpp), bullfrog,
-src/LbTime_LbTime_GetTime.cpp:
+src/bullfrog/LbTime.cpp:
   LbTime_GetTime 0x100468e4, LbTime_GetDate 0x10046968
 
 A case is a SYSTEMTIME (eight 16-bit words) answered by the fake NS_MacDoze::GetLocalTime (0x1006ba24, same event on both sides) and a

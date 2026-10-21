@@ -1,5 +1,5 @@
 // Test library for the outbox window's messages (unit v5031; libtpw_unit_OutboxSendingMsg.dylib, tests/test_OutboxSendingMsg.py), main app:
-//   src/UI_IslandLobby_CalcEmailAddressScrollBar_OutboxSendingMsg.cpp   MarkOutboxEmail, SendMailStatusDisplay, OutboxSendingMsg
+//   src/game/ui/ui_onlineOutbox.cpp   MarkOutboxEmail, SendMailStatusDisplay, OutboxSendingMsg
 //
 // The callees outside the unit (the user info constructor, the outbox cursor and marks, GetWindow, Show, UI_PostMessage,
 // DialogBoxCallback) are recording fakes that answer from the test's queues. gUserInfo and gLobby are defined here.

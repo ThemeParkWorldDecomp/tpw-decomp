@@ -1,6 +1,6 @@
-// Test library for unit w173 (libtpw_unit_BankAccount.dylib, tests/test_BankAccount.py), main app: src/BankAccount.cpp (CBankAccount::Serialise 0x100f2d10,
+// Test library for unit w173 (libtpw_unit_BankAccount.dylib, tests/test_BankAccount.py), main app: src/game/park/BankAccount.cpp (CBankAccount::Serialise 0x100f2d10,
 // MonthlyUpdate 0x100f36a8, GetLoanInfo 0x100f3c44, AnyLoanAvailable 0x100f3ee0, PayOffLoan 0x100f40c8) and CBankAccount::MakeWithdrawal 0x100f33b0
-// (src/Things2_small.cpp, real). Every other callee is a fake that records the same event as the PowerPC side's stub.
+// (src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/Weather.cpp, src/game/park/analyser.cpp, real). Every other callee is a fake that records the same event as the PowerPC side's stub.
 //
 // The worlds are not blocks of their Mac size: only the 0x80 bytes at world + 0x1da6f0 are real memory (gTail), and a world pointer is that block's
 // address minus 0x1da6f0 on both sides (mParkTime's address is only passed on). The account lives in gObj over 0x40 guard bytes on each side; the two

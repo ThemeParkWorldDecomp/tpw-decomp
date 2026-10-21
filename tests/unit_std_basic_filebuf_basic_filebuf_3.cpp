@@ -1,6 +1,6 @@
 // Test library for std::basic_filebuf<wchar_t> constructor and open, and std::__tree<pair<const nocase_string, BuddyInfo>>::insert_node_at
 // (unit v5944; libtpw_unit_std_basic_filebuf_basic_filebuf_3.dylib, tests/test_std_basic_filebuf_basic_filebuf_3.py), main app:
-//   src/std_basic_filebuf_basic_filebuf_3.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The blocks the world
 // needs (codecvt object, new node, reference count, string array) are built by the test and handed to the wrappers.

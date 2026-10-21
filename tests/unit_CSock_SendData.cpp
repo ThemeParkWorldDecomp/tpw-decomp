@@ -1,5 +1,5 @@
 // Test library for CSock (unit v5304; libtpw_unit_CSock_SendData.dylib, tests/test_CSock_SendData.py), main app:
-//   src/Email_Send_CSock_SendData.cpp   CSock::CSock, CSock::SendData
+//   src/game/online/Connection.cpp   CSock::CSock, CSock::SendData
 //
 // Sock::Sock writes two marker words into the object and records one event; send records its arguments (first byte and byte sum of
 // the data) and answers from the test's queue: a negative value as is, else min(value, length).

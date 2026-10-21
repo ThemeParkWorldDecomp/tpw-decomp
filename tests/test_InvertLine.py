@@ -1,5 +1,5 @@
 """Unit v5757, the text formatter's line helpers, against libtpw_unit_InvertLine.dylib (tests/unit_InvertLine.cpp),
-src/ltms_textformatter_rest.cpp and src/ltms_textformatter_rest_InvertLine.cpp:
+src/ltms/TbTextFormatter.cpp, src/engine/tb_depthoffield.cpp:
   InvertLine 0x10006c3c, IsHebInLine 0x10006bb4, GetNextNonDelimiter 0x10006b04, GetNextDelimiter 0x10006a68
 
 A case is an array of 16-byte CCharacterInfo records (the words random or taken from space, comma and the Hebrew range edges) and a

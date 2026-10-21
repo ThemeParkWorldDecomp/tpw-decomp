@@ -1,5 +1,5 @@
 """Unit v5739, CServiceQueue, against libtpw_unit_CServiceQueue_CServiceQueue.dylib (tests/unit_CServiceQueue_CServiceQueue.cpp), program
-"sound symbols shared", src/TbSoundSampleMPEG2_CServiceQueue_CServiceQueue.cpp:
+"sound symbols shared", src/sound/ServiceQueue.cpp:
   CServiceQueue::CServiceQueue 0x10007410, ~CServiceQueue 0x1000726c, Close 0x10007514, Poll 0x10007590
 
 A case is a world and a call. The queue object is built twice by ONE piece of Python code: in emulator memory (big-endian, 4-byte

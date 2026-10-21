@@ -1,4 +1,4 @@
-// Fakes for CHField::Execute (src/tb_hfield_execute.cpp). Everything Execute calls records an
+// Fakes for CHField::Execute (src/engine/tb_hfield.cpp). Everything Execute calls records an
 // event through tests/calllog.h; the larger things (the vertices handed to the clipper, the
 // quads handed to the sort, a primitive when it is executed) go to a dump of words that the
 // PowerPC side builds the same way (tests/test_HFieldExecute.py):

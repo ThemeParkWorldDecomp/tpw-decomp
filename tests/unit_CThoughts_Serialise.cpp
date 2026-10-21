@@ -1,5 +1,5 @@
 // Test library for CThoughts (unit v5888; libtpw_unit_CThoughts_Serialise.dylib, tests/test_CThoughts_Serialise.py), main app:
-//   src/MsgDeath_CThoughts_Serialise.cpp   the CThoughts functions and the script blocks
+//   src/game/people/Thoughts.cpp   the CThoughts functions and the script blocks
 //
 // The callees outside the unit are recording fakes; the globals of other files are defined here.
 #include <cstddef>

@@ -1,6 +1,6 @@
 // Test library for the keyboard action wrappers and small panel functions (unit v51122; libtpw_unit_context_help.dylib,
 // tests/test_context_help.py), main app:
-//   src/ui_Postcard_panel_win_ticket_1_show_person_history_info_enter_hoarding_mode_context_help.cpp
+//   src/game/keyboard.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_loansPanel.cpp, src/game/ui/ui_mainpanel2.cpp, src/game/ui/ui_optionsPanel.cpp, src/game/ui/ui_parkStatus.cpp
 //
 // The callees outside the unit (the UIInterface members, CWorld::GetAdvisor, CAdvisor::PlayLastTutorialMessage, UI_SendMessage, the wide
 // string constructor and __register_global_object) are recording fakes. The globals of other files are defined here.

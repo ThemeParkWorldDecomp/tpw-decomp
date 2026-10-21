@@ -1,10 +1,10 @@
 // Test library for the park's hoarding (unit w201; libtpw_unit_HoardingImage.dylib, tests/test_HoardingImage.py), main app:
-//   src/LLCellSystem_hoardimage.cpp  the 12 LLCC functions (the walk, the lock, the redraw, the image, the fill, the legality checks)
-//   src/TrackCell_flags.cpp, src/MapCell_flags.cpp  the six CTrackCell members and CMapCell::IsFlag
-//   src/CellBase.cpp, src/TrackCell.cpp, src/MapDelta.cpp (landed): the neighbour counts, the cell equivalents, GetNeighbouringCell and the compass
-//   src/LLCellClicks.cpp (landed): the click stack's count
+//   src/game/park/LLCellSystem.cpp  the 12 LLCC functions (the walk, the lock, the redraw, the image, the fill, the legality checks)
+//   src/game/park/TrackCell.cpp, src/game/park/MapCell.cpp  the six CTrackCell members and CMapCell::IsFlag
+//   src/game/park/CellBase.cpp, src/game/buildings/TrainingCentre.cpp, src/game/park/MapDelta.cpp (landed): the neighbour counts, the cell equivalents, GetNeighbouringCell and the compass
+//   src/game/park/LLCellSystem.cpp (landed): the click stack's count
 // Every other callee is a fake that records the event the PowerPC stub records. The globals of other files are defined here, and so are the two tiny
-// callees that run for real on the PowerPC side: OPPOSITE and CMap::IsXYValid (the host copies their bodies from src/MapDelta_map.cpp).
+// callees that run for real on the PowerPC side: OPPOSITE and CMap::IsXYValid (the host copies their bodies from src/game/park/Map.cpp).
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
@@ -28,7 +28,7 @@
 
 using namespace calllog;
 
-// ---- globals of other files (src/LLCellSystem.cpp's words, src/LLCellSystem_hoarding.cpp's extents, src/LLCellSystem_modes.cpp's click stack)
+// ---- globals of other files (src/game/park/LLCellSystem.cpp's words, src/game/park/LLCellSystem.cpp's extents, src/game/park/LLCellSystem.cpp's click stack)
 CWorld* gGameWorld;
 CWorld* gWorld;
 CMap* gWorldMap;
@@ -41,14 +41,14 @@ namespace {
 char* gWorldStore;   // the world block (gGameWorld, gWorld and gWorldMap point into it)
 }
 
-// ---- the two small callees that run for real on the PowerPC side: bodies as in src/MapDelta_map.cpp (0x10102500, 0x101012f4)
+// ---- the two small callees that run for real on the PowerPC side: bodies as in src/game/park/Map.cpp (0x10102500, 0x101012f4)
 uint8_t OPPOSITE(uint8_t d) {
     if (d == 0) return 0;
     if (d < 0x10) return static_cast<uint8_t>((d << 4) & 0xf0);
     return static_cast<uint8_t>((d >> 4) & 0xff);
 }
 int32_t CMap::IsXYValid(int32_t x, int32_t y) { return x >= 0 && y >= 0 && x < 0x80 && y < 0x80; }
-// 0x101037d0 (src/MapDelta_map.cpp): both words times k (the host writes 0 into the flag byte; GetNeighbouringCell never reads it).
+// 0x101037d0 (src/game/park/MapDelta.cpp): both words times k (the host writes 0 into the flag byte; GetNeighbouringCell never reads it).
 MapDelta MapDelta::operator*(int32_t k) const {
     MapDelta result;
     result.mX = mX * k;

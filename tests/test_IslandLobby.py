@@ -1,13 +1,13 @@
 """Differential tests for the island lobby's controller, the global master save and the ride names (unit w32), against
 libtpw_unit_IslandLobby.dylib (tests/unit_IslandLobby.cpp):
 
-  src/UI_IslandLobby.cpp          CreateIslandLobbyController, ShowIslandLobbyController, UpdateIslandLobbyUI,
+  src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_onlineOutbox.cpp          CreateIslandLobbyController, ShowIslandLobbyController, UpdateIslandLobbyUI,
                                   UpdateIslandLobbyKeyDisplay, EnableIslandLobbyButtons, UpdateOutboxMailIcon
-  src/InterfaceWindow_frame.cpp   InterfaceWindow::SetFrame
-  src/FS_MasterSave_global.cpp    CFSGlobalMasterSave: the constructor, ResetGlobalData, HowManyKeys, GetInfoOn, CreateNewTheme;
+  src/game/ui/InterfaceWindow.cpp   InterfaceWindow::SetFrame
+  src/game/save/FS_MasterSave.cpp    CFSGlobalMasterSave: the constructor, ResetGlobalData, HowManyKeys, GetInfoOn, CreateNewTheme;
                                   CFSGlobalParkData: the constructor, HowManyTickets, KeyCostToEnter, CheckBalanceFile,
                                   GetFullName; CGlobalParkDataBalance's two virtual members
-  src/RideDB_names.cpp            CRideNameDB::GetName, GetNameA, GetNameB; CRideDatabase::GetTypeName(id, buffer, size)
+  src/game/rides/RideDB.cpp, src/game/save/SaveLoad.cpp            CRideNameDB::GetName, GetNameA, GetNameB; CRideDatabase::GetTypeName(id, buffer, size)
 
 A case is a world and a script. The world: the controller's nine windows (each with a draw object and a client draw object), the
 lobby window and its mail icon, four fonts, eight islands and the lobby's screen system, eight themes whose balance files the

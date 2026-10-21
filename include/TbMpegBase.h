@@ -160,7 +160,7 @@ public:
 int32_t muldiv(int32_t a, int32_t b, int32_t c);
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Unit w71b: the second half of the decoder (src/TbMpegSynth.cpp): PolySynth, dct64, WRITE_SAMPLE, Decode_Layer2 and the two
+// Unit w71b: the second half of the decoder (src/sound/MpegDecode.cpp): PolySynth, dct64, WRITE_SAMPLE, Decode_Layer2 and the two
 // forms of II_step_two, with the static tables they use.
 
 // mpglib's allocation table entry (4 bytes on the Mac, two big-endian shorts): the first entry of a subband is {the bits of

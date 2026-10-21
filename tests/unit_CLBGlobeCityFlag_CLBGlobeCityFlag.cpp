@@ -1,6 +1,6 @@
 // Test library for the online globe's city flag (unit v5546; libtpw_unit_CLBGlobeCityFlag_CLBGlobeCityFlag.dylib,
 // tests/test_CLBGlobeCityFlag_CLBGlobeCityFlag.py), main app:
-//   src/CLBGlobeCityFlag_CLBGlobeCityFlag.cpp   the constructor and destructor, gGlobeNoCityName
+//   src/game/online/lobby_globe.cpp   the constructor and destructor, gGlobeNoCityName
 //
 // The lobby meshes' InstanceMeshType, the mesh instance's Show/SetDirection/SetPosition/Scale, _wcsicmp and the globe's two virtuals
 // are recording fakes. Objects are static buffers so the log's labels are fixed addresses.

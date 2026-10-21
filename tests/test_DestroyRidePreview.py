@@ -1,5 +1,5 @@
 """Unit v5977, the ride preview's destroy and tick and the ride highlight, against libtpw_unit_DestroyRidePreview.dylib
-(tests/unit_DestroyRidePreview.cpp), main app ("SimTheme Park"), src/Debug_overlays_DestroyRidePreview.cpp:
+(tests/unit_DestroyRidePreview.cpp), main app ("SimTheme Park"), src/game/rides/RidePreview.cpp:
   DestroyRidePreview 0x1006ccd0, HighlightRide 0x1006ce28, TickRidePreview 0x1006c970
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

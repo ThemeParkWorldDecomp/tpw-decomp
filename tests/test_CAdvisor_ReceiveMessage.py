@@ -1,5 +1,5 @@
 """Unit v5631, the advisor's message receiver, against libtpw_unit_CAdvisor_ReceiveMessage.dylib (tests/unit_CAdvisor_ReceiveMessage.cpp),
-main app ("SimTheme Park"), src/AdvisorQueue_CAdvisor_ReceiveMessage.cpp:
+main app ("SimTheme Park"), src/game/advisor/Advisor.cpp:
   CAdvisor::ReceiveMessage 0x1000c874
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

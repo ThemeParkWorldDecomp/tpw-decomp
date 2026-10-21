@@ -1,4 +1,4 @@
-// Fakes for the mesh draw registration unit (src/MeshDraw.cpp): the engine's map lists and
+// Fakes for the mesh draw registration unit (src/game/TPMesh.cpp): the engine's map lists and
 // CMesh::SetLocalMatrix record their arguments; the engine mesh is one static object.
 #include "TPEngine.h"
 #include "tb_mesh.h"

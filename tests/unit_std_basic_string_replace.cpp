@@ -1,6 +1,6 @@
 // Test library for std::basic_string<wchar_t> replace / substr / begin (unit v5044; libtpw_unit_std_basic_string_replace.dylib,
 // tests/test_std_basic_string_replace.py), main app:
-//   src/ui_iterators_std_basic_string_replace.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit (strlen, strcpy, the allocators, __throw, the wmem functions, the counted-pointer constructor and the
 // substring constructor) are recording fakes with the same events as the module's PowerPC stubs. The globals of other files are

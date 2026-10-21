@@ -1,5 +1,5 @@
 """Unit v5150, a person in a ride's queue, against libtpw_unit_CPerson_DismissFromQueue.dylib (tests/unit_CPerson_DismissFromQueue.cpp), main app
-("SimTheme Park"), src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_DismissFromQueue.cpp:
+("SimTheme Park"), src/game/people/PersonQueue.cpp:
   CPerson::DismissFromQueue 0x1011f1b8, EvaluateQueueEdit 0x1011f2f8, FindQueueDestination 0x1011ef14, ExitRide 0x1011f5a4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

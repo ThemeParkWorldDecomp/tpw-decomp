@@ -1,4 +1,4 @@
-"""Differential tests for unit w202, the ride's admittance and queue length (src/Object_admit.cpp). See difftest.py and tpwtest.py.
+"""Differential tests for unit w202, the ride's admittance and queue length (src/game/Object.cpp). See difftest.py and tpwtest.py.
 
 The eleven CObject members HasFreeQueueSpace, GetIdealQueueLength, QueueTooLong, AdmitPerson, FinishedAdmitting, ReadyToAdmit,
 PersonLeftDuringAdmittance, LetPeopleOn, LetPeopleOff, ProcessStateFunctioning and GoFirstPerson. Both sides work in ONE 2 MB block (the PowerPC side maps

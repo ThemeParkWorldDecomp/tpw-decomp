@@ -1,5 +1,5 @@
 """Unit v5053, the loft of a new brace and the link level of a pylon, against libtpw_unit_GetNewBraceLoftInterval.dylib
-(tests/unit_GetNewBraceLoftInterval.cpp), main app ("SimTheme Park"), src/GetNewBraceLoftInterval.cpp:
+(tests/unit_GetNewBraceLoftInterval.cpp), main app ("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   GetNewBraceLoftInterval 0x1003e108, DetermineLinkLevel 0x1003e7dc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

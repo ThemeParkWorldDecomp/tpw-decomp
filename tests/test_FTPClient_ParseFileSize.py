@@ -1,5 +1,5 @@
 """Unit v5273, six FTPClient members, against libtpw_unit_FTPClient_ParseFileSize.dylib (tests/unit_FTPClient_ParseFileSize.cpp), main app,
-src/FTPClient_RecvData_FTPClient_ParseFileSize.cpp:
+src/game/online/FTPClient.cpp:
   FTPClient::FTPClient 0x1020b368 (the constructor body), Disconnect 0x1020beb8, _Disconnect 0x1020bf94, Download 0x1020c064,
   _CloseDSocket 0x1020c174, ParseFileSize 0x1020c744
 

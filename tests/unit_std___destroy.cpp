@@ -1,5 +1,5 @@
 // Test library for std::__destroy<Argument*> / std::__destroy<Argument> (unit v5310; libtpw_unit_std___destroy.dylib, tests/test_std___destroy.py), main app:
-//   src/std___destroy.cpp   DestroyOne, DestroyRange, DestroyRangeTagged
+//   src/game/MslSupport.cpp   DestroyOne, DestroyRange, DestroyRangeTagged
 //
 // The callees (Argument::Destruct, the string destructors) are fakes that record the object and the flag.
 #include <cstddef>

@@ -661,7 +661,7 @@ void COnlineControl::ProcessQueue() {
 }
 
 namespace {
-// The theme list has a constructor now (src/FS_OnlineList.cpp, not linked here): this one is only ever asked for its name function (a
+// The theme list has a constructor now (src/game/online/FS_OnlineList.cpp, not linked here): this one is only ever asked for its name function (a
 // fake), so its storage is left raw.
 alignas(16) unsigned char gFakeThemeListStore[sizeof(CFSOnlineSystemThemeList)];
 CFSOnlineSystemThemeList* FakeThemeList() { return reinterpret_cast<CFSOnlineSystemThemeList*>(gFakeThemeListStore); }

@@ -21,12 +21,12 @@ struct List {
 // std::list<unsigned_int,std::allocator<unsigned_int>>::erase 0x1020919c (188): r3 = where the returned iterator is stored, r4 = the list,
 // r5 = first, r6 = last (iterators are the node addresses).
 void Erase(uint32_t* result, List* list, uint32_t first, uint32_t last);
-// operator delete glue 0x10238218 (weak in src/std_list_erase.cpp)
+// operator delete glue 0x10238218 (weak in src/game/MslSupport.cpp)
 void OperatorDelete(void* p);
 // std::list<unsigned_int,std::allocator<unsigned_int>>::clear 0x102090dc (124)
 void Clear(List* list);
 
-// Unit v5683 (src/std_list_unique.cpp)
+// Unit v5683 (src/game/MslSupport.cpp)
 // std::list<unsigned_int,std::allocator<unsigned_int>>::unique 0x10208dcc (308)
 void Unique(List* list);
 // std::list<unsigned_int,std::allocator<unsigned_int>>::sort 0x10208c04 (388)
@@ -34,7 +34,7 @@ void Sort(List* list);
 // std::list<unsigned_int,std::allocator<unsigned_int>>::merge 0x102095a0 (652): stand-in, a fake in the test
 void Merge(List* list, List* other);
 
-// Unit v5931 (src/std_list_insert_2.cpp; merge above is defined there too)
+// Unit v5931 (src/game/MslSupport.cpp; merge above is defined there too)
 // insert 0x102092f8 (428): result = where the iterator (the new node) is stored, pos = the node before which to insert
 void Insert(uint32_t* result, List* list, uint32_t pos, const uint32_t* value);
 // splice 0x1020a9a0 (432): moves all of other before pos

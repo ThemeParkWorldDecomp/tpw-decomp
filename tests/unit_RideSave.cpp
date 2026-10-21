@@ -1,5 +1,5 @@
 // Test library for the ride scripts' save and rsse.cpp's swap helpers (unit w166; libtpw_unit_RideSave.dylib, tests/test_RideSave.py), main app:
-//   src/rsse_save.cpp   RSSE_Save and the eleven RsseSwap helpers
+//   src/game/rides/rsse.cpp   RSSE_Save and the eleven RsseSwap helpers
 //
 // Every callee outside the unit is a fake that records what the PowerPC stub of the module records: LbFile_Write (the file, the length, whether a
 // bytes-done pointer was given; the bytes go to a list of chunks the test reads back) and the SamsUtilities copy, allocate and delete (the host's

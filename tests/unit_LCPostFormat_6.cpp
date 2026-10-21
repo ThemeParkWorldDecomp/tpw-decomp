@@ -1,5 +1,5 @@
 // Test library for the all-items list's attach function (unit v5560; libtpw_unit_LCPostFormat_6.dylib, tests/test_LCPostFormat_6.py), main app:
-//   src/ui_allKidsPanel_AllKidsPanelMsg_LCPostFormat_6.cpp   AllItemsListLCPostFormat
+//   src/game/ui/ui_allItemsPanel.cpp   AllItemsListLCPostFormat
 //
 // Every callee outside the unit is a fake that records what the real one reads. The windows are blocks the test makes (never read by the
 // code); GetChild and GetNext walk them in order. The two globals of MainWindowCallback.cpp are defined here.

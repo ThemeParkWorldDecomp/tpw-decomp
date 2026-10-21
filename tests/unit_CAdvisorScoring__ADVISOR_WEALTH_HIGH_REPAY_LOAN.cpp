@@ -1,6 +1,6 @@
 // Test library for twelve advisor scorers (unit v5896; libtpw_unit_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN.cpp   the twelve scorers and gAdvisorNoRideQueue
+//   src/game/advisor/AdvisorScoring.cpp   the twelve scorers and gAdvisorNoRideQueue
 //
 // The callees outside the unit (the world, the bank account, the park analyser, the park time, the history sum) are fakes that record the
 // arguments the real ones read and answer from the test's queues. The globals of other files the unit reads are defined here.

@@ -1,5 +1,5 @@
 """Unit v5002, the all-items panel's message functions and the all-features panel, against libtpw_unit_MainWindowCallback.dylib
-(tests/unit_MainWindowCallback.cpp), main app ("SimTheme Park"), src/MainWindowCallback.cpp:
+(tests/unit_MainWindowCallback.cpp), main app ("SimTheme Park"), src/game/ui/ui_allItemsPanel.cpp:
   MainWindowCallback 0x10197c2c, ListTemplateCallback 0x10197dac, CreateAllFeaturesPanel 0x101979c0, ActualListCallback 0x10198064
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

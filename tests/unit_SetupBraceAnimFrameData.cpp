@@ -1,8 +1,8 @@
 // Test library for SetupBraceAnimFrameData (unit v5214; libtpw_unit_SetupBraceAnimFrameData.dylib, tests/test_SetupBraceAnimFrameData.py), main app:
-//   src/GetTangentsFromZVector_SetupBraceAnimFrameData.cpp   SetupBraceAnimFrameData
+//   src/game/rides/CoasterPylon.cpp   SetupBraceAnimFrameData
 //
 // The only callee outside the unit is modf (the C library, run natively here and by the test's Python on the PowerPC side).
-// gRideAnimSets (src/RideTypes.cpp) is defined here.
+// gRideAnimSets (src/game/rides/TPRide.cpp) is defined here.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

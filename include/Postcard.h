@@ -62,7 +62,7 @@ public:
     // pixels, and then writes from address 0 (kept: see the .cpp).
     void generate_preview_into_buffer(uint8_t* out, int32_t width, int32_t height, int32_t format);
 
-    // 0x100c0c20 (unit v5906, src/Postcard_Postcard_save.cpp): writes the card as a JPEG (quality 75, 3 components, RGB) to `path`;
+    // 0x100c0c20 (unit v5906, src/game/ui/Postcard.cpp): writes the card as a JPEG (quality 75, 3 components, RGB) to `path`;
     // a card that cannot be opened prints "can't open %s" and exits. Always 1.
     int32_t save(char* path);
 

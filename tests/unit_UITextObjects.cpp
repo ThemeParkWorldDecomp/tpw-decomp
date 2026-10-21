@@ -1,7 +1,7 @@
-// Test library for the text draw objects (libtpw_unit_UITextObjects.dylib; see tests/test_UITextObjects.py): src/ui_DrawObjectText.cpp
+// Test library for the text draw objects (libtpw_unit_UITextObjects.dylib; see tests/test_UITextObjects.py): src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_textmanager.cpp
 // (InterfaceTextObjectSprite, InterfaceTitleTextObject and InterfaceCursorPosTextObjectSprite, the ten functions of unit w35c), under it the
-// real sprite draw object (src/ui_DrawObjectSprite.cpp), the real rectangles (src/UI_Base.cpp) and the real font table classes
-// (src/InterfaceFont.cpp).
+// real sprite draw object (src/game/ui/InterfaceDrawObjectSprite.cpp), the real rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp) and the real font table classes
+// (src/game/ui/InterfaceFont.cpp).
 //
 // Everything else the unit reaches is a fake that records through calllog: the draw object base class, the engine's sprite surfaces (the
 // game data, the surface and the sprite list) and the map, the text formatter, the font parameters, the render area helpers, the Hebrew
@@ -23,7 +23,7 @@
 
 using namespace calllog;
 
-// InterfaceFont::GetHeight passes a wrapper on to its own (src/InterfaceFont.cpp), which lives in a file this unit does not link;
+// InterfaceFont::GetHeight passes a wrapper on to its own (src/game/ui/InterfaceFont.cpp), which lives in a file this unit does not link;
 // no case here asks a wrapper for its height.
 int32_t InterfaceFontWrapper::GetHeight() { return 0; }
 

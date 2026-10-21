@@ -1,6 +1,6 @@
 // Test library for SetCoasterEdit, GetPylonFromBraceMesh, GetNthBraceMesh, HandleCoasterButtonClick (unit v5314;
 // libtpw_unit_SetCoasterEdit.dylib, tests/test_SetCoasterEdit.py), main app:
-//   src/TPConfig_LayoutSetMovePylon_SetCoasterEdit.cpp
+//   src/game/rides/CoasterEdit.cpp
 //
 // The callees outside the unit are fakes that record the arguments and answer from the test's queue; the globals of other files are defined here.
 #include <cstddef>

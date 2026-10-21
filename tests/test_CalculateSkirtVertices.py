@@ -1,5 +1,5 @@
 """Unit v5909, CalculateSkirtVertices, against libtpw_unit_CalculateSkirtVertices.dylib (tests/unit_CalculateSkirtVertices.cpp), main app
-("SimTheme Park"), src/RideDestroy_CalculateSkirtVertices.cpp:
+("SimTheme Park"), src/game/park/SkirtDeform.cpp:
   CalculateSkirtVertices 0x1006f748
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,5 +1,5 @@
 """The online park find panel's message function and the online panel builder (unit v5541), against libtpw_unit_OnlineParkFindPanelMsg.dylib
-(tests/unit_OnlineParkFindPanelMsg.cpp), main app ("SimTheme Park"), src/OnlineParkFindPanelMsg.cpp:
+(tests/unit_OnlineParkFindPanelMsg.cpp), main app ("SimTheme Park"), src/game/ui/ui_onlinePanel.cpp, src/game/ui/ui_onlineParkFindPanel.cpp:
   OnlineParkFindPanelMsg 0x101e93b0, CreateOnlinePanel 0x101e8f08
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

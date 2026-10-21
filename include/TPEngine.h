@@ -1,7 +1,7 @@
 // Engine start-up glue of the main app (EngineStartup*, the engine's Mac* hooks,
 // EngineTick*, the memory and scratch geometry buffers, procedural texturing, the level
 // set-up and the pointer). The original file name is unknown: the inventory files this
-// range under TPRide.cpp. src/TPEngine.cpp translates part of it; the rest is declared for
+// range under TPRide.cpp. src/game/TPEngine.cpp, src/game/rides/TPRide.cpp, src/game/TPInstance.cpp, src/game/TPMesh.cpp, src/game/park/TPHField.cpp translates part of it; the rest is declared for
 // callers.
 #pragma once
 #include <cstdint>
@@ -17,7 +17,7 @@ struct tag_sMesh;
 class CTPItemListResource;
 class CTPItemResource;
 
-// ---- start-up and shut-down (src/TPEngine.cpp)
+// ---- start-up and shut-down (src/game/TPEngine.cpp)
 // 0x1005adbc: reads the options, opens the window and the OpenGL context, starts the engine;
 // 1 on success, 0 (gExitError set when it is the window or the engine) on failure.
 int32_t EngineStartup();
@@ -47,19 +47,19 @@ void* MacMalloc(uint32_t size);                     // 0x1005a054
 void MacFree(void*& block);                         // 0x1005a0a0
 char* FindFilePath(const char* name, int32_t flags);   // 0x1005ad58: the engine's name hook
 
-// ---- the frame (src/TPEngine.cpp)
+// ---- the frame (src/game/TPEngine.cpp)
 void AnimateRides(uint32_t mode);             // 0x1005b36c: 2 the first-person ride only, else every ride
-void ProcessRideAnim(tag_sRideAnimSet* set, int32_t animate);   // 0x1005b24c, src/RideAnimStep.cpp
+void ProcessRideAnim(tag_sRideAnimSet* set, int32_t animate);   // 0x1005b24c, src/game/TPEngine.cpp
 void EngineTick1();                           // 0x1005b4d4
 void EngineTick2();                           // 0x1005b540: renders the map
 void EngineTick3();                           // 0x1005b590: flips the screen
 void TPForce3DRefresh(uint32_t flags);        // 0x1005b68c
 void ResetWorldBoundingArea();                // 0x1005b634
-void HandleActiveHoardings(tag_sRideAnimSet* set, float step);   // 0x100619d4, src/RideAnimStep.cpp
+void HandleActiveHoardings(tag_sRideAnimSet* set, float step);   // 0x100619d4, src/game/park/TPHoardings.cpp
 void EnableRideHoardings(tag_sRideAnimSet* set, int32_t enable); // 0x10061060, untranslated
 void SetRideHoardingLevel(tag_sRideAnimSet* set, float level);  // 0x10061268, untranslated
 
-// ---- memory (src/TPEngine.cpp)
+// ---- memory (src/game/park/TPHField.cpp, src/game/TPMesh.cpp)
 struct sHeapInfo;
 int32_t HNewHeap(uint32_t a, uint32_t b, uint32_t c, sHeapInfo** heap);   // 0x1005b734: a dummy heap, 1
 int32_t HFreeHeap(sHeapInfo* heap);           // 0x1005b774: 1
@@ -69,12 +69,12 @@ void* MReleaseAllocF(uint32_t size, uint32_t flags);
 // uninitialised value (its caller's return address); no caller uses the result.
 void* MReleaseFreeF(void* block);
 
-// ---- procedural texturing (gGameOptions 0x2000 available, 0x4000 on; src/TPEngine.cpp)
+// ---- procedural texturing (gGameOptions 0x2000 available, 0x4000 on; src/game/TPInstance.cpp)
 void EnableProceduralTexturing();             // 0x100635cc
 void DisableProceduralTexturing();            // 0x1006367c
 int32_t IsProceduralTexturingActive();        // 0x10063700
 
-// ---- meshes and the scratch geometry buffer (12-byte vertices; src/TPEngine.cpp)
+// ---- meshes and the scratch geometry buffer (12-byte vertices; src/game/TPMesh.cpp)
 // The mesh header and its nodes are the engine's (include/m3d2.h, the file's own layout).
 // The game's record of a loaded mesh (0x40 bytes on the Mac, from MReleaseAllocF, cleared).
 class CMesh;
@@ -104,13 +104,13 @@ struct tag_sMesh {
     int32_t mEngineMeshes;       // 0x34  engine meshes made by CreateEngineMesh
     uint8_t mF38[8];
 };
-tag_sMesh* CreateMeshFromM3D2Header(tag_sM3D2Header* header);   // 0x10064cf0 (src/MeshLoad.cpp)
-void CreateEngineMesh(tag_sMesh* mesh);                         // 0x10064f40 (src/MeshLoad.cpp)
+tag_sMesh* CreateMeshFromM3D2Header(tag_sM3D2Header* header);   // 0x10064cf0 (src/game/TPMesh.cpp)
+void CreateEngineMesh(tag_sMesh* mesh);                         // 0x10064f40 (src/game/TPMesh.cpp)
 struct sMatrix;
-// 0x10065004 (src/MeshDestroy.cpp): the mesh is taken out of the map lists when it is drawn, the engine meshes' count (on the mesh
+// 0x10065004 (src/game/TPMesh.cpp): the mesh is taken out of the map lists when it is drawn, the engine meshes' count (on the mesh
 // whose count it was added to, mF08 when set) goes down and the engine mesh is deleted (its virtual destructor with the delete flag).
 void DestroyEngineMesh(tag_sMesh* mesh);
-// 0x100631c4 (src/MeshDestroy.cpp): the same, then the block the instance lives in (mAllocation) is given back with MReleaseFreeF. The Mac
+// 0x100631c4 (src/game/TPInstance.cpp): the same, then the block the instance lives in (mAllocation) is given back with MReleaseFreeF. The Mac
 // answers 1 (r3; the callers ignore it) and does not use its two other arguments.
 void DestroyMeshInstance(tag_sMesh* mesh, sHeapInfo* heap, uint32_t flags);
 void EnableMeshDraw(tag_sMesh* mesh, sMatrix* matrix, int32_t flags);       // 0x10065200
@@ -124,8 +124,8 @@ struct HFieldXZ {
 void EnableMeshDraw(tag_sMesh* mesh);                                       // 0x10065178
 void EnableMeshDraw(tag_sMesh* mesh, HFieldXZ from, HFieldXZ to);           // 0x100650c4
 void DisableMeshDraw(tag_sMesh* mesh, HFieldXZ from, HFieldXZ to);          // 0x1006548c
-int32_t IsMeshDrawEnabled(tag_sMesh* mesh);                                // 0x10065364 (src/RideAnimTick.cpp): the mesh's flag 1
-// 0x1006553c (src/advisor_leaves.cpp): the mesh's header is drawn in the interface's space (header flag 0x200).
+int32_t IsMeshDrawEnabled(tag_sMesh* mesh);                                // 0x10065364 (src/game/TPMesh.cpp): the mesh's flag 1
+// 0x1006553c (src/game/TPMesh.cpp): the mesh's header is drawn in the interface's space (header flag 0x200).
 void SetMeshInUISpace(tag_sMesh*& mesh);                                    // 0x1006553c
 void ScaleMesh(tag_sMesh* mesh, s3DPoint* scale);                           // 0x100655d8
 struct sRideAnimEntry {
@@ -138,7 +138,7 @@ struct sRideAnimGroup {
     sRideAnimEntry* mEntries;
 };
 // A ride animation's time control (0x38 bytes on the Mac; the set's mTimeControls holds
-// mTimeCount of them). Only the words the set-up code uses are named (src/RideAnimInit.cpp).
+// mTimeCount of them). Only the words the set-up code uses are named (src/game/rides/RideAnim.cpp).
 struct sAnimTimeControl {
     uint32_t mFlags;                  // 0x00  0x40 selects TPGlobals' 0x4018 word over 0x4010
     uint32_t mF04;                    // 0x04  0xc when InitRideAnimSet's second argument is set
@@ -157,14 +157,14 @@ struct sAnimTimeControl {
 };
 static_assert(sizeof(sAnimTimeControl) == 0x38, "sAnimTimeControl layout");
 // Three axes of three floats (0x24 bytes): the orientation RACalcOrientationBetweenControlPoints
-// works out for AnimateNode (src/RideAnimTick.cpp). The Mac's debug name; the layout is read from
+// works out for AnimateNode (src/game/rides/RideAnim.cpp). The Mac's debug name; the layout is read from
 // the listing, where SetLMatrixOrientation gets the three axes as three s3DPoint pointers.
 struct s3DAxis {
     s3DPoint mX, mY, mZ;
 };
 static_assert(sizeof(s3DAxis) == 0x24, "s3DAxis layout");
 // The embedded data of a mesh (tag_sMesh::mF28 points at one, built by TPInitialiseEmbeddedData;
-// src/EmbeddedData.cpp). 0x14 bytes on the Mac; native pointers here.
+// src/game/TPEmbed.cpp). 0x14 bytes on the Mac; native pointers here.
 struct sEmbeddedRecord {
     uint32_t mFlags;                  // 0x00  0x01: has a block; 0x02: a head (TickRideHeads); 0x10: node has 0x400; 0x20: set by the setup
     uint8_t* mBlock;                  // 0x04  a 0x40-byte block, when mFlags has 0x01; TickRideHeads reads it as the head's 4 x 4 matrix
@@ -181,7 +181,7 @@ struct sEmbeddedSet {
 };
 // A dynamic mesh set (the coaster track's master set and its instances; 0x40 bytes on the Mac, 0x30-byte
 // entries): native pointers, with the Mac offsets in comments. Only InstanceDynamicMeshSet is translated, so
-// the words nothing here reads are left unnamed (src/RideInstance.cpp copies them as they are).
+// the words nothing here reads are left unnamed (src/game/TPInstance.cpp, src/game/TPEmbed.cpp, src/game/rides/TPRide.cpp, src/engine/EngineUtil.cpp, src/game/Debug.cpp, src/game/rides/RideAnim.cpp, src/game/rides/RidePlacement.cpp copies them as they are).
 struct sDMeshEntry {
     union {
         uint32_t mF00[10];            // 0x00..0x27
@@ -299,14 +299,14 @@ struct tag_sRideAnimSet {
                                  // pointer needs the room, so it is added here (unit v5314: an sBraceMeshBlock*, TPCoaster.h)
 };
 
-// Unit v5288 (src/RideAnimTick_StaticifyCreateOnlyAnimNodes.cpp)
+// Unit v5288 (src/game/rides/RideAnim.cpp)
 void StaticifyCreateOnlyAnimNodes(tag_sRideAnimSet* set);   // 0x100c6b54 (144)
 int32_t LoadRideAnimSet(char* name, uint32_t flags, tag_sRideAnimSet** output, char* loadedName, uint32_t timeCount); // 0x1006840c
 void CorrectNodeFlags1(tag_sRideAnimSet* set);                                // 0x10067cf4
-void OverrideActiveChannels(tag_sRideAnimSet* set);    // 0x100c609c (src/RideInstance.cpp)
-// 0x101ee150 (src/RideWrapping.cpp): StripNodeWrapping on the one node, or on every node of the set's mesh header that has not flag 0x200.
+void OverrideActiveChannels(tag_sRideAnimSet* set);    // 0x100c609c (src/game/rides/RideAnim.cpp)
+// 0x101ee150 (src/game/rides/RidePlacement.cpp): StripNodeWrapping on the one node, or on every node of the set's mesh header that has not flag 0x200.
 void StripRideWrapping(tag_sRideAnimSet* set, tag_sNode* node, float amount, void* data, s3DPoint* point);
-// 0x101edafc (src/NodeWrapping.cpp; mangled .StripNodeWrapping__FP15tag_sM3D2HeaderP9tag_sNodefP8LLCC_RBIP8s3DPointRi): brings the node's
+// 0x101edafc (src/game/rides/RidePlacement.cpp; mangled .StripNodeWrapping__FP15tag_sM3D2HeaderP9tag_sNodefP8LLCC_RBIP8s3DPointRi): brings the node's
 // texture coordinates into the unit square (the whole part of each face's smallest coordinates is taken off, fractions within `amount` of
 // a whole number are pushed to it) and checks them against the byte map `data` (the Mac's LLCC_RBI pointer, 16 bytes per row, cells of 10 units
 // of `point`'s x and z; used with `point`, the vertices' positions) before clearing flag bits 0x30 of face sets with no checked face. `counter`
@@ -323,7 +323,7 @@ void GetNumActiveChannels(tag_sRideAnimSet* set);   // 0x100c5fd4
 int32_t TPSetupEmbeddedHeirarchy(tag_sMesh* mesh, tag_sNode* node, tag_sM3D2Header* header);   // 0x101ff674
 void RAInitNodeAnimNodes(tag_sMesh* mesh, tag_sAnimHeader* animation, int32_t firstKind);   // 0x100c32ac
 int32_t InitRideAnimSet(tag_sRideAnimSet* set, int32_t init, int32_t mode, int32_t keepNodes);
-// Unit v5561 (src/RestoreAnimTime.cpp)
+// Unit v5561 (src/game/rides/TPRide.cpp)
 struct sAnimTimeControlSave {      // 0x2c bytes, the saved part of an sAnimTimeControl
     uint32_t mF00, mF04, mF08;     // 0x00 -> control 0x00, 0x04, 0x08
     uint32_t mF0C, mF10, mF14;     // 0x0c -> control 0x10, 0x14, 0x18
@@ -333,7 +333,7 @@ struct sAnimTimeControlSave {      // 0x2c bytes, the saved part of an sAnimTime
 };
 void RestoreAnimTimeStats(sAnimTimeControl* control, tag_sAnimHeader* animation);   // 0x100c5c68
 bool RestoreAnimTime(tag_sRideAnimSet* set, sAnimTimeControl* control, sAnimTimeControlSave* save);   // 0x1006b6f4
-// ---- ride types and instances (src/RideTypes.cpp), the level's height field
+// ---- ride types and instances (src/game/rides/TPRide.cpp), the level's height field
 // Where a ride is placed (InstanceRide's third argument; built by the code that places rides).
 struct sFixedRideParams {
     int32_t mX;                   // 0x00  the cell's x
@@ -365,7 +365,7 @@ uint32_t RestoreRideInstance(uint32_t instance, uint32_t type, uint32_t flags, s
 // puts the queue stands of the restored coaster back.
 void SetRideScriptID(uint32_t instance, uint32_t script);
 void HACKRestoreCoasterQueues(uint32_t instance);
-// ---- instancing (src/RideInstance.cpp)
+// ---- instancing (src/game/TPInstance.cpp)
 // 0x10062e1c (840 bytes): a ride's working copy of its animation set `set`, made in one block from the
 // allocator (the set, a copy of its time controls, its animation array and its group entries) with an
 // instance of its mesh (InstanceMesh with `flags` less 0x800, `timeCount` as the mask), of its dynamic mesh
@@ -404,18 +404,18 @@ extern uint32_t gPolySearchCount;
 void DestroyRideAnimSetInstance(tag_sRideAnimSet* set, sHeapInfo* heap, uint32_t flags);   // 0x10063338
 void DestroyRideType(uint32_t type);                                 // 0x1006a768
 int32_t IsCoasterType(uint32_t type);                                // 0x100432dc
-uint32_t InstanceCoaster(uint32_t type, uint32_t instance, uint32_t x, uint32_t z, int32_t a, void* b);   // 0x100434ec (544 bytes, src/TPCoaster_instances.cpp; answers the object number, 0 for none)
+uint32_t InstanceCoaster(uint32_t type, uint32_t instance, uint32_t x, uint32_t z, int32_t a, void* b);   // 0x100434ec (544 bytes, src/game/rides/TPCoaster.cpp; answers the object number, 0 for none)
 void DestroyCoasterInstanceFromEntranceID(uint32_t instance);        // 0x100438fc
 int32_t IsRideFirstPersonRide(uint32_t instance);                    // 0x100329cc
 void StopRidingRideIn1stPerson();                                    // 0x10032584
-void ToggleFirstPersonWalkAround();                                  // 0x10033b90 (508 bytes, src/TPCamera_modes.cpp, unit w141)
+void ToggleFirstPersonWalkAround();                                  // 0x10033b90 (508 bytes, src/game/TPCamera.cpp, unit w141)
 void UnhighlightRide();                                              // 0x1006d0f8
 void HighlightRide();                                                // 0x1006ce28 (untranslated; unit w142)
 void DisableRideHighlight(int32_t flag);                             // 0x100672e4 (untranslated; unit w141)
 void StartFlashingObject(tag_sRideAnimSet* set);                     // 0x1006d2f8
 void StopFlashingObject(tag_sRideAnimSet* set);                      // 0x1006d430
 void GetBlendedBaseTextures(tag_sRideAnimSet* set);                  // 0x10069770
-void AnimateRideCallback(tag_sM3D2Header* header);                   // 0x10069a98, src/RideAnimStep.cpp (CMesh::mCallback of every ride)
+void AnimateRideCallback(tag_sM3D2Header* header);                   // 0x10069a98, src/game/rides/TPRide.cpp (CMesh::mCallback of every ride)
 void CalculateRootNodeFaceNormals(tag_sNode* node, int32_t a, int32_t& result);   // 0x100694c8
 void DoMeshSkirtDeform(tag_sMesh* mesh, tag_sM3D2Header* header, float y, uint32_t a);   // 0x1006e930
 void SetHoardingYOffsets(tag_sRideAnimSet* set);                     // 0x10060c80
@@ -425,11 +425,11 @@ void GetRotatedHFieldCoord(int32_t angle, float a1, float a2, float a3, float a4
 void GenerateHoardingMeshes(const char* theme, tag_sRideAnimSet* set, void* b);   // 0x1005fa70
 void CalculateSkirtVertices(tag_sRideAnimSet* set, tag_sM3D2Header* header, void* a, int32_t w, int32_t h);   // 0x1006f748
 void SetBaseBlendFlags(tag_sMesh* mesh, tag_sNode* node, int32_t on);   // 0x1006ebec
-void CorrectFaceFlags1(tag_sMesh* mesh, int32_t a);                  // 0x10067fdc (src/RideInstance.cpp)
-void CorrectNodeFlags2(tag_sRideAnimSet* set);                       // 0x10067e1c (src/RideInstance.cpp)
-void SetupRideHeads(tag_sMesh*& mesh);                               // 0x10200b28 (src/RideInstance.cpp)
+void CorrectFaceFlags1(tag_sMesh* mesh, int32_t a);                  // 0x10067fdc (src/game/rides/TPRide.cpp)
+void CorrectNodeFlags2(tag_sRideAnimSet* set);                       // 0x10067e1c (src/game/rides/TPRide.cpp)
+void SetupRideHeads(tag_sMesh*& mesh);                               // 0x10200b28 (src/game/TPEmbed.cpp)
 void GetRideHeightMap(tag_sRideAnimSet* set, uint32_t w, uint32_t h, char* path, void* a, int32_t b);   // 0x1005e8e8
-// Unit v5127 (src/RideDestroy_LoadFileIntoMemory.cpp)
+// Unit v5127 (src/game/park/TPHField.cpp)
 struct sRideHeightMap;
 struct RideShape;
 char* LoadFileIntoMemory(char* path, int32_t binary);   // 0x1005e300
@@ -445,17 +445,17 @@ float GetAnimRemainingMilliseconds(sAnimTimeControl* control);   // 0x100c5db8
 void USwapInplace32ULong_1005e658(uint32_t& word);   // 0x1005e658 SamsUtilities::USwapInplace32<unsigned long>
 void USwapInplace16UShort_1005e610(uint16_t& half);  // 0x1005e610 SamsUtilities::USwapInplace16<unsigned short>
 uint32_t USwap32UCharPtr_1005e5b4(uint32_t word);    // 0x1005e5b4 SamsUtilities::USwap32<unsigned char*> (a pointer word)
-// 0x101ffb0c (264 bytes, src/RideAnimTick.cpp): moves a mesh's embedded records on the mesh's nodes.
+// 0x101ffb0c (264 bytes, src/game/TPEmbed.cpp): moves a mesh's embedded records on the mesh's nodes.
 void TPProcessEmbeddedData(tag_sMesh* mesh);
-// 0x101ffdc8 (104 bytes, src/advisor_leaves.cpp): the place (from 0) of the first embedded entry whose id is `id` and
+// 0x101ffdc8 (104 bytes, src/game/TPEmbed.cpp): the place (from 0) of the first embedded entry whose id is `id` and
 // whose flags share a bit with `mask`; 0xffffffff for none. A mask with none of the bits 0x3da1f83 is taken as
 // 0x3da1f82.
 uint32_t FindDataNodeIndexByID(tag_sRideAnimSet* set, uint32_t mask, uint32_t id);   // 0x101ffdc8
-// 0x101fff90 (408 bytes, src/advisor_leaves.cpp): the place of the advisor's node with the name for `id` (-1: "bug head",
+// 0x101fff90 (408 bytes, src/game/TPEmbed.cpp): the place of the advisor's node with the name for `id` (-1: "bug head",
 // 1 to 5: the mouth shapes "mouth - normal", "- aah", "- eee", "- ooh", "- sss"; compared without regard to case,
 // the nodes taken as full nodes), 0 for another id or none. `mask` is not used.
 uint32_t FindDataNodeIndexByIDAdvisorTempHack(tag_sRideAnimSet* set, uint32_t mask, uint32_t id);   // 0x101fff90
-// 0x101fef24 (1,744 bytes, src/RideAnimTick.cpp): works out the world matrices of a node and the
+// 0x101fef24 (1,744 bytes, src/game/TPEmbed.cpp): works out the world matrices of a node and the
 // nodes below it. `matrix` (by value: six words in registers, ten on the stack) is the parent's
 // world matrix and `world` points to a matrix of the same value (the identity for the root, which
 // TPProcessEmbeddedData passes). A node with flag 0x20000000 keeps its own world matrix in the block
@@ -480,7 +480,7 @@ int32_t CellIsRide(CELL_MODES mode);                                 // 0x1006d7
 void MoveRide(tag_sRideAnimSet* set, int32_t x, int32_t z, void* a, int32_t w, int32_t h, uint32_t flags);   // 0x101ed9a0
 // 0x101ed17c (unit v5886): the node's vertices through `matrix` into gScratchGeomBuffer
 void GetNodeWorldVertPosnsIntoGeomBuffer(tag_sNode* node, sMatrix* matrix);
-int32_t GetFontPath(char* out);                                    // 0x101eeac8 (src/RideInstance.cpp), 1 on success
+int32_t GetFontPath(char* out);                                    // 0x101eeac8 (src/game/rides/RidePlacement.cpp), 1 on success
 int32_t GenerateRideSign(tag_sRideAnimSet* set, char* folder, char* name, char* fontPath, const char16_t* sign1,
                       const char16_t* sign2);                        // 0x101ee290
 void DestroyRideSign(tag_sRideAnimSet* set);                         // 0x101eea14
@@ -490,21 +490,21 @@ template<class Tag, class T> struct tag_IDX_TYPE;
 // goes by value in one register (tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, unsigned short>).
 class CRideDatabase {
 public:
-    // 0x10154a10 (src/RideDB_names.cpp, unit w59): the ride type's name, the wide text inside its record (RideInfo::mTypeName),
+    // 0x10154a10 (src/game/rides/RideDB.cpp, unit w59): the ride type's name, the wide text inside its record (RideInfo::mTypeName),
     // or NULL when the database has no such type. Looks the type up like the three-argument one (the cache first).
     const char16_t* GetTypeName(uint16_t id);
-    // 0x10154c24 and 0x10154d68 (src/RideDB_names.cpp, unit w59): the first and the second part of the ride's sign text in
+    // 0x10154c24 and 0x10154d68 (src/game/rides/RideDB.cpp, unit w59): the first and the second part of the ride's sign text in
     // `buffer` (at most `size` characters): the name builder's part when the id is in its table, else the ride record's sign
     // text (RideInfo::mSignA, mSignB; a type the database does not have dereferences NULL, as on the Mac).
     void GetSignNameA(uint16_t id, char16_t* buffer, uint32_t size);
     void GetSignNameB(uint16_t id, char16_t* buffer, uint32_t size);
-    // 0x10154af0 (src/RideDB_names.cpp, unit w32): the ride type's name in `buffer` (at most `size` characters): the name
+    // 0x10154af0 (src/game/rides/RideDB.cpp, unit w32): the ride type's name in `buffer` (at most `size` characters): the name
     // the ride's own file gave, else the name builder's. The id goes by value in the high half of a register.
     void GetTypeName(uint16_t id, char16_t* buffer, uint32_t size);
-    // 0x101546e8 (src/RideDB_clear.cpp): CGame::ExitLevel empties the database with it: the custom effects are deleted, then each ride record
+    // 0x101546e8 (src/game/rides/RideDB.cpp): CGame::ExitLevel empties the database with it: the custom effects are deleted, then each ride record
     // (strings given back, record destroyed and freed, slot cleared), the count and the lookup cache reset.
     void ClearDatabase();
-    // 0x10156e34 (src/RideDB_effects.cpp, unit w88): from the first ride in the slots on (a NULL slot or the count ends the walk), frees
+    // 0x10156e34 (src/game/rides/RideDB.cpp, unit w88): from the first ride in the slots on (a NULL slot or the count ends the walk), frees
     // each ride's four emitters and its sound category; the emitter words and the category are left as they were.
     void DeleteCustomEffects();
     // 0x10154ea8: clears the database and scans the five item lists; ignores the path.
@@ -512,16 +512,16 @@ public:
     int32_t ScanDirectory(CTPItemListResource& list); // 0x10155c00
     int32_t LoadItem(const CTPItemListResource& list, bfl::FileSystem::CFileStorage& storage, CTPItemResource& item); // 0x1015600c
     void ProcessShape(RideInfo** ride); // 0x101557a4
-    // 0x101547b4 (24 bytes, src/RideDB_walk.cpp, unit w114): sets the position (mF72C) to 0 and answers the ride in slot 0 (NULL for an
+    // 0x101547b4 (24 bytes, src/game/rides/RideDB.cpp, unit w114): sets the position (mF72C) to 0 and answers the ride in slot 0 (NULL for an
     // empty database). 0x10154800 (52 bytes): while the position is below the count minus one (signed, the subtraction wraps) moves it on
     // and answers that slot, else answers NULL and leaves the position.
     RideInfo* GetFirstRide();
     RideInfo* GetNextRide();
-    // 0x10154868 (104 bytes, src/RideDB_lookup.cpp, unit w200): the ride record of the object type (by value, the HIGH halfword of the register): the cached
+    // 0x10154868 (104 bytes, src/game/rides/RideDB.cpp, unit w200): the ride record of the object type (by value, the HIGH halfword of the register): the cached
     // record when the id is the cached one, else the first slot below the count (signed) whose record starts with that halfword (the id and the record are then
     // cached), else NULL (the cache is left alone).
     RideInfo* GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id);
-    const char16_t* GetFileName(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id);   // 0x10154930 (128 bytes, src/RideDB_names.cpp, unit w210): the record's mItemName, a wide string; NULL when no record has the id
+    const char16_t* GetFileName(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id);   // 0x10154930 (128 bytes, src/game/rides/RideDB.cpp, unit w210): the record's mItemName, a wide string; NULL when no record has the id
 
     RideInfo* mRides[0x14a];       // 0x000  the ride types, in the order they were loaded
     int32_t mRideCount;            // 0x528
@@ -535,10 +535,10 @@ extern CRideDatabase gRideDatabase;                                  // 0x1037f6
 // 0x1005bc44: the level's height field into gHeightfieldRideSet; nonzero on success.
 int32_t LoadLevelHeightfield(int32_t a, int32_t b);
 void DestroyLevelHeightfield();                               // 0x1005c0fc
-int32_t BuildHFieldTextureTable(tag_sM3D2Header* header);       // 0x100319c0 (src/HFieldTextures.cpp)
-void FreeHFieldTextureTable();                                 // 0x10031b10 (src/HFieldTextures.cpp)
-void SetupHFieldNodeGamuts(tag_sM3D2Header* header);            // 0x100b971c (src/NodeGamuts.cpp)
-// 0x100b9304 (src/NodeGamuts.cpp): the cells of the height field that the node's box covers, for the
+int32_t BuildHFieldTextureTable(tag_sM3D2Header* header);       // 0x100319c0 (src/game/TextureTable.cpp)
+void FreeHFieldTextureTable();                                 // 0x10031b10 (src/game/TextureTable.cpp)
+void SetupHFieldNodeGamuts(tag_sM3D2Header* header);            // 0x100b971c (src/game/MeshLoad.cpp)
+// 0x100b9304 (src/game/MeshLoad.cpp): the cells of the height field that the node's box covers, for the
 // node and everything below it; `matrix` is the node's parent's matrix, taken by value.
 void DoCalcNodeHFieldGamut(tag_sNode* node, sHField* field, sMatrix matrix);
 // 0x1029eb78..0x1029eb84 (names invented): the range a cell index is held to before it is
@@ -547,16 +547,16 @@ extern int32_t gNodeGamutMinX;                                  // 0x1029eb78
 extern int32_t gNodeGamutMaxX;                                  // 0x1029eb7c
 extern int32_t gNodeGamutMinZ;                                  // 0x1029eb80
 extern int32_t gNodeGamutMaxZ;                                  // 0x1029eb84
-void DetermineHFieldFlatness(tag_sM3D2Header* header);          // 0x1005b9d0 (src/HFieldTextures.cpp)
+void DetermineHFieldFlatness(tag_sM3D2Header* header);          // 0x1005b9d0 (src/game/park/TPHField.cpp)
 void SaveHFieldCopy(tag_sM3D2Header* header, sHField** copy);    // 0x1005beec
-// 0x1005b8fc (164 bytes, src/TPRide_proctex.cpp, unit w114): the engine's PT_Load of "<GetMeshPath()>base.lnd" in `mode`, then, when
+// 0x1005b8fc (164 bytes, src/game/park/TPHField.cpp, unit w114): the engine's PT_Load of "<GetMeshPath()>base.lnd" in `mode`, then, when
 // gGameOptions bit 0x4000 is on, CorrectOrientationFlagsForDiffProceduralMode(1), else PT_Disable.
 void LoadProceduralTextureSet(int32_t mode);
 void DestroyRideAnimSet(tag_sRideAnimSet* set, int32_t mode);
 extern tag_sM3D2Header* gHeightfieldHeader;                    // 0x102c6c7c
 extern sHFieldQuad* gHeightfieldQuads;                        // 0x102c6c78
 extern sHField* gHeightfieldCopy;                             // 0x102c6c80
-// LevelInit2 (0x100639b0, src/LevelInit2.cpp, unit w110) keeps the height field's place and size (original names unknown):
+// LevelInit2 (0x100639b0, src/game/TPLevel.cpp, unit w110) keeps the height field's place and size (original names unknown):
 extern int32_t gHeightfieldXStart;                           // 0x102c6c70  CWorld::GetHeightfieldXStart's answer
 extern int32_t gHeightfieldYStart;                           // 0x102c6c6c
 extern int32_t gHeightfieldWidth;                            // 0x102c6c68
@@ -569,8 +569,8 @@ void UpdateScratchGeomBufferSize(tag_sMesh* mesh);   // 0x100682fc
 void CreateScratchGeomBuffer(int32_t large);         // 0x10068d14: 0x400 vertices, or the largest mesh's
 void DestroyScratchGeomBuffer();                     // 0x10068d90
 
-// ---- ride and mesh teardown (src/RideDestroy.cpp, unit w105)
-// 0x101ffa58 (124 bytes, src/TPEmbed_destroy.cpp, unit w114): the embedded data of a mesh being destroyed: the set's blocks, its records
+// ---- ride and mesh teardown (src/game/DynamicMeshSet.cpp, src/game/TPMesh.cpp, src/game/rides/TPRide.cpp, src/game/TPInstance.cpp, src/game/park/SkirtDeform.cpp, src/game/park/TPHField.cpp, unit w105)
+// 0x101ffa58 (124 bytes, src/game/TPEmbed.cpp, unit w114): the embedded data of a mesh being destroyed: the set's blocks, its records
 // and the set itself are given back (MReleaseFreeF each, the pointers cleared), then the mesh's word is cleared. Nothing for a mesh
 // without a set.
 void TPDestroyEmbeddedData(tag_sMesh* mesh);
@@ -578,7 +578,7 @@ void TPDestroyEmbeddedData(tag_sMesh* mesh);
 // engine mesh (CMesh::Close then its virtual destructor with the delete flag; only when no engine meshes are counted on the mesh), the
 // block (node word 0x98) of each node but the root that has flag 0x1000, mBlock14, the embedded data, the header's block and the mesh.
 void DestroyMesh(tag_sMesh* mesh);
-// 0x10030a48 and 0x100309c8 (84 and 68 bytes, src/RideDestroy.cpp; the Mac file is TPAdvisor.cpp): take the set's mesh out of the draw
+// 0x10030a48 and 0x100309c8 (84 and 68 bytes, src/game/DynamicMeshSet.cpp; the Mac file is TPAdvisor.cpp): take the set's mesh out of the draw
 // lists (over the map range given, or not) and clear the set's flag 0x4000. Both answer 1.
 int32_t DMDisableMeshRender(tag_sDMeshSet* set, HFieldXZ from, HFieldXZ to);
 int32_t DMDisableMeshRender(tag_sDMeshSet* set);
@@ -587,7 +587,7 @@ int32_t DMDisableMeshRender(tag_sDMeshSet* set);
 // clears flag 0x2000. Answers 1.
 int32_t DMFreeMesh(tag_sDMeshSet* set);
 struct sDTextureSet;
-// 0x100301c0 (1,668 bytes, TPAdvisor.cpp; src/DynamicMesh.cpp): lays the mesh of a set of entries out in one block of the engine allocator (the
+// 0x100301c0 (1,668 bytes, TPAdvisor.cpp; src/game/DynamicMeshSet.cpp): lays the mesh of a set of entries out in one block of the engine allocator (the
 // file's 32-bit layout), makes its mesh record and engine mesh and points the texture set's paths at the dynamic texture folders. flags: 1 fills the
 // index buffer, 2 sets the header flag 0x200000. Answers 1.
 int32_t DMCreateMesh(tag_sDMeshSet* set, sDTextureSet* textures, const char* name, uint32_t flags);
@@ -595,9 +595,9 @@ int32_t DMCreateMesh(tag_sDMeshSet* set, sDTextureSet* textures, const char* nam
 // set's flag 0x4000. Both answer 1.
 int32_t DMEnableMeshRender(tag_sDMeshSet* set);
 int32_t DMEnableMeshRender(tag_sDMeshSet* set, HFieldXZ from, HFieldXZ to);
-// 0x1005eda8 (676 bytes, src/TPRide_height.cpp, unit w140): the terrain height at a place.
+// 0x1005eda8 (676 bytes, src/game/park/TPHField.cpp, unit w140): the terrain height at a place.
 float DetermineHFieldHeightQuick(float x, float z);
-// The texture sets of the dynamic meshes (include/TPCoaster.h's sDTextureSet; the loader and the freer are in src/LevelLeaves.cpp):
+// The texture sets of the dynamic meshes (include/TPCoaster.h's sDTextureSet; the loader and the freer are in src/game/DynamicMeshSet.cpp):
 // 0x1003013c (8 bytes) loads a set's textures and answers nonzero when that worked, 0x10030178 (20 bytes) frees them.
 struct sDTextureSet;
 int32_t DMLoadTextures(sDTextureSet* set);
@@ -613,13 +613,13 @@ int32_t LevelInit2();                         // 0x100639b0, nonzero on success
 void LevelDeInit(bool restart);               // 0x10063b80
 void TickLevelLights(int32_t force);          // 0x100645b0
 
-void ResetCursorOverSprites(s3DPoint* position);                       // 0x1005b6c8 (src/TPEngine.cpp)
+void ResetCursorOverSprites(s3DPoint* position);                       // 0x1005b6c8 (src/game/TPEngine.cpp)
 void CalculatePointerWorldPosn(s3DPoint* position, float distance, s3DPoint* pickup, int32_t* result);   // 0x10065f50
-void GetMapCellFromPointerWorldPosn(s3DPoint* position);               // 0x10067084 (src/TPEngine_pointedcell.cpp, unit w139): the map cell under
+void GetMapCellFromPointerWorldPosn(s3DPoint* position);               // 0x10067084 (src/game/TPPointer.cpp, unit w139): the map cell under
 // the pointer's world position (x and z through the height field's origin and cell size, clamped) into gIntrface.mF24 (0 outside the level)
 
 // ---- globals (original names unknown)
-// Defined in src/TPEngine.cpp (this range's part of the BSS):
+// Defined in src/game/TPEngine.cpp, src/game/TPMesh.cpp, src/game/rides/TPRide.cpp (this range's part of the BSS):
 extern uint8_t gSmallTexturesOnly;           // 0x102c1de4, set when the card has 8 MB or less
 extern SamsUtilities::UOpenGL* gOpenGL;      // 0x102c1de8, the OpenGL context
 extern IdxDirectDraw* gIdxDirectDraw;        // 0x102c1dec, the DirectDraw shim object
@@ -631,27 +631,27 @@ extern uint32_t gScratchGeomVertices;        // 0x102c798c, the largest mesh's v
 extern void* gScratchGeomBuffer;             // 0x102c7990
 // Defined elsewhere:
 extern tag_sRideAnimSet* gHeightfieldRideSet;   // 0x102c6c74 (the heightfield code), animated by EngineTick1
-extern tag_sRideAnimSet* gRideAnimSets[];       // 0x102c79a4, from index 1 (src/RideTypes.cpp, kMaxRideInstances entries)
+extern tag_sRideAnimSet* gRideAnimSets[];       // 0x102c79a4, from index 1 (src/game/rides/TPRide.cpp, kMaxRideInstances entries)
 extern uint32_t gRideCountA;                    // 0x102d19a8, the sets AnimateRides walks are
 extern uint32_t gRideCountB;                    // 0x102d19ac, 1 .. gRideCountA + gRideCountB
 // InstanceRide and DestroyRideInstance keep gRideCountB = the instances, gRideCountA = the free
 // slots among numbers 1 .. gRideCountA + gRideCountB, and gRideFirstFree = the first free number - 1.
 constexpr uint32_t kMaxRideInstances = 10240;   // the array's size: 0x102c79a4 .. 0x102d19a4
 constexpr uint32_t kMaxRideTypes = 330;         // gRideTypes' size: 0x102d19b0 .. 0x102d1ed8
-extern uint32_t gRideFirstFree;                 // 0x102d19a4 (src/RideTypes.cpp)
-extern tag_sRideAnimSet* gRideTypes[];          // 0x102d19b0, from index 1 (src/RideTypes.cpp)
-extern uint32_t gRideTypeCount;                 // 0x102d1ed8, the types loaded (src/RideTypes.cpp)
+extern uint32_t gRideFirstFree;                 // 0x102d19a4 (src/game/rides/TPRide.cpp)
+extern tag_sRideAnimSet* gRideTypes[];          // 0x102d19b0, from index 1 (src/game/rides/TPRide.cpp)
+extern uint32_t gRideTypeCount;                 // 0x102d1ed8, the types loaded (src/game/rides/TPRide.cpp)
 extern tag_sRideAnimSet* gHighlightedRide;      // 0x102c6ce8, what GetPointedAtRide returns (names invented)
-extern int32_t gRideHighlightDisabled;          // 0x102d1f04 (TOC slot -0x70bc, unit v51049, src/std_locale_Dtor_locale.cpp): DisableRideHighlight's flag, 1 = off
+extern int32_t gRideHighlightDisabled;          // 0x102d1f04 (TOC slot -0x70bc, unit v51049, src/game/TPPointer.cpp): DisableRideHighlight's flag, 1 = off
 extern tag_sRideAnimSet* gPotentialHighlightedRide;   // 0x102d1f08, set by SetPotentiallyHighlightedRide
 extern uint32_t gMaxMeshFaces4;                 // 0x102d1f14, 4 x the largest face count (the ride highlight code)
 extern uint32_t gMaxMeshF3E;                    // 0x102d1f18
 extern uint32_t gMaxMeshNodes;                  // 0x102d1f1c
 extern s3DPoint gPickupWorldPosn;               // 0x102c6cec
 extern s3DPoint gPointerWorldPosn;              // 0x102c6cf8
-s3DPoint* GetPickupWorldPosn();                 // 0x10067220 (8 bytes, src/TPRide_pickup.cpp, unit w143): &gPickupWorldPosn
+s3DPoint* GetPickupWorldPosn();                 // 0x10067220 (8 bytes, src/game/TPPointer.cpp, unit w143): &gPickupWorldPosn
 
-// ---- Unit w134 (src/TPRide_pointer.cpp): CalculatePointerWorldPosn's own state and its callees (all names invented)
+// ---- Unit w134 (src/game/TPPointer.cpp): CalculatePointerWorldPosn's own state and its callees (all names invented)
 // The pointer's field of view factor: set to 0.885f the first time CalculatePointerWorldPosn runs (the byte is 0 until then).
 extern uint8_t gPointerFovOnce;                 // 0x102c6ca0
 extern float gPointerFovFactor;                 // 0x102c6ca4
@@ -663,12 +663,12 @@ extern s3DPoint gPointedRidePosition;           // 0x102c6ccc
 // `camera` are the ray's direction and the camera point.
 tag_sRideAnimSet* FindPointedRide(uint32_t cellX, uint32_t cellZ, int32_t axis, float x, float y, float z, float yStep,
                                   s3DPoint* direction, s3DPoint* camera, float step);
-void SetPotentiallyHighlightedRide(tag_sRideAnimSet* ride);                 // 0x1006cfa4 (12 bytes, src/Debug_pointer.cpp, unit v5L06)
-tag_sRideAnimSet* GetPointedAtRide();                                       // 0x10067254 (12 bytes, src/TPRide_pointed.cpp, unit v5L06): gHighlightedRide
-void VectorThroughLMatrixNoWNoTrans(sMatrix* matrix, s3DPoint* point);      // 0x100c2040 (132 bytes, src/rsse_math.cpp, unit w170)
-float DistanceBetweenPoints(const s3DPoint* a, const s3DPoint* b);          // 0x100c3198 (92 bytes, src/rsse_math.cpp, unit w170)
+void SetPotentiallyHighlightedRide(tag_sRideAnimSet* ride);                 // 0x1006cfa4 (12 bytes, src/game/rides/RidePreview.cpp, unit v5L06)
+tag_sRideAnimSet* GetPointedAtRide();                                       // 0x10067254 (12 bytes, src/game/TPPointer.cpp, unit v5L06): gHighlightedRide
+void VectorThroughLMatrixNoWNoTrans(sMatrix* matrix, s3DPoint* point);      // 0x100c2040 (132 bytes, src/game/LMatrix.cpp, unit w170)
+float DistanceBetweenPoints(const s3DPoint* a, const s3DPoint* b);          // 0x100c3198 (92 bytes, src/game/LMatrix.cpp, unit w170)
 
-// ---- Unit v51021 (src/advisor_leaves_RayPolyCheckOnRide.cpp): the ray test of the ride pick (names invented)
+// ---- Unit v51021 (src/game/TPPointer.cpp): the ray test of the ride pick (names invented)
 // 0x10065648 (1,184 bytes): the ray (gRayOrigin, gRayDirection) against the node's faces and then its children; the matrix is
 // passed by value (64 bytes: r4..r10 and the stack). Fills gRayHitPoint and gRayHitNormal and answers 1 on a hit.
 int32_t RayPolyCheckOnRide(tag_sNode* node, sMatrix matrix);
@@ -678,7 +678,7 @@ extern s3DPoint* gRayOrigin;          // 0x102c6cc0 (a 4-byte word on the Mac)
 extern s3DPoint* gRayDirection;       // 0x102c6cc4
 extern s3DPoint gPointedRideNormal;   // 0x102c6cd8
 
-// ---- Unit v5042 (src/Debug_blendflags_CalcSkirtTextureDirnFlags.cpp): CalcSkirtTextureDirnFlags and its state (names invented)
+// ---- Unit v5042 (src/game/park/SkirtDeform.cpp): CalcSkirtTextureDirnFlags and its state (names invented)
 struct RideShape;
 // One cell of the skirt table: the best face found over the cell, with its two edge directions.
 struct SkirtCell {
@@ -699,7 +699,7 @@ void DecideRideShapeDeformEdges(RideShape* shape, int32_t width, int32_t height)
 void* LLCC_GetRideBlendInfo(void* shape);                      // 0x1008f574 (732 bytes, untranslated): a 16 x 16 byte table (x * 16 + z) or 0
 void GetNodeWorldVertPosnsIntoGeomBuffer(tag_sNode* node);      // 0x10068dec (416 bytes, untranslated)
 
-// ---- Unit v5625 (src/LevelSystems_GenerateHoardingMeshes.cpp): GenerateHoardingMeshes' callees and tables (names invented)
+// ---- Unit v5625 (src/game/park/TPHoardings.cpp): GenerateHoardingMeshes' callees and tables (names invented)
 // A point of the plane (8 bytes): DetermineInnerBaseInsets' corners and insets.
 struct s2DPoint {
     float x, y;

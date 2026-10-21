@@ -1,6 +1,6 @@
 """Unit v5235: COnlineControl::SaveIgnore and LoadIgnore, against libtpw_unit_COnlineControl_SaveIgnore.dylib
 (tests/unit_COnlineControl_SaveIgnore.cpp), main app ("SimTheme Park"),
-src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_SaveIgnore.cpp:
+src/game/online/online.cpp:
   COnlineControl::SaveIgnore 0x1021d74c, COnlineControl::LoadIgnore 0x1021db98
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

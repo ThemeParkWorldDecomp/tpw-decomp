@@ -1,5 +1,5 @@
 // Test library for LOADVAR and SAVEVAR of AdvisorMessage (unit v5L05; libtpw_unit_AdvisorMessageVar.dylib,
-// tests/test_AdvisorMessageVar.py), main app: src/Advisor_AdvisorMessage_LOADVAR_SAVEVAR.cpp
+// tests/test_AdvisorMessageVar.py), main app: src/game/advisor/Advisor.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues: WriteSerialiseLog,
 // GAME_ASSERTMSG, LbFile_Read, LbFile_Write. gSaveLoad is defined here.

@@ -1,5 +1,5 @@
 """Unit v5715, the anaglyph key action, against libtpw_unit_AnaglyphToggle.dylib (tests/unit_AnaglyphToggle.cpp), main app
-("SimTheme Park"), src/keytables_enable_AnaglyphToggle.cpp:
+("SimTheme Park"), src/game/keyboard.cpp:
   AnaglyphToggle 0x1014fce4
 
 A case is the display flags word (gei_Display +0, 0x103bc8d0) written on both sides; the function is called and the answer and the flags are

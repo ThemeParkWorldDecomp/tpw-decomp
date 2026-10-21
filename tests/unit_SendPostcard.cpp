@@ -1,5 +1,5 @@
 // Test library for the postcard panel's sending half (unit v5884; libtpw_unit_SendPostcard.dylib, tests/test_SendPostcard.py), main app:
-//   src/ui_Postcard_panel_SendPostcard.cpp   IllCallYouBack, AddressesValid, AddToAddressField, SendPostcard and the globals they own
+//   src/game/ui/ui_Postcard.cpp   IllCallYouBack, AddressesValid, AddToAddressField, SendPostcard and the globals they own
 //
 // The callees outside the unit are fakes that record what the real ones read (texts as FNV-1a hashes, pointers as labels) and answer
 // from the test's queues; the C library's string functions are fakes with the C semantics. The globals of ui_Postcard_panel.cpp and the

@@ -3,7 +3,7 @@
 // through a Mac File Manager parameter block, SamsUtilities::UPooled<CMpegMacFilePlayerUnpooled, 10>, the pool that hands the
 // players out, and UInterruptSafeQueue<unsigned char[28004]>, the Mac OS queue the pool keeps its elements in. The base class
 // CMpegBase is unit w71a's (include/TbMpegBase.h, which this header includes). The one user is _TbSoundSampleMPEG2File
-// (src/TbSoundSampleMPEG2.cpp); the host sound module (platform/sound_module.cpp) tops the pool up.
+// (src/sound/StreamableMpeg2.cpp, src/sound/TbSoundSampleMPEG2.cpp, src/game/advisor/AdvisorScoring.cpp, src/sound/TbBank.cpp, src/sound/TbSoundSamplePipe.cpp); the host sound module (platform/sound_module.cpp) tops the pool up.
 //
 // The Mac player is 0x6d64 bytes; the first 0x24f0 are CMpegBase. The host object keeps the Mac's ORDER of members, with native
 // pointers (so not its offsets); the Mac offset of each member is in its comment.
@@ -101,7 +101,7 @@ public:
 // The pool of file players (StreamableMpeg2.cpp, CSprocketsModule.cpp): operator new takes an idle player from the queue and
 // answers NULL when none is idle (there is no heap fallback: the game keeps the pool full, MaintainPoolLevel, from the sound
 // module's Tick), operator delete puts the player back. Level 10 is the target the pool is kept at. The members are defined
-// for the one instance the game has, <CMpegMacFilePlayerUnpooled, 10> (src/TbMpegFilePlayer.cpp), as explicit specializations.
+// for the one instance the game has, <CMpegMacFilePlayerUnpooled, 10> (src/sound/StreamableMpeg2.cpp), as explicit specializations.
 template <class T, int Level>
 class UPooled : public T {
 public:
@@ -164,7 +164,7 @@ uint8_t SamsUtilities::MpegFilePlayerPool::gPoolKeepFull;
 template <>
 uint32_t SamsUtilities::MpegFilePlayerPool::gPoolTarget;
 
-// Unit v5123 (src/TbMpegFilePlayer_SamsUtilities_UManager_Allocate.cpp)
+// Unit v5123 (src/sound/CSprocketsModule.cpp)
 namespace SamsUtilities {
 class UAllocator;
 template <class A>

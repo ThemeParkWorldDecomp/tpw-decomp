@@ -1,5 +1,5 @@
 """Unit v5054, the coaster editor's data change and the loft drag toggle, against libtpw_unit_HandleCoasterDataChange.dylib
-(tests/unit_HandleCoasterDataChange.cpp), main app ("SimTheme Park"), src/HandleCoasterDataChange.cpp:
+(tests/unit_HandleCoasterDataChange.cpp), main app ("SimTheme Park"), src/game/rides/CoasterEdit.cpp, src/game/rides/CoasterTrack.cpp:
   HandleCoasterDataChange 0x10052318, ToggleLoftPylonState 0x10052ac4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

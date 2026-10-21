@@ -1,11 +1,11 @@
 """Differential tests for the four 4-bit font render method objects and the one-colour glyph writers (unit w45b), against
 libtpw_unit_FontRenderMethods.dylib (tests/unit_FontRenderMethods.cpp), all in the ltms library ("ltms symbols shared"):
 
-  src/ltms_fontrender_onecolour_noblend.cpp  TbOneColourNoBlend4BitFontRenderMethod::DrawCharTo555 0x1000d17c, To565 0x1000d4a4,
+  src/ltms/TbOneColourNoBlend4BitFontRenderMethod.cpp  TbOneColourNoBlend4BitFontRenderMethod::DrawCharTo555 0x1000d17c, To565 0x1000d4a4,
                                              To4444 0x1000d5cc, To8888 0x1000d908, ToBGRA 0x1000dc3c, ToAny 0x1000df64
-  src/ltms_fontrender_onecolour.cpp          TbOneColour4BitFontRenderMethod::DrawCharTo555 0x1000e10c, To565 0x1000e528,
+  src/ltms/TbOneColour4BitFontRenderMethod.cpp          TbOneColour4BitFontRenderMethod::DrawCharTo555 0x1000e10c, To565 0x1000e528,
                                              To4444 0x1000e93c, To8888 0x1000edb4, ToBGRA 0x1000f184, ToAny 0x1000f558
-  src/ltms_fontrender_methods.cpp            the four classes' constructors (0x1000dff0, 0x1000d050, 0x1000a0c0, 0x1000b9c8) and
+  src/ltms/TbOneColour4BitFontRenderMethod.cpp, src/ltms/TbOneColourNoBlend4BitFontRenderMethod.cpp, src/ltms/TbTextured4BitFontRenderMethod.cpp, src/ltms/TbTexturedNoBlend4BitFontRenderMethod.cpp            the four classes' constructors (0x1000dff0, 0x1000d050, 0x1000a0c0, 0x1000b9c8) and
                                              destructors (0x1000e068, 0x1000d0d0, 0x1000a138, 0x1000ba48), SetWriteZero 0x1000d020, the
                                              four objects and the table gFontRenderMethods; the static initialiser
                                              __sinit_TbFontRender_cpp 0x10002298 (the host's equivalent is the order of the global

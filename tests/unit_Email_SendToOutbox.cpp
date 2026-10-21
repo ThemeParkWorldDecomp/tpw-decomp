@@ -1,5 +1,5 @@
 // Test library for Email::SendToOutbox and Email::BuildBody (unit v5162; libtpw_unit_Email_SendToOutbox.dylib, tests/test_Email_SendToOutbox.py), main app:
-//   src/Email_Send_Email_SendToOutbox.cpp
+//   src/game/online/EmailMessage.cpp
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record: the string and list callees, Outbox::WriteMailData and
 // UTimer::GetAbsolute. A string field is named in the log by its Mac offset: 0..0x4b in the Email, 0x1000 + offset in the Outbox.

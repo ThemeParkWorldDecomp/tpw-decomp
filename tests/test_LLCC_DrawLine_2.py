@@ -1,5 +1,5 @@
 """Unit v51031, a cell line walk, a globe destructor and a download globe's message handler, against libtpw_unit_LLCC_DrawLine_2.dylib
-(tests/unit_LLCC_DrawLine_2.cpp), main app ("SimTheme Park"), src/MapCell_kinds_LLCC_DrawLine_2.cpp:
+(tests/unit_LLCC_DrawLine_2.cpp), main app ("SimTheme Park"), src/game/online/lobby_globe.cpp, src/game/park/MapCell.cpp:
   LLCC_DrawLine 0x1009c0d0, CLBGlobe::~CLBGlobe 0x100ac534, CLBScreenComponentDownloadGlobe::WindowMessagesFn 0x100ae374
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

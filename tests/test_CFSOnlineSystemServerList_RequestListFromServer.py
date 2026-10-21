@@ -1,5 +1,5 @@
 """Unit v5713, CFSOnlineSystemServerList, against libtpw_unit_CFSOnlineSystemServerList_RequestListFromServer.dylib
-(tests/unit_CFSOnlineSystemServerList_RequestListFromServer.cpp), main app, src/CFSOnlineSystemServerList_RequestListFromServer.cpp:
+(tests/unit_CFSOnlineSystemServerList_RequestListFromServer.cpp), main app, src/game/online/FS_OnlineList.cpp:
   GetList 0x1017ada8, RequestListFromServer 0x1017af40, StoreReceivedList 0x1017afec
 
 A case is a world and a call, built twice by one piece of Python code (emulator memory big-endian at the Mac's offsets; host memory at

@@ -1,6 +1,6 @@
 """Unit v5245, the CPerson queue states and the nearest-thing searches, against libtpw_unit_CPerson_FindNearestReachableLitterBin.dylib
 (tests/unit_CPerson_FindNearestReachableLitterBin.cpp), main app ("SimTheme Park"),
-src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin.cpp:
+src/game/people/PersonQueue.cpp:
   CPerson::FindNearestReachableLitterBin 0x1011e9ec, CPerson::FindNearestEntertainer 0x1011ebc4,
   CPerson::ProcessStateBeingUnloaded 0x1011e0e4, CPerson::ProcessStateBeingLoaded 0x1011dcc0
 

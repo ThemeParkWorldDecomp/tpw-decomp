@@ -1,6 +1,6 @@
 """Unit v51016, the person's per-use bookkeeping and minor-destination search, against libtpw_unit_CPerson_EveryTimeMods_2.dylib
 (tests/unit_CPerson_EveryTimeMods_2.cpp), main app ("SimTheme Park"),
-src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_EveryTimeMods_2.cpp:
+src/game/people/Person.cpp:
   CPerson::EveryTimeMods 0x1011a364, UpdateTemporaryHistory 0x10119b68, UseObject 0x101196a0, GetTimeInPark 0x1011962c,
   LookForMinorDest 0x1011915c
 

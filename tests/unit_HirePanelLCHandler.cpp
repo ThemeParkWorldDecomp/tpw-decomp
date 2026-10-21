@@ -1,5 +1,5 @@
 // Test library for the hire panel's list functions (unit v5554; libtpw_unit_HirePanelLCHandler.dylib, tests/test_HirePanelLCHandler.py), main app:
-//   src/HirePanelLCHandler.cpp   HirePanelLCPostFormat (0x101a18a4), HirePanelLCHandler (0x101a19f8) and the four globals they use
+//   src/game/ui/ui_hirePanel.cpp   HirePanelLCPostFormat (0x101a18a4), HirePanelLCHandler (0x101a19f8) and the four globals they use
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the PowerPC stubs): the allocation, the two
 // constructors, the window's members, GetFontTableEntry, FillHireList, UIMain_GetString, UIMain_SetTitleText, SCR_KillScript.

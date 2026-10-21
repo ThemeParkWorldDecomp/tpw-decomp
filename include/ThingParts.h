@@ -1,4 +1,4 @@
-// The parts of the singleton things that their constructors build (unit w122a, src/ThingCtors.cpp). Mac layouts, no pointers. Each
+// The parts of the singleton things that their constructors build (unit w122a, src/game/Thing.cpp, src/game/advisor/Advisor.cpp, src/game/buildings/MechanicHQ.cpp, src/game/buildings/ResearchLab.cpp, src/game/buildings/StaffHQ.cpp, src/game/park/Weather.cpp, src/game/ui/vector2d.cpp). Mac layouts, no pointers. Each
 // constructor is inline here because the Mac's leaf constructor is only a few stores; the address of the original is in the comment.
 // Names of members are the unit's own (the binary has none for these fields).
 #pragma once
@@ -12,7 +12,7 @@ struct CTrainingCentre {
     }
     uint32_t mF00[5];   // 0x00
     uint8_t mF14;       // 0x14  (0x15 to 0x17: padding, never written)
-    // Unit CTrainingCentre_Serialise (src/TrackCell_CTrainingCentre_Serialise.cpp)
+    // Unit CTrainingCentre_Serialise (src/game/buildings/TrainingCentre.cpp)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x10130008 (332 bytes)
     void UpdateMonthly();   // 0x1013018c (928 bytes)
 };
@@ -33,10 +33,10 @@ struct CWeatherForecast {
     uint32_t mF04;   // 0x04
     uint32_t mF08;   // 0x08  mQuality (the save name; an int)
     uint8_t mF0C;    // 0x0c  mValid (the save name; a bool) (0x0d to 0x0f: padding, never written)
-    // 0x10139854, 12 bytes (src/Weather.cpp, unit w181): clears the byte at +0xc.
+    // 0x10139854, 12 bytes (src/game/park/Weather.cpp, unit w181): clears the byte at +0xc.
     void Invalidate();
-    int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x101396b8, 356 bytes (src/Weather.cpp, unit w181)
-    void Set(int32_t days, int32_t quality);   // 0x10139894, 208 bytes (src/Weather.cpp, unit w181)
+    int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x101396b8, 356 bytes (src/game/park/Weather.cpp, unit w181)
+    void Set(int32_t days, int32_t quality);   // 0x10139894, 208 bytes (src/game/park/Weather.cpp, unit w181)
 };
 static_assert(sizeof(CWeatherForecast) == 0x10, "CWeatherForecast is 0x10 bytes");
 
@@ -44,7 +44,7 @@ static_assert(sizeof(CWeatherForecast) == 0x10, "CWeatherForecast is 0x10 bytes"
 struct RideInfo;
 struct CResearchProject {
     CResearchProject() {}
-    // Unit w211 (src/ResearchLab_projects.cpp): a project's setup, progress and remaining points.
+    // Unit w211 (src/game/buildings/ResearchLab.cpp): a project's setup, progress and remaining points.
     char SetupProject(const RideInfo* ride);       // 0x10123d7c (176 bytes): nonzero when the ride gives a project (a ride with no research cost is made available instead)
     char SetupStatUpgrade(const RideInfo* ride);   // 0x10123e6c (280 bytes): nonzero when the ride gives a statistics upgrade (skips and records the levels with no cost)
     void ContributeResearch(float points);         // 0x10123fc8 (296 bytes): adds the points; the finished project's object becomes available and the park is told

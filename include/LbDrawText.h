@@ -1,4 +1,4 @@
-// Unit w224 (src/LbDraw_text.cpp), Bullfrog text drawing.
+// Unit w224 (src/bullfrog/LbDrawText.cpp, src/bullfrog/LbRect.cpp), Bullfrog text drawing.
 #pragma once
 #include <cstdint>
 #include "TbGraphicFile.h"

@@ -1,5 +1,5 @@
 // Test library for SamsUtilities::UManager<UAllocator>::Allocate (unit v5123; libtpw_unit_SamsUtilities_UManager_Allocate.dylib), main app:
-//   src/TbMpegFilePlayer_SamsUtilities_UManager_Allocate.cpp
+//   src/sound/CSprocketsModule.cpp
 //
 // The two callees (0x1002eac4 allocation, 0x1002ec8c initialiser) are recording fakes.
 #include <cstddef>

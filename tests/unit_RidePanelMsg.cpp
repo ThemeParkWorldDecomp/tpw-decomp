@@ -1,5 +1,5 @@
 // Test library for the ride list panel's message handler (unit v51005; libtpw_unit_RidePanelMsg.dylib, tests/test_RidePanelMsg.py), main app:
-//   src/ChangeInfoWindow_RidePanelMsg.cpp   RidePanelMsg
+//   src/game/ui/ui_ridepanel.cpp   RidePanelMsg
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The windows
 // are static blocks whose first word is a fake vtable (slot 10 is SetText); the globals of other files the unit reads are defined here.

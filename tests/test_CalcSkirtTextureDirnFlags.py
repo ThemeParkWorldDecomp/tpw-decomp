@@ -1,5 +1,5 @@
 """Unit v5042, CalcSkirtTextureDirnFlags, against libtpw_unit_CalcSkirtTextureDirnFlags.dylib (tests/unit_CalcSkirtTextureDirnFlags.cpp), main app
-("SimTheme Park"), src/Debug_blendflags_CalcSkirtTextureDirnFlags.cpp:
+("SimTheme Park"), src/game/park/SkirtDeform.cpp:
   CalcSkirtTextureDirnFlags 0x1006eca0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

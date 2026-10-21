@@ -1,4 +1,4 @@
-// Test library for std::vector<facet*>::~vector (unit v5577), src/std_vector_Dtor_vector.cpp.
+// Test library for std::vector<facet*>::~vector (unit v5577), src/game/MslSupport.cpp.
 // operator delete is a recording fake: 1 = the vector, 2 = its buffer, 0 = other.
 #include <cstddef>
 #include <cstdint>

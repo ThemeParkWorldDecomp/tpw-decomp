@@ -1,6 +1,6 @@
 // Test library for the main panel's last-used-panel jump and the cash window (unit v5188; libtpw_unit_GotoLastUsedPanel.dylib,
 // tests/test_GotoLastUsedPanel.py), main app:
-//   src/ui_mainpanel2_msg_GotoLastUsedPanel.cpp   GotoLastUsedPanel, DoCashWin; defines the cash window's own globals
+//   src/game/ui/ui_mainpanel2.cpp   GotoLastUsedPanel, DoCashWin; defines the cash window's own globals
 //
 // The panels, the window members, the bank, the mouse and the cell system are recording fakes that answer from the test's queues. The globals
 // of other files the unit reads or writes are defined here. The global operator new is replaced so that the two news of DoCashWin are logged.
@@ -27,7 +27,7 @@
 using namespace calllog;
 
 // ---- globals of other files, defined here
-int32_t gCashWindowWord;     // 0x103949ac (src/ui_mainpanel2_msg.cpp)
+int32_t gCashWindowWord;     // 0x103949ac (src/game/ui/ui_mainpanel2.cpp)
 int32_t gLastPanelFinance;   // 0x103949b8
 int32_t gLastPanelPark;      // 0x103949bc
 int32_t gLastPanelLists;     // 0x103949c0

@@ -1,9 +1,9 @@
 // Test library for the script sprites and the script save and load (unit w165; libtpw_unit_ScriptSprites.dylib, tests/test_ScriptSprites.py),
 // main app:
-//   src/ScriptSprites.cpp  ESP_ForceGoto, ESP_RURunningThis, ESP_Spawn2DCopyOfScriptAt, ESP_Update2DScript, ESP_FixSpriteIDsFromDetail and the
+//   src/game/Script.cpp, src/game/ScriptOps.cpp  ESP_ForceGoto, ESP_RURunningThis, ESP_Spawn2DCopyOfScriptAt, ESP_Update2DScript, ESP_FixSpriteIDsFromDetail and the
 //                          PK_ commands SPAWN, SET_OBJ_ID, SET_OBJ_ACT, PutSpriteVAR, PutSpriteIM, Put3DSpriteIM, RemoveSprite, ResetScale,
 //                          ReduceScale, IncreaseScale, ResetRotation, ReduceRotation, IncreaseRotation
-//   src/ScriptSave.cpp     SCR_SaveAllScripts, SCR_LoadAllScripts and the file swaps (namespace ScriptSaveSwap)
+//   src/game/Script.cpp     SCR_SaveAllScripts, SCR_LoadAllScripts and the file swaps (namespace ScriptSaveSwap)
 //
 // Every callee outside the unit is a fake that records its arguments and answers from the test's queues: the allocator (LbMem_Alloc,
 // LbMem_Free and the script block pair, which logs the Mac's LbMem_Alloc(0x118); the queue "alloc" can make an allocation fail), the file
@@ -66,7 +66,7 @@ void* Fill(uint32_t size) {
 
 }  // namespace
 
-// The code array as the Mac's data (the host copies of src/ScriptInterp.cpp, which this library does not link).
+// The code array as the Mac's data (the host copies of src/game/Script.cpp, which this library does not link).
 uint32_t SCR_CodeWord(uint32_t address) {
     const uint32_t index = (address - kScriptCodeAddress) / 4;
     if (index < static_cast<uint32_t>(gScriptCodeWordsEnd - gScriptCodeWords)) return gScriptCodeWords[index];

@@ -1,4 +1,4 @@
-// Test library for src/lobby_parser.cpp (libtpw_unit_LobbyParser.dylib; see
+// Test library for src/game/online/lobby_parser.cpp (libtpw_unit_LobbyParser.dylib; see
 // tests/test_LobbyParser.py): the lobby description parser over a file the test supplies.
 // The file and memory calls are fakes that record; the strings are functional.
 #include <cstdlib>

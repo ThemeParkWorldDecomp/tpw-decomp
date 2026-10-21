@@ -1,11 +1,11 @@
 """Unit w65, the sound registration layer, against libtpw_unit_SoundRegister.dylib (tests/unit_SoundRegister.cpp), in the main app
 ("SimTheme Park"):
-  src/SoundRegister.cpp  SOUND_Malloc 0x100dc5e4, SOUND_Free 0x100dc64c, SOUND_RegisterCatagory (plain) 0x100dc6ac and (resource)
+  src/game/Sound.cpp, src/game/park/ParkSound.cpp  SOUND_Malloc 0x100dc5e4, SOUND_Free 0x100dc64c, SOUND_RegisterCatagory (plain) 0x100dc6ac and (resource)
                          0x100dc74c, SOUND_FreeCatagory 0x100dc89c, SND_RegisterGlobalLobbySounds 0x100def68,
                          SND_RegisterLocalLobbySounds 0x100df02c, SND_FreeGlobalLobbySounds 0x100df1bc, SND_FreeLocalLobbySounds
                          0x100df234, SND_RegisterGlobalSounds 0x100df310, SND_RegisterLocalParkSounds 0x100df4d4,
                          SND_FreeGlobalSounds 0x100df67c, SND_FreeLocalParkSounds 0x100df778
-  src/TPSound.cpp        the state they work on
+  src/game/Sound.cpp, src/game/park/ParkSound.cpp        the state they work on
 
 The functions run as the original, one script of operations per case, with the state block (the flags, the allocation counter, the
 sixteen words of the banks and the island table, and the table's rows) read after every operation. Every callee outside the unit is a

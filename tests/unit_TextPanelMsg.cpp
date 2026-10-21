@@ -1,5 +1,5 @@
 // Test library for the online news panel (unit v5225; libtpw_unit_TextPanelMsg.dylib, tests/test_TextPanelMsg.py), main app:
-//   src/UI_IslandLobby_TextPanelMsg.cpp   TextPanelMsg, CreateOnlineNewsPanel, CalcScrollBar and the panel's four globals
+//   src/game/ui/ui_onlineNewsPanel.cpp   TextPanelMsg, CreateOnlineNewsPanel, CalcScrollBar and the panel's four globals
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues. The windows are
 // zeroed blocks with a hand made vtable (the slots SetValue and SetText); the globals of other files are defined here.

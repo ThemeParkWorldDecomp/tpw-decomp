@@ -1,5 +1,5 @@
 #pragma once
-// Declarations for CreateOnlineLoginPanel (0x101e27bc, src/UI_IslandLobby_UpdateOnlineCityInfoOverlay_CreateOnlineLoginPanel.cpp).
+// Declarations for CreateOnlineLoginPanel (0x101e27bc, src/game/ui/ui_onlineLogin.cpp).
 #include <cstdint>
 
 #include "ui_DrawObject.h"

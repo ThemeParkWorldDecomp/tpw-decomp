@@ -1,6 +1,6 @@
 // Test library for the Outbox cursor and mark functions, std::operator== on strings, the std::basic_ifstream<char> constructor and
 // Email::Attachment::~Attachment (unit v5950; libtpw_unit_Outbox_First.dylib, tests/test_Outbox_First.py), main app:
-//   src/email_load_Outbox_Send_Outbox_WriteMailData_Outbox_First.cpp
+//   src/game/online/email.cpp
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record: Outbox::ReadMailData, DeleteMail, Save, the string
 // compare, the stream and filebuf constructors, the string destructor and the operator deletes. The globals of other files the unit

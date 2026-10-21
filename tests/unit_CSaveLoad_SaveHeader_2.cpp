@@ -1,6 +1,6 @@
 // Test library for CSaveLoad::SaveHeader, PostLoadOperations and PreLoadOperations (unit v51006;
 // libtpw_unit_CSaveLoad_SaveHeader_2.dylib, tests/test_CSaveLoad_SaveHeader_2.py), main app:
-//   src/SaveLoad_CSaveLoad_SaveHeader_2.cpp
+//   src/game/save/SaveLoad.cpp
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue. The globals
 // of other files are defined here: those of classes whose constructors live in other files are raw storage under the global's own

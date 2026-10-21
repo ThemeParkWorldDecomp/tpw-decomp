@@ -1,5 +1,5 @@
-"""Differential tests for the twenty basic serialisation instances (src/Serialise_basic.cpp and, since unit w114,
-src/Serialise_float.cpp): LOADVAR and SAVEVAR of int, bool, unsigned int, unsigned short, char, wchar_t and float (unit w146 adds unsigned char,
+"""Differential tests for the twenty basic serialisation instances (src/game/ControlManager.cpp, src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/rides/FlyingRide.cpp, src/game/save/FS_MasterSave.cpp and, since unit w114,
+src/game/park/analyser.cpp): LOADVAR and SAVEVAR of int, bool, unsigned int, unsigned short, char, wchar_t and float (unit w146 adds unsigned char,
 short and the thing id struct's LOADVARSTRUCT and SAVEVARSTRUCT), against
 libtpw_unit_Serialise.dylib (tests/unit_Serialise.cpp's fakes; see calllog.py).
 

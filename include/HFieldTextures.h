@@ -74,7 +74,7 @@ int32_t InterceptAndInsertM3D2Textures(tag_sM3D2Header* header, sExtraTextureTab
 // the kept ones. `total` is not used.
 void ReplaceTextures(tag_sM3D2Header* header, int32_t* map, sTexture* textures, int32_t kept, uint32_t total);
 
-// Unit v5906, 0x100b8080 (src/Postcard_Postcard_save.cpp): sets the texture and flags of the height field quad (x, y) of `header`:
+// Unit v5906, 0x100b8080 (src/game/MeshLoad.cpp): sets the texture and flags of the height field quad (x, y) of `header`:
 // category 0 with texture 8 makes it plain, category 0 with texture 0x37 takes the saved copy's words (gHeightfieldCopy), otherwise
 // the texture (wrapped into the table) is one of the category's; `rotation` 0x5a / 0xb4 / 0x10e sets bit 0x20 / 0x10 / 8.
 void SetHeightfieldTexture(tag_sM3D2Header* header, sExtraTextureTable* table, int32_t x, int32_t y, int32_t category, int32_t texture,

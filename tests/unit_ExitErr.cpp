@@ -1,5 +1,5 @@
-// Test library for the exit error report (libtpw_unit_ExitErr.dylib; see tests/test_ExitErr.py): src/ExitErr_report.cpp
-// (CExitError::ReportAnyError, HandleEngineErrors, ConvertEngineErrors) with src/ExitErr.cpp's gExitError. Real under them:
+// Test library for the exit error report (libtpw_unit_ExitErr.dylib; see tests/test_ExitErr.py): src/game/ExitErr.cpp
+// (CExitError::ReportAnyError, HandleEngineErrors, ConvertEngineErrors) with src/game/ExitErr.cpp's gExitError. Real under them:
 // the 16-bit C library (swprintf and wcslen, platform/msl.cpp). Fakes that record through calllog: the UI string table's
 // FormatString (it writes the case's text), the engine's error stack (CErrorHandler::Pop answers the case's records in
 // order) and NS_MacDoze::MessageBoxW (it records the whole message buffer, so that nothing the box would show is missed).

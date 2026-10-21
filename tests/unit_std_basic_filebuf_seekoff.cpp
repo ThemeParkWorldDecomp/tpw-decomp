@@ -1,6 +1,6 @@
 // Test library for std::basic_filebuf<wchar_t> seekoff, seekpos, overflow (unit v5093; libtpw_unit_std_basic_filebuf_seekoff.dylib,
 // tests/test_std_basic_filebuf_seekoff.py), main app:
-//   src/std_basic_filebuf_seekoff.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues (codecvt encoding/out,
 // unshift, fseek, ftell, fputc, the string init/assign/resize, operator delete). Pointers are logged as small kinds, not addresses.

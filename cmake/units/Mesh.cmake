@@ -1,3 +1,16 @@
-set(TPW_UNIT_Mesh src/tb_mesh.cpp platform/arena.cpp)
+set(TPW_UNIT_Mesh src/engine/Mesh.cpp platform/arena.cpp)
+set(TPW_UNIT_Mesh_KEEP
+  __ZN5CMesh11GetLinkTypeEv   # CMesh::GetLinkType()
+  __ZN5CMesh14DeleteRideBaseEv   # CMesh::DeleteRideBase()
+  __ZN5CMesh14DeleteRideSignEv   # CMesh::DeleteRideSign()
+  __ZN5CMesh16GenerateRideSignEPji   # CMesh::GenerateRideSign(unsigned int*, int)
+  __ZN5CMesh17GetTexturePointerEi   # CMesh::GetTexturePointer(int)
+  __ZN5CMesh25DestroyBumpmappingNormalsEv   # CMesh::DestroyBumpmappingNormals()
+  __ZN5CMesh4InitEP15tag_sM3D2Header   # CMesh::Init(tag_sM3D2Header*)
+  __ZN5CMesh5CloseEv   # CMesh::Close()
+  __ZN5CMesh7GetDataEv   # CMesh::GetData()
+  __ZN5CMeshC1Ev   # CMesh::CMesh()
+  __ZN5CMeshD1Ev   # CMesh::~CMesh()
+)
 # The unit file includes calllog.cpp itself.
 set(TPW_UNIT_Mesh_OWN_CALLLOG ON)

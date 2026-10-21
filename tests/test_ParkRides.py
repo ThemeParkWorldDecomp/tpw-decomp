@@ -1,4 +1,4 @@
-"""Differential tests for unit w153, the analyser's ride superlatives (src/ParkAnalyser_rides.cpp). See difftest.py and tpwtest.py.
+"""Differential tests for unit w153, the analyser's ride superlatives (src/game/park/analyser.cpp). See difftest.py and tpwtest.py.
 
 CParkAnalyser::GetMostExcitingGokart, GetGokartWithMostCrossRoads, GetLongestTrackRide (both overloads), GetCoasterWithMostLoops, GetHighestCoaster,
 GetAverageToiletQueueLenght, FindRideWithUnconnectedQueue, GetAverageExcitementLevelOfAllRides, GetScariestRide and GetRidesInPark. Every callee is a fake

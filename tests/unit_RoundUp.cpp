@@ -1,5 +1,5 @@
 // Test library for RoundUp and GetCoasterTrackStats (unit v5275; libtpw_unit_RoundUp.dylib, tests/test_RoundUp.py), main app:
-//   src/TPConfig_stats_RoundUp.cpp
+//   src/game/rides/CoasterSpline.cpp, src/game/rides/CoasterTrain.cpp
 //
 // GetCoasterInstanceFromCObject is a fake that records its argument and answers the block the test sets with tpw_rup_setinst.
 #include <cstddef>

@@ -1,5 +1,5 @@
 """Unit w192, the coaster trains, against libtpw_unit_CoasterTrains.dylib (tests/unit_CoasterTrains.cpp), main app ("SimTheme Park"),
-src/TPCoaster_trains.cpp:
+src/game/rides/BumperRide.cpp, src/game/rides/TPCoaster.cpp:
   InstanceCoasterTrains 0x10042084, DestroyCoasterTrains 0x10042344, GetCoaster1stPersonCar 0x100433F4, SaveTrainsAndCars 0x10043A18,
   LoadTrainsAndCars 0x10043E8C
 (the four swap instances 0x10043DB8, 0x10043E00, 0x10043E44 and 0x10021BB4 are tests/test_CoasterTrainsSwap.py's).

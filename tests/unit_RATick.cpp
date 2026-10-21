@@ -1,5 +1,5 @@
 // Test library for the ride animation tick and the quick vertex copy (unit v5308; libtpw_unit_RATick.dylib, tests/test_RATick.py), main app:
-//   src/RideAnimChange_RATick.cpp   RATick, QuickCopyUnmaskedMeshVertices
+//   src/game/rides/RideAnim.cpp   RATick, QuickCopyUnmaskedMeshVertices
 //
 // AnimateNode and RAAnimateTextureFrames are recording fakes; gTPGlobals (defined in another file) is defined here, zero at start.
 #include <cstddef>

@@ -1,5 +1,5 @@
 // Test library for the tb_depthoffield.cpp static initialiser (unit v5705), main app:
-//   src/tb_waveload_sinit_tb_depthoffield_cpp.cpp defines the function and the ten-float table.
+//   src/engine/tb_depthoffield.cpp defines the function and the ten-float table.
 // sin and cos are libm on both sides (no fakes).
 #include <cstddef>
 #include <cstdint>

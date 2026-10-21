@@ -1,5 +1,5 @@
 """Unit v5084, the pylon edit states of the track editor, against libtpw_unit_DisableCurrentPylonEditState.dylib
-(tests/unit_DisableCurrentPylonEditState.cpp), main app ("SimTheme Park"), src/DisableCurrentPylonEditState.cpp:
+(tests/unit_DisableCurrentPylonEditState.cpp), main app ("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   ExchangeTrackBraces 0x10053594, ToggleSwapUpPylonState 0x10053720, ToggleSwapDownPylonState 0x10053898,
   SetTrackPreview2ndBrace 0x10053a04, DisableCurrentPylonEditState 0x10053b58
 

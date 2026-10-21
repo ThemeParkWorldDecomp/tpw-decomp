@@ -41,8 +41,8 @@ public:
     int32_t Close();                         // 0x1001d244
     void SetLocalMatrix(int32_t flags, CMatrix& matrix); // 0x1001d3d0
     void SetLocalMatrix(int32_t flags, sMatrix& matrix); // 0x1001d654
-    int32_t Prepare() override;              // 0x1001df78 (src/tb_mesh_frame.cpp)
-    // The per-frame members (src/tb_mesh_frame.cpp). Preprocess walks a node, its siblings (mF08)
+    int32_t Prepare() override;              // 0x1001df78 (src/engine/Mesh.cpp)
+    // The per-frame members (src/engine/Mesh.cpp). Preprocess walks a node, its siblings (mF08)
     // and their children (mF0C) with two matrices per level; a node in view is lit, added to the
     // render list and has its textures asked for. 0 when the render list refuses a node.
     int32_t Preprocess(tag_sNode* node, CMatrix* matrix, CMatrix* matrix2);   // 0x1001dccc
@@ -60,7 +60,7 @@ public:
     int32_t GenerateRideSign(uint32_t* indices, int32_t count); // 0x1001ed9c: indices become arena offsets of pixel data
     uintptr_t GetTexturePointer(int32_t index);                // 0x1001f120: native pixel pointer
     int32_t GenerateRideBase(int32_t a, int32_t b, int32_t c, int32_t d);   // 0x10239a90 (glue import; GetBlendedBaseTextures)
-    // Unit v5752 (src/tb_mesh_CMesh_GenerateRideBase.cpp). The cells x0..x1, y0..y1 (the arguments a..d
+    // Unit v5752 (src/engine/Mesh.cpp). The cells x0..x1, y0..y1 (the arguments a..d
     // above are x0, y0, x1, y1) of the height field with both overlay flags get generated textures.
     int32_t GenerateRideBase(CTextureEntry* target, CTextureEntry* source, int32_t x, int32_t y, int32_t flags);   // 0x1001e644
     void CenterMatrix(int32_t flags, float scale);   // 0x1001d97c

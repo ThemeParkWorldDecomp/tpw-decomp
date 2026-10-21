@@ -1,5 +1,5 @@
 // Test library for the online park find panel (unit v5661; libtpw_unit_CreateOnlineParkFindPanel.dylib, tests/test_CreateOnlineParkFindPanel.py), main app:
-//   src/OnlineParkInfoPanelMsg_CreateOnlineParkFindPanel.cpp   CreateOnlineParkFindPanel, ShowFindListSearching, gOnlineParkFindScript, gOnlineParkFindWide
+//   src/game/ui/ui_onlineParkFindPanel.cpp   CreateOnlineParkFindPanel, ShowFindListSearching, gOnlineParkFindScript, gOnlineParkFindWide
 //
 // The callees outside the unit are fakes that record what the real ones read; objects are fixed fake addresses (never dereferenced here),
 // the globals of other files are defined here, zero at start like the Mac's bss.

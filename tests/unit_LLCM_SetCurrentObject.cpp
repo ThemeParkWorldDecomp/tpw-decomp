@@ -1,5 +1,5 @@
 // Test library for LLCM_SetCurrentObject and LLCM_StartTrackEditMode (unit v5182; libtpw_unit_LLCM_SetCurrentObject.dylib, tests/test_LLCM_SetCurrentObject.py), main app:
-//   src/LLCellMouse_LLCM_SetCurrentObject.cpp   the two functions and the nine new words they define
+//   src/game/park/LLCellMouse.cpp   the two functions and the nine new words they define
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs); cells are logged by their
 // index from the (fake) world, objects by label. The globals of other files the unit reads or writes are defined here.

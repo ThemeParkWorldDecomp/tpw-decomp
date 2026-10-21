@@ -10,7 +10,7 @@ CAdvisor::CAdvisor() {}   // declared for CWorld::SetupNewLevel (unit w117), whi
 namespace {
 CAdvisor gObject;
 CAdvisorRequest gRequest;
-// The world is raw storage: CWorld has a constructor (src/World_init.cpp, unit w113) that this module does not link.
+// The world is raw storage: CWorld has a constructor (src/game/World.cpp, unit w113) that this module does not link.
 alignas(CWorld) unsigned char gTestWorldBytes[sizeof(CWorld)];
 CWorld& gTestWorld = *reinterpret_cast<CWorld*>(gTestWorldBytes);
 CAdvisorScoring* gScoring;

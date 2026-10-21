@@ -1,6 +1,6 @@
 // ObjectControl (World.cpp, main app): 0x20 bytes, 0x96 of them in the world from +0x1d943c. The constructor is a bare blr: it
 // writes nothing (unit w113), so a fresh world holds whatever its allocator gave. The fields from +0x10 are named by unit w151 (the park
-// analyser's queries read them; names mine). Unit w176 (src/ControlManager.cpp) names the first 0x10 bytes: CControlManager::
+// analyser's queries read them; names mine). Unit w176 (src/game/ControlManager.cpp) names the first 0x10 bytes: CControlManager::
 // CheckAllControlsInitialised 0x100fa32c fills them from the ride record of the type.
 #pragma once
 #include <cstddef>
@@ -8,7 +8,7 @@
 
 class ObjectControl {
 public:
-    ObjectControl();    // 0x1013a10c (4 bytes, src/World_init.cpp)
+    ObjectControl();    // 0x1013a10c (4 bytes, src/game/World.cpp)
 
     uint16_t mType;               // 0x00  the object type's id (the key GetObjectControl searches)
     uint8_t mF02[2];              // 0x02  never written
@@ -27,7 +27,7 @@ static_assert(offsetof(ObjectControl, mUpgradeCost) == 4 && offsetof(ObjectContr
 static_assert(offsetof(ObjectControl, mAvailable) == 0x10 && offsetof(ObjectControl, mUpgradesAvailable) == 0x14 &&
               offsetof(ObjectControl, mNumberInPark) == 0x18 && offsetof(ObjectControl, mFirstBuiltTurn) == 0x1c, "ObjectControl layout");
 
-// Unit w176 (src/ControlManager.cpp): the two SamsUtilities::USwapInplace32 instances the object control's file functions use; each swaps
+// Unit w176 (src/game/ControlManager.cpp): the two SamsUtilities::USwapInplace32 instances the object control's file functions use; each swaps
 // the word where it stands (lwz; stwbrx on the Mac).
 namespace ControlSwap {
 void USwapInplace32ULong(uint32_t& word);   // 0x100fa5fc: USwapInplace32<unsigned long> (12 bytes)

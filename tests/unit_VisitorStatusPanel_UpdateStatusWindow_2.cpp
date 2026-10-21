@@ -1,6 +1,6 @@
 // Test library for VisitorStatusPanel::UpdateStatusWindow and UpdateViewWindow (unit v51022;
 // libtpw_unit_VisitorStatusPanel_UpdateStatusWindow_2.dylib, tests/test_VisitorStatusPanel_UpdateStatusWindow_2.py), main app:
-//   src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2_VisitorStatusPanel_UpdateStatusWindow_2.cpp
+//   src/game/ui/ui_visitorStatus.cpp
 //
 // The callees outside the unit are recording fakes; the globals of other files are defined here.
 #include <cstddef>

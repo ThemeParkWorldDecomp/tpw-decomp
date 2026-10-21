@@ -1,8 +1,8 @@
-// CMsgDeath, the "thing destroyed" message (type 0x1b). Unit w123c (src/MsgDeath.cpp) translates its constructor 0x10152264, GetType
+// CMsgDeath, the "thing destroyed" message (type 0x1b). Unit w123c (src/game/ui/MessageCentre.cpp, src/game/Thing.cpp) translates its constructor 0x10152264, GetType
 // 0x1012ec14 (answers 0x1b) and destructor 0x1012e984; CMessageCentre::PostMessage reads the dying thing's id from it. The Mac's word at
 // +0x08 holds the id (a uint16_t, from the tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short> argument); the host's native vtable
 // moves it. The Mac vtables (base 0x102a10ec, death 0x102a438c) are never used by the host: the native vtable comes from the key
-// function GetType in src/MsgDeath.cpp.
+// function GetType in src/game/Thing.cpp.
 #pragma once
 #include <cstdint>
 

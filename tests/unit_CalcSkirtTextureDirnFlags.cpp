@@ -1,5 +1,5 @@
 // Test library for CalcSkirtTextureDirnFlags (unit v5042; libtpw_unit_CalcSkirtTextureDirnFlags.dylib, tests/test_CalcSkirtTextureDirnFlags.py), main app:
-//   src/Debug_blendflags_CalcSkirtTextureDirnFlags.cpp   CalcSkirtTextureDirnFlags, gSkirtCurrentCell, gSkirtCells
+//   src/game/park/SkirtDeform.cpp   CalcSkirtTextureDirnFlags, gSkirtCurrentCell, gSkirtCells
 //
 // The callees outside the unit are recording fakes: LLCC_GetRideBlendInfo (answers gTestBlend), MReleaseAllocF (a zeroed block),
 // GetNodeWorldVertPosnsIntoGeomBuffer, StripRideWrapping, ERRORBox and CTRACE. gScratchGeomBuffer and gHeightfieldHeader are

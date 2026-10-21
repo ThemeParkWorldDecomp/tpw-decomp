@@ -1,6 +1,6 @@
 """Unit v5553, the online download globe's destructor and Hide, against libtpw_unit_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo.dylib
 (tests/unit_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo.cpp), main app ("SimTheme Park"),
-src/lobby_globe_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo.cpp:
+src/game/online/lobby_globe.cpp:
   CLBScreenComponentDownloadGlobe::~CLBScreenComponentDownloadGlobe 0x100af330, CLBScreenComponentDownloadGlobe::Hide 0x100ae63c
 
 A case is a world and a call. The world: the globe object (visible word, two lists of globes / city flags, the two sound words), the lists'

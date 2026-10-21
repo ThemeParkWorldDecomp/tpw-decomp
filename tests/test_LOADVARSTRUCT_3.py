@@ -1,6 +1,6 @@
 """Unit v5960, the action history load, the tag table lookup and the tag system's message receiver, against
 libtpw_unit_LOADVARSTRUCT_3.dylib (tests/unit_LOADVARSTRUCT_3.cpp), main app ("SimTheme Park"),
-src/MsgDeath_CThoughts_Serialise_LOADVARSTRUCT_3.cpp:
+src/game/Thing.cpp, src/game/buildings/TrainingCentre.cpp:
   LOADVARSTRUCT<CThoughts::EventHistType> 0x1012f5a8, CTagTable::GetElement 0x1012dd94, CTagSystem::ReceiveMessage 0x1012c90c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

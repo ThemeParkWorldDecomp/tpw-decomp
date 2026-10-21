@@ -1,6 +1,6 @@
 // Test library for the online globe's Show, Hide, zoom, CreateCities and UnRegister (unit v5923;
 // libtpw_unit_CLBScreenComponentOnlineGlobe_Show_2.dylib, tests/test_CLBScreenComponentOnlineGlobe_Show_2.py), main app:
-//   src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Show_2.cpp
+//   src/game/online/lobby_globe.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read. The globe object is a TestGlobe: the real class
 // is abstract, and its virtuals (IsVisible, RegisterGlobe, IsCityWanted) are fakes that record and answer from the test's queues.
@@ -46,7 +46,7 @@ CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
 void CLBScreenComponentOnlineGlobe::Render() {}
 void CLBScreenComponentOnlineGlobe::Close() {}
 uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
-// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp).
+// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 CLBGlobeCityFlag::~CLBGlobeCityFlag() {}

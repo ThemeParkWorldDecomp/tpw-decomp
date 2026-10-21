@@ -1,5 +1,5 @@
 // Test library for CParser::CParser and SetupWhitespaceSet (unit v5727; libtpw_unit_CParser_CParser.dylib), main app:
-//   src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_cmp_nocase_CParser_CParser.cpp
+//   src/game/online/Parser.cpp
 //
 // The callees (string ctor, tree ctor, SetupSeparatorSet, AddWhitespace) are fakes that record which field of the parser they got.
 #include <cstddef>

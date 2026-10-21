@@ -1,4 +1,4 @@
-// Test library for src/lobby_screen.cpp (libtpw_unit_LobbyScreens.dylib; see
+// Test library for src/game/online/LBScreenComponentAdvisor.cpp, src/game/online/lobby_screen.cpp (libtpw_unit_LobbyScreens.dylib; see
 // tests/test_LobbyScreens.py): the lobby's screen system and the base class of its screens,
 // driven by scripts.
 //
@@ -65,7 +65,7 @@ RECORD(CLBScreenComponentThemeIslands, "ThemeIslands", Tick)
 RECORD_INPUT(CLBScreenComponentThemeIslands, "ThemeIslands")
 RECORD_CANCEL(CLBScreenComponentThemeIslands, "ThemeIslands")
 QUIET_SHOW(CLBScreenComponentThemeIslands)
-void CLBScreenComponentThemeIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/lobby_islands_rest.cpp)
+void CLBScreenComponentThemeIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/game/online/lobby_island.cpp)
 RECORD_DTOR(CLBScreenComponentOnlineIslands, "OnlineIslands")
 RECORD(CLBScreenComponentOnlineIslands, "OnlineIslands", Tick)
 RECORD_INPUT(CLBScreenComponentOnlineIslands, "OnlineIslands")

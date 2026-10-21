@@ -1,5 +1,5 @@
 """Unit v5366, the track editor's preview brace, against libtpw_unit_LinkPreviewBrace.dylib (tests/unit_LinkPreviewBrace.cpp), main app
-("SimTheme Park"), src/LinkPreviewBrace.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp:
   LinkPreviewBrace 0x1003f9fc, LinkPreviewBraceToPylon 0x1003f4fc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

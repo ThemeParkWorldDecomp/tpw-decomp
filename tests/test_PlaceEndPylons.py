@@ -1,5 +1,5 @@
 """Unit v5641, the coaster's end pylons and texture scrolling, against libtpw_unit_PlaceEndPylons.dylib (tests/unit_PlaceEndPylons.cpp), main app
-("SimTheme Park"), src/LevelSystems_PlaceEndPylons.cpp:
+("SimTheme Park"), src/game/rides/TPCoaster.cpp:
   PlaceEndPylons 0x100424f0, CoasterUVAnimTick 0x100428d4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

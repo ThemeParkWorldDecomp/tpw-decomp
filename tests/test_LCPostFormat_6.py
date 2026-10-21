@@ -1,5 +1,5 @@
 """Unit v5560, the all-items list's attach function (LCPostFormat of ui_allKidsPanel.cpp, 0x101966ec), against
-libtpw_unit_LCPostFormat_6.dylib (tests/unit_LCPostFormat_6.cpp), main app ("SimTheme Park"), src/ui_allKidsPanel_AllKidsPanelMsg_LCPostFormat_6.cpp:
+libtpw_unit_LCPostFormat_6.dylib (tests/unit_LCPostFormat_6.cpp), main app ("SimTheme Park"), src/game/ui/ui_allItemsPanel.cpp:
   LCPostFormat 0x101966ec (named AllItemsListLCPostFormat on the host)
 
 A case is a list type and a font index. The row window and its six column windows are blocks made once (the code never reads them); GetChild

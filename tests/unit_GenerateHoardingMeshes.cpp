@@ -1,10 +1,10 @@
 // Test library for GenerateHoardingMeshes (unit v5625; libtpw_unit_GenerateHoardingMeshes.dylib, tests/test_GenerateHoardingMeshes.py),
 // main app:
-//   src/LevelSystems_GenerateHoardingMeshes.cpp   GenerateHoardingMeshes, gHoardingTexturePathFormat and the three sort tables
+//   src/game/park/TPHoardings.cpp   GenerateHoardingMeshes, gHoardingTexturePathFormat and the three sort tables
 //
 // The callees outside the unit (MReleaseAllocF, HoardingCentreAngle, FloatSortByArray, DMCreateMesh, SetMatrixIdentity,
 // DetermineInnerBaseInsets) are fakes that record what the real ones read and answer from the test's queues; MReleaseAllocF and
-// DMCreateMesh hand out arena blocks and remember them for the module. gRideHoardingTextures (src/LevelLeaves.cpp) is defined here.
+// DMCreateMesh hand out arena blocks and remember them for the module. gRideHoardingTextures (src/game/DynamicMeshSet.cpp) is defined here.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

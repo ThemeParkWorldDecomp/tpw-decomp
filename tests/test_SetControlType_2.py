@@ -1,5 +1,5 @@
 """Unit v5922, SetControlType, against libtpw_unit_SetControlType_2.dylib (tests/unit_SetControlType_2.cpp), main app
-("SimTheme Park"), src/SetupHeadIDs_SetControlType_2.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   SetControlType 0x1002d404
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

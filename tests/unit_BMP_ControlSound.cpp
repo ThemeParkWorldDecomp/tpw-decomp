@@ -1,5 +1,5 @@
 // Test library for the bump sound and ride record functions (unit v5966; libtpw_unit_BMP_ControlSound.dylib, tests/test_BMP_ControlSound.py), main app:
-//   src/BMP_Tick_BMP_ControlSound.cpp   BMP_ControlSound, FreeBuoysForRide, BMP_GetCarsOnRide, BMP_SetRideModelSelection
+//   src/game/rides/BumperRide.cpp   BMP_ControlSound, FreeBuoysForRide, BMP_GetCarsOnRide, BMP_SetRideModelSelection
 //
 // The callees outside the unit are fakes that record what the real ones read; the world (gColList, 0x3c bytes), the thing array, the
 // advisor id and the sound banks are defined here.

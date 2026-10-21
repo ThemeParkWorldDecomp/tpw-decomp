@@ -1,5 +1,5 @@
-// Differential library for unit w123b: the world's thing getters (src/World_getters.cpp), CParkTime::GetFunnyTime (src/ParkTime_funny.cpp),
-// CParkAnalyser::Init (src/ParkAnalyser_init.cpp) and CChallengeHQ::Init (src/ChallengeHQ_init.cpp).
+// Differential library for unit w123b: the world's thing getters (src/game/World.cpp), CParkTime::GetFunnyTime (src/game/people/ParkTime.cpp),
+// CParkAnalyser::Init (src/game/park/analyser.cpp) and CChallengeHQ::Init (src/game/park/ChallengeHQ.cpp).
 //
 // Every callee outside those ten is a fake that records the same event as the PowerPC side's stub: the assertion and the trace, the world accessor, the two
 // time stamp imports, the message centre (Subscribe, operator new, the header constructor), the analyser cell, the challenge constructor, AddChallenge,

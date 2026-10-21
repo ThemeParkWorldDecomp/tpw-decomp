@@ -1,5 +1,5 @@
 // Test library for eight advisor scorers (unit v5256; libtpw_unit_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__2.dylib), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__2.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The park analyser, the world, CTRACE, the master save are recording fakes; the world and the analyser are the fixed fake addresses
 // 0x1000 and 0x2000 (never dereferenced). gMainBalance is raw storage under the same symbol.

@@ -1,5 +1,5 @@
 """Unit v5697, the interface's progress bar, against libtpw_unit_CreateUIProgressBar.dylib (tests/unit_CreateUIProgressBar.cpp), main app
-("SimTheme Park"), src/InterfaceWindow_virtuals_CreateUIProgressBar.cpp:
+("SimTheme Park"), src/game/ui/ui_progressBar.cpp:
   CreateUIProgressBar(wchar_t*) 0x101dffd8, CreateUIProgressBar(int) 0x101e01f0, UpdateUIProgressBar 0x101e0300
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

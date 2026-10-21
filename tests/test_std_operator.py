@@ -1,5 +1,5 @@
 """Unit v5640, operator<<(wostream&, const wchar_t*), against libtpw_unit_std_operator.dylib (tests/unit_std_operator.cpp), main app
-("SimTheme Park"), src/std_operator.cpp:
+("SimTheme Park"), src/game/MslSupport.cpp:
   std::operator<<<wchar_t,std::char_traits<wchar_t>> 0x1021f374
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

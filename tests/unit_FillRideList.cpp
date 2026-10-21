@@ -1,6 +1,6 @@
 // Test library for the ride list panel's FillRideList and UpdateViewWindow (unit v5363; libtpw_unit_FillRideList.dylib,
 // tests/test_FillRideList.py), main app:
-//   src/FillRideList.cpp   FillRideList 0x101b5c14, UpdateViewWindow 0x101b5f1c
+//   src/game/ui/ui_ridepanel.cpp   FillRideList 0x101b5c14, UpdateViewWindow 0x101b5f1c
 //
 // The callees outside the unit are recording fakes (the same event name and arguments as the PowerPC stubs of the test module). A pointer a
 // fake answers is a handle from the case's queue: sPtr[handle] is the block the test built under that number (tpw_fr_setptr). The globals of

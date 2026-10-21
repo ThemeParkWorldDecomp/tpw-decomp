@@ -1,5 +1,5 @@
 // Test library for UIMenu::Init and UIMenu::AddItem (unit v5163; libtpw_unit_UIMenu_AddItem.dylib, tests/test_UIMenu_AddItem.py), main app:
-//   src/ui_main_kbcapture_UIMenu_AddItem.cpp   UIMenu::Init, UIMenu::AddItem, the handler handles
+//   src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/UIMenu.cpp, src/game/ui/UI_Base.cpp   UIMenu::Init, UIMenu::AddItem, the handler handles
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the weak
 // menu_callee functions of the src file are replaced by the fakes here. The two screen size globals are defined here, zero at start.

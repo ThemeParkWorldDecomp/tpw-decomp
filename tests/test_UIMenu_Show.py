@@ -1,5 +1,5 @@
 """Unit v5771, the main menu object's Show, Hide and destructor, against libtpw_unit_UIMenu_Show.dylib (tests/unit_UIMenu_Show.cpp), main
-app ("SimTheme Park"), src/ui_main_kbcapture_UIMenu_AddItem_UIMenu_Show.cpp:
+app ("SimTheme Park"), src/game/ui/UIMenu.cpp:
   UIMenu::Show 0x1018b0e0, UIMenu::Hide 0x1018b1fc, UIMenu::~UIMenu 0x1018ac8c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian for the original, host

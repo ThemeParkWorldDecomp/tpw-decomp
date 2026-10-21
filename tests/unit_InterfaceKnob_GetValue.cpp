@@ -1,6 +1,6 @@
 // Test library for the small members of the interface controls and panels (unit v51111; libtpw_unit_InterfaceKnob_GetValue.dylib,
 // tests/test_InterfaceKnob_GetValue.py), main app:
-//   src/InterfaceKnob_InterfaceKnob_GetValue.cpp   the 22 functions of the unit
+//   src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/UI_Base.cpp, src/game/ui/ui_progressBar.cpp, src/game/ui/ui_upgradeStatus.cpp, src/game/ui/ui_yearEndPanel.cpp   the 22 functions of the unit
 //
 // The callees outside the unit are fakes that record what the real ones read: ChangeValue of the knob and of the vary box, the
 // base destructor of the window, UIStatusPanel::CloseWindow, UI_SendMessage, InterfaceTimer::Stop and the window's default handler.

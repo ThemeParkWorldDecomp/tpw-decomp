@@ -1,5 +1,5 @@
 // Test library for DisableVoteButton and EarmuffsButtonDown (unit v5766; libtpw_unit_DisableVoteButton.dylib), main app:
-//   src/OnlinePanelMsg_DisableVoteButton.cpp
+//   src/game/ui/ui_onlinePanel.cpp
 //
 // Windows are arena blocks: word +0x200 holds the child GetWindow answers, word +0x204 a tag (1..4). GetWindow, SetState and the
 // virtual Enable are fakes that log the tag and their arguments.

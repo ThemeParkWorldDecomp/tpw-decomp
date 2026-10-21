@@ -19,12 +19,12 @@ public:
 
     CParticle();                       // inline in Particle_Init: also registers the link base
     ~CParticle() override;             // 0x1001f3e4
-    int32_t Prepare() override;        // 0x1001f4ac (src/tb_particle_frame.cpp)
+    int32_t Prepare() override;        // 0x1001f4ac (src/engine/tb_profiler.cpp)
     int32_t GetLinkType() override;    // 0x1001fc08: 4
     void* GetData() override;          // 0x1001fbd8: NULL
     // 0 on failure: CMapWho::RenderWindow tests the result, so the declaration's void became
     // int32_t (nothing defined or called it before).
-    int32_t PlotParticles();           // 0x1001f754 (src/tb_particle_frame.cpp)
+    int32_t PlotParticles();           // 0x1001f754 (src/engine/tb_profiler.cpp)
 
     int32_t mF04;                      // 0x04  -1
     int32_t mF08;                      // 0x08  -1
@@ -39,7 +39,7 @@ public:
 };
 extern CParticle* gei_Particle;   // engine export (0x100b0508)
 
-// What the game's particle hooks hand the frame members (src/tb_particle_frame.cpp). Added with
+// What the game's particle hooks hand the frame members (src/engine/tb_profiler.cpp). Added with
 // Prepare and PlotParticles; the layouts are the Mac's, with native pointers.
 //
 // A corner of an emitter's bounding box, in 1/1024 world units (all zero: no box).

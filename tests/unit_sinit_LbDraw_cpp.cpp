@@ -1,5 +1,5 @@
 // Test library for LbDraw.cpp's static initialiser (unit v5717; libtpw_unit_sinit_LbDraw_cpp.dylib, tests/test_sinit_LbDraw_cpp.py), main app:
-//   src/RenderContext_depth_circles_sinit_LbDraw_cpp.cpp   __sinit_LbDraw_cpp
+//   src/bullfrog/LbDraw.cpp   __sinit_LbDraw_cpp
 //
 // No callees. The globals of LbDraw.cpp it writes are defined here.
 #include <cstddef>

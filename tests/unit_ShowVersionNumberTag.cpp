@@ -1,5 +1,5 @@
 // Test library for the version tag and the "delme" dialog handler (unit v5289; libtpw_unit_ShowVersionNumberTag.dylib, tests/test_ShowVersionNumberTag.py), main app:
-//   src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_ShowVersionNumberTag.cpp   ShowVersionNumberTag, delme, gVersionNumberFormat
+//   src/game/ui/ui_StatusPanel.cpp, src/game/ui/ui_tags.cpp   ShowVersionNumberTag, delme, gVersionNumberFormat
 //
 // The callees outside the unit are recording fakes: swprintf, AddATag, ShowTagPanel, UI_SetSelectedObject, LLCM_SetCurrentObject,
 // LLCC_SystemSetMode, LLCM_LeftMouseButtonUp.

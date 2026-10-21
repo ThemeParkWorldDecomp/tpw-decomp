@@ -1,4 +1,4 @@
-// Test entry points for src/TbStringBuffer.cpp (library unit_TbStringBuffer). The string
+// Test entry points for src/bullfrog/FileSystem.cpp (library unit_TbStringBuffer). The string
 // classes' other members are not under test here: they get the smallest definitions that
 // let an object exist, so no other translation stands in for them.
 #include <cstring>

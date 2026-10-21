@@ -1,6 +1,6 @@
 """Unit v5950, the Outbox cursor and mark functions, a string ==, the basic_ifstream<char> constructor and Email::Attachment::~Attachment,
 against libtpw_unit_Outbox_First.dylib (tests/unit_Outbox_First.cpp), main app ("SimTheme Park"),
-src/email_load_Outbox_Send_Outbox_WriteMailData_Outbox_First.cpp:
+src/game/online/email.cpp:
   Outbox::First 0x10205718, Next 0x1020578c, MarkToSend 0x10205828, MarkToDelete 0x10205910, Delete 0x10206278,
   std::operator== (string) 0x1020702c, std::basic_ifstream<char>::basic_ifstream 0x1020801c, Email::Attachment::~Attachment 0x10202894
 

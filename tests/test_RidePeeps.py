@@ -1,5 +1,5 @@
 """Unit w149, the peep tables of a ride script, against libtpw_unit_RidePeeps.dylib (tests/unit_RidePeeps.cpp), main app
-("SimTheme Park"), src/rsse_peeps.cpp:
+("SimTheme Park"), src/game/rides/RideEffects.cpp:
   GetNodePos 0x100cc888, WALKNODE_Tick 0x100cd928, WALKNODE_Trigger 0x100cdd4c, WALKNODE_Get 0x100cdfc8, WALKNODE_Float 0x100ce054,
   WALKNODE_Release 0x100ce0f4, BOUNCE_Put 0x100ce3d4, BOUNCE_Get 0x100ce4ec, BOUNCE_ForceGet 0x100ce610, BOUNCE_Tick 0x100ce740,
   LIMBO_Put 0x100ceab0, LIMBO_Get 0x100ceb90, LIMBO_ForceGet 0x100cec58

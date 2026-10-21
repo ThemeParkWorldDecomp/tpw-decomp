@@ -1,6 +1,6 @@
 """Unit v51069: Advisor.cpp's static initialiser (its two save templates are lead unit v5L05's), the bump ride leaves, the lobby, camera and coaster leaves,
 against libtpw_unit_sinit_Advisor_cpp.dylib (tests/unit_sinit_Advisor_cpp.cpp), main app ("SimTheme Park"),
-src/AdvisorScoring_sinit_Advisor_cpp.cpp:
+src/game/TPCamera.cpp, src/game/advisor/Advisor.cpp, src/game/rides/BumperRide.cpp, src/game/rides/CoasterQueue.cpp, src/game/rides/CoasterTrain.cpp, src/game/rides/TPCoaster.cpp:
   __sinit_Advisor_cpp 0x1000fff0, FindBuoy 0x10025960,
   FreeColObjectsForRide 0x10027424, GetDataNodeWorldMatrix 0x1002addc, GetRideFromID 0x1002ae38, GetFinishLine 0x1002d340,
   SetBuoySequence 0x1002d390, BMPFile_Read 0x1002ffc4, __arraydtor$3112 0x10032300, GetFirstPersonRideID 0x10032b64,

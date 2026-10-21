@@ -1,6 +1,6 @@
 // Test library for the publish park panel and the online park list panel (unit v5064; libtpw_unit_PublishPanelMsg.dylib,
 // tests/test_PublishPanelMsg.py), main app:
-//   src/PublishPanelMsg.cpp   PublishPanelMsg, CreatePublishParkPanel, CreateOnlineParkListPanel and the panels' globals
+//   src/game/ui/ui_onlineParkListPanel.cpp, src/game/ui/ui_publishParkPanel.cpp   PublishPanelMsg, CreatePublishParkPanel, CreateOnlineParkListPanel and the panels' globals
 //
 // Every callee outside the unit is a fake that records what the real one reads (the same event name and arguments as the module's PowerPC
 // stub). The world's objects are blocks the module makes through the tpw_pp_* helpers: a window is a block with a fake vtable (the one

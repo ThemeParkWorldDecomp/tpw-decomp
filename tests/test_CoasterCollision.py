@@ -1,5 +1,5 @@
 """Unit v5L20, the coaster collision system, against libtpw_unit_CoasterCollision.dylib (tests/unit_CoasterCollision.cpp), main app
-("SimTheme Park"), src/TPConfig_collision.cpp:
+("SimTheme Park"), src/game/rides/CoasterCollision.cpp, src/game/rides/CoasterPylon.cpp:
   GetPylonAtCell 0x1003f954, GetTrackBounds 0x10047634, RecalcTrackBounds 0x10047818, GenerateSamplesInBoundArea 0x100478b8,
   DoProperChunkCollision 0x10047c64, DotProduct3D 0x100484b0, CheckTrackToTrackCollisions 0x10048510,
   RemoveAllCollisionsFromBrace 0x10048a64, CheckTrackToAllTracksCollisions 0x10048cd0, CheckAllTrackToTrackCollisions 0x10048e00,

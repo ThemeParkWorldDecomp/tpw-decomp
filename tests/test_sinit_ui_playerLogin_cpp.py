@@ -1,5 +1,5 @@
 """Unit v5726, ui_playerLogin.cpp's static initialiser, against libtpw_unit_sinit_ui_playerLogin_cpp.dylib
-(tests/unit_sinit_ui_playerLogin_cpp.cpp), main app, src/ui_newname_AddressBookMsg_sinit_ui_playerLogin_cpp.cpp:
+(tests/unit_sinit_ui_playerLogin_cpp.cpp), main app, src/game/ui/ui_playerLogin.cpp:
   __sinit_ui_playerLogin_cpp 0x101afa90
 
 The call has no input. The wide string constructor (0x10238800) and __register_global_object (0x10239940) are fakes on both sides

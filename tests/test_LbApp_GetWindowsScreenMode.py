@@ -1,5 +1,5 @@
 """Unit v5284, the bullfrog LbSCBack.cpp helpers, against libtpw_unit_LbApp_GetWindowsScreenMode.dylib
-(tests/unit_LbApp_GetWindowsScreenMode.cpp), src/LbFile_LbApp_GetWindowsScreenMode.cpp:
+(tests/unit_LbApp_GetWindowsScreenMode.cpp), src/bullfrog/LbApp.cpp, src/bullfrog/LbSCBack.cpp:
   LbApp_ProcessWindowMessages 0x10014018, LbApp_EnableWindowsScreenSaver 0x100141a8, LbApp_SetWindowName 0x10014278,
   LbApp_GetWindowsScreenMode 0x10014374, __sinit_LbSCBack_cpp 0x10014b4c
 

@@ -18,7 +18,7 @@ class CMap;
 class CIndividualChunkHandler {
 public:
     explicit CIndividualChunkHandler(uint32_t chunkId) : mChunkId(chunkId) {}
-    // 0x100f9c98 (28 bytes, src/ChunkFile.cpp): whether the id is this handler's. Slot +8 of the Mac vtable. The parameter is a
+    // 0x100f9c98 (28 bytes, src/game/save/ChunkFileReader.cpp): whether the id is this handler's. Slot +8 of the Mac vtable. The parameter is a
     // tag_IDX_TYPE<IDXTYPEUniqueNameChunkId, unsigned long> there (one register); a plain number here.
     virtual bool IsThisMyChunk(uint32_t chunkId);
     // Slot +0xc of the Mac vtable (0 in the base's table, 0x102a46f0): the handler's work on a chunk's data.
@@ -31,7 +31,7 @@ public:
 class CMapChunkHandler : public CIndividualChunkHandler {
 public:
     CMapChunkHandler(uint32_t chunkId, CMap* map) : CIndividualChunkHandler(chunkId), mMap(map) {}
-    // 0x1010276c (420 bytes, src/ChunkFile.cpp): data is the chunk's data (the size is not read). Words 0 and 1 are the two extents
+    // 0x1010276c (420 bytes, src/game/park/Map.cpp): data is the chunk's data (the size is not read). Words 0 and 1 are the two extents
     // (little endian), the bytes start at +0x1c, x-major; only the cells inside the 128 by 128 map get their attribute byte.
     void ParseChunk(void* data, uint32_t size) override;
 
@@ -41,7 +41,7 @@ public:
 class CChunkFileReader : public TbPtrList<CIndividualChunkHandler> {
 public:
     explicit CChunkFileReader(uint32_t magic) : mMagic(magic) {}
-    // 0x1013e754 (108 bytes, src/ChunkFile.cpp): the destructor; the Mac copy takes a delete flag and frees the list nodes.
+    // 0x1013e754 (108 bytes, src/game/World.cpp): the destructor; the Mac copy takes a delete flag and frees the list nodes.
     ~CChunkFileReader() override;
 
     // 0x100f98c8 (36 bytes): puts the handler at the head of the list (the newest handler is asked first).
@@ -60,7 +60,7 @@ public:
 class CMapAttribFileReader : public CChunkFileReader {
 public:
     explicit CMapAttribFileReader(CMap* map) : CChunkFileReader(0x4d325054), mHandler(0x2050414d, map) {}
-    // Unit w205 (src/ChunkFile.cpp). 0x1013e6b0 (112 bytes): the destructor of the local object; the Mac copy sets the list's vtable word, destroys
+    // Unit w205 (src/game/World.cpp). 0x1013e6b0 (112 bytes): the destructor of the local object; the Mac copy sets the list's vtable word, destroys
     // the list part (RemoveAll) and deletes the object when its flag is positive. The host destructor is the base chain's.
     ~CMapAttribFileReader() override;
 

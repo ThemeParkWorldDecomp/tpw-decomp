@@ -1,13 +1,13 @@
 """Unit w79c, the sound library's pipe channel and sample store, against libtpw_unit_SoundChannel.dylib
 (tests/unit_SoundChannel.cpp), in the program "sound symbols shared" (Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/TbSoundPipeChannel.cpp  TbSoundPipeChannel: constructor 0x10009a9c, destructor 0x1000ab10, GetNextHandle 0x10000bf8,
+  src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundSampleWAV.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/CSprocketsModule.cpp  TbSoundPipeChannel: constructor 0x10009a9c, destructor 0x1000ab10, GetNextHandle 0x10000bf8,
       SetBufferSize 0x10000f54, SetSampleHeader 0x10000f98, SetPriority 0x10009b68, SetPipeInfo 0x10009e18, GetChannelInfo
       0x10009f68, InitChannelInfo 0x1000a038, GetIndex 0x1000a19c, SetVolume 0x1000a238, SetInfo 0x1000a278, StreamerCallback
       0x1000a358, FillServiceBuffer 0x1000a408, GetDataChunk 0x1000a4ac, FindPipe 0x1000a5e8, Attatch 0x1000a6a0, GetChannelUsed
       0x1000a754, ReleasePipe 0x1000a7e0, GetVolume 0x1000a9b4, GetPriority 0x1000c19c, GetActualVolume 0x1000c1dc, SetIndex
       0x1000fd34, ControlledBy 0x10010520, GetHandle 0x100107ac, GetBufferSize 0x1001245c, GetSampleFlags 0x1002c024,
       GetSampleHeader 0x1002cf24
-  src/TbSoundSampleStore.cpp  TbSoundSampleStore: constructor 0x1000fa64, destructor 0x10010054, Init 0x1000fc60, ReleaseAllPipes
+  src/sound/TbSoundSampleStore.cpp, src/sound/TbSoundCore.cpp  TbSoundSampleStore: constructor 0x1000fa64, destructor 0x10010054, Init 0x1000fc60, ReleaseAllPipes
       0x1000fe34, StopAllChannels 0x1001038c, StopAllChannelsWithVolumeControl 0x1001043c, SetNumberOfChannelsToUse 0x10010568,
       GetFreeChannel 0x10010660, GetPipesFromHandle 0x10010c90, CreateNewSample 0x1001093c, CreateNewControl 0x10010b6c,
       operator[] 0x100100e8 and 0x10015478, FindChannelAndPipe 0x100101b0, GetValidChannelIndexFromHandle 0x100102ac,

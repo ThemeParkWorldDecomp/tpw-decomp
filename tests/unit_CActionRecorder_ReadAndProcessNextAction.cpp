@@ -1,6 +1,6 @@
 // Test library for CActionRecorder::ReadAndProcessNextAction (unit v5077; libtpw_unit_CActionRecorder_ReadAndProcessNextAction.dylib,
 // tests/test_CActionRecorder_ReadAndProcessNextAction.py), main app:
-//   src/ActionRecorder_CActionRecorder_ReadAndProcessNextAction.cpp
+//   src/game/ActionRecorder.cpp
 //
 // The callees outside the unit are recording fakes: the action file's Read (a stream of bytes the case supplies, a return value from
 // the queue "Read"), the twelve ProcessAction overloads, CTRACE and SamsUtilities::_USwapBlock16 (which swaps the bytes of each word).

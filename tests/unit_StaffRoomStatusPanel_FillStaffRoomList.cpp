@@ -1,6 +1,6 @@
 // Test library for the staff room panel's list fill and window set-up (unit v5669; libtpw_unit_StaffRoomStatusPanel_FillStaffRoomList.dylib,
 // tests/test_StaffRoomStatusPanel_FillStaffRoomList.py), main app:
-//   src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_StaffRoomStatusPanel_FillStaffRoomList.cpp
+//   src/game/ui/ui_staffRoomStatus.cpp
 //   FillStaffRoomList, InitStatusWindow, InitWindow, UpdateViewSprite; it defines gStaffRoomColumnColour, gStaffRoomList, gStaffRoomSpawnBlock.
 //
 // Every callee outside the unit is a recording fake with the event name and arguments of the module's PowerPC stub. The windows and

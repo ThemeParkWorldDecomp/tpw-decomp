@@ -8,8 +8,8 @@
 // come from CStaffInfo::Serialise 0x10128440; the constructor clears the ones marked.
 class CStaffInfo {
 public:
-    CStaffInfo();    // 0x10128390 (28 bytes, src/StaffDB_ctor.cpp)
-    // Unit w226 (src/StaffDB_pool.cpp).
+    CStaffInfo();    // 0x10128390 (28 bytes, src/game/people/StaffInfo.cpp)
+    // Unit w226 (src/game/people/StaffInfo.cpp).
     ~CStaffInfo();   // 0x101283d4, 68 bytes
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused); // 0x10128440, 756 bytes
     void GetName(char16_t* buffer, int32_t size) const; // 0x10128768, 200 bytes
@@ -37,12 +37,12 @@ class CStaffDB {
 public:
     // Unit w143: CMMPlaceStaff::OnRelease passes 0 once placed, 1 if not.
     enum StaffFate : int32_t {};
-    CStaffDB();     // 0x10128ed8 (108 bytes, src/StaffDB_ctor.cpp)
-    // 0x10128f68 (104 bytes, src/StaffDB_dtor.cpp): destroys the 0x20 staff records, last first; the Mac's flag (r4, a positive 16-bit
+    CStaffDB();     // 0x10128ed8 (108 bytes, src/game/people/StaffDB.cpp)
+    // 0x10128f68 (104 bytes, src/game/people/StaffDB.cpp): destroys the 0x20 staff records, last first; the Mac's flag (r4, a positive 16-bit
     // value also frees `this`) has no host form.
     ~CStaffDB();
 
-    // Unit w129 (src/StaffDB_update.cpp).
+    // Unit w129 (src/game/people/StaffDB.cpp).
     // 0x10129298 (60 bytes): makes the opening pool of staff, then stamps the top-up clock (mF294).
     void Init();
     // 0x1012a10c (856 bytes): retires the valid, unclaimed staff whose time ran out (shifted left by 2, as turns), and when the top-up interval has gone by
@@ -56,7 +56,7 @@ public:
     uint8_t mStopProducing[5];          // 0x299  cleared (memset)
                                         // 0x29e and 0x29f: padding, never written
 
-    // Unit w226 (src/StaffDB_pool.cpp).
+    // Unit w226 (src/game/people/StaffDB.cpp).
     // 0x10128ff4, 628 bytes: 0 on success, 1 on failure.
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);
     CStaffInfo* GetStaff(uint32_t slot) const; // 0x101292f8, 36 bytes
@@ -74,7 +74,7 @@ public:
 };
 static_assert(sizeof(CStaffDB) == 0x2a0, "the staff database is 0x2a0 bytes");
 
-// Unit w226 (src/StaffDB_pool.cpp), original names unknown.
+// Unit w226 (src/game/people/StaffDB.cpp, src/game/people/StaffInfo.cpp), original names unknown.
 extern char16_t gStaffNameScratch[0x80]; // 0x1034c4e0
 extern char16_t gStaffGeneratedName[0x80]; // 0x1034c5e0
 extern int32_t gStaffDBWord6E0; // 0x1034c6e0

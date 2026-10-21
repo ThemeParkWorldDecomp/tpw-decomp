@@ -1,4 +1,4 @@
-"""Unit v5L49: the weak library-glue callees of src/glue_callees.cpp against libtpw_unit_glue_callees.dylib, each run against the Mac's own
+"""Unit v5L49: the weak library-glue callees of src/game/online/online.cpp against libtpw_unit_glue_callees.dylib, each run against the Mac's own
 library code (not the main app: the glue leads out of it):
 
   online_parser_callee::WcsLen        wcslen, c_c++ 0x10033ff0 (glue 0x102389c8)

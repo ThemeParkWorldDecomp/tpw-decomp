@@ -1,5 +1,5 @@
 // Test library for the AI-world cell helpers (unit v5901; libtpw_unit_Destroy3DObjectFromAIWorld.dylib, tests/test_Destroy3DObjectFromAIWorld.py), main app:
-//   src/LevelSystems_Destroy3DObjectFromAIWorld.cpp   Destroy3DObjectFromAIWorld, Assign3DObjectToAIWorld, GetWorldGSquareHeight,
+//   src/game/park/TPHField.cpp   Destroy3DObjectFromAIWorld, Assign3DObjectToAIWorld, GetWorldGSquareHeight,
 //   DetermineInnerBaseInsets, GetRideIDAtCell (and the global gLevelNoThingId)
 //
 // The callees outside the unit are recording fakes; the globals of other files the unit reads are defined here.

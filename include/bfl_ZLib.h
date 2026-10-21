@@ -1,4 +1,4 @@
-// The bullfrog library's zlib unpacker (src/lb_zlib.cpp; "bullfrog symbols shared", LbMaths.cpp range of the inventory).
+// The bullfrog library's zlib unpacker (src/bullfrog/LbZLib.cpp; "bullfrog symbols shared", LbMaths.cpp range of the inventory).
 // PARTIAL: bfl::compress::CZLib is a class with a vtable on the Mac (the compression interface of bfl_Refpack.h plus the
 // buffered calls; vtable 0x100730f4). The packing and unpacking members are translated. The Mac
 // builds the one object lazily inside LbZLib_MemDecompress; the port has no need for a virtual call, so the members are
@@ -44,11 +44,11 @@ public:
     int32_t MemDecompress(uint8_t* dest, uint8_t* source, uint8_t* workspace) const;
     // 0x1002508c (12 bytes): 0x62a39.
     int32_t CompressWorkspaceSize() const;
-    // 0x1002512c (76 bytes, src/lb_zlib_size.cpp): the unpacked size the block's header gives, 0 when the tag is not "BILZ".
+    // 0x1002512c (76 bytes, src/bullfrog/LbZLib.cpp): the unpacked size the block's header gives, 0 when the tag is not "BILZ".
     // SwapHeader runs on the header first.
     uint32_t DecompressedSize(uint8_t* source) const;
 
-    // Unit w216 (src/lb_zlib_compress.cpp).
+    // Unit w216 (src/bullfrog/LbZLib.cpp).
     uint32_t MemCompress(uint8_t* dest, const uint8_t* source, uint32_t length, uint8_t* workspace) const; // 0x10024d0c
     uint32_t BufferedCompress(const uint8_t* source, uint32_t srcLength, uint8_t* buffer, uint32_t bufferSize,
                               uint8_t* workspace, CBufferCallback& callback) const; // 0x100251b8
@@ -96,11 +96,11 @@ public:
 // Declared with the same signature in include/Wavelet.h (unit w19). The original returns what MemDecompress answers.
 uint32_t LbZLib_MemDecompress(void* source, void* dest, void* workspace);
 
-// 0x100258a0 (152 bytes, src/lb_zlib_size.cpp): CZLib::DecompressedSize(source) on the library's one CZLib object. The save file
+// 0x100258a0 (152 bytes, src/bullfrog/LbZLib.cpp): CZLib::DecompressedSize(source) on the library's one CZLib object. The save file
 // reader (CSaveLoad::Load) asks it how big the packed block it has read unpacks to; 0 is a block that is not one.
 uint32_t LbZLib_MemDecompressedSize(void* source);
 
-// Unit w216 (src/lb_zlib_compress.cpp).
+// Unit w216 (src/bullfrog/LbZLib.cpp).
 uint32_t LbZLib_MemCompress(void* source, void* dest, uint32_t length, void* workspace); // 0x10025708
 uint32_t LbZLib_BufferedCompress(void* source, void* buffer, uint32_t srcLength, uint32_t bufferSize,
                                 bfl::compress::ZLibBufferFunction full, void* context, void* workspace); // 0x10025ae8

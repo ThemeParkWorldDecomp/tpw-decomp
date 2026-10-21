@@ -1,5 +1,5 @@
 // Test library for CResearchProject::Serialise (libtpw_unit_CResearchProject_Serialise.dylib, tests/test_CResearchProject_Serialise.py), main app:
-//   src/ResearchLab_projects_CResearchProject_Serialise.cpp
+//   src/game/buildings/ResearchLab.cpp
 //
 // The eight SAVEVAR / LOADVAR instances it calls are fakes that record the field offset, a hash of the name and the noLog flag, and answer from a queue.
 #include <cstddef>

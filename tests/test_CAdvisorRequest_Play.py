@@ -1,5 +1,5 @@
 """Unit v51003, CAdvisorRequest::Play and PlayWithoutScore, against libtpw_unit_CAdvisorRequest_Play.dylib
-(tests/unit_CAdvisorRequest_Play.cpp), main app, src/Serialise_basic_SAVEVARSTRUCT_2_CAdvisorRequest_Play.cpp:
+(tests/unit_CAdvisorRequest_Play.cpp), main app, src/game/advisor/Advisor.cpp:
   CAdvisorRequest::Play 0x1000dff4, CAdvisorRequest::PlayWithoutScore 0x1000e340
 
 A case is a world and a call. The world is built twice by one piece of Python code (emulator memory big-endian, host little-endian).

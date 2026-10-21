@@ -1,5 +1,5 @@
 """Unit v5688, the multi brace preview of the coaster editor, against libtpw_unit_HandleMultiBracePreviewChange.dylib
-(tests/unit_HandleMultiBracePreviewChange.cpp), main app ("SimTheme Park"), src/TPCoaster_ticks_HandleMultiBracePreviewChange.cpp:
+(tests/unit_HandleMultiBracePreviewChange.cpp), main app ("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   HandleMultiBracePreviewChange 0x10054ea8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

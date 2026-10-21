@@ -1,6 +1,6 @@
 // Test library for the address book panel's message function and list filler (unit v5055; libtpw_unit_AddressBookMsg.dylib,
 // tests/test_AddressBookMsg.py), main app:
-//   src/ui_newname_AddressBookMsg.cpp   AddressBookMsg, FillAddressList
+//   src/game/ui/ui_Postcard.cpp   AddressBookMsg, FillAddressList
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The windows are
 // fake objects: the edit box has the virtual SetText in the slot InterfaceWindow has it; the list control's members are fakes.

@@ -1,5 +1,5 @@
 """Unit v5123, SamsUtilities::UManager<UAllocator>::Allocate, against libtpw_unit_SamsUtilities_UManager_Allocate.dylib
-(tests/unit_SamsUtilities_UManager_Allocate.cpp), src/TbMpegFilePlayer_SamsUtilities_UManager_Allocate.cpp:
+(tests/unit_SamsUtilities_UManager_Allocate.cpp), src/sound/CSprocketsModule.cpp:
   SamsUtilities::UManager<SamsUtilities::UAllocator>::Allocate 0x1002bc7c
 
 A case is a manager object (one word) holding a stale value and a call. The two callees (0x1002eac4 allocation of 8 bytes, 0x1002ec8c

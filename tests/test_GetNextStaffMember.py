@@ -1,5 +1,5 @@
 """Unit v51001, GetNextStaffMember and ShowStatusPanel::InitWindow, against libtpw_unit_GetNextStaffMember.dylib
-(tests/unit_GetNextStaffMember.cpp), main app ("SimTheme Park"), src/ui_staffPanel_msg_hackfollowmode_GetNextStaffMember.cpp:
+(tests/unit_GetNextStaffMember.cpp), main app ("SimTheme Park"), src/game/ui/ui_showStatus.cpp, src/game/ui/ui_staffPanel.cpp:
   GetNextStaffMember 0x101bf32c, ShowStatusPanel::InitWindow 0x101c1c90
 
 A case is a world and a call, built twice by one piece of Python code (emulator memory for the original, the host library for the

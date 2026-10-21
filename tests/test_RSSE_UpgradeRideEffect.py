@@ -1,5 +1,5 @@
 """Unit v5020, the upgrade effect of a ride script, against libtpw_unit_RSSE_UpgradeRideEffect.dylib (tests/unit_RSSE_UpgradeRideEffect.cpp),
-main app ("SimTheme Park"), src/rsse_objects_RSSE_UpgradeRideEffect.cpp:
+main app ("SimTheme Park"), src/game/rides/rsse.cpp:
   RSSE_UpgradeRideEffect 0x100d67e0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

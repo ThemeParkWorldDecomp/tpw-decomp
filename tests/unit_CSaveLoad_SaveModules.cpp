@@ -1,5 +1,5 @@
 // Test library for CSaveLoad::SaveModules (unit v5628; libtpw_unit_CSaveLoad_SaveModules.dylib, tests/test_CSaveLoad_SaveModules.py), main app:
-//   src/SaveLoad_CSaveLoad_SaveModules.cpp   CSaveLoad::SaveModules and gSaveModulesTagTestWords
+//   src/game/save/SaveLoad.cpp   CSaveLoad::SaveModules and gSaveModulesTagTestWords
 //
 // Every callee is a fake that records the arguments the real one reads (pointers as labels, the tag write's four bytes as a big-endian
 // word) and answers from the test's queue; the savers that take the file by reference may hand back the second test file. TheScoring
@@ -35,7 +35,7 @@
 using namespace calllog;
 
 // ---- globals of other files the unit reads or writes, defined here (the program's definitions are in files this library does not compile)
-// gClock's member time is built at load; the fakes never read it, so its constructor is empty here (the real one is src/CFixedTime.cpp's).
+// gClock's member time is built at load; the fakes never read it, so its constructor is empty here (the real one is src/game/FixableTime.cpp's).
 CFixedTime::CFixedTime() {}
 CVariableTime::CVariableTime() {}
 CActionRecorder gActionRecorder;

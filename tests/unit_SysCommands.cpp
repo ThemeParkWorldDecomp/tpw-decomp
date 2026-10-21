@@ -1,7 +1,7 @@
 // Fakes and test entry points for unit w79h, the Execute bodies of the sound library's system commands (libtpw_unit_SysCommands.dylib,
 // driven by tests/test_SysCommands.py in the program "sound symbols shared"; see calllog.h and cmake/units/SysCommands.cmake):
-//   src/TbSysCommand.cpp  every TbSysCommand::<Class>::Execute and the accessors of SetValue, GetValue and Serialise (under test)
-// Real: the audio object of w79f (src/TbAudioBody.cpp: GetSoundManager, GetPlaceHolderList; its virtuals StopHandle and
+//   src/sound/TbSysCommand.cpp, src/sound/TpBody.cpp  every TbSysCommand::<Class>::Execute and the accessors of SetValue, GetValue and Serialise (under test)
+// Real: the audio object of w79f (src/sound/AudioComponent.cpp, src/sound/TbAudioBody.cpp, src/sound/TbSysCommand.cpp: GetSoundManager, GetPlaceHolderList; its virtuals StopHandle and
 // DeregisterCatagoryBanks are hooked below to record), the info and sample-info records (w77), the library's command constructors
 // (w79b: SystemCommand::Process, StopAll, PauseAll, RestartAll, SetSystemInfo, SetSampleInfo), the component chain (CAudioComponent).
 // Fakes, each recording what the original's callee is given (the PowerPC side records the same from its stubs):
@@ -257,7 +257,7 @@ void CAudioPlaceHolder::SetVolumeAndPitch(uint32_t volume, int32_t pitch) {
 }
 
 // The list: the constructor gives the array no data (its destructor then frees nothing); the sound lock's two members are defined
-// here (the real ones are in src/snd_handles.cpp, which this unit does not link).
+// here (the real ones are in src/sound/TbSoundCodecLoop.cpp, which this unit does not link).
 CAutoCriticalSection::CAutoCriticalSection() : mValue(0) {}
 CAutoCriticalSection::~CAutoCriticalSection() = default;
 CAudioPlaceHolderList::CAudioPlaceHolderList(uint32_t) : mPriorityList(nullptr) {}

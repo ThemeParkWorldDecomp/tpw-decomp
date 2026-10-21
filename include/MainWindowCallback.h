@@ -1,4 +1,4 @@
-// Unit v5002 (src/MainWindowCallback.cpp): the "all items" panel's message functions and the all-features panel (ui_allStaffPanel.cpp).
+// Unit v5002 (src/game/ui/ui_allItemsPanel.cpp): the "all items" panel's message functions and the all-features panel (ui_allStaffPanel.cpp).
 #pragma once
 #include <cstdint>
 
@@ -10,7 +10,7 @@
 
 class CThing;
 
-// ---- globals (no other file names them; defined in src/MainWindowCallback.cpp, names invented)
+// ---- globals (no other file names them; defined in src/game/ui/ui_allItemsPanel.cpp, names invented)
 extern InterfaceWindow* gAllItemsPanel;      // 0x103947e0 the open all-items panel (cleared when it is destroyed)
 extern int32_t gAllItemsListType;            // 0x103947dc 0 rides, 1 shops, 2 sideshows, 3 features: what the list shows
 extern InterfaceListControl2* gAllItemsList; // 0x103947d8 the list the all-features panel built
@@ -41,9 +41,9 @@ void UpdateRideListEntries(InterfaceListControl2* list);       // 0x1019600c
 void UpdateSideshowListEntries(InterfaceListControl2* list);   // 0x10196208
 void MAKECOLUMNBUTTON(InterfaceWindow* window, char16_t* text, int32_t a, int32_t b, int32_t c, int32_t d, int32_t e);   // 0x101818e4
 int32_t FillAllFeaturesListCallback(CThing* thing);      // 0x10195f24 (UI_IterateThingList's function)
-InterfaceWindow* LCFormat();   // 0x10194df0: the all-kids row maker (src/ui_allKidsPanel_AllKidsPanelMsg.cpp); the all-items one is AllItemsListLCFormat (v5L14)
+InterfaceWindow* LCFormat();   // 0x10194df0: the all-kids row maker (src/game/ui/ui_allKidsPanel.cpp); the all-items one is AllItemsListLCFormat (v5L14)
 
-// Unit v5013 (src/ui_main_kbcapture_UIMain_ShowRidePreview.cpp): the ride and sprite previews.
+// Unit v5013 (src/game/ui/ui_main.cpp): the ride and sprite previews.
 #include "UI_Base.h"
 struct sRidePreviewInfo;
 class CPeep;
@@ -53,13 +53,13 @@ extern int32_t gSpritePreviewHandle;     // 0x10380c40 the spawned sprite copy
 extern uint16_t gZoomSkipThing;          // 0x102a7866 the thing id UIMain_ZoomToThing ignores (0 at start)
 void UIMain_ShowRidePreview(CoolRect& rect, uint32_t id, int32_t z);              // 0x10181400
 void UIMain_ShowSpritePreview(CoolRect& rect, CPeep* peep, int32_t z, float scale);   // 0x10181648
-float CalcZTrans(int32_t z);                                                      // 0x101879d0 (src/TailSeven.cpp, unit v5L16)
+float CalcZTrans(int32_t z);                                                      // 0x101879d0 (src/game/ui/InterfaceDrawEngine.cpp, unit v5L16)
 sRidePreviewInfo* CreateRidePreview(float x, float y, float z, float w, float h, uint32_t id);   // 0x1006c3bc
 void DestroyRidePreview(sRidePreviewInfo* info);                                  // 0x1006ccd0
 void UIMain_DestroySpritePreview();                                               // 0x10181864
-void LCPostFormat(InterfaceWindow* window);   // 0x101c346c: the staff room attach function (src/LCPostFormat.cpp); the all-items one is AllItemsListLCPostFormat (v5L14)
+void LCPostFormat(InterfaceWindow* window);   // 0x101c346c: the staff room attach function (src/game/ui/ui_staffRoomStatus.cpp); the all-items one is AllItemsListLCPostFormat (v5L14)
 
-// Unit v5019 (src/CreateAllStaffPanel.cpp): the all-staff panel.
+// Unit v5019 (src/game/ui/ui_allStaffPanel.cpp): the all-staff panel.
 extern int32_t gStaffColumnFont;         // 0x102a9084 the font number of the column buttons (8 at start)
 extern int32_t gStaffSort;               // 0x102a9088 the sort column of the staff list (1 at start)
 extern InterfaceWindow* gStaffPanel;     // 0x103947f0 the open all-staff panel
@@ -70,7 +70,7 @@ int32_t AllStaffPanelLCHandler(InterfaceWindow* window, int32_t message, int32_t
 void FillAllStaffList(StaffType type, int32_t flag);   // 0x101987fc (untranslated)
 void RemoveAllStaffPanel();   // 0x10199e20 (56 bytes, stand-in)
 
-// Unit v5066 (src/MainWindowCallback_CreateAllItemsPanel.cpp): CreateAllItemsPanel (ui_main.h), the entry handler and the staff list.
+// Unit v5066 (src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allStaffPanel.cpp): CreateAllItemsPanel (ui_main.h), the entry handler and the staff list.
 class CObject;
 extern int16_t gAllItemsScript[];        // 0x102a8884 the all-items panel's window script (the image's words, generated at configure time)
 extern uint16_t gAllItemsNoParent;       // 0x102a8d0c the upgrade-parent id meaning "none" (0 at start)
@@ -79,7 +79,7 @@ int32_t AllItemsLCEntryHandler(InterfaceWindow* window, int32_t message, int32_t
 int32_t FillAllStaffListCallback(CThing* thing);   // 0x10198690 (UI_IterateThingList's function)
 void UpdateListEntries();                          // 0x10198944
 int32_t UIMain_GetObjectState(CObject* object, int32_t flag);   // 0x10180b84 (untranslated)
-// Unit v5694 (src/ui_main_panel_UIMain_GetObjectState.cpp): halfword globals (all 0 at start) UIMain_GetObjectState compares thing ids with.
+// Unit v5694 (src/game/ui/ui_main.cpp): halfword globals (all 0 at start) UIMain_GetObjectState compares thing ids with.
 extern uint16_t gUIMainId7858;   // 0x102a7858 the mechanic-list head meaning "none" for a ride that wants an upgrade
 extern uint16_t gUIMainId785A;   // 0x102a785a the staff id meaning "none" (upgrade case)
 extern uint16_t gUIMainId785C;   // 0x102a785c handyman head meaning "none" (flagged, relief)
@@ -90,7 +90,7 @@ extern uint16_t gUIMainId7864;   // 0x102a7864 the object id meaning "none" for 
 int32_t IsTrackValid(void* coaster);   // 0x100528d8 (stand-in)
 uint32_t UIMain_GetObjectStateTextColour(int32_t state);       // 0x10180fc0 (untranslated; a four-byte answer through a hidden pointer on the Mac)
 
-// Unit v5213 (src/CreateRidePreview.cpp): the ride preview's record and its scale.
+// Unit v5213 (src/game/rides/RidePreview.cpp): the ride preview's record and its scale.
 #include "m3d2.h"
 struct sRidePreviewInfo {            // 0x88 bytes on the Mac, one static block at 0x102d1f20
     uint32_t mActive;                // 0x00
@@ -116,12 +116,12 @@ void DetermineRidePreviewScale(uint32_t ride, float w, float h, float* scale, fl
                                float* rangeX, float* rangeZ, float* ratio, float* distance, float* distanceMid);   // 0x1006c198
 void SetRideMobile(uint32_t& ride);   // 0x10068280 (stand-in elsewhere)
 
-// Unit v5219 (src/AddItemToAllRidesList.cpp): the all-kids panel's creation and rows, the rides and sideshows list rows.
+// Unit v5219 (src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allKidsPanel.cpp): the all-kids panel's creation and rows, the rides and sideshows list rows.
 extern int16_t gAllKidsScript[];            // 0x102a868c the all-kids panel's window script (the image's words, generated at configure time)
 extern int32_t gAllKidsColumnFont;          // 0x102a887c the font number of the column buttons (8 at start)
 extern int32_t gAllKidsCounter;             // 0x103947c0 cleared before the list is filled
 extern uint16_t gAllRidesNoParent;          // 0x102a8d0a the upgrade-parent id meaning "no other ride" (0 at start)
-extern InterfaceListControl2* gAllKidsListControl;   // 0x103947c4 (src/ui_allKidsPanel_AllKidsPanelMsg.cpp)
+extern InterfaceListControl2* gAllKidsListControl;   // 0x103947c4 (src/game/ui/ui_allKidsPanel.cpp)
 extern InterfaceWindow* gAllKidsMsgWindow;           // 0x103947c8 (same file)
 extern int32_t gAllKidsSelectedIndex;                // 0x102a8880 (same file)
 int32_t FillAllKidsListCallback(CThing* thing);      // 0x10194880 (UI_IterateThingList's function)
@@ -130,14 +130,14 @@ void AddItemToAllRidesList(const CThing* thing, InterfaceListControl2* list, COb
 void AllKidsPanel_KidAdded(CThing* thing);           // 0x101957b8
 int32_t FillAllSideshowsListCallback(CThing* thing); // 0x10195dc8 (UI_IterateThingList's function)
 
-// Unit v5153 (src/CreateAllStaffPanel_LCFormat.cpp): the all-staff list's row maker and attach function (LCFormat and LCPostFormat of
+// Unit v5153 (src/game/ui/ui_allStaffPanel.cpp): the all-staff list's row maker and attach function (LCFormat and LCPostFormat of
 // ui_allStaffPanel.cpp; named AllStaff... here because the same names exist at other addresses) and AllStaffPanelLCHandler (above).
 extern int32_t gStaffListFormat;         // 0x103947e4 the row height AllStaffLCFormat keeps (0 until the first row)
 extern uint32_t gStaffListFont;          // 0x102a9080 the font table index of the list's text (7 at start)
 InterfaceWindow* AllStaffLCFormat();                     // 0x101991e8
 void AllStaffLCPostFormat(InterfaceWindow* window);      // 0x10199370
 
-// Unit v5335 (src/AddItemToAllRidesList_UpdateSideshowListEntries.cpp): the all-items list's row window (the file's LCFormat, 0x10196388).
+// Unit v5335 (src/game/ui/ui_allItemsPanel.cpp): the all-items list's row window (the file's LCFormat, 0x10196388).
 extern int32_t gAllItemsRowHeight;      // 0x103947d4 the row window's height, worked out once (0 until then)
 extern uint32_t gAllItemsFontIndex;     // 0x102a8cf0 the font table index the height is measured with (7 at start)
 InterfaceWindow* AllItemsListLCFormat();   // 0x10196388 (named so because LCFormat exists at other addresses)
@@ -147,7 +147,7 @@ namespace allitems_callee {
 int16_t FontVirtual(InterfaceFont* font);
 }  // namespace allitems_callee
 
-// Unit v5560 (src/ui_allKidsPanel_AllKidsPanelMsg_LCPostFormat_6.cpp): the all-items list's attach function (the file's LCPostFormat, 0x101966ec).
+// Unit v5560 (src/game/ui/ui_allItemsPanel.cpp): the all-items list's attach function (the file's LCPostFormat, 0x101966ec).
 void AllItemsListLCPostFormat(InterfaceWindow* window);   // 0x101966ec (named so because LCPostFormat exists at other addresses)
 namespace allitems_post_callee {
 // Callees the host cannot call as the Mac does; defined in src/ui_allKidsPanel_AllKidsPanelMsg_LCPostFormat_6_callees.cpp, faked by the test library.
@@ -159,7 +159,7 @@ void GradientCtor(void* mem, const char* mesh);         // 0x101898c8 InterfaceD
 void WindowSetValue(InterfaceWindow* window, int32_t value);   // the virtual SetValue (slot 0x24 of the table at +0x118)
 }  // namespace allitems_post_callee
 
-// Unit v5572 (src/CreateParkStatusPanel.cpp): CreateParkStatusPanel (declared above).
+// Unit v5572 (src/game/ui/ui_parkStatus.cpp): CreateParkStatusPanel (declared above).
 int32_t ThoughtMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);       // 0x101ab968 (untranslated; weak stand-in in the unit's file)
 int32_t GraphPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);    // 0x101ac044 (untranslated; weak stand-in)
 extern int16_t gParkStatusScript[];        // 0x102ab734 the park status panel's window script (the image's words, generated at configure time)
@@ -176,11 +176,11 @@ void WindowSetValue(InterfaceWindow* window, int32_t value);        // virtual s
 void WindowSetText(InterfaceWindow* window, const char16_t* text);  // virtual slot 0x2c
 }  // namespace parkstatus_callee
 
-// Unit v5952 (src/AddItemToAllRidesList_FillAllRidesListCallback_Upgrades.cpp): the upgrades row of the rides list, the shops row, the
+// Unit v5952 (src/game/ui/ui_allItemsPanel.cpp): the upgrades row of the rides list, the shops row, the
 // kid-gone removal and the kids list's attach function (the LCPostFormat at 0x10194fa8, named so because LCPostFormat exists at other addresses).
 // FillAllFeaturesListCallback (0x10195f24) is declared above.
 extern uint16_t gAllRidesNoUpgradeParent;   // 0x102a8d08 (halfword, 0 at start): the upgrade-parent id meaning "no parent"
-extern int32_t gAllKidsFontIndex;           // 0x102a8878 (7 at start; defined in src/ui_allKidsPanel_AllKidsPanelMsg.cpp): the kids list's font table index
+extern int32_t gAllKidsFontIndex;           // 0x102a8878 (7 at start; defined in src/game/ui/ui_allKidsPanel.cpp): the kids list's font table index
 int32_t FillAllRidesListCallback_Upgrades(CThing* thing);   // 0x10195ba8 (UI_IterateThingList's function)
 int32_t FillAllShopsListCallback(CThing* thing);            // 0x10195cb0 (UI_IterateThingList's function)
 void AllKidsPanel_KidGone(CThing* thing);                   // 0x10195708
@@ -192,9 +192,9 @@ void RectCtor(void* rect);        // 0x101c7448 CoolRect::CoolRect()
 void RectDtor(void* rect);        // 0x101c74e0 CoolRect::~CoolRect() (flag -1)
 }  // namespace kidlist_callee
 
-// Unit v5964 (src/MainWindowCallback_CreateAllRidesPanel.cpp)
+// Unit v5964 (src/game/ui/ui_allItemsPanel.cpp)
 extern int16_t gAllRidesScript[];                   // 0x102a8a5a the rides and shops lists' window script (the image's words, generated at configure time)
 int32_t FillAllRidesListCallback(CThing* thing);    // 0x10195b40 (UI_IterateThingList's function, untranslated)
 
-// Unit v5977 (src/Debug_overlays_DestroyRidePreview.cpp)
+// Unit v5977 (src/game/rides/RidePreview.cpp)
 void TickRidePreview(sRidePreviewInfo* info);       // 0x1006c970 (808 bytes)

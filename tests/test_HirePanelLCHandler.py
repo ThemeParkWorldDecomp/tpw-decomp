@@ -1,5 +1,5 @@
 """Unit v5554, the hire panel's list functions, against libtpw_unit_HirePanelLCHandler.dylib (tests/unit_HirePanelLCHandler.cpp), main app
-("SimTheme Park"), src/HirePanelLCHandler.cpp:
+("SimTheme Park"), src/game/ui/ui_hirePanel.cpp:
   LCPostFormat 0x101a18a4 (host name HirePanelLCPostFormat), HirePanelLCHandler 0x101a19f8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

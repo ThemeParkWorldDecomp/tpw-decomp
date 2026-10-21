@@ -1,6 +1,6 @@
 // Test library for COnlineParser's token list and the Say and Tell commands (unit v5187; libtpw_unit_COnlineParser_InitToken.dylib,
 // tests/test_COnlineParser_InitToken.py), main app:
-//   src/COnlineParser_ParseGoto_COnlineParser_InitToken.cpp   InitToken, InitTokenList, ParseSay, ParseTell
+//   src/game/online/OnlineParser.cpp   InitToken, InitTokenList, ParseSay, ParseTell
 //
 // The callees outside the unit (string and Argument constructors, the vector, the list insert, CToken, the parser's GetString and
 // GetRemainingString, the table's FormatString and the converter's ConvertString) are recording fakes. gText and the handler table are

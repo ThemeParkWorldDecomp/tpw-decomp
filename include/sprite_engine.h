@@ -56,8 +56,8 @@ extern SSpriteWaveHeader gSpriteWaveHeader;   // engine data 0x10052ad4 (not exp
 // The RLE picture of a sprite: a CCompBase a texture entry unpacks from, holding the file's
 // RLE bytes (0x20 bytes on the Mac: +0 the pointer to the virtual base CCompBase at +0x18, +0x14
 // the vtable; here a plain base, as for CWaveLoad). The constructor, SetSize, SetPalette and
-// LoadSprite are in src/tb_spritefileio.cpp; the destructor, Close and the three unpacking members
-// (Decompress, Blit, AverageColor) are in src/tb_rleload.cpp (unit w38).
+// LoadSprite are in src/engine/tb_depthoffield.cpp, src/engine/RLELoad.cpp, src/engine/SpriteData.cpp; the destructor, Close and the three unpacking members
+// (Decompress, Blit, AverageColor) are in src/engine/RLELoad.cpp (unit w38).
 class CRLELoad : public CCompBase {
 public:
     CRLELoad();                                                          // 0x10005104
@@ -66,7 +66,7 @@ public:
     int32_t Close();                                                     // 0x10005440
     // Decompress: the destination's `flip` is not looked at.
     int32_t Blit(SUnpackDestination* dest, int32_t flip) override;       // 0x10005b90
-    // Unpacks the picture into `dest` (the format of the texture settings), scaled to its size: see src/tb_rleload.cpp.
+    // Unpacks the picture into `dest` (the format of the texture settings), scaled to its size: see src/engine/RLELoad.cpp.
     int32_t Decompress(SUnpackDestination* dest) override;               // 0x100054c0
     uint32_t AverageColor() override;                                    // 0x10005b5c: 0xffffffff
 
@@ -122,7 +122,7 @@ struct CSpriteFileIO {
 
 // gei_Display + 0x93c and + 0x940 (see tb_resource_display.h: the Mac's display object goes on for 0x10 bytes after what the
 // host's CDisplay holds). SSpriteGameData::SetupVertices (0x1002f688) compares a sprite's screen position with them;
-// ESP_InitialiseAndLoadSprites sets both to 0.0 (unit w33). Defined in src/ESP_sprites.cpp for now: they belong next to
-// gHotSprite (src/tb_sprites.cpp) once SetupVertices is translated.
+// ESP_InitialiseAndLoadSprites sets both to 0.0 (unit w33). Defined in src/game/HLSprite.cpp for now: they belong next to
+// gHotSprite (src/engine/SpriteManager.cpp) once SetupVertices is translated.
 extern float gSpriteHotX;   // gei_Display + 0x93c
 extern float gSpriteHotY;   // gei_Display + 0x940

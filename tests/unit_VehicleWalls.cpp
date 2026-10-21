@@ -1,13 +1,13 @@
 // Test library for the vehicles' wall avoidance and callbacks (unit w218; libtpw_unit_VehicleWalls.dylib, tests/test_VehicleWalls.py), main app:
-//   src/Vehicle_walls.cpp          Avoid_Walls::calculate
-//   src/VehicleCallbacks_nav.cpp   implement_nav_rulesA2B, callback_collision_candidates, callback_obstacle_candidates, map_local_to_global
+//   src/game/rides/vehicle.cpp          Avoid_Walls::calculate
+//   src/game/rides/VehicleCallbacks.cpp   implement_nav_rulesA2B, callback_collision_candidates, callback_obstacle_candidates, map_local_to_global
 //
-// Real code besides the unit: unit w203's steering code (src/Vehicle_steer.cpp: Vehicle::predict_pos and the globals gVehZero and gVehOne), unit w209's
-// map_global_to_local and map_fn (src/VehicleCallbacks_map.cpp) and src/Vehicle_path.cpp (it defines gVehMapData), FixMul, FixDiv, isqrt and
+// Real code besides the unit: unit w203's steering code (src/game/rides/vehicle.cpp: Vehicle::predict_pos and the globals gVehZero and gVehOne), unit w209's
+// map_global_to_local and map_fn (src/game/rides/VehicleCallbacks.cpp) and src/game/rides/vehicle.cpp (it defines gVehMapData), FixMul, FixDiv, isqrt and
 // line_circle_intersect. The callees outside are fakes that record what the real ones read, with the same event names and arguments as the module's PowerPC
 // stubs: MAP_wall_in_way (0x10101ca4; the answer is the case's wall table entry for the three bytes), CMap::IsXYValid (0x101012f4; the answer is the case's
 // valid window), GAME_ASSERTMSG (0x1000dde8; the condition and the text) and the two functions the collision walk calls (callback_a and callback_b: the
-// labels of their two arguments). What src/Vehicle_path.cpp calls (wallhug_tricky, the map's time stamps, CTRACE) is faked as that module does and never reached.
+// labels of their two arguments). What src/game/rides/vehicle.cpp calls (wallhug_tricky, the map's time stamps, CTRACE) is faked as that module does and never reached.
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
@@ -73,7 +73,7 @@ int32_t CMap::IsXYValid(int32_t x, int32_t y) {
 // 0x1000dde8: the condition and the text (not formatted).
 void GAME_ASSERTMSG(int32_t condition, const char* format, ...) { ev("GAME_ASSERTMSG", {condition}, {format}); }
 
-// What src/Vehicle_path.cpp calls: this module never reaches them.
+// What src/game/rides/vehicle.cpp calls: this module never reaches them.
 uint32_t wallhug_tricky(wallhug_path* path, NavMode mode) {
     ev("wallhug_tricky", {lab(path), static_cast<int32_t>(mode)});
     return 1;

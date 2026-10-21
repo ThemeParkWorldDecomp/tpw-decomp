@@ -1,5 +1,5 @@
 // Test library for std::basic_ofstream<char> ctor and dtor (unit v5527; libtpw_unit_std_basic_ofstream_Dtor_basic_ofstream_2.dylib), main app:
-//   src/RideInstance_std_basic_ofstream_Dtor_basic_ofstream_2.cpp
+//   src/game/MslSupport.cpp
 // The callees (ostream ctor, filebuf ctor and close, locale dtor, ios_base dtor, operator delete) are recording fakes.
 #include <cstddef>
 #include <cstdint>

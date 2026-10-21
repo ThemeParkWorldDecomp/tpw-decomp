@@ -1,5 +1,5 @@
 """Unit v5L21, __sinit_Colour_cpp 0x1001a104 (bullfrog, PROGRAM "bullfrog symbols shared"), against libtpw_unit_Colour.dylib
-(src/bfl_Colour.cpp, tests/unit_Colour.cpp).
+(src/bullfrog/Colour.cpp, tests/unit_Colour.cpp).
 
 The static initialiser runs on the PowerPC over random garbage in the 13 records (0x10073f38..0x1007406c, 0x18 bytes each); the
 host's records hold what its constant initialisation produced. The 78 words are compared in address order.

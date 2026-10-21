@@ -1,5 +1,5 @@
 """Unit v5070, the height of a track piece from its map cell and neighbours, against libtpw_unit_GetTrackMapCellHeight.dylib
-(tests/unit_GetTrackMapCellHeight.cpp), main app ("SimTheme Park"), src/GetTrackMapCellHeight.cpp:
+(tests/unit_GetTrackMapCellHeight.cpp), main app ("SimTheme Park"), src/game/park/TrackCell.cpp:
   GetTrackMapCellHeight 0x1009d8d0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory (big-endian) for the original, and in the

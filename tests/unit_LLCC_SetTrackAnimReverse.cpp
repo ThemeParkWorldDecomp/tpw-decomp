@@ -1,5 +1,5 @@
 // Test library for LLCC_SetTrackAnimReverse (unit v5684; libtpw_unit_LLCC_SetTrackAnimReverse.dylib, tests/test_LLCC_SetTrackAnimReverse.py), main app:
-//   src/LLCellRide_offsets_LLCC_SetTrackAnimReverse.cpp
+//   src/game/park/LLCellRide.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. A cell pointer is logged
 // as its index in the world's track cell array. gGameWorld and gRideAnimSets are defined here.

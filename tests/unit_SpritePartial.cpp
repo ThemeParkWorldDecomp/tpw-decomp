@@ -1,9 +1,9 @@
 // Test entry points for the partial sprite draw and the sprite shadows (library unit_SpritePartial:
-// src/tb_sprites_partial.cpp and src/tb_sprites_shadow.cpp, with the real sprite classes' members that make a partial sprite
-// (src/tb_spritefileio.cpp, src/tb_spritelist_rest.cpp: Init(int, int), SetUsedPart, GeneratePartialTexture and the
-// rest), the texture entry (src/tb_textureentry.cpp), the shadow object (src/tb_shadow.cpp), the sprite manager's frame
-// members (src/tb_sprites.cpp: the scripts draw through the real CSpriteManager::Render) and the real math unit
-// (src/MatrixPowerPC.cpp: the shadows' two transforms).
+// src/engine/SpriteData.cpp, with the real sprite classes' members that make a partial sprite
+// (src/engine/RLELoad.cpp, src/engine/SpriteData.cpp, src/engine/SpriteManager.cpp, src/engine/tb_depthoffield.cpp: Init(int, int), SetUsedPart, GeneratePartialTexture and the
+// rest), the texture entry (src/engine/TextureEntry.cpp), the shadow object (src/engine/tb_shadow.cpp), the sprite manager's frame
+// members (src/engine/SpriteManager.cpp: the scripts draw through the real CSpriteManager::Render) and the real math unit
+// (src/engine/MatrixPowerPC.cpp: the shadows' two transforms).
 //
 // tests/test_SpritePartial.py builds one world twice from one description, in emulator memory for the original and
 // through tpw_sp_reset for the translation, runs the same script of operations on both (tpw_sp_op) and compares, after every

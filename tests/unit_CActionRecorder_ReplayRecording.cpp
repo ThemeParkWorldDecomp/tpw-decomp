@@ -1,6 +1,6 @@
 // Test library for CActionRecorder::ReplayRecording, EndReplay and three RecordAction overloads (unit v5224;
 // libtpw_unit_CActionRecorder_ReplayRecording.dylib, tests/test_CActionRecorder_ReplayRecording.py), main app:
-//   src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ReplayRecording.cpp
+//   src/game/ActionRecorder.cpp
 //
 // The three files of the recorder are fakes with CFile's vtable order (Write and Seek record an event); the callees outside the unit
 // (GetBankAccount, GetNext*FileEntry, DoTick, RSSE_Tick, LayoutStartAllCoasterSounds, CTRACE, the swear filter, the master save

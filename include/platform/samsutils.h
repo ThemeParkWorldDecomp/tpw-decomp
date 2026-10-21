@@ -247,7 +247,7 @@ extern UAllocator* gMemory;
 // null pointer until the first user makes one with the constructor: operator new(8) and the constructor). The Mac object is 8
 // bytes, a word at +0 and a pointer at +4 to the table the game calls through: the entry at +0xc answers a buffer of the given
 // size (NULL when it cannot), the entry at +0x14 releases the buffer the reference names and clears the reference. Both entries
-// take the allocator as `this`. PostcardBitmap::copy_from_opengl (src/Postcard.cpp) uses them for its 320 x 240 x 4 buffer.
+// take the allocator as `this`. PostcardBitmap::copy_from_opengl (src/game/ui/Postcard.cpp) uses them for its 320 x 240 x 4 buffer.
 // Host: the two entries are virtual members of the class itself (platform/sams_core.cpp: new[] and delete[]).
 class UAllocatorTemporary {
 public:

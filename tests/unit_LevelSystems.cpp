@@ -50,14 +50,14 @@ const uint32_t* gLastOk = nullptr;
 }  // namespace
 
 // ---- Globals of other files the functions read ------------------------------------------------------------------------------
-uint32_t gPolySearchCount;      // src/RideInstance.cpp's
+uint32_t gPolySearchCount;      // src/game/rides/TPRide.cpp's
 uint32_t gMaxMeshFaces4;        // TPEngine.cpp's
 uint32_t gMaxMeshF3E;
 uint32_t gMaxMeshNodes;
-uint32_t gObjectTableCount;     // src/CoasterDestroy.cpp's
+uint32_t gObjectTableCount;     // src/game/rides/TPCoaster.cpp's
 uint32_t gObjectTableFirstFree;
 uint32_t gObjectTableLowest;
-sGlobalLight* gGlobalLight;     // src/LevelInit.cpp's
+sGlobalLight* gGlobalLight;     // src/game/TPLevel.cpp's
 float GlobalDiffuse[4];         // the engine's
 CMapWho* gei_MapWho = reinterpret_cast<CMapWho*>(gMapStorage);
 CWorld* gGameWorld;

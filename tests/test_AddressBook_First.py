@@ -1,5 +1,5 @@
 """Unit v51057, 22 small e-mail functions, against libtpw_unit_AddressBook_First.dylib (tests/unit_AddressBook_First.cpp), main app
-("SimTheme Park"), src/email_load_AddressBook_Save_AddressBook_Add_AddressBook_First.cpp:
+("SimTheme Park"), src/game/online/email.cpp:
   AddressBook::First 0x10206534, Next 0x10206594, Outbox::UnmarkToSend 0x102058b4, UnmarkToDelete 0x102059a0, std::ios_base::exceptions
   0x10207664, operator|= 0x102076a0, state 0x10207700, operator& 0x10207734, rdstate 0x10207788, basic_ios::tie 0x10207964, good
   0x102079b4, istream::sentry::~sentry 0x10207f84, ~basic_istream 0x102043a8, the two list constructors 0x10208abc and 0x1020951c, the

@@ -1,5 +1,5 @@
 """Unit v5231, the ride list panel's row functions, against libtpw_unit_LCHandler.dylib (tests/unit_LCHandler.cpp), main app
-("SimTheme Park"), src/CreateRideListPanel_LCHandler.cpp:
+("SimTheme Park"), src/game/ui/ui_researchPanel.cpp:
   LCHandler 0x101b7d94, LCEntryHandler 0x101b7f30, LCFormat 0x101b811c, LCPostFormat 0x101b827c
 (the host names are RideListLCHandler, RideListLCEntryHandler, RideListLCFormat and RideListLCPostFormat: the plain names exist at other addresses).
 

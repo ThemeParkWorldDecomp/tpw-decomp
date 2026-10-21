@@ -1,7 +1,7 @@
-// Test library for the theme and the new level (libtpw_unit_NewLevel.dylib; see tests/test_NewLevel.py): src/Game_level.cpp (CGame::InitTheme,
-// InitLevel, InitLevel_Load, InitLevel_Initialise, LoadTheme), src/World_setup.cpp (CWorld::SetupNewLevel), src/FS_LoadSave_load.cpp
-// (CFSLoadSave::Load and LoadInternal), src/LLCellSystem_costs.cpp (the four cost setters), src/SkyObjects_ctor.cpp (the empty CSkyObjects
-// constructor) and src/HoardingsBalance_objects.cpp, all real, with the real main balance and hoardings tables.
+// Test library for the theme and the new level (libtpw_unit_NewLevel.dylib; see tests/test_NewLevel.py): src/game/Game.cpp (CGame::InitTheme,
+// InitLevel, InitLevel_Load, InitLevel_Initialise, LoadTheme), src/game/World.cpp (CWorld::SetupNewLevel), src/game/save/FS_LoadSave.cpp
+// (CFSLoadSave::Load and LoadInternal), src/game/park/LLCellSystem.cpp (the four cost setters), src/game/park/SkyObjects.cpp (the empty CSkyObjects
+// constructor) and src/game/balance/HoardingsBalance.cpp, all real, with the real main balance and hoardings tables.
 //
 // Everything else is a fake on both sides that records through calllog: the balance reader (Init, UnInit, Load), the ride database
 // (LoadTheme, GetFirstRide, GetNextRide), the ten thing constructors, CObject's, CThing::GetThingId, the world's leaves (control manager,

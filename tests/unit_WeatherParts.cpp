@@ -1,8 +1,8 @@
 // Test library for CWeather and CWeatherForecast (unit w181; libtpw_unit_WeatherParts.dylib, tests/test_WeatherParts.py), main app:
-//   src/Weather.cpp          the fifteen functions
-//   src/Serialise_basic.cpp, src/Serialise_float.cpp   the basic LOADVAR / SAVEVAR instances (REAL: the file is the fake)
-//   src/ThingMessages.cpp    the message classes (the test's message is a subclass whose GetType answers the case's type)
-//   src/MainBalance.cpp      gMainBalance (CBalanceTable::Init and UnInit are fakes, as in the things' turns unit)
+//   src/game/park/Weather.cpp          the fifteen functions
+//   src/game/ControlManager.cpp, src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/rides/FlyingRide.cpp, src/game/save/FS_MasterSave.cpp   the basic LOADVAR / SAVEVAR instances (REAL: the file is the fake)
+//   src/game/park/ChallengeHQ.cpp, src/game/park/Weather.cpp, src/game/ui/MessageCentre.cpp    the message classes (the test's message is a subclass whose GetType answers the case's type)
+//   src/game/balance/MainBalance.cpp      gMainBalance (CBalanceTable::Init and UnInit are fakes, as in the things' turns unit)
 //
 // The fake file: LbFile_Read hands out the test's bytes in order, LbFile_Write records them as hex; the queues "LbFile_Read", "LbFile_Read:xfer",
 // "LbFile_Write" and "LbFile_Write:xfer" replace the result and the transferred count. Every other callee records what the real one reads and

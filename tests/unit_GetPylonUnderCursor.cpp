@@ -1,5 +1,5 @@
 // Test library for GetPylonUnderCursor (unit v5759; libtpw_unit_GetPylonUnderCursor.dylib, tests/test_GetPylonUnderCursor.py), main app:
-//   src/LinkPreviewBrace_GetPylonUnderCursor.cpp   GetPylonUnderCursor
+//   src/game/rides/CoasterPylon.cpp   GetPylonUnderCursor
 //
 // No callees. The globals of other files the function reads are defined here. The world (instances, pylons, height field header)
 // is built through the tpw_gpc_* helpers because the host's structs hold native pointers.

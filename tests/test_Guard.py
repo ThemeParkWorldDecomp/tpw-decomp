@@ -1,5 +1,5 @@
 """Unit w182, against libtpw_unit_Guard.dylib (tests/unit_Guard.cpp), main app ("SimTheme Park"):
-  src/Guard.cpp   CGuard::CGuard (cell) 0x100fda68 and (cell, grade, flag, name) 0x100fdb08, Init 0x100fdc10, FinalDestroy 0x100fdd60, ReceiveMessage
+  src/game/people/guard.cpp   CGuard::CGuard (cell) 0x100fda68 and (cell, grade, flag, name) 0x100fdb08, Init 0x100fdc10, FinalDestroy 0x100fdd60, ReceiveMessage
                   0x100fdec0, Serialise 0x100fdf94, ProsecutePerp 0x100fe134, IsAvailable 0x100fe2b0, IsCarrying 0x100fe300, UpdateTurn 0x100fe344,
                   ChooseNextAction 0x100fe430, ModelState 0x100fe4e8, SetState 0x100fe5a8, ProcessIdle 0x100fe774, ProcessPatrolling 0x100fe888,
                   ProcessProsecuting 0x100fe99c, ProcessWalkingToEntrance 0x100fed5c, ProcessReturningToPatrol 0x100feebc

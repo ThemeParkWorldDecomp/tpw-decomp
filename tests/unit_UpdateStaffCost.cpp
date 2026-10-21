@@ -1,6 +1,6 @@
 // Test library for the staff costs panel's cost words and the two panel message functions (unit v5152; libtpw_unit_UpdateStaffCost.dylib,
 // tests/test_UpdateStaffCost.py), main app:
-//   src/CreateStaffCostsPanel_UpdateStaffCost.cpp   UpdateStaffCost, StaffCostsPanelMsg, ShopStatusMsg
+//   src/game/ui/ui_StaffCostsPanel.cpp, src/game/ui/ui_shopStatus.cpp   UpdateStaffCost, StaffCostsPanelMsg, ShopStatusMsg
 //
 // The callees outside the unit are recording fakes; the globals of other files the unit reads are defined here (zero at start like the
 // Mac's bss). The windows are fake objects (a vtable pointer first, every slot answering SetValue's fake).

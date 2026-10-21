@@ -1,5 +1,5 @@
 // Test library for email.cpp's static initialiser (unit v5567; libtpw_unit_sinit_email_cpp.dylib, tests/test_sinit_email_cpp.py), main app:
-//   src/FTPClient_RecvData_sinit_email_cpp.cpp   __sinit_email_cpp and the globals it builds
+//   src/game/online/email.cpp   __sinit_email_cpp and the globals it builds
 //
 // The callees outside the unit (the string constructors, __register_global_object, operator new, the two string destructor glues) are
 // fakes that record what the real ones read. The destructors are only addresses here.

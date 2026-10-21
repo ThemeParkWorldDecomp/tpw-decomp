@@ -1,5 +1,5 @@
 // Test library for TbITable::FormatString, multibyte overload (unit v5032; libtpw_unit_TbITable_FormatString.dylib), main app:
-//   src/TbITable_TbITable_FormatString.cpp
+//   src/ltms/TbITable.cpp
 //
 // Fakes: TbITable::DoFormat, CStaticMBBuffer::Close (and the unused appends), and a converter whose AddRef/Release record.
 #include <cstddef>
@@ -32,7 +32,7 @@ void CStaticMBBuffer::Close() {
     ev("Close", {static_cast<int64_t>(reinterpret_cast<uintptr_t>(mCursor) & kMask),
                  static_cast<int64_t>(reinterpret_cast<uintptr_t>(mEnd) & kMask), lab(mConverter), mOverflow ? 1 : 0});
 }
-// The destructor as translated in src/TbIMBToUnicode_TbIMBInfo_Dtor_TbIMBInfo.cpp (unit v51128): Close, then the Release if still held.
+// The destructor as translated in src/ltms/StaticUnicodeBuffer.cpp (unit v51128): Close, then the Release if still held.
 CStaticMBBuffer::~CStaticMBBuffer() {
     Close();
     if (mConverter != nullptr) mConverter->Release();

@@ -1,6 +1,6 @@
 // Test library for the upgrade status panel's window handler and the staff status static initialiser (unit v5548;
 // libtpw_unit_UpgradeStatusMsg.dylib, tests/test_UpgradeStatusMsg.py), main app:
-//   src/UpgradeStatusMsg.cpp   UpgradeStatusMsg, __sinit_ui_staffStatus_cpp, gStaffStatusF40, gStaffStatusF44
+//   src/game/ui/ui_staffStatus.cpp, src/game/ui/ui_upgradeStatus.cpp   UpgradeStatusMsg, __sinit_ui_staffStatus_cpp, gStaffStatusF40, gStaffStatusF44
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. Objects are named by
 // labels the test registers (tpw_us_setlab); the globals of other files are defined here.
@@ -86,7 +86,7 @@ namespace lender_callee {
 void WindowSetValue(InterfaceWindow* window, int32_t value) { ev("SetValue", {Lb(window), value}); }
 }  // namespace lender_callee
 
-// The table the static initialiser stores (src/ui_StatusPanel_tables.cpp, unit v5L31): a block of the arena made on first use; the test
+// The table the static initialiser stores (src/game/ui/ui_StatusPanel.cpp, unit v5L31): a block of the arena made on first use; the test
 // compares only where it is stored.
 uint32_t* StaffStatusPanelTable() {
     static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));

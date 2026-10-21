@@ -1,6 +1,6 @@
 // Test library for online.cpp's static initialiser, CheckShifts and the cdeque assign (unit v5907; libtpw_unit_sinit_online_cpp.dylib,
 // tests/test_sinit_online_cpp.py), main app:
-//   src/ProcessGetChatSatellitePlayers_sinit_online_cpp.cpp   __sinit_online_cpp, CheckShifts, CdequeDoAssignArgumentIter
+//   src/game/online/online.cpp, src/game/ui/ui_worldLobbyController.cpp   __sinit_online_cpp, CheckShifts, CdequeDoAssignArgumentIter
 //
 // The callees outside the unit are recording fakes: the string constructors, __register_global_object, GetKeyState and the runtime
 // (new, delete, strlen, strcpy, throw). The throw fake raises a C++ exception that the wrapper catches (the original goes on after

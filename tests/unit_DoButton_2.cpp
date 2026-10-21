@@ -1,5 +1,5 @@
 // Test library for the options panel's DoButton and OptionsPanelMsg (unit v5978; libtpw_unit_DoButton_2.dylib, tests/test_DoButton_2.py), main app:
-//   src/ui_mainpanel2_window_bumhole_DoScroll_3_DoButton_2.cpp
+//   src/game/ui/ui_optionsPanel.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of
 // other files are defined here (zero at start like the Mac's bss). gGame and gPlayerSettings are raw storage under the program's symbols.

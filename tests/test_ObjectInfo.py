@@ -1,7 +1,7 @@
 """Unit w210: a ride's names, kind, excitement and stand point, and its final destroy. The 16 functions are CObject's
 UpgradesWhat, GetControl, GetFileName, GetUIName, GetSignNameA/B, SetSignNameA/B, IsCoaster, IsTrackRide,
-GetProspectiveExcitementLevel, GetExcitementLevel, GetStandPoint and FinalDestroy (src/Object_info.cpp), the constructor
-of CMsgRideDeleted (src/ThingMessages2.cpp) and CRideDatabase::GetFileName (src/RideDB_names.cpp).
+GetProspectiveExcitementLevel, GetExcitementLevel, GetStandPoint and FinalDestroy (src/game/Object.cpp), the constructor
+of CMsgRideDeleted (src/game/Object.cpp, src/game/ui/MessageCentre.cpp) and CRideDatabase::GetFileName (src/game/rides/RideDB.cpp, src/game/save/SaveLoad.cpp).
 
 A case is a dict. "op" names the function, "seed" fills the object block (0x448 bytes between two guard blocks of 0x40)
 and the world tail with the same bytes on both sides, and the other keys are what the function reads or writes: the

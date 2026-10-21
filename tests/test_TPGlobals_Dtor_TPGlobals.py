@@ -1,5 +1,5 @@
 """Unit v5692, TPGlobals::~TPGlobals 0x10233378, against libtpw_unit_TPGlobals_Dtor_TPGlobals.dylib
-(tests/unit_TPGlobals_Dtor_TPGlobals.cpp), main app, src/TPGlobals_Dtor_TPGlobals.cpp.
+(tests/unit_TPGlobals_Dtor_TPGlobals.cpp), main app, src/game/TPGlobals.cpp.
 
 A case is an object (zeroed 0x4c90 bytes, or NULL) and the hidden delete flag (a short in r4). The callees outside the unit,
 the char and wide string destructors (0x102382f0, 0x10238710) and operator delete (0x10238218), are fakes on both sides that

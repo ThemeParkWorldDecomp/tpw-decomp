@@ -1,12 +1,12 @@
 """Unit v5894, the park status graph panel's message handler, against libtpw_unit_GraphPanelMsg.dylib (tests/unit_GraphPanelMsg.cpp), main app
-("SimTheme Park"), src/ParkInfoLines_GraphPanelMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_parkStatus.cpp:
   GraphPanelMsg 0x101ac044
 
 A case is a message and the globals (flags, range). Callees outside the unit are fakes on both sides that record their arguments:
 GetParkAnalyser (answers a fixed address), the two MaxAnalyserValue (the history's offset from that address, the value in and the range;
 the value out comes from the case's queue), SetupGraph (with the rectangle's four shorts), SetXRange, SetYRange, DrawMeGraph,
 GetClientRect (writes the rectangle from the queue) and CallDefaultWindowHandler. CoolRect's constructor and destructor run for real on
-the PowerPC side and from src/UI_Base.cpp on the host.
+the PowerPC side and from src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp on the host.
 
 What is compared: the answer, the event log, the flags and the range. No fused operations. Not tested: nothing skipped.
 """

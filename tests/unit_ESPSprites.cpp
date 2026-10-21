@@ -1,6 +1,6 @@
 // Test library for the ESP sprite loader (libtpw_unit_ESPSprites.dylib; see tests/test_ESPSprites.py):
-// src/ESP_sprites.cpp (ESP_CSprite, ESP_SortFileList, ESP_FindESPFiles, ESP_LoadSprites, ESP_GetParticleSprite,
-// ESP_InitialiseAndLoadSprites), src/HLSprite.cpp (the lists' array) and the game's default names (src/TPGlobals.cpp).
+// src/game/HLSprite.cpp (ESP_CSprite, ESP_SortFileList, ESP_FindESPFiles, ESP_LoadSprites, ESP_GetParticleSprite,
+// ESP_InitialiseAndLoadSprites), src/game/HLSprite.cpp (the lists' array) and the game's default names (src/game/TPGlobals.cpp).
 //
 // Real: those, with the bullfrog strings functional and unrecorded (fake_strings.h). Everything else the unit calls is a
 // fake that records through tests/calllog.h: the directory search (CTPBaseResource::FindFirst, FindNext and
@@ -342,7 +342,7 @@ bool TPStrGtr(const TbDynamicStringTemplate<char>& a, const TbDynamicStringTempl
     ev("TPStrGtr", {}, {a.mData, b.mData});
     return CompareIgnoringCase(a.mData, b.mData) > 0;
 }
-// The real one (src/FS_System.cpp) appends ":" unless the path's last character is one; recorded here with the path as it was.
+// The real one (src/game/save/FS_System.cpp) appends ":" unless the path's last character is one; recorded here with the path as it was.
 void FS_AddDirectorySeparator(TbDynamicStringTemplate<char>& path) {
     ev("FS_AddDirectorySeparator", {}, {path.mData});
     const int32_t length = path.Length();

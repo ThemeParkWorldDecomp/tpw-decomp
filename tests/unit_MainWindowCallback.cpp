@@ -1,5 +1,5 @@
 // Test library for the all-items panel's message functions (unit v5002; libtpw_unit_MainWindowCallback.dylib, tests/test_MainWindowCallback.py), main app:
-//   src/MainWindowCallback.cpp   MainWindowCallback, ListTemplateCallback, CreateAllFeaturesPanel, ActualListCallback and the globals they use
+//   src/game/ui/ui_allItemsPanel.cpp   MainWindowCallback, ListTemplateCallback, CreateAllFeaturesPanel, ActualListCallback and the globals they use
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue. Pointers are
 // logged as labels (lab(p)); the fakes that answer a pointer take it from the queue (a 32-bit arena address).

@@ -1,6 +1,6 @@
 // Test library for Postcard::save, SetWorldBoundingArea and SetHeightfieldTexture (unit v5906; libtpw_unit_Postcard_save.dylib,
 // tests/test_Postcard_save.py), main app:
-//   src/Postcard_Postcard_save.cpp
+//   src/game/MeshLoad.cpp, src/game/ui/Postcard.cpp
 //
 // The callees outside the unit are recording fakes: SamsUtilities::UPixels (constructors, Convert, GetData, destructor), the libjpeg
 // compressor calls, fopen and fclose. The fopen fake always opens (the failing path calls exit, which cannot be compared). The globals

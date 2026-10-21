@@ -3,7 +3,7 @@
 #include "TbColour.h"
 #include "platform/indirectx.h"
 
-// Unit w231 (src/LbSurface.cpp), bullfrog WinScrn.cpp.
+// Unit w231 (src/bullfrog/LbSurface.cpp), bullfrog WinScrn.cpp.
 TbRenderArea& LbSurface_MapToRenderArea(TbRenderArea&, TbSurface*); // 0x100666ac, 136 B
 TbPixFormat& LbSurface_GetPixelFormat(const TbSurface*, TbPixFormat&); // 0x10066780, 100 B
 void LbSurface_SetCurrent(TbSurface*); // 0x1006682c, 36 B
@@ -46,7 +46,7 @@ void LbDraw_SetCurrent(TbSurface*); // bullfrog 0x1002b690, 280 B
 TbRect* LbRect_Copy(TbRect*, const TbRect*); // bullfrog 0x100298d0, 36 B
 void OS_dd_error(int32_t); // bullfrog 0x10067e70, 1028 B
 
-// Unit v5945 (src/LbSurface_LbScreen_IsModeAvailable_2.cpp), bullfrog WinScrn.cpp.
+// Unit v5945 (src/bullfrog/WinScrn.cpp), bullfrog WinScrn.cpp.
 struct TbPalette;
 struct TbScreenModeFind;
 enum TbPaletteFadeType : int32_t { kPaletteFadeStep = 0, kPaletteFadeAll = 1 };

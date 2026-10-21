@@ -1,6 +1,6 @@
 // Test library for the ride sign regeneration and the object instance table (unit v5934; libtpw_unit_RegenerateRideSign.dylib,
 // tests/test_RegenerateRideSign.py), main app:
-//   src/RideInstance_RegenerateRideSign.cpp   RegenerateRideSign (0x101eeb9c), RegenerateRideSigns, SetRideScriptID, GetAnimStats,
+//   src/game/rides/RidePlacement.cpp   RegenerateRideSign (0x101eeb9c), RegenerateRideSigns, SetRideScriptID, GetAnimStats,
 //                                             AllocateObjectInstanceToTable, RemoveObjectInstanceFromTable, gRideSignListEnd
 //
 // The callees outside the unit are recording fakes (GetDBInfo, GetSignNameA/B, GetLocalPath, the string template's constructors and

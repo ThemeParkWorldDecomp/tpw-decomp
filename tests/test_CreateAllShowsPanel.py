@@ -1,4 +1,4 @@
-"""Unit v5677, CreateAllShowsPanel 0x10196ed0, against libtpw_unit_CreateAllShowsPanel.dylib, main app, src/LCPostFormat_CreateAllShowsPanel.cpp.
+"""Unit v5677, CreateAllShowsPanel 0x10196ed0, against libtpw_unit_CreateAllShowsPanel.dylib, main app, src/game/ui/ui_allItemsPanel.cpp.
 
 The callees outside the unit are fakes on both sides recording their arguments; windows are fixed fake addresses (never dereferenced).
 GetWindow answers by (this, id); the answers for id 400 on the group come from the queue G400 (0 none, 1 an object); FindData from its queue.

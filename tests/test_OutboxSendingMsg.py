@@ -1,5 +1,5 @@
 """Unit v5031, the outbox window's messages, against libtpw_unit_OutboxSendingMsg.dylib (tests/unit_OutboxSendingMsg.cpp), main app
-("SimTheme Park"), src/UI_IslandLobby_CalcEmailAddressScrollBar_OutboxSendingMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_onlineOutbox.cpp:
   MarkOutboxEmail 0x101e4004, SendMailStatusDisplay 0x101e4184, OutboxSendingMsg 0x101e4250
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian for the original, host

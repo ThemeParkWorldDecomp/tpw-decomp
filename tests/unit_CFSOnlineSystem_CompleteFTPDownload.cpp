@@ -1,6 +1,6 @@
 // Test library for the FTP download job of the online system (unit v5655; libtpw_unit_CFSOnlineSystem_CompleteFTPDownload.dylib,
 // tests/test_CFSOnlineSystem_CompleteFTPDownload.py), main app:
-//   src/FS_Online_init_CFSOnlineSystem_CompleteFTPDownload.cpp   CompleteFTPDownload, FTPDownloadCallbackFn,
+//   src/game/online/FS_Online.cpp, src/game/online/FS_OnlineList.cpp   CompleteFTPDownload, FTPDownloadCallbackFn,
 //                                                                RequestNextFileForFTPDownload, Instance
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queue. The strings are

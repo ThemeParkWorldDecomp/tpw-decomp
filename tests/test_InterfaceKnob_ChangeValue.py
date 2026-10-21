@@ -1,5 +1,5 @@
 """Unit v5264, InterfaceKnob::ChangeValue, against libtpw_unit_InterfaceKnob_ChangeValue.dylib (tests/unit_InterfaceKnob_ChangeValue.cpp), main app
-("SimTheme Park"), src/InterfaceKnob_InterfaceKnob_ChangeValue.cpp:
+("SimTheme Park"), src/game/ui/InterfaceKnob.cpp:
   InterfaceKnob::ChangeValue 0x101d0448
 
 A case is a knob with its ten range/value words, an id, a parent and (or not) a client draw object, and a new value. The knob is built

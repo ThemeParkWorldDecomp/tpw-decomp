@@ -1,6 +1,6 @@
 // Test library for the track editor's new brace and the preview brace's undoing (unit v5157; libtpw_unit_NewTrackBrace.dylib,
 // tests/test_NewTrackBrace.py), main app:
-//   src/NewTrackBrace.cpp   NewTrackBrace, UnLinkPreviewBrace
+//   src/game/rides/CoasterPylon.cpp   NewTrackBrace, UnLinkPreviewBrace
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The globals of other
 // files the unit reads (gCoasterEditInstance, gLinkFoundPylon, gPylonStackSkip, gRideAnimSets) and the two statics of
@@ -50,7 +50,7 @@ void RecordParams(const sFixedRideParams* p) {
 
 }  // namespace
 
-// 0x1003d5b0: the real function (src/TPCoaster_loaders.cpp is not compiled here)
+// 0x1003d5b0: the real function (src/game/rides/CoasterPylon.cpp is not compiled here)
 sFixedRideParams* GetTempFixedRideParams(int32_t a, int32_t b, int32_t x, int32_t z) {
     sPair[0] = a;
     sPair[1] = b;

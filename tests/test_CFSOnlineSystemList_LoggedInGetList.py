@@ -1,5 +1,5 @@
 """Unit v5215: the city list's LoggedInGetList and CompleteGetList, against libtpw_unit_CFSOnlineSystemList_LoggedInGetList.dylib
-(tests/unit_CFSOnlineSystemList_LoggedInGetList.cpp), main app, src/CFSOnlineSystemList_LoggedInGetList.cpp:
+(tests/unit_CFSOnlineSystemList_LoggedInGetList.cpp), main app, src/game/online/FS_OnlineList.cpp:
   CFSOnlineSystemList<TbPtrList<CFSOnlineCity>,ccCityList>::LoggedInGetList 0x10178414
   CFSOnlineSystemList<TbPtrList<CFSOnlineCity>,ccCityList>::CompleteGetList 0x10173f98
 

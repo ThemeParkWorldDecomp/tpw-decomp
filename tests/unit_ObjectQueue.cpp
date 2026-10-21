@@ -1,4 +1,4 @@
-// Differential library for unit w197, the ride's queue (src/Object_queue.cpp): the fifteen CObject members AddPersonToQueue, RemovePersonFromQueue,
+// Differential library for unit w197, the ride's queue (src/game/Object.cpp): the fifteen CObject members AddPersonToQueue, RemovePersonFromQueue,
 // GetNumPeopleInQueue, GetPositionInQueue, GetFrontOfPhysicalQueue, GetBackOfPhysicalQueue, GetBackOfVirtualQueue, GetBackOfQueue, GetQCellBehind,
 // RecalculateBackOfQueue, IsBOQConnected, IsExitCellConnected and the three Convert*QPositionToMapPos.
 //
@@ -7,7 +7,7 @@
 // (WG: gGameWorld, WW: gWorld and the block gWorldMap points into, WM: what CWorldSavvy::GetWorld and GetMap answer), each map at slot + 0x2d8. Every
 // fake appends (tag, value) to the trace; a pointer is recorded as its offset in the block, so the two sides' traces compare word for word. The three
 // CMapCell predicates answer from bits of the cell's halfword at +0x42 (IsPath bit 1, IsQueue bit 2, IsEntrance bit 3) with the case's truthy word.
-// The cell code (CCellBase, CMapCell::GetNeighbouringCell, OPPOSITE, the time stamps) runs as translated; CThing::GetThingId (src/Thing_receive.cpp, another unit) is a copy here.
+// The cell code (CCellBase, CMapCell::GetNeighbouringCell, OPPOSITE, the time stamps) runs as translated; CThing::GetThingId (src/game/Thing.cpp, another unit) is a copy here.
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>

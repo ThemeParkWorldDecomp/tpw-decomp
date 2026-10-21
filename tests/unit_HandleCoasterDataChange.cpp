@@ -1,6 +1,6 @@
 // Test library for the coaster editor's data change and loft toggle (unit v5054; libtpw_unit_HandleCoasterDataChange.dylib,
 // tests/test_HandleCoasterDataChange.py), main app:
-//   src/HandleCoasterDataChange.cpp   HandleCoasterDataChange, ToggleLoftPylonState, gCoasterVerticalFloor
+//   src/game/rides/CoasterEdit.cpp, src/game/rides/CoasterTrack.cpp   HandleCoasterDataChange, ToggleLoftPylonState, gCoasterVerticalFloor
 //
 // The callees outside the unit are recording fakes; the globals of other files the unit reads are defined here.
 #include <cstddef>

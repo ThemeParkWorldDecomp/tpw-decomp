@@ -1,4 +1,4 @@
-"""The version 0x13 wavelet texture decoder (engine, src/Wavelet_decode.cpp): LzssDecompress,
+"""The version 0x13 wavelet texture decoder (engine, src/engine/EngineUtil.cpp, src/engine/Wavelet.cpp): LzssDecompress,
 read_code, read_reset, CIgArray<float, float> (constructor, destructor, SetSize, GetData),
 CWaveletImp::ReverseTransformVert, Decompress_v13 and the two dispatching Decompress overloads.
 

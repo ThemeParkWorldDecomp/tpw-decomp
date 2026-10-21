@@ -1,5 +1,5 @@
 """Unit v5211, CMapCell::Delete, against libtpw_unit_CMapCell_Delete.dylib (tests/unit_CMapCell_Delete.cpp), main app
-("SimTheme Park"), src/MapDelta_map_CMapCell_Delete.cpp:
+("SimTheme Park"), src/game/park/MapCell.cpp:
   CMapCell::Delete 0x1009d0f4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

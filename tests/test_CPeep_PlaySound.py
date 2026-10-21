@@ -1,6 +1,6 @@
 """Unit v5281, CPeep::PlaySound, IsInsidePark, Teleport, UpdateTurn, IsStranded, SetStranded and the two SetDest, against
 libtpw_unit_CPeep_PlaySound.dylib (tests/unit_CPeep_PlaySound.cpp), main app ("SimTheme Park"),
-src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound.cpp:
+src/game/people/Peep.cpp:
   PlaySound 0x10115b80, IsInsidePark 0x10115a80, Teleport 0x101159d0, UpdateTurn 0x101158c8, IsStranded 0x1011566c,
   SetStranded 0x101155bc, SetDest(MapPos, MapPos) 0x101154f0, SetDest(cell) 0x10115400
 

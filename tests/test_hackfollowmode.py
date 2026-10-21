@@ -1,5 +1,5 @@
 """Unit v5076, the staff panel's status and location leaves, against libtpw_unit_hackfollowmode.dylib (tests/unit_hackfollowmode.cpp), main app,
-src/ui_staffPanel_msg_hackfollowmode.cpp:
+src/game/ui/ui_staffPanel.cpp:
   UpdateStatus 0x101bf5c4, UpdateLocator 0x101bf798, StaffLocationSwitch 0x101bf9f4, hackfollowmode 0x101bfb48
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for the

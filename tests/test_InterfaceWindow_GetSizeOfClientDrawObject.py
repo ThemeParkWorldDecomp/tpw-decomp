@@ -1,5 +1,5 @@
 """Unit v5119, six InterfaceWindow leaves, against libtpw_unit_InterfaceWindow_GetSizeOfClientDrawObject.dylib
-(tests/unit_InterfaceWindow_GetSizeOfClientDrawObject.cpp), main app, src/InterfaceWindow_draw_InterfaceWindow_GetSizeOfClientDrawObject.cpp:
+(tests/unit_InterfaceWindow_GetSizeOfClientDrawObject.cpp), main app, src/game/ui/InterfaceWindow.cpp:
   GetSizeOfClientDrawObject 0x101dbba8, AdjustPosition 0x101db0e8, UnCaptureKb 0x101dcdb0, stopAnim 0x101dd1e8,
   setAnimTimer 0x101dd5e0, SetWindowDrawText 0x101de1bc
 

@@ -1,5 +1,5 @@
 """Unit v5984, the hire panel's functions, against libtpw_unit_UpdateViewWindow_2.dylib (tests/unit_UpdateViewWindow_2.cpp), main app
-("SimTheme Park"), src/sinit_ui_FinancePanel_cpp_UpdateViewWindow_2.cpp:
+("SimTheme Park"), src/game/ui/ui_FinancePanel.cpp, src/game/ui/ui_hirePanel.cpp:
   UI_FinancePanelPanelDateChange 0x101a0cf4, FillHireList 0x101a0fc8, UpdateViewWindow 0x101a10f4, HirePanelMsg 0x101a1314,
   LCFormat (HireListLCFormat) 0x101a1798
 

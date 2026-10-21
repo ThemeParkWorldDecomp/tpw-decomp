@@ -1,5 +1,5 @@
 """Unit w175, the challenge hall's progress, against libtpw_unit_ChallengeHQ.dylib (tests/unit_ChallengeHQ.cpp), main app ("SimTheme Park"),
-src/ChallengeHQ_progress.cpp:
+src/game/park/ChallengeHQ.cpp:
   CChallengeHQ::FinalDestroy 0x100f6b60, Serialise 0x100f6fe0, AddToCounter 0x100f7324, GetCurrentChallenge 0x100f757c, ReceiveMessage 0x100f75e4,
   OfferFollowup 0x100f7fac, TellPlayerChallengeOffered 0x100f8194, ChallengeAccepted 0x100f83cc, ChallengeDeclined 0x100f853c,
   EndCurrentChallenge 0x100f86d8, WonCurrentChallenge 0x100f87d4, LostCurrentChallenge 0x100f8b20 (and the CMsgChallenge constructor 0x10152008, which

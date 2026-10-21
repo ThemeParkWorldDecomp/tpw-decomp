@@ -1,11 +1,11 @@
 """Unit w71b, the MPEG audio decoder, part 2 (synthesis and layer II), against libtpw_unit_MpegSynth.dylib
 (tests/unit_MpegSynth.cpp), in the sound library ("sound symbols shared", Code at 0x10000000, TOC r2 = 0x1003abf0):
-  src/TbMpegSynth.cpp  PolySynth 0x10006c38, dct64 0x10005adc, WRITE_SAMPLE 0x10006f88, Decode_Layer2 0x10005698,
+  src/sound/MpegDecode.cpp  PolySynth 0x10006c38, dct64 0x10005adc, WRITE_SAMPLE 0x10006f88, Decode_Layer2 0x10005698,
                        II_step_two 0x1000483c, II_step_twoMMX 0x10004ee0, and the tables they read: decwin (0x1003b488, 544
                        floats), the dct64 cosines (0x1003318c .. 0x10033204), alloc_0 .. alloc_4 (0x1003a2c8 ...), the group
                        tables (0x100394c0, 0x10039520, 0x100396a0), the translate table (0x1003b21c) and the sblimits (0x1003b27c)
 
-There are no fakes: part 1 (src/TbMpegBase.cpp, unit w71a: GetBits, the header code, Decode, Read) is linked into the unit
+There are no fakes: part 1 (src/sound/FileAccess.cpp, src/sound/LbMpeg.cpp, src/sound/MpegDecode.cpp, unit w71a: GetBits, the header code, Decode, Read) is linked into the unit
 library and the PowerPC side runs the original code of both parts, so a stream can be decoded end to end through Read and the
 PCM shorts compared. A case is a "Mac image" of the object (tests/test_MpegBase.py's: the 0x24f0 bytes in the Mac's byte order,
 the synthesis buffers as big-endian floats), a stream, the test's own areas (a fraction area of 0x180 floats, an integer

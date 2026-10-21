@@ -1,4 +1,4 @@
-"""Unit w167, the ride scripts' load, against libtpw_unit_RideLoad.dylib (tests/unit_RideLoad.cpp), main app ("SimTheme Park"), src/rsse_save.cpp:
+"""Unit w167, the ride scripts' load, against libtpw_unit_RideLoad.dylib (tests/unit_RideLoad.cpp), main app ("SimTheme Park"), src/game/rides/rsse.cpp:
   RSSE_Load 0x100d56bc and RSSE_WALK::Byteswap 0x100d65a8.
 
 A case is a file (a byte stream in the save's format, little-endian), the system's state before the call (initialised or not, a few live scripts,

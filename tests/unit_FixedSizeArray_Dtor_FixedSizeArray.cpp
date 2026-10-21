@@ -1,6 +1,6 @@
 // Test library for FixedSizeArray<BehaviourEntry>::~FixedSizeArray (unit v5733; libtpw_unit_FixedSizeArray_Dtor_FixedSizeArray.dylib,
 // tests/test_FixedSizeArray_Dtor_FixedSizeArray.py), main app:
-//   src/VehicleCallbacks_nav_FixedSizeArray_Dtor_FixedSizeArray.cpp
+//   src/game/rides/VehicleCallbacks.cpp
 //
 // The two runtime imports (__destroy_new_array, operator delete) are recording fakes, the same events as the PowerPC stubs.
 #include <cstddef>

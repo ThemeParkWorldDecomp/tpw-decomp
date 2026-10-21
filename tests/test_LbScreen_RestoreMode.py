@@ -1,5 +1,5 @@
 """Unit v5761, LbScreen_RestoreMode, against libtpw_unit_LbScreen_RestoreMode.dylib (tests/unit_LbScreen_RestoreMode.cpp), bullfrog,
-src/CreateDirectDrawObject_LbScreen_PartSwap_LbScreen_RestoreMode.cpp:
+src/bullfrog/WinScrn.cpp:
   LbScreen_RestoreMode 0x10069cac
 
 The callees (ReleaseMode, IDirectDraw::RestoreDisplayMode, IUnknown::Release, LbSurface_RegisterDirectDraw) are fakes on both sides that

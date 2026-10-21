@@ -1,5 +1,5 @@
 """Unit v5027, the sprite view switches and the script sprite adder, against libtpw_unit_ESP_SwitchToFirstPersonSprites.dylib
-(tests/unit_ESP_SwitchToFirstPersonSprites.cpp), main app ("SimTheme Park"), src/ESP_sprites_ESP_SwitchToFirstPersonSprites.cpp:
+(tests/unit_ESP_SwitchToFirstPersonSprites.cpp), main app ("SimTheme Park"), src/game/HLSprite.cpp:
   ESP_SwitchToFirstPersonSprites 0x1007cfc8, ESP_SwitchToThirdPersonSprites 0x1007d280, ESP_AddHLSpriteFromScript 0x1007ca9c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
@@ -234,7 +234,7 @@ class Host(Side):
         return CL.host_end(self.lib)
 
     def listed(self, e, sc):
-        """The host lists the script's host record (src/ScriptHostSprites.cpp), with the host's layout."""
+        """The host lists the script's host record (src/game/park/analyser.cpp), with the host's layout."""
         if e != self.lib.tpw_esp_hostsprite(sc):
             return False, None
         out = (C.c_uint64 * 16)()

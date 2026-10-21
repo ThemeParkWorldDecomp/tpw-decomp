@@ -1,12 +1,12 @@
 """Differential tests for the window drawing and the default window handler, against libtpw_unit_UIWindowDraw.dylib
 (tests/unit_UIWindowDraw.cpp):
 
-  src/InterfaceWindow_draw.cpp   UI_DefaultWindowCallback, InterfaceWindow::DrawMe, DrawReverseOrder, ClientDraw,
+  src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/InterfaceWindow.cpp   UI_DefaultWindowCallback, InterfaceWindow::DrawMe, DrawReverseOrder, ClientDraw,
                                  ShiftPosition, HandleScale, SetPosition, GetPosition, BringToTop, doAnimFrame, setZRot,
                                  SetValue, InterfaceTimer::Stop
 
-Real on both sides: those, the window's constructor (src/InterfaceWindow.cpp, which builds the test trees) and the
-rectangles (src/UI_Base.cpp). Fakes that record the same event on both sides: the message senders (UI_SendMessage and
+Real on both sides: those, the window's constructor (src/game/ui/InterfaceWindow.cpp, which builds the test trees) and the
+rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Fakes that record the same event on both sides: the message senders (UI_SendMessage and
 UI_PostMessage), UI_UpdatePointerIn, UI_SetCursor, the UI clock (IveGotTicks, answers from a queue), the window's untranslated
 virtual members (DrawFunction, CalcClientArea, the destructor, GetHelpText) and Show, the draw objects (Draw and Change record
 the fields their flags name), the help text handler, two regions (Shift) and the timers (plain storage).

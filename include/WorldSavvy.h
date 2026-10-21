@@ -1,4 +1,4 @@
-// CWorldSavvy: GetWorld's inline copy (0x1014205c, 12 bytes, src/WorldSavvy.cpp, unit w129) answers *gWorld and ignores `this`.
+// CWorldSavvy: GetWorld's inline copy (0x1014205c, 12 bytes, src/game/ui/ui_visitorStatus.cpp, unit w129) answers *gWorld and ignores `this`.
 #pragma once
 #include "World.h"
 class CWorldSavvy {

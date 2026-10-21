@@ -1,6 +1,6 @@
 // Test library for LLCC_AbortPylonMove, LLCC_IsRideMovable and LLCC_GetRideBlendInfo (unit v5186; libtpw_unit_LLCC_AbortPylonMove.dylib,
 // tests/test_LLCC_AbortPylonMove.py), main app:
-//   src/LLCC_Kill_Them_KILL_THEM_ALL_LLCC_AbortPylonMove.cpp   the three functions and the globals gLLCCE0B4, gLLCCE0B8, gLLCCE08C, gLLCCDF84
+//   src/game/park/LLCellRide.cpp   the three functions and the globals gLLCCE0B4, gLLCCE0B8, gLLCCE08C, gLLCCDF84
 //
 // The callees outside the unit are recording fakes: LLCC_DrawLine, CObject::GetDBInfo, LLCR_OffsetStartOfTrack, LLCR_OffsetEndOfTrack and
 // CCellBase::NumberOfNeighbours. gLLCCE090 and gGameWorld are defined here.

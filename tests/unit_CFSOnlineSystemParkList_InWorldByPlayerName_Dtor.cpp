@@ -1,6 +1,6 @@
 // Test library for the park list "in the world by player name" (unit v5063; libtpw_unit_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor.dylib,
 // tests/test_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor.py), main app:
-//   src/FS_Online_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor.cpp   the destructor and GetList
+//   src/game/online/FS_Online.cpp, src/game/online/FS_OnlineList.cpp   the destructor and GetList
 //
 // The callees outside the unit are recording fakes: the online system's constructor, AreWeLoggedIn and Login, PostLoginCallbackFn_Park,
 // the string's members (constructor, destructor, the virtual assignment), ccParkInfo's destructor, and the global operator new and delete

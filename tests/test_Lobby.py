@@ -1,4 +1,4 @@
-"""Differential test for src/lobby.cpp (the lobby object and the base class of its systems),
+"""Differential test for src/game/online/lobby.cpp (the lobby object and the base class of its systems),
 against libtpw_unit_Lobby.dylib (tests/unit_Lobby.cpp).
 
 A case is a script: make the lobby, make and destroy systems (which register with it), Init,

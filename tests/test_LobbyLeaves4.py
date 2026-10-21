@@ -1,11 +1,11 @@
 """Unit w62, the lobby's small leaves part 4, against libtpw_unit_LobbyLeaves4.dylib (tests/unit_LobbyLeaves4.cpp), in the main app
 ("SimTheme Park"):
-  src/lobby_globe.cpp  CLBScreenComponentOnlineGlobe::CLBScreenComponentOnlineGlobe 0x100ac90c, CLBScreenComponentDownloadGlobe::Init
+  src/game/online/lobby_globe.cpp  CLBScreenComponentOnlineGlobe::CLBScreenComponentOnlineGlobe 0x100ac90c, CLBScreenComponentDownloadGlobe::Init
                        0x100ae2d0, CLBScreenComponentPublishGlobe::Init 0x100aeac8
-  src/FS_Online.cpp    CFSOnlineSystem::Tick 0x10170f80, StopProcessing 0x10171404
-  src/email.cpp        Outbox::Outbox 0x10203940, AddressBook::AddressBook 0x102064cc, bthread_mutex::lock 0x10200d8c, unlock 0x10200de0
-  src/Game.cpp         CGame::DeInit 0x1014965c
-  src/InGame.cpp       CInGame::Init 0x1014b2bc
+  src/game/online/FS_Online.cpp    CFSOnlineSystem::Tick 0x10170f80, StopProcessing 0x10171404
+  src/game/online/bthread.cpp, src/game/online/email.cpp        Outbox::Outbox 0x10203940, AddressBook::AddressBook 0x102064cc, bthread_mutex::lock 0x10200d8c, unlock 0x10200de0
+  src/game/Game.cpp         CGame::DeInit 0x1014965c
+  src/game/InGame.cpp       CInGame::Init 0x1014b2bc
 
 Every callee outside the unit is a fake that records the same event on both sides: the screen base class's constructor (it records and
 sets the visible word; the real one also registers the screen with the lobby, which this test has not), the nesting new of the globe's two

@@ -1,6 +1,6 @@
 // Test library for the all-kids panel's creation and rows and the rides / sideshows list rows (unit v5219; libtpw_unit_AddItemToAllRidesList.dylib,
 // tests/test_AddItemToAllRidesList.py), main app:
-//   src/AddItemToAllRidesList.cpp   CreateAllKidsPanel, AllKidsPanel_KidAdded, AddItemToAllRidesList, FillAllSideshowsListCallback, UpdateRideListEntries
+//   src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allKidsPanel.cpp   CreateAllKidsPanel, AllKidsPanel_KidAdded, AddItemToAllRidesList, FillAllSideshowsListCallback, UpdateRideListEntries
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues; the globals of other files
 // the unit reads or writes are defined here, zero at start like the Mac's bss.

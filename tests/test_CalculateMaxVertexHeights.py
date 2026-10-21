@@ -1,5 +1,5 @@
 """Unit v5061, the ride height map rasteriser, against libtpw_unit_CalculateMaxVertexHeights.dylib (tests/unit_CalculateMaxVertexHeights.cpp), main app
-("SimTheme Park"), src/CalculateMaxVertexHeights.cpp:
+("SimTheme Park"), src/game/park/TPHField.cpp:
   CalculateMaxVertexHeights 0x1005d304
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

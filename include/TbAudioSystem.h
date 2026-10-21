@@ -58,7 +58,7 @@ public:
 
 // The commands SystemCommand takes: a vtable word (the vtable is an import of the sound library) and 0, 1, 2 or 3 payload
 // words on the Mac. Execute is slot +0x08 of every vtable: the Execute bodies are the sound library's (unit w79h,
-// src/TbSysCommand.cpp, 0x10027fd4 to 0x1002e348) and the audio object's SystemCommand calls them. The Mac's inlined constructors
+// src/sound/TbSysCommand.cpp, src/sound/TpBody.cpp, 0x10027fd4 to 0x1002e348) and the audio object's SystemCommand calls them. The Mac's inlined constructors
 // store the base class vtables (TbSysCommand::Command 0x102a01b0, TbSysCommand::SetValue 0x102a01a4) before the derived one; the host
 // needs no such stores. The library's classes the game never constructs are declared here too (unit w79h), in the same style.
 namespace TbSysCommand {

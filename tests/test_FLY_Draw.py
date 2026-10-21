@@ -1,5 +1,5 @@
 """Unit v5007, FLY_Draw, against libtpw_unit_FLY_Draw.dylib (tests/unit_FLY_Draw.cpp), main app ("SimTheme Park"),
-src/hlsprite_flybase_FLY_Draw.cpp:
+src/game/rides/FlyingRide.cpp:
   FLY_Draw 0x10077ae4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

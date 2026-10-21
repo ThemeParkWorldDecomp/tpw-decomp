@@ -1,8 +1,8 @@
 // Test library for CCellBase and CTrackCell (unit w179; libtpw_unit_CellBase.dylib, tests/test_CellBase.py), main app:
-//   src/CellBase.cpp        the neighbour, direction and overlap members, the four equivalents, CCellBase::Serialise and the four instances
-//   src/TrackCell.cpp       CTrackCell::HasBeenModifiedFrom, Serialise and the two GetNeighbouringCell
-//   src/Serialise_basic.cpp the basic LOADVAR / SAVEVAR instances (REAL: the file is the fake)
-//   src/MapDelta.cpp        the eight compass deltas
+//   src/game/park/CellBase.cpp        the neighbour, direction and overlap members, the four equivalents, CCellBase::Serialise and the four instances
+//   src/game/buildings/TrainingCentre.cpp       CTrackCell::HasBeenModifiedFrom, Serialise and the two GetNeighbouringCell
+//   src/game/ControlManager.cpp, src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/rides/FlyingRide.cpp, src/game/save/FS_MasterSave.cpp the basic LOADVAR / SAVEVAR instances (REAL: the file is the fake)
+//   src/game/park/MapDelta.cpp        the eight compass deltas
 //
 // The fake file: LbFile_Read hands out the test's bytes in order (a cursor), LbFile_Write records the bytes as hex; the queues "LbFile_Read",
 // "LbFile_Read:xfer", "LbFile_Write" and "LbFile_Write:xfer" replace the result and the transferred count. Every other callee is a fake that

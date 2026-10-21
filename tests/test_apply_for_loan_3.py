@@ -1,5 +1,5 @@
 """Unit v5036, apply_for_loan_3 and apply_for_loan_4 against libtpw_unit_apply_for_loan_3.dylib (tests/unit_apply_for_loan_3.cpp), main app,
-src/ui_Postcard_panel_spawn_handyman_apply_for_loan_3.cpp:
+src/game/keyboard.cpp:
   apply_for_loan_3 0x1014e380, apply_for_loan_4 0x1014e41c
 
 Callees GetBankAccount, ApplyForLoan, CTRACE are fakes on both sides recording their arguments; ApplyForLoan answers from the case.

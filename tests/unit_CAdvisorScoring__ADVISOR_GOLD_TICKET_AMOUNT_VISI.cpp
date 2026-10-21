@@ -1,6 +1,6 @@
 // Test library for the advisor's gold ticket scorers and the tooltip tutorial scorer (unit v5106;
 // libtpw_unit_CAdvisorScoring__ADVISOR_GOLD_TICKET_AMOUNT_VISI.dylib, tests/test_CAdvisorScoring__ADVISOR_GOLD_TICKET_AMOUNT_VISI.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_GOLD_TICKET_AMOUNT_VISI.cpp   the eight scorers
+//   src/game/advisor/AdvisorScoring.cpp   the eight scorers
 //
 // The callees outside the unit are recording fakes: CWorld::IsParkClosed, CWorld::GetParkAnalyser, CParkAnalyser::NumberOfVisitorsInPark,
 // CParkAnalyser::PercentageOfTotalObjectsInPark, CParkTime::GetFunnyTimeSinceSessionStart and CHistory<int,5>::HowFarBack. The world and the

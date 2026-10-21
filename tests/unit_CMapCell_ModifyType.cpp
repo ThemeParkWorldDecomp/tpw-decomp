@@ -1,5 +1,5 @@
 // Test library for CMapCell::ModifyType and CMapCell::GetTile (unit v5535; libtpw_unit_CMapCell_ModifyType.dylib, tests/test_CMapCell_ModifyType.py), main app:
-//   src/MapDelta_map_CMapCell_ModifyType.cpp   both functions and the globals nobody else defines (the two tile tables, their counts, the random flag,
+//   src/game/park/MapCell.cpp   both functions and the globals nobody else defines (the two tile tables, their counts, the random flag,
 //                                               the no-object thing id)
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The globals of other files

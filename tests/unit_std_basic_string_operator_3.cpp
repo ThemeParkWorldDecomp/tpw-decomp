@@ -1,5 +1,5 @@
 // Test library for unit v51033 (libtpw_unit_std_basic_string_operator_3.dylib, tests/test_std_basic_string_operator_3.py), main app:
-//   src/std_basic_string_operator_3.cpp   string operator[], locale ctor, widen, _RefCountedPtr dtor, filebuf<char> close / underflow
+//   src/game/MslSupport.cpp   string operator[], locale ctor, widen, _RefCountedPtr dtor, filebuf<char> close / underflow
 //
 // The callees are fakes that record what the real ones read; every block the module builds carries a tag word at +0x18, and a pointer
 // is logged as that tag (the two sides have different addresses). The globals of other files are defined here.

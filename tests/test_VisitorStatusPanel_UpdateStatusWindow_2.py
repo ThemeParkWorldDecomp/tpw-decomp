@@ -1,6 +1,6 @@
 """Unit v51022, the visitor status panel's two refresh functions, against libtpw_unit_VisitorStatusPanel_UpdateStatusWindow_2.dylib
 (tests/unit_VisitorStatusPanel_UpdateStatusWindow_2.cpp), main app ("SimTheme Park"),
-src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2_VisitorStatusPanel_UpdateStatusWindow_2.cpp:
+src/game/ui/ui_visitorStatus.cpp:
   VisitorStatusPanel::UpdateStatusWindow 0x10142ae4, VisitorStatusPanel::UpdateViewWindow 0x10142170
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian at the Mac's addresses,

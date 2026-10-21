@@ -1,5 +1,5 @@
 """Unit v5706, the distance and bump sound helpers, against libtpw_unit_BMP_Distance.dylib (tests/unit_BMP_Distance.cpp), main app
-("SimTheme Park"), src/BMP_InsideArea_PointOutAllInverse_BMP_Distance.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_Distance 0x1002b318, PossitionSound1 0x1002b248, SingleSoundAtBump 0x1002b180, MineToSystemCords 0x1002b0dc,
   NormaliseVector 0x1002ad34
 

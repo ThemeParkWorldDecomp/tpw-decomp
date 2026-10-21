@@ -1,5 +1,5 @@
 // Test library for std::basic_ostream<char>::flush (unit v5663; libtpw_unit_std_basic_ostream_flush.dylib), main app:
-//   src/std_basic_ostream_flush.cpp   OstreamFlush
+//   src/game/MslSupport.cpp   OstreamFlush
 //
 // The callees outside the unit (ios_base::good, basic_ios::tie, ios_base::setstate, the stream buffer virtual, __throw and the
 // allocator/string imports) are fakes recording what the real ones read; answers come from the test's queues.

@@ -1,5 +1,5 @@
 """The mesh file loader: LoadM3D2Header, FreeM3D2Header, the Fix* functions it calls and
-AlignTo64Bit (engine library, 0x100483f4..0x1004b9c8; src/m3d2_load.cpp).
+AlignTo64Bit (engine library, 0x100483f4..0x1004b9c8; src/engine/EngineUtil.cpp, src/engine/M3D2Load.cpp, src/game/park/TPHField.cpp).
 
 A case is a mesh file the test builds itself (class Mesh below: every table of the format,
 with small random counts and random contents), a set of load flags and the distance of

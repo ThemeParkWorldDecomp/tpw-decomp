@@ -1,6 +1,6 @@
 // Test library for the options panel's CreateOptionsPanel (unit v5634; libtpw_unit_CreateOptionsPanel.dylib,
 // tests/test_CreateOptionsPanel.py), main app:
-//   src/CreateOptionsPanel.cpp   CreateOptionsPanel 0x101a9fb8 and the panel's globals (0x10394a08, 0x10394a0c, 0x10394a10, 0x102ab668)
+//   src/game/ui/ui_optionsPanel.cpp   CreateOptionsPanel 0x101a9fb8 and the panel's globals (0x10394a08, 0x10394a0c, 0x10394a10, 0x102ab668)
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue: the
 // settings' StoreSettings and four volume getters, CGame::Pause, UI_PauseTimerSystem, ADV_Kill, the map's render options, the texture

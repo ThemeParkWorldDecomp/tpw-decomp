@@ -1,8 +1,8 @@
 // Test library for the window's destructor chain (libtpw_unit_UIDestroy.dylib; see tests/test_UIDestroy.py, unit w51):
-// src/InterfaceWindow_dtor.cpp (~InterfaceWindow, PropagateDestruction, UnCaptureKeys), src/UI_timers_remove.cpp (UI_RemoveTimer,
-// InterfaceTimer::FindTimer) and src/UI_invalidate.cpp (ClearAllPointers, UI_InvalidateMessages, UI_InvalidateDrawMessages,
+// src/game/ui/InterfaceWindow.cpp (~InterfaceWindow, PropagateDestruction, UnCaptureKeys), src/game/ui/InterfaceTimer.cpp (UI_RemoveTimer,
+// InterfaceTimer::FindTimer) and src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/UI_Base.cpp (ClearAllPointers, UI_InvalidateMessages, UI_InvalidateDrawMessages,
 // UI_InvalidateDeferredMessages and the two queues' InvalidateMsgs). Under them, real: the window's constructor
-// (src/InterfaceWindow.cpp), UI_SendMessage and CallWindowHandler (src/UI_send.cpp) and the rectangles (src/UI_Base.cpp).
+// (src/game/ui/InterfaceWindow.cpp), UI_SendMessage and CallWindowHandler (src/game/ui/InterfaceWindow.cpp, src/game/ui/UI_Base.cpp) and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp).
 //
 // Everything else the unit calls is a fake that records through calllog: the two window handlers (which also do what the case's
 // script says), the default handler, the message poster, the pointer update, the help text handler (OnHideOrDelete), the draw
@@ -10,9 +10,9 @@
 // destructors the original calls (the windows' own, the fakes') and their storage is kept, so that the state can be read afterwards:
 // a delete only records.
 //
-// Unit w54 adds to the same library: the base window's small virtuals (src/InterfaceWindow_virtuals.cpp), the bar's and the text box's
-// destructors (src/ui_controls_dtors.cpp), the timer's destructor (src/UI_timers_remove.cpp), ReleaseString (src/lobby_start_leaves.cpp) and
-// the button (src/InterfaceButton.cpp: its Enable, GetHelpText and destructor). A window of the world is a plain window, a bar, a text box
+// Unit w54 adds to the same library: the base window's small virtuals (src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceWindow.cpp), the bar's and the text box's
+// destructors (src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceTextBox.cpp), the timer's destructor (src/game/ui/InterfaceTimer.cpp), ReleaseString (src/game/rides/RidePlacement.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/InterfaceStringHeap.cpp) and
+// the button (src/game/ui/InterfaceButton.cpp: its Enable, GetHelpText and destructor). A window of the world is a plain window, a bar, a text box
 // or a button; the bar's and the text box's constructors and virtuals are fakes here (the originals run on the PowerPC side).
 //
 // The world: fourteen windows (made with the real constructor), six draw objects, three fake regions, a table of twelve timers, a

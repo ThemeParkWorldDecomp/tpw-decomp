@@ -1,6 +1,6 @@
 """Unit v51119, the world globe's camera steps, list registration, small destructors and byte swaps, against
 libtpw_unit_CLBScreenComponentOnlineGlobe_GlobeRight.dylib (tests/unit_CLBScreenComponentOnlineGlobe_GlobeRight.cpp), main app
-("SimTheme Park"), src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Show_2_CLBScreenComponentOnlineGlobe_GlobeRight.cpp:
+("SimTheme Park"), src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/park/LLCellMouse.cpp, src/game/park/TPHField.cpp, src/game/rides/RideAnim.cpp:
   CLBScreenComponentOnlineGlobe GlobeLeft 0x100adb54, GlobeRight 0x100adba8, GlobeUp 0x100adbfc, GlobeDown 0x100adc50,
   Register 0x100adff4, UnRegister 0x100ae064, ProcessCancel 0x100ad690, Render 0x100ad4cc, Init 0x100acc98;
   Bitmap::~Bitmap 0x100ca4bc, MapDelta::~MapDelta 0x10082c88, basic_filebuf<char>::~basic_filebuf 0x100700e4,

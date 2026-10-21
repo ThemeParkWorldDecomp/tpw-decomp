@@ -1,6 +1,6 @@
 // Test library for six advisor scorers (unit v5081; libtpw_unit_CAdvisorScoring__ADVISOR_FEATURES_DIRTY_TOILETS_.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_FEATURES_DIRTY_TOILETS_.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_FEATURES_DIRTY_TOILETS_.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The callees (world, analyser, bank account) are fakes that record the arguments and answer from the test's queues; the world pointer
 // the scorers read is defined here.

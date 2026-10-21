@@ -1,5 +1,5 @@
 """Unit v5008, std::basic_string<wchar_t> of the Metrowerks library, against libtpw_unit_std_basic_string_compare.dylib
-(tests/unit_std_basic_string_compare.cpp), main app, src/UI_Base_std_basic_string_compare.cpp:
+(tests/unit_std_basic_string_compare.cpp), main app, src/game/MslSupport.cpp:
   compare 0x101d5864, assign 0x101f7014, basic_string(str, pos, n) 0x101f7424
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,6 +1,6 @@
 """Unit v5125, std::exception::~exception (a destructor with the hidden short delete flag), against
 libtpw_unit_std_exception_Dtor_exception.dylib (tests/unit_std_exception_Dtor_exception.cpp), ltms library,
-src/ltms_textformatter_std_exception_Dtor_exception.cpp:
+src/ltms/MslSupport.cpp:
   std::exception::~exception 0x10008304
 
 A case is an object (or NULL) and a flag. The world is built by one piece of Python code on both memories. operator delete (glue

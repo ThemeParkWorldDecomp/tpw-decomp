@@ -25,7 +25,7 @@ extern TbPixFormat TbPixFormat16;   // 0x10073eb8  x1r5g5b5
 extern TbPixFormat TbPixFormat24;   // 0x10073ea0
 extern TbPixFormat TbPixFormat32;   // 0x10073e88  a8r8g8b8
 
-// Colour.cpp's records (src/bfl_Colour.cpp, __sinit_Colour_cpp 0x1001a104, unit v5L21; invented names, by layout).
+// Colour.cpp's records (src/bullfrog/Colour.cpp, __sinit_Colour_cpp 0x1001a104, unit v5L21; invented names, by layout).
 extern TbPixFormat gColourFormatRGBA8888;          // 0x10073f38
 extern TbPixFormat gColourFormatRGBA4444;          // 0x10073f50
 extern TbPixFormat gColourFormatXBGR8888;          // 0x10073f68

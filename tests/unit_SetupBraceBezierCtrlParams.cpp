@@ -1,6 +1,6 @@
 // Test library for SetupBraceBezierCtrlParams and GenerateTrack (unit v5992; libtpw_unit_SetupBraceBezierCtrlParams.dylib,
 // tests/test_SetupBraceBezierCtrlParams.py), main app:
-//   src/DestroyCoasterPylons_SetupBraceBezierCtrlParams.cpp   both functions and the globals gBraceBezierMin/Max, gTrackTextureCacheType,
+//   src/game/rides/CoasterTrack.cpp   both functions and the globals gBraceBezierMin/Max, gTrackTextureCacheType,
 //   gTrackSubdivTimes
 //
 // The callees outside the unit are recording fakes; the globals of other files are defined here (zero at start like the Mac's bss).

@@ -1,3 +1,21 @@
-# Unit w170: rsse.cpp's matrix and vector helpers and FloatSortByArray (src/rsse_math.cpp). No callee outside the C library: atan2 and
+# Unit w170: rsse.cpp's matrix and vector helpers and FloatSortByArray (src/game/LMatrix.cpp). No callee outside the C library: atan2 and
 # sqrt are the library's on the host side, fakes in the test module on the PowerPC side.
-set(TPW_UNIT_RsseMath src/rsse_math.cpp platform/arena.cpp)
+set(TPW_UNIT_RsseMath src/game/LMatrix.cpp platform/arena.cpp)
+set(TPW_UNIT_RsseMath_KEEP
+  __Z14XRotateLMatrixP7sMatrixff   # XRotateLMatrix(sMatrix*, float, float)
+  __Z14YRotateLMatrixP7sMatrixff   # YRotateLMatrix(sMatrix*, float, float)
+  __Z14ZRotateLMatrixP7sMatrixff   # ZRotateLMatrix(sMatrix*, float, float)
+  __Z16FloatSortByArrayiPPvS0_ii   # FloatSortByArray(int, void**, void**, int, int)
+  __Z19ScaleLMatrixNoTransP7sMatrixfff   # ScaleLMatrixNoTrans(sMatrix*, float, float, float)
+  __Z21DistanceBetweenPointsPK8s3DPointS1_   # DistanceBetweenPoints(s3DPoint const*, s3DPoint const*)
+  __Z25SetLMatrixIdentityNoTransP7sMatrix   # SetLMatrixIdentityNoTrans(sMatrix*)
+  __Z29GetLMatrixRotationAroundYAxisP7sMatrix   # GetLMatrixRotationAroundYAxis(sMatrix*)
+  __Z30VectorThroughLMatrixNoWNoTransP7sMatrixP8s3DPoint   # VectorThroughLMatrixNoWNoTrans(sMatrix*, s3DPoint*)
+  __Z32CombineMatricesNoWNoTransDest2ndP7sMatrixS0_   # CombineMatricesNoWNoTransDest2nd(sMatrix*, sMatrix*)
+  __Z33GetVectorRotationAroundXAxisFromZP8s3DPoint   # GetVectorRotationAroundXAxisFromZ(s3DPoint*)
+  __Z33GetVectorRotationAroundXAxisFromZR8s3DPoint   # GetVectorRotationAroundXAxisFromZ(s3DPoint&)
+  __Z33GetVectorRotationAroundYAxisFromZP8s3DPoint   # GetVectorRotationAroundYAxisFromZ(s3DPoint*)
+  __Z33GetVectorRotationAroundYAxisFromZR8s3DPoint   # GetVectorRotationAroundYAxisFromZ(s3DPoint&)
+  __Z33GetVectorRotationAroundZAxisFromYP8s3DPoint   # GetVectorRotationAroundZAxisFromY(s3DPoint*)
+  __Z33GetVectorRotationAroundZAxisFromYR8s3DPoint   # GetVectorRotationAroundZAxisFromY(s3DPoint&)
+)

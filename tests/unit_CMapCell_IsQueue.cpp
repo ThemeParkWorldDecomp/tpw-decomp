@@ -1,6 +1,6 @@
 // Test library for the small predicates and accessors of CMapCell, CTrackCell, CLBLobby and the cell system (unit v51060;
 // libtpw_unit_CMapCell_IsQueue.dylib, tests/test_CMapCell_IsQueue.py), main app:
-//   src/MapDelta_map_CMapCell_IsQueue.cpp   thirty small functions
+//   src/game/online/lobby.cpp, src/game/park/LLCellRide.cpp, src/game/park/MapCell.cpp, src/game/park/TrackCell.cpp   thirty small functions
 //
 // The callees outside the unit are fakes that record the arguments the real one reads and answer from the test's queue; the globals of
 // other files the unit reads or writes are defined here, zero at start like the Mac's bss.

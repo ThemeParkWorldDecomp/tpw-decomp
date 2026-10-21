@@ -1,5 +1,5 @@
 // Test library for the first-person ride helpers (unit v5764; libtpw_unit_IsRideRideable.dylib, tests/test_IsRideRideable.py), main app:
-//   src/lobby_exit_IsRideRideable.cpp   StopRidingRideIn1stPerson, GetThingAtPosnIfEntrance(float, float), IsRideRideable
+//   src/game/TPCamera.cpp   StopRidingRideIn1stPerson, GetThingAtPosnIfEntrance(float, float), IsRideRideable
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals
 // of other files the unit reads are defined here.

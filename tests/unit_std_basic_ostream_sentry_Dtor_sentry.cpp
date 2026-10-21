@@ -1,5 +1,5 @@
 // Test library for the ostream sentry destructor (unit v5251; libtpw_unit_std_basic_ostream_sentry_Dtor_sentry.dylib), main app:
-//   src/std_basic_ostream_sentry_Dtor_sentry.cpp   OstreamSentryDtor
+//   src/game/MslSupport.cpp   OstreamSentryDtor
 //
 // The callees outside the unit (flush, operator delete) are fakes recording their pointer as an offset from the case's block.
 #include <cstddef>

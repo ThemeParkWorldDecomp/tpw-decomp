@@ -1,5 +1,5 @@
 // Test library for ShowStatusMsg (unit v5525; libtpw_unit_ShowStatusMsg.dylib, tests/test_ShowStatusMsg.py), main app:
-//   src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_ShowStatusMsg.cpp   ShowStatusMsg
+//   src/game/ui/ui_showStatus.cpp   ShowStatusMsg
 //
 // Every callee is a recording fake with the PowerPC stub's event name and arguments. The globals of other files are defined here.
 #include <cstddef>

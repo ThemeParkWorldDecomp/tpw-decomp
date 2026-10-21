@@ -1,4 +1,4 @@
-// Test entry points for the park gates and the arrival vehicle (library unit_WorldGates: src/World_gates.cpp, unit w193): CWorld::
+// Test entry points for the park gates and the arrival vehicle (library unit_WorldGates: src/game/World.cpp, unit w193): CWorld::
 // SetParkOpenOrClosed, ParkGates_Open, ParkGates_Close, ArrivalVehicle_DoNextLeg, _GetStatus, _CrossingIsClear, _PeopleWaitingToLeave,
 // _PeopleLeftToDropOff and _IsSeagoing.
 //

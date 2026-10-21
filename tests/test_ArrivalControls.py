@@ -1,12 +1,12 @@
 """Unit w176 (main app), against libtpw_unit_ArrivalControls.dylib (tests/unit_ArrivalControls.cpp):
 
-  src/Arrival_people.cpp   CArrival::Serialise (0x100f2040), CreatePeople (0x100f2350), HowManyPeople (0x100f2638), CreatePerson (0x100f2840),
+  src/game/people/Arrival.cpp   CArrival::Serialise (0x100f2040), CreatePeople (0x100f2350), HowManyPeople (0x100f2638), CreatePerson (0x100f2840),
                            __sinit_Arrival_cpp (0x100f29b0)
-  src/ControlManager.cpp   CControlManager::Serialise (0x100f9ed0), GetObjectControl (0x100fa0b8, and the const twin 0x100fa1b8),
+  src/game/ControlManager.cpp   CControlManager::Serialise (0x100f9ed0), GetObjectControl (0x100fa0b8, and the const twin 0x100fa1b8),
                            CheckAllControlsInitialised (0x100fa32c), LOADVARSTRUCT / SAVEVARSTRUCT of ObjectControl (0x100fa4a0, 0x100fa6e4),
                            USwapInplace32 of unsigned long and long (0x100fa5fc, 0x100fa644)
 
-They run as the original on the PowerPC side and as src/ on the host (with src/WorldSavvy.cpp's GetWorld and TimeSig.h's inline members). Every
+They run as the original on the PowerPC side and as src/ on the host (with src/game/ui/ui_visitorStatus.cpp's GetWorld and TimeSig.h's inline members). Every
 callee outside the unit is a fake that records the same event on both sides (see unit_ArrivalControls.cpp): the arrival vehicle, the analyser and
 weather, the map's bus stop, CPerson's constructor and the allocation, CTRACE, GAME_ASSERTMSG, the serialise log, the file, the basic LOADVAR and
 SAVEVAR instances, the ride database walk.

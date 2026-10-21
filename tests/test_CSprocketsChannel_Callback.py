@@ -1,5 +1,5 @@
 """Unit v5263, the Sound Sprockets channel, against libtpw_unit_CSprocketsChannel_Callback.dylib (tests/unit_CSprocketsChannel_Callback.cpp), sound
-library ("sound symbols shared"), src/TbAudioBody_create_CSprocketsChannel_Callback.cpp:
+library ("sound symbols shared"), src/sound/PlaceHolderSentence.cpp:
   CSprocketsChannel::CSprocketsChannel 0x1002a29c, ~CSprocketsChannel 0x1002a33c, Cleanup 0x1002a3f0, Callback 0x1002a4cc,
   Play 0x1002a8a0, Set3D 0x1002b0b8
 

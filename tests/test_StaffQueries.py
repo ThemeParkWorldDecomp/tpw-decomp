@@ -1,5 +1,5 @@
 """Unit w190, against libtpw_unit_StaffQueries.dylib (tests/unit_StaffQueries.cpp), main app ("SimTheme Park"):
-  src/Staff_queries.cpp  CStaff::SackMe 0x10125660, TrainMe 0x10125854, GetEmploymentDuration 0x10125a10, CanBePickedUp 0x10125aec, PickMeUp 0x10125b98,
+  src/game/people/staff.cpp  CStaff::SackMe 0x10125660, TrainMe 0x10125854, GetEmploymentDuration 0x10125a10, CanBePickedUp 0x10125aec, PickMeUp 0x10125b98,
                          DropMe 0x10125de4, BeingPointedAt 0x10125f30, GetStaffType 0x10126718, GetGeneralStaffState 0x101267cc, GetSkill 0x1012686c,
                          IsStriking 0x10126904, IsAllocatedToRide 0x101269d8, IsWorkingOnAllocatedObject 0x10126aac, IsRestingInStaffRoom 0x10126c1c,
                          TooTiredToWork 0x10126cb4, SetName 0x10126f30, GetName 0x10126f98, GetSalary() 0x10126fc8 and the static GetSalary(type, grade) 0x101270b0

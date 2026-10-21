@@ -1,6 +1,6 @@
 """Unit w168, the particle system's swap helpers, against libtpw_unit_ParticleSwap.dylib (tests/unit_ParticleSwap.cpp: the sources and
 wrappers of tests/unit_ParticleSave.cpp built with TPW_SWAP_FILE_WORDS, so that the swaps really swap), main app ("SimTheme Park"),
-src/rsse_particles_save.cpp:
+src/game/Particles.cpp:
   tagPARTICLE::Byteswap 0x100BB110, USwapBlockStruct<tagEFFECTER> 0x100BB260, USwapBlockStruct<tagEMITTER> 0x100BB3B8,
   USwap32<tagPARTICLE*> 0x100BB6AC, USwap32<void*> 0x100BB720, USwap32<long*> 0x100BB77C
 

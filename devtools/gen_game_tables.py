@@ -381,7 +381,7 @@ WINDOW_SCRIPTS = [
     (0x102AF16C, 109, "gStaffEditNameScript"),
     (0x102AF2AC, 266, "gUpgradeStatusScript"),
     (0x102B2366, 674, "gMapPanelScript"),
-    # Unit v5L42: the scripts the launcher had as zero stand-ins (src/ui_window_scripts.cpp) and those its files held as two-word
+    # Unit v5L42: the scripts the launcher had as zero stand-ins (src/game/ui/ui_allStaffPanel.cpp, src/game/ui/ui_parkStatus.cpp) and those its files held as two-word
     # placeholders. Each address is the one its building function loads from the TOC; each walk ends where the next named data begins
     # (the year end panel's 28 bytes before it are RTTI pointers, not script).
     (0x102A772C, 21, "gCongratsScript"),
@@ -399,7 +399,7 @@ WINDOW_SCRIPTS = [
 
 
 def window_script_words(p, address):
-    """The words of the window script at address, as far as InterfaceWindow::Build reads them (src/InterfaceWindow_script.cpp
+    """The words of the window script at address, as far as InterfaceWindow::Build reads them (src/game/ui/InterfaceWindow.cpp
     describes the records): the walk follows the nesting and the window kinds that records 9 and 10 depend on, and ends with the
     record that ends the top level."""
     pos = [0]
@@ -456,7 +456,7 @@ def window_script_words(p, address):
 
 
 def window_scripts(p):
-    out = ["// The park panels' window scripts, as the Mac image holds them (signed 16-bit records, see src/InterfaceWindow_script.cpp): one",
+    out = ["// The park panels' window scripts, as the Mac image holds them (signed 16-bit records, see src/game/ui/InterfaceWindow.cpp): one",
            "// macro per script, named by its image address, that the array's definition in src expands.",
            GENERATED]
     for address, count, name in WINDOW_SCRIPTS:

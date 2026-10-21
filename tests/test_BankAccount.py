@@ -1,9 +1,9 @@
-"""Differential test for unit w173, the bank account's save, month and loans (main app "SimTheme Park", src/BankAccount.cpp), against
+"""Differential test for unit w173, the bank account's save, month and loans (main app "SimTheme Park", src/game/park/BankAccount.cpp), against
 libtpw_unit_BankAccount.dylib (tests/unit_BankAccount.cpp).
 
 Functions: CBankAccount::Serialise 0x100f2d10 (1,392 bytes), MonthlyUpdate 0x100f36a8 (752), GetLoanInfo 0x100f3c44 (320), AnyLoanAvailable 0x100f3ee0 (432),
 PayOffLoan 0x100f40c8 (384). The original inlines CBankAccount::MakeWithdrawal 0x100f33b0 into MonthlyUpdate and PayOffLoan; the host calls the translated one
-(src/Things2_small.cpp), so the log shows the same GetParkAnalyser call on both sides.
+(src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/Weather.cpp, src/game/park/analyser.cpp), so the log shows the same GetParkAnalyser call on both sides.
 
 A case is an account image (0x128 bytes over 0x40 guard bytes on each side, random words), two worlds (the 0x80 bytes at world + 0x1da6f0 are real memory, the
 turn word among them; a world pointer is that block's address minus 0x1da6f0), two analysers (blocks reaching their words +0x1f5a0 and +0x1fc90, the rest

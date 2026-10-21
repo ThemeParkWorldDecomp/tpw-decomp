@@ -1,4 +1,4 @@
-// Test library for src/lobby.cpp (libtpw_unit_Lobby.dylib; see tests/test_Lobby.py): the
+// Test library for src/game/online/lobby.cpp (libtpw_unit_Lobby.dylib; see tests/test_Lobby.py): the
 // lobby object and the base class of its systems, driven by scripts.
 //
 // Real: CLBLobby, CLBLobbySystem, the list of systems. Fakes that record: the four systems
@@ -55,7 +55,7 @@ extern unsigned char gClockStorage[sizeof(CClock)] __asm__("gClock");
 alignas(16) unsigned char gClockStorage[sizeof(CClock)] = {};
 CFSUserInfo* gUserInfo;
 CFSOnlineSystem* gOnlineSystem;
-// The lobby's window definition is the interface's root window (one global on the Mac; src/UI_focus.cpp defines it).
+// The lobby's window definition is the interface's root window (one global on the Mac; src/game/ui/UI_Base.cpp defines it).
 InterfaceWindow* gUIRootWindow;
 
 int32_t CClock::Read() {
@@ -166,7 +166,7 @@ CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
 void CLBScreenComponentOnlineGlobe::Render() {}
 void CLBScreenComponentOnlineGlobe::Close() {}
 uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
-// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp).
+// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 uint32_t CLBScreenComponentThemeIslands::ProcessCancel() { return 0; }
@@ -174,7 +174,7 @@ uint32_t CLBScreenComponentOnlineIslands::ProcessCancel() { return 0; }
 uint32_t CLBScreenComponentDownloadGlobe::ProcessCancel() { return 0; }
 uint32_t CLBScreenComponentAdvisor::ProcessCancel() { return 0; }
 FAKE_SCREEN(CLBScreenComponentThemeIslands, 1)
-void CLBScreenComponentThemeIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/lobby_islands_rest.cpp)
+void CLBScreenComponentThemeIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/game/online/lobby_island.cpp)
 FAKE_SCREEN(CLBScreenComponentOnlineIslands, 2)
 FAKE_SCREEN(CLBScreenComponentDownloadGlobe, 3)
 void CLBScreenComponentDownloadGlobe::Init() {}

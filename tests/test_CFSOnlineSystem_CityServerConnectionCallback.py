@@ -1,5 +1,5 @@
 """Unit v5373, CFSOnlineSystem::CityServerConnectionCallback 0x101727f8, against libtpw_unit_CFSOnlineSystem_CityServerConnectionCallback.dylib
-(tests/unit_CFSOnlineSystem_CityServerConnectionCallback.cpp), main app ("SimTheme Park"), src/FS_Online_init_CFSOnlineSystem_CityServerConnectionCallback.cpp.
+(tests/unit_CFSOnlineSystem_CityServerConnectionCallback.cpp), main app ("SimTheme Park"), src/game/online/FS_Online.cpp.
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian, native pointers, host offsets exported by the library) for the

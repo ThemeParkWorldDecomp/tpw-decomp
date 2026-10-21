@@ -1,6 +1,6 @@
 """Unit w79g1, CAudioPlaceHolderList and its CMemBlock, against libtpw_unit_AudioPlaceHolderList.dylib
 (tests/unit_AudioPlaceHolderList.cpp), in the program "sound symbols shared" (Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/AudioPlaceHolderList.cpp  CAudioPlaceHolderList: constructor 0x1001bb40, SetNumberOfChannels 0x1001bd68, destructor 0x1001be30,
+  src/sound/AudioPlaceHolderList.cpp, src/sound/PlaceHolderTypes.cpp, src/sound/TbSysCommand.cpp  CAudioPlaceHolderList: constructor 0x1001bb40, SetNumberOfChannels 0x1001bd68, destructor 0x1001be30,
       ProcessPlaceHolders 0x1001bf78, RemovePlaceHolder 0x1001c170, SetBoundingRectangle 0x1001c23c, GetPlaceholderAndSoundHandle
       0x1001c36c, StopAllPlaceHolders 0x1001c418, UpdatePlaceHolder 0x1001c4c0, UpdatePlaceHolderParameter 0x1001c5b4,
       CreatePlaceHolder 0x1001c678, FindPlaceHolder 0x1001c8d8, NewPlaceHolderMemory 0x1001c9ec, MoveToUsedItemList 0x1001cae0,

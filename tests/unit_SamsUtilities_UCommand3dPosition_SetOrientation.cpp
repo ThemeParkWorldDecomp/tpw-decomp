@@ -1,6 +1,6 @@
 // Test library for the position commands, GetTag answers, speaker kinds and the static initialiser of CSprocketsModule.cpp (unit v51053;
 // libtpw_unit_SamsUtilities_UCommand3dPosition_SetOrientation.dylib, tests/test_SamsUtilities_UCommand3dPosition_SetOrientation.py), sound program:
-//   src/TbSoundPipeChannel_CSprocketsModule_SetChannelVolume_SamsUtilities_UCommand3dPosition_SetOrientation.cpp
+//   src/sound/CSprocketsModule.cpp
 //
 // The callees outside the unit are recording fakes: UHasFlags SetFlag and constructor, UCommand's base constructor, TbSoundPosition::Get,
 // SendToChannel, UStatus::IfOk, the pool queue constructor and __register_global_object. The globals of other files the unit reads

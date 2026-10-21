@@ -1,5 +1,5 @@
 """Unit v5134, ui_ErrorDisplay.cpp's static initialiser, against libtpw_unit_sinit_ui_ErrorDisplay_cpp.dylib
-(tests/unit_sinit_ui_ErrorDisplay_cpp.cpp), main app, src/sinit_ui_ErrorDisplay_cpp.cpp:
+(tests/unit_sinit_ui_ErrorDisplay_cpp.cpp), main app, src/game/ui/ui_ErrorDisplay.cpp:
   __sinit_ui_ErrorDisplay_cpp 0x101f499c
 
 A case is a call. The deque constructor, the copy, tear_down, operator delete, the mutex constructor and __register_global_object are

@@ -1,5 +1,5 @@
 // Test library for CParser's nine functions (unit v5911; libtpw_unit_CParser_Parse.dylib, tests/test_CParser_Parse.py), main app:
-//   src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_cmp_nocase_CParser_CParser_CParser_Parse.cpp
+//   src/game/online/Parser.cpp
 //
 // The callees outside the unit are recording fakes: the string library (operator[], substr, assign, begin, compare), cmp_nocase, the
 // set's find and destroy, the string destructor, operator delete and the pointer-to-member glue. The fakes work on real string

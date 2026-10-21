@@ -1,5 +1,5 @@
 """Unit w192, the four in-place byte swaps, against libtpw_unit_CoasterTrainsSwap.dylib (tests/unit_CoasterTrainsSwap.cpp: the same
-sources as test_CoasterTrains, built with TPW_SWAP_FILE_WORDS), main app ("SimTheme Park"), src/TPCoaster_trains.cpp:
+sources as test_CoasterTrains, built with TPW_SWAP_FILE_WORDS), main app ("SimTheme Park"), src/game/rides/BumperRide.cpp, src/game/rides/TPCoaster.cpp:
   USwapInplace16<unsigned short> 0x10043DB8, USwapInplace32<int> 0x10043E00, USwapInplace32<unsigned long> 0x10043E44, USwapInplaceFloat 0x10021BB4.
 Each takes the address of a value and reverses its bytes in place. The original runs on a guarded buffer in emulator memory (the value written
 big-endian), the translation on a ctypes buffer (little-endian); both read the value back as a plain number, so the two results are the byte

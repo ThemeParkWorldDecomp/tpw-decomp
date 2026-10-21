@@ -1,5 +1,5 @@
 """Unit v5128, the online globe's city list callback, against libtpw_unit_PostGetCityListCallbackFunction.dylib
-(tests/unit_PostGetCityListCallbackFunction.cpp), main app ("SimTheme Park"), src/lobby_globe_close_PostGetCityListCallbackFunction.cpp:
+(tests/unit_PostGetCityListCallbackFunction.cpp), main app ("SimTheme Park"), src/game/online/lobby_globe.cpp:
   PostGetCityListCallbackFunction 0x100ad6dc
 
 A case is an error code, a context object and a list pointer (NULL or a block). The context is built in emulator memory with a vtable whose

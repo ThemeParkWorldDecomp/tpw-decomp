@@ -1,4 +1,4 @@
-"""Unit v5L31, the status panels' tables of virtual slots (src/ui_StatusPanel_tables.cpp), against libtpw_unit_UIStatusPanel_tables.dylib.
+"""Unit v5L31, the status panels' tables of virtual slots (src/game/ui/ui_StatusPanel.cpp), against libtpw_unit_UIStatusPanel_tables.dylib.
 The Mac's tables are the vtables the panel constructors store at +0x20:
   UIStatusPanel 0x102a8644, RideStatusPanel 0x102ad5fc, ShopStatusPanel 0x102adbd8, ShowStatusPanel 0x102ae980,
   StaffStatusPanel 0x102af264, StaffRoomStatusPanel 0x102aed88, UpgradeStatusPanel 0x102af4dc, FeatureStatusPanel 0x102a9ba0,

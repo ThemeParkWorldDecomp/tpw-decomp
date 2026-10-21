@@ -1,6 +1,6 @@
 // Test library for eight small main-app functions (unit v51048; libtpw_unit_CGame_GetLocalisedThemeName_3.dylib,
 // tests/test_CGame_GetLocalisedThemeName_3.py), main app:
-//   src/Game_level_CGame_GetLocalisedThemeName_3.cpp   CGame::GetLocalisedThemeName (narrow), CGame::TogglePause, __sinit_ActionRecorder_cpp,
+//   src/game/ActionRecorder.cpp, src/game/Game.cpp, src/game/people/ParkTime.cpp, src/game/ui/InterfaceBar.cpp, src/game/ui/UI_Base.cpp, src/game/ui/ui_visitorStatus.cpp   CGame::GetLocalisedThemeName (narrow), CGame::TogglePause, __sinit_ActionRecorder_cpp,
 //   the pending-delete list's RemoveAll, CParkTime::GetFunnyTimeForGameTurns, InterfaceBar::SetValue and operator-, UI_PutDeferredMessage
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the PowerPC stubs); the globals of other files the

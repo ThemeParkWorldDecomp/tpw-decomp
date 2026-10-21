@@ -1,5 +1,5 @@
 // Test library for LLCM_CoverUpgrade and LLCM_RebuildUpgradeBridges (unit v5059; libtpw_unit_LLCM_RebuildUpgradeBridges.dylib), main app:
-//   src/LLCellMeshes_LLCM_RebuildUpgradeBridges.cpp
+//   src/game/park/LLCellMouse.cpp
 //
 // The callees (cell lookups, flags, neighbours, the line drawer) are fakes that record their arguments (pointers as offsets from the world
 // block) and answer from the test's queues. gGameWorld and the compass offsets are defined here.

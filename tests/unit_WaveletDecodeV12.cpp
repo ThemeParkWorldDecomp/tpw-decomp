@@ -1,13 +1,13 @@
 // Test entry points for the version 0x12 wavelet decoder (library unit_WaveletDecodeV12:
-// src/Wavelet_decode_v12.cpp, src/Wavelet_decode.cpp for ReverseTransformVert, CIgArray and
-// the version dispatch, and src/tb_resource_texture.cpp for CTextureSettings::GetAlphaMask,
+// src/engine/Wavelet.cpp, src/engine/EngineUtil.cpp for ReverseTransformVert, CIgArray and
+// the version dispatch, and src/engine/tb_resource_texture.cpp for CTextureSettings::GetAlphaMask,
 // which the decoder calls). tests/test_WaveletDecodeV12.py drives them.
 //
 // Fakes: LbZLib_MemDecompress (the bullfrog library's zlib unpacker, untranslated) records
 // its three pointers and writes the bytes the test planted for that call into its
-// destination. The rest of CWaveletImp is src/Wavelet.cpp's (unit EngineStartup) or
+// destination. The rest of CWaveletImp is src/engine/Wavelet.cpp's (unit EngineStartup) or
 // untranslated; its vtable still needs every virtual member, so they are defined here (none
-// is reached). The decoder's workspace pointer belongs to src/Wavelet.cpp too; the test points
+// is reached). The decoder's workspace pointer belongs to src/engine/EngineUtil.cpp, src/engine/Wavelet.cpp too; the test points
 // it at a buffer.
 #include <cstdint>
 #include <cstring>
@@ -27,7 +27,7 @@ CWaveletImp::~CWaveletImp() {}
 int32_t CWaveletImp::AddRef() { return ++mReferences; }
 int32_t CWaveletImp::GetRefCount() { return mReferences; }
 int32_t CWaveletImp::Release() { return --mReferences; }
-// The fast path's decoders (untranslated; the dispatcher is src/Wavelet_decode.cpp's).
+// The fast path's decoders (untranslated; the dispatcher is src/engine/EngineUtil.cpp, src/engine/Wavelet.cpp's).
 void CWaveletImp::DecompressColorFast(uint32_t, uint32_t, const uint8_t*, uint8_t*, float, float, float) {
     ev("DecompressColorFast");
 }

@@ -1,15 +1,15 @@
 // Test library for the lobby's small leaves (libtpw_unit_LobbyLeaves2.dylib; see tests/test_LobbyLeaves2.py, unit w58):
-//   src/rsse_normals.cpp   RecalculateInvalidNodeFaceNormals, RecalculateInvalidFaceNormals (no callees)
-//   src/rsse_rotate.cpp    X/Y/ZRotateLMatrixNoTrans, RotateLMatrixXYZNoTrans, RotateLMatrixXYZNoTransHi (no callees but cos and sin)
-//   src/bfl_tbrect.cpp     TbRect::Bounding (and Intersection)
-//   src/ui_main_meshes.cpp DeInitGeneralUI and UIInterface::DeInitGeneral; src/InterfaceFont.cpp InterfaceFont::Release
+//   src/game/rides/RideAnim.cpp   RecalculateInvalidNodeFaceNormals, RecalculateInvalidFaceNormals (no callees)
+//   src/game/LMatrix.cpp    X/Y/ZRotateLMatrixNoTrans, RotateLMatrixXYZNoTrans, RotateLMatrixXYZNoTransHi (no callees but cos and sin)
+//   src/bullfrog/LbRect.cpp     TbRect::Bounding (and Intersection)
+//   src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_main.cpp DeInitGeneralUI and UIInterface::DeInitGeneral; src/game/ui/InterfaceFont.cpp InterfaceFont::Release
 //
 // The face normals and the rotations run on arena records the test builds. The end of the interface calls the cursor table's
 // DeAllocate, UI_CloseSystem, the string heap's DeAllocate and HFreeHeap, which are fakes here that record through calllog, and
 // deletes up to three windows through the window's virtual destructor: the windows are TestWindow objects of a pool whose
 // destructor and operator delete only record (the storage is the pool's), so a case can look at them afterwards.
 //
-// src/ui_main_meshes.cpp holds the interface's start-up as well, and the library must link, so the rest of what that file calls is
+// src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_main.cpp holds the interface's start-up as well, and the library must link, so the rest of what that file calls is
 // stood in for below ("link stand-ins"): none of it runs in these tests.
 #include <cstdarg>
 #include <cstdint>
@@ -42,7 +42,7 @@
 
 using namespace calllog;
 
-// InterfaceFont::GetHeight passes a wrapper on to its own (src/InterfaceFont.cpp), which lives in a file this unit does not link;
+// InterfaceFont::GetHeight passes a wrapper on to its own (src/game/ui/InterfaceFont.cpp), which lives in a file this unit does not link;
 // no case here asks a wrapper for its height.
 int32_t InterfaceFontWrapper::GetHeight() { return 0; }
 
@@ -62,7 +62,7 @@ int32_t gScreenWidth;
 InterfaceFont gInGameFont;   // 0x1037f1a0
 UIInterface gUIInterface;
 
-// ---- fakes: what the end of the interface calls. The cursor table's DeAllocate (src/ui_DrawObject.cpp) and the font's Release are
+// ---- fakes: what the end of the interface calls. The cursor table's DeAllocate (src/game/ui/InterfaceCursor.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceDrawObject.cpp) and the font's Release are
 // real; each fake records how far they have got (the delete[] blocks so far, the table's count, whether the font has a bitmap), so that
 // the order of the calls shows in the log.
 namespace {

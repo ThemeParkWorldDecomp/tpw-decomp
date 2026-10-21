@@ -1,6 +1,6 @@
 // Test library for the three CGoldenTicketControl::TellTheWorld overloads (unit w183; libtpw_unit_GoldenTicketTell.dylib, tests/test_GoldenTicketTell.py):
-//   src/GoldenTicket_tell.cpp   TellTheWorld (local, global, secret)
-//   src/MsgAdvisor.cpp          CMsgAdvisor (real, as the announcements build it)
+//   src/game/park/GoldenTickets.cpp   TellTheWorld (local, global, secret)
+//   src/game/park/GoldenTickets.cpp, src/game/ui/MessageCentre.cpp          CMsgAdvisor (real, as the announcements build it)
 //
 // Every callee outside the unit is a fake that records what the real one reads: TellIfFirst, CTRACE (the format and its integer arguments), the advisor
 // request's two constructors, the message centre (the nothrow new of its 0x1d0 bytes, the first header's constructor for the array construction,
@@ -58,7 +58,7 @@ void CTRACE(uint32_t level, const char* format, ...) {
     ev("CTRACE", {level, first, second}, {format});
 }
 
-// The advisor request: the six-argument constructor sets the eight fields as src/AdvisorRequest.cpp does; the copy constructor copies the eight fields
+// The advisor request: the six-argument constructor sets the eight fields as src/game/advisor/Advisor.cpp does; the copy constructor copies the eight fields
 // and leaves both padding regions alone (it logs the source's fields).
 CAdvisorRequest::CAdvisorRequest(AdvisorMessage message, tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> thingId, uint32_t secondary, int32_t responseNo,
                                  bool overrideOnlyOnce, int32_t score) {

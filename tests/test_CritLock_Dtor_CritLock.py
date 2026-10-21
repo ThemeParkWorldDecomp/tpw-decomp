@@ -1,5 +1,5 @@
 """Unit v5732, CritLock::~CritLock, against libtpw_unit_CritLock_Dtor_CritLock.dylib (tests/unit_CritLock_Dtor_CritLock.cpp), bullfrog,
-src/LbFile_LbApp_GetWindowsScreenMode_LbSystemEventCallback_Dtor__LbSystemEventCallbac_CritLock_Dtor_CritLock.cpp:
+src/bullfrog/FileSystem.cpp:
   CritLock::~CritLock 0x10014738
 
 A case is a CritLock object (or NULL) holding a section pointer (or NULL) and a delete flag. LeaveCriticalSection and operator delete are

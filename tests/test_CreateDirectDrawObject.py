@@ -1,5 +1,5 @@
 """Unit v5041, the DirectDraw/palette part of WinScrn.cpp, against libtpw_unit_CreateDirectDrawObject.dylib
-(tests/unit_CreateDirectDrawObject.cpp), main app ("SimTheme Park"), src/CreateDirectDrawObject.cpp:
+(tests/unit_CreateDirectDrawObject.cpp), main app ("SimTheme Park"), src/bullfrog/WinScrn.cpp:
   CreateDirectDrawObject 0x1006a514, EnumModesCallback 0x1006a45c, LbScreen_GetPaletteEntries 0x1006a304,
   LbScreen_SetPaletteEntries 0x1006a220, LbScreen_SwapClear 0x1006a198, __sinit_WinScrn_cpp 0x1006a968
 

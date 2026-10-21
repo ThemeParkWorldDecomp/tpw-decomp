@@ -27,12 +27,12 @@ public:
     // unit w43
     void Enable();   // 0x101500b8
     void Disable();  // 0x101500ec
-    // unit w50 (src/keytables_keys.cpp): the first entry of the key and modifiers (a disabled table has none) has its action called
+    // unit w50 (src/game/keyboard.cpp): the first entry of the key and modifiers (a disabled table has none) has its action called
     // with 0 and its state set (KeyDown 1, KeyUp 0); the answer is the action's, 0 when there was none to call or no entry.
     int32_t KeyDown(int16_t key, int16_t modifiers);   // 0x1014fdec
     int32_t KeyUp(int16_t key, int16_t modifiers);     // 0x1014fef0
     int32_t Search(int16_t key, int16_t modifiers);    // 0x1014fd68, unit w53
-    // lead 2026-10-14 (src/keytables_state.cpp; a fake in the camera test): the state of the entry with this id (nonzero: held), 0 for none.
+    // lead 2026-10-14 (src/game/keyboard.cpp; a fake in the camera test): the state of the entry with this id (nonzero: held), 0 for none.
     int16_t GetState(int16_t id);   // 0x1014fff0
 
     CKeyTableEntry* mEntries;   // 0x00
@@ -59,7 +59,7 @@ extern CKeyTableEntry gKeyEntriesCheat[42];       // 0x102a5998
 extern CKeyTableEntry gKeyEntriesCoaster[4];      // 0x102a5268
 extern CKeyTableEntry gKeyEntriesShortcuts[17];   // 0x102a52b8
 extern CKeyTableEntry gKeyEntriesDebug[71];       // 0x102a540c
-// 0x1015108c (src/keytables_disable.cpp): clears the enabled word of six of the seven tables (not the coaster's) and the state word of
+// 0x1015108c (src/game/keyboard.cpp): clears the enabled word of six of the seven tables (not the coaster's) and the state word of
 // every entry of each; EnableAllKeytables (0x10151010, untranslated) is the other way.
 void DisableAllKeytables();
 

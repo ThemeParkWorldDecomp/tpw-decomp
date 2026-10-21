@@ -1,5 +1,5 @@
 """Unit w147: the coaster cross-section builders, against libtpw_unit_CrossSections.dylib (tests/unit_CrossSections.cpp), main app
-("SimTheme Park"), src/TPCoaster_xsect.cpp:
+("SimTheme Park"), src/game/rides/CoasterType.cpp:
   BuildCrossSectionPoints 0x10036d5c, BuildCrossSectionEdges 0x10037aa8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses

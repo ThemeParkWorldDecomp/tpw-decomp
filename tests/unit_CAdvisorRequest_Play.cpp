@@ -1,5 +1,5 @@
 // Test library for CAdvisorRequest::Play and PlayWithoutScore (unit v51003; libtpw_unit_CAdvisorRequest_Play.dylib), main app:
-//   src/Serialise_basic_SAVEVARSTRUCT_2_CAdvisorRequest_Play.cpp
+//   src/game/advisor/Advisor.cpp
 //
 // The callees outside the unit are recording fakes: the scoring object's three methods, ADV_Call, ADV_GetTag, the message constructor,
 // PostMessage and the subscription header constructor (stands for the Mac's __construct_array). gMessageCentre is defined here.
@@ -57,7 +57,7 @@ int32_t ADV_GetTag(AdvisorResponse response) {
     return static_cast<int32_t>(ret("tag"));
 }
 
-// The real constructor (src/MsgTag.cpp) keeps only the thing word's high half; the fake saves the whole word, which the PPC stub
+// The real constructor (src/game/ui/MessageCentre.cpp) keeps only the thing word's high half; the fake saves the whole word, which the PPC stub
 // stores at +0xc, so the PostMessage records still compare it.
 static uint32_t gMsgTagThingWord = 0;
 

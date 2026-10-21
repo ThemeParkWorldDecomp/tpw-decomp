@@ -1,5 +1,5 @@
 """Unit v5672, BMP_DrawCarsForRide (the bumper cars of one ride are placed), against libtpw_unit_BMP_DrawCarsForRide.dylib
-(tests/unit_BMP_DrawCarsForRide.cpp), main app ("SimTheme Park"), src/BMP_DrawCarsForRide.cpp:
+(tests/unit_BMP_DrawCarsForRide.cpp), main app ("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_DrawCarsForRide 0x10028030
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

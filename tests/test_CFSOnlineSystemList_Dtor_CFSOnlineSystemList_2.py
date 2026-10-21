@@ -1,6 +1,6 @@
 """Unit v5921, three destructors of the online system, against libtpw_unit_CFSOnlineSystemList_Dtor_CFSOnlineSystemList_2.dylib
 (tests/unit_CFSOnlineSystemList_Dtor_CFSOnlineSystemList_2.cpp), main app ("SimTheme Park"),
-src/CFSOnlineSystemList_Dtor_CFSOnlineSystemList_2.cpp:
+src/game/online/FS_Online.cpp:
   CFSOnlineSystemList<TbPtrList<CFSOnlinePark>,ccParkList>::~CFSOnlineSystemList 0x1017004c, ccCityInfo::~ccCityInfo 0x101703e4,
   CFSOnlineSystem::~CFSOnlineSystem 0x1017055c
 

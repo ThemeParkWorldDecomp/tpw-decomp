@@ -1,4 +1,4 @@
-"""Unit v5113, the online login callbacks, against libtpw_unit_FSOnlineLoginRASFailureCallback.dylib, main app, src/FS_Online_FSOnlineLoginRASFailureCallback.cpp:
+"""Unit v5113, the online login callbacks, against libtpw_unit_FSOnlineLoginRASFailureCallback.dylib, main app, src/game/online/FS_Online.cpp:
   FSOnlineLoginRASFailureCallback 0x1017100c, FSOnlineLoginConnectionCallback 0x10171178
 
 The world: the global gOnlineSystem, either NULL (the system is made: operator new, the constructor fake) or an existing object. The

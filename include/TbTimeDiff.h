@@ -51,12 +51,12 @@ struct TbFileStamp;
 // PARTIAL: bullfrog TbTimeStamp (LbMaths.cpp range), a point in time in the same units.
 class TbTimeStamp {
 public:
-    // bullfrog 0x10026660 (172 bytes, src/TbTimeStamp_calendar.cpp): sets the stamp to the given calendar time (local time converted by
+    // bullfrog 0x10026660 (172 bytes, src/bullfrog/TbTimeStamp.cpp): sets the stamp to the given calendar time (local time converted by
     // NS_MacDoze::SystemTimeToFileTime); the result (0, or -1 when the date does not convert) comes back in a hidden buffer and the
     // callers seen so far (CParkTime::CParkTime and Reset) ignore it. The seventh argument is passed on the stack.
     TbError SetTime(int32_t year, int32_t month, int32_t day, int32_t hour, int32_t minute, int32_t second, int32_t millisecond);
 
-    // Unit w216 (src/TbTimeStamp_calendar.cpp).
+    // Unit w216 (src/bullfrog/TbTimeStamp.cpp).
     TbError AddMonths(int32_t months);                           // 0x100268a4
     TbError AddYears(int32_t years);                             // 0x10026a24
     TbTimeStamp& operator=(NS_MacDoze::tagFILETIME& fileTime);    // 0x1002640c
@@ -71,20 +71,20 @@ public:
     bool operator==(const TbTimeStamp& other) const;             // 0x1002631c
 
     // Unit w123b: two more bullfrog imports (stand-ins, called through main-app glue). operator+ is bullfrog 0x10025f0c (36 bytes, glue 0x10239958,
-    // import __pl__11TbTimeStampCFRC10TbTimeDiff; translated in src/TbTimeStamp_ops.cpp, unit w125): the sum of the stamp and the span, the hidden result in r3, this in r4, the span in r5.
+    // import __pl__11TbTimeStampCFRC10TbTimeDiff; translated in src/bullfrog/TbTimeStamp.cpp, unit w125): the sum of the stamp and the span, the hidden result in r3, this in r4, the span in r5.
     TbTimeStamp operator+(const TbTimeDiff& diff) const;
-    // Unit w124 stand-ins, translated in src/TbTimeStamp_ops.cpp (unit w125): bullfrog 0x100261f4 (glue 0x1023b1e8): true when this stamp is later than `other` as an UNSIGNED 64-bit count (the answer is 0 or 1 in the low byte of r3);
+    // Unit w124 stand-ins, translated in src/bullfrog/TbTimeStamp.cpp (unit w125): bullfrog 0x100261f4 (glue 0x1023b1e8): true when this stamp is later than `other` as an UNSIGNED 64-bit count (the answer is 0 or 1 in the low byte of r3);
     // bullfrog 0x10025fc4 (glue 0x10239988): the span from `other` to this stamp, the hidden result in r3, this in r4, `other` in r5.
     bool operator>(const TbTimeStamp& other) const;
     TbTimeDiff operator-(const TbTimeStamp& other) const;
     // GetTime is bullfrog 0x10026740 (296 bytes, glue 0x10239970, import GetTime__11TbTimeStampCFPiPiPiPiPiPiPiPi): the calendar fields of the stamp
     // (year, month, day, day of week, hour, minute, second, millisecond; each only if its pointer is not NULL); the hidden TbError comes back in r3,
-    // this in r4, the first six outputs in r5..r10 and the last two on the stack (+0x38, +0x3c). Translated in src/TbTimeStamp_ops.cpp (unit w125):
+    // this in r4, the first six outputs in r5..r10 and the last two on the stack (+0x38, +0x3c). Translated in src/bullfrog/TbTimeStamp.cpp (unit w125):
     // a failing NS_MacDoze::FileTimeToSystemTime gives TbError -1 and writes nothing.
     TbError GetTime(int32_t* year, int32_t* month, int32_t* day, int32_t* dayOfWeek, int32_t* hour, int32_t* minute, int32_t* second,
                     int32_t* millisecond) const;
 
-    // Unit w217 (src/TbTimeStamp_format.cpp), bullfrog LbMaths.cpp range.
+    // Unit w217 (src/bullfrog/TbTimeStamp.cpp), bullfrog LbMaths.cpp range.
     int32_t Format(char* buffer, int32_t size, const char* format) const;                  // 0x100264a8, 392 B
     int32_t Format(TbDynamicStringTemplate<char>* text, const char* format) const;         // 0x10026bc0, 52 B
     int32_t Format(TbDynamicStringTemplate<char16_t>* text, const char16_t* format) const; // 0x10026c40, 52 B

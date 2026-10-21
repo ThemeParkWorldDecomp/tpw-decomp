@@ -1,4 +1,4 @@
-"""Differential tests for unit w125, the park clock's leaves of bullfrog (src/TbTimeStamp_ops.cpp). See difftest.py and tpwtest.py.
+"""Differential tests for unit w125, the park clock's leaves of bullfrog (src/bullfrog/TbTimeStamp.cpp). See difftest.py and tpwtest.py.
 
 TbTimeStamp::operator+, operator-, operator> and GetTime. A stamp or span is 8 bytes: big-endian, high word first on the PowerPC, a native int64_t on
 the host. The three operators are pure; operator> is an UNSIGNED 64-bit compare and answers 0 or 1 in the low byte of r3. GetTime hands the stamp to

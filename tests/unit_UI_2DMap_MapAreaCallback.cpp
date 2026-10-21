@@ -1,5 +1,5 @@
 // Test library for UI_2DMap_MapAreaCallback (unit v5751; libtpw_unit_UI_2DMap_MapAreaCallback.dylib), main app:
-//   src/UpdateSatellite_UI_2DMap_MapAreaCallback.cpp
+//   src/game/ui/ui_2dmap.cpp
 //
 // CUI2DMap::MapAreaCallback is a fake recording its arguments; gUI2DMap is defined here.
 #include <cstddef>

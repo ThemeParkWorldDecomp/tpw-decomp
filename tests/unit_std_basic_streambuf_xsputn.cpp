@@ -1,5 +1,5 @@
 // Test library for basic_streambuf<wchar_t>::xsputn / xsgetn (unit v5185; libtpw_unit_std_basic_streambuf_xsputn.dylib), main app:
-//   src/std_basic_streambuf_xsputn.cpp
+//   src/game/MslSupport.cpp
 //
 // wmemcpy and the two virtual calls (uflow, overflow) are recording fakes that answer from the test's queues.
 #include <cstddef>

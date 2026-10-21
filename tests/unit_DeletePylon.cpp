@@ -1,5 +1,5 @@
 // Test library for the pylon edit helpers (unit v5893; libtpw_unit_DeletePylon.dylib, tests/test_DeletePylon.py), main app:
-//   src/DisableCurrentPylonEditState_SetCoasterEditState_DeletePylon.cpp   RemoveTrackBraceFromPylon, DeletePylon, MoveBrace
+//   src/game/rides/CoasterEdit.cpp   RemoveTrackBraceFromPylon, DeletePylon, MoveBrace
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of other
 // files the unit reads are defined here (zero at start, like the Mac's bss).

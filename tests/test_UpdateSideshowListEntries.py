@@ -1,5 +1,5 @@
 """Unit v5335, the sideshows list rows and the all-items list's row window, against libtpw_unit_UpdateSideshowListEntries.dylib
-(tests/unit_UpdateSideshowListEntries.cpp), main app ("SimTheme Park"), src/AddItemToAllRidesList_UpdateSideshowListEntries.cpp:
+(tests/unit_UpdateSideshowListEntries.cpp), main app ("SimTheme Park"), src/game/ui/ui_allItemsPanel.cpp:
   UpdateSideshowListEntries 0x10196208, LCFormat 0x10196388 (the host calls it AllItemsListLCFormat: the name LCFormat is taken)
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

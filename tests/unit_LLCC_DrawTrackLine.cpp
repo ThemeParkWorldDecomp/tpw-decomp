@@ -1,6 +1,6 @@
 // Test library for LLCC_DrawTrackLine and __sinit_lobby_cpp (unit v5946; libtpw_unit_LLCC_DrawTrackLine.dylib,
 // tests/test_LLCC_DrawTrackLine.py), main app:
-//   src/TrackCell_flags_CTrackCell_IsTrackStartBlock_LLCC_DrawTrackLine.cpp
+//   src/game/online/lobby.cpp, src/game/park/TrackCell.cpp
 //
 // Callees outside the unit (CMap::IsXYValid, the track cell's Modify body, the string constructors, __register_global_object) are
 // recording fakes. The globals of other files the unit touches are defined here.

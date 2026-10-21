@@ -1,5 +1,5 @@
-// TPCamera.cpp (main app): the park camera. PARTIAL (InitCamera in src/TPCamera_init.cpp, HandleCamera in src/TPCamera_handle.cpp,
-// Will_HandleCameraMessages in src/TPCamera_messages.cpp).
+// TPCamera.cpp (main app): the park camera. PARTIAL (InitCamera in src/game/TPCamera.cpp, HandleCamera in src/game/TPCamera.cpp,
+// Will_HandleCameraMessages in src/game/TPCamera.cpp).
 // The globals are in this file's part of the BSS (0x102b59f8..0x102b5c08); their names are invented.
 #pragma once
 #include <cstdint>
@@ -27,12 +27,12 @@ extern float gCameraTarget[3];
 struct tag_sRideAnimSet;
 extern tag_sRideAnimSet* gFirstPersonRideSet;
 // Bit of gFirstPersonFlags that says the player rides a ride in first person (IsRideFirstPersonRide, 0x100329cc,
-// src/lobby_exit.cpp).
+// src/game/TPCamera.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_main.cpp).
 constexpr uint32_t kFirstPersonRideBit = 4;
 // The instance of that ride (0x102b5a3c; the name is invented); 0 for none.
 extern uint32_t gFirstPersonRideInstance;
 
-// ---- InitCamera (src/TPCamera_init.cpp, unit w106)
+// ---- InitCamera (src/game/TPCamera.cpp, unit w106)
 // 0x100334d4 (344 bytes): the camera at the start of a park: the home position, the three camera matrices as identities with the
 // position in the row 3 of the main one, the engine's view and projection matrices and gamut from the field of view, and the
 // camera's modes and time stamp reset.
@@ -55,12 +55,12 @@ extern sMatrix gCameraMatrixB;          // 0x102b5b34  an identity
 extern float gCameraF5BB4[3];           // 0x102b5bb4  the camera velocity (unit w135 fixed the type; InitCamera clears it)
 extern float gCameraF5BF4;              // 0x102b5bf4  0.0
 
-// ---- Unit w134 (CalculatePointerWorldPosn, src/TPRide_pointer.cpp; names invented)
+// ---- Unit w134 (CalculatePointerWorldPosn, src/game/TPPointer.cpp; names invented)
 struct s3DPoint;
 extern float gPointerScreenXY[2];   // 0x102b5a94  the pointer's position in screen pixels (x, y); set by Will_HandleCameraMessages
 extern s3DPoint gCameraViewPoint;   // 0x102b5bc0  the point the pointer's ray starts from (x +0, y +4, z +8)
 
-// ---- Unit w135 (HandleCamera, src/TPCamera_handle.cpp; every name below is invented, the addresses are the original's)
+// ---- Unit w135 (HandleCamera, src/game/TPCamera.cpp; every name below is invented, the addresses are the original's)
 // The park camera's frame: keyboard and edge-scroll movement of the position, the smoothed yaw, the zoom, the first-person walk and ride
 // views, the camera matrix and the engine's view matrix. gCameraF68 is the zoom (a distance), gCameraF5BF4 the yaw the keys turn,
 // gCameraF5BB4 the velocity, gCameraModeA the held-key and mode bits.
@@ -89,14 +89,14 @@ extern float gCameraTiltMinX;          // 0x1029ccac  0.0
 extern float gCameraTiltMaxX;          // 0x1029ccb0  0.0
 extern float gCameraTiltMinZ;          // 0x1029ccb4  0.0
 extern float gCameraTiltMaxZ;          // 0x1029ccb8  0.0
-// Callees HandleCamera makes (src/TPCamera_callees.cpp and src/TPRide_height.cpp, unit w140; the unit tests of HandleCamera fake them).
+// Callees HandleCamera makes (src/game/TPCamera.cpp and src/game/park/TPHField.cpp, unit w140; the unit tests of HandleCamera fake them).
 float DetermineHFieldHeight(float x, float z, int32_t flag);    // 0x1005ea70  the ground height at (x, z)
 int32_t GetNextGridsquare(s3DPoint* from, s3DPoint* step, s3DPoint* out);   // 0x10033e14  moves from by step to the next grid square's edge; nonzero: more to go
 int32_t RideRideIfRequired(s3DPoint* point);                    // 0x100345f8  nonzero: the point is on a ride (the walk stops)
 int32_t MatrixDifferenceTiny(sMatrix* a, sMatrix* b);           // 0x10034784  NONZERO when the two matrices are almost the same (the sum of the 12 absolute differences of rows 0 to 3, x y z, is below 1e-5f)
 void ApplyHeadsOnRidesBumpage(sMatrix* ride, sMatrix* previous, float dt, sMatrix* out);   // 0x100336f4
 
-// ---- Lead 2026-10-14 (Will_HandleCameraMessages, src/TPCamera_messages.cpp; the four statics' names are invented)
+// ---- Lead 2026-10-14 (Will_HandleCameraMessages, src/game/TPCamera.cpp; the four statics' names are invented)
 // The game window's messages for the camera: the pointer's position (screen pixels, from the UI's 2048 x 1536 message space), bit
 // 0x100 of gFirstPersonFlags while the pointer is outside the window (no edge scroll), the mouse buttons' bits of gCameraModeA (left 1,
 // middle 2, right 4), the wheel's zoom (gCameraF68 +- 10) and, with the middle button held, the frame's turn of gCameraF5BF4.
@@ -106,7 +106,7 @@ extern float gCameraYawDragScale;         // 0x102b5a1c  1/2048 once set: the mi
 extern int8_t gCameraMessagesF5A10Once;   // 0x102b5a10
 extern float gCameraMessagesF5A14;        // 0x102b5a14  0.0 once set, never read here
 
-// ---- Unit w140 (src/TPCamera_callees.cpp, src/TPRide_height.cpp; the five globals' names are invented, the addresses and values are the original's)
+// ---- Unit w140 (src/game/TPCamera.cpp, src/game/park/TPHField.cpp; the five globals' names are invented, the addresses and values are the original's)
 // The camera's small callees: SetCameraPOI points the camera at a place (zeroes the velocity, then copies each non-null input), the
 // grid walk's constants and the matrix epsilon are initialised data in the camera's part of the data segment.
 void SetCameraPOI(float* x, float* z, float* zoom, float* yaw, float* value);   // 0x10033650
@@ -116,11 +116,11 @@ extern float gGridEdgeOffset;        // 0x1029cc90  9.999f: GetNextGridsquare pu
 extern float gGridStepScale;         // 0x1029cc94  1.01f: GetNextGridsquare splits a tie between the two axes with it
 extern float gGridNudge;             // 0x1029cc98  0.001f: GetNextGridsquare's push over a square's edge
 enum NavMode : int32_t {};   // MAP_wall_in_way's last argument (GetNextGridsquare passes 2)
-// 0x10101ca4 (1,724 bytes, src/MapDelta_wall.cpp, unit w141): nonzero when a wall stands in the way of the square (x, z) in the direction dir
+// 0x10101ca4 (1,724 bytes, src/game/park/Map.cpp, unit w141): nonzero when a wall stands in the way of the square (x, z) in the direction dir
 // (0 and 2 along z, 1 and 3 along x as GetNextGridsquare uses them).
 int32_t MAP_wall_in_way(uint8_t x, uint8_t z, uint8_t dir, NavMode mode);
 
-// Unit w145 (src/MapDelta_map.cpp): the walk planner's path buffer (0x208 bytes on the caller's stack; the names are invented).
+// Unit w145 (src/game/park/Map.cpp, src/game/park/MapDelta.cpp): the walk planner's path buffer (0x208 bytes on the caller's stack; the names are invented).
 struct IDXTYPEUniqueNameMapId;
 template<class Tag, class T> struct tag_IDX_TYPE;
 struct wallhug_waypoint { uint8_t mX; uint8_t mY; };
@@ -135,7 +135,7 @@ struct wallhug_path {
 };
 static_assert(sizeof(wallhug_path) == 0x208, "the path buffer is 0x208 bytes");
 
-// Unit w195 (src/World_sight.cpp; the globals' names are invented, the addresses are the original's): the line of sight and the path smoothing.
+// Unit w195 (src/game/park/LineOfSight.cpp; the globals' names are invented, the addresses are the original's): the line of sight and the path smoothing.
 // bresenham_start sets up a walk between two squares in the six globals below; line_of_sight walks it and answers 1 when no wall stands in the way.
 void bresenham_start(wallhug_waypoint from, wallhug_waypoint to);                  // 0x101360ac (324)
 int32_t line_of_sight(wallhug_waypoint from, wallhug_waypoint to);                 // 0x1013623c (532)
@@ -151,7 +151,7 @@ extern int32_t gBresenhamDX;       // 0x1034cacc  |dx|
 extern NavMode gWallhugNavMode;    // 0x1034cad0  wallhug_tricky stores its mode here; the cleanup and line_of_sight pass it on
 extern const int8_t gWallhugStep[4][2];   // 0x102a45a4  the step (x, y) of directions 0 to 3
 
-// Unit w196 (src/World_wallhug.cpp; the six globals' names are invented, the addresses are the original's): the walk planner.
+// Unit w196 (src/game/park/LineOfSight.cpp; the six globals' names are invented, the addresses are the original's): the walk planner.
 // wallhug_trivial plans a walk from (mStartX, mStartY) to (mEndX, mEndY) into the path; 0x70000000 when there is none.
 // wallhug_continue_trivial walks the line from `start` (a waypoint by value) to the end, sending two wall huggers round each wall.
 uint32_t wallhug_continue_trivial(wallhug_path* path, wallhug_waypoint start, uint32_t limit);   // 0x10136f04 (3500)
@@ -162,13 +162,13 @@ extern uint8_t gWallhugHitDir;       // 0x1034cab0  the direction that hit (the 
 extern uint8_t gWallhugHitSide;      // 0x1034cab1  0xff when the first hugger's squares were spliced in, 1 when the second's (the latest splice)
 extern uint8_t gWallhugHitCount;     // 0x1034cab2  mCount at the latest hit (wallhug_trivial stores 0xff when recording)
 extern uint32_t gWallhugSteps;       // 0x1034cab4  the step counter: wallhug_trivial clears it, every pass of either loop adds 1
-// 0x10102394 (220 bytes, src/MapDelta_map.cpp): the length of the planned walk in squares (-1 when there is none).
+// 0x10102394 (220 bytes, src/game/park/Map.cpp): the length of the planned walk in squares (-1 when there is none).
 int32_t MAP_count_walking_distance(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> from, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> to, NavMode mode);
 class CObject;
 // 0x1003277c (140 bytes, untranslated): the entrance object standing at the place, or NULL.
 CObject* GetThingAtPosnIfEntrance(float x, float z);
 
-// ---- Unit w141 (src/TPCamera_modes.cpp): the camera modes, the first person ride and walk, camera save and load.
+// ---- Unit w141 (src/game/TPCamera.cpp): the camera modes, the first person ride and walk, camera save and load.
 struct tag_sRideAnimSet;
 // 0x1003384c (792 bytes): switches the first person flags (mode 2 walk around, 4 ride, 0x40 leaves); toggle flips, force overrides a
 // blocked state, out (may be NULL) is set to 1 when a ride that was left returns to walking; resetTurn zeroes the look angles on entering.
@@ -189,8 +189,8 @@ extern float gCameraSavedPosition[3];           // 0x102b5bcc  the walking camer
 extern float gCameraSavedYaw;                   // 0x102b5bec
 extern int8_t gRideRideOnceGuard;               // 0x102b5a20  set once by ToggleRideRideIn1stPerson
 extern int8_t gRideRideOnceValue;               // 0x102b5a21  cleared the first time
-// Unit v5764 (src/lobby_exit_IsRideRideable.cpp): StopRidingRideIn1stPerson, GetThingAtPosnIfEntrance(float, float), IsRideRideable.
+// Unit v5764 (src/game/TPCamera.cpp): StopRidingRideIn1stPerson, GetThingAtPosnIfEntrance(float, float), IsRideRideable.
 CObject* GetThingAtPosnIfEntrance(int32_t gridX, int32_t gridZ);   // 0x10032618 (308 bytes, untranslated): the grid square's entrance object
 void MoveCameraOverRideExit();                                      // 0x10032838 (356 bytes, untranslated)
-// Unit v51013 (src/lobby_exit_IsRideRideable_GetThingAtPosnIfEntrance.cpp): the halfword that ends the thing list GetThingAtPosnIfEntrance walks.
+// Unit v51013 (src/game/TPCamera.cpp): the halfword that ends the thing list GetThingAtPosnIfEntrance walks.
 extern uint16_t gThingListEnd;   // 0x1029cc8c (name invented)

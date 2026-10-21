@@ -1,5 +1,5 @@
 """Unit v51058, twenty small functions of the main app ("SimTheme Park"), against libtpw_unit_ShowWorldLobbyController.dylib
-(tests/unit_ShowWorldLobbyController.cpp), src/std_less_std_basic_string_operator_ShowWorldLobbyController.cpp:
+(tests/unit_ShowWorldLobbyController.cpp), src/game/MslSupport.cpp, src/game/TPGlobals.cpp, src/game/online/OnlinePerson.cpp, src/game/ui/ui_2dmap.cpp, src/game/ui/ui_ErrorDisplay.cpp, src/game/ui/ui_publishParkPanel.cpp, src/game/ui/ui_worldLobbyController.cpp:
   Show/Hide/RemoveWorldLobbyController, __sinit_ui_worldLobbyController_cpp, UI_2DMap_CallbackFn,
   FindParkOnlineParkInfoPanelCancelCallback, the Argument deque iterator +=, the wstring operator<, std::operator!=,
   __sinit_TPGlobals_cpp, the two BuddyInfo map value_compare operator(), __sinit_OnlinePerson_cpp, the const void* deque

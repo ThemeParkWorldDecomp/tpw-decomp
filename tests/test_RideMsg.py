@@ -1,5 +1,5 @@
 """Unit v5029, the five research panel bar message functions, against libtpw_unit_RideMsg.dylib (tests/unit_RideMsg.cpp), main app
-("SimTheme Park"), src/CreateResearchPanel_RideMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_researchPanel.cpp:
   RideMsg 0x101b4bb0, UpgMsg 0x101b4c70, ShopMsg 0x101b4d30, ShowMsg 0x101b4df0, FeatureMsg 0x101b4eb0
 
 A case is a call (window, message, a, b). TankButton and AnimatingPumpMsg are fakes on both sides recording their arguments;

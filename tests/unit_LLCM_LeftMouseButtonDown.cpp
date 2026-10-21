@@ -1,5 +1,5 @@
 // Test library for LLCM_LeftMouseButtonDown (unit v5089; libtpw_unit_LLCM_LeftMouseButtonDown.dylib, tests/test_LLCM_LeftMouseButtonDown.py), main app:
-//   src/LLCM_LeftMouseButtonDown.cpp   LLCM_LeftMouseButtonDown and the two bytes gLLCCDB34, gLLCCE090
+//   src/game/park/LLCellMouse.cpp   LLCM_LeftMouseButtonDown and the two bytes gLLCCDB34, gLLCCE090
 //
 // The callees outside the unit are recording fakes; the globals of other files the unit reads are defined here.
 #include <cstddef>

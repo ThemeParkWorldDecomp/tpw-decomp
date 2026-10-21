@@ -1,6 +1,6 @@
 // Test library for CFSOnlineSystem::ConnectUploadServer and ::LoggedInRequestFTPDownload (unit v5935;
 // libtpw_unit_CFSOnlineSystem_ConnectUploadServer.dylib, tests/test_CFSOnlineSystem_ConnectUploadServer.py), main app:
-//   src/FS_Online_init_CFSOnlineSystem_ConnectUploadServer.cpp
+//   src/game/online/FS_Online.cpp
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues. The strings are
 // working fakes (a malloc'd buffer behind mData); an event names a text by a hash of its code units, the same function as the

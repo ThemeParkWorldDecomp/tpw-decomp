@@ -1,5 +1,5 @@
 // Test library for the mechanic (unit w187; libtpw_unit_Mechanic.dylib, tests/test_Mechanic.py), main app:
-//   src/Mechanic.cpp   CMechanic (both constructors, Init, FinalDestroy, ReceiveMessage, Serialise, SetState, ModelState, UpdateTurn, ChooseNextAction,
+//   src/game/people/mechanic.cpp   CMechanic (both constructors, Init, FinalDestroy, ReceiveMessage, Serialise, SetState, ModelState, UpdateTurn, ChooseNextAction,
 //                      ProcessPatrolling, ProcessWalkingToBreakdown, ProcessRepairing, ProcessIdle) and its four globals
 //
 // The callees outside it are fakes that record the same events as the PowerPC stubs: the CStaff, CPeep and CObject members, the delayed script,
@@ -90,7 +90,7 @@ int32_t CountInts(const char* format) {
 
 // Test-only key function of CMsgRideDeleted (the Mac's is 0x10110f34); TestMessage overrides GetType.
 int32_t CMsgRideDeleted::GetType() const { return 10; }
-// The destructor the vtable names (the Mac's is 0x10107b28, in src/ThingMessages2.cpp).
+// The destructor the vtable names (the Mac's is 0x10107b28, in src/game/Object.cpp).
 CMsgRideDeleted::~CMsgRideDeleted() {}
 
 // ---- the message centre: Subscribe, the 29 headers (the first stands for __construct_array's call) and the nothrow operator new

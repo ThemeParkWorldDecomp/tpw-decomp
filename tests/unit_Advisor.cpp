@@ -1,9 +1,9 @@
-// Test library for the advisor (libtpw_unit_Advisor.dylib; see tests/test_Advisor.py): src/Advisor.cpp (the state
-// machine), src/TPAdvisor_model.cpp (the model and its slots), src/advisor_leaves.cpp (the small callees),
-// ScaleLMatrixNoTrans (src/rsse_matrix.cpp, with the real SetMatrixIdentity) and SND_DuckVolume (src/TPSound.cpp), and
+// Test library for the advisor (libtpw_unit_Advisor.dylib; see tests/test_Advisor.py): src/game/advisor/Advisor.cpp (the state
+// machine), src/game/TPCamera.cpp, src/game/advisor/TPAdvisor.cpp (the model and its slots), src/game/TPEmbed.cpp, src/game/TPMesh.cpp, src/game/rides/RideAnim.cpp (the small callees),
+// ScaleLMatrixNoTrans (src/game/LMatrix.cpp, with the real SetMatrixIdentity) and SND_DuckVolume (src/game/Sound.cpp, src/game/park/ParkSound.cpp), and
 // the response table (src/advisor_lines.cpp).
 //
-// Real: those, and CLight (src/Light.cpp). Fakes, each recording its name and every argument (tests/calllog.h): the
+// Real: those, and CLight (src/game/Light.cpp). Fakes, each recording its name and every argument (tests/calllog.h): the
 // ride set loader, instancing, set-up and destruction, the animation changes and the animation tick, the mesh draw
 // switches, the engine's map and system, the sound wrappers, the effect manager, the particle emitters, the
 // interface's key display, the clock, rand, _stricmp, the trace, and malloc and free (only for blocks the test labels

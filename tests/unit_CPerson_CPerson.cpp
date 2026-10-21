@@ -1,5 +1,5 @@
 // Test library for CPerson::CPerson and CPerson::ReceiveMessage (unit v5052; libtpw_unit_CPerson_CPerson.dylib, tests/test_CPerson_CPerson.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_CPerson.cpp   the two functions and the three halfword globals
+//   src/game/people/Person.cpp   the two functions and the three halfword globals
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of
 // other files the unit reads are defined here (zero at start like the Mac's bss). The person is a raw block the test hands in: the

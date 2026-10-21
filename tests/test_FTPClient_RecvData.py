@@ -1,5 +1,5 @@
 """Unit v5101, the FTP client: RecvData, the destructor body (the Mac's hidden delete flag is the argument), Connect and
-_EnterPassiveMode, against libtpw_unit_FTPClient_RecvData.dylib (tests/unit_FTPClient_RecvData.cpp), main app, src/FTPClient_RecvData.cpp:
+_EnterPassiveMode, against libtpw_unit_FTPClient_RecvData.dylib (tests/unit_FTPClient_RecvData.cpp), main app, src/game/online/FTPClient.cpp:
   RecvData 0x1020b59c, ~FTPClient 0x1020b46c, Connect 0x1020b730, _EnterPassiveMode 0x1020b904
 
 A case is a world and a call. The object is built twice by ONE piece of Python code: in emulator memory at the Mac's offsets (big-endian)

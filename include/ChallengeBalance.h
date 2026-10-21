@@ -11,9 +11,9 @@ extern const BalanceDescription gChallengeBalanceDescriptions[13];
 class CChallengeBalance : public CBalanceTable {
 public:
     ~CChallengeBalance();   // 0x100f6acc, nonvirtual
-    // 0x100f9318 (16 bytes, src/ChallengeBalance.cpp): the description array at 0x1028e908 plus row * 0x3c; no bound test.
+    // 0x100f9318 (16 bytes, src/game/park/ChallengeHQ.cpp): the description array at 0x1028e908 plus row * 0x3c; no bound test.
     const BalanceDescription* GetBalanceDescription(int32_t row) override;
-    // 0x100f9368 (8 bytes, src/ChallengeBalance.cpp): this + 8, the first value slot.
+    // 0x100f9368 (8 bytes, src/game/park/ChallengeHQ.cpp): this + 8, the first value slot.
     BalanceValue* GetBalanceValuesStart() override;
 
     BalanceValue mValues[602];   // 0x08

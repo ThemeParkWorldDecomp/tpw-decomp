@@ -1,5 +1,5 @@
 // Test library for UI_ToggleHelpText and __sinit_UI_Base_cpp (unit v5295; libtpw_unit_sinit_UI_Base_cpp.dylib), main app:
-//   src/UI_pump_sinit_UI_Base_cpp.cpp
+//   src/game/ui/UI_Base.cpp
 //
 // InterfaceHelpText's constructor and virtuals are fakes that record events (the class's vtable is made here), the clock's
 // virtual is a stub, __register_global_object records its arguments. Globals of other files are defined here.

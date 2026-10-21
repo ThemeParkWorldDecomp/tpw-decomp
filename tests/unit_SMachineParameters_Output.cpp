@@ -1,6 +1,6 @@
 // Test library for SMachineParameters::Output and ::Suggest (unit v5092; libtpw_unit_SMachineParameters_Output.dylib,
 // tests/test_SMachineParameters_Output.py), engine:
-//   src/tb_init_SMachineParameters_Output.cpp   the two functions, gSMachineCfgData, gSMachineOutputCount
+//   src/engine/tb_init.cpp   the two functions, gSMachineCfgData, gSMachineOutputCount
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues: fopen,
 // fprintf, fflush, fclose (libc, overridden in this library), the render system's GetVRAMSize, the draw primitive's

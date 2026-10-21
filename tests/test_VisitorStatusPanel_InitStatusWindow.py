@@ -1,5 +1,5 @@
 """Unit v5521, VisitorStatusPanel::InitStatusWindow, against libtpw_unit_VisitorStatusPanel_InitStatusWindow.dylib
-(tests/unit_VisitorStatusPanel_InitStatusWindow.cpp), main app ("SimTheme Park"), src/WorldSavvy_VisitorStatusPanel_InitStatusWindow.cpp:
+(tests/unit_VisitorStatusPanel_InitStatusWindow.cpp), main app ("SimTheme Park"), src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_visitorStatus.cpp:
   VisitorStatusPanel::InitStatusWindow 0x10142238
 
 The panel is a block with its window at +0x10; the child windows are small blocks whose first word is their id, found by a fake GetWindow.

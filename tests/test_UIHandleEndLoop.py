@@ -1,5 +1,5 @@
 """Unit v5707, the coaster editor's button loops and the pylon type, against libtpw_unit_UIHandleEndLoop.dylib (tests/unit_UIHandleEndLoop.cpp), main app
-("SimTheme Park"), src/LayoutSetRotatePylon_DeleteLastTrackBrace_UIHandleEndLoop.cpp:
+("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   UIHandleEndLoop 0x100565cc, UIHandleMidLoop 0x10056548, SetPylonType 0x100562d4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory at the Mac's addresses, big-endian; the host

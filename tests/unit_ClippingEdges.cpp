@@ -1,5 +1,5 @@
 // Entry points for the clipper's edge functions (library unit_ClippingEdges:
-// src/tb_clipping_edges.cpp). The unit calls nothing outside itself, so there are no fakes: a
+// src/engine/Clipping.cpp). The unit calls nothing outside itself, so there are no fakes: a
 // test hands each clipper two vertices and a stride and compares the vertex it makes and the
 // five working globals with the original's (tests/test_ClippingEdges.py).
 #include <cstring>

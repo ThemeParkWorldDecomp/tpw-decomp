@@ -2,13 +2,13 @@
 // zlib unpacker and semaphore lock, the particle system's start-up, the lobby start's small leaves (texture folders, the
 // authorised user, the debug font, the string heap) and the ltms font render parameters.
 //
-// Real: src/lb_zlib.cpp (over the host's zlib), src/rsse_particles_init.cpp with the particle system's globals
-// (src/rsse_particles_state.cpp): PAR_*, the SamsUtilities swap helpers, DummyHeightCallBack; src/lobby_start_leaves.cpp,
-// src/tb_fontrenderparams.cpp and src/lb_semalock.cpp. The unit library is built with TPW_SWAP_FILE_WORDS, so that the
+// Real: src/bullfrog/LbZLib.cpp (over the host's zlib), src/game/Particles.cpp with the particle system's globals
+// (src/game/rides/rsse.cpp): PAR_*, the SamsUtilities swap helpers, DummyHeightCallBack; src/game/rides/RidePlacement.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/InterfaceStringHeap.cpp,
+// src/ltms/TbFontRenderParams.cpp and src/bullfrog/LbSemaphore.cpp. The unit library is built with TPW_SWAP_FILE_WORDS, so that the
 // swap helpers really swap (the loaded library's bytes are then the original's).
 // Fakes that record on both sides (name, then every argument): operator new[] (nothrow), LbMem_Alloc, the file calls
 // of the library loader (TPFile_Open, LbFile_Read, LbFile_Seek, LbFile_Close, served from a file the case sets), the
-// platform's _USwapBlock32, GAME_ASSERTMSG (it landed with unit w22, src/GameAssert.cpp, and is not part of this unit),
+// platform's _USwapBlock32, GAME_ASSERTMSG (it landed with unit w22, src/game/advisor/Advisor.cpp, and is not part of this unit),
 // the ltms TbRenderArea constructor and a font whose AddRef records.
 #include <algorithm>
 #include <cstdint>
@@ -230,7 +230,7 @@ void tpw_pi_poke_header(int32_t index, int32_t value) {
 
 // ---- the lobby start's leaves
 
-// Their globals (src/lobby_start_leaves.cpp; the two texture folders are declared in include/ui_ErrorDisplay.h).
+// Their globals (src/game/rides/RidePlacement.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/InterfaceStringHeap.cpp; the two texture folders are declared in include/ui_ErrorDisplay.h).
 extern char gSecurityKey[];
 extern char gSecurityText[];
 extern char gSecurityMask[];

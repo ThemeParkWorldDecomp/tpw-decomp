@@ -1,5 +1,5 @@
 // Test library for CPerson::WinningMods (unit v5671; libtpw_unit_CPerson_WinningMods.dylib, tests/test_CPerson_WinningMods.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_WinningMods.cpp
+//   src/game/people/Person.cpp
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queue. The globals of other
 // files the unit reads (gWorld, gSoundBanks, gPersonTable) are defined here.

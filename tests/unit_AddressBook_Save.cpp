@@ -1,5 +1,5 @@
 // Test library for AddressBook::Save (unit v5009; libtpw_unit_AddressBook_Save.dylib, tests/test_AddressBook_Save.py), main app:
-//   src/email_load_AddressBook_Save.cpp   AddressBook::Save
+//   src/game/online/email.cpp   AddressBook::Save
 //
 // The stream callees (ofstream ctor, open, operator<<, close, the dtors, __throw) are recording fakes; they answer from the case
 // passed to the wrapper. The fake throw returns, like the PowerPC fake.

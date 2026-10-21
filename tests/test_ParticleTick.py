@@ -1,6 +1,6 @@
 """Unit w26c: the particle system's per-tick work and drawing list (DoEmitters, DoEffecters, DoAParticle, MoveEmitter,
-MoveEffecter, PAR_BuildDrawingList; src/rsse_tick.cpp) and the effect manager (EM_Init, EM_SetEmitersOn, EM_SetEffectTranslation,
-EM_SetEffectOrbit, EM_Tick; src/effect_manager.cpp), against libtpw_unit_ParticleTick.dylib (tests/unit_ParticleTick.cpp).
+MoveEffecter, PAR_BuildDrawingList; src/game/Particles.cpp) and the effect manager (EM_Init, EM_SetEmitersOn, EM_SetEffectTranslation,
+EM_SetEffectOrbit, EM_Tick; src/game/HLSprite.cpp), against libtpw_unit_ParticleTick.dylib (tests/unit_ParticleTick.cpp).
 
 Each case builds the particle system's state block on both sides from the same Python values: the header (the counts, the seed),
 120 emitters of 0x140 bytes, 20 effecters of 0x68, the chain heads and a pool of 0x34-byte particles, with real chains (used and

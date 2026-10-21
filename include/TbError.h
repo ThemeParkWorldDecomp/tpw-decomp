@@ -3,7 +3,7 @@
 //
 // Out-of-line copies: 0x10001564 TbError(long) 8 B, 0x100014b8 TbError(const TbError&)
 // 12 B, 0x100014f0 operator long() 8 B (bullfrog, LbSCBack.cpp range),
-// counted in src/LbFile_more.cpp (unit w221).
+// counted in src/bullfrog/LbFile.cpp, src/bullfrog/LbApp.cpp (unit w221).
 // Values seen so far: 0 success, -1 failure.
 #pragma once
 #include <cstdint>

@@ -1,5 +1,5 @@
 """Unit v5287, RestoreHFieldDataFromCopy 0x1005c050, against libtpw_unit_RestoreHFieldDataFromCopy.dylib
-(tests/unit_RestoreHFieldDataFromCopy.cpp), main app, src/HeightfieldLoad_RestoreHFieldDataFromCopy.cpp.
+(tests/unit_RestoreHFieldDataFromCopy.cpp), main app, src/game/park/TPHField.cpp.
 
 A case is a header (or NULL) with a height field (or NULL) holding a quad table (or NULL) and a quad count, and a copy field with its own
 quad table (or NULL). The world is built twice by one piece of Python (emulator memory big-endian, host memory little-endian, host pointers

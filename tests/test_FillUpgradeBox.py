@@ -1,5 +1,5 @@
 """Unit v5074, the ride status panel's upgrade list, against libtpw_unit_FillUpgradeBox.dylib (tests/unit_FillUpgradeBox.cpp), main app
-("SimTheme Park"), src/FillUpgradeBox.cpp:
+("SimTheme Park"), src/game/ui/ui_RideStatus.cpp:
   FillUpgradeBox 0x101ba128, UpgradePanelMsg 0x101ba4e0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
@@ -529,7 +529,7 @@ def msg_random(r):
 
 
 # ---------------------------------------------------------------------------------------------------------------- LCPostFormat
-# LCPostFormat 0x101B9FB8 is OnlineParkListPanelLCPostFormat in src/FillUpgradeBox.cpp. The case is the font table index global (0x102AD5DC);
+# LCPostFormat 0x101B9FB8 is OnlineParkListPanelLCPostFormat in src/game/ui/ui_RideStatus.cpp. The case is the font table index global (0x102AD5DC);
 # the window and its first child are fakes that record; the child's vtable slot 0x24 is the fake SetValue (a call through any other slot logs
 # WrongVirtual). Compared: the whole event log.
 

@@ -1,5 +1,5 @@
 """Unit v5184, the research panel's speed lights and bars, against libtpw_unit_SpeedTimerFudge.dylib (tests/unit_SpeedTimerFudge.cpp), main app
-("SimTheme Park"), src/SpeedTimerFudge.cpp:
+("SimTheme Park"), src/game/ui/ui_researchPanel.cpp:
   SpeedTimerFudge 0x101b35d4, PercentComplete 0x101b3398, ResearchSpeed 0x101b381c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

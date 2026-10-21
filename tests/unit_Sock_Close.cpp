@@ -1,5 +1,5 @@
 // Test library for Sock::Close (unit v5765; libtpw_unit_Sock_Close.dylib, tests/test_Sock_Close.py), main app:
-//   src/COnlineParser_ParseGoto_COnlineParser_ParseIgnore_Sock_Close.cpp   Sock::Close
+//   src/game/online/IPBase.cpp   Sock::Close
 //
 // shutdown, recv and closesocket are fakes that record their arguments; recv answers from the queue "Recv".
 #include <cstddef>

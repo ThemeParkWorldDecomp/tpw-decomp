@@ -1,5 +1,5 @@
 // Test library for LayoutReplayCoasterSpeed (unit v5302; libtpw_unit_LayoutReplayCoasterSpeed.dylib), main app:
-//   src/TPConfig_LayoutReplayCoasterSpeed.cpp
+//   src/game/rides/CoasterEdit.cpp
 //
 // CoasterSetSpeed(uint32_t, uint32_t) is a recording fake; gObjectTable is defined here.
 #include <cstddef>

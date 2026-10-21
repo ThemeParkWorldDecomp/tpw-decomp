@@ -1,5 +1,5 @@
 """Unit v5705, the tb_depthoffield.cpp static initialiser, against libtpw_unit_sinit_tb_depthoffield_cpp.dylib, engine program,
-src/tb_waveload_sinit_tb_depthoffield_cpp.cpp:
+src/engine/tb_depthoffield.cpp:
   __sinit_tb_depthoffield_cpp 0x10006864
 
 A case pre-fills the ten-float table at 0x10052b08 with random words, calls the initialiser and compares all ten words. sin and cos

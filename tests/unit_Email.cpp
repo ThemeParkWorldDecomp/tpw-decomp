@@ -1,4 +1,4 @@
-// The fakes and entry points for unit w90 (src/email_load.cpp, src/TPEmbed_ime.cpp and the constructors of src/email.cpp;
+// The fakes and entry points for unit w90 (src/game/online/email.cpp, src/game/ui/IME.cpp and the constructors of src/game/online/bthread.cpp, src/game/online/email.cpp;
 // libtpw_unit_Email.dylib, used by test_Email.py).
 //
 // The loaders read their files through the platform's file calls (NS_MacDoze::CreateFile, GetFileSize, ReadFile, CloseHandle). Here
@@ -74,7 +74,7 @@ int32_t CloseHandle(InternalHandle* handle) {
     return 1;
 }
 
-// bthread_mutex (src/email.cpp): not used by the test.
+// bthread_mutex (src/game/online/bthread.cpp, src/game/online/email.cpp): not used by the test.
 void EnterCriticalSection(void**) {}
 void LeaveCriticalSection(void**) {}
 
@@ -140,7 +140,7 @@ IME::CIME gIme;
 
 }  // namespace
 
-// IME::MslWideString (include/ui_ime.h): gIme's constructor and destructor (src/TPEmbed_ime.cpp, src/ui_ime_lifetime.cpp) reach the
+// IME::MslWideString (include/ui_ime.h): gIme's constructor and destructor (src/game/ui/IME.cpp, src/game/ui/ui_graph.cpp, src/game/ui/ui_iterators.cpp) reach the
 // string library's pair, which launcher/pending_manual.cpp answers in the game; empty fakes here.
 IME::MslWideString::MslWideString() {}
 IME::MslWideString::~MslWideString() {}

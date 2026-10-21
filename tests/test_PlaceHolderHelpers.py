@@ -1,6 +1,6 @@
 """Unit w79g4, the placeholder helpers, against libtpw_unit_PlaceHolderHelpers.dylib (tests/unit_PlaceHolderHelpers.cpp), in the
 program "sound symbols shared" (Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/PlaceHolderHelpers.cpp  CMapReference: constructor 0x1001af5c, GetSoundIds 0x1001f0dc, GetSoundPointer 0x1001f364;
+  src/sound/AudioPlaceHolder.cpp, src/sound/PlaceHolderSentence.cpp, src/sound/TbMapStreamer.cpp  CMapReference: constructor 0x1001af5c, GetSoundIds 0x1001f0dc, GetSoundPointer 0x1001f364;
       CPlaceHolderOneShotBranchingSentenceElement: constructor 0x10023d38, ChooseRandomSound 0x10023f04, destructor 0x10024114,
       GetClassID 0x100241c0; CPlaceHolderOneShotSentenceElement: destructor 0x10023dc0, constructor 0x10024218, Init 0x10024328,
       FillSampleInfo 0x10024438, Update 0x10024724, GetParameterValue 0x10024814, GetClassID 0x100248c0; CPlaceHolderOneShotThrowaway:
@@ -9,12 +9,12 @@ program "sound symbols shared" (Code at 0x10000000, TOC base r2 = 0x1003abf0):
       0x1001eef4, GetPosition 0x1001ef2c (inline)
   include/PlaceHolderHelpers.h  TbAudioEventList::ListItem::ListItem 0x1001ece4 and the CAutoArrayPtr<ListItem> instance: operator
       T* 0x1001eaec, destructor 0x1001eb5c, counted constructor 0x1001ec10 (the template of include/snd_containers.h)
-  CCatagoryContainer's six functions (0x1001f410 .. 0x1001fc30) were already translated by unit w70 (src/snd_containers.cpp) and are not
+  CCatagoryContainer's six functions (0x1001f410 .. 0x1001fc30) were already translated by unit w70 (src/sound/TbMapStreamer.cpp) and are not
   part of this module.
 
 Each function runs as the original in the emulator (at its address, the hidden TbError buffer is not needed: none of them returns one)
 and as the host's translation, on a world built from the case. The base class CAudioPlaceHolder is REAL on both sides (the original's
-code in the emulator, src/AudioPlaceHolder.cpp on the host), so the Element classes run over the real base functions and the real vtable
+code in the emulator, src/sound/AudioPlaceHolder.cpp, src/sound/AudioPlaceHolderList.cpp, src/sound/TbAudioBody.cpp, src/sound/TbSoundSampleCallback.cpp on the host), so the Element classes run over the real base functions and the real vtable
 slots (the PowerPC objects keep their real Mac vtables; a wrong override would call a wrong slot). The world: a placeholder subject
 (made by the real constructor of its class, then a preset state of 34 words written into the members), a parent placeholder (the real
 base constructor and a preset: the sentence the Element belongs to), a tree of events, sounds, samples and branches (one block: Mac

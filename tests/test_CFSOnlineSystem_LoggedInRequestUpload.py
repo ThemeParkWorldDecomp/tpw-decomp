@@ -1,5 +1,5 @@
 """Unit v5043, the online upload job and the city unpublish request, against libtpw_unit_CFSOnlineSystem_LoggedInRequestUpload.dylib
-(tests/unit_CFSOnlineSystem_LoggedInRequestUpload.cpp), main app ("SimTheme Park"), src/FS_Online_init_CFSOnlineSystem_LoggedInRequestUpload.cpp:
+(tests/unit_CFSOnlineSystem_LoggedInRequestUpload.cpp), main app ("SimTheme Park"), src/game/online/FS_Online.cpp:
   UnpublishPark 0x10174ca0, RequestUpload 0x10174fe8, LoggedInRequestUpload 0x10175220, UploadServerConnectionCallback 0x101753dc,
   ReturnUploadFilename 0x10175608
 

@@ -1,5 +1,5 @@
 // Test library for the editor's pylon drag toggles (unit v5144; libtpw_unit_ToggleLoopTurnPylonState.dylib, tests/test_ToggleLoopTurnPylonState.py), main app:
-//   src/HandleCoasterDataChange_ToggleLoopTurnPylonState.cpp   ToggleLoopTurnPylonState, ToggleRotatePylonState, ToggleBankInclinePylonState
+//   src/game/rides/CoasterEdit.cpp   ToggleLoopTurnPylonState, ToggleRotatePylonState, ToggleBankInclinePylonState
 //
 // The callees outside the unit (CActionRecorder::RecordAction in its two float overloads, LockPointedAtRide) are fakes that record their
 // arguments; the globals of other files the unit reads or writes are defined here, zero at start like the Mac's bss.

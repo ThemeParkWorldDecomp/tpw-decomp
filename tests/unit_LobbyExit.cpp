@@ -1,10 +1,10 @@
 // Test library for the way out of the lobby (unit w104; libtpw_unit_LobbyExit.dylib, tests/test_LobbyExit.py):
-//   src/Game_theme_set.cpp   CGame::SetCurrentTheme (two), SetCurrentThemeName, ConverttoCurrentTheme
-//   src/lobby_exit.cpp       KeyParticlePOUFFE, DeInitLobbyUI, UIInterface::DeInitLobby, IsRideFirstPersonRide
-//   src/hlsprite_remove.cpp  ESP_RemoveSprites
-//   src/lobby_globe_close.cpp  the online globe's destructor, Close and the two list helpers
+//   src/game/Game.cpp   CGame::SetCurrentTheme (two), SetCurrentThemeName, ConverttoCurrentTheme
+//   src/game/TPCamera.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_main.cpp       KeyParticlePOUFFE, DeInitLobbyUI, UIInterface::DeInitLobby, IsRideFirstPersonRide
+//   src/game/HLSprite.cpp  ESP_RemoveSprites
+//   src/game/online/lobby_globe.cpp  the online globe's destructor, Close and the two list helpers
 //
-// Real: those, the rectangle (src/UI_Base.cpp) and the light (src/Light.cpp). Fakes that record the same event on both sides: the
+// Real: those, the rectangle (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp) and the light (src/game/Light.cpp). Fakes that record the same event on both sides: the
 // strings' copy constructor, destructor and virtual assignment (the other string members are unrecorded and functional), the
 // master save's constructor and ChangeCurrentTheme, CGame::GetCurrentThemeName, _stricmp, UI_DisableHelpText, CMapWho::Unlink,
 // InterfaceWindow::GetWindow and GetPosition (which writes the rectangle from the case's queue), PAR_InitEmitter, SOUND_SendEvent,
@@ -250,7 +250,7 @@ int32_t CLBScreenComponent::IsVisible() { return mVisible; }
 CLBScreenComponentOnlineGlobe::CLBScreenComponentOnlineGlobe() {}
 void CLBScreenComponentOnlineGlobe::Render() {}
 uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
-// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp).
+// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 CLBGlobe::~CLBGlobe() {}

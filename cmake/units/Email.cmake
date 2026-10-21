@@ -1,3 +1,26 @@
-# Unit w90: Outbox::~Outbox, Outbox::Load, AddressBook::Load (src/email_load.cpp) with the constructors of src/email.cpp for the
-# objects, and the three IME::CIME stubs (src/TPEmbed_ime.cpp). LbFile_Copy is tested in test_LbFile.py.
-set(TPW_UNIT_Email src/email.cpp src/email_load.cpp src/TPEmbed_ime.cpp src/ui_ime_lifetime.cpp)
+# Unit w90: Outbox::~Outbox, Outbox::Load, AddressBook::Load (src/game/online/email.cpp) with the constructors of src/game/online/bthread.cpp, src/game/online/email.cpp for the
+# objects, and the three IME::CIME stubs (src/game/ui/IME.cpp). LbFile_Copy is tested in test_LbFile.py.
+set(TPW_UNIT_Email src/game/online/bthread.cpp src/game/online/email.cpp src/game/ui/IME.cpp src/game/ui/ui_graph.cpp
+    src/game/ui/ui_iterators.cpp)
+set(TPW_UNIT_Email_KEEP
+  __ZN11AddressBook4LoadEPKc   # AddressBook::Load(char const*)
+  __ZN11AddressBook4NextEv   # AddressBook::Next()
+  __ZN11AddressBook5FirstEv   # AddressBook::First()
+  __ZN11AddressBookC1Ev   # AddressBook::AddressBook()
+  __ZN11AddressBookD1Ev   # AddressBook::~AddressBook()
+  __ZN13bthread_mutex4lockEv   # bthread_mutex::lock()
+  __ZN13bthread_mutex6unlockEv   # bthread_mutex::unlock()
+  __ZN3IME16list_cand_data_tD1Ev   # IME::list_cand_data_t::~list_cand_data_t()
+  __ZN3IME4CIME10UnActivateEv   # IME::CIME::UnActivate()
+  __ZN3IME4CIME23SetMaxCompositionLengthEi   # IME::CIME::SetMaxCompositionLength(int)
+  __ZN3IME4CIME8ActivateEP8GrafPort   # IME::CIME::Activate(GrafPort*)
+  __ZN3IME4CIMEC1Ev   # IME::CIME::CIME()
+  __ZN3IME4CIMED1Ev   # IME::CIME::~CIME()
+  __ZN6CUIIMED1Ev   # CUIIME::~CUIIME()
+  __ZN6Outbox4LoadEPKc   # Outbox::Load(char const*)
+  __ZN6OutboxC1Ev   # Outbox::Outbox()
+  __ZN6OutboxD1Ev   # Outbox::~Outbox()
+  __ZN9MslVectorIN3IME13MslWideStringEE9tear_downEv   # MslVector<IME::MslWideString>::tear_down()
+  __ZN9MslVectorIN3IME16list_cand_data_tEE9tear_downEv   # MslVector<IME::list_cand_data_t>::tear_down()
+  __ZN12_GLOBAL__N_113gAddressEntryE   # gAddressEntry (static object)
+)

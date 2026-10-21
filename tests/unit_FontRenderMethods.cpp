@@ -1,8 +1,8 @@
 // Test library for the four 4-bit font render method objects and the one-colour glyph writers (libtpw_unit_FontRenderMethods.dylib;
-// see tests/test_FontRenderMethods.py, unit w45b): src/ltms_fontrender_methods.cpp (the constructors and destructors, SetWriteZero, the
-// objects and the table gFontRenderMethods), src/ltms_fontrender_onecolour.cpp and src/ltms_fontrender_onecolour_noblend.cpp (the
-// twelve writers), linked with the render method's core of unit w45a (src/ltms_fontrender_method.cpp: DrawChar), the real font
-// (src/TbIRLE4bitFont.cpp) and the render parameters (src/ltms_fontrender.cpp, src/tb_fontrenderparams.cpp), so that DrawChar can be
+// see tests/test_FontRenderMethods.py, unit w45b): src/ltms/TbOneColour4BitFontRenderMethod.cpp, src/ltms/TbOneColourNoBlend4BitFontRenderMethod.cpp, src/ltms/TbTextured4BitFontRenderMethod.cpp, src/ltms/TbTexturedNoBlend4BitFontRenderMethod.cpp (the constructors and destructors, SetWriteZero, the
+// objects and the table gFontRenderMethods), src/ltms/TbOneColour4BitFontRenderMethod.cpp and src/ltms/TbOneColourNoBlend4BitFontRenderMethod.cpp (the
+// twelve writers), linked with the render method's core of unit w45a (src/ltms/StaticUnicodeBuffer.cpp, src/ltms/TbFontRender.cpp: DrawChar), the real font
+// (src/ltms/TbFontRenderParams.cpp, src/ltms/TbIRLE4bitFont.cpp) and the render parameters (src/ltms/TbFontRender.cpp, src/ltms/TbFontRenderParams.cpp), so that DrawChar can be
 // driven through the table end to end.
 //
 // Fakes (each records the same event as the PowerPC side's stub, through calllog):

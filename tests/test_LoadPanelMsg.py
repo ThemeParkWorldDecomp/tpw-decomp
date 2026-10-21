@@ -1,5 +1,5 @@
 """Unit v5183, the load, save and hire panels, against libtpw_unit_LoadPanelMsg.dylib (tests/unit_LoadPanelMsg.cpp), main app
-("SimTheme Park"), src/LoadPanelMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_hirePanel.cpp, src/game/ui/ui_loadSavePanel.cpp:
   LoadPanelMsg 0x101a2bdc, UI_HirePanelStateChange 0x101a2a14, SavePanelMsg 0x101a2df4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

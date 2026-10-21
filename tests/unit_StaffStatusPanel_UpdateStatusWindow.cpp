@@ -1,6 +1,6 @@
 // Test library for the staff status panel's InitStatusWindow, UpdateStatusWindow and UpdateWindow (unit v5207;
 // libtpw_unit_StaffStatusPanel_UpdateStatusWindow.dylib, tests/test_StaffStatusPanel_UpdateStatusWindow.py), main app:
-//   src/StaffStatusPanel_FireMe_StaffStatusPanel_UpdateStatusWindow.cpp
+//   src/game/ui/ui_staffStatus.cpp
 //
 // Every callee outside the unit is a fake that records what the real one reads (the same event names and arguments as the module's
 // PowerPC stubs). The windows are blocks of the arena with a fake virtual table (Enable, SetValue and SetText record). The draw

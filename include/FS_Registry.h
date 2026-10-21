@@ -1,4 +1,4 @@
-// FS_Registry.cpp (main app 0x100038b0..0x10003fa4; src/FS_Registry.cpp): the game's
+// FS_Registry.cpp (main app 0x100038b0..0x10003fa4; src/game/save/FS_Registry.cpp): the game's
 // folders and its language, read at start-up (the Windows version kept them in the
 // registry). Results are TbErrors, returned through a hidden r3 buffer on PowerPC.
 // OnlineConfig's destructor (0x10003508) is in this range; it is implicit here (the

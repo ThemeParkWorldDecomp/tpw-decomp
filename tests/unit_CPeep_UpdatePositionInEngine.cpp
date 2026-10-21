@@ -1,6 +1,6 @@
 // Test library for CPeep::UpdatePositionInEngine and CPeep::PeepWalks (unit v5974; libtpw_unit_CPeep_UpdatePositionInEngine.dylib,
 // tests/test_CPeep_UpdatePositionInEngine.py), main app:
-//   src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_UpdatePositionInEngine.cpp   both functions and the Peep.cpp statics
+//   src/game/people/Peep.cpp   both functions and the Peep.cpp statics
 //
 // The callees outside the unit are recording fakes; every pointer is logged as its offset from the peep block the test set with tpw_peep_base.
 #include <cstddef>

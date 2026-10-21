@@ -1,5 +1,5 @@
 """Unit w166, the ride scripts' save and rsse.cpp's swap helpers, against libtpw_unit_RideSave.dylib (tests/unit_RideSave.cpp), main app
-("SimTheme Park"), src/rsse_save.cpp:
+("SimTheme Park"), src/game/rides/rsse.cpp:
   RSSE_Save 0x100d45b0 and the eleven instances of the SamsUtilities swap templates USwapInplace32<int> 0x100d5324, <unsigned int> 0x100d5368,
   USwap32<RSSE_OBJECT*> 0x100d53b0, USwapInplace16<unsigned short> 0x100d5424, USwapInplace32<unsigned long> 0x100d546c,
   USwapInplace16<short> 0x100d54b4, USwap32<char*> 0x100d54f8, USwap32<RSSE_WALK*> 0x100d5554, USwap32<long*> 0x100d55c0,

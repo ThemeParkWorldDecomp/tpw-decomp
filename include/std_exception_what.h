@@ -1,4 +1,4 @@
-// Unit v51125 (src/std_exception_what.cpp): small leaves of the main app, translated on their own (Mac addresses in comments).
+// Unit v51125 (src/game/MslSupport.cpp, src/game/online/FS_Online.cpp, src/game/park/TPHField.cpp, src/game/ui/ui_FeatureStatus.cpp): small leaves of the main app, translated on their own (Mac addresses in comments).
 // The destructors take the hidden signed 16 bit delete flag (r4) and answer `self`; the stores of vtable words the compiler makes are not
 // written where the host has no Mac vtable (a note on each). The callees outside the unit are in stdexc_callee (weak defaults in
 // src/std_exception_what_callees.cpp, recording fakes in the test library).
@@ -30,7 +30,7 @@ MslExceptionObject* MslLengthErrorDtor(MslExceptionObject* self, int16_t deleteF
 }
 
 // The two RemoveHead instances the list destructors call (0x10177e2c city, 0x10177b98 park) are callees outside the unit: explicit
-// specializations (weak in src/std_exception_what.cpp, recording fakes in the test library) so the call is not inlined.
+// specializations (weak in src/game/online/FS_Online.cpp, recording fakes in the test library) so the call is not inlined.
 template<> CFSOnlineCity* TbTList<CFSOnlineCity*, CFSOnlineCity*>::RemoveHead();
 template<> CFSOnlinePark* TbTList<CFSOnlinePark*, CFSOnlinePark*>::RemoveHead();
 

@@ -2,7 +2,7 @@
 // of MFC's CArray<TYPE, ARG_TYPE>: the elements, their count, the capacity and a growth step.
 // The 2.04b3 engine has one instantiation, CIgArray<float, float> (Wavelet.cpp's decoder
 // builds four on its stack); its members are out of line at the addresses below and defined
-// in src/Wavelet_decode.cpp for that instantiation. The elements are trivial: the element
+// in src/engine/Wavelet.cpp, src/engine/EngineUtil.cpp for that instantiation. The elements are trivial: the element
 // construction and destruction loops of the original are empty counting loops.
 #pragma once
 #include <cstdint>

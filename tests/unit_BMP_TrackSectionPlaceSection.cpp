@@ -1,6 +1,6 @@
 // Test library for BMP_TrackSectionPlaceSection (unit v5566; libtpw_unit_BMP_TrackSectionPlaceSection.dylib,
 // tests/test_BMP_TrackSectionPlaceSection.py), main app:
-//   src/BMP_TrackSectionPlaceSection.cpp   BMP_TrackSectionPlaceSection
+//   src/game/rides/BumperRide.cpp   BMP_TrackSectionPlaceSection
 //
 // TRACE is a fake recording its text. The list at 0x102b56c0 (gColList) is defined here, big enough for the words the function reads.
 // The header is not included here (its gColList is a smaller struct); the function is declared below.

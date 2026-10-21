@@ -1,6 +1,6 @@
 // Test library for CTrainingCentre::Serialise and UpdateMonthly (libtpw_unit_CTrainingCentre_Serialise.dylib,
 // tests/test_CTrainingCentre_Serialise.py), main app:
-//   src/TrackCell_CTrainingCentre_Serialise.cpp   the two functions and the three training globals
+//   src/game/buildings/TrainingCentre.cpp   the two functions and the three training globals
 //
 // The callees outside the unit (SAVEVAR/LOADVAR, GAME_ASSERTMSG, the world's used-thing walk, CStaff::TrainMe) are recording fakes.
 #include <cstddef>

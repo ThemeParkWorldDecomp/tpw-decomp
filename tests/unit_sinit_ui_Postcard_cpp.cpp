@@ -1,5 +1,5 @@
 // Test library for the static initialiser of ui_Postcard.cpp (unit v5204; libtpw_unit_sinit_ui_Postcard_cpp.dylib).
-//   src/SpeedTimerFudge_sinit_ui_Postcard_cpp.cpp   __sinit_ui_Postcard_cpp and the bss block gPostcardBlob
+//   src/game/ui/ui_Postcard.cpp   __sinit_ui_Postcard_cpp and the bss block gPostcardBlob
 //
 // The string constructors, __register_global_object and the two destructor glues are fakes that record their arguments.
 #include <cstddef>

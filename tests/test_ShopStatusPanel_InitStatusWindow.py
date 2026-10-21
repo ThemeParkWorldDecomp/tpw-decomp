@@ -1,6 +1,6 @@
 """Unit v5936, the shop status panel's figure window, against libtpw_unit_ShopStatusPanel_InitStatusWindow.dylib
 (tests/unit_ShopStatusPanel_InitStatusWindow.cpp), main app ("SimTheme Park"),
-src/ShopStatusPanel_InitWindow_ShopStatusPanel_ApplyChanges_ShopStatusPanel_InitStatusWindow.cpp:
+src/game/ui/ui_shopStatus.cpp:
   ShopStatusPanel::InitStatusWindow 0x101bc6c4, ShopStatusPanel::UpdateWindow 0x101bd730
 
 A case is a panel and a call. The panel, its windows (blocks tagged at +0x138 with their id), the shop object and the two fake

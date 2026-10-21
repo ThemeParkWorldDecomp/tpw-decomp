@@ -1,5 +1,5 @@
 // Test library for the main app's std::exception destructor (unit v5710; libtpw_unit_std_exception_Dtor_exception_2.dylib).
-//   src/TPMain_std_exception_Dtor_exception_2.cpp   TPMainExc::ExceptionDtor
+//   src/game/MslSupport.cpp   TPMainExc::ExceptionDtor
 //
 // operator delete (glue 0x10238218) is a recording fake; the vtable global gMslExcVtblC is defined here.
 #include <cstddef>

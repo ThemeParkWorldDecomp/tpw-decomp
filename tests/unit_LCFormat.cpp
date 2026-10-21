@@ -1,6 +1,6 @@
 // Test library for the online park list panel's row functions, message function and fill (unit v5210; libtpw_unit_LCFormat.dylib,
 // tests/test_LCFormat.py), main app:
-//   src/PublishPanelMsg_LCFormat.cpp   OnlineParkListLCFormat, OnlineParkListLCPostFormat, OnlineParkListPanelMsg, FillParkList
+//   src/game/ui/ui_onlineParkListPanel.cpp   OnlineParkListLCFormat, OnlineParkListLCPostFormat, OnlineParkListPanelMsg, FillParkList
 //
 // Every callee outside the unit is a fake that records what the real one reads (the same event names and arguments as the module's
 // PowerPC stubs) and answers from the test's queues. The globals of other files are defined here, zero at start like the Mac's bss.

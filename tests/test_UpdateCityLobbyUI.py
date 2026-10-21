@@ -1,5 +1,5 @@
 """Unit v5189, the city lobby's controller window, against libtpw_unit_UpdateCityLobbyUI.dylib (tests/unit_UpdateCityLobbyUI.cpp), main app
-("SimTheme Park"), src/UI_IslandLobby_msg_sinit_ui_cityLobbyController_cpp_UpdateCityLobbyUI.cpp:
+("SimTheme Park"), src/game/ui/ui_cityLobbyController.cpp:
   UpdateCityLobbyUI 0x101e0928, CreateCityLobbyController 0x101e05e4, CityLobbyControllerMsg 0x101e0400
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

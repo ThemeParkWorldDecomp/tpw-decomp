@@ -1,5 +1,5 @@
 // Test library for the keyboard cheat actions (unit v5267; libtpw_unit_WeatherUpLots.dylib, tests/test_WeatherUpLots.py), main app:
-//   src/ui_Postcard_panel_spawn_handyman_WeatherUpLots.cpp
+//   src/game/keyboard.cpp
 //
 // The callees outside the unit are recording fakes; the globals of other files are defined here.
 #include <cstdarg>

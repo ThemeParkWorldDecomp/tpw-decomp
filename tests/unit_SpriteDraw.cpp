@@ -1,7 +1,7 @@
-// Test entry point for the regular sprite draw path (library unit_SpriteDraw: src/tb_sprites_draw.cpp,
-// src/tb_rotatevertex.cpp, src/tb_drawprimitive_addsprite.cpp, with the real sprite manager src/tb_sprites.cpp,
-// DrawSprite and AddPoly_TLCTEX src/tb_drawprimitive_sprite.cpp, the real clipper and the real texture entry
-// src/tb_textureentry.cpp): SSpriteGameData::Prepare, CalcRegular, SetupVertices, DrawRegular and AddRegular,
+// Test entry point for the regular sprite draw path (library unit_SpriteDraw: src/engine/SpriteData.cpp,
+// src/engine/EngineUtil.cpp, src/engine/DrawPrimitive.cpp, src/engine/tb_error.cpp, with the real sprite manager src/engine/SpriteManager.cpp,
+// DrawSprite and AddPoly_TLCTEX src/engine/DrawPrimitive.cpp, the real clipper and the real texture entry
+// src/engine/TextureEntry.cpp): SSpriteGameData::Prepare, CalcRegular, SetupVertices, DrawRegular and AddRegular,
 // RotateVertex_Y and RotateVertex_Z, CDrawPrimitive::AddSprite and the vertex record's four small members.
 //
 // tests/test_SpriteDraw.py builds one world twice from one description, in emulator memory for the original and

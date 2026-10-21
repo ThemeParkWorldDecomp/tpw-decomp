@@ -1,5 +1,5 @@
 """Unit v5030, keyboard actions win_ticket_0..6 and enter_area_delete_mode, against libtpw_unit_win_ticket_1.dylib
-(tests/unit_win_ticket_1.cpp), main app ("SimTheme Park"), src/ui_Postcard_panel_win_ticket_1.cpp:
+(tests/unit_win_ticket_1.cpp), main app ("SimTheme Park"), src/game/keyboard.cpp:
   win_ticket_0 0x1014ed40, _1 0x1014edd8, _2 0x1014ee70, _3 0x1014ef08, _4 0x1014efa0, _5 0x1014f038, _6 0x1014f0d0,
   enter_area_delete_mode 0x1014ec48
 

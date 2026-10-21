@@ -1,5 +1,5 @@
 // Test library for Email::Email and Email::Callback (unit v5912; libtpw_unit_Email_Callback_2.dylib, tests/test_Email_Callback_2.py), main app:
-//   src/Email_Send_Email_Callback_2.cpp
+//   src/game/online/EmailMessage.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read: the string, list and Mail functions, the
 // callback glue, Email::BuildBody and Outbox::NextMail. The string and list constructors write zero words (the real ones write

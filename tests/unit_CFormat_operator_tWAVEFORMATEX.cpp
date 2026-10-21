@@ -1,5 +1,5 @@
 // Test library for the small sound functions (unit v51124; libtpw_unit_CFormat_operator_tWAVEFORMATEX.dylib), sound program:
-//   src/TbMpegBase_CFormat_operator_tWAVEFORMATEX.cpp
+//   src/sound/TbSoundPipe.cpp
 // Fakes: CFormat::FillWaveFormatEx, the access object's Read, and operator new[] / delete[] / delete (recording while a wrapper runs).
 #include <cstddef>
 #include <cstdint>

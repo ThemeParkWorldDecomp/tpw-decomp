@@ -1,6 +1,6 @@
 // Test library for InterfaceListControl2 FindData, PropagateMessage, SelectClick, SetCurrent, SetSort and ColumnButtonClick (unit v5908;
 // libtpw_unit_InterfaceListControl2_SetSort.dylib, tests/test_InterfaceListControl2_SetSort.py), main app:
-//   src/InterfaceListControl2_items_InterfaceListControl2_SetSort.cpp
+//   src/game/ui/InterfaceListControl2.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues: UI_SendMessage,
 // UI_PostMessage, the list's AdvanceIndex, ChangeCurEntry, UpdateDisplay and Sort, the window's GetWindow, GetChild and GetNext, the rectangle's

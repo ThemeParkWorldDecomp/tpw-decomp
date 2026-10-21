@@ -1,10 +1,10 @@
 // Test library for the path tool's pointer and selection accessors (unit v5L06; libtpw_unit_PathInput.dylib, tests/test_PathInput.py),
 // main app:
-//   src/UI_Base_mouse.cpp           UI_GetMouseXY
-//   src/Debug_pointer.cpp           SetPotentiallyHighlightedRide
-//   src/TPRide_pointed.cpp          GetPointedAtRide, LockPointedAtRide
-//   src/intrface_current.cpp        CIntrface::SetCurrentThing
-//   src/ui_allKidsPanel_select.cpp  UI_GetSelectedPeep, UI_GetSelectedObject, UI_SetSelectedObject, UI_CheckSelected,
+//   src/game/ui/UI_Base.cpp           UI_GetMouseXY
+//   src/game/rides/RidePreview.cpp           SetPotentiallyHighlightedRide
+//   src/game/TPPointer.cpp          GetPointedAtRide, LockPointedAtRide
+//   src/game/ui/intrface.cpp        CIntrface::SetCurrentThing
+//   src/game/ui/ui_allKidsPanel.cpp  UI_GetSelectedPeep, UI_GetSelectedObject, UI_SetSelectedObject, UI_CheckSelected,
 //                                   UI_SetSelectedPeep (unit v5L16)
 //
 // No callees. The globals the functions read and write are defined here; the test loads them from eleven words (pointers as

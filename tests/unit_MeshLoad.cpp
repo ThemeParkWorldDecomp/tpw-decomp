@@ -1,4 +1,4 @@
-// Test library for src/MeshLoad.cpp (libtpw_unit_MeshLoad.dylib; see
+// Test library for src/game/MeshLoad.cpp, src/game/TPMesh.cpp (libtpw_unit_MeshLoad.dylib; see
 // tests/test_MeshLoad.py): the game's mesh paths, LoadMesh and the two functions that make
 // an engine mesh object, driven by scripts over a mesh image the test lays out.
 //

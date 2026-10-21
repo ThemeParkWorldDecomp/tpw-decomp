@@ -1,4 +1,4 @@
-// The park's second-stage systems that LevelInit2 (0x100639b0) and LevelDeInit (0x10063b80) call (unit w111, src/LevelSystems.cpp
+// The park's second-stage systems that LevelInit2 (0x100639b0) and LevelDeInit (0x10063b80) call (unit w111, src/game/park/TPHField.cpp, src/game/rides/CoasterType.cpp, src/game/rides/RidePreview.cpp, src/game/rides/TPCoaster.cpp, src/game/TPLevel.cpp, src/game/MeshLoad.cpp, src/game/park/TPHoardings.cpp
 // unless noted; the main app's TPRide.cpp, Debug.cpp, TPCoaster.cpp and rsse.cpp ranges). The coaster types are in TPCoaster.h, the
 // cell system in LLCellSystem.h, the script system and the dynamic cell meshes in analyser.h, PT_SetRange in tb_hfield.h.
 #pragma once
@@ -20,7 +20,7 @@ extern float gHeightmapScaleA;              // 0x102c1e0c  set first
 extern float gHeightmapScaleB;              // 0x102c1e08
 // 0x10061448 (40 bytes): gives back the ride hoardings' textures.
 void ClosedownRideHoardings();
-extern sDTextureSet gRideHoardingTextures;  // 0x1029cf58 (initialised data, defined in src/LevelLeaves.cpp)
+extern sDTextureSet gRideHoardingTextures;  // 0x1029cf58 (initialised data, defined in src/game/DynamicMeshSet.cpp)
 // 0x1006446c (280 bytes): takes the park's light (gGlobalLight, LevelInit.h) out of the map's list 0x70 and deletes it: type 2
 // the directional light and then the point light (never made, so a NULL link), 3 the point light, 1 sets GlobalDiffuse to
 // (1, 0, 0, 0) and then does what type 2 does, 0 reports "Invalid lightsource creation attempted" through DataErrorHandler; any
@@ -35,11 +35,11 @@ extern void* gHighlightNodeColours;         // 0x102d1f0c
 // 0x100b9834 (72 bytes, rsse.cpp): the Mac shows a warning box (OK and Cancel, titled "M3D2 Exporter - Data Error") and answers
 // false for Cancel. The port writes the text to the log through SamsUtilities::UDebug and answers true, as an OK.
 bool DataErrorHandler(char* text);
-// 0x1005b7a8 (112 bytes, src/MapReset.cpp, unit w112c; TPRide.cpp in the inventory): 0 for a cell outside the height field or one whose
+// 0x1005b7a8 (112 bytes, src/game/park/TPHField.cpp, unit w112c; TPRide.cpp in the inventory): 0 for a cell outside the height field or one whose
 // quad has bit 0 set, 1 for the rest, and also 1 when there is no height field. x and y are compared as unsigned numbers.
 int32_t HFieldCellStatus(int32_t x, int32_t y);
 
-// Unit v5258 (src/LevelSystems_GetNodePositionSimple.cpp)
+// Unit v5258 (src/game/park/TPHField.cpp)
 struct tag_sNode;
 struct s3DPoint;
 struct tag_sMesh;
@@ -55,7 +55,7 @@ int32_t GetRideIDAtCell(int32_t x, int32_t y);
 // 0x1005c1b0 (112 bytes): the ride set at the cell, x and y clamped (unsigned) to the height field's size at +0x18 and +0x1c; 0 for ride 0.
 tag_sRideAnimSet* GetMeshPtrAtHFieldCell(uint32_t x, uint32_t y);
 
-// Unit v5902 (src/LevelSystems_RecalculateParkDarkening.cpp)
+// Unit v5902 (src/game/park/TPHField.cpp)
 struct sMatrix;
 // 0x1005c2b0 (676 bytes): the matrix is passed by value (16 words: r4..r10 and the stack).
 void UpdateHFieldDarkeningNormals(tag_sNode* node, sMatrix matrix);

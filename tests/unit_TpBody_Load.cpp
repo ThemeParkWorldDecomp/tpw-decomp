@@ -1,5 +1,5 @@
 // Test library for TpBody::Load/Save, five Sound Sprockets command constructors and UReferenceCounted::RemoveReference (unit v51014;
-// libtpw_unit_TpBody_Load.dylib, tests/test_TpBody_Load.py), main app: src/TbSysCommand_TpBody_Load.cpp.
+// libtpw_unit_TpBody_Load.dylib, tests/test_TpBody_Load.py), main app: src/sound/CSprocketsModule.cpp, src/sound/SprocketsChannel.cpp, src/sound/TpBody.cpp.
 //
 // The callees outside the unit are fakes that record what the real ones read: the file (Read, Write, Seek), the list (Load, Save),
 // TbSoundPosition::Get and UCommand's constructor. The CFile members are defined here (the library's file class is an import).

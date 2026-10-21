@@ -1,5 +1,5 @@
 """Unit v5283, the static initialiser of tb_starfield.cpp, against libtpw_unit_sinit_tb_starfield_cpp.dylib
-(tests/unit_sinit_tb_starfield_cpp.cpp), main app, src/tb_switch_sinit_tb_starfield_cpp.cpp:
+(tests/unit_sinit_tb_starfield_cpp.cpp), main app, src/engine/tb_starfield.cpp:
   __sinit_tb_starfield_cpp 0x1003266c
 
 A case fills the 0x1c bytes of gStarfield with a junk byte, calls the initialiser and compares the seven fields (pointers as low

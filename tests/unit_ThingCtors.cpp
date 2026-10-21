@@ -1,5 +1,5 @@
 // Test library for the constructors of the things a new level makes (libtpw_unit_ThingCtors.dylib; see tests/test_ThingCtors.py):
-// src/ThingCtors.cpp, with the six leaf part constructors inline in include/ThingParts.h and include/ThingReceivers.h.
+// src/game/Thing.cpp, src/game/advisor/Advisor.cpp, src/game/buildings/MechanicHQ.cpp, src/game/buildings/ResearchLab.cpp, src/game/buildings/StaffHQ.cpp, src/game/park/Weather.cpp, src/game/ui/vector2d.cpp, with the six leaf part constructors inline in include/ThingParts.h and include/ThingReceivers.h.
 //
 // Every callee outside the unit is a fake that records through calllog: CWorld::AddThingToThingList, CThing::GetThingId,
 // CMapCell::InsertThing, TRACE, CMessageCentre::Subscribe, CWeather::FindNewQuality, CAdvisor::Init, CTagSystem::Init,

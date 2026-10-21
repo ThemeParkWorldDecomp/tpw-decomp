@@ -1,6 +1,6 @@
 """Unit v5200, the map panel's sprite position, coaster tracks and grid details, against libtpw_unit_CUI2DMap_UpdateSpritePosition.dylib
 (tests/unit_CUI2DMap_UpdateSpritePosition.cpp), main app ("SimTheme Park"),
-src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition.cpp:
+src/game/ui/ui_2dmap.cpp:
   CUI2DMap::UpdateSpritePosition 0x10230a0c, CUI2DMap::DrawCoasterTracks 0x1022f160, CUI2DMap::StoreMapGridDetails 0x1022de40
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,5 +1,5 @@
 // Test library for LbScreen_RestoreMode (unit v5761; libtpw_unit_LbScreen_RestoreMode.dylib, tests/test_LbScreen_RestoreMode.py), bullfrog:
-//   src/CreateDirectDrawObject_LbScreen_PartSwap_LbScreen_RestoreMode.cpp
+//   src/bullfrog/WinScrn.cpp
 //
 // The callees outside the unit are recording fakes; gWinScrnDirectDraw is defined here.
 #include <cstddef>

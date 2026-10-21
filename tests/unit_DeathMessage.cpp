@@ -1,5 +1,5 @@
-// Test library for unit w123c: src/MsgDeath.cpp (CMsgDeath constructor, GetType and destructor), src/MessageCentre_post.cpp
-// (CMessageCentre::PostMessage), src/World_death.cpp (CWorld::AddToPendingDeleteList and GetRand) and src/ParkTime_season.cpp
+// Test library for unit w123c: src/game/Thing.cpp, src/game/ui/MessageCentre.cpp (CMsgDeath constructor, GetType and destructor), src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/save/BlockSave.cpp, src/game/ui/MessageCentre.cpp
+// (CMessageCentre::PostMessage), src/game/World.cpp (CWorld::AddToPendingDeleteList and GetRand) and src/game/people/ParkTime.cpp
 // (CParkTime::GetSeason). Every callee outside the unit is a recording fake: the assertion, the thing's GetThingId and ReceiveMessage, the
 // subscription tree (find, erase, begin, the global increment, Construct and destroy), the pending list's AddHead, the world accessor and the
 // two timestamp imports. The death message's GetType is the real one; a non-death post uses a test subclass whose answer the case chooses.

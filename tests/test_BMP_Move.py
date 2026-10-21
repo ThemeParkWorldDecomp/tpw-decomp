@@ -1,5 +1,5 @@
 """Unit v5627, one step of a bump car (BMP_Move), against libtpw_unit_BMP_Move.dylib (tests/unit_BMP_Move.cpp), main app
-("SimTheme Park"), src/BMP_Move.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_Move 0x10029b9c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

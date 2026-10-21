@@ -1,5 +1,5 @@
 """Unit v5001, the tag functions AddATag, SaveTags and LoadTags, against libtpw_unit_SaveTags.dylib (tests/unit_SaveTags.cpp), main app
-("SimTheme Park"), src/ui_StatusPanel.cpp:
+("SimTheme Park"), src/game/ui/ui_tags.cpp:
   AddATag 0x10191ef8, SaveTags 0x1019231c, LoadTags 0x10192704
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

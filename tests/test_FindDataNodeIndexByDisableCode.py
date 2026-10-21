@@ -1,5 +1,5 @@
 """Unit v5L21, FindDataNodeIndexByDisableCode 0x1020017c and CTRACE 0x1006fcbc, against
-libtpw_unit_FindDataNodeIndexByDisableCode.dylib (src/advisor_leaves.cpp, src/Debug.cpp).
+libtpw_unit_FindDataNodeIndexByDisableCode.dylib (src/game/TPEmbed.cpp, src/game/TPMesh.cpp, src/game/rides/RideAnim.cpp, src/game/Debug.cpp).
 
 FindDataNodeIndexByDisableCode: a ride set whose mesh header holds a count (0x48) and the embedded entries (0x7c, 0x14 bytes
 each: flags, a word, the id at 0x08) is built in each memory; the answer is compared. The codes cover none of the used bits (the

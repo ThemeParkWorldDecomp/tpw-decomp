@@ -1,5 +1,5 @@
 // Test library for CFSUserInfo::GameLogout (libtpw_unit_CFSUserInfo_GameLogout.dylib, tests/test_CFSUserInfo_GameLogout.py), main app:
-//   src/FS_UserInfo_CFSUserInfo_GameLogout.cpp
+//   src/game/save/FS_UserInfo.cpp
 // Every callee is a recording fake; the strings are fakes that only record.
 #include <cstddef>
 #include <cstdint>

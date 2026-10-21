@@ -1,4 +1,4 @@
-"""Unit v5306, SetRideMobile, against libtpw_unit_SetRideMobile.dylib (tests/unit_SetRideMobile.cpp), main app, src/TPEngine_SetRideMobile.cpp:
+"""Unit v5306, SetRideMobile, against libtpw_unit_SetRideMobile.dylib (tests/unit_SetRideMobile.cpp), main app, src/game/rides/TPRide.cpp:
   SetRideMobile 0x10068280
 
 A case is a world and a call. Three anim sets (indexes 1..3 of gRideAnimSets), each with its own mesh, header and node, are built by ONE piece

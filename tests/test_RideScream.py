@@ -1,5 +1,5 @@
 """Unit w171, a ride script's screams and DrawPeep, against libtpw_unit_RideScream.dylib (tests/unit_RideScream.cpp), main app
-("SimTheme Park"), src/rsse_scream.cpp:
+("SimTheme Park"), src/game/rides/RideEffects.cpp, src/game/rides/rsse.cpp:
   SCREAM_Start 0x100CCB30, SCREAM_SetLevel 0x100CCCC0, SCREAM_Move 0x100CCD3C, SCREAM_Stop 0x100CCD98, SCREAM_Single 0x100CCDE8,
   SCREAM_SingleSad 0x100CD098, TriggerRepairParticleEffect 0x100CD190, DrawPeep 0x100CD388, RSSE_GetSoundEventCode 0x100D6D04,
   RSSE_GetCoasterHandle 0x100D6F34

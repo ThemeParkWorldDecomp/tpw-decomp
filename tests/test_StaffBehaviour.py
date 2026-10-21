@@ -1,5 +1,5 @@
 """Unit w191, against libtpw_unit_StaffBehaviour.dylib (tests/unit_StaffBehaviour.cpp), main app ("SimTheme Park"):
-  src/Staff_behaviour.cpp   CStaff::ProcessWalkingToRestArea 0x10126008, ProcessResting 0x101262a8, ProcessWalkingToStrike 0x10126444, ProcessStriking
+  src/game/people/staff.cpp   CStaff::ProcessWalkingToRestArea 0x10126008, ProcessResting 0x101262a8, ProcessWalkingToStrike 0x10126444, ProcessStriking
                             0x10126504, ProcessBeingStunned 0x10126688, GetTiredPatrolling 0x10126d1c, GetTiredWorking 0x10126e28, FindNearestRestingPlace
                             0x10127108, DoGeneralStaffThing 0x101272b0, GoToRestArea 0x10127658, StopResting 0x10127764, SetPatrolArea 0x101278f0,
                             GetPatrolArea 0x1012798c, CancelPatrolArea 0x10127a24, HasPatrolArea 0x10127a78, InsidePatrolArea 0x10127af8, FindDestInPatrolArea

@@ -1,6 +1,6 @@
 """Unit v51038, the interface's mouse, research button, kid and staff room events and the error dialog's queue, against
 libtpw_unit_UIInterface_CamcorderMode.dylib (tests/unit_UIInterface_CamcorderMode.cpp), main app ("SimTheme Park"),
-src/UI_pump_UIInterface_CamcorderMode.cpp:
+src/game/ui/UIInterface.cpp, src/game/ui/ui_ErrorDisplay.cpp:
   UIInterface::CamcorderMode 0x101f0ffc, UIInterface::EnableResearchButton 0x101f10f8, UIInterface::StaffRoomEvent 0x101f0dcc,
   UIInterface::KidArrived 0x101f0d14, ErrorDlgCancel 0x101f1cd0, AddUIError 0x101f1df0,
   std::__cdeque<errorthingy*,std::allocator<errorthingy*>>::~__cdeque 0x101f2520

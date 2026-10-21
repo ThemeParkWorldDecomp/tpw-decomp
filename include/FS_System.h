@@ -1,4 +1,4 @@
-// FS_System.cpp (main app 0x10003fd4..0x1000525c; src/FS_System.cpp): the game's file
+// FS_System.cpp (main app 0x10003fd4..0x1000525c; src/game/save/FS_System.cpp): the game's file
 // functions (the engine reads its files through them, see MacOpen...), the directory
 // helpers and the paths of the game's folders (CSYS_TPFileInfo).
 #pragma once

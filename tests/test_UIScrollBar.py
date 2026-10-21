@@ -1,15 +1,15 @@
 """Differential tests for the sprite draw object, the scroll bar and the window's show and position leaves, against
 libtpw_unit_UIScrollBar.dylib (tests/unit_UIScrollBar.cpp):
 
-  src/ui_DrawObjectSprite.cpp    InterfaceDrawObjectSprite: constructor, destructor, UpdateTextures, CreateTextures, Refresh, Change,
+  src/game/ui/InterfaceDrawObjectSprite.cpp    InterfaceDrawObjectSprite: constructor, destructor, UpdateTextures, CreateTextures, Refresh, Change,
                                  Show, Draw, GetWritableDataArea, SetPreDrawCallback
-  src/InterfaceScrollBar.cpp     InterfaceScrollBar: constructor, destructor, CalcClientArea, WhatAmI, Enable, ReCalcValue,
+  src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceScrollBar.cpp     InterfaceScrollBar: constructor, destructor, CalcClientArea, WhatAmI, Enable, ReCalcValue,
                                  ReCalcThumbPos, GetValue, SetMinMax, SetValue, SetPageValue, AddIncButton, AddDecButton,
                                  AddThumbTrack, ClientClick, DrawFunction, ClientDraw; UI_DefaultScrollBarCallback
-  src/InterfaceWindow_show.cpp   InterfaceWindow: Show, ShowAllDRAWOBJS, GetWindow and the two other SetPosition overloads
+  src/game/ui/InterfaceWindow.cpp   InterfaceWindow: Show, ShowAllDRAWOBJS, GetWindow and the two other SetPosition overloads
 
-Real on both sides: those, the window's constructor (src/InterfaceWindow.cpp, which builds the test trees) and the rectangles
-(src/UI_Base.cpp). Fakes that record the same event on both sides: the message senders and UI_UpdatePointerIn, the default window
+Real on both sides: those, the window's constructor (src/game/ui/InterfaceWindow.cpp, which builds the test trees) and the rectangles
+(src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Fakes that record the same event on both sides: the message senders and UI_UpdatePointerIn, the default window
 handler and the thumb's, the window's other members (destructor, Enable, DrawMe, GetPosition, SetPosition(CoolRect*), SetValue, ClientDraw,
 SetCallbackFunction, CreateObject, CalcClientArea, DrawFunction), the draw object base class and two kinds of fake draw object, the help
 text handler, the engine's sprite surfaces (SSpriteGameData, SSpriteEngineData, CSpriteList) and CMapWho::Link and Unlink.

@@ -1,9 +1,9 @@
 // Test library for the UIInterface forwarders and the small CodeWarrior deque pieces (unit v51076; libtpw_unit_std___cdeque_pop_front.dylib,
 // tests/test_std___cdeque_pop_front.py), main app:
-//   src/UI_pump_std___cdeque_pop_front.cpp   the forwarders, __cdeque<const void*>::pop_front / max_size, iterator copy, deque ctor
+//   src/game/ui/UIInterface.cpp   the forwarders, __cdeque<const void*>::pop_front / max_size, iterator copy, deque ctor
 //
 // The callees outside the unit are fakes that record the arguments the real ones read (pointers as labels) and answer from the test's
-// queue. gPlayerSettings (src/TPSettings.cpp) is defined here with empty Init and destructor, so that it stays zero at start.
+// queue. gPlayerSettings (src/game/TPSettings.cpp) is defined here with empty Init and destructor, so that it stays zero at start.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

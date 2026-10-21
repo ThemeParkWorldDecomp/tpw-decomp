@@ -1,5 +1,5 @@
 """Unit v5223, the advisor's staff report and its save/load walk, against libtpw_unit_CAdvisor_HandleStaffInfo.dylib
-(tests/unit_CAdvisor_HandleStaffInfo.cpp), main app ("SimTheme Park"), src/AdvisorQueue_CAdvisor_HandleStaffInfo.cpp:
+(tests/unit_CAdvisor_HandleStaffInfo.cpp), main app ("SimTheme Park"), src/game/advisor/Advisor.cpp:
   CAdvisor::HandleStaffInfo 0x1000c40c, CAdvisor::Serialise 0x1000a468
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses

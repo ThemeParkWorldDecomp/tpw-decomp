@@ -1,5 +1,5 @@
 """Unit v5711, EmailInfo::~EmailInfo, against libtpw_unit_EmailInfo_Dtor_EmailInfo.dylib (tests/unit_EmailInfo_Dtor_EmailInfo.cpp), main app,
-src/email_load_EmailInfo_Dtor_EmailInfo.cpp:
+src/game/online/email.cpp:
   EmailInfo::~EmailInfo 0x10203aec
 
 A case is an object (or NULL) and the hidden delete flag. The callees (string destructor 0x1000221c, list clear 0x1017fc04, operator

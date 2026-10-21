@@ -1,5 +1,5 @@
 // Test library for LbScreen_SetMode (unit v51000; libtpw_unit_LbScreen_SetMode_2.dylib, tests/test_LbScreen_SetMode_2.py), main app ("bullfrog"):
-//   src/LbScreen_Initialise_LbScreen_Terminate_LbScreen_SetMode_2.cpp   LbScreen_SetMode
+//   src/bullfrog/WinScrn.cpp   LbScreen_SetMode
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues. The globals of
 // WinScrn.cpp, LbSCBack.cpp and LbPalette are defined here, zero at start like the Mac's bss. The objects the fakes hand out are

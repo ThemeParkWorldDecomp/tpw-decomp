@@ -1,5 +1,5 @@
 """Unit v5100, the online city info overlay and the login panel's message function, against libtpw_unit_UpdateOnlineCityInfoOverlay.dylib
-(tests/unit_UpdateOnlineCityInfoOverlay.cpp), main app, src/UI_IslandLobby_UpdateOnlineCityInfoOverlay.cpp:
+(tests/unit_UpdateOnlineCityInfoOverlay.cpp), main app, src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineLogin.cpp:
   UpdateOnlineCityInfoOverlay 0x101e1f64, CreateOnlineCityInfoOverlay 0x101e20f0, OnlineLoginPanelDlgMsg 0x101e24c8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

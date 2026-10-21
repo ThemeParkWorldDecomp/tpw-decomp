@@ -1,5 +1,5 @@
 // Test library for CFormat::FillWaveFormatEx (unit v5274; libtpw_unit_CFormat_FillWaveFormatEx.dylib), main sound library:
-//   src/TbMpegBase_CFormat_FillWaveFormatEx.cpp
+//   src/sound/FileAccess.cpp
 // No callees and no globals.
 #include <cstddef>
 #include <cstdint>

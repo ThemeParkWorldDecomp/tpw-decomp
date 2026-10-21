@@ -1,5 +1,5 @@
 """Unit v5203, the list control's Sort and FindString, against libtpw_unit_InterfaceListControl2_Sort.dylib
-(tests/unit_InterfaceListControl2_Sort.cpp), main app ("SimTheme Park"), src/InterfaceListControl2_items_InterfaceListControl2_Sort.cpp:
+(tests/unit_InterfaceListControl2_Sort.cpp), main app ("SimTheme Park"), src/game/ui/InterfaceListControl2.cpp:
   InterfaceListControl2::Sort 0x101d1958, InterfaceListControl2::FindString 0x101d44b8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory (big-endian, 4-byte words) and in

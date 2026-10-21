@@ -1,5 +1,5 @@
 // Test library for the buddy map's tree (unit v51025; libtpw_unit_std___tree_std_pair_std_map_nocase_string_BuddyI_2.dylib), main app:
-//   src/std___tree_std_pair_std_map_nocase_string_BuddyI_2.cpp   find, insert_one, destroy, erase
+//   src/game/online/online.cpp   find, insert_one, destroy, erase
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues.
 #include <cstddef>

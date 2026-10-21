@@ -1,8 +1,8 @@
 // Test library for the 4-bit font render method's core (libtpw_unit_FontRenderMethod.dylib; see tests/test_FontRenderMethod.py,
-// unit w45a): src/ltms_fontrender_method.cpp (Tb4BitFontRenderMethod's constructor-side members, DrawChar, CalculateSourceRect,
-// GetRotate, FourBit::FontData, TbFontRenderMethod's destructor), src/ltms_fontrender.cpp (TbFontRender and the render parameters'
-// members, among them the five of this unit), src/tb_fontrenderparams.cpp (the parameters' constructors and destructor, which
-// TbFontRender's constructor runs) and src/TbIRLE4bitFont.cpp (the real font: GetCharHeader and GetCharData read a real image).
+// unit w45a): src/ltms/StaticUnicodeBuffer.cpp, src/ltms/TbFontRender.cpp (Tb4BitFontRenderMethod's constructor-side members, DrawChar, CalculateSourceRect,
+// GetRotate, FourBit::FontData, TbFontRenderMethod's destructor), src/ltms/TbFontRender.cpp, src/ltms/TbFontRenderParams.cpp (TbFontRender and the render parameters'
+// members, among them the five of this unit), src/ltms/TbFontRenderParams.cpp (the parameters' constructors and destructor, which
+// TbFontRender's constructor runs) and src/ltms/TbFontRenderParams.cpp, src/ltms/TbIRLE4bitFont.cpp (the real font: GetCharHeader and GetCharData read a real image).
 // The nybble and bit iterators are inline (include/TbFontBits.h) and are exercised through the exports below.
 //
 // Everything else the code calls is a fake that records through calllog, the same events as the PowerPC side's fakes:

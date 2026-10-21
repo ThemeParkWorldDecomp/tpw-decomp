@@ -1,6 +1,6 @@
 """Unit w80, the sound library's four small codecs, against libtpw_unit_SoundCodecs.dylib (tests/unit_SoundCodecs.cpp), in the
 program "sound symbols shared" (the Mac's sound library, Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/TbSoundCodecs.cpp  _TbSoundSampleWAV: constructor 0x10000d90, destructor 0x10011338, GetDataChunk 0x10011154, Restart
+  src/game/advisor/AdvisorScoring.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleWAV.cpp, src/sound/TbSoundSampleWAVFile.cpp, src/sound/TimerCodec.cpp  _TbSoundSampleWAV: constructor 0x10000d90, destructor 0x10011338, GetDataChunk 0x10011154, Restart
                          0x100113cc, SetDataStart 0x1001140c, operator new 0x10010ec4, operator delete 0x10010f90, TopUp
                          0x10011034, SetLevel 0x10011114, ClearCache 0x10010e34;
                          _TbSoundSampleWAVFile: constructor 0x10011868, destructor 0x10011b4c, GetDataChunk 0x10011934, Restart

@@ -1,5 +1,5 @@
 // Test library for LinearSampleTrack (unit v5664; libtpw_unit_LinearSampleTrack.dylib, tests/test_LinearSampleTrack.py), main app:
-//   src/DestroyCoasterPylons_CalcNumTrackSamples_LinearSampleTrack.cpp   LinearSampleTrack
+//   src/game/rides/CoasterTrack.cpp   LinearSampleTrack
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues; gCoasterCurrentData is
 // defined here. The position control fakes only move the control's numbers (the test's queue "inc" says how).

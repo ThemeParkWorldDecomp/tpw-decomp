@@ -1,4 +1,4 @@
-// Test entry points for the world's sequences (library unit_WorldSequences: src/World_sequences.cpp, unit w194): CWorld::PopulatePark,
+// Test entry points for the world's sequences (library unit_WorldSequences: src/game/World.cpp, unit w194): CWorld::PopulatePark,
 // StartingPopulationForOnline, StartBankruptcySequence, StartWinningSequence, IsPlayingWinningAnim, EndWinningSequence, GetPrevUsedThing,
 // SeedRand, ReconstructFreeList, GetNewPersonIndex, FlagItemAsSelected, ConvertDLRidesUsedToIndices, RestoreEngineObjects,
 // DeleteEngineObjects and the pending list's RemoveHead and AddHead.

@@ -1,5 +1,5 @@
 """Unit v5312, CStaticMBBuffer::AppendMB x2, AppendUnicode x2, Close, against libtpw_unit_CStaticMBBuffer_AppendMB.dylib
-(tests/unit_CStaticMBBuffer_AppendMB.cpp), program ltms, src/TbITable_TbITable_FormatString.cpp:
+(tests/unit_CStaticMBBuffer_AppendMB.cpp), program ltms, src/ltms/TbITable.cpp:
   AppendMB(ptr, size) 0x100000dc, AppendMB(u16) 0x100001e8, AppendUnicode(ptr, size) 0x10000284, AppendUnicode(wchar) 0x10000394, Close 0x10000420
 
 A case is a buffer object (cursor, end, converter, overflow flag) over a data block with padding, built by one piece of Python code in both

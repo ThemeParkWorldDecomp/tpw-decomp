@@ -1,5 +1,5 @@
 """Unit v5981, against libtpw_unit_InterfaceWindow_link.dylib (tests/unit_InterfaceWindow_link.cpp), main app
-("SimTheme Park"), src/InterfaceWindow_draw_InterfaceWindow_link.cpp:
+("SimTheme Park"), src/game/ui/InterfaceWindow.cpp, src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_onlineLogin.cpp, src/game/ui/ui_onlineOutbox.cpp:
   InterfaceWindow::link 0x101ddf20, __sinit_ui_islandLobbyController_cpp 0x101e1e3c, LobbyOnlineLoginPanelDlgMsg 0x101e26fc,
   AdressesTextPanelMsg 0x101e4b00, read_JPEG_file 0x101e538c
 

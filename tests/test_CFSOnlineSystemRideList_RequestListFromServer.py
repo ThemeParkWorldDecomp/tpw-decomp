@@ -1,6 +1,6 @@
 """Unit v5718, CFSOnlineSystemRideList::RequestListFromServer and StoreReceivedList, against
 libtpw_unit_CFSOnlineSystemRideList_RequestListFromServer.dylib (tests/unit_CFSOnlineSystemRideList_RequestListFromServer.cpp), main app,
-src/CFSOnlineSystemRideList_RequestListFromServer.cpp:
+src/game/online/FS_OnlineList.cpp:
   RequestListFromServer 0x1017bb4c, StoreReceivedList 0x1017bbf0
 
 A case is a world and a call, built by one piece of Python code on both memories. Callees (fakes on both sides): UDebug (length and weighted

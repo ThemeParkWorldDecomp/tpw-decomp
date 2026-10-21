@@ -1,5 +1,5 @@
 // Test library for std::list<CToken>::clear (unit v5132; libtpw_unit_std_list_clear.dylib, tests/test_std_list_clear.py), main app:
-//   src/COnlineParser_ParseGoto_std_list_clear.cpp   CTokenListClear
+//   src/game/online/OnlineParser.cpp   CTokenListClear
 //
 // The only callee, operator delete (0x10238218), is a fake that records the label of the pointer.
 #include <cstddef>

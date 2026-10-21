@@ -1,5 +1,5 @@
 // Test library for the research panel bar messages (unit v5029; libtpw_unit_RideMsg.dylib, tests/test_RideMsg.py), main app:
-//   src/CreateResearchPanel_RideMsg.cpp   RideMsg, UpgMsg, ShopMsg, ShowMsg, FeatureMsg
+//   src/game/ui/ui_researchPanel.cpp   RideMsg, UpgMsg, ShopMsg, ShowMsg, FeatureMsg
 //
 // TankButton and AnimatingPumpMsg are fakes that record their arguments; AnimatingPumpMsg answers from the queue.
 #include <cstddef>

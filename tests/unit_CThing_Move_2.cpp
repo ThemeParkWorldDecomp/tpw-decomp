@@ -1,5 +1,5 @@
 // Test library for CThing::Move, FinalDestroy and Serialise (unit v5927; libtpw_unit_CThing_Move_2.dylib, tests/test_CThing_Move_2.py), main app:
-//   src/Thing_receive_CThing_Move_2.cpp
+//   src/game/Thing.cpp
 //
 // The callees outside the unit are recording fakes; the globals of other files are defined here.
 #include <cstddef>

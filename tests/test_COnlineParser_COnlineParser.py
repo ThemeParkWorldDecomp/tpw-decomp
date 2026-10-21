@@ -1,6 +1,6 @@
 """Unit v5131, the COnlineParser constructor, destructor and the four argument-less commands, against
 libtpw_unit_COnlineParser_COnlineParser.dylib (tests/unit_COnlineParser_COnlineParser.cpp), main app ("SimTheme Park"),
-src/COnlineParser_ParseGoto_COnlineParser_COnlineParser.cpp:
+src/game/online/OnlineParser.cpp:
   COnlineParser::COnlineParser 0x1020e400, ParseEarmuffs 0x1020faf8, ParseAfk 0x1021023c, ParseVote 0x10210648,
   ParseFilter 0x10210720, ~COnlineParser 0x102107fc
 

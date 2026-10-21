@@ -1,5 +1,5 @@
 """Unit v5294, SOUND_SetRect, against libtpw_unit_SOUND_SetRect.dylib (tests/unit_SOUND_SetRect.cpp), main app
-("SimTheme Park"), src/SoundRuntime_SOUND_SetRect.cpp:
+("SimTheme Park"), src/game/Sound.cpp:
   SOUND_SetRect 0x100de828
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory, host memory). The only callee,

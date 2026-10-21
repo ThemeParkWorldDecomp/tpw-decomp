@@ -1,4 +1,4 @@
-"""Unit v5682, one tick of the bumper cars, against libtpw_unit_BMP_Tick.dylib (tests/unit_BMP_Tick.cpp), main app, src/BMP_Tick.cpp:
+"""Unit v5682, one tick of the bumper cars, against libtpw_unit_BMP_Tick.dylib (tests/unit_BMP_Tick.cpp), main app, src/game/rides/BumperRide.cpp:
   BMP_Tick 0x10028cb0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian, host memory little-endian).

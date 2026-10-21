@@ -1,6 +1,6 @@
 // Test library for the loft of a new brace and the link level of a pylon (unit v5053; libtpw_unit_GetNewBraceLoftInterval.dylib,
 // tests/test_GetNewBraceLoftInterval.py), main app:
-//   src/GetNewBraceLoftInterval.cpp   GetNewBraceLoftInterval, DetermineLinkLevel
+//   src/game/rides/CoasterPylon.cpp   GetNewBraceLoftInterval, DetermineLinkLevel
 //
 // The callees outside the unit (CTRACE, CalculateBraceHeight, DistanceBetweenPoints, GetIntervalForHeight, SetLoftPylon) are fakes that
 // record what the real ones read and answer from the test's queues; the globals of other files the unit reads are defined here.

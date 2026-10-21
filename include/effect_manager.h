@@ -1,6 +1,6 @@
 // The effect manager (main app, the HLSprite.cpp range of the inventory, 0x1007a3d0..0x1007a6b8): up to three effects, each a
 // group of particle emitters that orbit a point which moves from one place to another. The advisor uses it for its sparkles
-// (src/Advisor.cpp declares the five functions too, identically).
+// (src/game/advisor/Advisor.cpp declares the five functions too, identically).
 #pragma once
 #include <cstdint>
 
@@ -27,7 +27,7 @@ static_assert(sizeof(EMEffect) == 0x44 && __builtin_offsetof(EMEffect, mStart) =
 constexpr int32_t kEffects = 3;
 extern EMEffect gEffects[kEffects];   // 0x102dab10
 
-// ---- src/effect_manager.cpp (unit w26c)
+// ---- src/game/HLSprite.cpp (unit w26c)
 // 0x1007a3d0 (100 bytes): clears the three effects and makes the table of sines the effects' orbits read.
 void EM_Init();
 // 0x1007a454 (220 bytes): gives effect `effect` (no range check) `count` emitters of library type `emitter`: starts the missing ones
@@ -44,7 +44,7 @@ void EM_SetEffectOrbit(int32_t effect, int32_t index, float a, float b, float c)
 // progress without a stop (the move goes on past its end).
 void EM_Tick();
 
-// ---- what the effect manager calls of the rest of the main app (src/host_leaves.cpp, unit w38)
+// ---- what the effect manager calls of the rest of the main app (src/game/advisor/Advisor.cpp, src/game/rides/BumperRide.cpp, unit w38)
 uint32_t RealTimePauseAdjusted();     // 0x10007c68  the game's real-time clock in milliseconds, held still while paused
 int32_t HOST_Sin(int32_t angle);      // 0x100218f4  table of 512 sines (angle & 511) times 1024
 int32_t HOST_Cos(int32_t angle);      // 0x10021928  the same a quarter turn on (angle + 128)

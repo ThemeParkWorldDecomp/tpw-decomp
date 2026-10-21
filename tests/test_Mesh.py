@@ -1,6 +1,6 @@
 """CMesh: construction, Init, Close, DestroyBumpmappingNormals, DeleteRideBase,
 DeleteRideSign, GetData, GetLinkType (engine library, 0x1001cb44..0x1001f0f4;
-src/tb_mesh.cpp).
+src/engine/Mesh.cpp).
 
 A case lays a small mesh image out on both sides (header, texture records and infos, face
 sets, nodes: the fields CMesh reads, everything else zero; the original's in the Mac's

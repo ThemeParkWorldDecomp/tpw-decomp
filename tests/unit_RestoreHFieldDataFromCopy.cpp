@@ -1,5 +1,5 @@
 // Test library for RestoreHFieldDataFromCopy (unit v5287; libtpw_unit_RestoreHFieldDataFromCopy.dylib), main app:
-//   src/HeightfieldLoad_RestoreHFieldDataFromCopy.cpp
+//   src/game/park/TPHField.cpp
 //
 // No callees outside the C library's memcpy, which runs for real on both sides.
 #include <cstddef>

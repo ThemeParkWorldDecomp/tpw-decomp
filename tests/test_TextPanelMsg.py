@@ -1,5 +1,5 @@
 """Unit v5225, the online news panel, against libtpw_unit_TextPanelMsg.dylib (tests/unit_TextPanelMsg.cpp), main app
-("SimTheme Park"), src/UI_IslandLobby_TextPanelMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_onlineNewsPanel.cpp:
   TextPanelMsg 0x101e30b4, CreateOnlineNewsPanel 0x101e3264, CalcScrollBar 0x101e2ce8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

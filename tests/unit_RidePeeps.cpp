@@ -1,5 +1,5 @@
 // Test library for the peep tables of a ride script (unit w149; libtpw_unit_RidePeeps.dylib, tests/test_RidePeeps.py), main app:
-//   src/rsse_peeps.cpp   WALKNODE_Tick, Trigger, Get, Float, Release; BOUNCE_Put, Get, ForceGet, Tick; LIMBO_Put, Get, ForceGet; GetNodePos
+//   src/game/rides/RideEffects.cpp   WALKNODE_Tick, Trigger, Get, Float, Release; BOUNCE_Put, Get, ForceGet, Tick; LIMBO_Put, Get, ForceGet; GetNodePos
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues: the clock, the
 // assertion, DrawPeep, SetRideSpritePosnFocus, EnableRideHead, DisableRideHead, FindDataNodeIndexByID, PAR_InitEmitter, CPeep::DrawMySpriteAt,

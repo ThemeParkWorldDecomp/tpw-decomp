@@ -1,5 +1,5 @@
 """Unit v5337, the coaster editor's brace deletion, against libtpw_unit_DeleteLastTrackBrace.dylib (tests/unit_DeleteLastTrackBrace.cpp), main app
-("SimTheme Park"), src/LayoutSetRotatePylon_DeleteLastTrackBrace.cpp:
+("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   DeleteTrackBrace 0x10056660, DeleteLastTrackBrace 0x10056a80
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's offsets (big-endian,

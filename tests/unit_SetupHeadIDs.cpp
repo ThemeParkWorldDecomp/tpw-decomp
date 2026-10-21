@@ -1,5 +1,5 @@
 // Test library for the advisor's bump launch and collision functions (unit v5062; libtpw_unit_SetupHeadIDs.dylib, tests/test_SetupHeadIDs.py), main app:
-//   src/SetupHeadIDs.cpp   SetupHeadIDs, BMP_AddJoiningListToBump, BMP_LAUNCH, BMP_Collision
+//   src/game/rides/BumperRide.cpp   SetupHeadIDs, BMP_AddJoiningListToBump, BMP_LAUNCH, BMP_Collision
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs): FindDataNodeIndexByID,
 // EnableRideHead, PAR_InitEmitter, SetControlType, PointInColObject, BMP_StartBump, CRideDatabase::GetRideInfo, InstanceRide,

@@ -211,7 +211,7 @@ void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
 }
 void* operator new[](std::size_t size, const std::nothrow_t&) noexcept { return operator new[](size); }
 
-// ---- the window's untranslated members. CalcClientArea and WhatAmI are src/ui_whatami.cpp's, SetText is the unit's.
+// ---- the window's untranslated members. CalcClientArea and WhatAmI are src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp's, SetText is the unit's.
 void InterfaceWindow::DrawFunction() {}
 InterfaceWindow::~InterfaceWindow() { ev("Window.dtor", {lab(this)}); }
 void InterfaceWindow::ClientDraw() {}
@@ -226,7 +226,7 @@ char16_t* InterfaceWindow::GetText() { return nullptr; }
 int32_t InterfaceWindow::GetHelpText() { return mHelpText; }
 // Show records, and (the queue "ShowDropsUserInfo") may make the user information vanish at once, as a window message handler could.
 
-// The first child with that id (src/InterfaceWindow_show.cpp's, which is not linked; it records nothing).
+// The first child with that id (src/game/ui/InterfaceWindow.cpp's, which is not linked; it records nothing).
 
 
 // ---- the scroll bar (never made by the unit's script): the constructor and members that the vtable needs

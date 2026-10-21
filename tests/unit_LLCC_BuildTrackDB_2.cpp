@@ -1,5 +1,5 @@
 // Test library for LLCC_BuildTrackDB (unit v5982; libtpw_unit_LLCC_BuildTrackDB_2.dylib, tests/test_LLCC_BuildTrackDB_2.py), main app:
-//   src/LLCellRide_offsets_LLCC_SetTrackAnimReverse_LLCC_BuildTrackDB_2.cpp   LLCC_BuildTrackDB and the words gLLCCE0B0 / gLLCCE0B2
+//   src/game/park/LLCellRide.cpp   LLCC_BuildTrackDB and the words gLLCCE0B0 / gLLCCE0B2
 //
 // Every callee outside the unit is a recording fake with the same event name and arguments as the module's PowerPC stub; the cells
 // are named by their index in the world's track grid. The globals of other files the unit reads are defined here (zero at start).

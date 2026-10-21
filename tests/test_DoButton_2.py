@@ -1,5 +1,5 @@
 """Unit v5978, the options panel's DoButton and OptionsPanelMsg, against libtpw_unit_DoButton_2.dylib (tests/unit_DoButton_2.cpp), main app
-("SimTheme Park"), src/ui_mainpanel2_window_bumhole_DoScroll_3_DoButton_2.cpp:
+("SimTheme Park"), src/game/ui/ui_optionsPanel.cpp:
   DoButton 0x101a9808, OptionsPanelMsg 0x101a9d94
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

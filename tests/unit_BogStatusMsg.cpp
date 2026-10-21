@@ -1,6 +1,6 @@
 // Test library for the bog status panel's message function, its static constructor, CoasterPlaceMouseMode and
 // WhichCheckButtonsAreDown (unit v5699; libtpw_unit_BogStatusMsg.dylib, tests/test_BogStatusMsg.py), main app:
-//   src/BogStatusPanel_InitViewWindow_BogStatusMsg.cpp
+//   src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_coasterPanel.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of
 // other files the unit reads are defined here (zero at start like the Mac's bss).
@@ -98,7 +98,7 @@ int32_t InterfaceCheckButtons::SetCurrent(int32_t id) {
 }
 void UI_SetGameWindowCursor(int16_t cursor) { ev("UI_SetGameWindowCursor", {cursor}); }
 
-// The table the static initialiser stores (src/ui_StatusPanel_tables.cpp, unit v5L31): a block of the arena made on first use; the test
+// The table the static initialiser stores (src/game/ui/ui_StatusPanel.cpp, unit v5L31): a block of the arena made on first use; the test
 // compares only where it is stored.
 uint32_t* BogStatusPanelTable() {
     static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));

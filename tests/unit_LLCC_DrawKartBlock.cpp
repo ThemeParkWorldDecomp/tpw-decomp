@@ -1,5 +1,5 @@
 // Test library for LLCC_DrawKartBlock (unit v5536; libtpw_unit_LLCC_DrawKartBlock.dylib, tests/test_LLCC_DrawKartBlock.py), main app:
-//   src/LLCC_DrawKartBlock.cpp
+//   src/game/park/LLCellRide.cpp
 //
 // The callees (CMap::IsXYValid, LLCC_SystemGetRideTrack, ADD_DIRECTION, CMapCell::Modify) are fakes that record their arguments and
 // answer from the test's queues. gGameWorld is defined here; the test points it at a small block (cells are only addressed).

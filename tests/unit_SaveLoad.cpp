@@ -1,5 +1,5 @@
 // Test library for the park file reader and the most-recent-save loader (libtpw_unit_SaveLoad.dylib; see
-// tests/test_SaveLoad.py): src/SaveLoad.cpp (CSaveLoad::Load) and src/FS_LoadSave.cpp (CFSLoadSave::LoadMostRecent) of unit w108.
+// tests/test_SaveLoad.py): src/game/save/SaveLoad.cpp (CSaveLoad::Load) and src/game/save/FS_LoadSave.cpp (CFSLoadSave::LoadMostRecent) of unit w108.
 // Both functions are real, and LoadMostRecent calls the real Load.
 //
 // Everything else is a fake on both sides that records through calllog: the assertion, CTRACE and DEBUG_MESSAGE, the file

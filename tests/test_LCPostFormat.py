@@ -1,5 +1,5 @@
 """Unit v5004, the staff room panel's list formatter and message functions, against libtpw_unit_LCPostFormat.dylib
-(tests/unit_LCPostFormat.cpp), main app ("SimTheme Park"), src/LCPostFormat.cpp:
+(tests/unit_LCPostFormat.cpp), main app ("SimTheme Park"), src/game/ui/ui_staffRoomStatus.cpp:
   LCPostFormat 0x101c346c, StaffRoomPanelLCHandler 0x101c35a4, StaffRoomStatusMsg 0x101c3c68
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

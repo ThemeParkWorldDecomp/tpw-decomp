@@ -1,5 +1,5 @@
 // Test library for the ride creation (unit v5558; libtpw_unit_BMP_CreateRide.dylib, tests/test_BMP_CreateRide.py), main app:
-//   src/BMP_FixRide_BMP_CountTrackSections_BMP_CreateRide.cpp   BMP_CreateRide
+//   src/game/rides/BumperRide.cpp   BMP_CreateRide
 //
 // The callees outside the unit (BMP_StartColObject, BMP_AddBuoyToRide, BMP_StartColObjectForRide, TRACE) are fakes that record the
 // arguments the real ones read; the two that answer an object answer the block the test names. The globals of other files the unit

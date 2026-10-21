@@ -1,12 +1,12 @@
 """Differential tests for unit w56, the tooltip window, against libtpw_unit_UITooltip.dylib (tests/unit_UITooltip.cpp):
 
-  src/ui_tooltip.cpp           CUIHelpWindow (the static constructor, the destructor, ShowHelpText, HideHelpText, OnFrame,
+  src/game/ui/ui_tooltip.cpp           CUIHelpWindow (the static constructor, the destructor, ShowHelpText, HideHelpText, OnFrame,
                                OnMouseMovedIn, Init, DeInit, Enable, Disable, Update), HelpTextMsg, InitHelpText,
                                SetHelpTextString, MoveHelpText
-  src/InterfaceWindow_draw.cpp InterfaceWindow::GetOriginalPosition (and the real GetPosition, SetPosition, ShiftPosition under
+  src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/InterfaceWindow.cpp InterfaceWindow::GetOriginalPosition (and the real GetPosition, SetPosition, ShiftPosition under
                                MoveHelpText)
 
-Real on both sides: those, the help text handler the class derives from (src/ui_helptext.cpp: the base members the tooltip calls,
+Real on both sides: those, the help text handler the class derives from (src/game/ui/InterfaceHelpText.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp: the base members the tooltip calls,
 UI_SetHelpTextHandler), the window constructor and the rectangles. Fakes that record the same event on both sides: every other window
 member (CreateObject, the font, text and draw object setters, the extra parameters, the callback, Show, Enable, SetText, the default
 handler), the message senders, the pointer, the UI clock, the font table entry and its height, the draw object library, the text

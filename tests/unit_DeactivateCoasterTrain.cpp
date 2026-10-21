@@ -1,6 +1,6 @@
 // Test library for DeactivateCoasterTrain, GetTrainFrontAndRearSamples, GetCarWantedSpeedAtHeight (unit v5763;
 // libtpw_unit_DeactivateCoasterTrain.dylib, tests/test_DeactivateCoasterTrain.py), main app:
-//   src/TPConfig_ridetick_DeactivateCoasterTrain.cpp
+//   src/game/rides/CoasterTrain.cpp
 //
 // DisableMeshDraw (both forms) and StopTrainSounds are recording fakes; gRideAnimSets is defined here.
 #include <cstddef>

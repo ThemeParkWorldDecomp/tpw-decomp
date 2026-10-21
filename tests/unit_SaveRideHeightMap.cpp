@@ -1,5 +1,5 @@
 // Test library for SaveRideHeightMap (unit v5644; libtpw_unit_SaveRideHeightMap.dylib, tests/test_SaveRideHeightMap.py), main app:
-//   src/RideDestroy_LoadFileIntoMemory_SaveRideHeightMap.cpp
+//   src/game/park/TPHField.cpp
 //
 // The callees outside the unit are fakes recording what the real ones read: MReleaseAllocF, MReleaseFreeF, CTRACE, fopen, fwrite, fclose,
 // and (built with the port fixes on, unit v5L44) tpw::GamePathForWriting, the port's user-folder write path.

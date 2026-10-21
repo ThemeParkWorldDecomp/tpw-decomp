@@ -1,5 +1,5 @@
 """Unit v5649, LOADVARSTRUCT<AdvisorHistory> 0x1000ecb4, against libtpw_unit_LOADVARSTRUCT_2.dylib (tests/unit_LOADVARSTRUCT_2.cpp), main app
-("SimTheme Park"), src/AdvisorBalance_LOADVARSTRUCT_2.cpp.
+("SimTheme Park"), src/game/advisor/Advisor.cpp.
 
 A case is a world and a call. The callees outside the unit are fakes on both sides that record their arguments: WriteSerialiseLog
 (this, size, name, state), LbFile_Read (file, length; it writes 16 file bytes, answers a TbError and a count from the case's queues) and

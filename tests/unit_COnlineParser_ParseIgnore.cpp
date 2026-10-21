@@ -1,5 +1,5 @@
 // Test library for COnlineParser::ParseIgnore and DoParse (unit v5555), main app:
-//   src/COnlineParser_ParseGoto_COnlineParser_ParseIgnore.cpp
+//   src/game/online/OnlineParser.cpp
 // Callees are recording fakes; wide strings are opaque 32-bit words.
 #include <cstddef>
 #include <cstdint>

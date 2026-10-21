@@ -1,5 +1,5 @@
 """Unit v5949, the Metrowerks exception objects and the 3D line blend, against libtpw_unit_std_logic_error_Dtor_logic_error.dylib
-(tests/unit_std_logic_error_Dtor_logic_error.cpp), main app, src/TPMain_std_logic_error_Dtor_logic_error.cpp:
+(tests/unit_std_logic_error_Dtor_logic_error.cpp), main app, src/game/MslSupport.cpp, src/game/ui/3DFont.cpp:
   std::logic_error::~logic_error 0x100020cc, std::out_of_range::~out_of_range 0x10002008,
   std::_RefCountedPtr<char,std::_Array<char>>::~_RefCountedPtr 0x100025e0, ::_RefCountedPtr(char*) 0x100026ac,
   Antialiased<CTraits<__vec2x32float__>> 0x10006394.

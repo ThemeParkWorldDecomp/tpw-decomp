@@ -1,4 +1,4 @@
-"""Differential test for src/lobby_islands_tick.cpp (the lobby's island screen, part 2: the
+"""Differential test for src/game/online/LBFlyingMesh.cpp, src/game/online/lobby_island.cpp (the lobby's island screen, part 2: the
 per-frame work), against libtpw_unit_LobbyIslandsTick.dylib (tests/unit_LobbyIslandsTick.cpp).
 
 Functions: CLBScreenComponentIslands::Tick, CalcCamera, GotoNextIsland and GotoPreviousIsland,

@@ -5,7 +5,7 @@
 int32_t MainLobbyMenuConfirmQuit_OK(void* context);   // 0x101fb1f4
 int32_t MainGameMenuConfirmQuit_OK(void* context);    // 0x101fab10
 
-// Unit v5522 (src/ui_iterators_MainGameMenuConfirmPublish_OK.cpp).
+// Unit v5522 (src/game/ui/ui_mainmenu.cpp).
 class InterfaceWindow;
 class CFSOnlineSystem;
 class CFSUserInfo;
@@ -45,13 +45,13 @@ int32_t ScreenIsVisible(void* screen);
 void PublishGlobeSlot34(void* screen);
 }  // namespace mainmenu_callee
 
-// Unit v5634 (src/CreateOptionsPanel.cpp): CreateOptionsPanel 0x101a9fb8 opens the options panel (gSetOnOffRoot, ui_main.h). The
+// Unit v5634 (src/game/ui/ui_optionsPanel.cpp): CreateOptionsPanel 0x101a9fb8 opens the options panel (gSetOnOffRoot, ui_main.h). The
 // globals of its neighbourhood (ui_parkStatus.cpp on the Mac; names invented):
 extern uint8_t gOptionsPanelGameRunning;    // 0x10394a08  0 when opening the panel paused the game (gGame.mF3C was 1), else 1
 extern int32_t gOptionsPanelF0C;            // 0x10394a0c  cleared when the panel opens
 extern int32_t gOptionsPanelRenderOptions;  // 0x10394a10  the map's render options from before the panel set 0x21
 extern uint32_t gOptionsPanelFontIndex;     // 0x102ab668  the font table index of the panel's texts (6 at start)
-// 0x102aade4: the panel's window script, 1090 words (the image's words, generated at configure time; src/ui_window_scripts.cpp).
+// 0x102aade4: the panel's window script, 1090 words (the image's words, generated at configure time; src/game/ui/ui_parkStatus.cpp).
 extern int16_t gOptionsPanelScript[];
 // 0x101a9d94 (untranslated; its TVector is 0x10267c90): the panel's message function.
 int32_t OptionsPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
@@ -60,13 +60,13 @@ int32_t OptionsPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int
 namespace options_panel {
 void DoScroll(int32_t id, int32_t value);   // 0x101a8fb8 (1824 bytes)
 void DoButton(int32_t id, int32_t on);      // 0x101a9808 (1388 bytes); the Mac's answer in r3 is not read here
-// Unit v5895 (src/ui_mainpanel2_window_bumhole_DoScroll_3.cpp):
+// Unit v5895 (src/game/ui/ui_parkStatus.cpp):
 void StartScroll(int32_t id, int32_t value);   // 0x101a96f8 (236 bytes)
 }  // namespace options_panel
 // 0x1024e168: the panel's number formats (wide string data; the number format starts 5 characters in).
 extern char16_t gOptionsPanelNumberFormats[];
 
-// Unit v5969 (src/ui_allKidsPanel_AllKidsPanelMsg_LoansPanelMsg_CreateLoadPanel_2.cpp): the list fills and the lists' attach function.
+// Unit v5969 (src/game/ui/ui_loadSavePanel.cpp): the list fills and the lists' attach function.
 class InterfaceListControl2;
 void FillLoadList(InterfaceListControl2* list);          // 0x101a33c0 (428)
 void FillSaveList(InterfaceListControl2* list);          // 0x101a35a8 (456): the same with an unused wide string made and destroyed around it
@@ -79,7 +79,7 @@ void CursorPosCtor(void* mem);                           // 0x1018f1d0 Interface
 void FileTimeToLocal(const void* in, void* out);         // glue 0x10239fe8 NS_MacDoze::FileTimeToLocalFileTime(const tagFILETIME*, tagFILETIME*)
 }  // namespace loadsave_callee
 
-// Unit v5978 (src/ui_mainpanel2_window_bumhole_DoScroll_3_DoButton_2.cpp): the virtual calls on a window the host cannot make as the
+// Unit v5978 (src/game/ui/ui_optionsPanel.cpp): the virtual calls on a window the host cannot make as the
 // Mac does (the table at window +0x118): weak definitions in that file, faked by the test library.
 namespace options_callee {
 int32_t CallSetValue(InterfaceWindow* window, int32_t value);   // slot 0x24; the Mac reads the answer as a short

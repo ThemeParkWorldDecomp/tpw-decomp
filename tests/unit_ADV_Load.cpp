@@ -1,5 +1,5 @@
 // Test library for the advisor's save file part (unit v5685; libtpw_unit_ADV_Load.dylib, tests/test_ADV_Load.py), main app:
-//   src/ThingLoop_ADV_Load.cpp   ADV_Save, ADV_Load
+//   src/game/advisor/Advisor.cpp   ADV_Save, ADV_Load
 //
 // The callees outside the unit are recording fakes: LbFile_Read (answers the bytes of the case's queue "fb"), LbFile_Write (records the
 // bytes as words), the platform's _USwapCopy32 / _USwapDelete / _USwapBlock32 (a little-endian host: copies, no swapping). The advisor's

@@ -1,7 +1,7 @@
 // Test library for the cell system's modes (unit w185; libtpw_unit_LLCellModes.dylib, tests/test_LLCellModes.py), main app:
-//   src/LLCellSystem_modes.cpp  the 23 functions (modes, ride words, cursor, costs, click stack, FixFirstBlock)
-//   src/LLCellSystem_costs.cpp, src/LLCellClicks.cpp (landed): the cost words and the click stack's count
-//   src/Mouse.cpp       (landed) AssignMouseMode, CMMDefault: they run for real
+//   src/game/park/LLCellSystem.cpp  the 23 functions (modes, ride words, cursor, costs, click stack, FixFirstBlock)
+//   src/game/park/LLCellSystem.cpp (landed): the cost words and the click stack's count
+//   src/game/Mouse.cpp       (landed) AssignMouseMode, CMMDefault: they run for real
 // Every other callee is a fake that records the event the PowerPC stub records. The globals of other files are defined here.
 #include <cstdarg>
 #include <cstddef>
@@ -28,7 +28,7 @@
 
 using namespace calllog;
 
-// ---- globals of other files (src/LLCellSystem.cpp's words, the world and the recorder); gMouse and the mouse words are src/Mouse.cpp's
+// ---- globals of other files (src/game/park/LLCellSystem.cpp's words, the world and the recorder); gMouse and the mouse words are src/game/Mouse.cpp's
 CWorld* gGameWorld;
 CActionRecorder gActionRecorder;
 UIInterface gUIInterface;
@@ -126,7 +126,7 @@ CTrackCell* CTrackCell::GetNeighbouringCell(uint8_t direction, int32_t offset) {
     return k == 0 ? nullptr : TrackCell(k);
 }
 
-// ---- OPPOSITE and ADD_DIRECTION run for real on the PowerPC side; the bodies are src/MapDelta_map.cpp's (0x10102500, 0x1010254c)
+// ---- OPPOSITE and ADD_DIRECTION run for real on the PowerPC side; the bodies are src/game/park/Map.cpp's (0x10102500, 0x1010254c)
 uint8_t OPPOSITE(uint8_t d) {
     if (d == 0) return 0;
     if (d < 0x10) return static_cast<uint8_t>((d << 4) & 0xf0);

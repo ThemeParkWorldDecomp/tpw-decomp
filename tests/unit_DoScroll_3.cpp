@@ -1,5 +1,5 @@
 // Test library for the options panel's DoScroll and StartScroll (unit v5895; libtpw_unit_DoScroll_3.dylib, tests/test_DoScroll_3.py), main app:
-//   src/ui_mainpanel2_window_bumhole_DoScroll_3.cpp
+//   src/game/ui/ui_parkStatus.cpp
 // The callees are recording fakes; the text functions really copy and append, so the buffer is compared.
 #include <cstddef>
 #include <cstdint>

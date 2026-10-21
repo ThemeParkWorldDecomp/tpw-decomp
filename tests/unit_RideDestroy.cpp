@@ -1,7 +1,7 @@
 // Test library for the ride and mesh teardown (unit w105; libtpw_unit_RideDestroy.dylib, tests/test_RideDestroy.py), main app:
-//   src/RideDestroy.cpp     DestroyRideType, DestroyRideAnimSet, DestroyRideAnimSetInstance, DestroyMesh, DestroyMeshHeader,
+//   src/game/DynamicMeshSet.cpp, src/game/TPInstance.cpp, src/game/TPMesh.cpp, src/game/park/SkirtDeform.cpp, src/game/park/TPHField.cpp, src/game/rides/TPRide.cpp     DestroyRideType, DestroyRideAnimSet, DestroyRideAnimSetInstance, DestroyMesh, DestroyMeshHeader,
 //                           DestroyRideHeightMap, DestroySkirtVertices, DMFreeMesh, the two DMDisableMeshRender
-//   src/CoasterDestroy.cpp  DestroyCoasterInstance, DestroyCoasterInstanceFromEntranceID, DestroyCoasterInstances
+//   src/game/rides/TPCoaster.cpp  DestroyCoasterInstance, DestroyCoasterInstanceFromEntranceID, DestroyCoasterInstances
 //
 // Every callee outside the unit is a fake that records the same event on both sides: DisableMeshDraw (both overloads; from the case's
 // queues they clear the draw flag as the real one does or not), DestroyEngineMesh, MReleaseFreeF (it frees nothing: the event carries

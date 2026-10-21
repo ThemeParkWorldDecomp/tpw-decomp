@@ -1,5 +1,5 @@
 """Unit v5675, the ride height map generator, against libtpw_unit_GenerateRideHeightMap.dylib (tests/unit_GenerateRideHeightMap.cpp), main app
-("SimTheme Park"), src/RideDestroy_LoadFileIntoMemory_GenerateRideHeightMap.cpp:
+("SimTheme Park"), src/game/park/TPHField.cpp:
   GenerateRideHeightMap 0x1005db4c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

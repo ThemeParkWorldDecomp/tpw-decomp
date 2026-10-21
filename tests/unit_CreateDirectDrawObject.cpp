@@ -1,6 +1,6 @@
 // Test library for the WinScrn.cpp DirectDraw/palette part (unit v5041; libtpw_unit_CreateDirectDrawObject.dylib,
 // tests/test_CreateDirectDrawObject.py), main app:
-//   src/CreateDirectDrawObject.cpp   CreateDirectDrawObject, EnumModesCallback, LbScreen_GetPaletteEntries,
+//   src/bullfrog/WinScrn.cpp   CreateDirectDrawObject, EnumModesCallback, LbScreen_GetPaletteEntries,
 //   LbScreen_SetPaletteEntries, LbScreen_SwapClear, __sinit_WinScrn_cpp, and the file's statics.
 //
 // The callees outside the unit are recording fakes (DirectDrawCreate, LbApp_SetHWnd, operator new (nothrow), LbList_Insert, the

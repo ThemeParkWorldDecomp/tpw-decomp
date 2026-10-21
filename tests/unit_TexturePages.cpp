@@ -237,7 +237,7 @@ int32_t COpenGLTexture::Download(CTextureEntry* entry, int32_t x, int32_t y) {
     return 1;
 }
 COpenGLDrawPrimitive::COpenGLDrawPrimitive() {}   // tb_printf_opengl.cpp's; the test sets the fields
-COpenGLDrawPrimitive::~COpenGLDrawPrimitive() {}   // src/tb_opengl_texture_download.cpp's
+COpenGLDrawPrimitive::~COpenGLDrawPrimitive() {}   // src/engine/DrawPrimitiveOpenGL.cpp's
 int32_t COpenGLDrawPrimitive::Execute(SPrimitive*) { return 0; }
 int32_t COpenGLDrawPrimitive::DrawTestPoly() { return 0; }
 int32_t COpenGLDrawPrimitive::DrawFilledBox(float, float, float, float, int32_t, CTextureBase*) { return 0; }

@@ -1,5 +1,5 @@
 """The walk planner's line of sight and path smoothing (unit w195), against libtpw_unit_LineOfSight.dylib (tests/unit_LineOfSight.cpp), main app
-("SimTheme Park"), src/World_sight.cpp:
+("SimTheme Park"), src/game/park/LineOfSight.cpp:
   bresenham_start 0x101360ac, line_of_sight 0x1013623c, line_of_sight_cleanup 0x10136498, wallhug_cleanup 0x101365cc, wallhug_tricky 0x10136e7c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for

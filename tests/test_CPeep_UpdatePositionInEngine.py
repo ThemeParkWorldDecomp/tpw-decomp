@@ -1,5 +1,5 @@
 """Unit v5974: CPeep::UpdatePositionInEngine and CPeep::PeepWalks, against libtpw_unit_CPeep_UpdatePositionInEngine.dylib
-(tests/unit_CPeep_UpdatePositionInEngine.cpp), main app ("SimTheme Park"), src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_UpdatePositionInEngine.cpp:
+(tests/unit_CPeep_UpdatePositionInEngine.cpp), main app ("SimTheme Park"), src/game/people/Peep.cpp:
   CPeep::UpdatePositionInEngine 0x101149cc, CPeep::PeepWalks 0x10114fa8
 
 A case is a peep block and a call, built twice by one piece of Python code (emulator memory and host memory). The callees outside the unit

@@ -1,5 +1,5 @@
 """Unit v51036, the ride commands on the bump world, against libtpw_unit_BMP_SetRideDuration.dylib (tests/unit_BMP_SetRideDuration.cpp), main app
-("SimTheme Park"), src/BMP_FixRide_BMP_CountTrackSections_BMP_SetRideDuration.cpp:
+("SimTheme Park"), src/game/balance/HoardingsBalance.cpp, src/game/rides/BumperRide.cpp:
   BMP_SetRideDuration 0x10026b14, BMP_RideWorn 0x100263f4, BMP_GetCameraMesh 0x1002cf30, BMP_StartBump 0x1002eaac,
   BMP_AddBuoyToRide 0x1002ebd0, BMP_StartBuoy 0x1002ec84, __sinit_HoardingsBalance_cpp 0x10021074
 

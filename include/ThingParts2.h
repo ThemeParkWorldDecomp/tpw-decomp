@@ -10,11 +10,11 @@ struct CParkAnalyserVal {
     uint32_t mTimeSig;   // 0x00
     T mVal;              // 0x04  "mVal"
     bool mWorkedOut;     // 0x08  "mWorkedOut"  (0x09 to 0x0b: padding, never written)
-    // Unit w125 (<int> only; translated in src/ParkAnalyser_history.cpp, unit w157; src/ParkAnalyser_readers.cpp calls them): Get 0x100ef3c8 answers the
+    // Unit w125 (<int> only; translated in src/game/park/analyser.cpp, unit w157; src/game/park/analyser.cpp calls them): Get 0x100ef3c8 answers the
     // cached value, Set 0x100ef400 stores a value (and stamps the refresh clock). The first word is a CTimeSig image: SecondsSinceLastUpdate is asked of the Val.
     T Get() const;
     void Set(T value);
-    // Unit w158 (src/ParkAnalyser_save.cpp): <int> 0x100ef278, <float> 0x100ef4a8
+    // Unit w158 (src/game/park/analyser.cpp): <int> 0x100ef278, <float> 0x100ef4a8
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);
 };
 static_assert(sizeof(CParkAnalyserVal<int>) == 0xc, "CParkAnalyserVal<int>");
@@ -36,7 +36,7 @@ struct CParkAnalyserCell {
     CParkAnalyserVal<int> mVal58;     // 0x58
     CParkAnalyserVal<int> mVal64;     // 0x64
     CParkAnalyserVal<int> mVal70;     // 0x70
-    // Unit w156 (src/ParkAnalyser_cells.cpp): the counts of the map cells of the rectangle (mStartX, mStartY, mSizeX, mSizeY), each kept in its Val
+    // Unit w156 (src/game/park/analyser.cpp): the counts of the map cells of the rectangle (mStartX, mStartY, mSizeX, mSizeY), each kept in its Val
     // (mVal4C walkable, mVal58 littered, mVal64 developed cells) and recounted when the Val has no value or is older than `maxAge` seconds; the
     // answer is the Val's. 0x100e659c (304 bytes), 0x100e670c (288 bytes) and 0x100e686c (448 bytes). `this` is also read as a CWorldSavvy.
     int32_t GetNumWalkableCells(uint32_t maxAge) const;
@@ -45,7 +45,7 @@ struct CParkAnalyserCell {
     // Unit w123b: 0x100e6054 (24 bytes, untranslated: a launcher stand-in). Stores its four arguments in the first four words and answers 1;
     // CParkAnalyser::Init calls it once per cell and ignores the answer.
     int32_t Init(int32_t startX, int32_t startY, int32_t sizeX, int32_t sizeY);
-    int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x100e60a0 (1,220 bytes, src/ParkAnalyser_month.cpp, unit w161)
+    int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x100e60a0 (1,220 bytes, src/game/park/analyser.cpp, unit w161)
 };
 static_assert(sizeof(CParkAnalyserCell) == 0x7c, "CParkAnalyserCell is 0x7c bytes");
 
@@ -97,7 +97,7 @@ struct CChallenge {
     // Unit w124: untranslated callees of CChallengeHQ::UpdateTurn.
     bool DidThisWinIt(int32_t& value, bool atEnd);   // 0x100f60d8
     int32_t GetActiveId() const;                     // 0x100f8ee4
-    // Unit w174 (src/Challenge.cpp): the constructor above, DidThisWinIt and GetActiveId are translated there too.
+    // Unit w174 (src/game/park/ChallengeHQ.cpp): the constructor above, DidThisWinIt and GetActiveId are translated there too.
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x100f5b80
     int32_t GetOfferId() const;                      // 0x100f8d7c
     int32_t GetWinId() const;                        // 0x100f904c

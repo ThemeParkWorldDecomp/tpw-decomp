@@ -1,5 +1,5 @@
 // Test library for ui_IME.cpp's static initialiser (unit v5768; libtpw_unit_sinit_ui_IME_cpp.dylib, tests/test_sinit_ui_IME_cpp.py), main app:
-//   src/ui_iterators_sinit_ui_IME_cpp.cpp   __sinit_ui_IME_cpp, gUIIMESinitDtorTV, gUIIMESinitNode
+//   src/game/ui/ui_IME.cpp   __sinit_ui_IME_cpp, gUIIMESinitDtorTV, gUIIMESinitNode
 //
 // IME::CIME::CIME and __register_global_object are recording fakes; gUIIME is defined here with empty destructors.
 #include <cstddef>

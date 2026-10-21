@@ -1,4 +1,4 @@
-"""Differential tests for the bullfrog library's CPU class (src/bullfrog_CPU.cpp,
+"""Differential tests for the bullfrog library's CPU class (src/bullfrog/LbLog.cpp,
 namespace bullfrog). See difftest.py and tpwtest.py.
 
 Gestalt answers from the case on both sides (tpwtest's stub, the host placeholder) and

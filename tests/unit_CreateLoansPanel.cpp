@@ -1,5 +1,5 @@
 // Test library for CreateLoansPanel (unit v5698; libtpw_unit_CreateLoansPanel.dylib, tests/test_CreateLoansPanel.py), main app:
-//   src/FillLenderList_CreateLoansPanel.cpp   CreateLoansPanel and the globals gLoansScript, gLenderColumnColour, the game type storage and guard
+//   src/game/ui/ui_loansPanel.cpp   CreateLoansPanel and the globals gLoansScript, gLenderColumnColour, the game type storage and guard
 //
 // The callees outside the unit are fakes that record what the real ones read (windows are slots of a block the test gives; pointers go
 // through lab()) and answer from the test's queues. The globals of other files the unit reads are defined here.

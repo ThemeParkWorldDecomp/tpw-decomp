@@ -1,5 +1,5 @@
 """Unit v51021, the ride pointer pick, against libtpw_unit_RayPolyCheckOnRide.dylib (tests/unit_RayPolyCheckOnRide.cpp), main app
-("SimTheme Park"), src/advisor_leaves_RayPolyCheckOnRide.cpp:
+("SimTheme Park"), src/game/TPPointer.cpp:
   RayPolyCheckOnRide 0x10065648, FindPointedRide 0x10065b24
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

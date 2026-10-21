@@ -1,4 +1,4 @@
-"""TbRect::Intersection (bullfrog 0x10029f8c, src/bfl_tbrect.cpp; unit w45a), against libtpw_unit_TbRectIntersection.dylib
+"""TbRect::Intersection (bullfrog 0x10029f8c, src/bullfrog/LbRect.cpp; unit w45a), against libtpw_unit_TbRectIntersection.dylib
 (tests/unit_TbRectIntersection.cpp). The ltms font render method calls it (through the library's export) to cut a glyph's
 rectangle to the clip rectangle.
 

@@ -1,5 +1,5 @@
 """Unit v51009, five online functions, against libtpw_unit_VoteNotifyCallback.dylib (tests/unit_VoteNotifyCallback.cpp), main app
-("SimTheme Park"), src/COnlinePerson_SetDest_VoteNotifyCallback.cpp:
+("SimTheme Park"), src/game/online/FTPClient.cpp, src/game/online/IPBase.cpp, src/game/online/online.cpp:
   VoteNotifyCallback 0x10213590, SwearFilter::Init 0x1020d1bc, stristr 0x1020cbec, IPBase::ShowError 0x1020cac8,
   FTPClient::ProcessEvents 0x1020c8cc
 

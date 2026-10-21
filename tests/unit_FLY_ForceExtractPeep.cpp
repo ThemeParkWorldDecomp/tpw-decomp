@@ -1,6 +1,6 @@
 // Test library for the fly bases' peep handling and repair state (unit v5980; libtpw_unit_FLY_ForceExtractPeep.dylib,
 // tests/test_FLY_ForceExtractPeep.py), main app:
-//   src/hlsprite_flies_FLY_ForceExtractPeep.cpp   FLY_ForceExtractPeep, FLY_ExtractPeep, FLY_AddPeep, FLY_SetRepairState
+//   src/game/rides/FlyingRide.cpp   FLY_ForceExtractPeep, FLY_ExtractPeep, FLY_AddPeep, FLY_SetRepairState
 //
 // The callees outside the unit are recording fakes; the ride sets are named by their index in gRideAnimSets (1 to 3), their meshes by
 // the index of the set that owns them (0: NULL, 0xffffffff: unknown). The globals of other files the unit reads are defined here.

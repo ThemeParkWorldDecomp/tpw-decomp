@@ -1,5 +1,5 @@
 """Unit v5363, the ride list panel's FillRideList and UpdateViewWindow, against libtpw_unit_FillRideList.dylib (tests/unit_FillRideList.cpp),
-main app ("SimTheme Park"), src/FillRideList.cpp:
+main app ("SimTheme Park"), src/game/ui/ui_ridepanel.cpp:
   FillRideList 0x101b5c14, UpdateViewWindow 0x101b5f1c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

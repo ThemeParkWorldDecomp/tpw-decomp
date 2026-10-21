@@ -1,5 +1,5 @@
 """Unit v5531, the tag windows' OverrideTag and TagDlgCallback, against libtpw_unit_OverrideTag.dylib (tests/unit_OverrideTag.cpp), main
-app ("SimTheme Park"), src/ui_StatusPanel_FindStaticTag_OverrideTag.cpp:
+app ("SimTheme Park"), src/game/ui/ui_tags.cpp:
   OverrideTag 0x10191d7c, TagDlgCallback 0x10191628
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

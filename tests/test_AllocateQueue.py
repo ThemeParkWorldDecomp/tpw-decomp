@@ -1,5 +1,5 @@
 """Unit v5269, the coaster queues and the script commands on a coaster, against libtpw_unit_AllocateQueue.dylib
-(tests/unit_AllocateQueue.cpp), main app ("SimTheme Park"), src/AllocateQueue.cpp:
+(tests/unit_AllocateQueue.cpp), main app ("SimTheme Park"), src/game/rides/CoasterQueue.cpp:
   AllocateQueue 0x10049180, CoasterAddPeep 0x10049288, HACKCoasterReturnLostPeep 0x10049324, CoasterGetQueueSpace 0x1004944c,
   CoasterGetPeep 0x100494c0, CoasterSetRepairState 0x10049588, CoasterSetSpeed 0x10049630, CoasterSetOpenClosedState 0x100496c0
 

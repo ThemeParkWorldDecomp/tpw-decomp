@@ -1,4 +1,4 @@
-// The fakes for the engine start-up glue (src/TPEngine.cpp; libtpw_unit_TPEngine.dylib; see
+// The fakes for the engine start-up glue (src/game/TPEngine.cpp, src/game/TPInstance.cpp, src/game/TPMesh.cpp, src/game/park/TPHField.cpp, src/game/rides/TPRide.cpp; libtpw_unit_TPEngine.dylib; see
 // calllog.h) and the test entry points. Each fake records the event its PowerPC twin in
 // test_TPEngine.py records; they are functional where a value flows back (strings, the
 // rectangle SetRect fills, the OpenGL context, the resource handle, heap blocks).

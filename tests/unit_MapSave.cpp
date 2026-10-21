@@ -1,7 +1,7 @@
 // Test library for the save and litter half of MapDelta.cpp (unit w146; libtpw_unit_MapSave.dylib, tests/test_MapSave.py), main app:
-//   src/MapDelta_save.cpp   CMapCell::PlaceLitter, CMap::Serialise, CMapCell::Serialise, CMacroAI::Serialise, LOADVAR/SAVEVAR<LitterType>
-//   src/Serialise_basic.cpp the basic LOADVAR / SAVEVAR instances (REAL: the file is the fake)
-//   src/CellInit.cpp        the three cell constructors (REAL on both sides: the locals of CMap::Serialise)
+//   src/game/park/Map.cpp, src/game/park/MapDelta.cpp   CMapCell::PlaceLitter, CMap::Serialise, CMapCell::Serialise, CMacroAI::Serialise, LOADVAR/SAVEVAR<LitterType>
+//   src/game/ControlManager.cpp, src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/rides/FlyingRide.cpp, src/game/save/FS_MasterSave.cpp the basic LOADVAR / SAVEVAR instances (REAL: the file is the fake)
+//   src/game/buildings/TrainingCentre.cpp, src/game/park/CellBase.cpp, src/game/park/MapDelta.cpp, src/game/people/Researcher.cpp        the three cell constructors (REAL on both sides: the locals of CMap::Serialise)
 //
 // The fake file: LbFile_Read hands out the test's bytes in order (a cursor), LbFile_Write records the bytes as hex, LbFile_GetPosition answers
 // from its queue; the queues "LbFile_Read", "LbFile_Read:xfer", "LbFile_Write", "LbFile_Write:xfer" replace the result and the transferred count

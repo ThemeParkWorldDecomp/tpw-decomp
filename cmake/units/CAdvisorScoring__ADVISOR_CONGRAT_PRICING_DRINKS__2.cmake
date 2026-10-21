@@ -1,3 +1,20 @@
-# Unit v5256: eight advisor scorers (src/AdvisorScoring_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__2.cpp). The callees outside the unit are
+# Unit v5256: eight advisor scorers (src/game/advisor/AdvisorScoring.cpp). The callees outside the unit are
 # recording fakes in tests/unit_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__2.cpp, which also defines the globals of other files.
-set(TPW_UNIT_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__2 src/AdvisorScoring_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__2.cpp platform/arena.cpp)
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__2 src/game/advisor/AdvisorScoring.cpp platform/arena.cpp)
+set(TPW_UNIT_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS__2_KEEP
+  __ZN15CAdvisorScoring35_ADVISOR_GOLD_TICKET_NEAR_TO_XPEEPSEv   # CAdvisorScoring::_ADVISOR_GOLD_TICKET_NEAR_TO_XPEEPS()
+  __ZN15CAdvisorScoring37_ADVISOR_PRICING_SIDESHOWS_POOR_VALUEEv   # CAdvisorScoring::_ADVISOR_PRICING_SIDESHOWS_POOR_VALUE()
+  __ZN15CAdvisorScoring39_ADVISOR_PRICING_FOOD_POOR_SATISFACTIONEv   # CAdvisorScoring::_ADVISOR_PRICING_FOOD_POOR_SATISFACTION()
+  __ZN15CAdvisorScoring40_ADVISOR_PRICING_SHOPS_POOR_SATISFACTIONEv   # CAdvisorScoring::_ADVISOR_PRICING_SHOPS_POOR_SATISFACTION()
+  __ZN15CAdvisorScoring41_ADVISOR_PRICING_DRINKS_POOR_SATISFACTIONEv   # CAdvisorScoring::_ADVISOR_PRICING_DRINKS_POOR_SATISFACTION()
+  __ZN15CAdvisorScoring44_ADVISOR_PRICING_SIDESHOWS_POOR_SATISFACTIONEv   # CAdvisorScoring::_ADVISOR_PRICING_SIDESHOWS_POOR_SATISFACTION()
+  __ZN15CAdvisorScoring45_ADVISOR_PRICING_RESTAURANT_POOR_SATISFACTIONEv   # CAdvisorScoring::_ADVISOR_PRICING_RESTAURANT_POOR_SATISFACTION()
+  __ZN15CAdvisorScoring50_ADVISOR_CONGRAT_PRICING_DRINKS_GREAT_SATISFACTIONEv   # CAdvisorScoring::_ADVISOR_CONGRAT_PRICING_DRINKS_GREAT_SATISFACTION()
+  _gAdvisorNoneDrinksGreatSat
+  _gAdvisorNoneDrinksPoorSat
+  _gAdvisorNoneFoodPoorSat
+  _gAdvisorNoneRestaurantPoorSat
+  _gAdvisorNoneShopsPoorSat
+  _gAdvisorNoneSideshowsPoorSat
+  _gAdvisorNoneSideshowsPoorValue
+)

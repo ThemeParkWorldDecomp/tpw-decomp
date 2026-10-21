@@ -1,4 +1,4 @@
-// Test library for the window scripts of src/ui_window_scripts.cpp (unit v5L42; libtpw_unit_WindowScripts.dylib,
+// Test library for the window scripts of src/game/ui/ui_allStaffPanel.cpp, src/game/ui/ui_cityLobbyController.cpp, src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineOutbox.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_parkStatus.cpp (unit v5L42; libtpw_unit_WindowScripts.dylib,
 // tests/test_WindowScripts.py), main app: the arrays and nothing else; tpw_ws_addr names them for the test.
 #include <cstdint>
 #include <cstring>

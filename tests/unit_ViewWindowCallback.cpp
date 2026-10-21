@@ -1,5 +1,5 @@
 // Test library for two status panel window handlers (unit v5753; libtpw_unit_ViewWindowCallback.dylib, tests/test_ViewWindowCallback.py), main app:
-//   src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_ViewWindowCallback.cpp   ViewWindowCallback, StatusPanelTitleMsg
+//   src/game/ui/ui_StatusPanel.cpp   ViewWindowCallback, StatusPanelTitleMsg
 //
 // The callees outside the unit are recording fakes. The "windows" are raw blocks: word 0 is a marker the fakes log, word 1 (+4) the
 // extra parameter (an arena offset on the host). The panel block holds its marker at +0x24 and the table pointer at +0x20.

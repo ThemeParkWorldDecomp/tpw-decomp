@@ -1,6 +1,6 @@
 // Test library for StaticifyCreateOnlyAnimNodes (unit v5288; libtpw_unit_StaticifyCreateOnlyAnimNodes.dylib,
 // tests/test_StaticifyCreateOnlyAnimNodes.py), main app:
-//   src/RideAnimTick_StaticifyCreateOnlyAnimNodes.cpp   StaticifyCreateOnlyAnimNodes
+//   src/game/rides/RideAnim.cpp   StaticifyCreateOnlyAnimNodes
 //
 // No callees. gei_System is defined here as raw storage under its symbol name (the real CSystem constructor is not linked);
 // only its first word (mFlags) is used.

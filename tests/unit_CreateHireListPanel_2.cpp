@@ -1,5 +1,5 @@
 // Test library for the hire panel's builder (unit v51019; libtpw_unit_CreateHireListPanel_2.dylib, tests/test_CreateHireListPanel_2.py), main app:
-//   src/HirePanelLCHandler_CreateHireListPanel_2.cpp   CreateHireListPanel and the globals it defines
+//   src/game/ui/ui_hirePanel.cpp   CreateHireListPanel and the globals it defines
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's tables: the windows,
 // strings, fonts and other objects the test made are looked up by label (the case's table), the numbers come from the queues.
@@ -75,7 +75,7 @@ int64_t FnId(const void* f) {
 
 }  // namespace
 
-// The hire panel's functions the unit takes the address of (src/HirePanelLCHandler.cpp is not compiled here).
+// The hire panel's functions the unit takes the address of (src/game/ui/ui_hirePanel.cpp is not compiled here).
 void HirePanelLCPostFormat(InterfaceWindow*) {}
 int32_t HirePanelLCHandler(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
 

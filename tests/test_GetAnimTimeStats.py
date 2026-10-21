@@ -1,5 +1,5 @@
 """Unit v5576, the ride animation time statistics, against libtpw_unit_GetAnimTimeStats.dylib (tests/unit_GetAnimTimeStats.cpp), main app
-("SimTheme Park"), src/RideAnimInit_GetAnimTimeStats.cpp:
+("SimTheme Park"), src/game/rides/RideAnim.cpp:
   GetAnimTimeStats 0x100c5bcc, RestoreAnimTimeStats 0x100c5c68, GetNumActiveChannels 0x100c5fd4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

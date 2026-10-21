@@ -1,4 +1,4 @@
-// TPAdvisor.cpp (main app): the advisor's 3D model and the text file reader. src/TPAdvisor.cpp translates the
+// TPAdvisor.cpp (main app): the advisor's 3D model and the text file reader. src/game/TextureTable.cpp translates the
 // text file reader and the advisor's model (LoadAdvisor, DestroyAdvisor and their neighbours, 0x10031bc0..0x1003228c, the
 // slots' constructor 0x10032454). BMP_Tick is in this file's range in the inventory.
 #pragma once
@@ -41,7 +41,7 @@ void BMP_Tick();                                                  // 0x10028cb0
 // 0x10028030 (3,156 bytes, untranslated): draws the cars of a bumper car ride; `ride` is the word at +0x24 of the CObject, which the
 // callee masks with 0xff (unit w121).
 void BMP_DrawCarsForRide(int32_t ride, float step);
-// Unit v5672 (src/BMP_DrawCarsForRide.cpp): its data (names invented).
+// Unit v5672 (src/game/rides/BumperRide.cpp): its data (names invented).
 extern float gDrawCarsAngles[3];     // 0x1029ca9c, initial 0
 extern float gDrawCarsClampLo;       // 0x1029caa8, initial -1.0
 extern float gDrawCarsClampHi;       // 0x1029caac, initial 1.0
@@ -50,7 +50,7 @@ extern float gDrawCarsScale;         // 0x102b4ebc, 49143.0 once gDrawCarsInit i
 // 0x10026f20 (392 bytes, untranslated; unit w153): the track sections of the ride at the object's +0x24; the outs are unnamed.
 int32_t BMP_CountTrackSections(int32_t ride, int32_t* a, int32_t* b, int32_t* c, int32_t* d);
 
-// Unit v51069 (src/AdvisorScoring_sinit_Advisor_cpp.cpp). __arraydtor$3112 0x10032300 destroys gAdvisorStore (4 slots of 0xbc bytes on
+// Unit v51069 (src/game/TPCamera.cpp, src/game/rides/BumperRide.cpp). __arraydtor$3112 0x10032300 destroys gAdvisorStore (4 slots of 0xbc bytes on
 // the Mac) through __destroy_arr; the TVector 0x10266010 of ~sAdvisorStore is a stand-in.
 extern unsigned char gAdvisorStoreDtorVector[16];   // stand-in for 0x10266010
 void __arraydtor_3112();                            // 0x10032300

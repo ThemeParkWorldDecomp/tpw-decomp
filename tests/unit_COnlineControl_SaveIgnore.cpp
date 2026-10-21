@@ -1,6 +1,6 @@
 // Test library for COnlineControl::SaveIgnore and LoadIgnore (unit v5235; libtpw_unit_COnlineControl_SaveIgnore.dylib,
 // tests/test_COnlineControl_SaveIgnore.py), main app:
-//   src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_SaveIgnore.cpp
+//   src/game/online/online.cpp
 //
 // Every callee outside the unit (the stream, filebuf, string and tree library, the user info, the chat) is a fake that records the
 // arguments the real one reads and answers from the test's queues or memory. The globals of other files the unit reads are defined here.

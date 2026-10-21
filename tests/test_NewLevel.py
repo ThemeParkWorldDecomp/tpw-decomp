@@ -1,12 +1,12 @@
 """Differential tests for the theme and the new level (unit w117, main app), against libtpw_unit_NewLevel.dylib (tests/unit_NewLevel.cpp):
 
-  src/Game_level.cpp           CGame::InitTheme (0x10147ee4), InitLevel (0x10148028), InitLevel_Load (0x1014809c), InitLevel_Initialise
+  src/game/Game.cpp           CGame::InitTheme (0x10147ee4), InitLevel (0x10148028), InitLevel_Load (0x1014809c), InitLevel_Initialise
                                (0x101482bc), LoadTheme (0x1014960c)
-  src/World_setup.cpp          CWorld::SetupNewLevel (0x1013a2ac)
-  src/FS_LoadSave_load.cpp     CFSLoadSave::Load (0x101fc408), LoadInternal (0x101fc5e0)
-  src/LLCellSystem_costs.cpp   LLCC_SystemSetPathCost (0x10091b24), SetQueueCost (0x10091b9c), SetKartTrackCost (0x10091c14), SetWaterTrackCost
+  src/game/World.cpp          CWorld::SetupNewLevel (0x1013a2ac)
+  src/game/save/FS_LoadSave.cpp     CFSLoadSave::Load (0x101fc408), LoadInternal (0x101fc5e0)
+  src/game/park/LLCellSystem.cpp   LLCC_SystemSetPathCost (0x10091b24), SetQueueCost (0x10091b9c), SetKartTrackCost (0x10091c14), SetWaterTrackCost
                                (0x10091c94)
-  src/SkyObjects_ctor.cpp      CSkyObjects::CSkyObjects (0x1015b5f0)
+  src/game/park/SkyObjects.cpp      CSkyObjects::CSkyObjects (0x1015b5f0)
 
 The 13 functions run as the original on the PowerPC side and as src/ on the host, and call each other for real (an InitTheme case runs the
 whole chain). Every other callee is a fake on both sides that records the same event (name, integers, texts) and answers from the case's

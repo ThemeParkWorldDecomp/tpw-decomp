@@ -1,5 +1,5 @@
 """Unit v5999, LLCR_DeleteRide, against libtpw_unit_LLCR_DeleteRide_2.dylib (tests/unit_LLCR_DeleteRide_2.cpp), main app
-("SimTheme Park"), src/LLCR_OverRide_LLCR_DeleteRide_2.cpp:
+("SimTheme Park"), src/game/park/LLCellRide.cpp:
   LLCR_DeleteRide 0x100892c4 (2,576 bytes)
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,4 +1,4 @@
-"""Unit w203, against libtpw_unit_VehicleSteer.dylib (tests/unit_VehicleSteer.cpp), main app ("SimTheme Park"), src/Vehicle_steer.cpp:
+"""Unit w203, against libtpw_unit_VehicleSteer.dylib (tests/unit_VehicleSteer.cpp), main app ("SimTheme Park"), src/game/rides/vehicle.cpp:
   vector helpers    perp 0x1013380c, normalise 0x1013384c, truncate 0x101339f4
   Vehicle           point_to_local 0x101333c4, vec_to_global 0x101334a4, predict_pos 0x10133b58, is_finished_path 0x101341a4,
                     clear_behaviours 0x10133358, ~Vehicle 0x101332cc
@@ -106,7 +106,7 @@ class Bits(int):
 
 
 def fixmul(a, b):
-    """FixMul as src/fixmath.cpp (and the module test_vector2d) define it: rounds half away from zero, saturates."""
+    """FixMul as src/game/park/GoldenTickets.cpp (and the module test_vector2d) define it: rounds half away from zero, saturates."""
     p = a * b
     p += 0x8000 if p >= 0 else -0x8000
     return max(INT_MIN, min(INT_MAX, p >> 16))
@@ -143,7 +143,7 @@ def length(x, y):
 
 
 def xaxis(x, y, r):
-    """xaxis_circle_intersect (src/vector2d.cpp) as a 32-bit word."""
+    """xaxis_circle_intersect (src/game/ui/vector2d.cpp) as a 32-bit word."""
     a = s32((x >> 18) * (x >> 18) + (y >> 18) * (y >> 18))
     c = s32(a - fixmul(r, r))
     m2x = s32(x * -2)

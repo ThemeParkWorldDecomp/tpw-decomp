@@ -1,6 +1,6 @@
-// CVariableTime (main app): the constructor at 0x1016886c (src/CVariableTime.cpp, the
+// CVariableTime (main app): the constructor at 0x1016886c (src/game/VariableTime.cpp, the
 // inventory's FS_MasterSave.cpp range) and the rate members and ReadVariableTime at
-// 0x101688d4..0x10168a3c (src/GameClock.cpp). Packed to 4 bytes like CFixedTime.
+// 0x101688d4..0x10168a3c (src/game/VariableTime.cpp). Packed to 4 bytes like CFixedTime.
 //
 // The constructor builds a CFixedTime at +0 (a call of CFixedTime::CFixedTime on the
 // object) and sets the rate to 1.0; it leaves the reading and the milliseconds at +0x0c and

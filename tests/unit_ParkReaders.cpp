@@ -1,5 +1,5 @@
 // Differential library for unit w125, the frame readers of the things: CParkAnalyser::HowBusyIsPark, NumberOfVisitorsInPark, CountNeighboursOfType
-// (src/ParkAnalyser_readers.cpp) and InterfaceNumberTextObject::Change, InterfaceCashAndGTickTextObject::Change (src/ui_TextObjects.cpp).
+// (src/game/park/analyser.cpp) and InterfaceNumberTextObject::Change, InterfaceCashAndGTickTextObject::Change (src/game/ui/InterfaceTextObjectSprite.cpp).
 //
 // Every callee is a fake that records the same event as the PowerPC side's stub: GAME_ASSERTMSG (the condition and the text), the world accessor (its
 // receiver), CWorld::GetUsedThingHead and GetNextUsedThing (the world, and the thing), CPeep::IsInsidePark, CParkAnalyserVal<int>::Get and Set,

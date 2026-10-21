@@ -1,4 +1,4 @@
-// Test library for the mesh file loader (src/m3d2_load.cpp; libtpw_unit_M3D2.dylib; see
+// Test library for the mesh file loader (src/engine/EngineUtil.cpp, src/engine/M3D2Load.cpp, src/game/park/TPHField.cpp; libtpw_unit_M3D2.dylib; see
 // tests/test_M3D2.py). The loader runs for real over the test's file bytes; the engine's
 // allocator, the four file callbacks and the debug log are recording fakes. The block
 // comes from the arena (the file's structures have 32-bit pointer fields), at a distance

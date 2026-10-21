@@ -1,5 +1,5 @@
 // Test library for the dynamic face list and the water (unit w127; libtpw_unit_DynamicFaces.dylib, tests/test_DynamicFaces.py), main app:
-//   src/DynamicFaces.cpp   sort, DC_ResetSquareFaceListPtr, DC_AddSquareFaceToList, DC_AddPolyFaceToList, HDZ_RotatePointZ, DC_AnimateWater,
+//   src/game/park/DynamicCell.cpp   sort, DC_ResetSquareFaceListPtr, DC_AddSquareFaceToList, DC_AddPolyFaceToList, HDZ_RotatePointZ, DC_AnimateWater,
 //                          DC_DrawWater (and the two 16 x 19 grids it defines)
 //
 // The only callee outside the file is CTRACE (the two "Too many ... dynamic faces !" messages), a fake that records the level and the
@@ -20,7 +20,7 @@
 
 using namespace calllog;
 
-// ---- the strings of gTPGlobals are never read: Format (the only member src/TbString.cpp leaves to the test) does nothing
+// ---- the strings of gTPGlobals are never read: Format (the only member src/bullfrog/FileSystem.cpp leaves to the test) does nothing
 template<> void TbDynamicStringTemplate<char>::Format(const char*, ...) {}
 template<> void TbDynamicStringTemplate<char16_t>::Format(const char16_t*, ...) {}
 template<> void TbStaticStringTemplate<char>::Format(const char*, ...) {}

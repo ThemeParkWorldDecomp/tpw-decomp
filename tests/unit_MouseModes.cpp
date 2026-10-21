@@ -1,6 +1,6 @@
 // Test library for the rest of Mouse.cpp (unit w144; libtpw_unit_MouseModes.dylib, tests/test_MouseModes.py), main app:
-//   src/Mouse_modes.cpp  CMMPathDraw, CMMOnline, CMMCoaster, CMMFirstPersonTarget, __sinit_Mouse_cpp (and the CMouseMode bodies of include/Mouse.h)
-//   src/Mouse.cpp        (landed) AssignMouseMode, CMMDefault: they run for real, so the mode handover (old mode released and deleted) is tested
+//   src/game/Mouse.cpp  CMMPathDraw, CMMOnline, CMMCoaster, CMMFirstPersonTarget, __sinit_Mouse_cpp (and the CMouseMode bodies of include/Mouse.h)
+//   src/game/Mouse.cpp        (landed) AssignMouseMode, CMMDefault: they run for real, so the mode handover (old mode released and deleted) is tested
 // Every other callee is a fake that records the event the PowerPC stub records. The globals of other files are defined here, zero at start.
 #include <cstdarg>
 #include <cstddef>

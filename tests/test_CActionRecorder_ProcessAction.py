@@ -1,5 +1,5 @@
 """Unit v5254, the eight CActionRecorder::ProcessAction overloads, against libtpw_unit_CActionRecorder_ProcessAction.dylib, main app,
-src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ProcessAction.cpp:
+src/game/ActionRecorder.cpp:
   0x10145b28 (action), 0x10145d34 (u8,u8,u16), 0x10145c24 (u8,u8), 0x10146058 (u16,u8), 0x10146140 (float,u16),
   0x10146248 (float,float,u16), 0x1014634c (u16,u16), 0x1014644c (u16,u16,u16)
 

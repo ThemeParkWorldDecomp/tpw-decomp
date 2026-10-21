@@ -1,6 +1,6 @@
 // Test library for the online panel builder and the park find panel's message function (unit v5541;
 // libtpw_unit_OnlineParkFindPanelMsg.dylib, tests/test_OnlineParkFindPanelMsg.py), main app:
-//   src/OnlineParkFindPanelMsg.cpp   CreateOnlinePanel, OnlineParkFindPanelMsg and the globals they own
+//   src/game/ui/ui_onlinePanel.cpp, src/game/ui/ui_onlineParkFindPanel.cpp   CreateOnlinePanel, OnlineParkFindPanelMsg and the globals they own
 //
 // Every callee outside the unit is a recording fake with the same event name and arguments as the module's PowerPC stub. The window
 // objects are 40 Probe windows (an InterfaceWindow whose virtual SetText records); constructors of classes whose bases are not linked

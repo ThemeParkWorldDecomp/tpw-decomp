@@ -1,5 +1,5 @@
 """Unit SAVEVAR_2: SAVEVAR<ESP_Sprites> and the static initialiser of Peep.cpp, against libtpw_unit_SAVEVAR_2.dylib (tests/unit_SAVEVAR_2.cpp), main app
-("SimTheme Park"), src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_SAVEVAR_2.cpp:
+("SimTheme Park"), src/game/people/Peep.cpp:
   SAVEVAR<ESP_Sprites> 0x101162d4, __sinit_Peep_cpp 0x10116418
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian, host memory little-endian).

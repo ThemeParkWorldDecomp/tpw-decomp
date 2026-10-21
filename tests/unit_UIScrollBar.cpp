@@ -1,7 +1,7 @@
 // Test library for the sprite draw object, the scroll bar and the window's show and position leaves (libtpw_unit_UIScrollBar.dylib; see
-// tests/test_UIScrollBar.py): src/ui_DrawObjectSprite.cpp, src/InterfaceScrollBar.cpp and src/InterfaceWindow_show.cpp (the 33 functions
-// of unit w30b), under them the real window constructor (src/InterfaceWindow.cpp, which builds the test trees) and the real rectangles
-// (src/UI_Base.cpp).
+// tests/test_UIScrollBar.py): src/game/ui/InterfaceDrawObjectSprite.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceScrollBar.cpp and src/game/ui/InterfaceWindow.cpp (the 33 functions
+// of unit w30b), under them the real window constructor (src/game/ui/InterfaceWindow.cpp, which builds the test trees) and the real rectangles
+// (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp).
 //
 // Everything else the unit reaches is a fake that records through calllog: the message senders and the pointer, the default window
 // handler and the thumb's, the window's other members (the destructor, Enable, DrawMe, GetPosition, SetPosition(CoolRect*), SetValue,
@@ -196,7 +196,7 @@ void InterfaceHelpText::OnMouseMovedOut() {}
 void InterfaceHelpText::OnMouseDown() {}
 void InterfaceHelpText::OnFrame() {}
 void InterfaceHelpText::OnHideOrDelete(InterfaceWindow* window) { ev("Help.OnHideOrDelete", {lab(window)}); }
-// The constructor and the two virtuals unit w36 added to the class (src/ui_helptext.cpp; the vtable must link here too).
+// The constructor and the two virtuals unit w36 added to the class (src/game/ui/InterfaceHelpText.cpp; the vtable must link here too).
 InterfaceHelpText::InterfaceHelpText() {}
 void InterfaceHelpText::Init() {}
 void InterfaceHelpText::DeInit() {}

@@ -1,6 +1,6 @@
 """Unit v51025, the buddy map's tree (std::map<nocase_string, BuddyInfo>), against
 libtpw_unit_std___tree_std_pair_std_map_nocase_string_BuddyI_2.dylib (tests/unit_std___tree_std_pair_std_map_nocase_string_BuddyI_2.cpp), main app,
-src/std___tree_std_pair_std_map_nocase_string_BuddyI_2.cpp:
+src/game/online/online.cpp:
   find 0x1021f8d8, insert_one 0x10222d9c, destroy 0x10222564, erase 0x102278fc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory (32-bit big-endian words) for the

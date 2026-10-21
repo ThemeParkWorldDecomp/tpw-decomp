@@ -1,5 +1,5 @@
 """Unit v5625, the dynamic mesh of a ride's hoardings, against libtpw_unit_GenerateHoardingMeshes.dylib
-(tests/unit_GenerateHoardingMeshes.cpp), main app ("SimTheme Park"), src/LevelSystems_GenerateHoardingMeshes.cpp:
+(tests/unit_GenerateHoardingMeshes.cpp), main app ("SimTheme Park"), src/game/park/TPHoardings.cpp:
   GenerateHoardingMeshes 0x1005fa70
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

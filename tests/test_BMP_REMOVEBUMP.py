@@ -1,5 +1,5 @@
 """Unit v5087, the bump removal of the advisor world, against libtpw_unit_BMP_REMOVEBUMP.dylib (tests/unit_BMP_REMOVEBUMP.cpp), main app
-("SimTheme Park"), src/BMP_REMOVEBUMP.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_REMOVEBUMP 0x1002e614, BMP_DOCK 0x1002e740, RemovePeepsFromBump 0x1002e464, FindTargetBump 0x1002df10
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

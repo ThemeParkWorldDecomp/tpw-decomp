@@ -1,12 +1,12 @@
 """Differential tests for the text draw objects of the interface, against libtpw_unit_UITextObjects.dylib
 (tests/unit_UITextObjects.cpp):
 
-  src/ui_DrawObjectText.cpp   InterfaceTextObjectSprite: constructor, destructor, UpdateTextures, Change
+  src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_textmanager.cpp   InterfaceTextObjectSprite: constructor, destructor, UpdateTextures, Change
                               InterfaceTitleTextObject: constructor, destructor, UpdateTextures
                               InterfaceCursorPosTextObjectSprite: constructor, destructor, Query
 
-Real on both sides: those ten, the sprite draw object under them (src/ui_DrawObjectSprite.cpp: constructor, destructor, Change,
-Show, CreateTextures, ...) and the rectangles (src/UI_Base.cpp: CoolRect::Set). Fakes that record the same event on both sides: the draw
+Real on both sides: those ten, the sprite draw object under them (src/game/ui/InterfaceDrawObjectSprite.cpp: constructor, destructor, Change,
+Show, CreateTextures, ...) and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp: CoolRect::Set). Fakes that record the same event on both sides: the draw
 object base class, the engine's sprite surfaces (SSpriteGameData, SSpriteEngineData, CSpriteList) and CMapWho, the text formatter
 (TbTextFormatter: constructor, destructor, the two justifications, the character positions, Draw and Measure), the font parameters
 (SetFont, UseReColour, UsePreColoured, UseAlphaWriteMode), the render area (constructor, MakeRenderArea, LbDraw_SetCurrent), the
@@ -22,7 +22,7 @@ that the sprite's Change would read through NULL. They are skipped on both sides
 caller had are tested with those registers cleared: a justification code outside 0 to 2 (the text box is then four zeros) and a font
 id outside 0 to 12 (the font word is read from address 0x14, which the test maps as a page of zeros).
 
-Unit v5L49: textobj_callee::CursorDtor (the password object's call of 0x1018f2b8, src/ui_DrawObjectText.cpp) is the cursor object's
+Unit v5L49: textobj_callee::CursorDtor (the password object's call of 0x1018f2b8, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_textmanager.cpp) is the cursor object's
 destructor test again with the host going through that glue (operation 24) instead of the language's delete.
 
 Quirks the tests pin: the text objects do not call UI_DrawText but do the same job inline; the Title draws the text twice (grey, two

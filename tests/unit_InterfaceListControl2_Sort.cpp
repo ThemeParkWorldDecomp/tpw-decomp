@@ -1,6 +1,6 @@
 // Test library for InterfaceListControl2::Sort and FindString (unit v5203; libtpw_unit_InterfaceListControl2_Sort.dylib,
 // tests/test_InterfaceListControl2_Sort.py), main app:
-//   src/InterfaceListControl2_items_InterfaceListControl2_Sort.cpp
+//   src/game/ui/InterfaceListControl2.cpp
 //
 // The callees outside the unit are fakes: the wide string compare, WcsLen, AdvanceIndex (the next link) and GetNonHierIndexedEntry (the
 // entry `position` links along the next links), each recording what the PowerPC stubs of the module record.

@@ -1,6 +1,6 @@
 // Test library for the small online / lobby / 2D map functions of unit v51044 (libtpw_unit_std_less_std_basic_string_operator.dylib,
 // tests/test_std_less_std_basic_string_operator.py), main app:
-//   src/std_less_std_basic_string_operator.cpp   WideStringLess, the three allocator destroys, PairCtor, WStreambufUflow,
+//   src/game/online/online.cpp, src/game/ui/ui_2dmap.cpp, src/game/ui/ui_worldLobbyController.cpp   WideStringLess, the three allocator destroys, PairCtor, WStreambufUflow,
 //   Show/HideWorldLobbySats, WorldLobbySetZoomButton, CUI2DMapSprite::CUI2DMapSprite
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs); the globals of other

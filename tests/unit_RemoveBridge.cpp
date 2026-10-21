@@ -1,5 +1,5 @@
 // Test library for RemoveBridge and LLCC_SystemGetPointedPeepThing (unit v5689; libtpw_unit_RemoveBridge.dylib, tests/test_RemoveBridge.py), main app:
-//   src/LLCellSystem_hoardimage_RemoveBridge.cpp
+//   src/game/park/LLCellSystem.cpp, src/game/park/MapCell.cpp
 //
 // The callees are recording fakes; the globals of other files are defined here.
 #include <cstddef>

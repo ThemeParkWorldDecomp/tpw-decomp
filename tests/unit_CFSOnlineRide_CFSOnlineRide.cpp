@@ -1,6 +1,6 @@
 // Test library for CFSOnlineRide's constructor (unit v5141; libtpw_unit_CFSOnlineRide_CFSOnlineRide.dylib,
 // tests/test_CFSOnlineRide_CFSOnlineRide.py), main app:
-//   src/CFSOnlineRide_CFSOnlineRide.cpp   CFSOnlineRide::CFSOnlineRide and the (empty) destructor
+//   src/game/online/FS_OnlineList.cpp   CFSOnlineRide::CFSOnlineRide and the (empty) destructor
 //
 // The string constructor and the virtual assignment from a wide C string are recording fakes (the same events as the module's
 // PowerPC stubs). The list's AddTail is the header's real template, run on both sides; the helpers below build and read the lists.

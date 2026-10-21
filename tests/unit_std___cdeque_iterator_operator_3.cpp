@@ -1,6 +1,6 @@
 // Test library for the CodeWarrior cdeque iterator operator-=, queue<errorthingy>::~queue and __cdeque<const void*>::reserve (unit v5925;
 // libtpw_unit_std___cdeque_iterator_operator_3.dylib, tests/test_std___cdeque_iterator_operator_3.py), main app:
-//   src/MinAnalyserValue_std___cdeque_iterator_operator_3.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are recording fakes: operator+= , tear_down, ~__cdeque, max_size and the runtime imports. Addresses
 // are logged relative to a base the wrapper sets (the host's heap differs from the emulator's).

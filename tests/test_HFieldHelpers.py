@@ -1,4 +1,4 @@
-"""The height field's helpers and the face sorter (src/tb_hfield_helpers.cpp), original versus
+"""The height field's helpers and the face sorter (src/engine/DrawPrimitive.cpp, src/engine/tb_hfield.cpp), original versus
 translation: CHField::CheckGamutArea, ProcessTextureParameters, QSort_textures, qSortTextures_lpTex,
 GetTexturesUsed, CalcFullLighting and CalcLine, and QSortFaces_float.
 

@@ -1,5 +1,5 @@
 """Unit v5217, CPerson::UpdateTurn and CPerson::FindNearestFireworks, against libtpw_unit_CPerson_UpdateTurn.dylib
-(tests/unit_CPerson_UpdateTurn.cpp), main app ("SimTheme Park"), src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_UpdateTurn.cpp:
+(tests/unit_CPerson_UpdateTurn.cpp), main app ("SimTheme Park"), src/game/people/PersonQueue.cpp:
   CPerson::UpdateTurn 0x1011f7d0, CPerson::FindNearestFireworks 0x1011ed54
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

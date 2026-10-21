@@ -1,6 +1,6 @@
 // Test library for LLCC_GetRideProfileInfo and LLCC_StartPylonMove (unit v5691; libtpw_unit_LLCC_GetRideProfileInfo.dylib,
 // tests/test_LLCC_GetRideProfileInfo.py), main app:
-//   src/LLCC_Kill_Them_KILL_THEM_ALL_LLCC_AbortPylonMove_LLCC_GetRideProfileInfo.cpp
+//   src/game/park/LLCellRide.cpp
 //
 // CCellBase::GetTrackCellEquiv and CMapCell::Delete are fakes that record the cell's offset from the world. The globals of other files
 // the unit touches are defined here.

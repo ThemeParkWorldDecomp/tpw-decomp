@@ -1,6 +1,6 @@
 // Test library for Advisor.cpp's static initialiser and save templates plus small leaves of the bump rides, camera and coasters
 // (unit v51069; libtpw_unit_sinit_Advisor_cpp.dylib, tests/test_sinit_Advisor_cpp.py), main app:
-//   src/AdvisorScoring_sinit_Advisor_cpp.cpp
+//   src/game/TPCamera.cpp, src/game/advisor/Advisor.cpp, src/game/rides/BumperRide.cpp, src/game/rides/CoasterQueue.cpp, src/game/rides/CoasterTrain.cpp, src/game/rides/TPCoaster.cpp
 //
 // The callees outside the unit (the string constructor, __register_global_object, WriteSerialiseLog, GAME_ASSERTMSG, LbFile_Read,
 // LbFile_Write, MReleaseFreeF, __destroy_arr) are fakes that record the arguments the real ones read and answer from the test's queues.

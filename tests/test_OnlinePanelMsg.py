@@ -1,5 +1,5 @@
 """Unit v5079, the online panel's message function, against libtpw_unit_OnlinePanelMsg.dylib (tests/unit_OnlinePanelMsg.cpp), main app
-("SimTheme Park"), src/OnlinePanelMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_onlinePanel.cpp:
   OnlinePanelMsg 0x101e62d0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

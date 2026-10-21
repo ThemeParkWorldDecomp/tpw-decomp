@@ -1,5 +1,5 @@
 """Unit v51050, CLightParallel::~CLightParallel and InterfaceImage::SetValue, against libtpw_unit_CLightParallel_Dtor_CLightParallel.dylib
-(tests/unit_CLightParallel_Dtor_CLightParallel.cpp), main app, src/Light_CLightParallel_Dtor_CLightParallel.cpp:
+(tests/unit_CLightParallel_Dtor_CLightParallel.cpp), main app, src/game/advisor/Advisor.cpp, src/game/ui/InterfaceImage.cpp:
   CLightParallel::~CLightParallel 0x10007750, InterfaceImage::SetValue 0x101cff88
 
 The destructor is run on the Mac's raw layout: a 0x80 byte object, the block its word 0 points at (0x70), the block that one points at

@@ -1,5 +1,5 @@
 // Test library for RestoreAnimTime (unit v5561; libtpw_unit_RestoreAnimTime.dylib, tests/test_RestoreAnimTime.py), main app:
-//   src/RestoreAnimTime.cpp
+//   src/game/rides/TPRide.cpp
 //
 // IsValidAnimation and RestoreAnimTimeStats are fakes that record their arguments; the header's first word is a marker the fake logs.
 #include <cstddef>

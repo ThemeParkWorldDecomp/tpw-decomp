@@ -1,5 +1,5 @@
 """Unit v5525, the show-status panel's message handler, against libtpw_unit_ShowStatusMsg.dylib (tests/unit_ShowStatusMsg.cpp), main app
-("SimTheme Park"), src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_ShowStatusMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_showStatus.cpp:
   ShowStatusMsg 0x101c2708
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory for the original, host memory for the

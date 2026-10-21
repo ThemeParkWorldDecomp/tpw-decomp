@@ -1,6 +1,6 @@
 // Test library for ShopStatusPanel::ApplyChanges, applytoallcallback and Show (unit v5734; libtpw_unit_ShopStatusPanel_ApplyChanges.dylib,
 // tests/test_ShopStatusPanel_ApplyChanges.py), main app:
-//   src/ShopStatusPanel_InitWindow_ShopStatusPanel_ApplyChanges.cpp
+//   src/game/ui/ui_shopStatus.cpp
 //
 // The callees outside the unit are fakes recording their arguments; an object or panel is told apart by the tag word the test writes at +0x100.
 #include <cstddef>

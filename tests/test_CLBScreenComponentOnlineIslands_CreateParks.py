@@ -1,6 +1,6 @@
 """Unit v5639, the online islands screen's CreateParks, Show and ProcessCancel, against
 libtpw_unit_CLBScreenComponentOnlineIslands_CreateParks.dylib (tests/unit_CLBScreenComponentOnlineIslands_CreateParks.cpp), main app
-("SimTheme Park"), src/CLBScreenComponentOnlineIslands_GotoNextIsland_CLBScreenComponentOnlineIslands_CreateParks.cpp:
+("SimTheme Park"), src/game/online/lobby_island.cpp:
   CLBScreenComponentOnlineIslands::CreateParks 0x100b4880, Show 0x100b3ec8, ProcessCancel 0x100b3cd0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,5 +1,5 @@
 """Unit v5907, online.cpp's static initialiser, CheckShifts and the cdeque assign, against libtpw_unit_sinit_online_cpp.dylib
-(tests/unit_sinit_online_cpp.cpp), main app ("SimTheme Park"), src/ProcessGetChatSatellitePlayers_sinit_online_cpp.cpp:
+(tests/unit_sinit_online_cpp.cpp), main app ("SimTheme Park"), src/game/online/online.cpp, src/game/ui/ui_worldLobbyController.cpp:
   __sinit_online_cpp 0x1022a06c, CheckShifts 0x1022a3b4,
   std::__cdeque<const_void*,...>::do_assign<__cdeque<vector<Argument>*>::iterator> 0x10229ae4
 

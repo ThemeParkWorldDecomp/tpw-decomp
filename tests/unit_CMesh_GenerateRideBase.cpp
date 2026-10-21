@@ -1,5 +1,5 @@
 // Test library for the CMesh ride base members (unit v5752; libtpw_unit_CMesh_GenerateRideBase.dylib, tests/test_CMesh_GenerateRideBase.py), engine:
-//   src/tb_mesh_CMesh_GenerateRideBase.cpp   CMesh::CenterMatrix, CMesh::GenerateRideBase (two overloads)
+//   src/engine/Mesh.cpp   CMesh::CenterMatrix, CMesh::GenerateRideBase (two overloads)
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. Entries are
 // identified by their flag word (the test gives each a different marker), arrays of CsTexture by the index of the element.

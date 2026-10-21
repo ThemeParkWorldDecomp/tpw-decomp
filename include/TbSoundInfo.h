@@ -1,7 +1,7 @@
 // TbSoundInfo.h: the records the sound runtime passes around (unit w77, "sound symbols shared", Code at 0x10000000):
 // TbSoundReverbInfo, TbSoundVolumeControl, TbSoundSampleInfo (what one sample is played with) and TbSoundSystemInfo (what the
-// audio device is opened with). Plain value classes without virtuals. The functions are in src/TbSoundInfo.cpp, except
-// TbSoundSampleInfo::SetBank, which is in src/TbSoundBank.cpp (unit w72).
+// audio device is opened with). Plain value classes without virtuals. The functions are in src/sound/TbSoundPosition.cpp, src/sound/TbSoundSampleInfo.cpp, src/sound/TbSoundSystemInfo.cpp, src/sound/SystemCommand.cpp, src/sound/AudioPlaceHolder.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/TbSysCommand.cpp, except
+// TbSoundSampleInfo::SetBank, which is in src/sound/TbSoundSampleInfo.cpp (unit w72).
 //
 // The Mac's layouts are given in comments as offsets. Pointer members are native pointers on the host (8 bytes), so the host
 // classes are larger than the Mac's (0x90 bytes for the sample info, 0x4c for the system info); the offsets here are the Mac's.
@@ -61,7 +61,7 @@ public:
     TbSoundSampleInfo();                                                    // 0x100158bc (100)
 
     void SetNumber(uint32_t number);                                        // 0x1000df08 (20): flag 0x80
-    void SetBank(Bank::CBank* bank);                                        // 0x1000df50 (20): flag 8; src/TbSoundBank.cpp (w72)
+    void SetBank(Bank::CBank* bank);                                        // 0x1000df50 (20): flag 8; src/sound/TbSoundSampleInfo.cpp (w72)
     void SetUserId(uint32_t id);                                            // 0x1000dcac (20): flag 4
     void SetPan(uint32_t pan);                                              // 0x1000dec0 (20): flag 0x10
     void SetVolume(uint32_t volume);                                        // 0x1000dd98 (20): flag 2

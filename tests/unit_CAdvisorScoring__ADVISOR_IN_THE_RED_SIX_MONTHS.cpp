@@ -1,5 +1,5 @@
 // Test library for eight advisor scorers (unit v5252; libtpw_unit_CAdvisorScoring__ADVISOR_IN_THE_RED_SIX_MONTHS.dylib), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_IN_THE_RED_SIX_MONTHS.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The world, bank account and analyser callees are recording fakes; the objects are tokens (0x4000, 0x5000, 0x6000) that are never read.
 // gGameWorld is defined here.

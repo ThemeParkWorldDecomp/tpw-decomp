@@ -1,6 +1,6 @@
 """Unit v5340, UIStatusPanel::ShowEditNamePanel, against libtpw_unit_UIStatusPanel_ShowEditNamePanel.dylib
 (tests/unit_UIStatusPanel_ShowEditNamePanel.cpp), main app ("SimTheme Park"),
-src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_UIStatusPanel_ShowEditNamePanel.cpp:
+src/game/ui/ui_StatusPanel.cpp:
   UIStatusPanel::ShowEditNamePanel 0x10194208
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

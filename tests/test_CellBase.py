@@ -1,5 +1,5 @@
 """Unit w179, CCellBase and CTrackCell, against libtpw_unit_CellBase.dylib (tests/unit_CellBase.cpp), main app ("SimTheme Park"),
-src/CellBase.cpp and src/TrackCell.cpp:
+src/game/park/CellBase.cpp and src/game/buildings/TrainingCentre.cpp:
   CCellBase: ModifyNeighbours 0x10081608, GetNeighbours 0x100816e8, NumberOfNeighbours 0x10081744, RemoveDirection 0x1008184c,
   NumberOfHVNeighbours 0x10081890, GetDirection 0x10081930, NumberOfDirections 0x10081968, DecOverlapCounter 0x100819d8, SetOverlapCounter
   0x10081a1c, GetOverlapCounter 0x10081a5c, GetTrackCellEquiv 0x100f4844 (const) and 0x100f48c4, GetMapCellEquiv 0x100f4928 (const) and

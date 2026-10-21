@@ -1,5 +1,5 @@
 """Unit v5064, the publish park panel and the online park list panel, against libtpw_unit_PublishPanelMsg.dylib
-(tests/unit_PublishPanelMsg.cpp), main app ("SimTheme Park"), src/PublishPanelMsg.cpp:
+(tests/unit_PublishPanelMsg.cpp), main app ("SimTheme Park"), src/game/ui/ui_onlineParkListPanel.cpp, src/game/ui/ui_publishParkPanel.cpp:
   PublishPanelMsg 0x101eca2c, CreatePublishParkPanel 0x101eccc8, CreateOnlineParkListPanel 0x101ec4e0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

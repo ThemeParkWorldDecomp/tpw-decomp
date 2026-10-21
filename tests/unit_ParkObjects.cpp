@@ -1,4 +1,4 @@
-// Differential library for unit w151, the park analyser's object and ride type queries (src/ParkAnalyser_objects.cpp, src/Object_queries.cpp).
+// Differential library for unit w151, the park analyser's object and ride type queries (src/game/park/analyser.cpp, src/game/Object.cpp).
 //
 // Every callee is a fake that records the same event as the PowerPC side's stub: the world accessor (its receiver), CWorld::GetUsedThingHead and
 // GetNextUsedThing, GAME_ASSERTMSG, CParkAnalyserVal<int>::Get and Set, CRideDatabase::GetFirstRide, GetNextRide and GetRideInfo, the const

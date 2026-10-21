@@ -1,10 +1,10 @@
 """Unit w199, against libtpw_unit_ObjectUpkeep.dylib (tests/unit_ObjectUpkeep.cpp), main app ("SimTheme Park"):
-  src/Object_upkeep.cpp  CObject::GetProspectiveDamagePerTurn 0x1010ae5c, GetProspectiveReliability 0x1010b1cc, AddWearAndTear 0x1010b244,
+  src/game/Object.cpp  CObject::GetProspectiveDamagePerTurn 0x1010ae5c, GetProspectiveReliability 0x1010b1cc, AddWearAndTear 0x1010b244,
                          RepairFully 0x1010b5bc, CleanFully 0x1010bda8, RequestMaintenance 0x1010beb8, AssignStaffMember 0x1010c4d4, UnassignStaffMember
                          0x1010c554, GetAssignedStaffMember 0x1010c5a0, IsBeingWorkedUpon 0x1010c6d8, IsCondemned 0x1010c8bc, IsDirty 0x1010c900,
                          IsFlaggedForMaintenance 0x1010c980, RequiresUpgrade 0x1010c9c0, StartFixing 0x1010ca08, IsPlayingFixAnim 0x1010ca6c,
                          RequestBreakdown 0x1010d90c, SetWornFlag 0x1010d994
-  src/Object_queries.cpp CObject::IsBrokenDown 0x1010c878 (another unit; on the Mac it runs as the original, like CThing::GetThingId 0x1012e1f8)
+  src/game/Object.cpp CObject::IsBrokenDown 0x1010c878 (another unit; on the Mac it runs as the original, like CThing::GetThingId 0x1012e1f8)
 
 A case is a ride (CObject, 0x448 bytes of seeded fill between two 0x40 byte guards, the fields the code reads or writes set from the case), the world's
 tail block (the turn at world + 0x1da70c; the world pointer is shifted back to it), a ride record (the slots the code reads: the base slots 70 to 75 and the

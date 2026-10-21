@@ -1,9 +1,9 @@
-// Test library for HandleCamera and SetLMatrixOrientationHi (libtpw_unit_Camera.dylib; see tests/test_Camera.py): src/TPCamera_handle.cpp,
-// src/rsse_orientation.cpp, src/TPCamera.cpp (the external branch), src/rsse_matrix.cpp and src/rsse_rotate.cpp, all real.
+// Test library for HandleCamera and SetLMatrixOrientationHi (libtpw_unit_Camera.dylib; see tests/test_Camera.py): src/game/TPCamera.cpp,
+// src/game/LMatrix.cpp, src/game/TPCamera.cpp (the external branch), src/game/LMatrix.cpp, all real.
 //
 // Fakes that record through calllog: the clock (CClock::ReadFixed), the camera key table (CKeyTable::GetState: held when the id's bit is set
 // in the case's key mask), DetermineHFieldHeight, GetNextGridsquare, RideRideIfRequired, MatrixDifferenceTiny, ApplyHeadsOnRidesBumpage
-// (writes the scripted matrix) and the engine's view matrix (CMatrix::Load). The camera's globals of src/TPCamera_init.cpp are defined here
+// (writes the scripted matrix) and the engine's view matrix (CMatrix::Load). The camera's globals of src/game/TPCamera.cpp are defined here
 // (InitCamera is not linked); the test sets them through tpw_cam_run and reads them back.
 #include <cstdint>
 #include <cstring>

@@ -1,5 +1,5 @@
 """Unit v5648: SamsUtilities::USwapBlockStruct<FLYBOY> 0x10079740, against libtpw_unit_SamsUtilities_USwapBlockStruct.dylib, main app,
-src/FLY_Load_SamsUtilities_USwapBlockStruct.cpp.
+src/game/HLSprite.cpp.
 
 A case is a count and that many 0xe4-byte records of random bytes. The PowerPC side runs the original with its real swap callees
 (no fakes needed: nothing outside the unit has effects). What is compared: every byte of the records after the call, plus a guard

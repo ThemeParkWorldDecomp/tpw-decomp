@@ -1,5 +1,5 @@
 // Test library for CPeep::SetRandomDestination (unit v5989; libtpw_unit_CPeep_SetRandomDestination.dylib, tests/test_CPeep_SetRandomDestination.py), main app:
-//   src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_SetRandomDestination.cpp   SetRandomDestination and gPeepNoCell
+//   src/game/people/Peep.cpp   SetRandomDestination and gPeepNoCell
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queue; cells are named by their byte
 // offset from gWorldMap. The globals of other files (gWorld, gWorldMap, the four compass offsets) are defined here.

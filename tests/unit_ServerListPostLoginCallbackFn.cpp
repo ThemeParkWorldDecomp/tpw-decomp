@@ -1,5 +1,5 @@
 // Test library for ServerListPostLoginCallbackFn (unit v5721; libtpw_unit_ServerListPostLoginCallbackFn.dylib), main app:
-//   src/ServerListPostLoginCallbackFn.cpp
+//   src/game/online/FS_OnlineList.cpp
 //
 // The callees outside the unit (the CFSOnlineSystem constructor and the two server list functions) are recording fakes.
 #include <cstddef>

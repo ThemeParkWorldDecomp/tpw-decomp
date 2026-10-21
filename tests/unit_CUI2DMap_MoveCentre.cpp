@@ -1,6 +1,6 @@
 // Test library for the 2D map's MoveCentre, InitSprites and UpdateMapZoom (unit v5083; libtpw_unit_CUI2DMap_MoveCentre.dylib,
 // tests/test_CUI2DMap_MoveCentre.py), main app:
-//   src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre.cpp   CUI2DMap::MoveCentre, InitSprites, UpdateMapZoom
+//   src/game/ui/ui_2dmap.cpp   CUI2DMap::MoveCentre, InitSprites, UpdateMapZoom
 //
 // The callees outside the unit are recording fakes: CWorld::GetUsedThingHead / GetNextUsedThing, GAME_ASSERTMSG, CEZSprite::Init /
 // Enable / LoadSprite, CMapZoom::Use / Window, CUI2DMap::CreateMapSprites and UpdateAllSpritePositions. The globals of other files the

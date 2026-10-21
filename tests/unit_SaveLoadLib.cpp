@@ -1,7 +1,7 @@
 // Test library for the three small bullfrog functions unit w108 added (libtpw_unit_SaveLoadLib.dylib; see
-// tests/test_SaveLoadLib.py): src/LbFile_stamp.cpp (LbFile_CompareFileStamps) and src/lb_zlib_size.cpp (CZLib::DecompressedSize and
+// tests/test_SaveLoadLib.py): src/bullfrog/LbFile.cpp (LbFile_CompareFileStamps) and src/bullfrog/LbZLib.cpp (CZLib::DecompressedSize and
 // LbZLib_MemDecompressedSize). Fakes that record through calllog: the platform's NS_MacDoze::CompareFileTime (answers the queue
-// "CompareFileTime") and SwapHeader (the host's: it only marks the header, as src/lb_zlib.cpp's does on a little endian host).
+// "CompareFileTime") and SwapHeader (the host's: it only marks the header, as src/bullfrog/LbZLib.cpp's does on a little endian host).
 #include <cstdint>
 #include <cstring>
 

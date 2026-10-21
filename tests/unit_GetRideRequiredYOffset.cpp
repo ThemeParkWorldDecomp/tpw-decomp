@@ -1,5 +1,5 @@
 // Test library for the ride placement functions (unit v5886; libtpw_unit_GetRideRequiredYOffset.dylib, tests/test_GetRideRequiredYOffset.py), main app:
-//   src/PublishPanelMsg_GetRideRequiredYOffset.cpp   GetRideMasterBoundArea, GetNodeWorldVertPosnsIntoGeomBuffer (node, matrix),
+//   src/game/rides/RidePlacement.cpp   GetRideMasterBoundArea, GetNodeWorldVertPosnsIntoGeomBuffer (node, matrix),
 //   GetRideRequiredYOffset, CorrectRidePosnForRotation, SetRidePositionAndRotation, MoveRide
 //
 // The callees outside the unit (CellIsRide, GetRotatedHFieldCoord, YRotateLMatrixNoTrans, Disable/EnableMeshDraw) are recording fakes;

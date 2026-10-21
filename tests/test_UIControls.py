@@ -1,14 +1,14 @@
 """Differential tests for the control factory, the control constructors and the button, against
 libtpw_unit_UIControls.dylib (tests/unit_UIControls.cpp):
 
-  src/ui_controls_create.cpp   InterfaceWindow::CreateObject and the constructors of InterfaceBar, InterfaceCheckButtons,
+  src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp   InterfaceWindow::CreateObject and the constructors of InterfaceBar, InterfaceCheckButtons,
                                InterfaceEditBox, InterfaceImage, InterfaceKnob, InterfaceLightPanel, InterfaceListBox,
                                InterfaceListControl2, InterfaceTextBox and InterfaceVaryBox
-  src/InterfaceButton.cpp      InterfaceButton's constructor, destructor, CalcFrame, Enable, WhatAmI, GetState, DoTextColour,
+  src/game/ui/InterfaceButton.cpp      InterfaceButton's constructor, destructor, CalcFrame, Enable, WhatAmI, GetState, DoTextColour,
                                SetState, HiLight, SetText, GetText, StopHeldTimer, SetAutoRepeat, SetTextUpColour,
                                SetTextDownColour and GetHelpText
 
-Real on both sides: those, the window's constructor (src/InterfaceWindow.cpp) and the rectangles (src/UI_Base.cpp). Fakes that
+Real on both sides: those, the window's constructor (src/game/ui/InterfaceWindow.cpp) and the rectangles (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Fakes that
 record the same event on both sides: UI_PostMessage, UI_UpdatePointerIn, UI_AddTimer (answers a timer of the world from a queue),
 the window's untranslated virtual members (DrawFunction, CalcClientArea and the three overrides of it the constructors reach,
 the destructor, Enable, SetText), SetCallbackFunction (which also sets the handler), CaptureKb, Show, the string heap's

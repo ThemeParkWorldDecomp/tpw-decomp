@@ -1,5 +1,5 @@
 // Test library for the ui_RideStatus.cpp static initialiser (unit v5300; libtpw_unit_sinit_ui_RideStatus_cpp.dylib):
-//   src/sinit_ui_RideStatus_cpp.cpp   __sinit_ui_RideStatus_cpp
+//   src/game/ui/ui_RideStatus.cpp   __sinit_ui_RideStatus_cpp
 //
 // UIStatusPanel::UIStatusPanel is a recording fake. gRideStatusPanel and RideStatusPanelTable are defined here.
 #include <cstddef>
@@ -17,7 +17,7 @@ void __sinit_ui_RideStatus_cpp();
 
 RideStatusPanel gRideStatusPanel;
 
-// The ride panel's table: the main app's is in src/ui_StatusPanel_tables.cpp, outside the unit (unit v5L31). This one is a block of the
+// The ride panel's table: the main app's is in src/game/ui/ui_StatusPanel.cpp, outside the unit (unit v5L31). This one is a block of the
 // arena of its own, made on first use; only its address is compared.
 uint32_t* RideStatusPanelTable() {
     static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(32 * 4));

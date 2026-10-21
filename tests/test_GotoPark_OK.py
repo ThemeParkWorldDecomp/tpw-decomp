@@ -1,5 +1,5 @@
 """Unit v5276, the park-goto callbacks, against libtpw_unit_GotoPark_OK.dylib (tests/unit_GotoPark_OK.cpp), main app
-("SimTheme Park"), src/COnlinePerson_SetDest_GotoPark_OK.cpp:
+("SimTheme Park"), src/game/online/online.cpp:
   GotoPark_OK 0x10213728, GotoCallbackFn 0x102137bc
 
 A case is a world and a call. The callees outside the unit (operator new, the COnlineControl constructor, GotoFailed, GotoStoredPerson,

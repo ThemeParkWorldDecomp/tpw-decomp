@@ -1,5 +1,5 @@
 """Unit v51052, small functions, against libtpw_unit_CStaffHQ_PickUpStaff.dylib (tests/unit_CStaffHQ_PickUpStaff.cpp), main app
-("SimTheme Park"), src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_Serialise_CStaffHQ_PickUpStaff.cpp: the 23 functions of FNS below.
+("SimTheme Park"), src/game/Thing.cpp, src/game/buildings/ResearchLab.cpp, src/game/buildings/StaffHQ.cpp, src/game/buildings/TrainingCentre.cpp, src/game/people/Thoughts.cpp, src/game/ui/vector2d.cpp: the 23 functions of FNS below.
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian) for the translation. The callees outside the unit (CThing::FinalDestroy,

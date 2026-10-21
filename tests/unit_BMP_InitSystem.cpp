@@ -1,5 +1,5 @@
 // Test library for the advisor's bump world (unit v5659; libtpw_unit_BMP_InitSystem.dylib, tests/test_BMP_InitSystem.py), main app:
-//   src/host_leaves_BMP_InitSystem.cpp   BMP_InitSystem, BMP_CloseSystem, BMP_FreeAll, BMP_OpenRide, BMP_CloseRide
+//   src/game/rides/BumperRide.cpp   BMP_InitSystem, BMP_CloseSystem, BMP_FreeAll, BMP_OpenRide, BMP_CloseRide
 //
 // The callees outside the unit are recording fakes: TRACE, SetBuoySequence, BMP_SetRidePerformance, BMP_DestroyRide, NS_MacDoze::GlobalAlloc
 // and GlobalFree, Rand. GlobalAlloc hands out arena blocks stamped with their size at +4; GlobalFree logs that stamp. The world (gColList's

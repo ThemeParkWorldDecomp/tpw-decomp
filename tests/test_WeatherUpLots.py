@@ -1,5 +1,5 @@
 """Unit v5267, the keyboard cheat actions, against libtpw_unit_WeatherUpLots.dylib (tests/unit_WeatherUpLots.cpp), main app
-("SimTheme Park"), src/ui_Postcard_panel_spawn_handyman_WeatherUpLots.cpp:
+("SimTheme Park"), src/game/keyboard.cpp:
   WeatherUpLots 0x1014d6bc, WeatherDown 0x1014d62c, WeatherDownLots 0x1014d74c, WeatherUp 0x1014d5a0, DeactivateWeather 0x1014d83c,
   ChatterToggle 0x1014d51c, RealTimeLightingMasterToggle 0x1014d8bc, start_cheating 0x1014d470
 

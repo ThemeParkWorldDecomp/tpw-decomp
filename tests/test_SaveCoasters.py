@@ -1,5 +1,5 @@
 """Unit v5968, SaveCoasters, against libtpw_unit_SaveCoasters.dylib (tests/unit_SaveCoasters.cpp), main app
-("SimTheme Park"), src/TPCoaster_trains_SaveCoasters.cpp:
+("SimTheme Park"), src/game/rides/TPCoaster.cpp:
   SaveCoasters 0x10044280
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's offsets (big-endian) for

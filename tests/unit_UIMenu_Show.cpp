@@ -1,5 +1,5 @@
 // Test library for UIMenu::Show, Hide and ~UIMenu (unit v5771; libtpw_unit_UIMenu_Show.dylib, tests/test_UIMenu_Show.py), main app:
-//   src/ui_main_kbcapture_UIMenu_AddItem_UIMenu_Show.cpp
+//   src/game/ui/UIMenu.cpp
 //
 // The InterfaceWindow methods the menu calls, UI_GetHighestZ, UIMain_CheckPanel, UIMain_DecideKbCapture, UI_SendMessage and the runtime's
 // operator delete are recording fakes; gUIRootWindow is defined here.

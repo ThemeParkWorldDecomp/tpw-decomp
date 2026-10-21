@@ -1,5 +1,5 @@
 // Test library for eight key actions (unit v5034; libtpw_unit_turn_object_counterclockwise.dylib, tests/test_turn_object_counterclockwise.py), main app:
-//   src/turn_object_counterclockwise.cpp   the eight functions, gTestAdvisorIndex and gQuickSaveSuffix
+//   src/game/keyboard.cpp   the eight functions, gTestAdvisorIndex and gQuickSaveSuffix
 //
 // The callees are fakes that record the arguments the real ones read and answer from the test's queues; the globals of other files the
 // unit reads are defined here, zero at start like the Mac's bss.

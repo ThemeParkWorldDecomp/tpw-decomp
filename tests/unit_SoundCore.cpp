@@ -1,7 +1,7 @@
 // Fakes and test entry points for unit w79b, the sound library's core (libtpw_unit_SoundCore.dylib, driven by
 // tests/test_SoundCore.py in the program "sound symbols shared"; see calllog.h):
-//   src/TbSoundCore.cpp   TbSoundCore, CAudioComponentAccess, CAudioComponent, CModuleFactory, CMemoryCopyInit and the copier
-//                         classes; src/snd_commands.cpp the SystemCommand constructors
+//   src/sound/ChannelState.cpp, src/sound/ServiceQueue.cpp, src/sound/TbSoundCore.cpp   TbSoundCore, CAudioComponentAccess, CAudioComponent, CModuleFactory, CMemoryCopyInit and the copier
+//                         classes; src/sound/AudioPlaceHolder.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSysCommand.cpp the SystemCommand constructors
 // Real: those, the info records (w77), TbRefRelease (w78), the device-module base and the handle values (w79a).
 // Fakes, each recording what the original's callee is given (the PowerPC side records the same from its stubs):
 //   CSprocketsModule (p-sound): the device module GenerateModule makes; every slot the core calls records and answers a queue

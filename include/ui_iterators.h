@@ -3,7 +3,7 @@
 
 #include "analyser.h"
 
-// Unit w227 (src/ui_iterators.cpp). Enumerator names are invented from the selections.
+// Unit w227 (src/game/ui/ui_iterators.cpp). Enumerator names are invented from the selections.
 enum UIIteratorTypes : int32_t {
     kUIIterStaff = 0x1, kUIIterHandymen = 0x2, kUIIterMechanics = 0x4,
     kUIIterGuards = 0x8, kUIIterEntertainers = 0x10, kUIIterResearchers = 0x20,

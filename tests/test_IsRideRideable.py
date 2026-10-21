@@ -1,5 +1,5 @@
 """Unit v5764, the first-person ride helpers, against libtpw_unit_IsRideRideable.dylib (tests/unit_IsRideRideable.cpp), main app
-("SimTheme Park"), src/lobby_exit_IsRideRideable.cpp:
+("SimTheme Park"), src/game/TPCamera.cpp:
   StopRidingRideIn1stPerson 0x10032584, GetThingAtPosnIfEntrance 0x1003277c, IsRideRideable 0x10032a44
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory at the Mac's addresses, then the host

@@ -1,5 +1,5 @@
 // Test library for RideStatusMsg (unit v5534; libtpw_unit_RideStatusMsg.dylib, tests/test_RideStatusMsg.py), main app:
-//   src/sinit_ui_RideStatus_cpp_RideStatusMsg.cpp   RideStatusMsg
+//   src/game/ui/ui_RideStatus.cpp   RideStatusMsg
 //
 // Every callee is a fake recording the arguments the real one reads and answering from the test's queue; gRideStatusPanel and
 // gStaffRoomPanelThing, defined in other files, are defined here.

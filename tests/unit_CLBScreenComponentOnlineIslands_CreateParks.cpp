@@ -1,6 +1,6 @@
 // Test library for the online islands screen's CreateParks, Show and ProcessCancel (unit v5639;
 // libtpw_unit_CLBScreenComponentOnlineIslands_CreateParks.dylib, tests/test_CLBScreenComponentOnlineIslands_CreateParks.py), main app:
-//   src/CLBScreenComponentOnlineIslands_GotoNextIsland_CLBScreenComponentOnlineIslands_CreateParks.cpp
+//   src/game/online/lobby_island.cpp
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues. The strings'
 // members are fakes too (the text of a string is its hash in the log). The globals of other files the unit reads are defined here.

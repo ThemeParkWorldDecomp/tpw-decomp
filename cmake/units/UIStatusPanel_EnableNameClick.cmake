@@ -1,4 +1,33 @@
 # Unit v51114: the status panel's small members, the SamsUtilities swaps and the rank text object's destructor
-# (src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_UIStatusPanel_EnableNameClick.cpp). The callees outside the unit are recording
+# (src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_StatusPanel.cpp). The callees outside the unit are recording
 # fakes in tests/unit_UIStatusPanel_EnableNameClick.cpp, which also defines the globals of other files.
-set(TPW_UNIT_UIStatusPanel_EnableNameClick src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_UIStatusPanel_EnableNameClick.cpp platform/arena.cpp)
+set(TPW_UNIT_UIStatusPanel_EnableNameClick src/game/ui/InterfaceTextObjectSprite.cpp src/game/ui/ui_StatusPanel.cpp
+    platform/arena.cpp tests/standins/UIStatusPanel_EnableNameClick.cpp)
+set(TPW_UNIT_UIStatusPanel_EnableNameClick_KEEP
+  __Z23UIStatusPanel_ConstructP13UIStatusPanel   # UIStatusPanel_Construct(UIStatusPanel*)
+  __Z28InterfaceRankTextObject_DtorP23InterfaceRankTextObjects   # InterfaceRankTextObject_Dtor(InterfaceRankTextObject*, short)
+  __ZN13SamsUtilities12USwapBlock16EPDsi   # SamsUtilities::USwapBlock16(char16_t*, int)
+  __ZN13SamsUtilities7USwap32E15TagButtonAction   # SamsUtilities::USwap32(TagButtonAction)
+  __ZN13SamsUtilities7USwap32E5TagId   # SamsUtilities::USwap32(TagId)
+  __ZN13UIStatusPanel10ChangeNameEPDs   # UIStatusPanel::ChangeName(char16_t*)
+  __ZN13UIStatusPanel10InitWindowEv   # UIStatusPanel::InitWindow()
+  __ZN13UIStatusPanel10ObjectGoneEP6CThing   # UIStatusPanel::ObjectGone(CThing*)
+  __ZN13UIStatusPanel11CloseObjectEi   # UIStatusPanel::CloseObject(int)
+  __ZN13UIStatusPanel11CloseWindowEv   # UIStatusPanel::CloseWindow()
+  __ZN13UIStatusPanel12ApplyChangesEv   # UIStatusPanel::ApplyChanges()
+  __ZN13UIStatusPanel12DeInitWindowEv   # UIStatusPanel::DeInitWindow()
+  __ZN13UIStatusPanel12UpdateWindowEv   # UIStatusPanel::UpdateWindow()
+  __ZN13UIStatusPanel14InitViewWindowEv   # UIStatusPanel::InitViewWindow()
+  __ZN13UIStatusPanel15EnableNameClickEi   # UIStatusPanel::EnableNameClick(int)
+  __ZN13UIStatusPanel16DeInitViewWindowEv   # UIStatusPanel::DeInitViewWindow()
+  __ZN13UIStatusPanel16InitStatusWindowEv   # UIStatusPanel::InitStatusWindow()
+  __ZN13UIStatusPanel16UpdateViewWindowEv   # UIStatusPanel::UpdateViewWindow()
+  __ZN13UIStatusPanel17EditNamePanelGoneEv   # UIStatusPanel::EditNamePanelGone()
+  __ZN13UIStatusPanel17GetPreviousObjectEv   # UIStatusPanel::GetPreviousObject()
+  __ZN13UIStatusPanel18DeInitStatusWindowEv   # UIStatusPanel::DeInitStatusWindow()
+  __ZN13UIStatusPanel18UpdateStatusWindowEv   # UIStatusPanel::UpdateStatusWindow()
+  __ZN13UIStatusPanel4ShowEP6CThing   # UIStatusPanel::Show(CThing*)
+  __ZN13UIStatusPanel6RemoveEv   # UIStatusPanel::Remove()
+  __ZN13UIStatusPanel6ZoomToEv   # UIStatusPanel::ZoomTo()
+  __ZN13UIStatusPanel7GetNameEv   # UIStatusPanel::GetName()
+)

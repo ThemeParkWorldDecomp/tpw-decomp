@@ -1,5 +1,5 @@
 // Test library for OutputAnimTimeStats and RestoreRideInstance (unit v5933; libtpw_unit_OutputAnimTimeStats.dylib,
-// tests/test_OutputAnimTimeStats.py), main app: src/RideTypes_OutputAnimTimeStats.cpp.
+// tests/test_OutputAnimTimeStats.py), main app: src/game/rides/TPRide.cpp.
 // Fakes: CTRACE, CRideDatabase::GetRideInfo, SetCoasterCObject; the ride tables are defined here.
 #include <cstddef>
 #include <cstdint>

@@ -1,6 +1,35 @@
 # Unit w165: the script sprites (ESP_ForceGoto, ESP_RURunningThis, ESP_Spawn2DCopyOfScriptAt, ESP_Update2DScript,
-# ESP_FixSpriteIDsFromDetail and thirteen PK_ commands; src/ScriptSprites.cpp) and the script save and load (SCR_SaveAllScripts,
-# SCR_LoadAllScripts and the file swaps; src/ScriptSave.cpp). The arena is the allocator behind the Ptr32 words of the script table.
+# ESP_FixSpriteIDsFromDetail and thirteen PK_ commands; src/game/Script.cpp, src/game/ScriptOps.cpp) and the script save and load (SCR_SaveAllScripts,
+# SCR_LoadAllScripts and the file swaps; src/game/Script.cpp). The arena is the allocator behind the Ptr32 words of the script table.
 # The code array, the table's globals, the allocator, the file reads and writes, the swaps of platform/sams_core.cpp, the sprites and
-# the other callees are fakes or storage in tests/unit_ScriptSprites.cpp; src/ScriptInterp.cpp and src/ScriptBlocks.cpp are not linked.
-set(TPW_UNIT_ScriptSprites src/ScriptSprites.cpp src/ScriptSave.cpp platform/arena.cpp)
+# the other callees are fakes or storage in tests/unit_ScriptSprites.cpp; src/game/Script.cpp, src/game/ScriptOps.cpp and src/game/park/analyser.cpp are not linked.
+set(TPW_UNIT_ScriptSprites src/game/Script.cpp src/game/ScriptOps.cpp platform/arena.cpp)
+set(TPW_UNIT_ScriptSprites_KEEP
+  __Z13ESP_ForceGotoiPv   # ESP_ForceGoto(int, void*)
+  __Z13PK_ResetScalev   # PK_ResetScale()
+  __Z13PK_SET_OBJ_IDv   # PK_SET_OBJ_ID()
+  __Z14PK_PutSpriteIMv   # PK_PutSpriteIM()
+  __Z14PK_ReduceScalev   # PK_ReduceScale()
+  __Z14PK_SET_OBJ_ACTv   # PK_SET_OBJ_ACT()
+  __Z15PK_PutSpriteVARv   # PK_PutSpriteVAR()
+  __Z15PK_RemoveSpritev   # PK_RemoveSprite()
+  __Z16PK_IncreaseScalev   # PK_IncreaseScale()
+  __Z16PK_Put3DSpriteIMv   # PK_Put3DSpriteIM()
+  __Z16PK_ResetRotationv   # PK_ResetRotation()
+  __Z17ESP_RURunningThisiPv   # ESP_RURunningThis(int, void*)
+  __Z17PK_ReduceRotationv   # PK_ReduceRotation()
+  __Z18ESP_Update2DScriptii   # ESP_Update2DScript(int, int)
+  __Z18SCR_LoadAllScriptsPv   # SCR_LoadAllScripts(void*)
+  __Z18SCR_SaveAllScriptsPv   # SCR_SaveAllScripts(void*)
+  __Z19PK_IncreaseRotationv   # PK_IncreaseRotation()
+  __Z25ESP_Spawn2DCopyOfScriptAtiffff   # ESP_Spawn2DCopyOfScriptAt(int, float, float, float, float)
+  __Z26ESP_FixSpriteIDsFromDetailv   # ESP_FixSpriteIDsFromDetail()
+  __Z8PK_SPAWNv   # PK_SPAWN()
+  __ZN14ScriptSaveSwap14USwap32CharPtrEj   # ScriptSaveSwap::USwap32CharPtr(unsigned int)
+  __ZN14ScriptSaveSwap14USwap32LongPtrEj   # ScriptSaveSwap::USwap32LongPtr(unsigned int)
+  __ZN14ScriptSaveSwap16USwapBlock32LongEPii   # ScriptSaveSwap::USwapBlock32Long(int*, int)
+  __ZN14ScriptSaveSwap17USwapInplace32IntERi   # ScriptSaveSwap::USwapInplace32Int(int&)
+  __ZN14ScriptSaveSwap18USwapInplace32LongERi   # ScriptSaveSwap::USwapInplace32Long(int&)
+  __ZN14ScriptSaveSwap20SpriteRecordByteswapEPh   # ScriptSaveSwap::SpriteRecordByteswap(unsigned char*)
+  __ZN14ScriptSaveSwap22USwapBlock32SLONGfloatEPii   # ScriptSaveSwap::USwapBlock32SLONGfloat(int*, int)
+)

@@ -1,4 +1,4 @@
-// Fakes for SRenderListEntry::CalcRenderEntry (src/tb_renderentry.cpp; the test is
+// Fakes for SRenderListEntry::CalcRenderEntry (src/engine/RenderList.cpp; the test is
 // tests/test_RenderEntry.py). Every function it calls outside the unit records an event through
 // tests/calllog.h, with pointers into the vertex and index memory as byte offsets:
 //

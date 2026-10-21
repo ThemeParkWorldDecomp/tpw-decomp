@@ -1,11 +1,11 @@
 // Test library for the lobby's small leaves part 8 (unit w88; libtpw_unit_LobbyLeaves8.dylib, tests/test_LobbyLeaves8.py):
-//   src/RideDB_effects.cpp         CRideDatabase::DeleteCustomEffects 0x10156e34
-//   src/ui_main_pause.cpp          PauseUI 0x1018679c, TogglePauseUI 0x10186854
-//   src/ui_mainpanel2_window.cpp   ShowPauseWindow 0x101a86d0, TogglePauseWindow 0x101a87c4, PauseWindowMsg 0x101a8504
-//   src/ui_pause_data.cpp          the pause window's script (0x102aacfc) and animation (0x102aadbc)
-//   src/ui_mainpanel2_pause.cpp    gPauseWindow 0x103949cc and HidePauseWindow (only the global is used)
+//   src/game/rides/RideDB.cpp         CRideDatabase::DeleteCustomEffects 0x10156e34
+//   src/game/ui/ui_main.cpp          PauseUI 0x1018679c, TogglePauseUI 0x10186854
+//   src/game/ui/ui_mainpanel2.cpp   ShowPauseWindow 0x101a86d0, TogglePauseWindow 0x101a87c4, PauseWindowMsg 0x101a8504
+//   src/game/ui/ui_mainpanel2.cpp          the pause window's script (0x102aacfc) and animation (0x102aadbc)
+//   src/game/ui/ui_mainpanel2.cpp    gPauseWindow 0x103949cc and HidePauseWindow (only the global is used)
 //
-// Real: the sources above and the rectangle (src/UI_Base.cpp). Fakes that record the same event on both sides: PAR_KillLibEmitter,
+// Real: the sources above and the rectangle (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp). Fakes that record the same event on both sides: PAR_KillLibEmitter,
 // SOUND_FreeCatagory, UI_PauseTimerSystem, UI_UnPauseTimerSystem, UI_SendMessage, UIMain_DecideKbCapture, Dialog (which also logs the
 // words of the script it was given), DefaultDialogCallback, InterfaceWindow::GetPosition (it writes the rectangle from the case's queue),
 // setPivot and startAnim (which also logs the animation's frames), CKeyTable::Search and CGame::TogglePause. Each operation has one entry

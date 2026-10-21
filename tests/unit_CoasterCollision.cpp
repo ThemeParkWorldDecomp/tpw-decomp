@@ -1,12 +1,12 @@
 // Test library for the coaster collision system (unit v5L20; libtpw_unit_CoasterCollision.dylib, tests/test_CoasterCollision.py),
 // main app:
-//   src/TPConfig_collision.cpp   GetPylonAtCell, GetTrackBounds, RecalcTrackBounds, GenerateSamplesInBoundArea,
+//   src/game/rides/CoasterCollision.cpp, src/game/rides/CoasterPylon.cpp   GetPylonAtCell, GetTrackBounds, RecalcTrackBounds, GenerateSamplesInBoundArea,
 //                                DoProperChunkCollision, DotProduct3D, CheckTrackToTrackCollisions, RemoveAllCollisionsFromBrace,
 //                                CheckTrackToAllTracksCollisions, CheckAllTrackToTrackCollisions, DoCollisionChecking,
 //                                RemoveBraceFromCollisionSystem, FlagRecalcAllCoasterCollisions
 //
 // The callees outside the unit: NormaliseVector (not recorded: the original's own body runs on the PowerPC, a copy of the host's
-// translation, src/BMP_InsideArea_PointOutAllInverse_BMP_Distance.cpp, runs here), MReleaseAllocF (records the size and the flags,
+// translation, src/game/rides/BumperRide.cpp, runs here), MReleaseAllocF (records the size and the flags,
 // labels the zeroed block) and MReleaseFreeF (records the block's label). The globals of other files (gCoasterInstances,
 // gHeightfieldHeader, gTPGlobals with its sine table) are defined here.
 #include <cmath>

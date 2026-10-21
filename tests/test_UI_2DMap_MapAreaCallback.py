@@ -1,5 +1,5 @@
 """Unit v5751, UI_2DMap_MapAreaCallback 0x1022bff8, against libtpw_unit_UI_2DMap_MapAreaCallback.dylib
-(tests/unit_UI_2DMap_MapAreaCallback.cpp), src/UpdateSatellite_UI_2DMap_MapAreaCallback.cpp.
+(tests/unit_UI_2DMap_MapAreaCallback.cpp), src/game/ui/ui_2dmap.cpp.
 
 The function forwards its four arguments to CUI2DMap::MapAreaCallback on gUI2DMap (0x1039742c). The callee is a fake on both
 sides recording (this label, window label, message, a, b). Compared: the event log. No fused operations. Not tested: nothing.

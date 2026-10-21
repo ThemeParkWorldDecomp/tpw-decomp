@@ -248,7 +248,7 @@ public:
 };
 
 // Unit v5047: the in-binary callees of SaveCatgoryFixupTable that no header names (default definitions are weak in
-// src/TbMapStreamer_TbMapStreamer_ReShuffleSoundForDroppable.cpp; the unit test defines recording fakes).
+// src/sound/TbMapStreamer.cpp, src/sound/CSprocketsModule.cpp; the unit test defines recording fakes).
 namespace TbMapStreamerFixup {
 uint32_t NameLength(const TbDynamicStringTemplate<char>& name);   // 0x1002efa4 (the string's length)
 const char* NameText(const TbDynamicStringTemplate<char>& name);  // 0x10016bd8 (operator const char*)

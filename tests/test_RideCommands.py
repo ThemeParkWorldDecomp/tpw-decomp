@@ -1,5 +1,5 @@
 """Unit w172, the ride-specific commands of the ride scripts, against libtpw_unit_RideCommands.dylib (tests/unit_RideCommands.cpp), main app
-("SimTheme Park"), src/rsse_commands.cpp:
+("SimTheme Park"), src/game/rides/rsse.cpp:
   ExecuteTourSpecificCommand 0x100d6fec, ExecuteBumperSpecificCommand 0x100d78ec, ExecuteCoasterSpecificCommand 0x100d8104,
   __sinit_rsse_cpp 0x100d85f0
 
@@ -7,7 +7,7 @@ A case is a world and a call. The world is built twice by ONE piece of Python co
 original, and in the host library's memory (little-endian) for the translation; the same code reads both back. The callees outside the unit (the
 FLY_ tour ride, BMP_ bumper ride, Coaster and LLCC_ calls, GetCoasterInstanceID, FindDataNodeIndexByID and the assert) are fakes on both sides that
 record their arguments and answer from the case's queues. ReadScript and ExtractData are inlined by the original; the host library runs the unit's
-own translation of them (src/rsse_objects.cpp, tested by unit w150).
+own translation of them (src/game/rides/RideEffects.cpp, src/game/rides/rsse.cpp, tested by unit w150).
 
 The world of a case: a script record (random words, the fields the dispatchers read set), its program (the command, its operand, random words
 around them; the program counter and the program length are random so the reads can run off the end), eight variables, the thing table (rows 0 to 7,

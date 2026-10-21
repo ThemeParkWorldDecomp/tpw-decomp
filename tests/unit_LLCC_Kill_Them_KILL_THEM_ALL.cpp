@@ -1,6 +1,6 @@
 // Test library for the cell system's rectangle clearer and hoarding walk (unit v5082; libtpw_unit_LLCC_Kill_Them_KILL_THEM_ALL.dylib,
 // tests/test_LLCC_Kill_Them_KILL_THEM_ALL.py), main app:
-//   src/LLCC_Kill_Them_KILL_THEM_ALL.cpp   LLCC_Kill_Them_KILL_THEM_ALL, LLCC_BuildHoardingDB and the four extent words
+//   src/game/park/LLCellRide.cpp   LLCC_Kill_Them_KILL_THEM_ALL, LLCC_BuildHoardingDB and the four extent words
 //
 // The callees outside the unit are recording fakes (the cell predicates and mutators, IsXYValid, LLCR_DeleteRide, OPPOSITE, ADD_DIRECTION,
 // GetNeighbouringCell, LLCC_CreateCurrentHoardingImage); cells are named in the log by their id halfword.

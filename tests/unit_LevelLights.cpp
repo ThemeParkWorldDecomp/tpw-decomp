@@ -88,9 +88,9 @@ constexpr int kBalanceSlot = (0x544 - 8) / 4;
 // ---- Globals of other files ------------------------------------------------------------------------------------------------
 CWorld* gGameWorld;
 CWorld*& gGameWorldRef = gGameWorld;
-uint32_t gGameOptions;                      // src/TPMain.cpp's
+uint32_t gGameOptions;                      // src/game/TPMain.cpp's
 tag_sM3D2Header* gHeightfieldHeader;        // the height field code's
-tag_sRideAnimSet* gRideAnimSets[kMaxRideInstances];   // src/RideTypes.cpp's
+tag_sRideAnimSet* gRideAnimSets[kMaxRideInstances];   // src/game/rides/TPRide.cpp's
 uint32_t gRideCountA;
 uint32_t gRideCountB;
 

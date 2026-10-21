@@ -1,6 +1,6 @@
-"""Differential test for the advisor: src/Advisor.cpp (the state machine), src/TPAdvisor_model.cpp (the model and its four
-slots), src/advisor_leaves.cpp (the small callees), ScaleLMatrixNoTrans (src/rsse_matrix.cpp) and SND_DuckVolume
-(src/TPSound.cpp), against libtpw_unit_Advisor.dylib (tests/unit_Advisor.cpp).
+"""Differential test for the advisor: src/game/advisor/Advisor.cpp (the state machine), src/game/TPCamera.cpp, src/game/advisor/TPAdvisor.cpp (the model and its four
+slots), src/game/TPEmbed.cpp, src/game/TPMesh.cpp, src/game/rides/RideAnim.cpp (the small callees), ScaleLMatrixNoTrans (src/game/LMatrix.cpp) and SND_DuckVolume
+(src/game/Sound.cpp, src/game/park/ParkSound.cpp), against libtpw_unit_Advisor.dylib (tests/unit_Advisor.cpp).
 
 A case is a SCRIPT over a small world: up to three advisor meshes ("variants": the mesh header with its nodes, mini nodes
 and embedded entries as a file image, the ride set that is its instance with a group of animations and time controls, the

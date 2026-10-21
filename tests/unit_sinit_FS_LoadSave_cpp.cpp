@@ -1,5 +1,5 @@
 // Test library for the static initialiser of FS_LoadSave.cpp (unit v5720):
-//   src/ui_cursor_classes_CUIGrapher_DrawGraph_sinit_FS_LoadSave_cpp.cpp
+//   src/game/save/FS_LoadSave.cpp
 // __register_global_object is a recording fake (object, destructor and node as labels).
 #include <cstddef>
 #include <cstdint>

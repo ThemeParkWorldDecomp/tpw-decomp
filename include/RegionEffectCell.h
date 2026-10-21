@@ -5,8 +5,8 @@
 
 class CRegionEffectCell {
 public:
-    CRegionEffectCell();    // 0x10120c10 (60 bytes, src/CellInit.cpp)
-    // Unit w188 (src/Researcher.cpp, where the inventory puts them): Serialise 0x10120cfc (256 bytes), the five shorts; operator== 0x10120c7c (60 bytes), memcmp of the ten bytes == 0.
+    CRegionEffectCell();    // 0x10120c10 (60 bytes, src/game/people/Researcher.cpp)
+    // Unit w188 (src/game/people/Researcher.cpp, where the inventory puts them): Serialise 0x10120cfc (256 bytes), the five shorts; operator== 0x10120c7c (60 bytes), memcmp of the ten bytes == 0.
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);
     bool operator==(const CRegionEffectCell& other);   // (the mangled name has no const)
 

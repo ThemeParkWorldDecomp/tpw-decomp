@@ -1,5 +1,5 @@
 // Test library for LLCR_DeleteRide (unit v5999; libtpw_unit_LLCR_DeleteRide_2.dylib, tests/test_LLCR_DeleteRide_2.py), main app:
-//   src/LLCR_OverRide_LLCR_DeleteRide_2.cpp   LLCR_DeleteRide and the word gLLCRNoRide
+//   src/game/park/LLCellRide.cpp   LLCR_DeleteRide and the word gLLCRNoRide
 //
 // The callees outside the unit are fakes that record the arguments the real ones read (pointers as codes, see Code) and answer from the
 // test's queues. The globals of other files the unit reads are defined here, zero at start like the Mac's bss.

@@ -1,5 +1,5 @@
 """Unit v5314, the coaster edit buttons and the brace mesh lists, against libtpw_unit_SetCoasterEdit.dylib (tests/unit_SetCoasterEdit.cpp),
-main app ("SimTheme Park"), src/TPConfig_LayoutSetMovePylon_SetCoasterEdit.cpp:
+main app ("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   SetCoasterEdit 0x10058758, GetPylonFromBraceMesh 0x100587fc, GetNthBraceMesh 0x10058888, HandleCoasterButtonClick 0x10058510
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

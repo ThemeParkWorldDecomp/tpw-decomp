@@ -1,5 +1,5 @@
 """Unit v51005, the ride list panel's message handler, against libtpw_unit_RidePanelMsg.dylib (tests/unit_RidePanelMsg.cpp), main app
-("SimTheme Park"), src/ChangeInfoWindow_RidePanelMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_ridepanel.cpp:
   RidePanelMsg 0x101b7538
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

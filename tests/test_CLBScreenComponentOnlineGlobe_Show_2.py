@@ -1,6 +1,6 @@
 """Unit v5923, the online globe window's Show, Hide, GlobeZoomIn, GlobeZoomOut, SortOutZoomConstants, CreateCities and UnRegister, against
 libtpw_unit_CLBScreenComponentOnlineGlobe_Show_2.dylib (tests/unit_CLBScreenComponentOnlineGlobe_Show_2.cpp), main app
-("SimTheme Park"), src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Show_2.cpp:
+("SimTheme Park"), src/game/online/lobby_globe.cpp:
   Show 0x100ad788, Hide 0x100ada68, GlobeZoomIn 0x100adca4, GlobeZoomOut 0x100add2c, SortOutZoomConstants 0x100addb4,
   CreateCities 0x100ade44, UnRegister 0x100ae228
 

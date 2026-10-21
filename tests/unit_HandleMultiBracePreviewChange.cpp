@@ -1,6 +1,6 @@
 // Test library for HandleMultiBracePreviewChange (unit v5688; libtpw_unit_HandleMultiBracePreviewChange.dylib,
 // tests/test_HandleMultiBracePreviewChange.py), main app:
-//   src/TPCoaster_ticks_HandleMultiBracePreviewChange.cpp   HandleMultiBracePreviewChange
+//   src/game/rides/CoasterEdit.cpp   HandleMultiBracePreviewChange
 //
 // The callees outside the unit are fakes that record the arguments (objects as the first word they hold, an id the test writes) and answer
 // from the test's queues. The globals of other files the unit reads or writes are defined here.

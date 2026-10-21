@@ -1,5 +1,5 @@
 """Unit v5039, the pylon setters of the editor's coaster, against libtpw_unit_LayoutSetRotatePylon.dylib (tests/unit_LayoutSetRotatePylon.cpp), main app
-("SimTheme Park"), src/LayoutSetRotatePylon.cpp:
+("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   SetLoftPylon 0x10055e0c, LayoutSetLoftPylon 0x10055eac, SetRotatePylon 0x10055f38, LayoutSetRotatePylon 0x10055ff0,
   SetWobblePylon 0x1005608c, LayoutSetWobblePylon 0x10056180, ToggleDrawUpSpline 0x10056258, CorrectBraceNumbering 0x100564ac
 

@@ -1,7 +1,7 @@
 """Unit v5636, COnlineControl::DoCommand: runs one chat command from the vector of Argument the parser built (the first Argument's command
 number picks a case of the jump table at 0x102b1d68), against libtpw_unit_COnlineControl_DoCommand.dylib
 (tests/unit_COnlineControl_DoCommand.cpp), main app ("SimTheme Park"),
-src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_DoCommand.cpp:
+src/game/online/online.cpp:
   COnlineControl::DoCommand 0x10219bec
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

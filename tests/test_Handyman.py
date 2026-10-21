@@ -1,5 +1,5 @@
 """Unit w184, against libtpw_unit_Handyman.dylib (tests/unit_Handyman.cpp), main app ("SimTheme Park"):
-  src/Handyman.cpp   CHandyman::CHandyman (cell) 0x100fefd0 and (cell, grade, flag, name) 0x100ff0a4, Init 0x100ff1b8, FinalDestroy 0x100ff2e0,
+  src/game/people/Handyman.cpp   CHandyman::CHandyman (cell) 0x100fefd0 and (cell, grade, flag, name) 0x100ff0a4, Init 0x100ff1b8, FinalDestroy 0x100ff2e0,
                      ReceiveMessage 0x100ff3c4, Serialise 0x100ff4c0, UpdateTurn 0x100ff6b4, ChooseNextAction 0x100ff7e4, SetState 0x100ffb70,
                      ModelState 0x100ffca8, ProcessPatrolling 0x100ffd78, ProcessWalkingToLitter 0x100ffe38, ProcessCleaningLitter 0x10100050,
                      ProcessWalkingToCleanToilet 0x10100230, ProcessCleaningToilet 0x101003ac, ProcessIdle 0x101004bc, FindNearestDirtyToilet

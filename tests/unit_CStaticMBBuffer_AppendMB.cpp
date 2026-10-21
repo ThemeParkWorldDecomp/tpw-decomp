@@ -1,5 +1,5 @@
 // Test library for CStaticMBBuffer AppendMB x2, AppendUnicode x2, Close (unit v5312; libtpw_unit_CStaticMBBuffer_AppendMB.dylib), main app:
-//   src/TbITable_TbITable_FormatString.cpp
+//   src/ltms/TbITable.cpp
 //
 // The virtual calls go through fake vtables in raw memory (Itanium slots: 0 Release for the converter; 4 AppendMB(uint16_t) for the buffer), each
 // recording an event like the PowerPC glue stub. TbIUnicodeToMB::LocateValue (behind the inline GetMBValue) is a recording fake.

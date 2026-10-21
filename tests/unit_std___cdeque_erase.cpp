@@ -1,5 +1,5 @@
 // Test library for the const void* deque (unit v5149; libtpw_unit_std___cdeque_erase.dylib, tests/test_std___cdeque_erase.py), main app:
-//   src/std___cdeque_erase.cpp   erase, resize, push_back
+//   src/game/MslSupport.cpp   erase, resize, push_back
 //
 // The callees outside the unit are fakes that record what the real ones read: insert, the iterator copy and +=, strlen, strcpy,
 // operator new / new[] / delete and __throw. The globals of other files are defined here.

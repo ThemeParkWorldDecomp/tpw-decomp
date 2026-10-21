@@ -1,7 +1,7 @@
 """Unit v51075, small functions of the sound library, against libtpw_unit_TbSpeaker_Mono_operator_int.dylib
-(tests/unit_TbSpeaker_Mono_operator_int.cpp), sound symbols shared, src/TbSoundCore_TbSpeaker_Mono_operator_int.cpp:
+(tests/unit_TbSpeaker_Mono_operator_int.cpp), sound symbols shared, src/sound/Bank.cpp, src/sound/ChannelState.cpp, src/sound/TbBank.cpp, src/sound/TbSoundSampleWAVFile.cpp, src/sound/TimerCodec.cpp, src/sound/UserCallback.cpp:
   TbSpeaker::Mono/Headphones/Stereo::operator_int, TbSpeaker::Config::SetModuleSpeaker, __sinit_ChannelState_cpp, CBank::GetSampleName,
-  GetSampleLength, IsType, TbSoundSampleStore::operator[] (src/TbSoundSampleStore.cpp), __sinit_UserCallback_cpp, __sinit_TimerCodec_cpp,
+  GetSampleLength, IsType, TbSoundSampleStore::operator[] (src/sound/TbSoundCore.cpp, src/sound/TbSoundSampleStore.cpp), __sinit_UserCallback_cpp, __sinit_TimerCodec_cpp,
   __sinit_TbSoundSampleWAVFile_cpp, the three _CS_ destructors, CRefManager::CRefManager, TbStaticFileBank::IsType,
   TbDynamicStringTemplate<char>::operator_const_char*, std::powf, LB_MIN<int,int>, std::fabs (two), std::fabsf, TbRect::TbRect.
 Unit v5L21 adds Bank::CBank::GetNumberOfSamples 0x100146a8 (slot +0x18, logged as 0x7018) and LB_MIN<unsigned int,unsigned int>

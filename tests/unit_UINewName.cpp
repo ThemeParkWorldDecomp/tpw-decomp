@@ -1,6 +1,6 @@
-// Test library for unit w43b (libtpw_unit_UINewName.dylib; see tests/test_UINewName.py): src/ui_newname.cpp (NewName),
-// src/ui_newname_data.cpp (the dialog's window description), src/ui_dialog.cpp (Dialog), src/InterfaceWindow_z.cpp (setZ and
-// GetClientRect), src/InterfaceCheckButtons_current.cpp (SetCurrent) and the rectangles of src/UI_Base.cpp.
+// Test library for unit w43b (libtpw_unit_UINewName.dylib; see tests/test_UINewName.py): src/game/ui/ui_playerLogin.cpp (NewName),
+// src/game/ui/ui_playerLogin.cpp (the dialog's window description), src/game/ui/ui_ErrorDisplay.cpp (Dialog), src/game/ui/InterfaceWindow.cpp (setZ and
+// GetClientRect), src/game/ui/InterfaceButton.cpp (SetCurrent) and the rectangles of src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp.
 //
 // Everything else the five functions call is a fake that records through calllog: the window's setters, GetWindow (the first child with the
 // id, as the original), the script builder and the window factory (they answer the windows the test queues), the highest depth and the

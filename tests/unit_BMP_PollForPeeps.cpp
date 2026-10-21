@@ -1,5 +1,5 @@
 // Test library for the bump ride's peep lists and BMP_LeaveBump (unit v5139; libtpw_unit_BMP_PollForPeeps.dylib, tests/test_BMP_PollForPeeps.py), main app:
-//   src/BMP_REMOVEBUMP_BMP_PollForPeeps.cpp   BMP_PollForPeeps, BMP_AddPeepToRideLeavingList, BMP_AddPeepToRideJoiningList, BMP_LeaveBump
+//   src/game/rides/BumperRide.cpp   BMP_PollForPeeps, BMP_AddPeepToRideLeavingList, BMP_AddPeepToRideJoiningList, BMP_LeaveBump
 //
 // The callees outside the unit (TRACE, RemovePeepsFromBump, FlushDeferredAnim, SetCurRideAnim) are fakes recording their arguments.
 // gColList is a 0x100 byte block here (the Mac's list is larger than the header's struct); gRideAnimSets is a table of native pointers.

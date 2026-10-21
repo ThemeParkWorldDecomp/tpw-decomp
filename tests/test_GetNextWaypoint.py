@@ -1,5 +1,5 @@
 """Unit v5198, GetNextWaypoint 0x100745ec, against libtpw_unit_GetNextWaypoint.dylib (tests/unit_GetNextWaypoint.cpp), main app
-("SimTheme Park"), src/GetNextWaypoint.cpp.
+("SimTheme Park"), src/game/rides/FlyingRide.cpp.
 
 A case is a fly and the globals around it, built twice by one piece of Python code (emulator memory big-endian, host memory
 little-endian). CWorld::GetRand, HeightAtPos_NAV, GetWorldGSquareHeight are fakes on both sides recording their arguments and answering

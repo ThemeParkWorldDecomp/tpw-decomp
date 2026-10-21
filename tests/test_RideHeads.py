@@ -1,7 +1,7 @@
 """Differential tests of the ride heads (unit w63), against libtpw_unit_RideHeads.dylib (tests/unit_RideHeads.cpp):
 
-  src/TPEmbed_heads.cpp  TickRideHeads 0x10200460
-  src/rsse_matrix.cpp    GetLMatrixRotationAroundZAxisYOnly 0x100c0fc8
+  src/game/TPEmbed.cpp  TickRideHeads 0x10200460
+  src/game/LMatrix.cpp    GetLMatrixRotationAroundZAxisYOnly 0x100c0fc8
 
 TickRideHeads runs as the original on the PowerPC side, with InvertMatrix, CombineMatricesNoWDest2nd, SetMatrixIdentity and
 SetLMatrixOrientation real on both sides. The C library's sqrt and atan2 and the class function __fpclassifyf are stubs

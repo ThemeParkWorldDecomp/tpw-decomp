@@ -1,5 +1,5 @@
 // Test library for the coaster train loading (unit v5900; libtpw_unit_UnloadTrain_2.dylib, tests/test_UnloadTrain_2.py), main app:
-//   src/AllocateQueue_UnloadTrain_2.cpp   UnloadTrain, KickPeepsFromEntranceQueue, LoadTrain, CoasterSetCapacity, SetEntranceLinearSamples,
+//   src/game/rides/CoasterQueue.cpp   UnloadTrain, KickPeepsFromEntranceQueue, LoadTrain, CoasterSetCapacity, SetEntranceLinearSamples,
 //                                         GetCarsInStation, HandleTrainLoading (and the two bss globals it defines)
 //
 // The callees outside the unit (EnableRideHead, DisableRideHead, SetTrainCapacity) are fakes that record their arguments (a mesh as the id in

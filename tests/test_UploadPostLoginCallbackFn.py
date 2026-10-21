@@ -1,5 +1,5 @@
 """Unit v5961, seven small members of the online system, against libtpw_unit_UploadPostLoginCallbackFn.dylib
-(tests/unit_UploadPostLoginCallbackFn.cpp), main app ("SimTheme Park"), src/FS_Online_init_CFSOnlineSystem_LoggedInRequestUpload_UploadPostLoginCallbackFn.cpp:
+(tests/unit_UploadPostLoginCallbackFn.cpp), main app ("SimTheme Park"), src/game/online/FS_Online.cpp, src/game/online/FS_OnlineList.cpp:
   UploadPostLoginCallbackFn 0x10174f2c, GotoPlayerFTPPostGetParkInfoCallbackFn 0x1017620c, CFSOnlineSystem::ReturnConnectionToCityServer
   0x1017346c, ccThemeInfo::~ccThemeInfo 0x101732e4, ccRideInfo::~ccRideInfo 0x10173110, CFSOnlineFTPControl::CallbackFn 0x1017769c,
   CFSOnlineSystemCityList::GetList 0x10178718

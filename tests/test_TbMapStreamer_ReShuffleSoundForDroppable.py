@@ -1,6 +1,6 @@
 """Unit v5047, TbMapStreamer::ReShuffleSoundForDroppable and SaveCatgoryFixupTable, against
 libtpw_unit_TbMapStreamer_ReShuffleSoundForDroppable.dylib (tests/unit_TbMapStreamer_ReShuffleSoundForDroppable.cpp), sound library
-(sound, TOC r2 0x1003abf0), src/TbMapStreamer_TbMapStreamer_ReShuffleSoundForDroppable.cpp:
+(sound, TOC r2 0x1003abf0), src/sound/TbMapStreamer.cpp:
   TbMapStreamer::ReShuffleSoundForDroppable 0x1002309c, TbMapStreamer::SaveCatgoryFixupTable 0x100233e0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

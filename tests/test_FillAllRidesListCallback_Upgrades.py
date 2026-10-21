@@ -1,6 +1,6 @@
 """Unit v5952, the all-items lists' rows and the kids list, against libtpw_unit_FillAllRidesListCallback_Upgrades.dylib
 (tests/unit_FillAllRidesListCallback_Upgrades.cpp), main app ("SimTheme Park"),
-src/AddItemToAllRidesList_FillAllRidesListCallback_Upgrades.cpp:
+src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allKidsPanel.cpp:
   FillAllRidesListCallback_Upgrades 0x10195ba8, FillAllShopsListCallback 0x10195cb0, FillAllFeaturesListCallback 0x10195f24,
   AllKidsPanel_KidGone 0x10195708, LCPostFormat 0x10194fa8 (the kids list's attach function)
 

@@ -1,5 +1,5 @@
 """Unit v5989, CPeep::SetRandomDestination, against libtpw_unit_CPeep_SetRandomDestination.dylib (tests/unit_CPeep_SetRandomDestination.cpp), main app
-("SimTheme Park"), src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_SetRandomDestination.cpp:
+("SimTheme Park"), src/game/people/Peep.cpp:
   CPeep::SetRandomDestination 0x10113870
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

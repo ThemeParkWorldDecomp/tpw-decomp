@@ -1,6 +1,6 @@
 // Test library for CFSOnlineSystem::CityServerConnectionCallback (unit v5373; libtpw_unit_CFSOnlineSystem_CityServerConnectionCallback.dylib,
 // tests/test_CFSOnlineSystem_CityServerConnectionCallback.py), main app:
-//   src/FS_Online_init_CFSOnlineSystem_CityServerConnectionCallback.cpp
+//   src/game/online/FS_Online.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read: UDebug (the text), the info destructors (kind and index
 // in the array), operator delete (the tag of the block) and operator delete[] (the array's own block).

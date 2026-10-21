@@ -1,5 +1,5 @@
 // Test library for SetControlType (unit v5922; libtpw_unit_SetControlType_2.dylib, tests/test_SetControlType_2.py), main app:
-//   src/SetupHeadIDs_SetControlType_2.cpp   SetControlType
+//   src/game/rides/BumperRide.cpp   SetControlType
 //
 // The callees outside the unit (GetRand, FindDataNodeIndexByID, GetRideInfo, InstanceRide, TrackRideIdToThingId, GAME_ASSERTMSG,
 // SND_SendIndirectedEvent, SOUND_MoveSoundEffect, FindTargetBump) are recording fakes that answer from the test's queues. The globals

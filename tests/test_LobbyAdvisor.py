@@ -1,4 +1,4 @@
-"""Differential test for src/lobby_advisor.cpp (CLBScreenComponentAdvisor and its list of
+"""Differential test for src/game/online/LBScreenComponentAdvisor.cpp (CLBScreenComponentAdvisor and its list of
 responses), against libtpw_unit_LobbyAdvisor.dylib.
 
 A case is a script over two advisor screens: Init, Tick, Add, ClearAll, the timeout line,

@@ -1,4 +1,4 @@
-// Test library for apply_for_loan_3 and apply_for_loan_4 (unit v5036), src/ui_Postcard_panel_spawn_handyman_apply_for_loan_3.cpp.
+// Test library for apply_for_loan_3 and apply_for_loan_4 (unit v5036), src/game/keyboard.cpp.
 // Callees (GetBankAccount, ApplyForLoan, CTRACE) are recording fakes.
 #include <cstddef>
 #include <cstdint>

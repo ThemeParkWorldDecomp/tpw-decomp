@@ -1,5 +1,5 @@
 // Test library for the load, save and hire panels (unit v5183; libtpw_unit_LoadPanelMsg.dylib, tests/test_LoadPanelMsg.py), main app:
-//   src/LoadPanelMsg.cpp   LoadPanelMsg, UI_HirePanelStateChange, SavePanelMsg (and the five globals they own)
+//   src/game/ui/ui_hirePanel.cpp, src/game/ui/ui_loadSavePanel.cpp   LoadPanelMsg, UI_HirePanelStateChange, SavePanelMsg (and the five globals they own)
 //
 // The callees outside the unit are recording fakes; the objects they answer are static blocks here. The globals of other files the unit
 // reads (gGame, gText, gLoadSave, gGameWorld) are defined here: gGame and gText as raw bytes under the program's symbol names, because

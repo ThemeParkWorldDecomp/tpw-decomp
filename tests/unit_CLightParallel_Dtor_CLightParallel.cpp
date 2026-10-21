@@ -1,5 +1,5 @@
 // Test library for CLightParallel::~CLightParallel and InterfaceImage::SetValue (unit v51050; libtpw_unit_CLightParallel_Dtor_CLightParallel.dylib),
-// main app: src/Light_CLightParallel_Dtor_CLightParallel.cpp.
+// main app: src/game/advisor/Advisor.cpp, src/game/ui/InterfaceImage.cpp.
 //
 // Fakes: operator delete (records, never frees), InterfaceWindow::SetValue, and a draw object whose Change records.
 #include <cstddef>

@@ -1,6 +1,6 @@
 // The mesh file ("M3D2", .md2) as the engine keeps it in memory.
 //
-// LoadM3D2Header (src/m3d2_load.cpp) reads the whole file into one block and uses it in
+// LoadM3D2Header (src/engine/M3D2Load.cpp) reads the whole file into one block and uses it in
 // place: the file is little-endian, with offsets from its start where these structures
 // have pointers. The structures below therefore keep the FILE's layout exactly (the sizes
 // and offsets are the Mac's and the file's; static_assert on each), and every pointer
@@ -219,7 +219,7 @@ struct sUVAnim {
 static_assert(sizeof(sUVAnim) == 0x14, "sUVAnim layout");
 
 // A compressed vertex: three 10-bit fields in one word, which the loader rewrites as it
-// does a face's first word (see src/m3d2_load.cpp for the layout the engine reads).
+// does a face's first word (see src/engine/M3D2Load.cpp, src/engine/EngineUtil.cpp, src/game/park/TPHField.cpp for the layout the engine reads).
 struct sCVertex {
     uint32_t mPacked;
 };
@@ -379,12 +379,12 @@ constexpr uint32_t kM3D2OneFrame = 4;       // see sTextureInfo
 tag_sM3D2Header* LoadM3D2Header(char* name, uint32_t flags);   // engine 0x100483f4
 void FreeM3D2Header(tag_sM3D2Header* header);                  // engine 0x10049574
 
-// The loader's steps (src/m3d2_load.cpp). Each one puts a table's records into the Mac's
+// The loader's steps (src/engine/EngineUtil.cpp). Each one puts a table's records into the Mac's
 // byte order (nothing to do on a little-endian host) and turns the offsets in them into
 // pointers into the block at `base`.
 void AlignTo64Bit(uint32_t& value, uint32_t* moved);     // 0x10039078
 void AlignTo64Bit(void*& address, uint32_t* moved);      // 0x100390cc
-// 0x10039120 and 0x10039174 (src/RideInstance.cpp): the same for a multiple of four.
+// 0x10039120 and 0x10039174 (src/engine/EngineUtil.cpp): the same for a multiple of four.
 void AlignTo32Bit(uint32_t& value, uint32_t* moved);
 void AlignTo32Bit(void*& address, uint32_t* moved);
 void FixMainPointers(tag_sM3D2Header* header, const void* base);                                      // 0x10049fe4
@@ -411,7 +411,7 @@ void FixAnimEnableRecords(int16_t* enables, uint16_t count);                    
 void FixAnimUVRecords(sUVAnim* anims, uint16_t count, const void* base);                              // 0x1004b17c
 void FixAnimMorphRecords(tag_sNodeAnim* anim, const void* base);                                      // 0x1004b3dc
 
-// Unit v5061 (src/CalculateMaxVertexHeights.cpp)
+// Unit v5061 (src/game/park/TPHField.cpp)
 // The ride's height map: a byte per cell (stride gRideHeightStride) and the bounds of the vertices seen.
 struct sRideHeightMap {
     uint32_t mF00, mF04, mF08;   // 0x00
@@ -425,13 +425,13 @@ static_assert(sizeof(sRideHeightMap) == 0x30, "sRideHeightMap layout");
 extern int32_t gRideHeightStride;    // 0x102c2144
 extern float gRideHeightLimitZ;      // 0x102c2148
 extern float gRideHeightLimitX;      // 0x102c214c
-extern int32_t gRideHeightRows;      // 0x102c2140 (defined in src/RideDestroy_LoadFileIntoMemory_GenerateRideHeightMap.cpp)
+extern int32_t gRideHeightRows;      // 0x102c2140 (defined in src/game/park/TPHField.cpp)
 extern int32_t gRideHeightScan[50][4];   // 0x102c1e20  per row: min cell, max cell, height there, height there
 
 // 0x1005d304 (1984 bytes). Walks the node tree; the matrix is passed by value.
 int32_t CalculateMaxVertexHeights(tag_sNode* node, tag_sM3D2Header* header, sMatrix matrix, sRideHeightMap* map,
                                   tag_sNode** badNode, tag_sAnimHeader* anim, int32_t unused, int32_t* flag);
 
-// Unit v5287 (src/HeightfieldLoad_RestoreHFieldDataFromCopy.cpp)
+// Unit v5287 (src/game/park/TPHField.cpp)
 // 0x1005c050 (96 bytes). Copies the quad table of `copy` over the header's own height field (mQuadCount words).
 void RestoreHFieldDataFromCopy(tag_sM3D2Header* header, sHField* copy);

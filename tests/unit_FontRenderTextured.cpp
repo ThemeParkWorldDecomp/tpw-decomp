@@ -1,8 +1,8 @@
 // Test library for the twelve textured glyph writers (libtpw_unit_FontRenderTextured.dylib; see tests/test_FontRenderTextured.py,
-// unit w45c): src/ltms_fontrender_textured.cpp (TbTextured4BitFontRenderMethod, blending) and src/ltms_fontrender_textured_noblend.cpp
+// unit w45c): src/ltms/TbTextured4BitFontRenderMethod.cpp (TbTextured4BitFontRenderMethod, blending) and src/ltms/TbTexturedNoBlend4BitFontRenderMethod.cpp
 // (TbTexturedNoBlend4BitFontRenderMethod), linked with the method objects and the one-colour writers (unit w45b) and the render method's
-// core (unit w45a), the real font (src/TbIRLE4bitFont.cpp), the render parameters (src/ltms_fontrender.cpp, src/tb_fontrenderparams.cpp)
-// and TbPixFormat32 (src/TbPixFmt.cpp), so that DrawChar can be driven through the table end to end with style 2.
+// core (unit w45a), the real font (src/ltms/TbFontRenderParams.cpp, src/ltms/TbIRLE4bitFont.cpp), the render parameters (src/ltms/TbFontRender.cpp, src/ltms/TbFontRenderParams.cpp)
+// and TbPixFormat32 (src/bullfrog/TbPixFmt.cpp), so that DrawChar can be driven through the table end to end with style 2.
 //
 // Fakes (each records the same event as the PowerPC side's stub, through calllog): LbDraw_GetClipRect (answers a case-owned clip
 // rectangle), TbRect::Intersection (the formula of the listing, recording its operands), the font's AddRef and Release.

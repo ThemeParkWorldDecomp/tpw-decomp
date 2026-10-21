@@ -1,4 +1,4 @@
-"""CFSUserInfo::GameLogout (main app 0x1017f61c, src/FS_UserInfo_CFSUserInfo_GameLogout.cpp), against
+"""CFSUserInfo::GameLogout (main app 0x1017f61c, src/game/save/FS_UserInfo.cpp), against
 libtpw_unit_CFSUserInfo_GameLogout.dylib (tests/unit_CFSUserInfo_GameLogout.cpp).
 
 Every callee (the slot and save paths, the string class, UniStringToString, the two saves, the master save destructor, SaveGlobal) is a

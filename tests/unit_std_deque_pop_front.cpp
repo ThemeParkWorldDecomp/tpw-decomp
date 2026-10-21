@@ -1,5 +1,5 @@
 // Test library for the CodeWarrior std::deque<errorthingy> (unit v5115; libtpw_unit_std_deque_pop_front.dylib, tests/test_std_deque_pop_front.py), main app:
-//   src/UI_pump_std_deque_pop_front.cpp   pop_front, ~deque, make_iterator
+//   src/game/MslSupport.cpp   pop_front, ~deque, make_iterator
 //
 // The callees outside the unit (the block table's operator[], tear_down, the cursor's +=, operator delete) are fakes recording what the
 // real ones read.

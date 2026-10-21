@@ -1,3 +1,32 @@
-# Unit v51076: UIInterface forwarders and small deque pieces (src/UI_pump_std___cdeque_pop_front.cpp). The callees outside the unit are
+# Unit v51076: UIInterface forwarders and small deque pieces (src/game/ui/UIInterface.cpp). The callees outside the unit are
 # recording fakes in tests/unit_std___cdeque_pop_front.cpp, which also defines the globals of other files.
-set(TPW_UNIT_std___cdeque_pop_front src/UI_pump_std___cdeque_pop_front.cpp platform/arena.cpp)
+set(TPW_UNIT_std___cdeque_pop_front src/game/ui/UIInterface.cpp platform/arena.cpp)
+set(TPW_UNIT_std___cdeque_pop_front_KEEP
+  __Z17ErrorCdequeResizePvjP11errorthingy   # ErrorCdequeResize(void*, unsigned int, errorthingy*)
+  __Z18ErrorCdequeReservePvj   # ErrorCdequeReserve(void*, unsigned int)
+  __ZN11UIInterface11TogglePauseEv   # UIInterface::TogglePause()
+  __ZN11UIInterface12DeInitOnlineEv   # UIInterface::DeInitOnline()
+  __ZN11UIInterface14EndCoasterEditEv   # UIInterface::EndCoasterEdit()
+  __ZN11UIInterface14OnlineAddBuddyEPDsi   # UIInterface::OnlineAddBuddy(char16_t*, int)
+  __ZN11UIInterface14ShowVersionTagEv   # UIInterface::ShowVersionTag()
+  __ZN11UIInterface14ToggleHelpTextEv   # UIInterface::ToggleHelpText()
+  __ZN11UIInterface15CongratulationsEP7CObject   # UIInterface::Congratulations(CObject*)
+  __ZN11UIInterface15Screen_ResearchEv   # UIInterface::Screen_Research()
+  __ZN11UIInterface16OnlineAddContactEPDsi   # UIInterface::OnlineAddContact(char16_t*, int)
+  __ZN11UIInterface16OnlineReceiveStrEPDsi   # UIInterface::OnlineReceiveStr(char16_t*, int)
+  __ZN11UIInterface16SwitchGameWindowEv   # UIInterface::SwitchGameWindow()
+  __ZN11UIInterface17OnlineRemoveBuddyEPDs   # UIInterface::OnlineRemoveBuddy(char16_t*)
+  __ZN11UIInterface17OnlineUpdateBuddyEPDsi   # UIInterface::OnlineUpdateBuddy(char16_t*, int)
+  __ZN11UIInterface17Screen_EntryPriceEv   # UIInterface::Screen_EntryPrice()
+  __ZN11UIInterface19OnlineRemoveContactEPDs   # UIInterface::OnlineRemoveContact(char16_t*)
+  __ZN11UIInterface19OnlineUpdateContactEPDsi   # UIInterface::OnlineUpdateContact(char16_t*, int)
+  __ZN11UIInterface21ShowFirstPersonWindowEi   # UIInterface::ShowFirstPersonWindow(int)
+  __ZN11UIInterface24ChangeCoasterButtonsDownEj   # UIInterface::ChangeCoasterButtonsDown(unsigned int)
+  __ZN11UIInterface27ChangeCoasterButtonsEnabledEj   # UIInterface::ChangeCoasterButtonsEnabled(unsigned int)
+  __ZN11UIInterface8BankruptEP7CObject   # UIInterface::Bankrupt(CObject*)
+  __ZN13cdeque_callee8IterCopyEP13MslCdequeIterPKS0_   # cdeque_callee::IterCopy(MslCdequeIter*, MslCdequeIter const*)
+  __ZN15errsinit_callee9DequeCtorEPvS0_   # errsinit_callee::DequeCtor(void*, void*)
+  __ZNKSt8__cdequeIPKvNSt3__19allocatorIS1_EEE8max_sizeEv   # std::__cdeque<void const*, std::__1::allocator<void const*>>::max_size() const
+  __ZNSt8__cdequeIPKvNSt3__19allocatorIS1_EEE9pop_frontEv   # std::__cdeque<void const*, std::__1::allocator<void const*>>::pop_front()
+  _gMslErrorDequeMapSize
+)

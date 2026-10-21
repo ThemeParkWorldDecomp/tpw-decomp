@@ -1,6 +1,6 @@
 // Test library for std::__tree<nocase_string, ...> (a std::set<nocase_string>): erase, destroy, insert_node_at (unit v5899;
 // libtpw_unit_std___tree_erase_2.dylib, tests/test_std___tree_erase_2.py), main app:
-//   src/std___tree_erase_2.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are recording fakes: the runtime (new, new[], delete, strlen, strcpy, __throw), the string's copy
 // constructor and destructor, the allocator's destroy and deallocate, and the red-black balancing (insert and erase). They write nothing

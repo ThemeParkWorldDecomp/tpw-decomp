@@ -1,6 +1,6 @@
 // Test library for the small MSL locale / streambuf / filebuf / ios_base::failure helpers (unit v51054;
 // libtpw_unit_std_use_facet.dylib, tests/test_std_use_facet.py), main app:
-//   src/std_use_facet.cpp   the 25 functions of the unit
+//   src/game/MslSupport.cpp, src/game/rides/FlyingRide.cpp   the 25 functions of the unit
 //
 // The callees outside the unit are fakes that record the arguments the real ones read: operator delete, the
 // _RefCountedPtr<char> destructor, the codecvt unshift (__ptr_glue), fputc, fflush and the four __use_facet instances.

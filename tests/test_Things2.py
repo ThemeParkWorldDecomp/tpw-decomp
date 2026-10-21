@@ -1,4 +1,4 @@
-"""w130: the things' second batch, original code on one side and src/ResearchLab_init.cpp, src/ChallengeHQ_offer.cpp and src/Things2_small.cpp on the
+"""w130: the things' second batch, original code on one side and src/game/buildings/ResearchLab.cpp, src/game/park/ChallengeHQ.cpp and src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/Weather.cpp, src/game/park/analyser.cpp on the
 other (tests/unit_Things2.cpp).
 
 Functions (main app): CResearchLab::Init 0x10121bd4, SetupProjects 0x10122004, SetupCategories 0x101221a8, CParkAnalyser::BuiltSomething 0x100e46a4,

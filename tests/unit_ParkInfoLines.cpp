@@ -1,5 +1,5 @@
 // Test library for the park status panel (unit v5232; libtpw_unit_ParkInfoLines.dylib, tests/test_ParkInfoLines.py), main app:
-//   src/ParkInfoLines.cpp   ParkInfoLines, ParkStatusPanelMsg, DoDominantThoughts; gParkStatusLastTotal, gParkStatusLastInPark
+//   src/game/ui/ui_parkStatus.cpp   ParkInfoLines, ParkStatusPanelMsg, DoDominantThoughts; gParkStatusLastTotal, gParkStatusLastInPark
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The fake windows are
 // raw blocks whose vtable pointer leads to a table of one recording function (the SetValue the original calls through the glue).

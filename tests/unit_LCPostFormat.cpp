@@ -1,6 +1,6 @@
 // Test library for the staff room panel's list formatter and message functions (unit v5004; libtpw_unit_LCPostFormat.dylib,
 // tests/test_LCPostFormat.py), main app:
-//   src/LCPostFormat.cpp   LCPostFormat, StaffRoomPanelLCHandler, StaffRoomStatusMsg
+//   src/game/ui/ui_staffRoomStatus.cpp   LCPostFormat, StaffRoomPanelLCHandler, StaffRoomStatusMsg
 //
 // Every callee outside the unit is a fake that records what the real one reads (the same event names and arguments as the module's
 // PowerPC stubs). The globals of other files the unit reads are defined here. The InterfaceWindow virtuals are defined here (a fake

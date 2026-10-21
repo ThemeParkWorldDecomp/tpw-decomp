@@ -1,5 +1,5 @@
 // Test library for DestroyTrackBrace and PlaceEntrancePylons (unit v5365; libtpw_unit_DestroyTrackBrace.dylib, tests/test_DestroyTrackBrace.py), main app:
-//   src/TPCoaster_instances_DestroyTrackBrace.cpp
+//   src/game/rides/CoasterPylon.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of other
 // files the unit reads are defined here.

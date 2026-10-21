@@ -1,4 +1,4 @@
-// ActionRecorder.cpp (main app): CActionRecorder. PARTIAL: ResetActionRecording and DoTick (unit w133, src/ActionRecorder.cpp);
+// ActionRecorder.cpp (main app): CActionRecorder. PARTIAL: ResetActionRecording and DoTick (unit w133, src/game/ActionRecorder.cpp);
 // ReplayRecording and the rest are untranslated.
 #pragma once
 #include <cstdint>
@@ -9,10 +9,10 @@ enum RecordedAction : int32_t {};   // unit v5075: the first argument of RecordA
 class CActionRecorder {
 public:
     void ReplayRecording(ReplayType type);   // 0x10144e2c
-    // 0x10143e08 (260 bytes, src/ActionRecorder.cpp; CWorld::SetupNewLevel calls it): closes the action file (and, in mode 0, the
+    // 0x10143e08 (260 bytes, src/game/ActionRecorder.cpp; CWorld::SetupNewLevel calls it): closes the action file (and, in mode 0, the
     // timing and camera files), opens them again (0x200 bytes each) and records the action 0xe7 with a zeroed 128-byte buffer.
     void ResetActionRecording();
-    // 0x10144f80 (872 bytes, src/ActionRecorder.cpp; CWorld::DoGameTurn calls it): while a replay runs, plays the recorded actions.
+    // 0x10144f80 (872 bytes, src/game/ActionRecorder.cpp; CWorld::DoGameTurn calls it): while a replay runs, plays the recorded actions.
     void DoTick();
 
     // Untranslated callees of DoTick and ResetActionRecording (stand-ins in the launcher).
@@ -55,7 +55,7 @@ public:
     void ProcessAction(int32_t action, uint16_t a, uint8_t count, char16_t* text);            // 0x101465a8
     void ProcessAction(int32_t action, uint8_t* data);                                        // 0x10146850
 
-    // Unit v5075 (src/ActionRecorder_CActionRecorder_CActionRecorder.cpp).
+    // Unit v5075 (src/game/ActionRecorder.cpp).
     enum RecordMode : int32_t {};
     // Not a C++ constructor / destructor: other units define gActionRecorder and would then need them.
     void Construct();                        // 0x10143658: builds the three files, the mode table 0x34..0x3d3 and starts recording mode 0
@@ -68,21 +68,21 @@ public:
     void RecordAction(RecordedAction action, uint8_t a, uint8_t b, uint16_t c);      // 0x101440e0 (208 bytes)
     void RecordAction(RecordedAction action, float a, float b, uint16_t id);         // 0x10144868 (336 bytes; unit v5144 declares it)
 
-    // Unit v5224 (src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ReplayRecording.cpp).
+    // Unit v5224 (src/game/ActionRecorder.cpp).
     void RecordAction(RecordedAction action, float value, uint16_t id);   // 0x10144704 (284 bytes), label ...F14RecordedActionfUs
     // 0x10144a00 (416 bytes), label ...F14RecordedActionUsUcPw: records the action, a (swapped), b and the swear-filtered text (UTF-16, swapped).
     void RecordAction(RecordedAction action, uint16_t a, uint8_t b, const char16_t* text);
     // Unit v5337: the action alone (108 bytes), label RecordAction__15CActionRecorderF14RecordedAction, defined in the v5075 file.
     void RecordAction(RecordedAction action);   // 0x10143f48
 
-    // Unit v51041 (src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ProcessAction_CActionRecorder_ActivateActionRecording.cpp).
+    // Unit v51041 (src/game/ActionRecorder.cpp).
     void RecordAction(RecordedAction action, uint16_t value);                // 0x101441fc, label ...F14RecordedActionUs
     void RecordAction(RecordedAction action, uint16_t value, uint8_t extra); // 0x101445d0, label ...F14RecordedActionUsUc
     void RecordAction(RecordedAction action, uint8_t* data);                 // 0x10144bec, label ...F14RecordedActionPUc
     void ProcessAction(RecordedAction action, uint8_t* data);                // 0x10146850, label ...F14RecordedActionPUc
 };
 extern CActionRecorder gActionRecorder;   // 0x1037ec44, original name unknown
-// Unit v51048 (src/Game_level_CGame_GetLocalisedThemeName_3.cpp): __sinit_ActionRecorder_cpp 0x10146e9c (88 bytes): a wide string (the text at
+// Unit v51048 (src/game/ActionRecorder.cpp): __sinit_ActionRecorder_cpp 0x10146e9c (88 bytes): a wide string (the text at
 // 0x10248615) built in gActionRecorderString with its exit record, then the recorder constructed with its exit record. Storage is raw
 // (the Mac's string is 0x14 bytes); names invented.
 void __sinit_ActionRecorder_cpp();
@@ -91,18 +91,18 @@ extern uint8_t gActionRecorderStringNode[];   // 0x1037f038
 extern uint8_t gActionRecorderNode[];         // 0x1037f018
 extern uint8_t gActionRecorderDtor[];         // stands for the destructor word 0x10266e58
 
-// Unit v5362 (src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ProcessAction_CActionRecorder_ProcessAction_2.cpp).
+// Unit v5362 (src/game/ActionRecorder.cpp).
 // Two halfwords of initialised data that end the chain of things the replay follows from a map cell (names invented; both 0 at start).
 extern uint16_t gReplayChainEndA;   // 0x102a4bd4 (ProcessAction 0x10145e38)
 extern uint16_t gReplayChainEndB;   // 0x102a4cec (ProcessAction 0x101465a8)
-// Layout functions with an id argument (the listing's overloads; the bodies live in src/TPConfig_LayoutSetMovePylon.cpp).
+// Layout functions with an id argument (the listing's overloads; the bodies live in src/game/rides/CoasterEdit.cpp).
 void LayoutStackPylonUp(uint16_t id);        // 0x10058c08
 void LayoutStackPylonDown(uint16_t id);      // 0x10058c80
 void LayoutSetCoasterEditOld(uint32_t id);   // 0x10058fa0
 void LayoutSetCoasterEdit(uint32_t id);      // 0x1005901c
 void LayoutRegenerateTrack(uint32_t id);     // 0x10058ec0
 
-// Unit v51072 (src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ProcessAction_3.cpp). The Mac's destructors and constructor
+// Unit v51072 (src/game/InGame.cpp, src/game/ExitErr.cpp). The Mac's destructors and constructor
 // below take their object by address (and the hidden short "delete storage" flag), so they are free functions on the host.
 void WideStringDestroy(void* string, int16_t flag);       // 0x101468f8 std::wstring::~basic_string (the string is one Ptr32 to its shared representation)
 void CMemFileDestroy(void* file, int16_t flag);           // 0x101437e0 bfl::FileSystem::CMemFile::~CMemFile

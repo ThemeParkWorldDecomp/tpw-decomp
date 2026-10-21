@@ -1,4 +1,4 @@
-"""CHField::Execute (src/tb_hfield_execute.cpp), original versus translation.
+"""CHField::Execute (src/engine/tb_hfield.cpp), original versus translation.
 
 Everything Execute calls is a fake on both sides (tests/unit_HFieldExecute.cpp has the host's):
 the height field's helpers (CalcFullLighting, CalcLine, GetTexturesUsed, ProcessTextureParameters,

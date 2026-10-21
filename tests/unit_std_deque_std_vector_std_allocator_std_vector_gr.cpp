@@ -1,6 +1,6 @@
 // Test library for std::deque<std::vector<Argument>>::grow_buf_back, destroy and ~deque (unit v5976;
 // libtpw_unit_std_deque_std_vector_std_allocator_std_vector_gr.dylib), main app:
-//   src/std_deque_std_vector_std_allocator_std_vector_gr.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read: operator new/delete, the block table's reserve, push_back
 // and do_assign, tear_down, the iterator copy and +=, and __destroy. Pointers are logged as (region number, offset) of the blocks the

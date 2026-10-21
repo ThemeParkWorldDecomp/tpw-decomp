@@ -1,6 +1,6 @@
 """Unit v5130, the online system's chat satellite, publishing, upload and FTP download entry points and AreWeProcessing, against
 libtpw_unit_CFSOnlineSystem_EnterChatSatellite.dylib (tests/unit_CFSOnlineSystem_EnterChatSatellite.cpp), main app ("SimTheme Park"),
-src/FS_Online_init_CFSOnlineSystem_EnterChatSatellite.cpp:
+src/game/online/FS_Online.cpp:
   EnterChatSatellite 0x10174be8, SetPublishing 0x10174e4c, RequestUploadPostLoginCallback 0x10175154, CompleteUpload 0x10175c20,
   RequestFTPDownload 0x10175dfc, GotoPlayerRequestFTPDownloadByID 0x10176074, GotoPlayerFTPPostGetParkInfoCallback 0x101762e8,
   AreWeProcessing 0x10171498

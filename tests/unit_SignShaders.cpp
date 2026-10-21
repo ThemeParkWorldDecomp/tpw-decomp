@@ -1,7 +1,7 @@
 // Test library for the ride sign's image filters and shaders (unit w84; libtpw_unit_SignShaders.dylib, tests/test_SignShaders.py):
-//   src/rsse_sign_filters.cpp   erodebuffer_erode 0x100c8e40, make_gaussian_filter_2d 0x100c90d8, copy_offset_alpha 0x100c922c,
+//   src/game/rides/RideSign.cpp   erodebuffer_erode 0x100c8e40, make_gaussian_filter_2d 0x100c90d8, copy_offset_alpha 0x100c922c,
 //                               dilate 0x100c9404, erode 0x100c9650, blur 0x100c98e4
-//   src/rsse_sign_shaders.cpp   PlasticShader::clear 0x100ca6a0, ~PlasticShader 0x100ca558, load_settings 0x100ca724, bevel 0x100ca95c,
+//   src/game/rides/RideSign.cpp   PlasticShader::clear 0x100ca6a0, ~PlasticShader 0x100ca558, load_settings 0x100ca724, bevel 0x100ca95c,
 //                               blur_with_mask 0x100cab6c, plastic_shade 0x100caf40, ShadowGlow::shadow_glow 0x100cb468,
 //                               ~ShadowGlow 0x100cb7c0
 //

@@ -1,6 +1,6 @@
 // tb_clipping.h: the engine's polygon clipper (engine library; the file name is not known).
-// CClipping's members are in src/tb_clipping.cpp (0x1003f4d4, 0x1003f6dc, 0x10040640..0x10040cf0),
-// the edge clippers they call and the colour blend in src/tb_clipping_edges.cpp (0x1003f8b0..
+// CClipping's members are in src/engine/Clipping.cpp (0x1003f4d4, 0x1003f6dc, 0x10040640..0x10040cf0),
+// the edge clippers they call and the colour blend in src/engine/Clipping.cpp (0x1003f8b0..
 // 0x10040424); Clipping_Init and Clipping_Close (0x1003f3bc, 0x1003f45c) are in tb_printf_opengl.cpp.
 //
 // CClipping was a two-word placeholder in tb_printf_opengl.h; that header now includes this
@@ -72,7 +72,7 @@ struct CClipping {
 static_assert(sizeof(CClipping) == 8, "CClipping is eight bytes");
 
 // The six edge clippers ClipPoly calls through a table (data at 0x10052068, one per plane in the
-// order below; src/tb_clipping_edges.cpp). Each makes the vertex where the edge from `inside` to
+// order below; src/engine/Clipping.cpp). Each makes the vertex where the edge from `inside` to
 // `outside` meets its plane and writes it at `out` (stride bytes; the stride after the 0x18 bytes
 // of position, w, colour and specular colour must be a multiple of 8, or the original loops
 // until it faults). Static functions of the original's file.

@@ -1,9 +1,9 @@
 """Unit w40, the main-app half: the lobby's remaining leaves, against libtpw_unit_LobbyLeaves.dylib (tests/unit_LobbyLeaves.cpp), in the main
 app ("SimTheme Park"):
-  src/ui_main_leaves.cpp      GetFontTableEntry 0x10180270, UI_CreateVersionNumber 0x101874d0
-  src/ui_measuretext.cpp      UI_MeasureText 0x1018b8e4
-  src/lobby_mailicon.cpp      LB_Lobby_MailIconMessagesFn 0x100a59ec
-  src/FS_Online_gametype.cpp  CGameType::CGameType 0x1016f5d8, CGameType::SetGameType 0x1016f6a0
+  src/game/ui/ui_main.cpp      GetFontTableEntry 0x10180270, UI_CreateVersionNumber 0x101874d0
+  src/game/ui/ui_utils.cpp      UI_MeasureText 0x1018b8e4
+  src/game/online/lobby.cpp      LB_Lobby_MailIconMessagesFn 0x100a59ec
+  src/game/online/FS_Online.cpp  CGameType::CGameType 0x1016f5d8, CGameType::SetGameType 0x1016f6a0
 (the ltms string buffer is test_LobbyLeavesLtms.py, in the ltms library, against the same host library).
 
 Every callee outside the unit is a fake that records the same event on both sides: the ltms text formatter (constructor, destructor, the two

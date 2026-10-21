@@ -1,5 +1,5 @@
 """Unit v5694, UIMain_GetObjectState, against libtpw_unit_UIMain_GetObjectState.dylib (tests/unit_UIMain_GetObjectState.cpp), main app,
-src/ui_main_panel_UIMain_GetObjectState.cpp:
+src/game/ui/ui_main.cpp:
   UIMain_GetObjectState 0x10180b84
 
 A case is a world and a call. The world (an object block, a ride record block, a few world halfwords, seven id globals) is built twice by

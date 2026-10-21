@@ -1,7 +1,7 @@
 // Test library for CSprocketsChannelMac::SetDescription, the UReferenceCounter<USoundDescription> copy constructor and destructor,
 // TbMapStreamer::CCatFixupTable::Unload / LoadCatgoryFixupTable / SetDroppable and TbStaticFileBank (unit v51032;
 // libtpw_unit_CSprocketsChannel_SetDescription_2.dylib, tests/test_CSprocketsChannel_SetDescription_2.py), sound program:
-//   src/TbSysCommand_TpBody_Load_CSprocketsChannel_SetDescription_2.cpp
+//   src/sound/TbMapStreamer.cpp, src/sound/TimerCodec.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read (pointers as labels) and answer from the
 // test's queues; the blocks they hand out are set by the test (tpw_sd_setblock).
@@ -118,7 +118,7 @@ uint32_t TbBank::GetSamplePosition(uint32_t) { return 0; }
 bfl::FileSystem::CFile* TbBank::GetHandle() { return nullptr; }
 bool TbBank::IsStreaming() const { return false; }
 TbError TbBank::Initialise(TbRefRelease**) { return TbError(0); }
-// TbStaticFileBank's vtable (emitted here) names IsType, unit v51075's (src/TbSoundCore_TbSpeaker_Mono_operator_int.cpp).
+// TbStaticFileBank's vtable (emitted here) names IsType, unit v51075's (src/sound/TimerCodec.cpp, src/sound/Bank.cpp).
 bool TbStaticFileBank::IsType(uint32_t) const { return false; }
 
 extern "C" {

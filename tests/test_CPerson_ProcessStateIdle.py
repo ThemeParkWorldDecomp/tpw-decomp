@@ -1,5 +1,5 @@
 """Unit v5098, CPerson::ProcessStateIdle, against libtpw_unit_CPerson_ProcessStateIdle.dylib (tests/unit_CPerson_ProcessStateIdle.cpp), main app
-("SimTheme Park"), src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_ProcessStateIdle.cpp:
+("SimTheme Park"), src/game/people/PersonQueue.cpp:
   CPerson::ProcessStateIdle 0x1011baa8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for the

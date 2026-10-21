@@ -1,8 +1,8 @@
 // FS_MasterSave.cpp (main app): the game-wide save (CFSGlobalMasterSave) and the theme
-// scan. PARTIAL: FS_ScanThemes is translated (src/FS_MasterSave.cpp); the master save's
+// scan. PARTIAL: FS_ScanThemes is translated (src/game/save/FS_MasterSave.cpp); the master save's
 // constructor, the keys and the theme records the island lobby reads are translated in
-// src/FS_MasterSave_global.cpp (unit w32); the golden ticket bookkeeping, the current theme and the sign names are in
-// src/FS_MasterSave_tickets.cpp and src/FS_MasterSave_signs.cpp (unit w89); loading and saving are not.
+// src/game/save/FS_MasterSave.cpp (unit w32); the golden ticket bookkeeping, the current theme and the sign names are in
+// src/game/save/FS_MasterSave.cpp (unit w89); loading and saving are not.
 #pragma once
 #include <cstdint>
 #include <list>
@@ -17,7 +17,7 @@
 // 0x10169310 (the inventory files it under FS_MasterSave.cpp).
 TbError FS_ScanThemes(const TbDynamicStringTemplate<char>& localPath);
 
-// The balance table of a park's global save: "data:levels:<theme>:global.sam" (src/FS_MasterSave_global.cpp). Mac 0x1c bytes
+// The balance table of a park's global save: "data:levels:<theme>:global.sam" (src/game/save/FS_MasterSave.cpp). Mac 0x1c bytes
 // (mRows, the vptr 0x102a721c, then five value slots); its constructor and destructor are inline in the callers. The values
 // the game reads are slot 3 (the keys the park costs to enter) and slot 4 (the id of the park's gate object, which names the
 // park). Slot 0 is the reserved one.
@@ -51,7 +51,7 @@ class SwearFilter {
 public:
     bool Init(const char* wordFile, const char* allowedFile, bool flag);   // 0x1020d1bc
 
-    // Unit v5094 (src/SwearFilter_Filter.cpp).
+    // Unit v5094 (src/game/online/IPBase.cpp).
     // 0x1020d2cc: walks the word list. A word starting with a space must start a word of the text, one starting with '*' may
     // sit anywhere, any other must be a whole word; a match that the allowed list does not excuse (case blind compare at the
     // match) makes the answer true and, when `replace` is set, is overwritten with '*' up to the end of the word. The text's
@@ -76,7 +76,7 @@ extern uint16_t gSwearWctypeMap[256];   // 0x103bd05c (data import c/c++_shared:
 extern char gIfstreamVtbl[];            // 0x102b1778 (TOC slot -0x5f04; initial word 0x102b1770)
 char16_t* stristr(char16_t* haystack, char16_t* needle);   // 0x1020cbec: the first case blind match, NULL when none
 // Unit v51009: stristr's table (data import c/c++_shared::__wlower_map, 0x103bcf9c: the lower case of the characters below 0x100;
-// defined in src/COnlinePerson_SetDest_VoteNotifyCallback.cpp with the ASCII mapping) and the callee of SwearFilter::Init.
+// defined in src/game/online/IPBase.cpp with the ASCII mapping) and the callee of SwearFilter::Init.
 extern uint16_t gSwearLowerMap[256];   // 0x103bcf9c
 namespace swear_callee {
 void EraseList(std::list<std::u16string>* list);   // 0x1020db8c std::list::erase(begin, end) as Init calls it (weak default clears)
@@ -127,7 +127,7 @@ public:
     // 0x1016c57c: the park's name: the player's sign names when there are any, else the name of the park's gate object (the
     // ride database's type name). Writes nothing when the balance file cannot be read.
     void GetFullName(char16_t* buffer, uint32_t size);
-    // 0x1016c7e8 (src/FS_MasterSave_signs.cpp, unit w89): the first line of the gate sign. With player-given sign names the
+    // 0x1016c7e8 (src/game/save/FS_MasterSave.cpp, unit w89): the first line of the gate sign. With player-given sign names the
     // first one (the last character dropped when the name ends in two hyphens), else the ride database's text for the gate
     // object; an empty text when the balance file cannot be read.
     void GetSignNameA(char16_t* buffer, uint32_t size);
@@ -135,7 +135,7 @@ public:
     void SetSignNameA(const char16_t* text);                       // 0x1016cbe8: at most 0x21 characters, and the sign flag set
     void SetSignNameB(const char16_t* text);                       // 0x1016cc60
 
-    // unit w89 (src/FS_MasterSave_tickets.cpp). No index is range checked.
+    // unit w89 (src/game/save/FS_MasterSave.cpp). No index is range checked.
     ~CFSGlobalParkData();                                          // 0x1016bcd4: takes the balance table down (nonvirtual)
     bool HaveTicket(GoldenTicketTypeLocal type) const;             // 0x1016c158: the byte, as a truth value
     bool EarnedTicket(GoldenTicketTypeLocal type);                 // 0x1016c1ac: sets the byte; false when it was exactly 1 already
@@ -144,7 +144,7 @@ public:
     void ClearAward(GoldenTicketTypeGlobal type);                  // 0x1016c2f8
     void SetAward(GoldenTicketTypeGlobal type, int32_t score);     // 0x1016c354
 
-    // unit w89b (src/FS_MasterSave_park.cpp)
+    // unit w89b (src/game/save/FS_MasterSave.cpp)
     // 0x1016bb04: the loader's constructor: no balance table and the theme's name; the rest is read by Serialise (it is left as it is).
     CFSGlobalParkData(CSerialise& serialise, const TbDynamicStringTemplate<char>& name);
     // 0x1016bd9c: writes (save != 0) or reads the record's tickets, awards and their scores, the two sign names and the two flags; 0 on
@@ -162,7 +162,7 @@ public:
     uint8_t mAllResearchCompleted;          // 0xb9  1 once all the park's research is done (HasAllResearchBeenCompleted)
 };
 
-// The game-wide save: what the player owns across parks (src/FS_MasterSave_global.cpp). Mac 0x4c bytes; the two string lists, the
+// The game-wide save: what the player owns across parks (src/game/save/FS_MasterSave.cpp). Mac 0x4c bytes; the two string lists, the
 // set of bought things and the theme map are Metrowerks library containers there (a list is 0xc bytes, a set 0xc and a map
 // 0x10, with the end node inside) and standard containers here.
 class CFSGlobalMasterSave {
@@ -174,7 +174,7 @@ public:
     void ResetGlobalData();
     bool IsEasyModeUser() const;           // 0x1016a4fc
     int32_t Load(const char* path);        // 0x1016a6c8: 1
-    bool IsFirstTimePlayer();              // 0x1016ba70 (src/FS_MasterSave_tickets.cpp)
+    bool IsFirstTimePlayer();              // 0x1016ba70 (src/game/save/FS_MasterSave.cpp)
     void ClearFirstTimePlayer();           // 0x1016bab8
     // 0x1016b47c: the record of the theme `name`, made (and its balance file read) when there is none; NULL when the
     // theme's global.sam cannot be read.
@@ -189,7 +189,7 @@ public:
     // unit w43
     void GiveExtraKey();   // 0x1016a4b4
 
-    // unit w89 (src/FS_MasterSave_tickets.cpp): the golden tickets, what they buy, the current theme, the sign names and flags.
+    // unit w89 (src/game/save/FS_MasterSave.cpp): the golden tickets, what they buy, the current theme, the sign names and flags.
     // The global ticket bytes count 4 (not the 6 ResetGlobalData clears), the secret ones 2.
     int32_t HowManyTickets() const;                         // 0x10169b24: global tickets won + the local ones of the parks whose balance file reads
     int32_t HowManyTicketsIncludingSecrets() const;         // 0x10169c24: the same + the secret ones
@@ -217,11 +217,11 @@ public:
     void SetAllResearchCompletedInCurrentTheme();           // 0x1016ba04
 
     // unit w48
-    void SetEasyModeUser(int32_t easyMode);   // 0x1016a540 (src/FS_MasterSave_easy.cpp): the low byte of the argument into the byte at 0x24
+    void SetEasyModeUser(int32_t easyMode);   // 0x1016a540 (src/game/save/FS_MasterSave.cpp): the low byte of the argument into the byte at 0x24
     // 0x1016a584, 272 bytes (untranslated): writes the master save to the file `path`; 1 when it was written.
     int32_t Save(const char* path);
 
-    // unit w89b (src/FS_MasterSave_file.cpp). Load (0x1016a6c8, above) resets the save, empties the theme map and reads the file at `path`
+    // unit w89b (src/game/save/FS_MasterSave.cpp). Load (0x1016a6c8, above) resets the save, empties the theme map and reads the file at `path`
     // (a version below 0xc is refused); 1 when it was read. Serialise (0x1016aa08) is the body of the file: the tickets, the keys, the flags,
     // the theme records (a name and a CFSGlobalParkData each), the player settings (CPlayerSettings::SerialiseLocal of gPlayerSettings) and
     // the bought things; 0 on success, 1 on a failed read or write.
@@ -245,7 +245,7 @@ extern CFSGlobalMasterSave* gMasterSave;   // 0x10380a8c, created on first use (
 extern char16_t gParkSignNameScratch[0x21];
 
 // Unit v5126: std::__tree<std::pair<const TbDynamicStringTemplate<char>, CFSGlobalParkData*>, ...map::value_compare, ...>, the theme
-// map's tree (src/FS_MasterSave_global_std___tree_std_pair_std_map_TbDynamicStringTempl.cpp). Mac words are 32 bits, the host's are
+// map's tree (src/game/MslSupport.cpp). Mac words are 32 bits, the host's are
 // native (the Mac offsets are in the comments). The end node is the root word itself, as in MslSubscriptionTree.h.
 struct ParkThemeTree {
     using Key = TbDynamicStringTemplate<char>;
@@ -303,7 +303,7 @@ void PairCopy(ParkThemeTree::Pair* pair, const ParkThemeTree::Pair& value);     
 void BalanceInsert(ParkThemeTree::node* node, ParkThemeTree::node* root);                // 0x10153b24 __red_black_tree::balance_insert
 }
 
-// Unit v51118 (src/TPOptions_CTimeSig_GetTimeSecond.cpp): destructors with the Mac's hidden "delete storage" short (answer: self), and the
+// Unit v51118 (src/game/ui/InterfaceFont.cpp, src/game/save/SaveLoad.cpp, src/game/ui/MessageCentre.cpp, src/game/park/SkyObjects.cpp): destructors with the Mac's hidden "delete storage" short (answer: self), and the
 // constructors of the std::list<std::wstring> and of the park theme tree. std::set<unsigned short> on the Mac's 32-bit layout:
 class CSkyObjects;
 class CRideDatabase;

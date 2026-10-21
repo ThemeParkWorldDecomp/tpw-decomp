@@ -1,5 +1,5 @@
 // Test library for SetCoasterEditState, RejoinTrack, SetPlaceLoop (unit v5257; libtpw_unit_SetCoasterEditState.dylib, tests/test_SetCoasterEditState.py), main app:
-//   src/DisableCurrentPylonEditState_SetCoasterEditState.cpp
+//   src/game/rides/CoasterEdit.cpp
 //
 // The callees outside the unit are recording fakes (DisableCurrentPylonEditState, SetCoasterButtonState, GetCoasterEditAvailableButtons,
 // the two UIInterface button calls, SetCoasterState, FlagGenerateTrack). The globals of other files are defined here.

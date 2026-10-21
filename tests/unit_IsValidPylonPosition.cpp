@@ -1,5 +1,5 @@
 // Test library for IsValidPylonPosition (unit v5551; libtpw_unit_IsValidPylonPosition.dylib, tests/test_IsValidPylonPosition.py), main app:
-//   src/TPCoaster_instances_IsValidPylonPosition.cpp   IsValidPylonPosition and the clamp globals gPylonClampMax / gPylonClampMin
+//   src/game/rides/CoasterPylon.cpp   IsValidPylonPosition and the clamp globals gPylonClampMax / gPylonClampMin
 //
 // The callee outside the unit is XZAngleBetweenPylons: a fake that records its six arguments and answers the float bits of the test's queue
 // (sqrt is the host's, the PowerPC side has the same one from install_std_stubs). The globals of other files the unit reads are defined here.

@@ -1,6 +1,6 @@
 // Test library for the entrance camera and collision object helpers (unit v51013; libtpw_unit_GetThingAtPosnIfEntrance.dylib,
 // tests/test_GetThingAtPosnIfEntrance.py), main app:
-//   src/lobby_exit_IsRideRideable_GetThingAtPosnIfEntrance.cpp   GetThingAtPosnIfEntrance(int, int), MoveCameraOverRideExit,
+//   src/game/TPCamera.cpp, src/game/rides/BumperRide.cpp   GetThingAtPosnIfEntrance(int, int), MoveCameraOverRideExit,
 //   FreeTrackForRide, BMP_StartColObject, BMP_StartColObjectForRide
 //
 // The callees outside the unit are fakes recording the arguments the real ones read: GAME_ASSERTMSG, TRACE, CMapCell::IsEntrance,

@@ -1,6 +1,6 @@
 """Unit w77, the sound library's value classes, against libtpw_unit_SoundInfo.dylib (tests/unit_SoundInfo.cpp), in the program
 "sound symbols shared" (the Mac's sound library, Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/TbSoundInfo.cpp  TbSoundPosition (18 functions, 0x1000c580 to 0x100246e4), TbSoundDistance (0x10001324, 0x10015950),
+  src/sound/AudioPlaceHolder.cpp, src/sound/SystemCommand.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundManager.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundPosition.cpp, src/sound/TbSoundSampleInfo.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/TbSoundSystemInfo.cpp, src/sound/TbSysCommand.cpp  TbSoundPosition (18 functions, 0x1000c580 to 0x100246e4), TbSoundDistance (0x10001324, 0x10015950),
                        TbSoundReverbInfo (0x100012ac), TbSoundVolumeControl (0x10009d9c, 0x1000aac8, 0x10026f28, 0x10026f68),
                        TbSoundSampleInfo (18 functions, 0x1000dc60 to 0x100196f4; SetBank 0x1000df50 is w72's) and
                        TbSoundSystemInfo (23 functions, 0x1000ba78 to 0x10028c08): 66 functions in all

@@ -1,5 +1,5 @@
 // Test library for the ride status panel's upgrade list (unit v5074; libtpw_unit_FillUpgradeBox.dylib, tests/test_FillUpgradeBox.py), main app:
-//   src/FillUpgradeBox.cpp   FillUpgradeBox, UpgradePanelMsg
+//   src/game/ui/ui_RideStatus.cpp   FillUpgradeBox, UpgradePanelMsg
 //
 // The callees outside the unit are recording fakes that record what the real one reads and answer from the test's tables (the pointers set
 // by tpw_fub_setptr). The globals of other files the unit reads are defined here, zero at start like the Mac's bss.

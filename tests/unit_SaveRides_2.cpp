@@ -1,5 +1,5 @@
 // Test library for SaveRides (unit v51028; libtpw_unit_SaveRides_2.dylib, tests/test_SaveRides_2.py), main app:
-//   src/RideTypes_OutputAnimTimeStats_SaveRides_2.cpp   SaveRides, and the global gSaveRidesTbErrorZero it defines
+//   src/game/rides/TPRide.cpp   SaveRides, and the global gSaveRidesTbErrorZero it defines
 //
 // The callees outside the unit are recording fakes: MReleaseAllocF, MReleaseFreeF, CTRACE, OutputAnimTimeStats, LbFile_Write (which also
 // keeps the bytes it was given), UDebug. The swaps are the host's (identity); USwapInplaceFloat is a no-op here as on the host.

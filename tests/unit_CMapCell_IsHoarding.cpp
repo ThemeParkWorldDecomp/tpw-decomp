@@ -1,6 +1,6 @@
 // Test library for CMapCell::IsHoarding, IsTrack, RefreshHFieldTile, ValidTypeChange and CalculateDirections (unit v5270;
 // libtpw_unit_CMapCell_IsHoarding.dylib, tests/test_CMapCell_IsHoarding.py), main app:
-//   src/MapDelta_map_CMapCell_IsHoarding.cpp   the five functions and the globals gIsTrackNoParent, gValidTypeChangeLock
+//   src/game/park/MapCell.cpp   the five functions and the globals gIsTrackNoParent, gValidTypeChangeLock
 //
 // Fakes (the same events as the module's PowerPC stubs): CCellBase::GetTrackCellEquiv, ModifyDirection, CTrackCell::IsTrackX, IsTrack,
 // IsHoarding, LLCCM_CreateQMesh, SingleHFieldTextureChange. gGameWorld (defined in another file) is defined here; it is only a base address

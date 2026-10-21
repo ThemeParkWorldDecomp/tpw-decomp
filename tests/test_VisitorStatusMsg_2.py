@@ -1,5 +1,5 @@
 """Unit v5929, the visitor status panel, against libtpw_unit_VisitorStatusMsg_2.dylib (tests/unit_VisitorStatusMsg_2.cpp), main app
-("SimTheme Park"), src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2.cpp:
+("SimTheme Park"), src/game/ui/ui_visitorStatus.cpp:
   VisitorStatusMsg 0x1014320c, __sinit_ui_visitorStatus_cpp 0x101435c4, VisitorStatusPanel::UpdateWindow 0x101430c0,
   VisitorStatusPanel::Show 0x101433f8, VisitorStatusPanel::InitWindow 0x10142f44
 

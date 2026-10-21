@@ -1,5 +1,5 @@
 """Unit v5546, the online globe's city flag, against libtpw_unit_CLBGlobeCityFlag_CLBGlobeCityFlag.dylib
-(tests/unit_CLBGlobeCityFlag_CLBGlobeCityFlag.cpp), main app ("SimTheme Park"), src/CLBGlobeCityFlag_CLBGlobeCityFlag.cpp:
+(tests/unit_CLBGlobeCityFlag_CLBGlobeCityFlag.cpp), main app ("SimTheme Park"), src/game/online/lobby_globe.cpp:
   CLBGlobeCityFlag::CLBGlobeCityFlag 0x100ac5c8, CLBGlobeCityFlag::~CLBGlobeCityFlag 0x100ac86c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory, big-endian, and the host library's

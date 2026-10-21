@@ -1,4 +1,4 @@
-// Differential library for unit w202, the ride's admittance and queue length (src/Object_admit.cpp): the eleven CObject members HasFreeQueueSpace,
+// Differential library for unit w202, the ride's admittance and queue length (src/game/Object.cpp): the eleven CObject members HasFreeQueueSpace,
 // GetIdealQueueLength, QueueTooLong, AdmitPerson, FinishedAdmitting, ReadyToAdmit, PersonLeftDuringAdmittance, LetPeopleOn, LetPeopleOff,
 // ProcessStateFunctioning and GoFirstPerson.
 //
@@ -7,7 +7,7 @@
 // record, a script block, 64 anim set blocks and a world-sized block (gWorld; only mTurn is read). Every fake appends (tag, value) to the trace; a pointer
 // is recorded as its offset in the block, so the two sides' traces compare word for word. The ride record's value slots are 4 bytes on the Mac and 8 on
 // the host (BalanceValue holds a pointer), so the test writes each side's record at that side's own offsets. SetState is a fake here (the real one is
-// another unit's); CThing::GetThingId (src/Thing_receive.cpp, another unit) is a copy. The float global is the one the unit defines.
+// another unit's); CThing::GetThingId (src/game/Thing.cpp, another unit) is a copy. The float global is the one the unit defines.
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>

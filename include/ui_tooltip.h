@@ -1,5 +1,5 @@
 // ui_tooltip.cpp (main app, 0x1018be38..0x1018c8ec, unit w56): the tooltip of the lobby, the text that appears under the pointer over a
-// bar. CUIHelpWindow is the one subclass of InterfaceHelpText (include/UI_Base.h, src/ui_helptext.cpp); its one static object is
+// bar. CUIHelpWindow is the one subclass of InterfaceHelpText (include/UI_Base.h, src/game/ui/InterfaceHelpText.cpp); its one static object is
 // gUIHelpWindow. InitHelpText (include/ui_main.h) builds the text window at start-up and makes the object the help text handler; the
 // interface's pump then tells it, through the handler's virtual members, when the pointer moves into a window, and it asks that window
 // for its help text (message 0xc) and shows it.

@@ -1,5 +1,5 @@
 """Unit v5195, the loans panel, against libtpw_unit_LoansPanelMsg.dylib (tests/unit_LoansPanelMsg.cpp), main app
-("SimTheme Park"), src/ui_allKidsPanel_AllKidsPanelMsg_LoansPanelMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_loansPanel.cpp:
   LoansPanelMsg 0x101a3f6c, Payback 0x101a3cd4, UpdateListHeadings 0x101a4230
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

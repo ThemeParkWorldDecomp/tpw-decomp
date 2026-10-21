@@ -1,6 +1,6 @@
 // Test library for VoteNotifyCallback, SwearFilter::Init, stristr, IPBase::ShowError and FTPClient::ProcessEvents (unit v51009;
 // libtpw_unit_VoteNotifyCallback.dylib, tests/test_VoteNotifyCallback.py), main app:
-//   src/COnlinePerson_SetDest_VoteNotifyCallback.cpp   the five functions and the globals gSwearLowerMap, gIPErrorCodes, gIPErrorTexts
+//   src/game/online/FTPClient.cpp, src/game/online/IPBase.cpp, src/game/online/online.cpp   the five functions and the globals gSwearLowerMap, gIPErrorCodes, gIPErrorTexts
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record. gOnlineControl is defined here (other files define it).
 #include <cstddef>

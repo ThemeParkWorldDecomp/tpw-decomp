@@ -431,7 +431,7 @@ TPW_WEAK CSYS_TPFileInfo gTPFileInfo;
 TPW_WEAK CFSUserInfo* gUserInfo;
 TPW_WEAK CFSOnlineSystem* gOnlineSystem;
 TPW_WEAK CPlayerSettings gPlayerSettings;
-// gGame itself is src/GlobalOrder.cpp's (a weak blank next to it would be constructed twice);
+// gGame itself is src/game/TPGlobals.cpp's (a weak blank next to it would be constructed twice);
 // its constructor and destructor here leave it alone, as the tests expect.
 TPW_WEAK CGame::CGame() {}
 TPW_WEAK CGame::~CGame() {}
@@ -441,7 +441,7 @@ TPW_WEAK int16_t gUIRealScreenWidth;
 TPW_WEAK int16_t gUIRealScreenHeight;
 TPW_WEAK CText gText;
 TPW_WEAK CLBLobby* gLobby;
-// gTPGlobals is src/TPGlobals.cpp's now (a second definition here would be built and
+// gTPGlobals is src/game/TPGlobals.cpp's now (a second definition here would be built and
 // destroyed a second time over the same object).
 
 namespace {
@@ -520,7 +520,7 @@ TPW_WEAK CFSOnlineSystem::CFSOnlineSystem() {
 }
 TPW_WEAK CFSOnlineSystem::~CFSOnlineSystem() { with_this(E_OnlineDtor, this); }
 TPW_WEAK void CFSOnlineSystem::Tick() { with_this(E_OnlineTick, this); }
-// The real Tick and StopProcessing (src/FS_Online.cpp, unit w62) are linked in for OnlineConfig and call these; the login ticker
+// The real Tick and StopProcessing (src/game/online/FS_Online.cpp, unit w62) are linked in for OnlineConfig and call these; the login ticker
 // stands for the whole tick (one OnlineTick event per Tick, as before), the others do nothing.
 TPW_WEAK void CFSOnlineSystem::TickLogin() { with_this(E_OnlineTick, this); }
 TPW_WEAK void CFSOnlineSystem::TickNews() {}

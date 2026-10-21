@@ -1,5 +1,5 @@
 """Unit w168, the particle system's save and load, against libtpw_unit_ParticleSave.dylib (tests/unit_ParticleSave.cpp), main app
-("SimTheme Park"), src/rsse_particles_save.cpp:
+("SimTheme Park"), src/game/Particles.cpp:
   PAR_SaveStatus 0x100BACAC, PAR_LoadStatus 0x100BB7D8
 (the swap helpers and tagPARTICLE::Byteswap are tests/test_ParticleSwap.py's).
 

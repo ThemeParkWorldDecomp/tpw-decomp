@@ -1,11 +1,11 @@
 // Fakes and test entry points for unit w66, the sound runtime (libtpw_unit_SoundRuntime.dylib, driven by
 // tests/test_SoundRuntime.py; see calllog.h):
-//   src/SoundRuntime.cpp  SOUND_Init 0x100dc940, SOUND_Close, SOUND_SetChannels, SOUND_SetSoundQuality, the four volume setters,
+//   src/game/Sound.cpp  SOUND_Init 0x100dc940, SOUND_Close, SOUND_SetChannels, SOUND_SetSoundQuality, the four volume setters,
 //                         SOUND_SetParamValue, StopAllSfx, FadeOutAllSfx, Pause, UnPause, SOUND_Tick, SendEvent, PauseSound,
 //                         UnpauseSound, SetVolumeOnSound, SendEventExt, SetPauseOn3DSoundsOnly, SetEarPosition, MoveSoundEffect,
 //                         StopSoundEffect, FadeSoundEffect, GetCurrentSampleLengthInMilliseconds and the five empty wrappers
 //   include/TbAudioSystem.h  the TbAudioEvent getters (0x100de9e0 to 0x100dea8c)
-//   src/TPSound.cpp       the state (and the status setters and SND_DuckVolume, which the scripts also call)
+//   src/game/Sound.cpp, src/game/park/ParkSound.cpp       the state (and the status setters and SND_DuckVolume, which the scripts also call)
 // Fakes, each recording what the original's callee would be given (the PowerPC side records the same from its stubs): the audio
 // object (a TbAudioSystem whose SystemCommand records the command's kind and payload words and writes the out words of the two
 // query commands, whose SendEvent/UpdateHandle/UpdateParameter answer the queues "Handle" and "Word"), CreateAudioObject (the
@@ -39,7 +39,7 @@ extern unsigned char gSoundBalanceStorage[sizeof(CSoundBalance)] __asm__("gSound
 #endif
 alignas(16) unsigned char gSoundBalanceStorage[sizeof(CSoundBalance)];
 
-// src/Advisor.cpp's (the unit does not link it).
+// src/game/advisor/Advisor.cpp's (the unit does not link it).
 int32_t gAdvisorThemeSoundBank;
 
 namespace {

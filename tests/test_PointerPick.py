@@ -1,4 +1,4 @@
-"""Differential test for src/TPRide_pointer.cpp (main app 0x10065f50, unit w134): CalculatePointerWorldPosn, the pointer's world
+"""Differential test for src/game/TPPointer.cpp (main app 0x10065f50, unit w134): CalculatePointerWorldPosn, the pointer's world
 position from the camera ray through the height field and the rides, against libtpw_unit_PointerPick.dylib.
 
 The four callees are fakes on both sides and record their arguments (FindPointedRide in two events, because an event holds twelve words):

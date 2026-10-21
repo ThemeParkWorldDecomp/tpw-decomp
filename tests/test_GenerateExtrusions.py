@@ -1,5 +1,5 @@
 """Unit v5557, GenerateExtrusions, against libtpw_unit_GenerateExtrusions.dylib (tests/unit_GenerateExtrusions.cpp), main app
-("SimTheme Park"), src/TPConfig_extrude_GetCrossSectionFromParams_GenerateExtrusions.cpp:
+("SimTheme Park"), src/game/rides/CoasterExtrude.cpp:
   GenerateExtrusions 0x1004ff18
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

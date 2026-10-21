@@ -1,5 +1,5 @@
 // Test library for EmailInfo::~EmailInfo (unit v5711; libtpw_unit_EmailInfo_Dtor_EmailInfo.dylib, tests/test_EmailInfo_Dtor_EmailInfo.py), main app:
-//   src/email_load_EmailInfo_Dtor_EmailInfo.cpp
+//   src/game/online/email.cpp
 //
 // The callees (string destructor, list clear, operator delete) are fakes that record the offset of the address they get from the object.
 #include <cstddef>

@@ -1,4 +1,4 @@
-// String helpers of the main app (0x10005354..0x1000585c; src/TPString.cpp). The
+// String helpers of the main app (0x10005354..0x1000585c; src/game/ui/3DFont.cpp). The
 // original file is unknown (the inventory files the range under 3DFont.cpp); the name is
 // invented.
 #pragma once

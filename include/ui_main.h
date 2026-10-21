@@ -1,5 +1,5 @@
-// ui_main.cpp (main app). PARTIAL: the text conversion (src/ui_main.cpp) and the start of
-// the interface with its meshes (src/ui_main_meshes.cpp). UI text is 16-bit (the Mac wchar_t).
+// ui_main.cpp (main app). PARTIAL: the text conversion (src/game/ui/ui_main.cpp) and the start of
+// the interface with its meshes (src/game/ui/ui_main.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/UIInterface.cpp). UI text is 16-bit (the Mac wchar_t).
 #pragma once
 #include <cstddef>
 #include <cstdint>
@@ -11,12 +11,12 @@
 #include "ui_DrawObject.h"
 #include "TbVTag.h"
 
-// 0x10180468 (src/ui_loginpanel.cpp): the interface's string number `id` (the table at gText's resource 6) as Unicode, converted into
+// 0x10180468 (src/game/ui/ui_main.cpp): the interface's string number `id` (the table at gText's resource 6) as Unicode, converted into
 // gUIMainConvertBuffer when the language's converters are loaded (the first 0x200 characters; the buffer is left as it was when they are
 // not); NULL when the table has no such string.
 const char16_t* UIMain_GetString(int32_t id);
 class InterfaceWindow;
-// 0x1018bd3c (src/ui_loginpanel.cpp): the colour of a title's text: SetFontColour(window, 0xea, 0xef, 0x66, 0xff).
+// 0x1018bd3c (src/game/ui/ui_utils.cpp): the colour of a title's text: SetFontColour(window, 0xea, 0xef, 0x66, 0xff).
 void UI_TITLE_COLOUR(InterfaceWindow* window);
 char16_t* UIMain_ConvertMulti(const unsigned char* text);   // 0x101803cc
 char16_t* UIMain_ConvertMulti(unsigned char* text);         // 0x10180334
@@ -24,7 +24,7 @@ char16_t* UIMain_ConvertMulti(unsigned char* text);         // 0x10180334
 // texts into it with a limit of 0x3fff); UIMain_ConvertMulti uses the first 0x200.
 extern char16_t gUIMainConvertBuffer[0x4000];
 void UIMain_GetFullyOutOfFirstPerson();                     // 0x10187434
-// ---- the panel helpers (src/ui_main_panel.cpp, unit w101)
+// ---- the panel helpers (src/game/ui/ui_main.cpp, unit w101)
 enum AdvisorMessage : int32_t;
 // 0x101802cc: the sound event `code` of the UI's sound category (gSoundBanks[3]).
 void UIMain_UISound(int32_t code);
@@ -45,7 +45,7 @@ int32_t UIMain_DefaultPanelMsg(InterfaceWindow* window, int32_t message, int32_t
 // Untranslated, called by the above: 0x101a83d8 (256 bytes) closes the slide-out panel; 0x101a8c58 (80 bytes) sets the game window's cursor.
 void RemoveSlideoutPanel(int16_t which);
 void UI_SetGameWindowCursor(int16_t cursor);
-// Unit v5313 (src/ui_mainpanel2_window_bumhole_UI_SwitchGameWindow.cpp).
+// Unit v5313 (src/game/ui/ui_mainpanel2.cpp).
 // 0x103949b0: the cursor UI_SetGameWindowCursor last gave the game window (name invented).
 extern int32_t gGameWindowCursor;
 // 0x101a8cd8 (240 bytes): unless the world's state (mF1DA738) is 4 or the winning animation plays, sends message 6 to the game window
@@ -55,11 +55,11 @@ void UI_SwitchGameWindow(int32_t first);
 void ChatGoFirstPerson();       // 0x101e5968 (stand-in)
 void ChatBackToThirdPerson();   // 0x101e5ba0 (stand-in)
 class InterfaceFont;
-// 0x10180270 (src/ui_main_leaves.cpp, unit w40): the interface's font number `index` (0 to 12) of the current resolution group
+// 0x10180270 (src/game/ui/ui_main.cpp, unit w40): the interface's font number `index` (0 to 12) of the current resolution group
 // (gText.mResolutionGroup, 0 to 3): the address of that entry of the game text object's font table (gText.mFonts, 13 to a group,
 // an InterfaceFontWrapper), or NULL for 13 and up. The group is not checked.
 InterfaceFont* GetFontTableEntry(uint32_t index);
-// 0x1018b8e4 (src/ui_measuretext.cpp, unit w40; the inventory files it under ui_utils.cpp): how large UI_DrawText's text would be. The
+// 0x1018b8e4 (src/game/ui/ui_utils.cpp, unit w40; the inventory files it under ui_utils.cpp): how large UI_DrawText's text would be. The
 // same set-up as UI_DrawText (the formatter, the Hebrew swap of left and right, the justification values, the unwrapped box, the font
 // of gText's group), but nothing is coloured or drawn: the text goes through UIMain_ConvertString into the formatter's Measure, and
 // `extent` (if not NULL) gets the rectangle it reports. NULL text: nothing happens, and `extent` is not written.
@@ -67,7 +67,7 @@ struct TbRect;
 void UI_MeasureText(const char16_t* text, const TbRect& rect, int8_t font, int8_t horizontal, int8_t vertical, int32_t wrap,
                     TbRect* extent);
 
-// ---- the start of the interface (src/ui_main_meshes.cpp)
+// ---- the start of the interface (src/game/ui/ui_main.cpp)
 class InterfaceTitleTextObject;
 InterfaceDrawEngineResizableFrame* TPResource_AddFrameMesh(bfl::FileSystem::CFileInfo info, bfl::FileSystem::CFileStorage& storage,
                                                            const TbDynamicStringTemplate<char>& folder);   // 0x10184abc
@@ -78,34 +78,34 @@ InterfaceDrawEngineMesh* TPResource_AddMeshDrawObject(bfl::FileSystem::CFileInfo
 int32_t LoadAllUIMeshes();          // 0x1018515c
 int32_t LoadLocalisedUIMeshes();    // 0x10185414
 void InitGeneralUI();               // 0x10185b68
-// 0x10185d64 (204 bytes, src/ui_main_meshes.cpp): the end of InitGeneralUI's work: the cursor table and the UI system are closed,
+// 0x10185d64 (204 bytes, src/game/ui/ui_main.cpp): the end of InitGeneralUI's work: the cursor table and the UI system are closed,
 // the three windows below deleted (each only when it is not NULL, through the window's virtual destructor with the flag 1) in
 // the order A, B, C, then the string heap, the debug font's bitmap and the UI's heap are given back.
 void DeInitGeneralUI();
-// The cursors (src/ui_cursors.cpp). InitialiseCOLOURCursors loads 22 cursor pictures from "data:UI:cursors" into
+// The cursors (src/game/ui/ui_main.cpp). InitialiseCOLOURCursors loads 22 cursor pictures from "data:UI:cursors" into
 // gCursorTable by number (a picture that is not found leaves its number empty).
 void InitialiseCOLOURCursors();     // 0x1018575c
 InterfaceBFCursor* LoadBFCurs(const char* name);   // 0x10185670: the cursor of the file "data:UI:cursors:<name>", or NULL
 void InitLobbyUI();                 // 0x10186324: the lobby's light, and the help text on or off by the player's setting
-void DeInitLobbyUI();               // 0x10186434 (src/lobby_exit.cpp): the help text off, the light out of the map's list 0x20
-// 0x101874d0 (src/ui_main_leaves.cpp, unit w40): makes the small text window that shows the game's version ("v 2.04b3": the version
+void DeInitLobbyUI();               // 0x10186434 (src/game/ui/ui_main.cpp): the help text off, the light out of the map's list 0x20
+// 0x101874d0 (src/game/ui/ui_main.cpp, unit w40): makes the small text window that shows the game's version ("v 2.04b3": the version
 // resource's short text) in the bottom right corner of the 2048 x 1536 interface, under the root window when `show` is set and
 // under the lobby's window otherwise (gLobby->mWindow; neither is checked for NULL). The text is measured (font 6, left, top, not
 // wrapped) and the window is as large as that in the screen's real pixels scaled to the interface's units, ending at (0x7c0, 0x5c0).
 void UI_CreateVersionNumber(bool show);
-void InitHelpText();                // 0x1018c60c (src/ui_tooltip.cpp, unit w56): builds the tooltip window and makes it the help text handler
-// The UI's message filter (src/ui_main_peek.cpp): sound, IME and button highlight before dispatch.
+void InitHelpText();                // 0x1018c60c (src/game/ui/ui_tooltip.cpp, unit w56): builds the tooltip window and makes it the help text handler
+// The UI's message filter (src/game/ui/ui_main.cpp): sound, IME and button highlight before dispatch.
 int32_t EffectPeekMsg(InterfaceWindow* window, int32_t a, int32_t b, int32_t c);   // 0x1017fdf8
-// 0x1018679c (src/ui_main_pause.cpp, unit w88): with a root window, stop the timers then ShowPauseWindow. UIInterface::Pause calls it.
+// 0x1018679c (src/game/ui/ui_main.cpp, unit w88): with a root window, stop the timers then ShowPauseWindow. UIInterface::Pause calls it.
 void PauseUI();
-// 0x10186854 (src/ui_main_pause.cpp, unit w88): TogglePauseWindow, then the timers stopped when a pause window is up, started again when not.
+// 0x10186854 (src/game/ui/ui_main.cpp, unit w88): TogglePauseWindow, then the timers stopped when a pause window is up, started again when not.
 void TogglePauseUI();
 void UnPauseUI(); // 0x101867f8: with a root window, resume timers then HidePauseWindow
-// 0x101a8744 (src/ui_mainpanel2_pause.cpp): closes the pause window (message 4) if there is one, forgets it and has the keyboard capture
+// 0x101a8744 (src/game/ui/ui_mainpanel2.cpp): closes the pause window (message 4) if there is one, forgets it and has the keyboard capture
 // decided again.
 void HidePauseWindow();
 extern InterfaceWindow* gPauseWindow;   // 0x103949cc (original name unknown): the pause window, set by ShowPauseWindow and TogglePauseWindow
-// src/ui_mainpanel2_window.cpp (unit w88): the pause window. 0x101a86d0: makes it (Dialog, modal) when there is none.
+// src/game/ui/ui_mainpanel2.cpp (unit w88): the pause window. 0x101a86d0: makes it (Dialog, modal) when there is none.
 void ShowPauseWindow();
 // 0x101a87c4: makes the pause window when there is none, else closes it (message 4), forgets it and has the keyboard capture decided again.
 void TogglePauseWindow();
@@ -113,7 +113,7 @@ void TogglePauseWindow();
 // pivot is the middle of its rectangle and the animation gPauseAnim starts, at the key event 0x1000b (with the system key table off) the
 // key is looked up there and the game's pause toggled. Everything ends in DefaultDialogCallback, whose answer is returned.
 int32_t PauseWindowMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
-// src/ui_pause_data.cpp (unit w88, names invented): the pause window's script (21 words at main 0x102aacfc) and its animation (five
+// src/game/ui/ui_mainpanel2.cpp (unit w88, names invented): the pause window's script (21 words at main 0x102aacfc) and its animation (five
 // frames, 0x102aadbc: four rectangle deltas, then a jump back to frame 0).
 extern int16_t gPauseDialogDescription[21];
 extern UI_RectDelta gPauseAnim[5];
@@ -141,12 +141,12 @@ extern const char* gBFCursorFolder;
 extern int32_t gTbReadHeaderFailed;
 extern int32_t gTbLoadFailed;
 // The interface's light (an object at 0x1038cc78 whose CLight part the Mac's word there points at), defined in
-// src/ui_cursors.cpp.
+// src/game/ui/InterfaceBFCursor.cpp.
 class CLight;
 extern CLight gUILight;
-void DeInitOnlineUI();   // 0x10186620 (124 bytes): src/UI_pump_DeInitOnlineUI.cpp
+void DeInitOnlineUI();   // 0x10186620 (124 bytes): src/game/ui/ui_main.cpp
 
-// ---- the keyboard decision (src/ui_main_kbcapture.cpp, src/ui_coasteredit_kb.cpp; unit w49)
+// ---- the keyboard decision (src/game/ui/ui_main.cpp, src/game/ui/ui_coasterPanel.cpp; unit w49)
 class UIMenu;
 // 0x1018116c, 612 bytes (Mac file ui_main.cpp): decides which window has the keyboard, from the main menu, the game's windows, the
 // bankrupt window, the panel, the coaster editor and the lobby's window, enabling the camera, game and cheat key tables on the way.
@@ -178,7 +178,7 @@ extern UIMenu* gMainMenu;                    // 0x10396a58: InitialiseMainMenu 0
 extern int32_t gCoasterEditMode;             // 0x10394830: CoasterEditMode 0x1019c584 sets it (CoasterEditPanelUp answers it)
 extern InterfaceWindow* gCoasterPanel;       // 0x10394834: InitCoasterPanel 0x1019c2dc builds it (CoasterPanelMsg 0x1019b2b8 clears it)
 
-// ---- Unit v5143 (src/ui_mainpanel2_window_bumhole.cpp)
+// ---- Unit v5143 (src/game/ui/ui_mainpanel2.cpp, src/game/ui/ui_optionsPanel.cpp)
 // 0x101a886c: the bumhole window's message function (callback descriptor 0x10267c30): the capture of the keys at 0x10004 / 0x10005, the camera
 // messages, the camera key table (0x10004 up, 0x10005 down, 0x1000a down, 0x1000b up); at 0x1000b also the escape key / the game table's
 // action 4 toggle the game window and the shortcuts table's action 0xf makes the postcard (the main menu instead of both while the world's
@@ -207,10 +207,10 @@ void DeInitCoasterPanel();          // 0x1019c378
 void InitControlPanel();            // 0x1019d180
 void DeInitControlPanel();          // 0x1019d21c
 void DeInitStaffPanel();            // 0x101c05d4
-void CreateMainPanel();             // 0x101a7878 (src/ui_mainpanel2_create.cpp, unit w118)
-void InitStaffPanel();              // 0x101c02fc (src/ui_staffPanel_init.cpp, unit w118)
-int32_t Engine_GameWinMsg(InterfaceWindow*, int32_t, int32_t, int32_t);         // 0x10183c84 (src/ui_main_gamewin.cpp, unit w136)
-int32_t Engine_GameFirstPersonMsg(InterfaceWindow*, int32_t, int32_t, int32_t); // 0x10184628 (src/ui_main_gamewin.cpp, unit w136)
+void CreateMainPanel();             // 0x101a7878 (src/game/ui/ui_mainpanel2.cpp, unit w118)
+void InitStaffPanel();              // 0x101c02fc (src/game/ui/ui_staffPanel.cpp, unit w118)
+int32_t Engine_GameWinMsg(InterfaceWindow*, int32_t, int32_t, int32_t);         // 0x10183c84 (src/game/ui/ui_main.cpp, unit w136)
+int32_t Engine_GameFirstPersonMsg(InterfaceWindow*, int32_t, int32_t, int32_t); // 0x10184628 (src/game/ui/ui_main.cpp, unit w136)
 int32_t TagCallback(InterfaceWindow*, int32_t, int32_t, int32_t);               // 0x10190f04, untranslated
 int32_t TagDlgCallback(InterfaceWindow*, int32_t, int32_t, int32_t);            // 0x10191628, untranslated
 int32_t CashPanelMsg(InterfaceWindow*, int32_t, int32_t, int32_t);              // 0x1019ade8 (unit w131)
@@ -230,7 +230,7 @@ struct sStaticTag {
     uint8_t mPayload[0x202];
 };
 extern sStaticTag gStaticTags[10];       // 0x1038cd84
-// Unit v5001 (src/ui_StatusPanel.cpp). The parameters of a tag; Mac layout in the comments (the text is a native pointer here).
+// Unit v5001 (src/game/ui/ui_tags.cpp). The parameters of a tag; Mac layout in the comments (the text is a native pointer here).
 struct CTagParams {
     uint32_t mId;       // 0x00  TagId
     int32_t mF4;        // 0x04  0x17f in LoadTags
@@ -248,16 +248,16 @@ void SaveTags(void* file);                      // 0x1019231c
 void LoadTags(void* file);                      // 0x10192704
 bool OverrideTag(CTagParams& params);           // 0x10191d7c, untranslated
 void ShowTagPanel(InterfaceWindow* window);     // 0x10190d0c, untranslated
-// Unit v5249 (src/ui_StatusPanel_FindStaticTag.cpp)
+// Unit v5249 (src/game/ui/ui_tags.cpp)
 int32_t FindStaticTag(InterfaceWindow* window); // 0x10191cf4
 bool AddTag(CTagParams& params);                // 0x101921f4
 extern int32_t gMaxTags;                        // 0x102a8464, initially 10
 extern int32_t gTagCount;                       // 0x1038cd74
-// Unit v5531 (src/ui_StatusPanel_FindStaticTag_OverrideTag.cpp)
+// Unit v5531 (src/game/ui/ui_tags.cpp)
 extern InterfaceWindow* gTagPanelPending;       // 0x1038cd7c: the window TagDlgCallback makes gTagPanelSource when it opens; message 0x1d (1) clears it
 extern UI_RectDelta gTagSlideAnim[7];           // 0x102a83b2: the frames TagDlgCallback slides the panel with (7 frames, the last a goto)
 extern InterfaceWindow* gTagFirstWindow;        // 0x103949d0
-// Unit v5565 (src/ui_StatusPanel_SetButton_ShowTagPanel.cpp)
+// Unit v5565 (src/game/ui/ui_tags.cpp)
 extern UI_RectDelta gTagShiftAnim[15];          // 0x102a83ea: the frames TagCallback shifts the other tags with (15 frames, the last an end)
 void UIMain_MidWindowParticles(int32_t id, InterfaceWindow* window);   // 0x10182404, stand-in
 extern void* gUISelectedThing;          // 0x103947b8, unknown word 0 of the selection
@@ -283,7 +283,7 @@ extern int32_t gLastPanelLists;              // 0x103949c0: set to 1 (SetLastPan
 extern int32_t gLastPanelPark;               // 0x103949bc: set to 3 (type 2: 3 park status, 4 all staff, 5 all items, 6 all kids)
 extern int32_t gLastPanelFinance;            // 0x103949b8: set to 10 (type 3: 7 finance, 8 loans, 9 staff costs, 10 entry price)
 extern int32_t gStaffPanelState;             // 0x10395a38: StaffPanelUp answers it; InitStaffPanel zeroes it last
-// The window scripts (src/ui_mainpanel_data.cpp, the image's words).
+// The window scripts (src/game/ui/ui_mainpanel2.cpp, src/game/ui/ui_staffPanel.cpp, the image's words).
 extern int16_t gMainPanelScript[606];        // 0x102aa840: four top-level windows under the game window (0x1d, 0x2d, 0x2f, 0x33)
 extern int16_t gStaffPanelScriptA[195];      // 0x102ae164: the staff panels 0x95c and 0x963
 extern int16_t gStaffPanelScriptB[95];       // 0x102ae2ea: the location panel 0x146
@@ -293,7 +293,7 @@ int32_t AerialCallback(InterfaceWindow*, int32_t, int32_t, int32_t);            
 int32_t BobbleCallback(InterfaceWindow*, int32_t, int32_t, int32_t);                // 0x101a67f4 (unit w131) (window 0x2e)
 int32_t CashWindowCallback(InterfaceWindow*, int32_t, int32_t, int32_t);            // 0x101a60c0 (unit w131) (window 0x2f)
 int32_t RailsCallback(InterfaceWindow*, int32_t, int32_t, int32_t);                 // 0x101a6f2c, untranslated (window 0x21)
-// Unit v5979 (src/ui_mainpanel2_msg_HideIfUnder.cpp)
+// Unit v5979 (src/game/ui/ui_mainpanel2.cpp)
 struct UI_RectDelta;
 void HideIfUnder(InterfaceWindow* window, int16_t limit);   // 0x101a6c44: shows each window of the tree (4 levels, then recursion) whose right edge is above the limit
 extern UI_RectDelta gAerialSlide[15];                       // 0x102aad44: the bobble window's slide (15 frames, the last an end)
@@ -302,7 +302,7 @@ int32_t MainPanelButtonsMsg(InterfaceWindow*, int32_t, int32_t, int32_t);       
 int32_t StaffPanelMsg(InterfaceWindow*, int32_t, int32_t, int32_t);                 // 0x101bfdd8 (unit w131) (windows 0x95c and 0x963)
 int32_t ModifiedCheckButtonsCallback(InterfaceWindow*, int32_t, int32_t, int32_t);  // 0x101bffb0 (unit w131) (the check button groups 0x95d)
 int32_t StaffLocMsg(InterfaceWindow*, int32_t, int32_t, int32_t);                   // 0x101c00f0 (unit w131) (window 0x146)
-// src/ui_mainpanel2_msg.cpp: clears gMainPanel on message 0x14, then the default handler's answer.
+// src/game/ui/ui_mainpanel2.cpp: clears gMainPanel on message 0x14, then the default handler's answer.
 int32_t MainPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);          // 0x101a5b6c (window 0x1d)
 // The default handler's answer, nothing else.
 int32_t HappyGaugeCallback(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);    // 0x101a5c44 (window 0x1e)
@@ -313,7 +313,7 @@ void UI_ParkStatusPanelDateChange(int32_t month);    // 0x101ada64
 void UI_FinancePanelPanelDateChange(int32_t month);  // 0x101a0cf4
 void UI_LoansPanelDateChange(int32_t month);         // 0x101a577c
 
-// ---- Unit w131: the panel message functions (src/ui_mainpanel2_msg.cpp, src/ui_entryPricePanel_msg.cpp, src/ui_staffPanel_msg.cpp).
+// ---- Unit w131: the panel message functions (src/game/ui/ui_mainpanel2.cpp, src/game/ui/ui_cashPanel.cpp, src/game/ui/ui_controlPanel.cpp, src/game/ui/ui_staffPanel.cpp).
 // Names of the file statics are invented; the addresses are the Mac's.
 // CashWindowCallback's statics: a guard byte (tested as a signed byte), the frame counter and a word that only message 0x15 clears.
 extern int8_t gCashWindowGuard;        // 0x10394998
@@ -326,25 +326,25 @@ extern int8_t gGoldenKeysGuard;        // 0x10394988
 extern int32_t gGoldenLastKeys;        // 0x1039498c
 class CThing;
 class CParkAnalyser;
-extern CThing* gStaffPanelThing;       // 0x10395a3c: the thing the staff panels show (src/ui_staffPanel_msg.cpp); StaffLocMsg reads its kind byte
+extern CThing* gStaffPanelThing;       // 0x10395a3c: the thing the staff panels show (src/game/ui/ui_staffPanel.cpp); StaffLocMsg reads its kind byte
 // The two status panels and the map the panels reach: one object each, only their Show / CreateMapPanel are used (untranslated).
 class StaffStatusPanel {
 public:
     void Show(CThing* thing);          // 0x101c54f0 (104 bytes)
-    // Unit v5107 (src/StaffStatusPanel_FireMe.cpp). The object has the UIStatusPanelFields layout (window at 0x0c, view window at 0x14, table at 0x20).
+    // Unit v5107 (src/game/ui/ui_staffStatus.cpp). The object has the UIStatusPanelFields layout (window at 0x0c, view window at 0x14, table at 0x20).
     void FireMe();                     // 0x101c5400 (192 bytes): sacks the staff member (asks first when the settings confirm deletes), then virtual slot 0x34
     void InitWindow();                 // 0x101c4c34 (136 bytes)
     void UpdateViewWindow();           // 0x101c423c (140 bytes)
-    // Unit v5207 (src/StaffStatusPanel_FireMe_StaffStatusPanel_UpdateStatusWindow.cpp).
+    // Unit v5207 (src/game/ui/ui_staffStatus.cpp).
     void InitStatusWindow();           // 0x101c4304 (1552 bytes): the texts, fonts and bars of the status window (window at 0x10)
     void UpdateStatusWindow();         // 0x101c4990 (616 bytes)
     void UpdateWindow();               // 0x101c4d2c (348 bytes)
-    // Unit v5364 (src/StaffStatusPanel_FireMe_StaffStatusPanel_UpdateStatusWindow_StaffStatusMsg.cpp).
+    // Unit v5364 (src/game/ui/ui_staffStatus.cpp).
     void Remove();                     // 0x101c5668 (36 bytes, stand-in)
     void SetSelected();                // 0x101c5358 (44 bytes, stand-in)
-    // Unit v5951 (src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_sinit_ui_staffRoomStatus_cpp.cpp). +0x8 the edit window, +0xc the parent.
+    // Unit v5951 (src/game/ui/ui_staffStatus.cpp). +0x8 the edit window, +0xc the parent.
     void ShowEditNamePanel();          // 0x101c5878 (824 bytes)
-    // Unit v51051 (src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_StaffRoomStatusPanel_InitViewWindow.cpp)
+    // Unit v51051 (src/game/ui/ui_staffStatus.cpp)
     void InitViewWindow();             // 0x101c41a0 (4 bytes, nothing)
     void DeInitViewWindow();           // 0x101c41dc (36 bytes): UIMain_DestroySpritePreview
     void DeInitStatusWindow();         // 0x101c4950 (4 bytes, nothing)
@@ -377,12 +377,12 @@ extern CThing* gStaffStatusThing;      // 0x10395b18 (name invented): the thing 
 class VisitorStatusPanel {
 public:
     void Show(CThing* thing);          // 0x101433f8 (112 bytes)
-    // Unit v5521 (src/WorldSavvy_VisitorStatusPanel_InitStatusWindow.cpp)
+    // Unit v5521 (src/game/ui/ui_visitorStatus.cpp)
     uint8_t mF00[0x10];                // 0x00  (not known)
     Ptr32<InterfaceWindow> mWindow;    // 0x10  the panel's status window (UIStatusPanelFields; unit v5L31)
     // 0x10142238 (2092 bytes): gives the panel's child windows (ids 0x3724 to 0x3733) their draw objects, fonts (table entry 6) and texts.
     void InitStatusWindow();
-    // Unit v5929 (src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2.cpp). The object has the UIStatusPanelFields layout
+    // Unit v5929 (src/game/ui/ui_visitorStatus.cpp). The object has the UIStatusPanelFields layout
     // (Mac offsets: state at 0x00, window at 0x0c, table at 0x20, a word at 0x24); the functions below read it through that struct.
     void InitWindow();          // 0x10142f44 (264 bytes)
     void UpdateWindow();        // 0x101430c0 (276 bytes): three or four virtual calls through the table at 0x20, then the title text
@@ -390,7 +390,7 @@ public:
     void Locate();              // 0x1014350c (44 bytes, stand-in)
     void UpdateStatusWindow();  // 0x10142ae4 (1056 bytes, stand-in)
     uint8_t mF14[0x28 - 0x14];  // 0x14  the rest of the Mac object (UIStatusPanelFields; the Mac's size is 0x28)
-    // Unit v51022 (src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2_VisitorStatusPanel_UpdateStatusWindow_2.cpp)
+    // Unit v51022 (src/game/ui/ui_visitorStatus.cpp)
     void UpdateViewWindow();    // 0x10142170 (140 bytes): the sprite preview of the thing in the window at Mac +0x14
     // Unit v51037 (untranslated stand-in): a kid left.
     void KidGone(CThing* thing);   // 0x101434a0 (48 bytes)
@@ -443,8 +443,8 @@ public:
     // 0x10231134 (860 bytes); the status is passed by value in r4 to r6
     void UpdateVisibilityAndColour(int32_t mask, int32_t second, int32_t third);
     // Unit v5959: not virtual on the host (the Mac's deleting destructor is slot 8, untranslated); a weak empty body is in
-    // src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister.cpp.
-    // Unit v51047 (src/std_basic_istream_basic_istream.cpp): 0x10230f78 (104 bytes) shows (nonzero) or hides the sprite: on a change the
+    // src/game/ui/ui_2dmap.cpp.
+    // Unit v51047 (src/game/ui/ui_2dmap.cpp): 0x10230f78 (104 bytes) shows (nonzero) or hides the sprite: on a change the
     // detail block's flag bit 0 is cleared when shown, set when hidden. The destructor 0x10230ea4 (168 bytes) is defined there too.
     void SetVisibility(int32_t visible);
     ~CUI2DMapSprite();
@@ -464,9 +464,9 @@ public:
     void CreateMapPanel();             // 0x1022c080
     // Unit v5058. The map's fields are read by Mac offset from this (the class has no members yet): width int32 at 0x24, height int32 at 0x28,
     // the sprite images (Ptr32 words) at 0x20068 .. 0x2007c.
-    void CreateMapSprites();           // 0x1022fd78 (2628 bytes, src/CUI2DMap_CreateMapSprites.cpp)
+    void CreateMapSprites();           // 0x1022fd78 (2628 bytes, src/game/ui/ui_2dmap.cpp)
     void UpdateSpritePosition(CUI2DMapSprite* sprite);   // 0x10230a0c (388 bytes, untranslated)
-    // Unit v5083 (src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre.cpp). More Mac offsets: the image width and height of the map
+    // Unit v5083 (src/game/ui/ui_2dmap.cpp). More Mac offsets: the image width and height of the map
     // picture ints at 0x48 and 0x4c, the centre x and y floats at 0x54 and 0x58, the zoom float at 0x5c, the sprite list (a
     // TbTList<CUI2DMapSprite*,CUI2DMapSprite*>*, a NATIVE pointer on the host) at 0x20080.
     void MoveCentre(EUI2DMapMoveDirection direction, float amount);   // 0x1022f8a4 (308 bytes)
@@ -487,12 +487,12 @@ public:
     // stay as the Mac's; LoadMap sets this area up from them and the drawing, MapZoom and FreeMemory use this one.
     static constexpr size_t kHostAreaOffset = 0x20100;
     TbRenderArea* HostArea() { return reinterpret_cast<TbRenderArea*>(mBytes + kHostAreaOffset); }
-    // Unit v5200 (src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition.cpp). More Mac offsets: the render area
+    // Unit v5200 (src/game/ui/ui_2dmap.cpp). More Mac offsets: the render area
     // (a TbRenderArea) at 0x2c whose depth word at 0x3c gives the bytes per pixel, and the map grid of 128 x 128 eight-byte entries at 0x60
     // (a type int, a thing id halfword at +4).
     void DrawCoasterTracks();          // 0x1022f160 (832 bytes)
     void StoreMapGridDetails();        // 0x1022de40 (1104 bytes)
-    // Unit v5526 (src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_MapCallback.cpp). More Mac
+    // Unit v5526 (src/game/ui/ui_2dmap.cpp). More Mac
     // offsets: window Ptr32 at 4 (the map panel), fog colour at 8, render options at 0xc, mouse x and y ints at 0x10 and 0x14, the
     // layer flag bits at 0x18, the two filter words at 0x1c and 0x20.
     // The window message function; the answer is the default handler's, 0 for the keys it eats.
@@ -502,7 +502,7 @@ public:
     void Zoom(EUI2DMapZoom zoom, float amount);   // 0x1022fa1c (128 bytes, untranslated): 0 in, 1 out
     void MapAreaCallback(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x1022d0ac (2652 bytes, unit v5985)
     int32_t MapAreaCallbackResult(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // v5985: the body of MapAreaCallback, with the answer in r3 (the default handler's, 0 for a click)
-    // Unit v5959 (src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister.cpp).
+    // Unit v5959 (src/game/ui/ui_2dmap.cpp).
     void UnRegister(CUI2DMapSprite* sprite);   // 0x10230cd4 (84 bytes)
     void DeleteSpriteListEntries();            // 0x10230bd4 (100 bytes)
     void LoadMap(int32_t reload);              // 0x1022dbdc (460 bytes): 0 also sets the map's render area (0x2c) up and allocates it
@@ -546,7 +546,7 @@ extern uint16_t gObjectIdNone;   // 0x102b294e
 extern StaffStatusPanel gStaffStatusPanel;      // 0x10395b1c
 extern VisitorStatusPanel gVisitorStatusPanel;  // 0x1037ec14
 extern CUI2DMap gUI2DMap;                       // 0x1039742c
-// Unit v5194 (src/sinit_ui_2dmap_cpp.cpp): the static initialiser of ui_2dmap.cpp and the globals it sets up (names invented).
+// Unit v5194 (src/game/ui/ui_2dmap.cpp): the static initialiser of ui_2dmap.cpp and the globals it sets up (names invented).
 extern "C" void __sinit_ui_2dmap_cpp();          // 0x102319d4 (3776 bytes)
 struct CUI2DMapColourEntry {                     // 0x24 bytes: a colour and a 32 byte block whose last 16 bytes the original copies from uninitialised stack (zero here)
     uint8_t mColour[4];
@@ -570,7 +570,7 @@ void ShowControlPanel();                        // 0x1019d28c
 void RemoveControlPanel();                      // 0x1019d2f0
 void GotoLastUsedPanel(int32_t type);           // 0x101a587c
 void CreateResearchPanel();                     // 0x101b4f74
-// Unit v5021 (src/CreateResearchPanel.cpp): what the research panel keeps (the Mac's addresses; the names are invented).
+// Unit v5021 (src/game/ui/ui_researchPanel.cpp): what the research panel keeps (the Mac's addresses; the names are invented).
 extern InterfaceWindow* gResearchPanel;         // 0x10395980: the panel; non-NULL while it is up
 extern InterfaceWindow* gResearchEffortBar;     // 0x1039597c: its window 0xd2d10 (the effort gauge scroll bar)
 extern int32_t gResearchMaxAbility;             // 0x10395974: CParkAnalyser::MaxResearcherAbility at creation
@@ -596,13 +596,13 @@ void CreateYearEndPanel();                      // 0x101c68d0
 void UpdateStatus();                            // 0x101bf5c4
 void StaffLocationSwitch(int32_t which);        // 0x101bf9f4
 void hackfollowmode();                          // 0x101bfb48
-// Unit v5076 (src/ui_staffPanel_msg_hackfollowmode.cpp)
+// Unit v5076 (src/game/ui/ui_staffPanel.cpp)
 void UpdateLocator();                           // 0x101bf798
 class CPeep;
 enum CELL_MODES : int32_t;
 void UIMain_ZoomToPeep(CPeep* peep);            // 0x10181c70 (stand-in)
 void GetNextStaffMember();                      // 0x101bf32c (stand-in; sets gStaffPanelThing)
-void LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);   // 0x1009c0d0 (768 bytes, src/MapCell_kinds_LLCC_DrawLine_2.cpp)
+void LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);   // 0x1009c0d0 (768 bytes, src/game/park/MapCell.cpp)
 // The real text of LLCC_DrawLine, answering r3 (0 when a Modify refused, else 1); the void declaration above is what other files use.
 int32_t LLCC_DrawLineBody(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);
 int32_t UIMain_GetStaffStateFrame(int32_t state);   // 0x10180a1c (stand-in)
@@ -613,11 +613,11 @@ void DoCashWin(InterfaceWindow* window);        // 0x101a5ca8 (996 bytes)
 void ContextMouse(int32_t context);             // 0x10182548
 int32_t StaffPanelUp();                         // 0x101c0cac (untranslated; unit w142)
 void RemoveStaffPanel();                        // 0x101c0c5c (unit v51061)
-void* UI_GetSelectedObject();                   // 0x10194730 (src/ui_allKidsPanel_select.cpp, unit v5L06; the word is compared with a thing pointer)
+void* UI_GetSelectedObject();                   // 0x10194730 (src/game/ui/ui_allKidsPanel.cpp, unit v5L06; the word is compared with a thing pointer)
 // CParkAnalyser::GetHappinessLevel (0x100e4cd8, 424 bytes, unit w154): the analyser's happiness for `which` (HappyBarMsg asks for 4), a float
-// in f1. A free forwarder to the member CParkAnalyser::GetHappinessLevel (src/ParkAnalyser_visitors.cpp), which ignores its argument.
+// in f1. A free forwarder to the member CParkAnalyser::GetHappinessLevel (src/game/park/analyser.cpp), which ignores its argument.
 float CParkAnalyser_GetHappinessLevel(CParkAnalyser* analyser, int32_t which);
-// Unit v5188 (src/ui_mainpanel2_msg_GotoLastUsedPanel.cpp): callees of GotoLastUsedPanel / DoCashWin and the cash window's state.
+// Unit v5188 (src/game/ui/ui_mainpanel2.cpp): callees of GotoLastUsedPanel / DoCashWin and the cash window's state.
 enum StaffType : int32_t;
 void CreateFinancePanel();                      // 0x101a001c (stand-in)
 void CreateHireListPanel(StaffType type);       // 0x101a1c88 (stand-in)
@@ -628,7 +628,7 @@ extern int32_t gCashSessionCost;                // 0x103949a8: the session cost 
 extern int32_t gCashFontCurrent;                // 0x102aad28: initialised data, 999: the colour index last given to SetFontColour
 extern uint8_t gCashFontColours[24];            // 0x102aad2c: initialised data, 6 entries of red, green, blue, spare (red up to white)
 
-// ---- Unit w136 (src/ui_main_gamewin.cpp): the game window's message functions. The names below are invented by w136; the addresses are the
+// ---- Unit w136 (src/game/ui/ui_main.cpp): the game window's message functions. The names below are invented by w136; the addresses are the
 // Mac's (ui_main.cpp BSS). The function statics of Engine_GameWinMsg sit behind guard bytes, kept here as globals so that a test can reset them.
 extern int32_t gGameWinRightDown;         // 0x10380c2c (guard 0x10380c28): a right press is being watched
 extern int8_t gGameWinRightDownGuard;     // 0x10380c28
@@ -645,20 +645,20 @@ extern int8_t gGameWinCheatGuard;         // 0x102da940: the static CCheat below
 alignas(4) extern uint8_t gGameWinCheat[12];   // 0x102da934: raw storage of the static CCheat (12 bytes; built behind the guard byte)
 extern int32_t gRideHighlightKeep;        // 0x102c6cc8: the frame calls UnhighlightRide when it is 0 (role guessed)
 // Callees of the game window's messages no header declared yet.
-int32_t ContextMouseClick();              // 0x10183320 (src/ui_main_click.cpp, unit w143)
+int32_t ContextMouseClick();              // 0x10183320 (src/game/ui/ui_main.cpp, unit w143)
 int16_t CheckShifts();                    // 0x1022a3b4 (ui_worldLobbyController.cpp; untranslated): the modifier keys, passed on as a short
 void EndCoasterEditMode();                // 0x1019cad0 (ui_entryPricePanel.cpp; untranslated)
-// Unit w143 (callees of ContextMouseClick; the selection ones are src/ui_allKidsPanel_select.cpp, unit v5L06).
+// Unit w143 (callees of ContextMouseClick; the selection ones are src/game/ui/ui_allKidsPanel.cpp, unit v5L06).
 void UI_CheckSelected();                  // 0x101947e4: the selection words take gIntrface's three pointer words
 CThing* UI_GetSelectedPeep();             // 0x101946f8
 void UI_SetSelectedObject(void* object);  // 0x10194768 (the word UI_GetSelectedObject answers)
 void UIMain_GotoStatusPanelForThing(void* thing);   // 0x10181e2c
 void CreateEntryPricePanel();             // 0x1019d660
 void CoasterEditMode(void* object);       // 0x1019c584
-// Unit v5246 (src/ui_entryPricePanel_CoasterEditMode.cpp): the coaster edit panel's buttons.
+// Unit v5246 (src/game/ui/ui_coasterPanel.cpp): the coaster edit panel's buttons.
 void WhichSpecialButton();                                // 0x1019c3e8 (368 bytes)
 void LinkSlideoutPanel(InterfaceWindow* panel, int32_t n);
-InterfaceWindow* LinkSlideoutPanelResult(InterfaceWindow* panel, int32_t n);   // same code, keeps r3 (the panel, or NULL)   // 0x101a82ec (src/ui_mainpanel2_window_LinkSlideoutPanel.cpp): answers the panel, or NULL when slot 0x21 already holds one
+InterfaceWindow* LinkSlideoutPanelResult(InterfaceWindow* panel, int32_t n);   // same code, keeps r3 (the panel, or NULL)   // 0x101a82ec (src/game/ui/ui_mainpanel2.cpp): answers the panel, or NULL when slot 0x21 already holds one
 // Host only: the slide-out slot's message 0xa carries the arriving panel as a 32-bit word (the Mac's pointer); a host window is above
 // 4 GB, so LinkSlideoutPanel notes the panel here and RailsCallback's WindowFromWord gets it back from the word's low 32 bits.
 inline InterfaceWindow* gSlideoutWordWindows[16] = {};
@@ -676,12 +676,12 @@ int32_t IsTrackClosed(void* coaster);                     // 0x10052850 (stand-i
 void GetCoasterEditAvailableButtons(uint32_t* out);       // 0x10057278 (stand-in): bit mask of the buttons
 void GetCoasterEditDefaultButtons(uint32_t* out);         // 0x10057120 (stand-in)
 void WhichCheckButtonsAreDown(uint32_t mask);             // 0x1019b120 (stand-in)
-extern void* gCoasterEditObject;                          // 0x1039482c: the coaster being edited (name invented); defined in src/ui_entryPricePanel_CoasterEditMode.cpp
+extern void* gCoasterEditObject;                          // 0x1039482c: the coaster being edited (name invented); defined in src/game/ui/ui_coasterPanel.cpp
 extern uint8_t gCoasterEditBusy;                          // 0x10394828: nonzero keeps CoasterEditMode from starting (name invented); defined there too
-// Unit v5343 (src/ui_staffPanel_ShowKidLocatorPanel.cpp)
+// Unit v5343 (src/game/ui/ui_staffPanel.cpp)
 void ShowStaffPanel(CThing* thing);                       // 0x101c0690 (892 bytes)
 void ShowKidLocatorPanel();                               // 0x101c0a38 (504 bytes)
-// Unit v5538 (src/ui_coasteredit_kb_EndCoasterEditMode.cpp)
+// Unit v5538 (src/game/ui/ui_coasterPanel.cpp)
 void CoasterButtonsEnabled(uint32_t buttons);             // 0x1019cd6c (576 bytes): enables the panel's buttons by the mask bits
 
 // Unit v5986 (src/CUI2DMap_..._CUI2DMap_CreateMapPanel.cpp)
@@ -693,7 +693,7 @@ namespace mappanel_callee {
 InterfaceDrawObject* NewTextSprite();   // operator new(0x19c), then InterfaceTextObjectSprite(NULL) 0x1018d11c; faked by the test library
 }
 
-// ---- Unit v5057 (src/ShowEditParkNamePanel.cpp): the panel that edits the two sign names of the park's gates.
+// ---- Unit v5057 (src/game/ui/ui_entryPricePanel.cpp): the panel that edits the two sign names of the park's gates.
 class CObject;
 int32_t TwoEditsMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x1019da6c
 void ShowEditParkNamePanel();                  // 0x1019deac
@@ -701,7 +701,7 @@ extern InterfaceWindow* gEditParkNamePanel;    // 0x1039483c: the panel, NULL wh
 extern InterfaceWindow* gParkScreenWindow;     // 0x10394848: the window the panel is built under (its z + 7 is the panel's)
 extern int16_t gEditParkNameScript[];         // 0x102a9834: the panel's window script
 
-// ---- Unit v5885 (src/ShowEditParkNamePanel_CreateEntryPricePanel_2.cpp): the entry price panel (CreateEntryPricePanel is declared above).
+// ---- Unit v5885 (src/game/ui/ui_entryPricePanel.cpp): the entry price panel (CreateEntryPricePanel is declared above).
 int32_t EntryPricePanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);        // 0x1019d350
 int32_t EntryPricePanelTitleMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x1019d544
 void RemoveEntryPricePanel();                  // 0x1019da08 (stand-in)
@@ -712,7 +712,7 @@ namespace entry_callee {
 void WindowEnable(InterfaceWindow* window, int16_t on);   // the virtual Enable (slot 0x1c of the table at +0x118); faked by the test library
 }
 
-// ---- Unit v5071 (src/ui_main_kbcapture_UIMain_ShowRidePreview_UIMain_GotoStatusPanelForThing.cpp): the status panels of the other kinds
+// ---- Unit v5071 (src/game/ui/ui_main.cpp): the status panels of the other kinds
 // (one object each, only Show is used here; untranslated, the unit's test library fakes them).
 struct IDXTYPEUniqueNameThingId;
 template<class Tag, class T> struct tag_IDX_TYPE;
@@ -724,7 +724,7 @@ public:
     void UpdateStatusWindow();                  // 0x101b9ac4
     void Remove();                              // 0x101bc1a0
     void UpgradePanelByeBye();                  // 0x101ba930
-    // Unit v5191 (src/LCPostFormat_RideStatusPanel_UpdateStatusWindow.cpp)
+    // Unit v5191 (src/game/ui/ui_RideStatus.cpp)
     void UpdateWhichButtons();                  // 0x101b8cc8 (992 bytes)
     void ShowUpgradePanel();                    // 0x101ba6e8 (528 bytes)
     void UpdateKnobsWindow();                   // 0x101bb494 (588 bytes, stand-in)
@@ -746,21 +746,21 @@ public:
     // Unit v5534
     void Edit(int32_t on);          // 0x101bb71c (624 bytes, stand-in)
     void DoDial(int32_t a, int32_t b);   // 0x101bb9b8 (228 bytes, stand-in)
-    // Unit v5580 (src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Condemned.cpp)
+    // Unit v5580 (src/game/ui/ui_RideStatus.cpp)
     // 0x101bc2f0 (156 bytes): with a window, asserts that thing array entry 0 is free, then tells the ops table (slot at +0x1c) when the entry
     // of the id holds the staff room panel's thing.
     void Condemned(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> id);
     void BreakDown(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> id);   // 0x101bc1f4 (unit v51061)
     // 0x101b9340 (1804 bytes): gives the status window's children their draw objects, fonts and texts.
     void InitStatusWindow();
-    // Unit v5914 (src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Upgrade.cpp)
+    // Unit v5914 (src/game/ui/ui_RideStatus.cpp)
     void ApplyChanges();                // 0x101bbacc (136 bytes): the speed, capacity and (when the ride has a duration unit) duration into gStaffRoomPanelThing
     void UpdateKnobsTitles(int32_t which);   // 0x101baf28 (1328 bytes, stand-in): the knobs' titles (bit mask 1 speed, 2 capacity, 4 duration)
-    // Unit v51011 (src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Upgrade_RideStatusPanel_InitKnobsWindow.cpp)
+    // Unit v51011 (src/game/ui/ui_RideStatus.cpp)
     void InitWindow();        // 0x101ba99c (164 bytes)
     void UpdateWindow();      // 0x101baaac (140 bytes)
     void InitKnobsWindow();   // 0x101bab6c (900 bytes)
-    // Unit v51121 (src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Upgrade_RideStatusPanel_UpgradePanelByeBye.cpp):
+    // Unit v51121 (src/game/ui/ui_RideStatus.cpp):
     // the view windows are reached by Mac offset (UIStatusPanelFields: +0x14 the preview window, +0x18 the text window).
     void DeInitWindow();         // 0x101baa74 (4 bytes)
     void DeInitStatusWindow();   // 0x101b9a84 (4 bytes)
@@ -775,7 +775,7 @@ struct RideKnobTag : TbIntegerVTag {
     RideKnobTag(uint32_t id, int32_t value, int32_t negative) : TbIntegerVTag(id, value), mNegative(negative) {}
     int32_t mNegative;   // Mac +0x10
 };
-// Unit v5914: 0x10182160 (64 bytes, src/ui_main_preview_tick.cpp, unit v5L06): the "not enough dough" sound, event 0x1d of gSoundBanks[3].
+// Unit v5914: 0x10182160 (64 bytes, src/game/ui/ui_main.cpp, unit v5L06): the "not enough dough" sound, event 0x1d of gSoundBanks[3].
 void UIMain_NotEnoughDough();
 // Unit v5914: RideStatusPanel::Show's two globals (names invented): the thing the panel was opened for (0x1039599c, bss), and the window
 // script it opens (0x102acef0, initial word 1, the rest of the data is not recovered).
@@ -791,16 +791,16 @@ struct RideAgeTag : TbIntegerVTag {
 extern int16_t gUpgradePanelScript[];
 class UpgradeStatusPanel { public: void Show(CThing* thing);   // 0x101c665c (76 bytes)
     void Remove();   // 0x101c66e0 (36 bytes, stand-in; unit v5548)
-    // Unit v5905 (src/UpgradeStatusMsg_UpgradeStatusPanel_InitStatusWindow_2.cpp): the panel is a UIStatusPanel; +0xc the parent window
+    // Unit v5905 (src/game/ui/ui_upgradeStatus.cpp): the panel is a UIStatusPanel; +0xc the parent window
     // and +0x10 the status window (32-bit pointers, read by offset).
     void InitStatusWindow();     // 0x101c5e00 (596 bytes)
     void UpdateStatusWindow();   // 0x101c60d4 (244 bytes)
     void InitWindow();           // 0x101c6208 (136 bytes)
-    // Unit v51051 (src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_StaffRoomStatusPanel_InitViewWindow.cpp)
+    // Unit v51051 (src/game/ui/ui_upgradeStatus.cpp)
     void InitViewWindow();       // 0x101c5c80 (4 bytes, nothing)
     void DeInitViewWindow();     // 0x101c5cc0 (36 bytes): UIMain_DestroyRidePreview
     void UpdateViewWindow();     // 0x101c5d20 (164 bytes): the ride preview in the view window at +0x14
-    // Unit v51111 (src/InterfaceKnob_InterfaceKnob_GetValue.cpp)
+    // Unit v51111 (src/game/ui/ui_upgradeStatus.cpp)
     void UpdateWindow();         // 0x101c6304 (120 bytes): the text from slot 0x3c to the window at +0x1c, then slots 0x20 and 0x1c
     void DeInitWindow();         // 0x101c62c8 (4 bytes, nothing)
     void DeInitStatusWindow();   // 0x101c6090 (4 bytes, nothing)
@@ -812,12 +812,12 @@ class UpgradeStatusPanel { public: void Show(CThing* thing);   // 0x101c665c (76
 extern CThing* gUpgradeStatusThing;
 // 0x102af2ac (name invented): the upgrade panel's window script (initial word 1; the rest is not kept here).
 extern int16_t gUpgradeStatusScript[];
-// Unit v5548 (src/UpgradeStatusMsg.cpp): the upgrade panel's window handler, and the static initialiser of ui_staffStatus.cpp.
+// Unit v5548 (src/game/ui/ui_upgradeStatus.cpp, src/game/ui/ui_staffStatus.cpp): the upgrade panel's window handler, and the static initialiser of ui_staffStatus.cpp.
 int32_t UpgradeStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101c63b4 (620 bytes)
 void __sinit_ui_staffStatus_cpp();   // 0x101c5bec (100 bytes)
 extern int32_t gStaffStatusF40;      // 0x10395b40 (name invented): 0x10000 after the sinit, no reader known
 extern int32_t gStaffStatusF44;      // 0x10395b44 (name invented): 0 after the sinit
-// 0x101bdee0 Show (80 bytes), 0x101bd28c InitWindow (1080 bytes) and 0x101bcea0 UpdateStatusWindow (944 bytes) (unit v5085, src/ShopStatusPanel_InitWindow.cpp).
+// 0x101bdee0 Show (80 bytes), 0x101bd28c InitWindow (1080 bytes) and 0x101bcea0 UpdateStatusWindow (944 bytes) (unit v5085, src/game/ui/ui_shopStatus.cpp).
 // The fields are named from those two; the Mac's layout (UIStatusPanelFields; the windows and the table are Ptr32; unit v5L31).
 class ShopStatusPanel {
 public:
@@ -835,14 +835,14 @@ public:
     int32_t mIngredient;          // 0x28  the ingredient amount (InitWindow clears it)
     void Remove();                // 0x101bdf64 (36 bytes, stand-in; unit v5152)
     int32_t mF2c;                 // 0x2c  (unit v5152: ShopStatusMsg's message 0x800 / 0xc085 stores b here)
-    // Unit v5734 (src/ShopStatusPanel_InitWindow_ShopStatusPanel_ApplyChanges.cpp)
+    // Unit v5734 (src/game/ui/ui_shopStatus.cpp)
     void ApplyChanges();                      // 0x101bd9bc (108 bytes): the panel's figures onto the shop
     void applytoallcallback(CThing* thing);   // 0x101bdab8 (144 bytes): the same onto a thing of the shop's type
-    // Unit v5936 (src/ShopStatusPanel_InitWindow_ShopStatusPanel_ApplyChanges_ShopStatusPanel_InitStatusWindow.cpp)
+    // Unit v5936 (src/game/ui/ui_shopStatus.cpp)
     // The Mac's window pointer at 0x1c (UpdateWindow) is the Ptr32 at mF14 + 8.
     void InitStatusWindow();   // 0x101bc6c4 (1892 bytes): the figures window's draw objects, fonts and texts
     void UpdateWindow();       // 0x101bd730 (600 bytes): the panel's figures from the shop (gStaffRoomPanelThing)
-    // Unit v51121 (src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Upgrade_RideStatusPanel_UpgradePanelByeBye.cpp)
+    // Unit v51121 (src/game/ui/ui_shopStatus.cpp)
     void InitViewWindow();       // 0x101bc468 (236 bytes)
     void DeInitViewWindow();     // 0x101bc58c (36 bytes)
     void UpdateViewWindow();     // 0x101bc5e8 (164 bytes)
@@ -854,21 +854,21 @@ extern const char gShopStatusMeshNames[];
 // 0x102ad644 (name invented, defined in the unit v5734 file): the window description Show hands OpenWindow.
 extern int16_t gShopStatusDescription[];
 // 0x19c bytes on the Mac, made by operator new(0x19c) and 0x1018de60 (164 bytes, unit v5L16; unit v5085): the draw object of a money figure.
-extern CObject* gShopStatusObject;   // 0x103959dc (name invented): the shop the panel shows (defined in src/ShopStatusPanel_InitWindow.cpp)
+extern CObject* gShopStatusObject;   // 0x103959dc (name invented): the shop the panel shows (defined in src/game/ui/ui_shopStatus.cpp)
 class ShowStatusPanel { public: void Show(CThing* thing);       // 0x101c2a38 (80 bytes)
-    // Unit v5525 (src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_ShowStatusMsg.cpp). UIStatusPanelFields layout; +0x24, +0x28, +0x2c are ints.
+    // Unit v5525 (src/game/ui/ui_showStatus.cpp). UIStatusPanelFields layout; +0x24, +0x28, +0x2c are ints.
     void Remove();               // 0x101c2abc (36 bytes, stand-in)
     void UpdateStatusWindow();   // 0x101c1848 (1036 bytes, stand-in)
-    // Unit v5547 (src/ShowStatusPanel_UpdateStatusWindow.cpp)
+    // Unit v5547 (src/game/ui/ui_showStatus.cpp)
     void ApplyChanges();                      // 0x101c2508 (132 bytes)
     void applytoallcallback(CThing* thing);   // 0x101c261c (168 bytes): ApplyChanges for every thing of the same type as gStaffRoomPanelThing
-    // Unit v51001 (src/ui_staffPanel_msg_hackfollowmode_GetNextStaffMember.cpp)
+    // Unit v51001 (src/game/ui/ui_showStatus.cpp)
     void InitWindow();                        // 0x101c1c90 (1224 bytes)
-    // Unit v51007 (src/ShowStatusPanel_UpdateStatusWindow_ShowStatusPanel_UpdateWindow_2.cpp)
+    // Unit v51007 (src/game/ui/ui_showStatus.cpp)
     void UpdateWindow();                      // 0x101c21c4 (784 bytes): the panel's figures from gStaffRoomPanelThing; +0x1c window, +0x20 table
-    // Unit v51018 (src/ShowStatusPanel_UpdateStatusWindow_ShowStatusPanel_InitStatusWindow.cpp)
+    // Unit v51018 (src/game/ui/ui_showStatus.cpp)
     void InitStatusWindow();                  // 0x101c0f80 (2128 bytes): draw objects and fonts for the children of the window at +0x10
-    // Unit v51051 (src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_StaffRoomStatusPanel_InitViewWindow.cpp)
+    // Unit v51051 (src/game/ui/ui_showStatus.cpp)
     void DeInitWindow();                      // 0x101c218c (4 bytes, nothing)
     void DeInitStatusWindow();                // 0x101c1808 (4 bytes, nothing)
     void UpdateViewWindow();                  // 0x101c0ea4 (164 bytes): the ride preview in the view window at +0x14
@@ -891,7 +891,7 @@ void GradientCtor(void* mem, const char* meshName);    // 0x101898c8 InterfaceDr
 void WindowSetValue(InterfaceWindow* window, int32_t value);   // virtual slot 0x24
 }  // namespace statusinit_callee
 // Callees the host cannot call as the Mac does (operator new(0x19c) plus the constructor with NULL, 0x1018de60 / 0x1018d11c): weak
-// definitions in src/ui_staffPanel_msg_hackfollowmode_GetNextStaffMember.cpp, faked by the test library.
+// definitions in src/game/ui/ui_showStatus.cpp, faked by the test library.
 class InterfaceDrawObject;
 namespace showstatus_callee {
 InterfaceDrawObject* NewCashText();
@@ -909,12 +909,12 @@ int32_t ShowStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32
 class BogStatusPanel {
 public:
     void Show(CThing* thing);   // 0x1019ac5c (140 bytes)
-    // Unit v5301 (src/BogStatusPanel_InitViewWindow.cpp). The panel has the UIStatusPanelFields layout (below, in this header).
+    // Unit v5301 (src/game/ui/ui_bogStatus.cpp). The panel has the UIStatusPanelFields layout (below, in this header).
     void InitViewWindow();      // 0x10199ed0 (236 bytes): the view window (+0x18) one deeper, hidden, with a text sprite and font 8
     void UpdateViewWindow();    // 0x1019a050 (164 bytes): shows the ride preview of gStaffRoomPanelThing in the view window (+0x14)
     void InitWindow();          // 0x1019a7c8 (152 bytes)
     void UpdateWindow();        // 0x1019a8cc (120 bytes): four virtual calls
-    // Unit v5519 (src/BogStatusPanel_InitViewWindow_BogStatusPanel_UpdateStatusWindow.cpp)
+    // Unit v5519 (src/game/ui/ui_bogStatus.cpp)
     void InitStatusWindow();    // 0x1019a12c (864 bytes): the labels, number, bar and cash windows of the status window (+0x10)
     void UpdateStatusWindow();  // 0x1019a504 (648 bytes): refreshes them from gStaffRoomPanelThing and the buttons of the panel window (+0x0c)
     // Unit v5699
@@ -935,22 +935,22 @@ extern int16_t gBogStatusScript[];   // 0x102a908c (name invented): the panel's 
 class FeatureStatusPanel {
 public:
     void Show(CThing* thing);   // 0x1019edc4 (76 bytes)
-    // Unit v5311 (src/FeatureStatusPanel_UpdateStatusWindow.cpp). The panel has the UIStatusPanelFields layout (below, in this header).
+    // Unit v5311 (src/game/ui/ui_FeatureStatus.cpp). The panel has the UIStatusPanelFields layout (below, in this header).
     void UpdateStatusWindow();   // 0x1019e728 (244 bytes): the park count (0x1586) and the residual value (0x1584) of gStaffRoomPanelThing
     void InitWindow();           // 0x1019e85c (136 bytes)
     void UpdateWindow();         // 0x1019e958 (208 bytes): four virtual calls
     void RideIt();               // 0x1019ea60 (80 bytes)
     void UpdateViewWindow();     // 0x1019e374 (164 bytes): the ride preview of gStaffRoomPanelThing in the view window (+0x14)
-    // Unit v5676 (src/FeatureStatusPanel_UpdateStatusWindow_FeatureStatusPanel_InitStatusWindow.cpp)
+    // Unit v5676 (src/game/ui/ui_FeatureStatus.cpp)
     void InitStatusWindow();     // 0x1019e454 (596 bytes): the texts, numbers and cash of the windows 0x1587 to 0x1584 of the window at +0x10
     // Unit v5904
     void Remove();               // 0x1019ee48 (36 bytes, stand-in)
     // Unit v51123
     void InitViewWindow();       // 0x1019e2d4 (4 bytes): nothing
-    // Unit v51126 (src/std___tree_std_pair_std_map_nocase_string_BuddyI.cpp): both do nothing.
+    // Unit v51126 (src/game/ui/ui_FeatureStatus.cpp): both do nothing.
     void DeInitWindow();         // 0x1019e91c (4 bytes)
     void DeInitStatusWindow();   // 0x1019e6e4 (4 bytes)
-    // Unit v51125 (src/std_exception_what.cpp)
+    // Unit v51125 (src/game/ui/ui_FeatureStatus.cpp)
     void DeInitViewWindow();     // 0x1019e314 (36 bytes): UIMain_DestroyRidePreview
     // the Mac object, read by offset through UIStatusPanelFields (unit v5L31: an empty class made the global one byte, and the static
     // initialiser's fields ran over its neighbours); the Mac's size is 0x24
@@ -975,7 +975,7 @@ extern char16_t gEditSignBufA[15];             // 0x10394782: the first edit box
 extern char16_t gEditSignBufB[15];             // 0x10394764: the second one's
 extern const char16_t* gCheatSignA;            // 0x102a9940: the cheat text (pointer to a string in the data; initial 0x1024e068)
 extern const char16_t* gCheatSignB;            // 0x102a9944: (initial 0x1024e07c)
-char16_t* UIMain_GetObjectName(CObject* object);   // 0x101810fc (src/TailSeven.cpp, unit v5L16)
+char16_t* UIMain_GetObjectName(CObject* object);   // 0x101810fc (src/game/ui/ui_main.cpp, unit v5L16)
 // The call in TwoEditsMsg passes only (object, first text, second text); the 5-argument overload in ui_ErrorDisplay.h is another function.
 void RegenerateRideSign(void* object, const char16_t* signA, const char16_t* signB);   // 0x101eeb9c (unit v5934; the callers ignore r3)
 int32_t RegenerateRideSignResult(void* object, const char16_t* signA, const char16_t* signB);   // the same, answering r3 (the test compares it)
@@ -983,7 +983,7 @@ void RegenerateRideSigns();   // 0x101eeeb4 (unit v5934): regenerates the sign o
 extern uint16_t gRideSignListEnd;   // 0x102b12e6 (name invented, unit v5934): the object list's end marker RegenerateRideSigns compares the link with
 int32_t wcscmp(const char16_t* a, const char16_t* b);   // the MSL import (glue 0x10238c98)
 
-// ---- Unit v5004 (src/LCPostFormat.cpp): the staff room panel's list control and message functions.
+// ---- Unit v5004 (src/game/ui/ui_staffRoomStatus.cpp): the staff room panel's list control and message functions.
 enum UIObjType : int32_t;
 enum StaffType : int32_t;
 class CStaff;
@@ -996,7 +996,7 @@ public:
     void Move();                // 0x101938d8
     int32_t FillObjectList(CThing* thing);   // 0x10192a90 (348 bytes, stand-in; unit v5085): the number of objects listed
     void InitEditBox(int32_t id);            // 0x10193dcc (124 bytes, stand-in; unit v5085)
-    // Unit v5090 (src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject.cpp)
+    // Unit v5090 (src/game/ui/ui_StatusPanel.cpp)
     void OpenWindow(int16_t* description, InterfaceWindowCallback callback, int32_t windowA, int32_t windowB, int32_t windowC);   // 0x101935a0 (388 bytes)
     void EnableNameClick(int32_t enable);   // 0x10194608 (52 bytes, stand-in; unit v5191)
     // Unit v5300
@@ -1015,7 +1015,7 @@ public:
     void CloseWindow();               // 0x10193774 (52 bytes, stand-in, faked by the test library)
     // Unit v51072
     void ObjectGone(CThing* thing);   // 0x10192f9c (60 bytes, stand-in, faked by the test library)
-    // Unit v51114 (src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_UIStatusPanel_EnableNameClick.cpp): the empty base versions (blr)
+    // Unit v51114 (src/game/ui/ui_StatusPanel.cpp): the empty base versions (blr)
     void ApplyChanges();                 // 0x10194674 (4 bytes)
     char16_t* GetName();                 // 0x1019387c (44 bytes): UIMain_GetObjectName of gStaffRoomPanelThing
     void ChangeName(char16_t* name);     // 0x10193844 (4 bytes)
@@ -1032,7 +1032,7 @@ public:
     void InitWindow();                   // 0x10193398 (4 bytes)
 };
 // Unit v51114: the table UIStatusPanel::UIStatusPanel stores at +0x20 (Mac 0x102a8644, name invented; the Mac's initial word before it is 0x102a863c).
-// On the host it is a block of the arena (a Ptr32 cannot name a static), made on first use and kept (src/ui_StatusPanel_tables.cpp, unit v5L31).
+// On the host it is a block of the arena (a Ptr32 cannot name a static), made on first use and kept (src/game/ui/ui_StatusPanel.cpp, unit v5L31).
 uint32_t* UIStatusPanelTable();
 enum TagId : uint32_t {};
 enum TagButtonAction : int32_t;
@@ -1044,7 +1044,7 @@ void USwapBlock16(char16_t* words, int32_t count);    // 0x10192644 USwapBlock16
 void USwapInplace32(int32_t& word);                   // 0x10192600 USwapInplace32<long>
 void USwapInplace16(int16_t& half);                   // 0x101925bc USwapInplace16<short>
 }  // namespace SamsUtilities
-// Unit v5910 (src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_ViewWindowCallback_DefaultStatusPanelMsg.cpp)
+// Unit v5910 (src/game/ui/ui_StatusPanel.cpp)
 // The edit-name panel's handler at 0x10193fac (548 bytes); the Mac's name is TwoEditsMsg too (file-local there), the park-name one at 0x1019da6c keeps the plain name.
 int32_t TwoEditsMsgStatus(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
 void UIMain_SetObjectStateText(InterfaceWindow* window, int32_t state);   // 0x10181018 (148 bytes, stand-in)
@@ -1090,7 +1090,7 @@ inline uint64_t UIStatusPanel_CallSlot(void* panel, uint32_t offset, const void*
     const UIStatusPanelSlot slot = *reinterpret_cast<const UIStatusPanelSlot*>(tpw::gArenaBase + table[offset / 4]);
     return slot(panel, arg);
 }
-// The tables the static initialisers store at +0x20 (the Mac's vtables; src/ui_StatusPanel_tables.cpp), made on first use and kept.
+// The tables the static initialisers store at +0x20 (the Mac's vtables; src/game/ui/ui_StatusPanel.cpp), made on first use and kept.
 uint32_t* RideStatusPanelTable();        // 0x102ad5fc
 uint32_t* ShopStatusPanelTable();        // 0x102adbd8
 uint32_t* ShowStatusPanelTable();        // 0x102ae980
@@ -1121,16 +1121,16 @@ public:
     int32_t mScript;         // 0x24  the script handle of the staff view (0 none)
     int32_t mF28;            // 0x28  -1 after the script is killed
     int32_t mF2c;            // 0x2c  -1 after the script is killed
-    // Unit v5291 (src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom.cpp)
+    // Unit v5291 (src/game/ui/ui_staffRoomStatus.cpp)
     void StaffWentIntoStaffRoom(CThing* staff);   // 0x101c3a80 (240 bytes)
     void UpdateWindow();                          // 0x101c39b8 (140 bytes)
     void StaffLeftStaffRoom(CThing* staff);       // 0x101c3bbc (100 bytes)
     void UpdateStatusWindow();                    // 0x101c3054 (104 bytes)
     void DeInitViewWindow();                      // 0x101c2db4 (80 bytes)
-    // Unit v5669 (src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_StaffRoomStatusPanel_FillStaffRoomList.cpp)
+    // Unit v5669 (src/game/ui/ui_staffRoomStatus.cpp)
     void InitStatusWindow();                      // 0x101c2e88 (328 bytes)
     void InitWindow();                            // 0x101c36f0 (592 bytes)
-    // Unit v51051 (src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_StaffRoomStatusPanel_InitViewWindow.cpp)
+    // Unit v51051 (src/game/ui/ui_staffRoomStatus.cpp)
     void InitViewWindow();                        // 0x101c2d60 (24 bytes): +0x24 0, +0x28 and +0x2c -1
     void UpdateViewWindow();                      // 0x101c2e44 (4 bytes, nothing)
     void DeInitStatusWindow();                    // 0x101c3010 (4 bytes, nothing)
@@ -1150,8 +1150,8 @@ void __sinit_ui_staffPanel_cpp();         // 0x101c0cdc (28 bytes): gStaffPanelW
 extern int32_t gStaffPanelWord4c;         // 0x10395a4c
 extern int32_t gStaffPanelWord50;         // 0x10395a50
 void RemoveStaffPanel();                  // 0x101c0c5c (40 bytes): RemoveSlideoutPanel(0)
-void LocatorByeByeKid(CThing* thing);     // 0x101bf98c (56 bytes, src/gameplay_leaves.cpp): RemoveSlideoutPanel(1) when the staff panels show thing
-void UI_SetSelectedPeep(CPeep* peep);     // 0x101947a8 (12 bytes, src/ui_allKidsPanel_select.cpp, unit v5L16)
+void LocatorByeByeKid(CThing* thing);     // 0x101bf98c (56 bytes, src/game/ui/ui_staffPanel.cpp): RemoveSlideoutPanel(1) when the staff panels show thing
+void UI_SetSelectedPeep(CPeep* peep);     // 0x101947a8 (12 bytes, src/game/ui/ui_allKidsPanel.cpp, unit v5L16)
 // Unit v5669: globals it defines and the untranslated neighbours it passes to the list (weak stand-ins in its file).
 extern int32_t gStaffRoomColumnColour;       // 0x102aed64 (name invented; 8 at start): MAKECOLUMNBUTTON's third argument
 class InterfaceListControl2;
@@ -1187,13 +1187,13 @@ extern CThing* gStaffRoomPanelThing;                 // 0x103947a4 (name invente
 extern StaffType gStaffRoomStaffType;                // 0x10395a98 (name invented): the staff type CreateAllStaffPanel is given
 // Unit v51039: UIMain_IndentClient 0x10180940 (156, stand-in): the window's position (less the animation), moved in by a and b on the
 // left/right and top/bottom, becomes its client rectangle. The CoolRect is passed as raw storage (the host's is not the Mac's size).
-// Adjust and RectDtor: weak definitions in src/Serialise_basic_std_list_std_basic_string_std_allocator_std_basi_4.cpp; the other three:
+// Adjust and RectDtor: weak definitions in src/game/ui/ui_main.cpp; the other three:
 // platform/indent_dispatch.cpp (the launcher's). The test library fakes all five.
 namespace indent_callee {
 void RectCtor(void* rect);                                           // 0x101c7448
 int32_t GetPosition(InterfaceWindow* window, void* rect, int16_t subtract);   // 0x101db884
 void Adjust(void* rect, int16_t left, int16_t top, int16_t right, int16_t bottom);   // 0x101c7a78
-void SetClientRect(InterfaceWindow* window, void* rect);             // 0x101db3fc (InterfaceWindow::SetClientRect, src/InterfaceWindow_z.cpp)
+void SetClientRect(InterfaceWindow* window, void* rect);             // 0x101db3fc (InterfaceWindow::SetClientRect, src/game/ui/InterfaceWindow.cpp)
 void RectDtor(void* rect, int16_t flag);                             // 0x101c74e0
 }
 void UIMain_IndentClient(InterfaceWindow* window, int16_t a, int16_t b);   // 0x10180940
@@ -1203,9 +1203,9 @@ int32_t DefaultStatusPanelMsg(InterfaceWindow* window, int32_t message, int32_t 
 void LCPostFormat(InterfaceWindow* window);                                // 0x101c346c
 int32_t StaffRoomPanelLCHandler(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101c35a4
 int32_t StaffRoomStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);        // 0x101c3c68
-// Unit v5753 (src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_ViewWindowCallback.cpp)
+// Unit v5753 (src/game/ui/ui_StatusPanel.cpp)
 int32_t StatusPanelTitleMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);       // 0x10193e7c (240 bytes)
-// Unit v5951 (src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_sinit_ui_staffRoomStatus_cpp.cpp)
+// Unit v5951 (src/game/ui/ui_staffRoomStatus.cpp, src/game/ui/ui_showStatus.cpp)
 void __sinit_ui_staffRoomStatus_cpp();   // 0x101c40f0 (124 bytes)
 void __sinit_ui_showStatus_cpp();        // 0x101c2b10 (76 bytes)
 extern int32_t gStaffRoomListFormat;     // 0x10395a8c (name invented): the row height StaffRoomLCFormat works out once (0 until then)
@@ -1225,7 +1225,7 @@ InterfaceDrawObject* NewCursorText();             // operator new(0x19c), then 0
 void WindowSetText(InterfaceWindow* window, const char16_t* text);   // the virtual at slot 0x2c of the table at window +0x118
 }  // namespace staffroom_callee
 
-// ---- Unit v5010 (src/CreateRideListPanel.cpp): the ride list panel. Names invented; the addresses are the Mac's.
+// ---- Unit v5010 (src/game/ui/ui_ridepanel.cpp): the ride list panel. Names invented; the addresses are the Mac's.
 struct IDXTYPEUniqueNameObjectId;
 template<class Tag, class T> struct tag_IDX_TYPE;
 // 0x101b8434 (1936 bytes): the ride list (type kUIObjRide to kUIObjFeature, -1 for the type the panel showed last). `selected` is a 16-bit
@@ -1246,13 +1246,13 @@ extern int32_t gRideListF90;           // 0x10395990: zeroed by a new panel
 extern int16_t gRideListF8C;           // 0x1039598c: zeroed by a new panel
 extern int16_t gRideListF8A;           // 0x1039598a: zeroed by a new panel
 extern int16_t gRideListF88;           // 0x10395988: zeroed by a new panel
-// Unit v51005 (src/ChangeInfoWindow_RidePanelMsg.cpp): two halfwords RidePanelMsg only reads (zero at start; names invented) and the
+// Unit v51005 (src/game/ui/ui_ridepanel.cpp): two halfwords RidePanelMsg only reads (zero at start; names invented) and the
 // panel's remover (0x101b8c28, 56 bytes, stand-in).
 extern uint16_t gRideListPending;      // 0x102acee8: the id the timer last refreshed; the tick refreshes the view while f8c differs
 extern uint16_t gRideListHelpShown;    // 0x102aceea: the id the help text shows; the tick updates it while f8a differs
-void RemoveRideListPanel();            // 0x101b8c28 (src/ui_ridepanel_remove.cpp, unit v5L06): message 4 to gRideListPanel
+void RemoveRideListPanel();            // 0x101b8c28 (src/game/ui/ui_ridepanel.cpp, unit v5L06): message 4 to gRideListPanel
 
-// ---- Unit v5022 (src/ui_main_panel_UI_Congratulations.cpp): the congratulations and bankrupt windows and ui_main.cpp's static initialiser.
+// ---- Unit v5022 (src/game/ui/ui_main.cpp): the congratulations and bankrupt windows and ui_main.cpp's static initialiser.
 class CObject;
 // 0x1018724c (436 bytes): leaves first person and the game window, closes the panel, makes the full-screen congratulations window (script
 // gCongratsScript, animation gCongratsAnim, message function CongratsWindowMsg) and gives it the keyboard.
@@ -1287,12 +1287,12 @@ void UIMain_DestroyLight(void* object);    // the light's destructor word 0x1026
 void UIMain_DestroyCursorTable(void* object);   // the cursor table's destructor word 0x10268138
 void UIMain_DestroyString(void* object);   // the string destructor glue 0x103bcd38
 
-// ---- Unit v5060 (src/lobby_exit_InitOnlineUI.cpp; BankruptWindowMsg above is translated there)
+// ---- Unit v5060 (src/game/ui/ui_main.cpp; BankruptWindowMsg above is translated there)
 // 0x101864b0, 332 bytes: the online lobby's interface: the light's colour and direction, linked into map list 0x20, the online panel,
 // the first person window (gFirstPersonWindow), the help text on or off by the tooltips setting.
 void InitOnlineUI();
 
-// ---- Unit v5240 (src/ui_StatusPanel_SetButton.cpp): the status panel's button helpers.
+// ---- Unit v5240 (src/game/ui/ui_tags.cpp): the status panel's button helpers.
 struct IDXTYPEUniqueNameThingId;
 struct IDXTYPEUniqueNameMapId;
 // The Mac's TagButtonAction (an int in r3 / r4): 3 to 27 are the actions the two switches know, anything else does nothing.
@@ -1305,11 +1305,11 @@ void SetButton(InterfaceWindow* window, TagButtonAction action);
 int32_t DoButton(TagButtonAction action, tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> id, int32_t extra);
 // 0x10181d34 (164 bytes, stand-in): zooms the camera to the map cell.
 void UIMain_ZoomToMapId(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>& id);
-// ---- Unit v5723 (src/ui_main_kbcapture_UIMain_ShowRidePreview_UIMain_GotoStatusPanelForThing_UIMain_ZoomToMapId.cpp)
+// ---- Unit v5723 (src/game/ui/ui_main.cpp)
 uint32_t UIMain_GetShiftKeyState();   // 0x10182088 (168 bytes): bits 3 (shift), 0xc (option), 0x30 (command) from the keyboard modifiers
 void UIMain_DestroyRidePreview();     // 0x101815d4 (68 bytes): destroys gRidePreview and clears it
 
-// ---- Unit v5079 (src/OnlinePanelMsg.cpp): the online panel's message function. Names invented; the addresses are the Mac's.
+// ---- Unit v5079 (src/game/ui/ui_onlinePanel.cpp): the online panel's message function. Names invented; the addresses are the Mac's.
 // 0x101e62d0, 3,552 bytes: answers what the window's default handler answers.
 int32_t OnlinePanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
 void UpdateAvatarPos();                      // 0x101e5e08 (824 bytes, untranslated)
@@ -1326,7 +1326,7 @@ extern InterfaceWindow* gOnlineWindowE8c;    // 0x10395e8c
 extern InterfaceWindow* gOnlineWindowE90;    // 0x10395e90
 extern char16_t gOnlineEmptyHelp[2];         // 0x1024ef54: the empty help text
 
-// ---- Unit v5088 (src/CreateStaffCostsPanel.cpp). Names invented; the addresses are the Mac's.
+// ---- Unit v5088 (src/game/ui/ui_StaffCostsPanel.cpp). Names invented; the addresses are the Mac's.
 extern InterfaceWindow* gStaffCostsPanel;    // 0x10395a20: the panel, NULL while it is not up
 extern int32_t gStaffCostsDeposits;          // 0x10395a1c: the deposits history's newest value (CHistory 0x1fc90)
 extern int32_t gStaffCostsWithdrawals;       // 0x10395a18: the withdrawals history's newest value (0x1f5a0)
@@ -1335,7 +1335,7 @@ extern int32_t gStaffCostsWord14;            // 0x10395a14: word 18 less word 10
 extern int16_t gStaffCostsScript[];         // 0x102adc20: the panel's window script (the image's words, generated at configure time)
 int32_t StaffCostsPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101be1f4 (untranslated)
 
-// ---- Unit v5097 (src/DoScroll.cpp): the research panel's scroll handling, InitAll and ResearchPanelMsg.
+// ---- Unit v5097 (src/game/ui/ui_researchPanel.cpp): the research panel's scroll handling, InitAll and ResearchPanelMsg.
 void DoScroll(int32_t id, int32_t value);       // 0x101b42d0 (752 bytes)
 extern int32_t gResearchScrollSound;            // 0x10395960 (name invented): the handle of the scroll sound (0 none)
 void NameWindow(int32_t group);                 // 0x101b3da8 (stand-in)
@@ -1343,30 +1343,30 @@ void PercentComplete(int32_t group);            // 0x101b3398 (stand-in)
 void ResearchSpeed(int32_t group);              // 0x101b381c (stand-in)
 void RemoveResearchPanel();                     // 0x101b5ae8 (stand-in)
 
-// ---- Unit v51043 (src/ui_Postcard_panel_CreateAddressBook_DeleteEntryOK.cpp)
+// ---- Unit v51043 (src/game/ui/ui_researchPanel.cpp)
 void ResearchPanelCategoryComplete(int32_t category);   // 0x101b5b4c (the category is a ResearchCat)
 InterfaceWindow* ResearchListLCFormat();                // 0x101b9ea8 (LCFormat of the research/ride list file)
 extern int32_t gResearchRowHeight;                      // 0x103959a0 (name invented): the row height ResearchListLCFormat works out once
 
-// ---- Unit v5102 (src/ChangeInfoWindow.cpp): the ride list's info window and help text.
+// ---- Unit v5102 (src/game/ui/ui_ridepanel.cpp): the ride list's info window and help text.
 // 0x101b7108 (1024 bytes): shows or hides the eight windows of the panel's info window (0x1ed) for the type: 0 shows all, 2 a mix, 1 and 3 hide all.
 void ChangeInfoWindow(UIObjType type);
 // 0x101b6d18 (924 bytes): the help line for the ride id under the mouse inside the panel's window 0x1f8.
 void UpdateHelpText(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>& id);
-void UI_GetMouseXY(int16_t& x, int16_t& y);     // 0x101ca900 (src/UI_Base_mouse.cpp, unit v5L06): gUIPointerX, gUIPointerY
+void UI_GetMouseXY(int16_t& x, int16_t& y);     // 0x101ca900 (src/game/ui/UI_Base.cpp, unit v5L06): gUIPointerX, gUIPointerY
 extern int32_t gHelpTextState;                  // 0x102acee0 (name invented): -1 at start; 0..3 the ride's state, 4 a negative id
 
-// ---- Unit v5241(src/ChangeInfoWindow_UpdateInfoWindow.cpp): the ride list panel's info window set-up and refresh.
+// ---- Unit v5241(src/game/ui/ui_ridepanel.cpp): the ride list panel's info window set-up and refresh.
 // 0x101b6500 (1332 bytes): gives the info window's (0x1ed) seven text windows their text objects, font 6 and strings, and its three bars their gradients.
 void InitInfoWindow();
 // 0x101b6a5c (612 bytes): the ride id's count in the park and, for the list type 0 or 2, the bars and text of the info window.
 void UpdateInfoWindow(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>& id);
 
-// ---- Unit v5184 (src/SpeedTimerFudge.cpp): PercentComplete and ResearchSpeed (declared above) and the light's state machine.
+// ---- Unit v5184 (src/game/ui/ui_researchPanel.cpp): PercentComplete and ResearchSpeed (declared above) and the light's state machine.
 void SpeedTimerFudge(InterfaceWindow* window, int32_t speed);   // 0x101b35d4 (528 bytes)
 extern uint16_t gResearchProjectNone;           // 0x102aca98 (name invented): the project id meaning none (initial word 0)
 
-// ---- Unit v5200 (src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition.cpp): DrawCoasterTracks and StoreMapGridDetails.
+// ---- Unit v5200 (src/game/ui/ui_2dmap.cpp): DrawCoasterTracks and StoreMapGridDetails.
 struct TbRenderArea;
 struct TbRect;
 struct TbPoint;
@@ -1388,10 +1388,10 @@ namespace tpw_antialias {
 template <int N>
 void Antialiased(const tpw_intensify::CTraits<N>& traits, const TbRenderArea& area, const TbRect& clip, const bfl::draw::CColour& colour,
                  const TbPoint& from, const TbPoint& to);
-// Unit v5940: the instances for 3 and 4 bytes per pixel are defined in src/TPString_Antialiased_3.cpp (specialisations, not declared here).
+// Unit v5940: the instances for 3 and 4 bytes per pixel are defined in src/game/ui/3DFont.cpp (specialisations, not declared here).
 }
 
-// ---- Unit v5231 (src/CreateRideListPanel_LCHandler.cpp): the ride list's row functions (the LCFormat, LCPostFormat, LCEntryHandler and
+// ---- Unit v5231 (src/game/ui/ui_researchPanel.cpp): the ride list's row functions (the LCFormat, LCPostFormat, LCEntryHandler and
 // LCHandler of the file at 0x101b7d94; RideListLCHandler is declared above). Names invented; the addresses are the Mac's.
 // 0x101b7f30 (432 bytes): message 0x403 colours the row's text by the ride (b is the ride id, negative for none).
 int32_t RideListLCEntryHandler(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
@@ -1400,7 +1400,7 @@ void RideListLCPostFormat(InterfaceWindow* window);       // 0x101b827c (388 byt
 extern uint32_t gRideListFontIndex;                       // 0x102aced8 (name invented): the font table index of the rows (7 at start)
 extern int32_t gRideListRowHeight;                        // 0x10395984 (name invented): the row height RideListLCFormat works out once (0 until then)
 
-// ---- Unit v5279 (src/ContactsLCFormat.cpp): the online panel's contacts and messages lists (row window, draw objects, colours) and the
+// ---- Unit v5279 (src/game/ui/ui_onlinePanel.cpp): the online panel's contacts and messages lists (row window, draw objects, colours) and the
 // contact list helpers. Names invented; the addresses are the Mac's.
 int32_t ContactsLCEntryHandler(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101e7648 (224 bytes): message 0x403 colours the row by b's low three bits
 int32_t MessagesLCEntryHandler(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101e776c (164 bytes): message 0x403 colours the row by b & 7
@@ -1414,10 +1414,10 @@ extern uint8_t gMessagesLCColours[32];     // 0x102b0c58: 8 colours of red, gree
 extern uint32_t gContactsLCColours[4];     // 0x102b0c78: 4 colour words 0xRRGGBB00 (the first 0xffffff00)
 extern int32_t gOnlineContactsBusy;        // 0x10395e7c: not 0 keeps the contact helpers from touching the list
 
-// ---- Unit UpdateStaffCost (src/CreateStaffCostsPanel_UpdateStaffCost.cpp)
+// ---- Unit UpdateStaffCost (src/game/ui/ui_StaffCostsPanel.cpp, src/game/ui/ui_shopStatus.cpp)
 void UpdateStaffCost(int32_t id, int32_t value);   // 0x101be030 (412 bytes): the staff HQ's cost word for the row id, clamped at 0; a positive one sets the flag at 0x14
 int32_t ShopStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101bdb8c (796 bytes)
-void UIMain_TickRidePreview();     // 0x10181570 (src/ui_main_preview_tick.cpp, unit v5L06): TickRidePreview(gRidePreview) when there is one
+void UIMain_TickRidePreview();     // 0x10181570 (src/game/ui/ui_main.cpp, unit v5L06): TickRidePreview(gRidePreview) when there is one
 void RemoveStaffCostsPanel();      // 0x101bf278 (stand-in)
 // Unit v51121: the static initialisers of ui_ridepanel.cpp and ui_StaffCostsPanel.cpp, the two words of the latter (names invented) and the
 // shop's _applytoall (0x101bda5c; the staff room's 0x101c25c0 owns the name _applytoall).
@@ -1427,10 +1427,10 @@ extern int32_t gStaffCostsF24;            // 0x10395a24: 0x10000 after the sinit
 extern int32_t gStaffCostsF28;            // 0x10395a28: 0 after the sinit
 int32_t _applytoall_shop(CThing* thing);  // 0x101bda5c: gShopStatusPanel.applytoallcallback(thing), answers 1
 void CreateFinancePanel();         // 0x101a001c (stand-in)
-extern int16_t gFinanceScript[];   // 0x102a9bec: the finance panel's window script (unit v51026, src/CreateFinancePanel_2.cpp)
+extern int16_t gFinanceScript[];   // 0x102a9bec: the finance panel's window script (unit v51026, src/game/ui/ui_FinancePanel.cpp)
 int32_t _applytoall(CThing* thing);   // 0x101bda5c (not translated; ShopStatusMsg hands its TVector 0x10267e20 to UI_IterateThingList)
 
-// ---- Unit v5363 (src/FillRideList.cpp): FillRideList (declared above) and the ride list panel's view window.
+// ---- Unit v5363 (src/game/ui/ui_ridepanel.cpp): FillRideList (declared above) and the ride list panel's view window.
 // 0x101b5f1c (1420 bytes): the picture (0x1eb) and the label (0x1ec) of the panel's view window (0x1ea) for the ride id (the Mac passes the
 // address of the word; negative ids -1 and -2 are the two special rows, a positive one is a locked ride). A ride that is open gets the grid
 // of its profile drawn into the picture and its type string as the label; otherwise the picture is black and the label is string 0x86, 0x87 or 0x89.
@@ -1439,7 +1439,7 @@ void UpdateViewWindow(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>& id);
 // then the row count at word 256 and the column count at word 257.
 int32_t* LLCC_GetRideProfileInfo(void* ride);
 
-// ---- Unit v5541 (src/OnlineParkFindPanelMsg.cpp): the online panel's builder and the park find panel's message function. Names invented.
+// ---- Unit v5541 (src/game/ui/ui_onlineParkFindPanel.cpp, src/game/ui/ui_onlinePanel.cpp): the online panel's builder and the park find panel's message function. Names invented.
 template<class T> class TbPtrList;
 class CFSOnlinePark;
 int32_t OnlineParkFindPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101e93b0 (700 bytes)
@@ -1465,15 +1465,15 @@ extern char16_t gOnlineEditText[256];        // 0x10395e9c: the edit box's stati
 extern char16_t gFindPanelPlayerName[64];    // 0x103960a4: the player name the park find panel looks for
 extern void (*gFindPanelCloseCallback)();    // 0x103960c4: called when the find panel closes
 extern int32_t gFindPanelWord;               // 0x103960c8: cleared by message 0x14
-// Unit v5660 (src/OnlineParkFindPanelMsg_ContactMenu.cpp). Names invented.
+// Unit v5660 (src/game/ui/ui_onlinePanel.cpp). Names invented.
 void FillBuddyList();            // 0x101e8608 (152 bytes): empties the contacts list and has the online control refill it
 void ContactMenu(int32_t position);   // 0x101e8b98 (844 bytes): pops the buttons menu up at the mouse for the contact at `position`
 void HideButtonsMenu();          // 0x101e8b18 (88 bytes, stand-in)
 
-// ---- Unit v5913 (src/UpgradeStatusMsg_UpgradeStatusPanel_InitStatusWindow_2_CreateYearEndPanel.cpp). Names invented.
+// ---- Unit v5913 (src/game/ui/ui_yearEndPanel.cpp). Names invented.
 extern InterfaceWindow* gYearEndPanel;   // 0x10395b70: the year end panel, NULL while it is not up (a 32-bit pointer on the Mac)
 extern int16_t gYearEndScript[];         // 0x102af524: the panel's window script, 478 words (the image's words, generated at configure time)
-int32_t YearEndPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101c67b4 (TVector 0x10268078; unit v51007 translates it in src/ShowStatusPanel_UpdateStatusWindow_ShowStatusPanel_UpdateWindow_2.cpp)
+int32_t YearEndPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101c67b4 (TVector 0x10268078; unit v51007 translates it in src/game/ui/ui_yearEndPanel.cpp, src/game/ui/ui_upgradeStatus.cpp)
 // Unit v51007
 void RemoveYearEndPanel();   // 0x101c73e4 (56 bytes, stand-in)
 void __sinit_ui_upgradeStatus_cpp();   // 0x101c6738 (76 bytes): gUpgradeStatusPanel's constructor, table 0x102af4dc at +0x20, mode 0x3ec
@@ -1491,11 +1491,11 @@ struct CUI2DMapDrawOps {
 };
 // Host seam: the draw ops of CDraw's render context. On the Mac the context is one of Draw.cpp's four objects and the slots
 // are its vtable's HorizontalLine (+0x10), VerticalLine (+0x14), RectangleOutline (+0x24) and RectangleFilled (+0x28); the
-// host's contexts have no vtable, so src/host_ui2dmap_draw_ops.cpp answers an adapter onto CRenderClass8 .. 32 for them
+// host's contexts have no vtable, so src/game/ui/ui_2dmap.cpp answers an adapter onto CRenderClass8 .. 32 for them
 // (any other context as it is). The unit test's library defines it as the identity.
 CUI2DMapDrawOps* UI2DMapDrawOps(void* context);
 
-// ---- Unit v5991 (src/ContactsLCFormat_OnlineReceiveString_2.cpp)
+// ---- Unit v5991 (src/game/ui/ui_onlinePanel.cpp)
 class COnlineControl;
 extern int32_t gContactsMaxRows;   // 0x102b0c54: the rows the contacts list keeps (20 at start; name invented)
 void FillContactList();            // 0x101e82dc (152 bytes, stand-in)
@@ -1510,6 +1510,6 @@ void WindowSlot1c(InterfaceWindow* window, int32_t value);        // the window'
 COnlineControl* NewOnlineControl();                                // operator new(0xe8c), then the constructor
 }  // namespace contacts_callee
 
-// ---- Unit v5995 (src/ui_mainpanel2_msg_UI_MainPanelDateChange_2.cpp)
+// ---- Unit v5995 (src/game/ui/ui_mainpanel2.cpp)
 // 0x101a6234 (416 bytes): shows the date (day, month, year since 1900) in the toolbar's title window and sets the frame of the cash window's gauge.
 void UI_MainPanelDateChange(int32_t day, int32_t month, int32_t year);

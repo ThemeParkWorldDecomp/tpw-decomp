@@ -1,6 +1,6 @@
 """Unit v5048, three CPeep functions, against libtpw_unit_CPeep_IsLocalAreaUnchangedSinceBecomingStranded.dylib
 (tests/unit_CPeep_IsLocalAreaUnchangedSinceBecomingStranded.cpp), main app ("SimTheme Park"),
-src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded.cpp:
+src/game/people/Peep.cpp:
   CPeep::IsLocalAreaUnchangedSinceBecomingStranded 0x101156fc, CPeep::SpawnParticleEffect 0x101152a4, CPeep::ReportAllEvents 0x10115c3c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for the

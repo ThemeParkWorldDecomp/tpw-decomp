@@ -1,5 +1,5 @@
 // Test library for the online panel's contact helpers (unit v5660; libtpw_unit_ContactMenu.dylib, tests/test_ContactMenu.py), main app:
-//   src/OnlineParkFindPanelMsg_ContactMenu.cpp   FillBuddyList, ButtonsMenuMsg, ContactMenu
+//   src/game/ui/ui_onlinePanel.cpp   FillBuddyList, ButtonsMenuMsg, ContactMenu
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue; the globals of
 // other files are defined here, zero at start like the Mac's bss.

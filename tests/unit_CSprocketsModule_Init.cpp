@@ -1,7 +1,7 @@
 // Test library for CSprocketsModule::Init (unit v5L24; libtpw_unit_CSprocketsModule_Init.dylib, tests/test_CSprocketsModule_Init.py),
 // "sound symbols shared":
-//   src/CSprocketsModule_Init.cpp
-// with src/TbSoundSystemModule.cpp, whose Init runs for real on both sides (the PowerPC side runs the original 0x10012340).
+//   src/sound/CSprocketsModule.cpp
+// with src/sound/ServiceQueue.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundSystemModule.cpp, whose Init runs for real on both sides (the PowerPC side runs the original 0x10012340).
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record: the array allocation (AllocBuffer_), the
 // sound library's allocator, the channel constructor, the three command constructors, SetImmediate, the channel send,
@@ -77,7 +77,7 @@ void CSprocketsModule::Tick() { ev("Tick", {}); }
 CSprocketsChannel** CSprocketsModule::Channels() const { return gArray; }
 void CSprocketsModule::SetChannels(CSprocketsChannel** channels) { gArray = channels; }
 
-// The base class's member (0x1001493c; src/snd_handles.cpp is not compiled here).
+// The base class's member (0x1001493c; src/sound/ChannelState.cpp is not compiled here).
 TbSpeaker::AutoDelete::~AutoDelete() {}
 
 template <>

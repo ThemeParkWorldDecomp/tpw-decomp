@@ -1,6 +1,6 @@
 // Test library for the three leaving-park states of CPerson (unit v5006; libtpw_unit_CPerson_ProcessStateWaitingToCrossRoadOutOfPark.dylib,
 // tests/test_CPerson_ProcessStateWaitingToCrossRoadOutOfPark.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark.cpp   ProcessStateLeavingPark, ProcessStateWaitingToCrossRoadOutOfPark,
+//   src/game/people/PersonQueue.cpp   ProcessStateLeavingPark, ProcessStateWaitingToCrossRoadOutOfPark,
 //                                                             ProcessStateWaitingForBusOuttaHere
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues.

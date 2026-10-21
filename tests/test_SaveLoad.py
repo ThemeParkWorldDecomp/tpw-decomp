@@ -1,5 +1,5 @@
 """Differential tests for the park file reader CSaveLoad::Load (0x10157fec) and the most-recent-save loader
-CFSLoadSave::LoadMostRecent (0x101fcdcc), src/SaveLoad.cpp and src/FS_LoadSave.cpp (unit w108), against
+CFSLoadSave::LoadMostRecent (0x101fcdcc), src/game/save/SaveLoad.cpp and src/game/save/FS_LoadSave.cpp (unit w108), against
 libtpw_unit_SaveLoad.dylib (tests/unit_SaveLoad.cpp's fakes; see calllog.py).
 
 Both functions run as the original on the PowerPC side and as the translation on the host; LoadMostRecent calls the real Load on both

@@ -1,4 +1,4 @@
-// Differential library for unit w176: the arrivals' people and the control manager (src/Arrival_people.cpp, src/ControlManager.cpp, src/WorldSavvy.cpp).
+// Differential library for unit w176: the arrivals' people and the control manager (src/game/people/Arrival.cpp, src/game/ControlManager.cpp, src/game/ui/ui_visitorStatus.cpp).
 //
 // Every callee outside the unit is a fake that records the same event as the PowerPC side's stub: the arrival vehicle, the park analyser and weather, the
 // map's bus stop, CPerson's constructor (and the allocation before it), the trace and assert functions, the serialise log, the file functions, the basic

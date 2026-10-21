@@ -1,4 +1,4 @@
-// Differential library for unit w159, the park rating, the park value and the attraction points (src/ParkAnalyser_rating.cpp).
+// Differential library for unit w159, the park rating, the park value and the attraction points (src/game/park/analyser.cpp).
 //
 // Every callee outside the unit is a fake that records the same event as the PowerPC side's stub: the world accessor, CWorld::GetUsedThingHead and
 // GetNextUsedThing, GAME_ASSERTMSG, CPeep::IsInsidePark, the analyser value's Get and Set, CRideDatabase::GetRideInfo, both CControlManager::GetObjectControl

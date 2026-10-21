@@ -1,5 +1,5 @@
 """Unit v5228, the ride height by polygon search, against libtpw_unit_GetRideHeightAtPoint.dylib (tests/unit_GetRideHeightAtPoint.cpp), main app
-("SimTheme Park"), src/CalculateMaxVertexHeights_GetRideHeightAtPoint.cpp:
+("SimTheme Park"), src/game/park/TPHField.cpp:
   GetRideHeightAtPoint 0x1005d198, GetHeightFromPolySearch 0x1005d000, DoNodePolySearch 0x1005cce4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

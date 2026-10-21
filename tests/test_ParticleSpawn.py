@@ -1,5 +1,5 @@
 """Unit w26b: the particle system's spawning, against libtpw_unit_ParticleSpawn.dylib (tests/unit_ParticleSpawn.cpp):
-SpawnParticle, PAR_InitEmitter, PAR_InitEmitterLaunch, PAR_InitEffecter, DoSpecialEmitter and SpecialEmitter1 (src/rsse_spawn.cpp).
+SpawnParticle, PAR_InitEmitter, PAR_InitEmitterLaunch, PAR_InitEffecter, DoSpecialEmitter and SpecialEmitter1 (src/game/Particles.cpp).
 
 A case is a SCRIPT: a world (the pool's length, the system's running and low-spec state, the seed and serials, pokes into the
 emitter and effecter definitions of the library) and a list of steps (start an emitter, start one with a launch vector, start an

@@ -1,12 +1,12 @@
 """Unit w139 (main app), against libtpw_unit_MapCells.dylib (tests/unit_MapCells.cpp):
 
-  src/World_register.cpp       CWorld::Register for CHandyman (0x1013ef14), CMechanic (0x1013f144), CEntertainer (0x1013f374), CGuard (0x1013f5ac),
+  src/game/World.cpp       CWorld::Register for CHandyman (0x1013ef14), CMechanic (0x1013f144), CEntertainer (0x1013f374), CGuard (0x1013f5ac),
                                CResearcher (0x1013f7d8) and CObject (0x1013fa10)
-  src/Map_init.cpp             CMap::Init (0x10100a8c)
-  src/MapCell_tile.cpp         CMapCell::SetHFieldTile (0x1009cdb4)
-  src/MapDelta.cpp             MapDelta::Rotate (0x10103d88)
-  src/TPEngine_pointedcell.cpp GetMapCellFromPointerWorldPosn (0x10067084)
-  src/TrackCell_modify.cpp     CTrackCell::ModifyType (0x100a0828)
+  src/game/park/Map.cpp             CMap::Init (0x10100a8c)
+  src/game/park/MapCell.cpp         CMapCell::SetHFieldTile (0x1009cdb4)
+  src/game/park/MapDelta.cpp             MapDelta::Rotate (0x10103d88)
+  src/game/TPPointer.cpp GetMapCellFromPointerWorldPosn (0x10067084)
+  src/game/park/TrackCell.cpp     CTrackCell::ModifyType (0x100a0828)
 
 The eleven run as the original on the PowerPC side and as src/ on the host. Every callee outside them is a fake that records the same event on both sides
 (tests/calllog.py): GetThingId, GetTile, SingleHFieldTextureChange, LLCCM_CreateQMesh and DestroyQMesh, IsXYValid, the two track cost getters, ValidTypeChange,

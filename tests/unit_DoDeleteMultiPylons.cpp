@@ -1,5 +1,5 @@
 // Test library for DoDeleteMultiPylons (unit v5647; libtpw_unit_DoDeleteMultiPylons.dylib, tests/test_DoDeleteMultiPylons.py), main app:
-//   src/DisableCurrentPylonEditState_SetCoasterEditState_DoDeleteMultiPylons.cpp   DoDeleteMultiPylons
+//   src/game/rides/CoasterEdit.cpp   DoDeleteMultiPylons
 //
 // The callees outside the unit are fakes that record what the real ones read; the globals of other files are defined here.
 #include <cstddef>

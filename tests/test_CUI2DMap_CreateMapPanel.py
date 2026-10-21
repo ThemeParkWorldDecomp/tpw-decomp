@@ -1,5 +1,5 @@
 """Unit v5986, the map panel's opening, against libtpw_unit_CUI2DMap_CreateMapPanel.dylib (tests/unit_CUI2DMap_CreateMapPanel.cpp), main app
-("SimTheme Park"), src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister_CUI2DMap_CreateMapPanel.cpp:
+("SimTheme Park"), src/game/ui/ui_2dmap.cpp:
   CUI2DMap::CreateMapPanel 0x1022c080
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

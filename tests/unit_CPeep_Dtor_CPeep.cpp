@@ -1,6 +1,6 @@
 // Test library for the CPeep destructor, HideMySprite, DrawMySpriteAt and FinalDestroy (unit v5298; libtpw_unit_CPeep_Dtor_CPeep.dylib,
 // tests/test_CPeep_Dtor_CPeep.py), main app:
-//   src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_Dtor_CPeep.cpp
+//   src/game/people/Peep.cpp, src/game/people/Person.cpp
 //
 // The callees outside the unit are fakes that record the same events as the module's PowerPC stubs (pointers as the offset from the peep block).
 #include <cstddef>

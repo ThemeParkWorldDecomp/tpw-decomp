@@ -1,5 +1,5 @@
 // Test library for CreateYearEndPanel (unit v5913; libtpw_unit_CreateYearEndPanel.dylib, tests/test_CreateYearEndPanel.py), main app:
-//   src/UpgradeStatusMsg_UpgradeStatusPanel_InitStatusWindow_2_CreateYearEndPanel.cpp   CreateYearEndPanel, gYearEndPanel, gYearEndScript
+//   src/game/ui/ui_yearEndPanel.cpp   CreateYearEndPanel, gYearEndPanel, gYearEndScript
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The windows,
 // strings and fonts are arena blocks the test names by labels (tpw_yep_setlabel); the new draw objects get the constructor labels.

@@ -1,6 +1,6 @@
 // Test library for the CodeWarrior std::deque<errorthingy> tear_down, copy constructor and destroy (unit v5680;
 // libtpw_unit_std_deque_tear_down.dylib, tests/test_std_deque_tear_down.py), main app:
-//   src/sinit_ui_ErrorDisplay_cpp_std_deque_tear_down.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record. The block table fakes (reserve, resize, push_back,
 // operator new) hand out the memory the test pre-allocated (tpw_edq_set), so both sides see the same world.

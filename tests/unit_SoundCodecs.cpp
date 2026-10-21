@@ -1,7 +1,7 @@
 // Fakes and test entry points for unit w80, the sound library's four small codecs (libtpw_unit_SoundCodecs.dylib, driven by
 // tests/test_SoundCodecs.py in the program "sound symbols shared"; see calllog.h):
-//   src/TbSoundCodecs.cpp   _TbSoundSampleWAV, _TbSoundSampleWAVFile, _TbSoundCodecLoop, TbTimerCodec, CMemoryCopy::Copy
-// Real: those, unit w78's classes (src/TbSoundPipe.cpp) and TbRefRelease. Fakes, each recording what the original's callee would
+//   src/game/advisor/AdvisorScoring.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleWAV.cpp, src/sound/TbSoundSampleWAVFile.cpp, src/sound/TimerCodec.cpp   _TbSoundSampleWAV, _TbSoundSampleWAVFile, _TbSoundCodecLoop, TbTimerCodec, CMemoryCopy::Copy
+// Real: those, unit w78's classes (src/sound/StreamableMpeg2.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundSampleCallback.cpp, src/sound/TbSoundSampleCodec.cpp, src/sound/TbSoundSamplePipe.cpp, src/sound/TbSoundSystemInfo.cpp) and TbRefRelease. Fakes, each recording what the original's callee would
 // be given (the PowerPC side records the same from its stubs):
 //   FakeNode, a TbSoundSampleCodec that overrides every virtual slot and records it: the codec behind a loop (its
 //       GetDataChunk answers the queues "Chunk" (the result) and "Got" (the bytes delivered); its destructor records the flag)

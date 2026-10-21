@@ -1,6 +1,6 @@
 // Test entry points for the ltms character-set converters and their factories (library
-// unit_TbConverters: src/TbResourceFactories.cpp, src/TbIMBToUnicode.cpp,
-// src/TbIUnicodeToMB.cpp). The file the factories read is the queued fake of
+// unit_TbConverters: src/ltms/TbFontRenderParams.cpp, src/ltms/TbIRLE4bitFont.cpp, src/ltms/TbITable.cpp, src/ltms/TbIUnicodeToMB.cpp, src/ltms/StaticUnicodeBuffer.cpp, src/ltms/TbIResourceIndex.cpp,
+// src/ltms/TbIUnicodeToMB.cpp). The file the factories read is the queued fake of
 // ltms_file_fakes.h; the base resource's reference counting is not under test here.
 #include "TbIResourceIndex.h"
 #include "platform/ltms.h"

@@ -1,5 +1,5 @@
 // Test library for the FS_Online.cpp static initialiser (unit v5742; libtpw_unit_sinit_FS_Online_cpp.dylib, tests/test_sinit_FS_Online_cpp.py), main app:
-//   src/FS_Online_init_CFSOnlineSystem_CompleteFTPDownload_sinit_FS_Online_cpp.cpp   sinit_FS_Online_cpp
+//   src/game/online/FS_Online.cpp   sinit_FS_Online_cpp
 //
 // The string constructor and __register_global_object are fakes that record their arguments; the globals the initialiser touches are
 // defined here.

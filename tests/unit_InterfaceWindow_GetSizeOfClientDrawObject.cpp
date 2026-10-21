@@ -1,6 +1,6 @@
 // Test library for six InterfaceWindow leaves (unit v5119; libtpw_unit_InterfaceWindow_GetSizeOfClientDrawObject.dylib,
 // tests/test_InterfaceWindow_GetSizeOfClientDrawObject.py), main app:
-//   src/InterfaceWindow_draw_InterfaceWindow_GetSizeOfClientDrawObject.cpp
+//   src/game/ui/InterfaceWindow.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read: the CoolRect members, SetPosition, the timers, the UI
 // posts and the draw object's Change. gUIKeyboardWindow is defined here.

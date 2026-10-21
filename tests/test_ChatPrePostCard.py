@@ -1,5 +1,5 @@
 """Unit v5579, the chat postcard hand-over and two file leftovers, against libtpw_unit_ChatPrePostCard.dylib
-(tests/unit_ChatPrePostCard.cpp), main app, src/LCPostFormat_2_ChatPrePostCard.cpp:
+(tests/unit_ChatPrePostCard.cpp), main app, src/game/ui/ui_onlineOutbox.cpp, src/game/ui/ui_onlinePanel.cpp:
   ChatPrePostCard 0x101e568c, ChatReinstateAfterPostcard 0x101e5700, LockChatPanelOff 0x101e55ec,
   __sinit_ui_onlineOutbox_cpp 0x101e551c, my_error_exit 0x101e5310
 

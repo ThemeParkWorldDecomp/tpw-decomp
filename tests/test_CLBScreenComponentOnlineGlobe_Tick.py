@@ -1,5 +1,5 @@
 """Unit v5571, the online globe's Tick and WindowMessagesFn, against libtpw_unit_CLBScreenComponentOnlineGlobe_Tick.dylib
-(tests/unit_CLBScreenComponentOnlineGlobe_Tick.cpp), main app ("SimTheme Park"), src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp:
+(tests/unit_CLBScreenComponentOnlineGlobe_Tick.cpp), main app ("SimTheme Park"), src/game/online/lobby_globe.cpp:
   CLBScreenComponentOnlineGlobe::Tick 0x100acce0, CLBScreenComponentOnlineGlobe::WindowMessagesFn 0x100ad54c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian,

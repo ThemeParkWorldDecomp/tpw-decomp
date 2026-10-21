@@ -1,5 +1,5 @@
 """Unit v5967, the pylon-move abort and six small coaster/heightfield functions, against libtpw_unit_AbortMovePylon.dylib
-(tests/unit_AbortMovePylon.cpp), main app ("SimTheme Park"), src/Mouse_modes_AbortMovePylon.cpp:
+(tests/unit_AbortMovePylon.cpp), main app ("SimTheme Park"), src/game/park/TPHField.cpp, src/game/rides/CoasterEdit.cpp, src/game/rides/CoasterTrack.cpp:
   AbortMovePylon 0x10057df4, SingleHFieldTextureChange 0x1005b840, PlacePylon (4 arguments) 0x10052a30, IsCoasterUseable 0x10052954,
   IsTrackValid 0x100528d8, IsTrackClosed (void*) 0x10052850, DecCoasterConst2 0x10052628
 

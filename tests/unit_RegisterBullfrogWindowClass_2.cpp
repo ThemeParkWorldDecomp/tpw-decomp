@@ -1,5 +1,5 @@
 // Test library for the unit v5963 functions (libtpw_unit_RegisterBullfrogWindowClass_2.dylib, tests/test_RegisterBullfrogWindowClass_2.py), main app:
-//   src/CreateDirectDrawObject_RegisterBullfrogWindowClass_2.cpp   RegisterBullfrogWindowClass, ScreenFPUHandler_Dtor,
+//   src/bullfrog/FileSystem.cpp, src/bullfrog/LbRect.cpp, src/bullfrog/TbSystemInfo.cpp, src/bullfrog/WinScrn.cpp   RegisterBullfrogWindowClass, ScreenFPUHandler_Dtor,
 //   __sinit_TbSystemInfo_cpp, LbRect_Contains, LbRect_Bounding, CRefpack::MemCompress
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues:

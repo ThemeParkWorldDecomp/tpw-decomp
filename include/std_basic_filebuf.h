@@ -110,7 +110,7 @@ struct BasicFilebufChar {
     FposInt seekpos(int32_t off, int32_t state, uint32_t mode); // 0x10070eb4 (304)
     FposInt seekoff(int32_t off, int32_t dir, uint32_t mode);   // 0x10071058 (444)
     int32_t overflow(int32_t c);                                // 0x10071294 (720)
-    // Unit v51049 (src/std_locale_Dtor_locale.cpp), no layout change
+    // Unit v51049 (src/game/HLSprite.cpp), no layout change
     void imbue(const void* loc);                                // 0x10070bf4 (244)
     int32_t pbackfail(int32_t c);                               // 0x100715b4 (88)
 };
@@ -203,7 +203,7 @@ int32_t Overflow(void* sb, int32_t c);    // __ptr_glue, vtable 0x38
 }  // namespace streambuf_io_callee
 
 // Unit v5146: std::basic_string<char> compare 0x10209cac, substring constructor 0x101b2918, append(n, c) 0x100731b4
-// (src/std_basic_string_compare_2.cpp). The string is one 32-bit word on the Mac: the address of the shared MslStrRep
+// (src/game/MslSupport.cpp). The string is one 32-bit word on the Mac: the address of the shared MslStrRep
 // (len +0, cap +4, refs +8, data +0xc; refs 0 = not shared yet). Arena memory is 32-bit addressable, so the word is kept as is.
 struct MslCharRep {
     uint32_t len;    // 0x00
@@ -284,7 +284,7 @@ void VecErase(UseFacetImp* vec, void** first, void** last);            // 0x1007
 void FacetDelete(void* facet, int32_t flag);                           // 0x1023baa8, vtable +8
 }  // namespace use_facet_callee
 
-// Unit v5253: std::basic_string<char> constructors, destructor, init, assign, resize, append (src/TPMain_std_basic_string_basic_string.cpp).
+// Unit v5253: std::basic_string<char> constructors, destructor, init, assign, resize, append (src/game/MslSupport.cpp).
 // MslCharString / MslCharRep as above (Mac rep: len +0, cap +4, refs +8, data +0xc). The callees are IME::MslNew / MslNewRep /
 // MslNewArray / MslDelete / MslStrlen / MslStrcpy / MslThrow / MslRefCountedCharsCtor (ui_ime.h) and msl_char_string::change_size.
 namespace msl_char_string {
@@ -304,7 +304,7 @@ void* Memset(void* to, int32_t c, uint32_t n);          // memset glue 0x1023856
 extern char gMslInitNul;   // 0x10278bd2 (TOC slot -0x5d54): the terminator init writes (zero)
 extern char gMslCtorNul;   // 0x1029d294 (TOC slot -0x53b0): the terminator the default constructor writes (zero)
 
-// Unit v5376: assign(str, pos, n) 0x10001c80 (src/TPMain_std_basic_string_assign.cpp); change_size (declared above) is defined there too.
+// Unit v5376: assign(str, pos, n) 0x10001c80 (src/game/MslSupport.cpp); change_size (declared above) is defined there too.
 // replace(pos, n1, n2, c) 0x10002d20 is a callee (fake in the test).
 extern char gMslChangeSizeNul;   // 0x10278bd3 (TOC slot -0x5d50): the terminator change_size writes (zero)
 namespace msl_char_string {
@@ -312,7 +312,7 @@ MslCharString* assign(MslCharString* self, const MslCharString* src, uint32_t po
 void replace(MslCharString* self, uint32_t pos, uint32_t n1, uint32_t n2, char c);                // 0x10002d20 (callee, fake in tests)
 }  // namespace msl_char_string
 
-// Unit v5941 (src/std_basic_string_replace_2.cpp): replace(pos, n1, n2, c) 0x10002d20 (1176) and init(n, c, allocator) 0x10072e6c (516).
+// Unit v5941 (src/game/MslSupport.cpp): replace(pos, n1, n2, c) 0x10002d20 (1176) and init(n, c, allocator) 0x10072e6c (516).
 extern char gMslReplaceNulCopy;    // 0x10278bd0 (TOC slot -0x5d58): the terminator replace writes on the copy path (zero)
 extern char gMslReplaceNulPlace;   // 0x10278bd1 (TOC slot -0x5d5c): the terminator replace writes in place (zero)
 extern char gMslInitFillNul;       // 0x1029d295 (TOC slot -0x53ac): the terminator init(n, c) writes (zero)
@@ -320,7 +320,7 @@ namespace msl_char_string {
 void init(MslCharString* self, uint32_t n, char c, const void* allocator);   // 0x10072e6c (516)
 }  // namespace msl_char_string
 
-// Unit v5916 (src/GetNextWaypoint_HeightAtPos_NAV_std_vector_insert.cpp): std::vector<const void*> insert 0x10073ed4 (736),
+// Unit v5916 (src/game/MslSupport.cpp): std::vector<const void*> insert 0x10073ed4 (736),
 // erase 0x10073e10 (116), resize 0x10073d58 (108) and std::__locale_imp::~__locale_imp 0x100737a0 (352).
 // The elements are native pointers on the host (8 bytes; 4 on the Mac), the data pointer too.
 struct MslPtrVector {
@@ -343,7 +343,7 @@ struct LocaleImp {         // std::__locale_imp<__int128>: the facet vector, the
 };
 LocaleImp* LocaleImpDestroy(LocaleImp* self, int16_t deleteFlag);   // 0x100737a0 (the destructor with the hidden flag)
 
-// Unit v5944 (src/std_basic_filebuf_basic_filebuf_3.cpp): basic_filebuf<wchar_t>(FILE*) 0x10226ef4 (272), open 0x10221c30 (396),
+// Unit v5944 (src/game/MslSupport.cpp): basic_filebuf<wchar_t>(FILE*) 0x10226ef4 (272), open 0x10221c30 (396),
 // callees: filebuf_char_callee (LocaleCtor, LocaleDtor, CodecvtAlwaysNoconv, Fopen, Fseek, Fclose, DeleteArray),
 // filebuf_wclose_callee (Getloc, UseFacetCodecvtW), filebuf_wseek_callee::Unshift.
 BasicFilebufWchar* FilebufWcharConstruct(BasicFilebufWchar* self, uint32_t file);                      // 0x10226ef4
@@ -374,13 +374,13 @@ void* PairCtor(void* self, const void* src);                     // 0x10227840
 void BalanceInsert(void* node, void* root);                      // 0x10153b24
 }  // namespace buddy_tree_callee
 
-// Unit v5950 (src/email_load_Outbox_Send_Outbox_WriteMailData_Outbox_First.cpp): std::operator==(const string&, const string&) 0x1020702c (76).
+// Unit v5950 (src/game/online/email.cpp): std::operator==(const string&, const string&) 0x1020702c (76).
 // Answers compare(a, 0, a.size, b.data, b.size) == 0.
 namespace msl_char_string {
 bool equal(const MslCharString* a, const MslCharString* b);
 }
 
-// Unit v51025 (src/std___tree_std_pair_std_map_nocase_string_BuddyI_2.cpp): the buddy map's tree (BuddyTree above): find 0x1021f8d8 (196),
+// Unit v51025 (src/game/online/online.cpp): the buddy map's tree (BuddyTree above): find 0x1021f8d8 (196),
 // insert_one 0x10222d9c (236), destroy 0x10222564 (604), erase 0x102278fc (324). The iterator is the node pointer; end() is the address of
 // mRoot (Mac tree + 4). The pair at the node is a BuddyEntry (online.h): the key's rep pointer, then the two flag bytes.
 struct BuddyTreeInsertResult {   // the pair<iterator, bool> insert_one answers through a hidden pointer
@@ -397,7 +397,7 @@ void Deallocate(void* allocator, void* node, uint32_t count);        // 0x102229
 void Delete(void* p);                                                // 0x10238218 operator delete
 }  // namespace buddy_tree_callee
 
-// Unit v51033 (src/std_basic_string_operator_3.cpp). Free functions (the receiver may be NULL for the destructor).
+// Unit v51033 (src/game/MslSupport.cpp). Free functions (the receiver may be NULL for the destructor).
 char* MslCharStringIndex(MslCharString* self, uint32_t i);                  // 0x100733b0 (328) basic_string<char>::operator[]
 extern LocaleRefPtr gLocaleGlobal;                                           // 0x103bcfd4 (TOC slot -0x7034) std::locale::global_s
 LocaleRefPtr* LocaleConstruct(LocaleRefPtr* self);                           // 0x10072d24 (160) std::locale::locale()
@@ -411,7 +411,7 @@ const LocaleRefPtr* LocaleClassic();                                         // 
 char CtypeWiden(void* facet, char c);                                        // __ptr_glue, vtable 0x1c
 }  // namespace v51033_callee
 
-// Unit v51049 (src/std_locale_Dtor_locale.cpp): std::locale::~locale 0x10070d44 (172). The locale is two 32-bit words
+// Unit v51049 (src/game/HLSprite.cpp): std::locale::~locale 0x10070d44 (172). The locale is two 32-bit words
 // (impl and count pointers; arena memory is 32-bit addressable). Callees: filebuf_wclose_callee::LocaleImpDtor, locale_imp_callee::Delete.
 struct StdLocaleWords {
     uint32_t mImp;     // Mac 0x00
@@ -419,7 +419,7 @@ struct StdLocaleWords {
 };
 StdLocaleWords* LocaleStdDestroy(StdLocaleWords* self, int16_t flag);   // 0x10070d44
 
-// Unit v51054 (src/std_use_facet.cpp): small locale / streambuf / filebuf / ios_base::failure helpers. No layout changes.
+// Unit v51054 (src/game/rides/FlyingRide.cpp): small locale / streambuf / filebuf / ios_base::failure helpers. No layout changes.
 namespace IME { struct MslExceptionObject; }
 struct IosBaseLocalePtr {      // std::ios_base prefix
     uint8_t pad0[0x20];

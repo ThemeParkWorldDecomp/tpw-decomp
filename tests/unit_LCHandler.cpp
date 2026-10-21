@@ -1,5 +1,5 @@
 // Test library for the ride list panel's row functions (unit v5231; libtpw_unit_LCHandler.dylib, tests/test_LCHandler.py), main app:
-//   src/CreateRideListPanel_LCHandler.cpp   RideListLCHandler, RideListLCEntryHandler, RideListLCFormat, RideListLCPostFormat and the two
+//   src/game/ui/ui_researchPanel.cpp   RideListLCHandler, RideListLCEntryHandler, RideListLCFormat, RideListLCPostFormat and the two
 //                                           globals gRideListFontIndex and gRideListRowHeight it defines
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The objects the

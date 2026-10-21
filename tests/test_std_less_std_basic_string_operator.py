@@ -1,5 +1,5 @@
 """Unit v51044: ten small functions of the online, lobby and 2D map code, against libtpw_unit_std_less_std_basic_string_operator.dylib
-(tests/unit_std_less_std_basic_string_operator.cpp), main app ("SimTheme Park"), src/std_less_std_basic_string_operator.cpp:
+(tests/unit_std_less_std_basic_string_operator.cpp), main app ("SimTheme Park"), src/game/online/online.cpp, src/game/ui/ui_2dmap.cpp, src/game/ui/ui_worldLobbyController.cpp:
   std::less<wstring>::operator() 0x1021eb7c, std::allocator<nocase_string>::destroy 0x1021ecb8, basic_streambuf<wchar_t>::uflow 0x1021e4dc,
   std::allocator<pair<const nocase_string,BuddyInfo>>::destroy 0x10222c78, std::allocator<wstring>::destroy 0x102238d4,
   pair<const nocase_string,BuddyInfo>::pair 0x10227840, ShowWorldLobbySats 0x1022b7e8, HideWorldLobbySats 0x1022b85c,

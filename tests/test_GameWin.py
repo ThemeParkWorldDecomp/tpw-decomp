@@ -1,6 +1,6 @@
 """Unit w136, the game window's message functions, against libtpw_unit_GameWin.dylib (tests/unit_GameWin.cpp), in the main app
 ("SimTheme Park"):
-  src/ui_main_gamewin.cpp  Engine_GameWinMsg 0x10183c84, Engine_GameFirstPersonMsg 0x10184628
+  src/game/ui/ui_main.cpp  Engine_GameWinMsg 0x10183c84, Engine_GameFirstPersonMsg 0x10184628
 
 Every callee is a recording fake on both sides: the key tables' KeyDown, KeyUp and Search (one scripted answer per call, from the queues of the
 same names), CheckShifts, IveGotTicks, CaptureDevice, UnCaptureDevice, setCursor, CallDefaultWindowHandler, CMouse::AssignMouseMode,

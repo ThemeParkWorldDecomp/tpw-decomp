@@ -1,5 +1,5 @@
 """Unit v5685, the advisor's part of the save file, against libtpw_unit_ADV_Load.dylib (tests/unit_ADV_Load.cpp), main app
-("SimTheme Park"), src/ThingLoop_ADV_Load.cpp:
+("SimTheme Park"), src/game/advisor/Advisor.cpp:
   ADV_Save 0x10009788, ADV_Load 0x10009cb8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

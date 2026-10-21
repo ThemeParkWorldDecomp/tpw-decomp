@@ -1,10 +1,10 @@
-// Test library for src/RideAnimTick.cpp (libtpw_unit_RideAnimTick.dylib; see
+// Test library for src/game/TPEmbed.cpp, src/game/TPMesh.cpp, src/game/rides/RideAnim.cpp (libtpw_unit_RideAnimTick.dylib; see
 // tests/test_RideAnimTick.py): TickRideAnimSet, DoAnimateRideSet, RAAnimateTextureFrames,
 // AnimateNode, GetAnimFrameData, IsMeshDrawEnabled, TPProcessEmbeddedData and
 // DoWorldTransformsForEmbeddedData.
 //
-// The unit also links the real DisableMeshDraw (src/MeshDraw.cpp), SetMatrixIdentity,
-// CombineMatricesNoWDest2nd (0x100c28fc) and VectorThroughLMatrixNoW (src/rsse_matrix.cpp).
+// The unit also links the real DisableMeshDraw (src/game/TPMesh.cpp), SetMatrixIdentity,
+// CombineMatricesNoWDest2nd (0x100c28fc) and VectorThroughLMatrixNoW (src/game/LMatrix.cpp).
 // Everything else the eight call is a fake that records its name, its arguments and the words of
 // the records it is given (tests/calllog.h); some write what the real function would write, from
 // the case's queues. The mesh file's records (headers, nodes, animations, keys, textures) are

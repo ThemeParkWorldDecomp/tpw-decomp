@@ -1,5 +1,5 @@
 // Test library for std::list<unsigned int>::unique and ::sort (unit v5683; libtpw_unit_std_list_unique.dylib, tests/test_std_list_unique.py), main app:
-//   src/std_list_unique.cpp
+//   src/game/MslSupport.cpp
 //
 // Fakes: merge (records both lists' sizes and values; drains the second list when the case's queue says so) and operator delete (records the node's value).
 #include <cstddef>

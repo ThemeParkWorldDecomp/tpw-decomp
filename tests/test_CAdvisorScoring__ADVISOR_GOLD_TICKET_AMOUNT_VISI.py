@@ -1,6 +1,6 @@
 """Unit v5106, the advisor's gold ticket scorers and the tooltip tutorial scorer, against
 libtpw_unit_CAdvisorScoring__ADVISOR_GOLD_TICKET_AMOUNT_VISI.dylib (tests/unit_CAdvisorScoring__ADVISOR_GOLD_TICKET_AMOUNT_VISI.cpp), main app,
-src/AdvisorScoring_CAdvisorScoring__ADVISOR_GOLD_TICKET_AMOUNT_VISI.cpp:
+src/game/advisor/AdvisorScoring.cpp:
   _ADVISOR_TUTORIAL_EXPLAIN_TOOLTIPS 0x1001b604, _ADVISOR_GOLD_TICKET_EXPLANATION 0x1001b6d0,
   _ADVISOR_GOLD_TICKET_AMOUNT_ALL_RIDES_RESEARCHED_a/b/c 0x1001b8ec 0x1001b9d0 0x1001bab4,
   _ADVISOR_GOLD_TICKET_AMOUNT_VISITORS_a/b/c 0x1001bb8c 0x1001bcc0 0x1001bdf4

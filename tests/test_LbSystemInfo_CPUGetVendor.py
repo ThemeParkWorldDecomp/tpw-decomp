@@ -1,5 +1,5 @@
 """Unit v51071, thirty small bullfrog functions (TbSystemInfo, LbDraw, WinScrn, LbMaths, TbJPEGSaver, Draw, LbSCBack), against
-libtpw_unit_LbSystemInfo_CPUGetVendor.dylib (tests/unit_LbSystemInfo_CPUGetVendor.cpp), src/CreateDirectDrawObject_RegisterBullfrogWindowClass_2_LbSystemInfo_CPUGetVendor.cpp.
+libtpw_unit_LbSystemInfo_CPUGetVendor.dylib (tests/unit_LbSystemInfo_CPUGetVendor.cpp), src/bullfrog/Draw.cpp, src/bullfrog/LbApp.cpp, src/bullfrog/LbMaths.cpp, src/bullfrog/LbRect.cpp, src/bullfrog/LbTime.cpp, src/bullfrog/TbJPEGSaver.cpp, src/bullfrog/TbSystemInfo.cpp, src/bullfrog/WinScrn.cpp.
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian at the Mac's addresses, host
 library little-endian). Callees outside the unit are fakes on both sides recording their arguments: CPU::clocks_per_millisec,

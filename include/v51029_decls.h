@@ -1,4 +1,4 @@
-// Unit v51029: declarations of the functions and globals of src/SkyObjects_destroy_CSkyObjects_InitSkyObjects_2.cpp
+// Unit v51029: declarations of the functions and globals of src/game/rides/RideDB.cpp, src/game/keyboard.cpp
 // (CText::~CText, __sinit_RideDB_cpp, __sinit_keyboard_cpp; the others are members declared in their class headers).
 #pragma once
 #include <cstdint>

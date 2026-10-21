@@ -1,5 +1,5 @@
 // Test library for the ride list panel's info window (unit v5241; libtpw_unit_UpdateInfoWindow.dylib, tests/test_UpdateInfoWindow.py), main app:
-//   src/ChangeInfoWindow_UpdateInfoWindow.cpp   InitInfoWindow, UpdateInfoWindow
+//   src/game/ui/ui_ridepanel.cpp   InitInfoWindow, UpdateInfoWindow
 //
 // The callees outside the unit are fakes that record what the real ones read. The windows are fake objects whose virtual SetValue and
 // SetText record (the Mac's go through __ptr_glue); the constructors of the text and gradient objects are fakes under their symbol names.

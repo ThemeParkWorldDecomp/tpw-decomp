@@ -1,6 +1,6 @@
 // Test library for the cash, null cash, percent, visitor number and password text objects' Change and the password object's destructor
 // (unit v5983; libtpw_unit_InterfaceCashTextObject_Change.dylib, tests/test_InterfaceCashTextObject_Change.py), main app:
-//   src/ui_TextObjects_InterfaceCashTextObject_Change.cpp
+//   src/game/ui/InterfaceTextObjectSprite.cpp
 //
 // Fakes: InterfaceTextObjectSprite::Change (logs the flags, optionally the words, the text's length and hash), TbITable::FormatString
 // (writes "id:value" or "id"), labs, _wcsset (really sets), the cursor sprite's destructor and operator delete. gText and the shared

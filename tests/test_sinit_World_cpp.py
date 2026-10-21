@@ -1,5 +1,5 @@
 """Unit v5569, World.cpp's static initialiser, against libtpw_unit_sinit_World_cpp.dylib (tests/unit_sinit_World_cpp.cpp), main app
-("SimTheme Park"), src/World_save_sinit_World_cpp.cpp:
+("SimTheme Park"), src/game/World.cpp:
   __sinit_World_cpp 0x10141c14
 
 The world is built twice by one piece of Python code (emulator memory and host memory). The callees (__construct_array, the list

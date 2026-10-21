@@ -1,5 +1,5 @@
 """Unit v5129, the e-mail object, against libtpw_unit_Email_Send.dylib (tests/unit_Email_Send.cpp), main app ("SimTheme Park"),
-src/Email_Send.cpp:
+src/game/online/EmailMessage.cpp:
   Email::~Email 0x1020248c, Email::Reset 0x10202588, Email::AttachData 0x10202950, Email::Send 0x10202ee4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

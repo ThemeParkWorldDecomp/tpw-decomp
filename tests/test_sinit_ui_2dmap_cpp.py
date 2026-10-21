@@ -1,5 +1,5 @@
 """Unit v5194, the static initialiser of ui_2dmap.cpp, against libtpw_unit_sinit_ui_2dmap_cpp.dylib (tests/unit_sinit_ui_2dmap_cpp.cpp), main app
-("SimTheme Park"), src/sinit_ui_2dmap_cpp.cpp:
+("SimTheme Park"), src/game/ui/ui_2dmap.cpp:
   __sinit_ui_2dmap_cpp 0x102319d4
 
 A case is a world and the call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,5 +1,5 @@
 // Test library for GetRequiredBraceTangents (unit v51024; libtpw_unit_GetRequiredBraceTangents_2.dylib, tests/test_GetRequiredBraceTangents_2.py), main app:
-//   src/LevelSystems_GetRequiredBraceTangents_2.cpp   GetRequiredBraceTangents and the two clamp constants
+//   src/game/rides/CoasterPylon.cpp   GetRequiredBraceTangents and the two clamp constants
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record: NormaliseVectorXZ and MathLib::__fpclassifyf.
 #include <cmath>

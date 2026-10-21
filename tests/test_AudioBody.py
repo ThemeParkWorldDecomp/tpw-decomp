@@ -1,6 +1,6 @@
 """Unit w79f, the audio object the game holds, against libtpw_unit_AudioBody.dylib (tests/unit_AudioBody.cpp), in the program
 "sound symbols shared" (the Mac's sound library, Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/TbAudioBody.cpp  TbAudioBody: constructor 0x100161a0, destructor 0x100163bc, CreateSystemChain 0x10016480, Init 0x1001653c,
+  src/sound/AudioComponent.cpp, src/sound/TbAudioBody.cpp, src/sound/TbSysCommand.cpp  TbAudioBody: constructor 0x100161a0, destructor 0x100163bc, CreateSystemChain 0x10016480, Init 0x1001653c,
                        Release 0x10016804, DeregisterCatagoryBanks 0x10016884, QualifyPath 0x10016928, RegisterCatagory
                        0x10016ae4, SendEvent 0x10016c1c, CanBeDroppedDueToVolControl 0x10016f68, UpdateHandle 0x10017314,
                        UpdateParameter 0x100173d4, StopHandle 0x10017490, SystemCommand 0x1001753c, SetListenerOrientation
@@ -177,7 +177,7 @@ def setup(runner):
 
     e.stub("memcmp", memcmp)
 
-    # ---- the TbRefRelease imports of the bullfrog library (src/TbRefRelease.cpp): the count is the word after the vptr
+    # ---- the TbRefRelease imports of the bullfrog library (src/bullfrog/TbRefRelease.cpp): the count is the word after the vptr
     def ref_ctor(e):
         e.write(e.r(3) + 4, pack([1]))
 

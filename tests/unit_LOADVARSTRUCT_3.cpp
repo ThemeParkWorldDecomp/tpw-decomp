@@ -1,6 +1,6 @@
 // Test library for the action history load, the tag table lookup and the tag system's message receiver (unit v5960;
 // libtpw_unit_LOADVARSTRUCT_3.dylib, tests/test_LOADVARSTRUCT_3.py), main app:
-//   src/MsgDeath_CThoughts_Serialise_LOADVARSTRUCT_3.cpp   LOADVARSTRUCT<CThoughts::EventHistType>, CTagTable::GetElement,
+//   src/game/Thing.cpp, src/game/buildings/TrainingCentre.cpp   LOADVARSTRUCT<CThoughts::EventHistType>, CTagTable::GetElement,
 //   CTagSystem::ReceiveMessage; it defines gTagTable and gTbErrorZero.
 //
 // The callees outside the unit are fakes that record what the real ones read: WriteSerialiseLog, LbFile_Read, GAME_ASSERTMSG, CTRACE,

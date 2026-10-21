@@ -1,5 +1,5 @@
 // Test library for std::basic_ifstream<char>::~basic_ifstream at 0x1020448c (unit v5642; libtpw_unit_std_basic_ifstream_Dtor_basic_ifstream_2.dylib),
-// main app: src/email_load_Outbox_Send_Outbox_WriteMailData_std_basic_ifstream_Dtor_basic_ifstream_2.cpp
+// main app: src/game/MslSupport.cpp
 //
 // The callees (filebuf close, locale dtor, ios_base dtor, operator delete) are recording fakes. The vtable globals of other files are defined here.
 #include <cstddef>

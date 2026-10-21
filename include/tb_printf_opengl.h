@@ -73,7 +73,7 @@ extern void* gOpenGLTextureData; // 0x102b3648
 class COpenGLPrintf {
 public:
     void printf_xy(int32_t x, int32_t y, char* text); // 0x10046cec
-    bool Close(); // 0x10046c64 (src/tb_capture_ConvertSquareFrom32.cpp): deletes the 0x100 lists at word 0; glGetError == 0
+    bool Close(); // 0x10046c64 (src/engine/tb_printf_opengl.cpp): deletes the 0x100 lists at word 0; glGetError == 0
     uint8_t mOpaque[0x10];
     char* mText; // 0x10
     int32_t mX, mY; // 0x14, 0x18
@@ -93,7 +93,7 @@ public:
     int32_t EndDraw() override;
     int32_t DrawTestPoly() override;
     int32_t DrawFilledBox(float, float, float, float, int32_t, CTextureBase*) override;
-    // The rest of the drawing members (src/tb_opengl_draw.cpp). Execute, DrawTestPoly and
+    // The rest of the drawing members (src/engine/DrawPrimitiveOpenGL.cpp). Execute, DrawTestPoly and
     // DrawFilledBox above are 0x100431ac, 0x10043b70 and 0x10043eb0.
     int32_t DrawEdgeBox() override;   // 0x10044420
     int32_t DrawPoly(XZType*, int32_t, int32_t, float) override;   // 0x100441f4

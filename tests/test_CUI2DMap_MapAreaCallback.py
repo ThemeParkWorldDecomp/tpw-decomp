@@ -1,6 +1,6 @@
 """Unit v5985, the map area window's message function, against libtpw_unit_CUI2DMap_MapAreaCallback.dylib
 (tests/unit_CUI2DMap_MapAreaCallback.cpp), main app ("SimTheme Park"),
-src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister_CUI2DMap_MapAreaCallback.cpp:
+src/game/ui/ui_2dmap.cpp:
   CUI2DMap::MapAreaCallback 0x1022d0ac
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

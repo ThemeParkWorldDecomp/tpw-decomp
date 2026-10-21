@@ -1,5 +1,5 @@
 """Differential tests for FS_Registry.cpp, FS_System.cpp and the string helpers
-(src/FS_Registry.cpp, src/FS_System.cpp, src/TPString.cpp; Milestone 1 unit 5, part 1),
+(src/game/save/FS_Registry.cpp, src/game/save/FS_System.cpp, src/game/ui/3DFont.cpp; Milestone 1 unit 5, part 1),
 against libtpw_unit_FSSystem.dylib (tests/unit_FSSystem.cpp's fakes; see calllog.py).
 
 The bullfrog strings are functional and unrecorded on both sides: the PowerPC side's

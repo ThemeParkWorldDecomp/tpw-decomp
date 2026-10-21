@@ -1,5 +1,5 @@
 // Test library for the ltms CDiscFileStorage destructor (unit v5110), main app:
-//   src/TbIResourceIndex_bfl_FileSystem_CDiscFileStorage_Dtor_CDiscFileSt.cpp
+//   src/ltms/TbFontRenderParams.cpp
 //
 // The base destructor is a fake recording the same event as the PowerPC stub. The library's global operator delete is
 // the real one (defined elsewhere in this library), so the test allocates the object with operator new and sees the delete

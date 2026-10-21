@@ -1,5 +1,5 @@
 """Unit v5006, the three states of a guest leaving the park, against libtpw_unit_CPerson_ProcessStateWaitingToCrossRoadOutOfPark.dylib
-(tests/unit_CPerson_ProcessStateWaitingToCrossRoadOutOfPark.cpp), main app ("SimTheme Park"), src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark.cpp:
+(tests/unit_CPerson_ProcessStateWaitingToCrossRoadOutOfPark.cpp), main app ("SimTheme Park"), src/game/people/PersonQueue.cpp:
   CPerson::ProcessStateLeavingPark 0x1011e2e8, CPerson::ProcessStateWaitingToCrossRoadOutOfPark 0x1011e42c,
   CPerson::ProcessStateWaitingForBusOuttaHere 0x1011e654
 

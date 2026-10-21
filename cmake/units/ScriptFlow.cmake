@@ -1,4 +1,27 @@
 # Unit w164: the script interpreter's flow and arithmetic (SCR_FindNextEndif, SCR_FindNextElseOrEndif, PK_IF, ENDIF, ELSE, REPEAT, UNTIL, DO,
-# LOOP and the twelve arithmetic commands; src/ScriptFlow.cpp). The script system's globals, the code array, SCR_Error, SCR_Push, SCR_Pop and
-# CWorld::GetRand are fakes or storage in tests/unit_ScriptFlow.cpp; src/ScriptInterp.cpp is not linked.
-set(TPW_UNIT_ScriptFlow src/ScriptFlow.cpp platform/arena.cpp)
+# LOOP and the twelve arithmetic commands; src/game/Script.cpp, src/game/ScriptOps.cpp). The script system's globals, the code array, SCR_Error, SCR_Push, SCR_Pop and
+# CWorld::GetRand are fakes or storage in tests/unit_ScriptFlow.cpp; src/game/Script.cpp, src/game/ScriptOps.cpp is not linked.
+set(TPW_UNIT_ScriptFlow src/game/Script.cpp src/game/ScriptOps.cpp platform/arena.cpp)
+set(TPW_UNIT_ScriptFlow_KEEP
+  __Z10PK_COPYVARv   # PK_COPYVAR()
+  __Z17SCR_FindNextEndifv   # SCR_FindNextEndif()
+  __Z23SCR_FindNextElseOrEndifv   # SCR_FindNextElseOrEndif()
+  __Z5PK_DOv   # PK_DO()
+  __Z5PK_IFv   # PK_IF()
+  __Z6PK_ADDv   # PK_ADD()
+  __Z6PK_ANDv   # PK_AND()
+  __Z6PK_DIVv   # PK_DIV()
+  __Z6PK_MODv   # PK_MOD()
+  __Z6PK_MULv   # PK_MUL()
+  __Z6PK_SUBv   # PK_SUB()
+  __Z7PK_ELSEv   # PK_ELSE()
+  __Z7PK_LOOPv   # PK_LOOP()
+  __Z8PK_ENDIFv   # PK_ENDIF()
+  __Z8PK_UNTILv   # PK_UNTIL()
+  __Z9PK_ADDVARv   # PK_ADDVAR()
+  __Z9PK_DIVVARv   # PK_DIVVAR()
+  __Z9PK_MODVARv   # PK_MODVAR()
+  __Z9PK_MULVARv   # PK_MULVAR()
+  __Z9PK_RANDOMv   # PK_RANDOM()
+  __Z9PK_REPEATv   # PK_REPEAT()
+)

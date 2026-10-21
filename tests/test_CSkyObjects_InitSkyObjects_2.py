@@ -1,5 +1,5 @@
 """Unit v51029, seven small functions, against libtpw_unit_CSkyObjects_InitSkyObjects_2.dylib (tests/unit_CSkyObjects_InitSkyObjects_2.cpp), main
-app ("SimTheme Park"), src/SkyObjects_destroy_CSkyObjects_InitSkyObjects_2.cpp:
+app ("SimTheme Park"), src/game/keyboard.cpp, src/game/park/SkyObjects.cpp, src/game/rides/RideDB.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/MessageCentre.cpp:
   CSkyObjects::InitSkyObjects 0x1015b688, CText::~CText 0x1015ee20, __sinit_RideDB_cpp 0x10157010, CSubscription::Save 0x10152b08,
   __sinit_keyboard_cpp 0x101512fc, InterfaceFontWrapper::GetWidth 0x10168c7c, InterfaceFontWrapper::LastCharIn 0x10168d38
 

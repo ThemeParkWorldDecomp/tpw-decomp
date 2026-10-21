@@ -1,8 +1,8 @@
 // Test library for the coaster instances (unit w186; libtpw_unit_CoasterInstances.dylib, tests/test_CoasterInstances.py), main app:
-//   src/TPCoaster_instances.cpp   SetCurrentEditCoaster, the pylon interval three, FlagGenerateTrack, XZAngleBetweenPylons, the pylon area
+//   src/game/rides/CoasterPylon.cpp, src/game/rides/CoasterType.cpp, src/game/rides/TPCoaster.cpp   SetCurrentEditCoaster, the pylon interval three, FlagGenerateTrack, XZAngleBetweenPylons, the pylon area
 //                                 words, DestroyEndPylons, EndTrack, SetCoasterState, IsCoasterType, IsCoaster, the finders and setters,
 //                                 InstanceCoaster, ui_GetNumCoasterTracks (and gCoasterInstances, gCoasterInstanceCount, the four words)
-//   src/CoasterBalance.cpp        ~CCoasterBalance
+//   src/game/rides/CoasterType.cpp, src/game/rides/TPCoaster.cpp        ~CCoasterBalance
 //
 // Every callee outside the unit is a fake that records its arguments (floats as bits, objects as labels) and answers from the test's queues;
 // the ones that run while a loop of the unit runs can also change the world (the edit coaster, the trains' base and count, a brace's next)

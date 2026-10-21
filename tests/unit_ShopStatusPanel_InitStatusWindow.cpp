@@ -1,6 +1,6 @@
 // Test library for ShopStatusPanel::InitStatusWindow and ShopStatusPanel::UpdateWindow (unit v5936;
 // libtpw_unit_ShopStatusPanel_InitStatusWindow.dylib, tests/test_ShopStatusPanel_InitStatusWindow.py), main app:
-//   src/ShopStatusPanel_InitWindow_ShopStatusPanel_ApplyChanges_ShopStatusPanel_InitStatusWindow.cpp
+//   src/game/ui/ui_shopStatus.cpp
 //
 // Every callee outside the unit is a fake that records what the real one reads. Objects are named by a tag word at +0x138 of the
 // test's blocks (windows, the shop object), new objects by their order (100 + n).

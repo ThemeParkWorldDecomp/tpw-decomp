@@ -1,7 +1,7 @@
 """The archive name tree and the wildcard masks (bullfrog library: WadNameTree,
 TreeIterator, DirNode, FileNode, the two node allocators and node lists, 0x10043d78..
 0x10046868 and 0x10009d8c; TbStringMatch and TbCharStringList, 0x100087bc, 0x1000885c,
-0x10013850..0x10013c68; src/bfl_WadFile.cpp, src/TbStringMatch.cpp).
+0x10013850..0x10013c68; src/bullfrog/TbWadStorageAccess.cpp, src/bullfrog/WadNameTree.cpp, src/bullfrog/FileSystem.cpp).
 
 Both sides run their real code all the way down (the tree, its iterator, the allocators,
 the lists, the masks, the bullfrog strings): only the archive is a fake, a file object over

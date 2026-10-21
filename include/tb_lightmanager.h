@@ -1,6 +1,6 @@
 // tb_lightmanager.h: the light manager's two working globals (engine data, not exported; the
 // names are invented). They sit between gLightInverseWorld (0x100af150, tb_light.h) and
-// GlobalDiffuse (0x100af1a8, MapWho.h) and are defined in src/tb_lightmanager_frame.cpp.
+// GlobalDiffuse (0x100af1a8, MapWho.h) and are defined in src/engine/LightManager.cpp, src/engine/MapWho.cpp.
 #pragma once
 
 class CMatrix;

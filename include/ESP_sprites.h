@@ -1,5 +1,5 @@
 // ESP_sprites.h: the ESP sprite loader of HLSprite.cpp (main app, 0x1007ace0..0x1007c93c and ESP_GetParticleSprite
-// 0x1007cefc; src/ESP_sprites.cpp). An .ESP file describes one people sprite set: the name of its data file (.tps/.tpc
+// 0x1007cefc; src/game/HLSprite.cpp). An .ESP file describes one people sprite set: the name of its data file (.tps/.tpc
 // for the third person, .fps/.fpc for the first person, which is what the game ships as ".TPC" and ".FPC"), sixteen
 // action records and, in the later files, four blocks of custom data. ESP_FindESPFiles lists the .ESP files of a
 // sprite folder (the "generic" one, then the current theme's), sorts them by name and loads them; the sprites go into
@@ -22,7 +22,7 @@ class CThing;
 enum ACTS : int32_t {};
 // Unit w143: the sprite set numbers the staff modes spawn scripts for (4 to 8); a 32-bit value.
 enum ESP_Sprites : int32_t {};
-// 0x100da18c (332 bytes, src/ScriptInterp.cpp, unit w163; mangled __FPv11ESP_Spritesi4ACTSfff): starts a script on a sprite; answers the script handle.
+// 0x100da18c (332 bytes, src/game/Script.cpp, unit w163; mangled __FPv11ESP_Spritesi4ACTSfff): starts a script on a sprite; answers the script handle.
 int32_t ESP_SpawnScript(void* block, ESP_Sprites sprite, int32_t a, ACTS acts, float x, float y, float z);
 
 struct PTCLTexture;
@@ -136,7 +136,7 @@ bool ESP_LoadSprites(bool particlesOnly);
 // when the index falls outside the file.
 PTCLTexture* ESP_GetParticleSprite(int32_t sprite, int32_t frame, int32_t variant);
 // Unit w141 (untranslated): 0x1007cfc8 and 0x1007d280, switch the sprites between the first person and the third person view.
-// (Unit v5027, src/ESP_sprites_ESP_SwitchToFirstPersonSprites.cpp: both answer r3: 1 when they reloaded the sprites, 0 when the view was
+// (Unit v5027, src/game/HLSprite.cpp: both answer r3: 1 when they reloaded the sprites, 0 when the view was
 // already set or the "Sprites" resource is missing.)
 void ESP_SwitchToFirstPersonSprites();
 void ESP_SwitchToThirdPersonSprites();
@@ -146,7 +146,7 @@ void ESP_DisableSpriteDraw();
 // Unit w207 (untranslated): 0x1007ac68 (16 bytes), the pair of ESP_DisableSpriteDraw; CWorld::Load calls it for every world state but 4.
 void ESP_EnableSpriteDraw();
 
-// Unit v5027 (src/ESP_sprites_ESP_SwitchToFirstPersonSprites.cpp), used by ESP_AddHLSpriteFromScript (names invented).
+// Unit v5027 (src/game/HLSprite.cpp), used by ESP_AddHLSpriteFromScript (names invented).
 extern int32_t gESPMaxCellX;        // 0x1029d420  3
 extern int32_t gESPMinCellX;        // 0x1029d424  0
 extern int32_t gESPMaxCellZ;        // 0x1029d428  3
@@ -154,7 +154,7 @@ extern int32_t gESPMinCellZ;        // 0x1029d42c  0
 extern int32_t gESPGlobalCount;     // 0x102dbd40  how many entries gESPGlobalInstances holds
 extern int32_t gESPCellCounts[4][4];   // 0x102dbd7c  how many sprites each cell's list holds (the list is full at 0x800)
 
-// Unit v51046 (src/CLBScreenComponentOnlineIslands_GotoNextIsland_OnlineIslandParkDownloadCompleteCallback_2.cpp)
+// Unit v51046 (src/game/HLSprite.cpp)
 // 0x1007c9f8: a random number below the action count of sprite `sprites` of the set (gESPSprites[gESPGroups[set].mFirst + sprites]):
 // (GetRand() >> 2) mod mActionCount, unsigned. No range check; an action count of 0 divides by zero on the Mac (answers GetRand() >> 2
 // here, as the emulator does).

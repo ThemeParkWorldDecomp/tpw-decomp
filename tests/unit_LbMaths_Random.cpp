@@ -1,5 +1,5 @@
 // Test library for LbMaths_Random (unit v5738; libtpw_unit_LbMaths_Random.dylib, tests/test_LbMaths_Random.py), main app:
-//   src/AudioPlaceHolder_LbMaths_Random.cpp   LbMaths_Random
+//   src/sound/AudioPlaceHolder.cpp   LbMaths_Random
 //
 // RotateRight<long> is a fake that records its two arguments.
 #include <cstddef>

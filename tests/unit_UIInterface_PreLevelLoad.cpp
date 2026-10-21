@@ -1,5 +1,5 @@
 // Test library for the UIInterface stand-ins (unit v51061; libtpw_unit_UIInterface_PreLevelLoad.dylib, tests/test_UIInterface_PreLevelLoad.py), main app:
-//   src/OnlineParkFindPanelMsg_ContactMenu_ButtonsUnderlayMsg_2_UIInterface_PreLevelLoad.cpp
+//   src/game/ui/UIInterface.cpp
 //
 // Every callee is a fake recording the arguments the real one reads and answering from the test's queue; the panels the functions use are
 // globals defined here.

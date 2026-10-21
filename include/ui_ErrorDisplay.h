@@ -1,5 +1,5 @@
 // UI_DialogBox (main app 0x101f1800; the inventory files it under ui_ErrorDisplay.cpp).
-// Dialog construction is translated in src/ui_dialogbox.cpp (unit w43); Dialog and its callbacks remain untranslated.
+// Dialog construction is translated in src/game/ui/ui_main.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/ui_ErrorDisplay.cpp (unit w43); Dialog and its callbacks remain untranslated.
 #pragma once
 #include <cstdint>
 
@@ -21,7 +21,7 @@ InterfaceWindow* UI_DialogBox(dlgboxparams& params, dlgbutton button1, dlgcallba
 
 // unit w43
 InterfaceWindow* Dialog(int16_t* script, int32_t (*handler)(InterfaceWindow*, int32_t, int32_t, int32_t), int32_t modal);   // 0x101f12c8
-int32_t DialogBoxCallback(InterfaceWindow*, int32_t, int32_t, int32_t);   // 0x101f1520 (src/ui_dialogbox_callback.cpp, unit w47)
+int32_t DialogBoxCallback(InterfaceWindow*, int32_t, int32_t, int32_t);   // 0x101f1520 (src/game/ui/ui_ErrorDisplay.cpp, unit w47)
 extern int16_t gDialogBoxWindowData[];   // 0x102b1380
 extern uint8_t gUIMainKeyTablesDisabled;   // 0x1038cc54
 uint8_t UIMain_IsKeyTableDisabled();   // 0x101823c8
@@ -40,7 +40,7 @@ extern char gThemeTextureFolder[];    // 0x103963cc
 extern char gSharedTextureFolder[];   // 0x103963bc, 16 bytes
 const char* SEC_AuthorizedUser();                 // a text GAMESYSTEM_Init traces
 
-// unit w43b (src/ui_dialog.cpp)
+// unit w43b (src/game/ui/ui_ErrorDisplay.cpp)
 class InterfaceWindow;
 // 0x101f12c8 (Dialog(short*, int (*)(InterfaceWindow*, long, long, long), int), file ui_ErrorDisplay.cpp): makes a full-screen holder window
 // under the interface's root window, builds the window script `description` under it (InterfaceWindow::Build, with `callback` as the
@@ -50,14 +50,14 @@ class InterfaceWindow;
 // (when not NULL) and the keyboard. (UI_DialogBox, 0x101f1800, is another function.)
 InterfaceWindow* Dialog(int16_t* description, int32_t (*callback)(InterfaceWindow*, int32_t, int32_t, int32_t), int32_t modal);
 
-// unit w47 (src/ui_dialogbox_callback.cpp)
+// unit w47 (src/game/ui/ui_ErrorDisplay.cpp, src/game/ui/ui_main.cpp, src/game/ui/InterfaceTimer.cpp)
 // 0x101f1448: the message function of the dialogs that have no job of their own: message 0x14 posts message 4 to the parent and lets the
 // keyboard be decided again (UIMain_DecideKbCapture); then the window's default handler, and its answer.
 int32_t DefaultDialogCallback(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
 void UIMain_EnableAllKeyTables();     // 0x10182304: the six tables on again, the bookkeeping byte 0
 void UI_UnPauseTimerSystem();         // 0x101d8ba0: after UI_PauseTimerSystem: every running timer starts again from now
 
-// 0x101e0294 (64 bytes, src/ui_progress_cursor.cpp, unit w75): removes the interface's progress bar (tells the window message 4); the global
+// 0x101e0294 (64 bytes, src/game/ui/ui_progressBar.cpp, unit w75): removes the interface's progress bar (tells the window message 4); the global
 // is not cleared here. StopProcessing calls it last.
 void FuckOffUIProgressBar();
 extern InterfaceWindow* gUIProgressBar;   // 0x10395c6c, original name unknown: the window CreateUIProgressBar (0x101e01f0) makes

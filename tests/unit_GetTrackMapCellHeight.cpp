@@ -1,5 +1,5 @@
 // Test library for GetTrackMapCellHeight (unit v5070; libtpw_unit_GetTrackMapCellHeight.dylib, tests/test_GetTrackMapCellHeight.py), main app:
-//   src/GetTrackMapCellHeight.cpp   GetTrackMapCellHeight
+//   src/game/park/TrackCell.cpp   GetTrackMapCellHeight
 //
 // The callees outside the unit are recording fakes: GetWorldGSquareHeight (answers from the queue "Height") and CMapCell::GetNeighbouringCell
 // (answers the neighbour cell the case set for the offset asked: (0,1) first, (1,0) second, (1,1) third). The three compass offsets are

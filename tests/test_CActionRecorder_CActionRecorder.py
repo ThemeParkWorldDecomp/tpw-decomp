@@ -1,5 +1,5 @@
 """Unit v5075, CActionRecorder's constructor, destructor, Serialise and RecordAction, against
-libtpw_unit_CActionRecorder_CActionRecorder.dylib (tests/unit_CActionRecorder_CActionRecorder.cpp), main app, src/ActionRecorder_CActionRecorder_CActionRecorder.cpp:
+libtpw_unit_CActionRecorder_CActionRecorder.dylib (tests/unit_CActionRecorder_CActionRecorder.cpp), main app, src/game/ActionRecorder.cpp:
   CActionRecorder::CActionRecorder 0x10143658, ~CActionRecorder 0x10143880, Serialise 0x101439dc, RecordAction 0x1014430c
 
 A case is a recorder object and a call. The object is built twice by ONE piece of Python code: in emulator memory (big-endian, the Mac's

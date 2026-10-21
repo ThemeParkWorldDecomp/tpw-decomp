@@ -1,5 +1,5 @@
 """Unit v5028, the key-table spawn and loan actions, against libtpw_unit_spawn_handyman.dylib (tests/unit_spawn_handyman.cpp), main app
-("SimTheme Park"), src/ui_Postcard_panel_spawn_handyman.cpp:
+("SimTheme Park"), src/game/keyboard.cpp:
   spawn_person 0x1014dbf4, spawn_five_persons 0x1014dca0, start_winning_sequence 0x1014ddd0, spawn_entertainer 0x1014debc,
   spawn_handyman 0x1014df3c, spawn_bag_o_staff 0x1014e138, apply_for_loan_1 0x1014e248, apply_for_loan_2 0x1014e2e4
 

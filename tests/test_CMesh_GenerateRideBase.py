@@ -1,5 +1,5 @@
 """Unit v5752, the ride base members of CMesh, against libtpw_unit_CMesh_GenerateRideBase.dylib (tests/unit_CMesh_GenerateRideBase.cpp), engine,
-src/tb_mesh_CMesh_GenerateRideBase.cpp:
+src/engine/Mesh.cpp:
   CMesh::GenerateRideBase 0x1001e644 (one overlay for a texture entry), CMesh::GenerateRideBase 0x1001e72c (the cells of a rectangle of the
   height field get generated textures), CMesh::CenterMatrix 0x1001d97c.
 

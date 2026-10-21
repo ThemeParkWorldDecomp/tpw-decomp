@@ -1,6 +1,6 @@
 // TbSoundCore.h: the sound library's core (unit w79b, "sound symbols shared", Code at 0x10000000, TOC r2 = 0x1003abf0):
 // TbSoundCore, the component chain it hangs on (CAudioComponentAccess, CAudioComponent), the device-module factory
-// (CModuleFactory) and CMemoryCopyInit. Functions are in src/TbSoundCore.cpp; the command constructors are in src/snd_commands.cpp.
+// (CModuleFactory) and CMemoryCopyInit. Functions are in src/sound/TbSoundCore.cpp; the command constructors are in src/sound/TbSysCommand.cpp, src/sound/TbSoundCore.cpp, src/sound/AudioPlaceHolder.cpp.
 //
 // Calling convention: every function returning TbError returns it through a hidden r3 result buffer on the Mac (this moves to
 // r4); the host returns TbError by value (see include/TbSoundSystemModule.h). A virtual call on the Mac goes through the

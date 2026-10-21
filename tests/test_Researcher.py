@@ -1,5 +1,5 @@
 """Unit w188, against libtpw_unit_Researcher.dylib (tests/unit_Researcher.cpp), main app ("SimTheme Park"):
-  src/Researcher.cpp   CRegionEffectCell::operator== 0x10120c7c and Serialise 0x10120cfc, CResearcher::CResearcher (cell) 0x10120e34 and
+  src/game/people/Researcher.cpp   CRegionEffectCell::operator== 0x10120c7c and Serialise 0x10120cfc, CResearcher::CResearcher (cell) 0x10120e34 and
                        (cell, grade, flag, name) 0x10120eec, Init 0x10121004, Serialise 0x101210e4, FinalDestroy 0x1012123c, ReceiveMessage 0x101212e4,
                        UpdateTurn 0x10121340, ModelState 0x101213fc, ChooseNextAction 0x101214c0, ProcessPatrolling 0x101215d0, ProcessResearching
                        0x10121748, ProcessIdle 0x10121858, DoSomeResearch 0x101219cc, __sinit_Researcher_cpp 0x10121a88

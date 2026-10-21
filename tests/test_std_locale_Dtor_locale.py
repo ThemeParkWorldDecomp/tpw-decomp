@@ -1,5 +1,5 @@
 """Unit v51049, eight small functions, against libtpw_unit_std_locale_Dtor_locale.dylib (tests/unit_std_locale_Dtor_locale.cpp), main app
-("SimTheme Park"), src/std_locale_Dtor_locale.cpp:
+("SimTheme Park"), src/game/HLSprite.cpp, src/game/TPInstance.cpp, src/game/TPPointer.cpp, src/game/advisor/Advisor.cpp:
   std::locale::~locale 0x10070d44, std::basic_filebuf<char>::imbue 0x10070bf4, std::basic_filebuf<char>::pbackfail 0x100715b4,
   DisableRideHighlight 0x100672e4, ESP_GetRandomSpritesFrom 0x1007c900, ToggleProceduralTexturing 0x100634f8,
   DestroyDynamicMeshSetInstance 0x10063264, CAdvisor::SetPlayingFor 0x1000c7fc

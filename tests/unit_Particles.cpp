@@ -1,18 +1,18 @@
 // Test library for unit w26a (libtpw_unit_Particles.dylib; see tests/test_Particles.py): the particle system's core, second half
-// (src/rsse_particles.cpp): PAR_CloseParticleSystem, PAR_Free, PAR_LoadLibEmitter, PAR_KillLibEmitter, PAR_Tick (PAR_TickResult),
+// (src/game/Particles.cpp): PAR_CloseParticleSystem, PAR_Free, PAR_LoadLibEmitter, PAR_KillLibEmitter, PAR_Tick (PAR_TickResult),
 // ApplyParticleDensityAdjustment, the status queries, the emitter setters and killers, PAR_GetEmitterBoundingBox and
 // PAR_FreeDrawingList.
 //
-// Real: src/rsse_particles.cpp with the start-up half (src/rsse_particles_init.cpp: PAR_InitParticleSystem, PAR_LoadLibrary and the
+// Real: src/game/Particles.cpp with the start-up half (src/game/Particles.cpp: PAR_InitParticleSystem, PAR_LoadLibrary and the
 // swap helpers, which the test uses to build a state from the game's own Tp2.plb) and the state's globals
-// (src/rsse_particles_state.cpp). The library is built WITH TPW_SWAP_FILE_WORDS, like unit ParticlesInit's: the swap helpers
+// (src/game/rides/rsse.cpp). The library is built WITH TPW_SWAP_FILE_WORDS, like unit ParticlesInit's: the swap helpers
 // really swap, so that PAR_LoadLibEmitter's records end up in the original's byte order and the test compares the library as it
 // is. (The state's emitters, effecters, chain heads and pool stay in the host's order: the test turns them into the original's
 // order field by field before it compares.)
 // Fakes that record on both sides (name, then every argument): LbMem_Alloc and LbMem_Free (the library heap; the
 // pool and the drawing list are labelled blocks), the file calls of the library loader and of PAR_LoadLibEmitter (TPFile_Open,
 // TPFile_Read, LbFile_Read, LbFile_Seek, LbFile_Close, served from a file the case sets), the platform's _USwapBlock32,
-// GAME_ASSERTMSG (src/GameAssert.cpp, unit w22) and the three functions of unit w26c that PAR_Tick calls (DoEmitters, DoEffecters,
+// GAME_ASSERTMSG (src/game/advisor/Advisor.cpp, unit w22) and the three functions of unit w26c that PAR_Tick calls (DoEmitters, DoEffecters,
 // DoAParticle). DoEmitters and DoAParticle can change the state while they run, from queues the case fills ("DoEmitters head":
 // the emitter chain head it leaves; "DoAParticle next:<index>": the next link they give that particle), so that the order of PAR_Tick's
 // reads shows.

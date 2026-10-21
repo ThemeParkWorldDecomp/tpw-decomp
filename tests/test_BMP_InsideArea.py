@@ -1,5 +1,5 @@
 """Unit v5050, the bump area functions, against libtpw_unit_BMP_InsideArea.dylib (tests/unit_BMP_InsideArea.cpp), main app
-("SimTheme Park"), src/BMP_InsideArea.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_InsideArea 0x1002c260, BMP_OutsideArea 0x1002be04
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

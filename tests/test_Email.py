@@ -1,6 +1,6 @@
 """Unit w90, against libtpw_unit_Email.dylib (tests/unit_Email.cpp), in the main app ("SimTheme Park"):
-  src/email_load.cpp   Outbox::~Outbox 0x10203ba8, Outbox::Load 0x10203ce0, AddressBook::Load 0x10206b2c
-  src/TPEmbed_ime.cpp  IME::CIME::Activate 0x101feab0, UnActivate 0x101feae8, SetMaxCompositionLength 0x101feb18
+  src/game/online/email.cpp   Outbox::~Outbox 0x10203ba8, Outbox::Load 0x10203ce0, AddressBook::Load 0x10206b2c
+  src/game/ui/IME.cpp  IME::CIME::Activate 0x101feab0, UnActivate 0x101feae8, SetMaxCompositionLength 0x101feb18
 (LbFile_Copy 0x10000ddc, the unit's seventh function, is in bullfrog and its cases are in test_LbFile.py.)
 
 The two loaders run the original on the PowerPC side with the MSL library as it is in the binary: the strings (assign, append,

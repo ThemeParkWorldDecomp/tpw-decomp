@@ -1,6 +1,6 @@
 // Test library for CFSOnlineServer's constructor (unit v5049; libtpw_unit_CFSOnlineServer_CFSOnlineServer.dylib,
 // tests/test_CFSOnlineServer_CFSOnlineServer.py), main app:
-//   src/CFSOnlineServer_CFSOnlineServer.cpp   CFSOnlineServer::CFSOnlineServer
+//   src/game/online/FS_OnlineList.cpp   CFSOnlineServer::CFSOnlineServer
 //
 // The string members' constructor and operator=(const char16_t*) are recording fakes (the same events as the PowerPC stubs); the list's
 // AddTail runs for real on both sides.

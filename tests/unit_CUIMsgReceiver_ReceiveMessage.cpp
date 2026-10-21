@@ -1,5 +1,5 @@
 // Test library for CUIMsgReceiver::ReceiveMessage (unit v5666; libtpw_unit_CUIMsgReceiver_ReceiveMessage.dylib), main app:
-//   src/vector2d_CUIMsgReceiver_ReceiveMessage.cpp
+//   src/game/ui/vector2d.cpp
 //
 // The UIInterface callees are fakes that record the arguments the real ones get. gUIInterface is defined here. The message is a test
 // subclass: its GetType answers from the queue "GetType"; its fields sit where the casts of the translation read them.

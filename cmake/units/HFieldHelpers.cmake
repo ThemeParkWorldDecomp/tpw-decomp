@@ -1,1 +1,11 @@
-set(TPW_UNIT_HFieldHelpers src/tb_hfield_helpers.cpp platform/arena.cpp)
+set(TPW_UNIT_HFieldHelpers src/engine/DrawPrimitive.cpp src/engine/tb_hfield.cpp platform/arena.cpp)
+set(TPW_UNIT_HFieldHelpers_KEEP
+  __Z16QSortFaces_floatPfPtii   # QSortFaces_float(float*, unsigned short*, int, int)
+  __ZN7CHField14CheckGamutAreaEPa   # CHField::CheckGamutArea(signed char*)
+  __ZN7CHField14QSort_texturesEPPvii   # CHField::QSort_textures(void**, int, int)
+  __ZN7CHField15GetTexturesUsedEPPvRiPP13CTextureEntry   # CHField::GetTexturesUsed(void**, int&, CTextureEntry**)
+  __ZN7CHField16CalcFullLightingEv   # CHField::CalcFullLighting()
+  __ZN7CHField19qSortTextures_lpTexEP12QuadSaveInfoii   # CHField::qSortTextures_lpTex(QuadSaveInfo*, int, int)
+  __ZN7CHField24ProcessTextureParametersEPjP11sHFieldQuad   # CHField::ProcessTextureParameters(unsigned int*, sHFieldQuad*)
+  __ZN7CHField8CalcLineEPhP7SVertexPjiii   # CHField::CalcLine(unsigned char*, SVertex*, unsigned int*, int, int, int)
+)

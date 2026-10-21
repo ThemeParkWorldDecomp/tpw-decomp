@@ -1,6 +1,6 @@
 // Test library for FeatureStatusPanel::InitStatusWindow (unit v5676; libtpw_unit_FeatureStatusPanel_InitStatusWindow.dylib,
 // tests/test_FeatureStatusPanel_InitStatusWindow.py), main app:
-//   src/FeatureStatusPanel_UpdateStatusWindow_FeatureStatusPanel_InitStatusWindow.cpp
+//   src/game/ui/ui_FeatureStatus.cpp
 //
 // The callees are fakes that record the arguments the real ones read. Windows are blocks inside the parent block, so they are logged
 // as offsets from the parent.

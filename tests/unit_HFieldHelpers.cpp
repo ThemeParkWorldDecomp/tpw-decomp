@@ -1,4 +1,4 @@
-// Harness for the height field's helpers and the face sorter (src/tb_hfield_helpers.cpp).
+// Harness for the height field's helpers and the face sorter (src/engine/DrawPrimitive.cpp, src/engine/tb_hfield.cpp).
 //
 // Everything the helpers call outside the unit is a fake that records through calllog:
 //  - CLightManager::CalcIntensities (CalcFullLighting): records the colour offset and the point

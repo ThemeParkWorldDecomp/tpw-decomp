@@ -1,9 +1,9 @@
 """Differential tests for unit w39, the login panel, against libtpw_unit_LoginPanel.dylib (tests/unit_LoginPanel.cpp):
 
-  src/ui_loginpanel.cpp        CreateLoginPanel, FillLoginNames, UI_TITLE_COLOUR, UIMain_GetString
-  src/InterfaceWindow_font.cpp InterfaceWindow::SetFont, SetFontJust, SetFontColour, setExtraParam, SetClientDrawText and the virtual
+  src/game/ui/ui_main.cpp, src/game/ui/ui_playerLogin.cpp, src/game/ui/ui_utils.cpp        CreateLoginPanel, FillLoginNames, UI_TITLE_COLOUR, UIMain_GetString
+  src/game/ui/InterfaceWindow.cpp InterfaceWindow::SetFont, SetFontJust, SetFontColour, setExtraParam, SetClientDrawText and the virtual
                                SetText
-  src/keytables_disable.cpp    DisableAllKeytables
+  src/game/keyboard.cpp    DisableAllKeytables
 
 Real on both sides, so that CreateLoginPanel builds the panel the way the game does: the login panel's script (the PowerPC side reads
 the image's words, the host its array), the script interpreter, the control factory and constructors, the window constructor, WhatAmI,

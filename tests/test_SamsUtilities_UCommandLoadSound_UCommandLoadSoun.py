@@ -1,5 +1,5 @@
 """Unit v5758, the UCommandLoadSound constructor and destructor, against libtpw_unit_SamsUtilities_UCommandLoadSound_UCommandLoadSoun.dylib
-(tests/unit_SamsUtilities_UCommandLoadSound_UCommandLoadSoun.cpp), src/SamsUtilities_UCommandLoadSound_UCommandLoadSoun.cpp:
+(tests/unit_SamsUtilities_UCommandLoadSound_UCommandLoadSoun.cpp), src/sound/SprocketsChannel.cpp:
   UCommandLoadSound 0x1002ac30, ~UCommandLoadSound 0x1002ab8c
 
 The callees (UCommand ctor, counter copy ctor, counter dtor, operator delete glue) are fakes on both sides that record their arguments and

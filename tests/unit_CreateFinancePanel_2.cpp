@@ -1,5 +1,5 @@
 // Test library for CreateFinancePanel (unit v51026; libtpw_unit_CreateFinancePanel_2.dylib, tests/test_CreateFinancePanel_2.py), main app:
-//   src/CreateFinancePanel_2.cpp   CreateFinancePanel, gFinanceScript
+//   src/game/ui/ui_FinancePanel.cpp   CreateFinancePanel, gFinanceScript
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads. Window pointers come from a table the test
 // fills (GetWindow answers the table's entry for the id), so no window is ever dereferenced on the host.

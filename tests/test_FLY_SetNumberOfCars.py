@@ -1,5 +1,5 @@
 """Unit v5277, the FLY base accessors, against libtpw_unit_FLY_SetNumberOfCars.dylib (tests/unit_FLY_SetNumberOfCars.cpp), main app,
-src/FLY_SetNumberOfCars.cpp:
+src/game/rides/FlyingRide.cpp:
   FLY_SetRunTime 0x10078958, FLY_SetRunSpeed 0x100789ec, FLY_SetOpenClosed 0x10078a58, FLY_SetNumberOfCars 0x10078ee4,
   FLY_GetBrokenStat 0x10078fb0, FLY_LaunchCar 0x10079024, FLY_RideRunning 0x100791c0
 

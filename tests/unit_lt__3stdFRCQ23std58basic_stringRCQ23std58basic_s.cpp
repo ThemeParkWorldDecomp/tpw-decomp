@@ -1,5 +1,5 @@
 // Test library for std::operator< on nocase wide strings (unit v5756; tests/test_lt__3stdFRCQ23std58basic_stringRCQ23std58basic_s.py), main app:
-//   src/lt__3stdFRCQ23std58basic_stringRCQ23std58basic_s.cpp   NocaseWStringLess
+//   src/game/MslSupport.cpp   NocaseWStringLess
 //
 // size, begin and compare are recording fakes that answer from the test's queues.
 #include <cstddef>

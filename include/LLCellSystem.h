@@ -1,4 +1,4 @@
-// The cell system (LLCellSystem.cpp of the main app, unit w111, src/LLCellSystem.cpp): its start and end. The globals are named
+// The cell system (LLCellSystem.cpp of the main app, unit w111, src/game/park/LLCellSystem.cpp): its start and end. The globals are named
 // after their addresses (the real names are unknown); the first column of each comment is the Mac's width.
 #pragma once
 #include <cstdint>
@@ -51,12 +51,12 @@ extern int32_t gLLCCDB6C;     // 0x102ddb6c  cleared (after the mesh sets are lo
 extern uint16_t gLLCCDB68;    // 0x102ddb68  half word, cleared
 extern int32_t gLLCC47C8;     // 0x102e47c8  cleared last
 
-// ---- The cell costs (unit w117, src/LLCellSystem_costs.cpp): each setter stores its argument in the word and answers nothing; the
+// ---- The cell costs (unit w117, src/game/park/LLCellSystem.cpp): each setter stores its argument in the word and answers nothing; the
 // game sets them from the level's balance (CGame::InitLevel_Initialise). The words are named after their addresses.
 void LLCC_SystemSetPathCost(int32_t cost);        // 0x10091b24 (12 bytes)
 void LLCC_SystemSetQueueCost(int32_t cost);       // 0x10091b9c
-void LLCC_SystemSetSessionCost(int32_t cost);     // 0x10091d14 (12 bytes, src/LLCellSystem_modes.cpp, unit w185; CashWindowCallback calls it with 0 every frame)
-void LLCC_SystemAddToSessionCost(int32_t cost);   // 0x10091d50 (20 bytes, src/LLCellSystem_modes.cpp, unit w185)
+void LLCC_SystemSetSessionCost(int32_t cost);     // 0x10091d14 (12 bytes, src/game/park/LLCellSystem.cpp, unit w185; CashWindowCallback calls it with 0 every frame)
+void LLCC_SystemAddToSessionCost(int32_t cost);   // 0x10091d50 (20 bytes, src/game/park/LLCellSystem.cpp, unit w185)
 void LLCC_SystemSetKartTrackCost(int32_t cost);   // 0x10091c14
 void LLCC_SystemSetWaterTrackCost(int32_t cost);  // 0x10091c94
 extern int32_t gLLCC47DC;   // 0x102e47dc  the path cost
@@ -84,10 +84,10 @@ extern int32_t gLLCMQSize[2];              // 0x102dcea8  {1, 1} after LLCM_Load
 extern int32_t gLLCMTrackSize[2];          // 0x102dc220  {2, 2} after the other three loaders
 extern int32_t gLLCMIllegalPlacement;      // 0x102dc218  LLCM_SetIllegalPlacement's word (LLCM_GetIllegalPlacement 0x10088970 reads it)
 extern int32_t gLLCCClickStackCount;       // 0x102e47c0  the click stack's entry count (LLCC_SystemAddToClickStack's)
-// 0x100914f4 (12 bytes, src/DynamicMesh.cpp; LLCellSystem.cpp on the Mac): the cell system's mode (gLLCC480C).
+// 0x100914f4 (12 bytes, src/game/park/LLCellSystem.cpp; LLCellSystem.cpp on the Mac): the cell system's mode (gLLCC480C).
 int32_t LLCC_SystemGetMode();
 
-// The four instancers (src/LLCellMeshes.cpp, unit w120; LLCellMouse.cpp on the Mac). The decompiled text prints the wrong parameters and a
+// The four instancers (src/game/park/LLCellMouse.cpp, unit w120; LLCellMouse.cpp on the Mac). The decompiled text prints the wrong parameters and a
 // void answer for three of them: the tile is a CELL_IndexType passed by value (r5 to r7), `restore` is r8 (0 from SetHFieldTile, 1 from
 // RefreshHFieldTile), and all four answer the instance number (InstanceRide's or RestoreRideInstance's answer), which the callers store in
 // the cell's mMeshInstance. The ride is placed from an sFixedRideParams whose mF0C is the address of the size pair (gLLCMQSize or
@@ -98,7 +98,7 @@ uint32_t LLCCM_CreateKTrackMesh(int32_t x, int32_t y, CCellBase::CELL_IndexType 
 uint32_t LLCCM_CreateWTrackMesh(int32_t x, int32_t y, CCellBase::CELL_IndexType index, int32_t restore);    // 0x10082350 (364 bytes)
 uint32_t LLCCM_CreateHoardingMesh(int32_t x, int32_t y, CCellBase::CELL_IndexType index, int32_t restore);  // 0x10082720 (284 bytes)
 
-// Unit w133 (LLCC_DrawInitialHoarding, src/LLCellSystem_hoarding.cpp). The park's hoarding extents (initialised data, all -1 in the image;
+// Unit w133 (LLCC_DrawInitialHoarding, src/game/park/LLCellSystem.cpp). The park's hoarding extents (initialised data, all -1 in the image;
 // names invented): left, top, right, bottom in cells.
 extern int32_t gHoardingLeft;     // 0x1029e044
 extern int32_t gHoardingTop;      // 0x1029e048
@@ -116,10 +116,10 @@ int32_t LLCC_BuildHoardingDB(int32_t right, int32_t bottom, int32_t left, int32_
 void RecalculateParkDarkening();                                                         // 0x1005c59c
 void LLCR_OverRide(uint16_t* out, int32_t x, int32_t y);                                 // 0x10089210 (unit w142; the Mac answers through a hidden halfword result, y in r5)
 void LLCR_OverRide(uint16_t* out, int32_t* x, int32_t* y);                               // 0x1008905c (stand-in; unit v5033 calls it with the addresses of its x and y)
-void LLCC_SetRideRotation(int32_t rotation, bool flag);                                 // 0x10090d40 (unit w143; src/LLCellSystem_modes.cpp, unit w185)
+void LLCC_SetRideRotation(int32_t rotation, bool flag);                                 // 0x10090d40 (unit w143; src/game/park/LLCellSystem.cpp, unit w185)
 void LLCR_GetHoardingExtents(int32_t* a, int32_t* b, int32_t* c, int32_t* d);            // 0x1008f9c8
 
-// Unit w201 (src/LLCellSystem_hoardimage.cpp): the park's hoarding walked, locked, redrawn and checked. The image words are initialised data of the
+// Unit w201 (src/game/park/LLCellSystem.cpp): the park's hoarding walked, locked, redrawn and checked. The image words are initialised data of the
 // Mac (all names invented): a 0x43 by 0x43 byte grid of half cells, indexed x * 0x43 + y, the NEW image directly followed by the CURRENT one (one array here, as the Mac keeps them back to back).
 void LLCC_SystemConstructHoardingClickStack();                                           // 0x100936f4 (512 bytes): the click stack along the hoarding from (right, bottom)
 void LLCC_LockHoarding(bool lock);                                                       // 0x10093934 (432 bytes): sets (lock) or clears the lock flag 0x20 along the hoarding
@@ -136,7 +136,7 @@ bool LLCC_IsPatrolAreaLegal(int32_t x1, int32_t y1, int32_t x2, int32_t y2);    
 extern int32_t gLLCCReviseAnswer;                  // 0x1029df30  LLCC_ReviseHoarding stores LLCC_BuildHoardingDB's answer (initialised data: 1; name invented)
 extern uint8_t gLLCCHoardingImages[2 * 0x43 * 0x43];   // 0x102de198  the new image (0x1189 bytes), directly followed by the current image (0x102df321)
 
-// Unit w206 (src/LLCellSystem_hoardedit.cpp): the park's inside filled from the locked hoarding, and a hoarding edit checked for legality and cost.
+// Unit w206 (src/game/park/LLCellSystem.cpp): the park's inside filled from the locked hoarding, and a hoarding edit checked for legality and cost.
 void LLCC_FillInsideOfPark();                                                            // 0x10093b0c (2,836 bytes)
 int32_t LLCC_IsHoardingEditLegal(int32_t x1, int32_t y1, int32_t x2, int32_t y2, bool charge);   // 0x1009464c (3,488 bytes; answers 0 or 1 as a word)
 // The edit check's edge tally (names invented). Index 0 is the column at the larger x, 1 the row at the larger y, 2 the column at the smaller x,
@@ -145,7 +145,7 @@ int32_t LLCC_IsHoardingEditLegal(int32_t x1, int32_t y1, int32_t x2, int32_t y2,
 extern int32_t gLLCCEdgeCount[4];       // 0x102e05a0
 extern uint8_t gLLCCEdgeMarks[4][0x80]; // 0x102e05b0
 
-// Unit w208 (src/LLCellSystem_hoardwrite.cpp): the park's hoarding written to the theme's hoardings balance file, and the static objects of
+// Unit w208 (src/game/park/LLCellSystem.cpp): the park's hoarding written to the theme's hoardings balance file, and the static objects of
 // LLCellSystem.cpp (__sinit_LLCellSystem_cpp, 0x10096f04, 764 bytes: the source defines them in the order the Mac constructs them). All names
 // are invented. Each writer opens the theme's file for the name gTPGlobals holds, writes two rows per click of the copied click stack (the
 // click minus the hoarding's right or bottom edge), then the closing pair of rows (0x200 each), and closes the file.
@@ -169,7 +169,7 @@ extern TbDynamicStringTemplate<char> gLLCCHoardingSep;          // 0x102e04ac  "
 extern const MapDelta gLLCCPointedOffsets[9];   // 0x102de0e4
 extern int32_t gLLCC481C;   // 0x102e481c  0x10000 after __sinit_LLCellSystem_cpp (no reader found; 1.0 in 16.16?)
 extern int32_t gLLCC4820;   // 0x102e4820  0 after it (no reader found)
-// Unit v5689 (src/LLCellSystem_hoardimage_RemoveBridge.cpp).
+// Unit v5689 (src/game/park/MapCell.cpp).
 class CTrackCell;
 extern uint16_t gLLCCThingListEnd;   // 0x1029e20c (name invented): the id that ends a cell's thing list in LLCC_SystemGetPointedPeepThing (0 at start)
 void RemoveBridge(CTrackCell* cell, MapDelta a, MapDelta b);   // 0x1009722c (712 bytes): the two MapDeltas are passed by reference (8 bytes copied)
@@ -187,7 +187,7 @@ void LLCC_SystemSetRide(const tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>&
 void LLCC_SystemSetRideQueue(int32_t queue);                                        // 0x10091994
 void LLCC_SystemSetRideTrack(int32_t track);                                        // 0x10091a5c
 
-// Unit w185 (src/LLCellSystem_modes.cpp; LLCellSystem.cpp on the Mac): the mode switches, the ride and cost words, the cursor, the click stack
+// Unit w185 (src/game/park/LLCellSystem.cpp; LLCellSystem.cpp on the Mac): the mode switches, the ride and cost words, the cursor, the click stack
 // and the first block fix up. SetMode, SetRideRotation, SetRide, SetRideQueue, SetRideTrack, SetSessionCost and AddToSessionCost are declared above.
 int32_t LLCC_GetRideRotation();                          // 0x10090de0 (12 bytes)
 void LLCC_SystemSetModeNR(int32_t mode, bool flag);      // 0x100911f0 (716 bytes): SetMode's twin that does not reset the mode's words
@@ -197,7 +197,7 @@ void LLCC_SystemSetCursor();                             // 0x1009179c (460 byte
 int32_t LLCC_SystemGetRideQueue();                       // 0x10091a08 (36 bytes)
 int32_t LLCC_SystemGetRideTrack();                       // 0x10091ad0 (36 bytes)
 int32_t LLCC_SystemGetPathCost();                        // 0x10091b60 (12 bytes)
-// Unit v5536 (src/LLCC_DrawKartBlock.cpp): 0x10089cfc (1308 bytes); the third argument is unused (r5).
+// Unit v5536 (src/game/park/LLCellRide.cpp): 0x10089cfc (1308 bytes); the third argument is unused (r5).
 int32_t LLCC_DrawKartBlock(int32_t x, int32_t y, int32_t unused, int32_t flagA, int32_t flagB, uint8_t direction);
 int32_t LLCC_SystemGetQueueCost();                       // 0x10091bd8 (12 bytes)
 // (LLCC_SystemGetKartTrackCost 0x10091c54 and LLCC_SystemGetWaterTrackCost 0x10091cd4 are declared in TrackCell.h, as uint32_t.)
@@ -236,10 +236,10 @@ extern int32_t gLLCCFirstBlockY;   // 0x1029e030  -1 (name invented)
 void AbortMovePylon();                                   // 0x10057df4 (356 bytes, untranslated)
 void SetCoasterEdit(void* coaster, int32_t flag);        // 0x10058758 (124 bytes, untranslated)
 int32_t LLCM_GetIllegalPlacement();                      // 0x10088970 (12 bytes, untranslated)
-extern uint8_t gLLCCDB34;      // 0x102ddb34  set to 1 by every left button down (defined in src/LLCM_LeftMouseButtonDown.cpp)
-extern uint8_t gLLCCE090;      // 0x102de090  nonzero while a brace drag is pending (defined in src/LLCM_LeftMouseButtonDown.cpp)
+extern uint8_t gLLCCDB34;      // 0x102ddb34  set to 1 by every left button down (defined in src/game/park/LLCellMouse.cpp)
+extern uint8_t gLLCCE090;      // 0x102de090  nonzero while a brace drag is pending (defined in src/game/park/LLCellMouse.cpp)
 
-// Unit w204 (src/LLCellSystem_clickstacks.cpp, src/LLCellRide_offsets.cpp): backtracking a click, the queue walk and the two track walks that
+// Unit w204 (src/game/park/LLCellSystem.cpp, src/game/park/LLCellRide.cpp): backtracking a click, the queue walk and the two track walks that
 // fill the click stack, and the track end offsets.
 int32_t LLCC_SystemBacktrack(CObject* obj, bool fixBridges);   // 0x10092280 (912 bytes): 0 or 1
 int32_t LLCC_SystemConstructQueueClickStack(CObject* obj);   // 0x10092644 (1980 bytes): 0, or the direction byte when the walk met a cell that is not a queue
@@ -253,12 +253,15 @@ void DeleteLastTrackBrace();   // 0x10056a80 (720 bytes)
 uint8_t LLCR_FixBridges(CObject* ride, bool a, bool b, bool c);   // 0x1008fa34 (2020 bytes)
 uint8_t LLCR_FixBridgesReverse(CObject* ride, bool a, bool b, bool c);   // 0x1009024c (2216 bytes; the answer is not read)
 
-// Unit v5059 (src/LLCellMeshes_LLCM_RebuildUpgradeBridges.cpp).
+// Unit v5059 (src/game/park/LLCellMouse.cpp).
 void LLCM_CoverUpgrade(int32_t* x, int32_t* y);          // 0x100828e4 (888 bytes)
 void LLCM_RebuildUpgradeBridges(int32_t x, int32_t y);   // 0x10082cf0 (1116 bytes)
+// game/park/TrackCell.cpp defines it with the r3 the listing answers (int32_t, the same mangled name) and leaves this out.
+#ifndef TPW_LLCC_DRAWTRACKLINE_R3
 void LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);   // 0x100a30f8 (912 bytes, stand-in)
+#endif
 
-// Unit v5082 (src/LLCC_Kill_Them_KILL_THEM_ALL.cpp): LLCC_BuildHoardingDB (declared above) and the rectangle clearer. The four words are defined by
+// Unit v5082 (src/game/park/LLCellRide.cpp): LLCC_BuildHoardingDB (declared above) and the rectangle clearer. The four words are defined by
 // the unit (names invented): the extents of the hoarding walk, min x / min y / max x / max y.
 int32_t LLCC_Kill_Them_KILL_THEM_ALL(int32_t x1, int32_t y1, int32_t x2, int32_t y2);   // 0x1008ebc0 (1,212 bytes): 1
 void LLCR_DeleteRide(int32_t x, int32_t y, int32_t flag);   // 0x100892c4 (2,576 bytes, stand-in)
@@ -267,11 +270,11 @@ extern int32_t gLLCCHoardMinY;   // 0x102de0c4  0x400
 extern int32_t gLLCCHoardMaxX;   // 0x102de0c0  0
 extern int32_t gLLCCHoardMaxY;   // 0x102de0bc  0
 
-// Unit v5182 (src/LLCellMouse_LLCM_SetCurrentObject.cpp): the current object's track end and the track edit mode's start. Names are invented.
+// Unit v5182 (src/game/park/LLCellMouse.cpp): the current object's track end and the track edit mode's start. Names are invented.
 class CTrackCell;
 void LLCM_StartTrackEditMode(int32_t x, int32_t y, uint16_t unused);   // 0x10088a64 (1,372 bytes; the third argument is never read)
 void LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag);   // 0x1008ddfc: calls LLCC_TraceTrackCount
-int32_t LLCC_TraceTrackCount(CTrackCell* from, CTrackCell* to, int32_t flag);   // 0x1008ddfc body: the number of cells walked, -1 when a cell is no track (2,212 bytes, src/LLCC_TraceTrack.cpp): the number of cells walked, -1 when a cell is no track
+int32_t LLCC_TraceTrackCount(CTrackCell* from, CTrackCell* to, int32_t flag);   // 0x1008ddfc body: the number of cells walked, -1 when a cell is no track (2,212 bytes, src/game/park/LLCellRide.cpp): the number of cells walked, -1 when a cell is no track
 extern int32_t gLLCC9F18;        // 0x1029df18  -1 (initialised data): the current object's cell x
 extern int32_t gLLCC9F1C;        // 0x1029df1c  -1: its cell y
 extern int32_t gLLCC9F20;        // 0x1029df20  -1: its rotation
@@ -286,7 +289,7 @@ extern uint16_t gLLCCDB5C;       // 0x102ddb5c  0: gLLCCDB68's previous value
 // another unit leave no current object). Host only, no Mac address.
 extern CObject* gLLCMCurrentObject;
 
-// Unit v5186 (src/LLCC_Kill_Them_KILL_THEM_ALL_LLCC_AbortPylonMove.cpp): LLCC_AbortPylonMove (declared in TPCoaster.h), LLCC_IsRideMovable and
+// Unit v5186 (src/game/park/LLCellRide.cpp): LLCC_AbortPylonMove (declared in TPCoaster.h), LLCC_IsRideMovable and
 // LLCC_GetRideBlendInfo (declared in TPEngine.h). The globals are defined by the unit (names invented).
 int32_t LLCC_IsRideMovable(CObject* ride);   // 0x1008f330 (528 bytes): 1 unless the ride's track type is 1 or 2 and the cell before its start or after its end has other than one neighbour
 extern int32_t gLLCCE0B4;    // 0x1029e0b4  the pylon's x, -1 for none (initially -1)
@@ -301,10 +304,10 @@ extern LLCCRideBlend gLLCCDF84;   // 0x102ddf84
 // Unit v5691: LLCC_GetRideProfileInfo's table (0x102ddb7c): 16 x 16 words (x * 16 + z), then the shape's size at +0x400 and +0x404.
 extern int32_t gLLCCDB7C[0x102];
 
-// Unit v5633 (src/LLCellMeshes_LLCM_RebuildUpgradeBridges_LLCM_MouseMoved.cpp): LLCM_MouseMoved's untranslated callees and the words it
+// Unit v5633 (src/game/park/LLCellMouse.cpp): LLCM_MouseMoved's untranslated callees and the words it
 // defines (names invented from the Mac addresses).
 void LLCM_TrackCellBoundary(int32_t x, int32_t y, int32_t* cellX, int32_t* cellY, int32_t* outX, int32_t* outY);   // 0x100889ac (128 bytes, stand-in)
-// (Unit v5635 translated it, src/LLCC_DrawKartBlock_LLCR_PlaceRide.cpp: the answer is the placement block or NULL, see below.)
+// (Unit v5635 translated it, src/game/park/LLCellRide.cpp: the answer is the placement block or NULL, see below.)
 int32_t LLCR_PlaceRide(int32_t x, int32_t y, int32_t a, int32_t rotation, int32_t b, int32_t c);    // 0x1008a248 (6,572 bytes; answers the block's address, low 32 bits, or 0)
 struct LLCRPlacement* LLCR_PlaceRideBlock(int32_t x, int32_t y, int32_t a, int32_t rotation, int32_t b, int32_t c);   // the body of LLCR_PlaceRide, answers the block or NULL
 extern uint16_t gLLCC9F34;    // 0x1029df34  0: the ride id the ride mode does not preview
@@ -318,7 +321,7 @@ extern int32_t gLLCCDB60;     // 0x102ddb60  1 while the mouse cell is the drag 
 extern int32_t gLLCCDE0B4;    // 0x102de0b4  the ride under the mouse's info word (record +0x54)
 extern int32_t gLLCCDE0B8;    // 0x102de0b8  the mode's info word (2, 3, or the ride record's +0x54)
 
-// Unit v5635 (src/LLCC_DrawKartBlock_LLCR_PlaceRide.cpp): LLCR_PlaceRide (declared above) and its words (BSS; names invented).
+// Unit v5635 (src/game/park/LLCellRide.cpp): LLCR_PlaceRide (declared above) and its words (BSS; names invented).
 // The block LLCR_PlaceRide answers (0x102de0a0, 0x14 bytes): the entrance cell, the footprint's top left cell, the entrance's direction.
 struct LLCRPlacement {
     int32_t mEntranceX;            // 0x00  -1 until a build places the entrance
@@ -343,7 +346,7 @@ uint8_t LLCR_GetRideCellDirection(int32_t col, int32_t row);                // 0
 void LLCR_SetTopLeft(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);  // 0x1008bd68 (20 bytes)
 CObject* LLCR_AddRideToDB(int32_t rotation);                                // 0x1008be1c (740 bytes): the ride (+4 and +6 its cell bytes)
 
-// Unit v5687 (src/TrackCell_flags_CTrackCell_SetHFieldTile_LLCC_BreakTrack.cpp).
+// Unit v5687 (src/game/park/TrackCell.cpp).
 // 0x100a510c (1,156 bytes): takes the direction bits (dir, else the cell's own direction; at the track end only the neighbour bits the direction
 // lacks) off the cell, with the cell beyond; answers the track cell of the first block's id. 0x100a55bc (224 bytes): the mesh instance word
 // of the track cell at (x, y), or of its parent for a track X cell (0 with a trace when the parent is gLLCCE380).
@@ -352,7 +355,7 @@ CTrackCell* LLCC_BreakTrack(int32_t x, int32_t y, uint8_t dir);
 uint32_t LLCC_GetTrackMeshAt(int32_t x, int32_t y);
 extern uint16_t gLLCCE380;    // 0x1029e380  0 (initialised data, name invented): the cell id that stands for no parent
 
-// Unit v5883 (src/LLCM_LeftMouseButtonDown_LLCM_LeftMouseButtonUp.cpp, which defines the words; names are the addresses).
+// Unit v5883 (src/game/park/LLCellMouse.cpp, which defines the words; names are the addresses).
 // LLCM_LeftMouseButtonUp's own words, the undeclared callees it calls and PlacePylon's four-argument overload.
 class CCellBase;
 class CThing;
@@ -370,7 +373,7 @@ CCellBase* LLCR_StartQueue(LLCR_PRR* placement, int32_t* x, int32_t* y);        
 CTrackCell* LLCR_StartTrack(LLCR_PRR* placement, int32_t* x, int32_t* y, int32_t track); // 0x1008c320 (716 bytes, stand-in)
 int32_t PlacePylon(uint32_t x, uint32_t z, int32_t flag, uint32_t* meshSlot);            // 0x10052a30 (108 bytes; the answer is not read)
 
-// Unit v5932 (src/LLCR_OverRide_LLCR_OverRide_3.cpp, which defines the words; names are the addresses).
+// Unit v5932 (src/game/park/LLCellRide.cpp, which defines the words; names are the addresses).
 struct RideInfo;
 extern uint16_t gLLCCE04C;     // 0x1029e04c  0 (halfword): the thing id LLCR_OverRide's cell answer is compared with
 extern uint16_t gLLCCE092;     // 0x102de092  0 (halfword): the cell id of the ride being placed
@@ -380,13 +383,13 @@ extern int32_t gLLCCE094;      // 0x102de094  0: the selected ride record's word
 extern const uint8_t* gLLCRRideShape;
 extern RideInfo* gLLCCE098;    // 0x102de098  0 (a pointer): the selected ride record
 extern uint16_t gLLCCE09C;     // 0x102de09c  0 (halfword; the Mac reads it as the high half of a word): the selected ride's id
-// Unit v51063 (src/LLCR_OverRide_LLCR_OverRide_3_LLCR_GetRideCell.cpp): the static initialiser of LLCellMouse.cpp.
+// Unit v51063 (src/game/park/LLCellMouse.cpp): the static initialiser of LLCellMouse.cpp.
 extern int32_t gLLCCDB74;      // 0x102ddb74  0x10000 after __sinit_LLCellMouse_cpp
 extern int32_t gLLCCDB78;      // 0x102ddb78  0 after __sinit_LLCellMouse_cpp
 void __sinit_LLCellMouse_cpp();   // 0x10088ff4 (60 bytes): also gLLCCDB68, gLLCCDB5C, gLLCCDB5A, gLLCCDB58 = 0
-// 0x1008905c (396 bytes) is declared above; 0x100889ac and 0x1008be1c are in src/LLCR_OverRide_LLCR_OverRide_3.cpp.
+// 0x1008905c (396 bytes) is declared above; 0x100889ac and 0x1008be1c are in src/game/park/LLCellRide.cpp, src/game/park/LLCellMouse.cpp.
 
-// Unit v5982 (src/LLCellRide_offsets_LLCC_SetTrackAnimReverse_LLCC_BuildTrackDB_2.cpp defines the two words; names are the addresses).
+// Unit v5982 (src/game/park/LLCellRide.cpp defines the two words; names are the addresses).
 struct tag_sRideAnimSet;
 extern uint16_t gLLCCE0B0;     // 0x1029e0b0  0 (halfword): the cell answer LLCC_BuildTrackDB compares a straight section's ride with
 extern uint16_t gLLCCE0B2;     // 0x1029e0b2  0 (halfword, image): the cell answer it compares a start-flag cell's ride with
@@ -394,9 +397,9 @@ extern uint16_t gLLCCE0B2;     // 0x1029e0b2  0 (halfword, image): the cell answ
 // 0x1002ef98 (4,080 bytes, unit v5566, declared in BMP_InsideArea.h too): answers 1 placed, 0 refused; LLCC_BuildTrackDB ignores it.
 int32_t BMP_TrackSectionPlaceSection(int32_t ride, int32_t x, int32_t z, int32_t kind, int32_t count, uint32_t thing, int32_t info);
 
-// Unit v5999 (src/LLCR_OverRide_LLCR_DeleteRide_2.cpp defines the word; name invented).
+// Unit v5999 (src/game/park/LLCellRide.cpp defines the word; name invented).
 extern uint16_t gLLCRNoRide;   // 0x1029e04e  0 (halfword): the thing id LLCR_OverRide answers when no ride stands on the cell (LLCR_DeleteRide compares with it)
-int32_t FindDataNodeIndexByDisableCode(tag_sRideAnimSet* set, uint32_t code, uint32_t id);   // 0x1020017c (104 bytes, src/advisor_leaves.cpp): -1 for none
+int32_t FindDataNodeIndexByDisableCode(tag_sRideAnimSet* set, uint32_t code, uint32_t id);   // 0x1020017c (104 bytes, src/game/TPEmbed.cpp): -1 for none
 
-// Unit v51060 (src/MapDelta_map_CMapCell_IsQueue.cpp): 0x10090b2c (16 bytes), the static initialiser of LLCellRide.cpp: gLLCCE092 = 0.
+// Unit v51060 (src/game/park/LLCellRide.cpp): 0x10090b2c (16 bytes), the static initialiser of LLCellRide.cpp: gLLCCE092 = 0.
 void __sinit_LLCellRide_cpp();

@@ -48,7 +48,7 @@ public:
     char mNameBuffer[0x104];    // 0x24
 };
 
-// Unit w222 (src/bfl_FileSystem_more.cpp): UTF-16 directory entry, Mac size 0x22c.
+// Unit w222 (src/bullfrog/FileSystem.cpp, src/bullfrog/TbMemFileAccess.cpp, src/bullfrog/TbZLibFileAccess.cpp, src/bullfrog/LbMaths.cpp, src/bullfrog/TbWadStorageAccess.cpp): UTF-16 directory entry, Mac size 0x22c.
 class CUniFileInfo {
 public:
     CUniFileInfo() : mName(mNameBuffer) { mNameBuffer[0] = 0; }
@@ -83,7 +83,7 @@ public:
     virtual TbError Delete(const char* name);
     virtual TbError Move(const char* from, const char* to);
     virtual ~CFileStorage();
-    // Unit w222 (src/bfl_FileSystem_more.cpp): non-virtual wide wrappers.
+    // Unit w222 (src/bullfrog/FileSystem.cpp): non-virtual wide wrappers.
     TbError FindFirst(const char16_t*, CUniFileInfo&); // 0x1000c2b4
     TbError FindNext(CUniFileInfo&);                 // 0x1000c448
     TbError OpenFile(CFile&, const char16_t*, uint32_t, void*); // 0x1000c5b0
@@ -105,12 +105,12 @@ public:
     CDiscFileStorage() {}
     ~CDiscFileStorage() override {} // Unit w222: bullfrog 0x1000d12c
     TbError Open(const char* path);   // bullfrog import: the storage for a directory
-    // Unit w222 (src/bfl_FileSystem_more.cpp).
+    // Unit w222 (src/bullfrog/FileSystem.cpp).
     TbError Open(const char16_t* path); // 0x1000b060
-    // Unit v5110 (src/TbIResourceIndex_bfl_FileSystem_CDiscFileStorage_Dtor_CDiscFileSt.cpp): the ltms
+    // Unit v5110 (src/ltms/TbFontRenderParams.cpp): the ltms
     // library's out-of-line destructor 0x100034c0 (this in r3, the hidden "delete storage" short in r4).
     static CDiscFileStorage* DestroyLtms(CDiscFileStorage* self, int16_t deleteFlag);
-    // Unit v51112 (src/AudioPlaceHolder_LbMaths_Random_LbMaths_RangedRandomSlow.cpp): the sound program's out-of-line
+    // Unit v51112 (src/sound/PlaceHolderSentence.cpp): the sound program's out-of-line
     // destructor 0x10020c50 (same body as DestroyLtms).
     static CDiscFileStorage* DestroySound(CDiscFileStorage* self, int16_t deleteFlag);
 };
@@ -123,7 +123,7 @@ public:
     CWadFileStorage() {}
     ~CWadFileStorage() override {} // Unit w222: bullfrog 0x1000d1d4
     TbError Open(const char* path, uint32_t flags);   // bullfrog import (the main app passes 0)
-    // Unit w222 (src/bfl_FileSystem_more.cpp).
+    // Unit w222 (src/bullfrog/FileSystem.cpp).
     TbError Open(const char16_t* path, uint32_t flags); // 0x1000d3b8
 };
 
@@ -273,7 +273,7 @@ public:
     _LbSemaphore mSemaphore;                 // +0x1c
 };
 
-// Unit w222 (src/bfl_FileSystem_more.cpp): Mac size 0x2c, vtable 0x10071a60.
+// Unit w222 (src/bullfrog/TbMemFileAccess.cpp): Mac size 0x2c, vtable 0x10071a60.
 class _TbMemFileAccess : public CAccessItem {
 public:
     struct Block {
@@ -357,7 +357,7 @@ public:
 
 class _TbBufferedFile : public CFile {
 public:
-    ~_TbBufferedFile() override; // 0x10023024, src/bfl_graphicfile.cpp
+    ~_TbBufferedFile() override; // 0x10023024, src/bullfrog/Lbgfsave.cpp
     TbError Open(CFile& file, uint32_t size);
 };
 

@@ -1,5 +1,5 @@
 """Unit v5213, the ride preview, against libtpw_unit_CreateRidePreview.dylib (tests/unit_CreateRidePreview.cpp), main app
-("SimTheme Park"), src/CreateRidePreview.cpp:
+("SimTheme Park"), src/game/rides/RidePreview.cpp:
   CreateRidePreview 0x1006c3bc, DetermineRidePreviewScale 0x1006c198
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

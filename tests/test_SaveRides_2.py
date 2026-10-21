@@ -1,5 +1,5 @@
 """Unit v51028, SaveRides 0x1006acf8, against libtpw_unit_SaveRides_2.dylib (tests/unit_SaveRides_2.cpp), main app
-("SimTheme Park"), src/RideTypes_OutputAnimTimeStats_SaveRides_2.cpp.
+("SimTheme Park"), src/game/rides/TPRide.cpp.
 
 A case is a world and a call. The world (the ride anim sets with their meshes, headers, nodes, embedded data and time controls, the three
 counters and the zero word) is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian, 4-byte

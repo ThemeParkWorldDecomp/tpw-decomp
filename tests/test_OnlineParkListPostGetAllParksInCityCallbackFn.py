@@ -1,6 +1,6 @@
 """Unit v51067, twenty small online UI functions, against libtpw_unit_OnlineParkListPostGetAllParksInCityCallbackFn.dylib
 (tests/unit_OnlineParkListPostGetAllParksInCityCallbackFn.cpp), main app ("SimTheme Park"),
-src/PublishPanelMsg_OnlineParkListPostGetAllParksInCityCallbackFn.cpp:
+src/game/ui/ui_cityLobbyController.cpp, src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineLogin.cpp, src/game/ui/ui_onlineNewsPanel.cpp, src/game/ui/ui_onlineOutbox.cpp, src/game/ui/ui_onlinePanel.cpp, src/game/ui/ui_onlineParkFindPanel.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_onlineParkListPanel.cpp:
   OnlineParkListPostGetAllParksInCityCallbackFn 0x101ec444, RemoveOnlineParkInfoPanel 0x101eba64, FindParksPostGetPlayerParksCallbackFn
   0x101e9324, RemoveOnlinePanel 0x101e92c4, FillContactList 0x101e82dc, MessagesLCPostFormat 0x101e7cf4, MessagesLCFormat 0x101e7c18,
   OutboxCallback 0x101e4124, __sinit_ui_onlineNewsPanel_cpp 0x101e3628, RemoveOnlineNewsPanel 0x101e35c4, __sinit_ui_onlineLogin_cpp

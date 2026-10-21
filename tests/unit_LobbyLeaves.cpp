@@ -1,10 +1,10 @@
 // Fakes and test entry points for unit w40, the lobby's remaining leaves (libtpw_unit_LobbyLeaves.dylib, driven by test_LobbyLeaves.py for
 // the main app and test_LobbyLeavesLtms.py for the ltms library; see calllog.h):
-//   src/ui_main_leaves.cpp     GetFontTableEntry 0x10180270, UI_CreateVersionNumber 0x101874d0
-//   src/ui_measuretext.cpp     UI_MeasureText 0x1018b8e4
-//   src/lobby_mailicon.cpp     LB_Lobby_MailIconMessagesFn 0x100a59ec
-//   src/FS_Online_gametype.cpp CGameType::CGameType 0x1016f5d8, CGameType::SetGameType 0x1016f6a0
-//   src/CStaticUnicodeBuffer.cpp (ltms) AppendMB x2, AppendUnicode x2, Close, the destructor, with src/TbIMBToUnicode.cpp for the converter
+//   src/game/ui/ui_main.cpp     GetFontTableEntry 0x10180270, UI_CreateVersionNumber 0x101874d0
+//   src/game/ui/ui_utils.cpp     UI_MeasureText 0x1018b8e4
+//   src/game/online/lobby.cpp     LB_Lobby_MailIconMessagesFn 0x100a59ec
+//   src/game/online/FS_Online.cpp CGameType::CGameType 0x1016f5d8, CGameType::SetGameType 0x1016f6a0
+//   src/ltms/StaticUnicodeBuffer.cpp (ltms) AppendMB x2, AppendUnicode x2, Close, the destructor, with src/ltms/StaticUnicodeBuffer.cpp, src/ltms/TbFontRenderParams.cpp, src/ltms/TbIResourceIndex.cpp for the converter
 // Every callee outside the unit is a fake that records the same event as the PowerPC side's stub (names, labels, values, texts). The labels
 // the main app's cases use: 1 the render parameters inside gText, 3 the multibyte buffer UIMain_ConvertString answers, 5 gText, 10 + n the
 // font table entry n (0..51), 62 + n the font object n (0..51), 30 the root window, 31 the lobby's window, 32 the window CreateObject
@@ -78,7 +78,7 @@ InterfaceFontWrapper::InterfaceFontWrapper(TbIFont* font) : mFont(font) {}
 InterfaceFontWrapper::~InterfaceFontWrapper() {}
 TbFontRenderParams::TbFontRenderParams() {}
 TbFontRenderParams::~TbFontRenderParams() {}
-// The member TbFontRender of the formatter (src/ltms_fontrender.cpp is not part of this library).
+// The member TbFontRender of the formatter (src/ltms/TbFontRender.cpp is not part of this library).
 TbFontRender::TbFontRender() : mMethod(nullptr) {}
 TbFontRender::~TbFontRender() {}
 TbTextResourceManager::TbTextResourceManager() {}
@@ -193,7 +193,7 @@ void InterfaceDrawObjectSprite::Refresh() {}
 int32_t InterfaceDrawObjectSprite::GetWritableDataArea(int32_t*, int32_t*) { return 0; }
 void InterfaceDrawObjectSprite::UpdateTextures(char16_t*) {}
 void InterfaceDrawObjectSprite::CreateTextures(char16_t*) {}
-// The members those classes own by value (the rectangles are src/UI_Base.cpp's; the engine's sprite surface and list): never used here, but their constructors
+// The members those classes own by value (the rectangles are src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp's; the engine's sprite surface and list): never used here, but their constructors
 // and destructors must exist to link.
 SSpriteGameData::SSpriteGameData() {}
 SSpriteEngineData::SSpriteEngineData() {}
@@ -302,7 +302,7 @@ int32_t swprintf(char16_t* buffer, uint32_t size, const char16_t* format, ...) {
     return n < size ? static_cast<int32_t>(n) : -1;
 }
 
-// ---- TbResource's virtual members: the string buffer's converter is a TbIMBToUnicode (src/TbIMBToUnicode.cpp), and releasing it is
+// ---- TbResource's virtual members: the string buffer's converter is a TbIMBToUnicode (src/ltms/StaticUnicodeBuffer.cpp, src/ltms/TbFontRenderParams.cpp, src/ltms/TbIResourceIndex.cpp), and releasing it is
 // what the tests watch
 int32_t TbResource::Release() {
     ev("Release", {lab(this)});

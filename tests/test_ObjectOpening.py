@@ -1,12 +1,12 @@
 """Unit w200, a ride opens, closes, runs and asks for an upgrade, and its messages, against libtpw_unit_ObjectOpening.dylib
 (tests/unit_ObjectOpening.cpp), main app ("SimTheme Park"):
-  src/Object_opening.cpp   CObject::IsOpenable 0x1010aaac, IsCloseable 0x1010ab98, CloseObject 0x1010abcc, Reopen 0x1010acdc, IsRunning 0x1010cb28,
+  src/game/Object.cpp   CObject::IsOpenable 0x1010aaac, IsCloseable 0x1010ab98, CloseObject 0x1010abcc, Reopen 0x1010acdc, IsRunning 0x1010cb28,
                            IsAvailableToChoose 0x101083e0, RequestUpgrade 0x1010c214, SetUpgradeParent 0x1010d9f8, GetUpgradeParent 0x1010da64,
                            NotifyExitBlocked 0x1010a93c, GetDBInfo 0x10107cd4, SetOperatingSpeed 0x10108068, SetOperatingDuration 0x10108104,
                            SetOperatingCapacity 0x10108248, ReceiveMessage 0x10107ba0
-  src/ThingMessages2.cpp   the constructors, GetType functions and deleting destructors of CMsgNewRide, CMsgRideBrokenDown, CMsgRideCondemned,
+  src/game/Object.cpp, src/game/ui/MessageCentre.cpp   the constructors, GetType functions and deleting destructors of CMsgNewRide, CMsgRideBrokenDown, CMsgRideCondemned,
                            CMsgRideWantsUpgrade, CMsgRideDeleted (it has no constructor) and CMsgBlockedExit
-  src/RideDB_lookup.cpp    CRideDatabase::GetRideInfo 0x10154868
+  src/game/rides/RideDB.cpp    CRideDatabase::GetRideInfo 0x10154868
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian) for the
 original, and in the host library's memory (little-endian) for the translation; the same code reads both back. CRideDatabase::GetRideInfo runs for

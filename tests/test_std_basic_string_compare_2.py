@@ -1,6 +1,6 @@
 """Unit v5146, std::basic_string<char> compare / substring constructor / append, against
 libtpw_unit_std_basic_string_compare_2.dylib (tests/unit_std_basic_string_compare_2.cpp), main app
-("SimTheme Park"), src/std_basic_string_compare_2.cpp:
+("SimTheme Park"), src/game/MslSupport.cpp:
   compare 0x10209cac, basic_string(const&, pos, n) 0x101b2918, append(n, c) 0x100731b4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (Side.words): a string object (one word, the

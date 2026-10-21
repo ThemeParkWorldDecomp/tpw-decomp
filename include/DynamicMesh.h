@@ -1,7 +1,7 @@
 // CDynamicMesh (analyser.cpp range of the main app, 0x100e1610..): the meshes the park draws cell by cell (the blueprint,
 // the water and the flags). Unit w112b translates the constructor, the destructor, SetBoundingBox, DC_CreateSquareFace and
-// DC_SetVertex (src/DynamicMesh.cpp); unit w120 translates DrawAll (0x100e1a04) and DC_CreatePolyFace (0x100e2778) with the per-frame
-// tick that calls them (src/DynamicCells.cpp).
+// DC_SetVertex (src/game/park/DynamicCell.cpp); unit w120 translates DrawAll (0x100e1a04) and DC_CreatePolyFace (0x100e2778) with the per-frame
+// tick that calls them (src/game/park/DynamicCell.cpp).
 //
 // The Mac object is 0xa4 bytes with no vtable. The host object is native: the three embedded records (the texture set, the mesh
 // entry and the mesh set) hold native pointers, the Mac offsets are in the comments, and the member names are invented. Members
@@ -39,13 +39,13 @@ public:
                              uint8_t unused2, int32_t keepPosition);
     // 0x100e1f10 (444 bytes): one vertex (position, point and texture coordinates) at the vertex counter, which it advances.
     void DC_SetVertex(float x, float y, float z, float u, float v, int32_t followTerrain, s3DPoint* point);
-    // 0x100e1a04 (1,248 bytes, src/DynamicCells.cpp, unit w120): rebuilds the mesh from the sorted list of dynamic faces (gDynamicFaceKeys over
+    // 0x100e1a04 (1,248 bytes, src/game/park/DynamicCell.cpp, unit w120): rebuilds the mesh from the sorted list of dynamic faces (gDynamicFaceKeys over
     // gDynamicFaces): clears the counters and the 20 face sets, then walks the list, drawing every face whose mesh type is this one (squares
     // through DC_CreateSquareFace, poly faces through DC_CreatePolyFace) up to mMaxSquares, and sets the entry's counts. The walk stops at the
     // first face of another type after it has seen one of its own. The entry's box is the last drawn face's first corner plus and minus 10,
     // clamped to +-1024 (the original's running box is never updated).
     void DrawAll();
-    // 0x100e2778 (232 bytes, src/DynamicCells.cpp, unit w120): a quadrilateral as four vertices (DC_SetVertex, no terrain following) and two
+    // 0x100e2778 (232 bytes, src/game/park/DynamicCell.cpp, unit w120): a quadrilateral as four vertices (DC_SetVertex, no terrain following) and two
     // faces at the cursor. `texture` is never read. The vertex counter is read once, before the vertices are made.
     void DC_CreatePolyFace(s3DPoint* positions, int32_t texture, s3DPoint* uvs, s3DPoint* points);
 
@@ -68,8 +68,8 @@ extern int32_t gLLCCDB50;                      // 0x102ddb50  a cell system word
 extern int32_t gLLCCDB54;                      // 0x102ddb54  the same in x (the int that scales into gDynamicCellF9BC4)
 extern sDTextureEntry gDynamicCellTextureEntries[20];   // 0x102a01bc  initialised data, defined by the unit that translates DMLoadTextures
 
-// ---- the dynamic face list (unit w120, src/DynamicCells.cpp). Names invented; Mac addresses given. The producers (DC_AddSquareFaceToList
-// 0x100e02a0, DC_AddPolyFaceToList 0x100e03f0) are in src/DynamicFaces.cpp (unit w127); the layout is what DrawAll and the producers agree on. Plain data, so the
+// ---- the dynamic face list (unit w120, src/game/park/DynamicCell.cpp). Names invented; Mac addresses given. The producers (DC_AddSquareFaceToList
+// 0x100e02a0, DC_AddPolyFaceToList 0x100e03f0) are in src/game/park/DynamicCell.cpp (unit w127); the layout is what DrawAll and the producers agree on. Plain data, so the
 // Mac layout holds on the host (the byte fields are single bytes).
 struct sDynamicFace {                   // 0xa0 bytes
     union {
@@ -123,7 +123,7 @@ void DC_ResetSquareFaceListPtr();                                       // 0x100
 // 0x100dfb68 (512 bytes): a 1-based quicksort of `count` keys on their low five bits; the pointer is ONE WORD BELOW the first key.
 void sort(uint32_t* keysMinusOne, uint32_t count);
 
-// ---- the face list's producers and the water (unit w127, src/DynamicFaces.cpp)
+// ---- the face list's producers and the water (unit w127, src/game/park/DynamicCell.cpp)
 // 0x100e02a0 (268 bytes): appends a square at the end of the list. `texture` goes to the byte at 0x9c and to the key; a face whose texture is 1
 // is dropped (nothing stored, the count unchanged) while gDynamicCellFlag is 0; mKeepPosition is `keepPosition`, or 1 while gDynamicCellF9BD4
 // is not 0. `rotation` (0x10), `unused1` (0x14), `large` (0x18) and `unused2` (0x1c) are stored as DC_CreateSquareFace takes them. A full list
@@ -141,7 +141,7 @@ void DC_AddPolyFaceToList(s3DPoint* positions, int32_t texture, s3DPoint* uvs, s
 extern s3DPoint gDynamicGridNormals[16][19];     // 0x102f7ec8 (TOC 0x102611f0)
 extern s3DPoint gDynamicGridPositions[16][19];   // 0x102f8d08 (TOC 0x102611f4)
 
-// ---- the flags (unit w128, src/DynamicFlags.cpp)
+// ---- the flags (unit w128, src/game/park/DynamicCell.cpp)
 // 0x102a03a0 (TOC 0x10262c90): initialised data, 1.0f. DC_AnimateFlag limits the ripple's stretch (the point's column coordinate over the
 // flag's width, 0 at the pole) to it.
 extern float gDynamicFlagClamp;

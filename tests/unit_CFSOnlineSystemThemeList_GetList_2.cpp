@@ -1,6 +1,6 @@
 // Test library for the theme list functions (unit v5928; libtpw_unit_CFSOnlineSystemThemeList_GetList_2.dylib,
 // tests/test_CFSOnlineSystemThemeList_GetList_2.py), main app:
-//   src/CFSOnlineSystemThemeList_GetList_2.cpp   GetList, RequestListFromServer, StoreReceivedList, ReturnOnlineThemeID, ThemeListPostLoginCallbackFn,
+//   src/game/online/FS_OnlineList.cpp   GetList, RequestListFromServer, StoreReceivedList, ReturnOnlineThemeID, ThemeListPostLoginCallbackFn,
 //   and the by-park-id and top-10 park lists' RequestListFromServer.
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). The world lives in

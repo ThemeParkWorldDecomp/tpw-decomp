@@ -1,6 +1,6 @@
 // Test library for the e-mail object's destructor, Reset, AttachData and Send (unit v5129; libtpw_unit_Email_Send.dylib,
 // tests/test_Email_Send.py), main app:
-//   src/Email_Send.cpp   Email::~Email (Destruct), Email::Reset, Email::AttachData, Email::Send
+//   src/game/online/EmailMessage.cpp   Email::~Email (Destruct), Email::Reset, Email::AttachData, Email::Send
 //
 // The callees outside the unit (operator new and delete, the Mail and Attachment members, the string and list members, WSACleanup,
 // the pointer glue) are fakes that record the arguments the real ones read and answer from the test's queues. No globals of other files.

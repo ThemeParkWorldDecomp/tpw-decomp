@@ -1,5 +1,5 @@
 """Unit v5768, ui_IME.cpp's static initialiser, against libtpw_unit_sinit_ui_IME_cpp.dylib (tests/unit_sinit_ui_IME_cpp.cpp), main app,
-src/ui_iterators_sinit_ui_IME_cpp.cpp:
+src/game/ui/ui_IME.cpp:
   __sinit_ui_IME_cpp 0x101f7c74
 
 A case fills gUIIME with one garbage byte on both sides, then calls the initialiser. The callees outside the unit are fakes on both

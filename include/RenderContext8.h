@@ -15,7 +15,7 @@ public:
     void LbDraw_HorizontalLine(int32_t x, int32_t y, int32_t length, TbColour colour);
     void LbDraw_VerticalLine(int32_t x, int32_t y, int32_t length, TbColour colour);
     void LbDraw_Circle(int32_t x, int32_t y, uint32_t radius, TbColour colour);
-    // Unit w233 (src/RenderContext8_circle.cpp), bullfrog 0x1002c7dc, 6892 B.
+    // Unit w233 (src/bullfrog/RenderContext.cpp), bullfrog 0x1002c7dc, 6892 B.
     // Original virtual slot 0x1c; directly callable while dispatch is unfinished.
     void LbDraw_CircleOutline(int32_t x, int32_t y, uint32_t radius, TbColour colour);
     void LbDraw_CircleFilled(int32_t x, int32_t y, uint32_t radius, TbColour colour);

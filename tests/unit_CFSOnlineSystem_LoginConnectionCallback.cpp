@@ -1,6 +1,6 @@
 // Test library for the online system's login and news jobs (unit v5924; libtpw_unit_CFSOnlineSystem_LoginConnectionCallback.dylib,
 // tests/test_CFSOnlineSystem_LoginConnectionCallback.py), main app:
-//   src/FS_Online_init_CFSOnlineSystem_LoginConnectionCallback.cpp   LoginConnectionCallback, DoLogin, LoggedInGetNews,
+//   src/game/online/FS_Online.cpp   LoginConnectionCallback, DoLogin, LoggedInGetNews,
 //   NewsConnectionCallback, CompleteNews, gOnlineNewsGuid, a weak online_callee::Free and a weak FSOnlineNewsConnectionCallback.
 //
 // The callees outside the unit are fakes that record the arguments the real ones read (pointers as labels, texts as a hash of their

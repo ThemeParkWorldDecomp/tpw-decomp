@@ -1,6 +1,6 @@
 // Test library for CFSOnlineSystemList<TbPtrList<CFSOnlineRide>,ccRideList>::CompleteGetList (unit v5662; libtpw_unit_CFSOnlineSystemList_CompleteGetList.dylib,
 // tests/test_CFSOnlineSystemList_CompleteGetList.py), main app:
-//   src/FS_Online_init_CFSOnlineSystemList_CompleteGetList.cpp   CompleteGetList (0x10174410) and gRideRecordDeleter
+//   src/game/online/FS_Online.cpp   CompleteGetList (0x10174410) and gRideRecordDeleter
 //
 // The callees outside the unit are recording fakes: AddUIError, the CFSOnlineSystem constructor and Logout, the list's virtual
 // StoreReceivedList (a derived test class), the ride deleter and the callback hooks, operator delete and delete[] (only for the pointers

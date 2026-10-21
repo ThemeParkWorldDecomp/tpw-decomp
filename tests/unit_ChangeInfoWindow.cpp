@@ -1,7 +1,7 @@
 // Test library for the ride list panel's info window and help line (unit v5102; libtpw_unit_ChangeInfoWindow.dylib, tests/test_ChangeInfoWindow.py), main app:
-//   src/ChangeInfoWindow.cpp   ChangeInfoWindow, UpdateHelpText; gHelpTextState
+//   src/game/ui/ui_ridepanel.cpp   ChangeInfoWindow, UpdateHelpText; gHelpTextState
 //
-// The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. CoolRect (src/UI_Base.cpp) runs
+// The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. CoolRect (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp) runs
 // for real on both sides. The globals of other files the unit reads are defined here, zero at start like the Mac's bss.
 #include <cstdarg>
 #include <cstddef>

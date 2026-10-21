@@ -1,5 +1,5 @@
 """Unit v5980, the fly bases' peep handling and repair state, against libtpw_unit_FLY_ForceExtractPeep.dylib
-(tests/unit_FLY_ForceExtractPeep.cpp), main app ("SimTheme Park"), src/hlsprite_flies_FLY_ForceExtractPeep.cpp:
+(tests/unit_FLY_ForceExtractPeep.cpp), main app ("SimTheme Park"), src/game/rides/FlyingRide.cpp:
   FLY_ExtractPeep 0x1007848c, FLY_ForceExtractPeep 0x1007861c, FLY_AddPeep 0x100787c8, FLY_SetRepairState 0x10078b40
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

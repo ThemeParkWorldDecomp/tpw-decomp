@@ -1,7 +1,7 @@
 """Unit v5632, CMapCell::CalculateNeighbours: links a map cell with the neighbours of its mode (mode 1, paths: the eight compass neighbours, then
 the diagonals beside queues are dropped; modes 0 and 3: the current object's entry cell and the straight neighbour the a / b pair points to),
 against libtpw_unit_CMapCell_CalculateNeighbours.dylib (tests/unit_CMapCell_CalculateNeighbours.cpp), main app ("SimTheme Park"),
-src/MapDelta_map_CMapCell_CalculateNeighbours.cpp:
+src/game/park/MapCell.cpp:
   CMapCell::CalculateNeighbours 0x10099998
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,5 +1,5 @@
 // Test library for DeInitOnlineUI (unit v5769; libtpw_unit_DeInitOnlineUI.dylib, tests/test_DeInitOnlineUI.py), main app:
-//   src/UI_pump_DeInitOnlineUI.cpp   DeInitOnlineUI
+//   src/game/ui/ui_main.cpp   DeInitOnlineUI
 //
 // The callees outside the unit are fakes that record what the real ones read: RemoveOnlinePanel, UI_SendMessage,
 // UI_DisableHelpText, CMapWho::Unlink. The globals of other files are defined here.

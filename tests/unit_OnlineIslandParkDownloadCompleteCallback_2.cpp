@@ -1,6 +1,6 @@
 // Test library for nine small lobby, interface and ESP sprite functions (unit v51046; libtpw_unit_OnlineIslandParkDownloadCompleteCallback_2.dylib,
 // tests/test_OnlineIslandParkDownloadCompleteCallback_2.py), main app:
-//   src/CLBScreenComponentOnlineIslands_GotoNextIsland_OnlineIslandParkDownloadCompleteCallback_2.cpp
+//   src/game/HLSprite.cpp, src/game/online/lobby_globe.cpp, src/game/online/lobby_island.cpp, src/game/online/lobby_parser.cpp, src/game/ui/intrface.cpp
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queues. The globals of other
 // files the unit reads are defined here. Objects the unit only points at are forged blocks of the arena; the download globe's virtual IsVisible is

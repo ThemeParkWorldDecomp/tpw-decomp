@@ -1,15 +1,15 @@
 // The interface's controls (main app, the Interface*.cpp files of the UI toolkit): the InterfaceWindow subclasses that
-// InterfaceWindow::CreateObject (0x101dc750, src/ui_controls_create.cpp) makes by kind number. Each class has the layout
+// InterfaceWindow::CreateObject (0x101dc750, src/game/ui/InterfaceWindow.cpp) makes by kind number. Each class has the layout
 // of the Mac's object (the offsets are in the comments; the Mac's sizes are the operator new arguments in CreateObject) and
 // declares the virtual members its vtable overrides, in the order of the base class's 12 slots (the Mac vtables, one per
 // class, are at the addresses below). The host's objects are larger than the Mac's (native pointers, the vtable pointer
 // first); the Mac offsets are comments only.
 //
-// PARTIAL: the constructors (and, for the button, the whole class) and every class's WhatAmI (src/ui_whatami.cpp) are translated;
+// PARTIAL: the constructors (and, for the button, the whole class) and every class's WhatAmI (src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceEditBox.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceListControl2.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/InterfaceImage.cpp) are translated;
 // the other virtual members are declared with their addresses and untranslated. The class's first declared virtual member that is
 // not inline is the key function of its vtable: the launcher defines it in launcher/pending_manual.cpp until its unit lands.
 // PARTIAL: the constructors (and, for the button, the whole class) are translated, and so are the window handlers of the
-// button, the check buttons, the knob, the text box and the vary box (src/ui_handlers_small.cpp, unit w37a) with the knob's and
+// button, the check buttons, the knob, the text box and the vary box (src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, unit w37a) with the knob's and
 // the vary box's own members; the other virtual members are declared with their addresses and untranslated. The class's first
 // declared virtual member that is not inline is the key function of its vtable: the launcher defines it in
 // launcher/pending_manual.cpp until its unit lands.
@@ -27,7 +27,7 @@
 struct tagLBEntry;
 class InterfaceDrawObject;
 
-// The kinds of window: what WhatAmI answers (src/ui_whatami.cpp, src/InterfaceButton.cpp, src/InterfaceScrollBar.cpp) and the kind
+// The kinds of window: what WhatAmI answers (src/game/ui/InterfaceWindow.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceButton.cpp, src/game/ui/InterfaceScrollBar.cpp) and the kind
 // numbers InterfaceWindow::CreateObject and the window scripts' record 0 take; one number per class, the same table. The Mac's
 // names are known for the five that its assertion strings give (UIOBJ_CREATE_SCROLLBAR, _LISTCONTROL, _KNOB, _VARYBOX and
 // _LIGHTPANEL); the other names are invented.
@@ -57,7 +57,7 @@ struct UI_RGBA {
 };
 
 // ---- the controls' window handlers (the constructors store them as the window's message function). The button's, the check
-// buttons', the knob's, the text box's and the vary box's are in src/ui_handlers_small.cpp (unit w37a); the others are untranslated.
+// buttons', the knob's, the text box's and the vary box's are in src/game/ui/InterfaceButton.cpp (unit w37a); the others are untranslated.
 // The button's: pointer in (0x10001), out (0x10002) and moved (0x10003), the left button down (0x10005) and up (0x10004), and the
 // on-frame message (0x1e) for the auto-repeat. It answers 0 for the pointer messages and the left button's press and release,
 // which it does not pass on, and what UI_DefaultWindowCallback answers for everything else (the on-frame message too).
@@ -83,8 +83,8 @@ public:
     InterfaceBar(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
                  int16_t bottom);                                  // 0x101c86c4
     void DrawFunction() override;                                  // 0x1018a8c4 (untranslated)
-    ~InterfaceBar() override;                                      // 0x101c87a4 (src/ui_controls_dtors.cpp, unit w54)
-    int32_t WhatAmI() override;                                    // 0x101c8848 (src/ui_whatami.cpp)
+    ~InterfaceBar() override;                                      // 0x101c87a4 (src/game/ui/InterfaceBar.cpp, unit w54)
+    int32_t WhatAmI() override;                                    // 0x101c8848 (src/game/ui/InterfaceBar.cpp)
     int32_t operator-(InterfaceWindow& other) override;            // 0x101c89a0 (untranslated)
     int32_t SetValue(int32_t value) override;                      // 0x101c887c (untranslated)
     int32_t GetValue() override;                                   // 0x101c8968 (untranslated): mValue
@@ -100,7 +100,7 @@ public:
 class InterfaceButton : public InterfaceWindow {
 public:
     InterfaceButton(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
-                    int16_t bottom);                               // 0x101cadc0 (src/InterfaceButton.cpp)
+                    int16_t bottom);                               // 0x101cadc0 (src/game/ui/InterfaceButton.cpp)
     ~InterfaceButton() override;                                   // 0x101caea0: gives the text back to the string heap
     int32_t WhatAmI() override;                                    // 0x101cb010: 2
     int16_t Enable(int16_t on) override;                           // 0x101caf48
@@ -145,18 +145,18 @@ class InterfaceCheckButtons : public InterfaceWindow {
 public:
     InterfaceCheckButtons(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
                           int16_t bottom);                         // 0x101cbf90
-    ~InterfaceCheckButtons() override;                             // 0x101cc02c (src/InterfaceCheckButtons_dtor.cpp, unit w91): the base's
-    int32_t WhatAmI() override;                                    // 0x101cc0c8 (src/ui_whatami.cpp)
+    ~InterfaceCheckButtons() override;                             // 0x101cc02c (src/game/ui/InterfaceButton.cpp, unit w91): the base's
+    int32_t WhatAmI() override;                                    // 0x101cc0c8 (src/game/ui/InterfaceButton.cpp)
 
     int32_t mCurrent;   // 0x138  -1 (GetCurrent at 0x101cc108)
 
-    // unit w43b (src/InterfaceCheckButtons_current.cpp)
+    // unit w43b (src/game/ui/InterfaceButton.cpp)
     // Makes the button with this id the current one: the old current button is set to state 0 and the new one to state 1 (SetState with
     // redraw 1), and the old id answered as a signed short. Answers -1 and changes nothing when the id is the current one or when no child
     // has it; -1 as the id clears the current one (the old button is set to 0) and answers -1 too.
     int32_t SetCurrent(int32_t id);                          // 0x101cc148
 
-    // unit w47 (src/InterfaceCheckButtons_current.cpp): the current button's id (-1 for none); the word at 0x138.
+    // unit w47 (src/game/ui/InterfaceButton.cpp): the current button's id (-1 for none); the word at 0x138.
     int32_t GetCurrent();                                    // 0x101cc108
 };
 
@@ -168,7 +168,7 @@ public:
     void DrawFunction() override;                                  // 0x1018a850 (untranslated)
     void CalcClientArea() override;                                // 0x101cd468 (untranslated): the client rectangle is the rectangle
     ~InterfaceEditBox() override;                                  // 0x101cd65c (untranslated)
-    int32_t WhatAmI() override;                                    // 0x101cd7a8 (src/ui_whatami.cpp)
+    int32_t WhatAmI() override;                                    // 0x101cd7a8 (src/game/ui/InterfaceEditBox.cpp)
     void ClientDraw() override;                                    // 0x1018a88c (untranslated)
     int32_t SetText(char16_t* text) override;                      // 0x101cda6c (untranslated)
 
@@ -210,8 +210,8 @@ class InterfaceImage : public InterfaceWindow {
 public:
     InterfaceImage(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
                    int16_t bottom);                                // 0x101cfe3c
-    ~InterfaceImage() override;                                    // 0x101cfebc (src/ui_image_dtor.cpp)
-    int32_t WhatAmI() override;                                    // 0x101cff50 (src/ui_whatami.cpp)
+    ~InterfaceImage() override;                                    // 0x101cfebc (src/game/ui/InterfaceImage.cpp)
+    int32_t WhatAmI() override;                                    // 0x101cff50 (src/game/ui/InterfaceImage.cpp)
     int32_t SetValue(int32_t value) override;                      // 0x101cff88 (untranslated)
     int32_t GetValue() override;                                   // 0x101d0054 (untranslated): mValue
 
@@ -226,24 +226,24 @@ public:
     InterfaceKnob(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
                   int16_t bottom);                                 // 0x101d008c
     ~InterfaceKnob() override;                                     // 0x101d0194 (untranslated)
-    int32_t WhatAmI() override;                                    // 0x101d0228 (src/ui_whatami.cpp): 0xb
+    int32_t WhatAmI() override;                                    // 0x101d0228 (src/game/ui/InterfaceKnob.cpp): 0xb
     int32_t operator-(InterfaceWindow& other) override;            // 0x101d038c (untranslated)
     int32_t SetValue(int32_t value) override;                      // 0x101d02e8 (untranslated)
     int32_t GetValue() override;                                   // 0x101d0354 (untranslated): mValue
     // Sets the smallest and the largest angle from the words the pointers point at (a NULL pointer leaves that one). When the
     // smallest is then above the largest, both become the largest. The range is the largest less the smallest.
-    void SetMinMaxAngles(int32_t* minimum, int32_t* maximum);      // 0x101d0260 (src/ui_controls_small.cpp, unit w31a)
+    void SetMinMaxAngles(int32_t* minimum, int32_t* maximum);      // 0x101d0260 (src/game/ui/InterfaceKnob.cpp, unit w31a)
     // Turns the knob to this drag angle (cut to the angle range): when it differs from mDragAngle the value follows (the angle's share
     // of the value range, the ends mapped to the ends), and when that changes the value too, the displayed angle is worked out from the
     // value (the client draw object is told it, change flag 4) and the parent is posted 0x800 (the knob's id, the value).
-    void ChangeAngle(int32_t angle);                               // 0x101d0574 (src/InterfaceKnob.cpp, unit w37a)
+    void ChangeAngle(int32_t angle);                               // 0x101d0574 (src/game/ui/InterfaceKnob.cpp, unit w37a)
     // A pointer move while the knob is held (mDragging): when the pointer's y (the low 16 bits of `y`) differs from mLastY, the knob
     // turns by 8 angle units for each unit the pointer went up (ChangeAngle).
-    void DoKnobMove(int32_t y);                                    // 0x101d0718 (src/InterfaceKnob.cpp, unit w37a)
+    void DoKnobMove(int32_t y);                                    // 0x101d0718 (src/game/ui/InterfaceKnob.cpp, unit w37a)
     // Unit v5264. Sets the value (cut to the value range, the largest first); when it differs from mValue the old one is kept, the
     // displayed angle is worked out from the value (the ends mapped to the ends), the client draw object (if any) is told it (change
     // flag 4) and the parent hears 0x800 with the knob's id and the value.
-    void ChangeValue(int32_t value);                               // 0x101d0448 (src/InterfaceKnob_InterfaceKnob_ChangeValue.cpp)
+    void ChangeValue(int32_t value);                               // 0x101d0448 (src/game/ui/InterfaceKnob.cpp)
 
     int32_t mMinAngle;     // 0x138  0
     int32_t mMaxAngle;     // 0x13c  0xfff
@@ -267,7 +267,7 @@ public:
     InterfaceLightPanel(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
                         int16_t bottom);                           // 0x101d08f0
     ~InterfaceLightPanel() override;                               // 0x101d097c (untranslated)
-    int32_t WhatAmI() override;                                    // 0x101d0a14 (src/ui_whatami.cpp)
+    int32_t WhatAmI() override;                                    // 0x101d0a14 (src/game/ui/InterfaceLightPanel.cpp)
     int32_t SetValue(int32_t value) override;                      // 0x101d0a50 (untranslated)
     int32_t GetValue() override;                                   // 0x101d0b5c (untranslated): mValue
 
@@ -282,9 +282,9 @@ public:
     void DrawFunction() override;                                  // 0x1018a3a0 (untranslated)
     void CalcClientArea() override;                                // 0x101d0b98 (untranslated): the client rectangle less 0x30 on the right, and the list rectangle
     ~InterfaceListBox() override;                                  // 0x101d0dc4 (untranslated)
-    int32_t WhatAmI() override;                                    // 0x101d0e78 (src/ui_whatami.cpp)
+    int32_t WhatAmI() override;                                    // 0x101d0e78 (src/game/ui/InterfaceListBox.cpp)
     void ClientDraw() override;                                    // 0x1018a3dc (untranslated)
-    void SetListRect(int16_t left, int16_t top, int16_t right, int16_t bottom);   // 0x101d11b0 (src/ui_controls_small.cpp, unit w31a)
+    void SetListRect(int16_t left, int16_t top, int16_t right, int16_t bottom);   // 0x101d11b0 (src/game/ui/InterfaceListBox.cpp, unit w31a)
 
     CoolRect mListRect;   // 0x138  the part the entries are drawn in (CalcClientArea; SetListRect)
     union {
@@ -352,22 +352,22 @@ class InterfaceListControl2 : public InterfaceWindow {
 public:
     InterfaceListControl2(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
                           int16_t bottom);                         // 0x101d15cc
-    void CalcClientArea() override;                                // 0x101d154c (src/InterfaceListControl2_draw.cpp): the list rectangle is the client rectangle
-    ~InterfaceListControl2() override;                             // 0x101d1768 (src/InterfaceListControl2_draw.cpp)
-    int32_t WhatAmI() override;                                    // 0x101d1918 (src/ui_whatami.cpp)
-    void ClientDraw() override;                                    // 0x1018a934 (src/InterfaceListControl2_draw.cpp)
-    void SetListRect(int16_t left, int16_t top, int16_t right, int16_t bottom);   // 0x101d47f0 (src/ui_controls_small.cpp, unit w31a)
+    void CalcClientArea() override;                                // 0x101d154c (src/game/ui/InterfaceListControl2.cpp): the list rectangle is the client rectangle
+    ~InterfaceListControl2() override;                             // 0x101d1768 (src/game/ui/InterfaceListControl2.cpp)
+    int32_t WhatAmI() override;                                    // 0x101d1918 (src/game/ui/InterfaceListControl2.cpp)
+    void ClientDraw() override;                                    // 0x1018a934 (src/game/ui/InterfaceDrawEngine.cpp)
+    void SetListRect(int16_t left, int16_t top, int16_t right, int16_t bottom);   // 0x101d47f0 (src/game/ui/InterfaceListControl2.cpp, unit w31a)
     // Makes `count` columns when there are none (mColumnCount 0): the rectangle of column i starts as 32 i, 0, 32 (i + 1), 1.
     // A count of 0 makes the (empty) array and leaves mColumnCount at 0, so the next call makes another.
-    void SetColumns(int16_t count);                                               // 0x101d2488 (src/ui_controls_small.cpp, unit w31a)
+    void SetColumns(int16_t count);                                               // 0x101d2488 (src/game/ui/InterfaceListControl2.cpp, unit w31a)
     // Puts column `column` at left and right (top 0, bottom 1) when the column is below mColumnCount and the columns exist; a
     // negative column is not tested (the original writes before the array).
-    void SetColumnPos(int16_t column, int16_t left, int16_t right);               // 0x101d2584 (src/ui_controls_small.cpp, unit w31a)
-    // 0x101d518c (src/ui_controls_small.cpp, unit w50): the Z of the window the first item pointer names (mItemWindows[0]); 0 when there is
+    void SetColumnPos(int16_t column, int16_t left, int16_t right);               // 0x101d2584 (src/game/ui/InterfaceListControl2.cpp, unit w31a)
+    // 0x101d518c (src/game/ui/InterfaceListControl2.cpp, unit w50): the Z of the window the first item pointer names (mItemWindows[0]); 0 when there is
     // no array or the pointer is NULL. highestZ uses it as the list's own Z.
     int16_t GetZOfEntries();
 
-    // ---- unit w93: the item block (src/InterfaceListControl2_items.cpp)
+    // ---- unit w93: the item block (src/game/ui/InterfaceListControl2.cpp)
     // Takes `object` as the selection bar's draw object (the old one loses a user, is told Show(0) and is deleted when it was the last
     // one), sets it to one user, places it over the first row (Change flags 0x17) and shows it when the list is visible and has a
     // current entry.
@@ -448,7 +448,7 @@ public:
     void SetSort(int32_t column, bool descending);   // 0x101d4db8 (436 bytes)
     void SetCurrent(int32_t position);               // 0x101d4c64 (284 bytes)
 
-    // Unit v5095 (src/InterfaceListControl2_items_InterfaceListControl2_RemoveAllItems.cpp; RemoveAllItems above is translated there too)
+    // Unit v5095 (src/game/ui/InterfaceListControl2.cpp; RemoveAllItems above is translated there too)
     // Takes the entry at `position` out of the list; 1, or 0 for a position out of range (or no block).
     int32_t RemoveItem(int32_t position);            // 0x101d39f0 (672 bytes)
     // Frees entry `entry` (and its children, and with `removeNext` its following siblings) into the free chain.
@@ -457,7 +457,7 @@ public:
     // The item block as words.
     LCWord* Words() const { return reinterpret_cast<LCWord*>(mItemStorage); }
 
-    // Unit v5203 (src/InterfaceListControl2_items_InterfaceListControl2_Sort.cpp)
+    // Unit v5203 (src/game/ui/InterfaceListControl2.cpp)
     // Sorts the chain by column mSortColumn (the argument is not used); mSortDescending 0 or 1, anything else moves nothing.
     void Sort(int32_t unused);                                   // 0x101d1958 (1320 bytes)
     // The position of the first entry whose text cell in column `column` equals `text`, -1 for none.
@@ -465,7 +465,7 @@ public:
     // The entry at `position` ignoring the hierarchy (untranslated stand-in; the second argument is -1 in Sort).
     int32_t GetNonHierIndexedEntry(int32_t position, int32_t parent);   // 0x101d2c30
 
-    // Unit v5908 (src/InterfaceListControl2_items_InterfaceListControl2_SetSort.cpp; FindData, SetCurrent and SetSort above are translated there too)
+    // Unit v5908 (src/game/ui/InterfaceListControl2.cpp; FindData, SetCurrent and SetSort above are translated there too)
     // Sends the message to every cell of the visible rows (message 0x1e: row << 16 | column, and the entry's data word).
     void PropagateMessage(int32_t message, int32_t a, int32_t b);   // 0x101d4650 (352 bytes)
     // A click at (x, y): makes the row under it current, posts the column (0x404) and, with attribute 0x80, the current entry (0x400).
@@ -473,7 +473,7 @@ public:
     // A click on the column button `id` (column id - 0x10): changes the sort column or direction, sorts and updates.
     void ColumnButtonClick(int32_t id);                             // 0x101d4fa4 (424 bytes)
 
-    // Unit v5955 (src/InterfaceListControl2_items_InterfaceListControl2_GetColumnPos.cpp)
+    // Unit v5955 (src/game/ui/InterfaceListControl2.cpp)
     // Column `column`'s left and right edges through the two pointers (neither may be NULL); false when there are no columns, a pointer
     // is NULL or the column is not below mColumnCount (a negative column is not tested).
     bool GetColumnPos(int32_t column, int16_t* left, int16_t* right);   // 0x101d42ec
@@ -481,15 +481,15 @@ public:
 // Unit v5955: the keys UI_DefaultListControl2Callback asks CaptureKeys for (0x102afbcc; the Mac's first word is 0x23000000; the rest is a guess).
 extern captureKeyList gListControl2Keys[];
 
-// Unit v5074 (src/FillUpgradeBox.cpp): the ride status panel's upgrade list.
+// Unit v5074 (src/game/ui/ui_RideStatus.cpp): the ride status panel's upgrade list.
 class CObject;
 #include "ui_main.h"   // RideStatusPanel (Upgrade, UpdateStatusWindow, Remove, UpgradePanelByeBye) lives there
 extern RideStatusPanel gRideStatusPanel;        // 0x103959a4, original name unknown
 void FillUpgradeBox(int32_t kind, InterfaceListControl2* list, int32_t clear, CObject* object);   // 0x101ba128
 int32_t UpgradePanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);          // 0x101ba4e0
-// 0x101b9fb8: the LCPostFormat of ui_onlineParkListPanel.cpp (the staff room's, src/LCPostFormat.cpp, has the same name at 0x101c346c): gives the row a text
+// 0x101b9fb8: the LCPostFormat of ui_onlineParkListPanel.cpp (the staff room's, src/game/ui/ui_staffRoomStatus.cpp, has the same name at 0x101c346c): gives the row a text
 // draw object and the font, and its first child a cash text object, the font and right/middle justification.
-// Lead 2026-10-20 (v5914): was OnlineParkListLCPostFormat, the name src/PublishPanelMsg_LCFormat.cpp gives 0x101ebef4; both in one link = duplicate symbol.
+// Lead 2026-10-20 (v5914): was OnlineParkListLCPostFormat, the name src/game/ui/ui_onlineParkListPanel.cpp gives 0x101ebef4; both in one link = duplicate symbol.
 void OnlineParkListPanelLCPostFormat(InterfaceWindow* window);
 extern uint32_t gParkListFontIndex;   // 0x102ad5dc (name invented): the font table index of that list, 7 at start
 // MSL's wcstok (an import, glue 0x1023a078); the original passes a stale third register, so the state argument is never meaningful.
@@ -501,8 +501,8 @@ public:
     InterfaceTextBox(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
                      int16_t bottom);                              // 0x101d7bf0
     void DrawFunction() override;                                  // 0x101d80f8 (untranslated)
-    ~InterfaceTextBox() override;                                  // 0x101d7cc8 (src/ui_controls_dtors.cpp, unit w54): frees the text block
-    int32_t WhatAmI() override;                                    // 0x101d7d74 (src/ui_whatami.cpp): 0xa
+    ~InterfaceTextBox() override;                                  // 0x101d7cc8 (src/game/ui/InterfaceTextBox.cpp, unit w54): frees the text block
+    int32_t WhatAmI() override;                                    // 0x101d7d74 (src/game/ui/InterfaceTextBox.cpp): 0xa
     void ClientDraw() override;                                    // 0x1018a8fc (untranslated)
     int32_t operator-(InterfaceWindow& other) override;            // 0x101d8034 (untranslated)
     int32_t SetText(char16_t* text) override;                      // 0x101d7f50 (untranslated)
@@ -514,12 +514,12 @@ public:
     int32_t mTextLength;    // 0x148  0: the size of the block in characters
     int16_t mTextX;         // 0x14c  0: where CalcTextPos puts the text
     int16_t mTextY;         // 0x14e  0
-    // Unit v5975 (src/ui_whatami_InterfaceTextBox_CalcTextPos_2.cpp): 0x101d7dac (368): places the text in the client rectangle by
+    // Unit v5975 (src/game/ui/InterfaceTextBox.cpp): 0x101d7dac (368): places the text in the client rectangle by
     // mHorizontal / mVertical (1 right or bottom, 2 middle, else left or top) using the font's width and height; nothing without a font or text.
     void CalcTextPos();
 };
 // Unit v5975: the runtime's operator new[] (0x10238668) and operator delete (0x10238218) as SetText calls them (weak defaults in
-// src/ui_whatami_InterfaceTextBox_CalcTextPos_2.cpp; recording fakes in the test library).
+// src/game/ui/InterfaceTextBox.cpp; recording fakes in the test library).
 namespace textbox_callee {
 void* NewArray(uint32_t size);
 void Delete(void* block);
@@ -532,7 +532,7 @@ public:
     InterfaceVaryBox(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
                      int16_t bottom);                              // 0x101d8c94
     ~InterfaceVaryBox() override;                                  // 0x101d8d74 (untranslated)
-    int32_t WhatAmI() override;                                    // 0x101d8e0c (src/ui_whatami.cpp)
+    int32_t WhatAmI() override;                                    // 0x101d8e0c (src/game/ui/InterfaceVaryBox.cpp)
     int32_t operator-(InterfaceWindow& other) override;            // 0x101d8fc0 (untranslated)
     int32_t SetValue(int32_t value) override;                      // 0x101d8f2c (untranslated)
     int32_t GetValue() override;                                   // 0x101d8f84 (untranslated): mValue
@@ -541,7 +541,7 @@ public:
     // a hold (3 also takes one increment up), 4 and 5 a repeat step down and up. Any other number does nothing. A new value is cut to the
     // ends (the maximum first), taken when it differs from the value or the update is forced, and then told to the draw objects (the
     // window's own SetValue, not this class's) and posted to the parent as 0x800 (the box's id, the value).
-    void DoVaryBoxButton(int16_t which);                           // 0x101d915c (src/InterfaceVaryBox.cpp, unit w37a)
+    void DoVaryBoxButton(int16_t which);                           // 0x101d915c (src/game/ui/InterfaceVaryBox.cpp, unit w37a)
 
     int32_t mMinValue;       // 0x138  0
     int32_t mMaxValue;       // 0x13c  1
@@ -557,7 +557,7 @@ public:
     void SetInc(int32_t* increment);                            // 0x101d8ee8 (20 bytes)
     // Unit v5266: cuts the value to the range (the maximum first), takes it when it differs or the update is forced, then told to
     // the window's SetValue and posted to the parent as 0x800 (id, value). 1 when taken, else 0.
-    int32_t ChangeValue(int32_t value);                         // 0x101d9080 (168 bytes, src/ui_whatami_InterfaceVaryBox_ChangeValue.cpp)
+    int32_t ChangeValue(int32_t value);                         // 0x101d9080 (168 bytes, src/game/ui/InterfaceVaryBox.cpp)
 };
 
 // unit w37b: tagLBEntry, Mac 0x50 bytes. Preorder traversal is child, sibling, then parent.

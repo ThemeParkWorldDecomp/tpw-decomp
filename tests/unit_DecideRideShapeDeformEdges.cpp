@@ -1,6 +1,6 @@
 // Test library for the ride highlight and flash functions and the shape edge marker (unit v5915;
 // libtpw_unit_DecideRideShapeDeformEdges.dylib, tests/test_DecideRideShapeDeformEdges.py), main app:
-//   src/Debug_overlays_DecideRideShapeDeformEdges.cpp   UnhighlightRide, StartFlashingObject, StopFlashingObject, DecideRideShapeDeformEdges
+//   src/game/park/SkirtDeform.cpp, src/game/rides/RidePreview.cpp   UnhighlightRide, StartFlashingObject, StopFlashingObject, DecideRideShapeDeformEdges
 //
 // MReleaseAllocF answers the block the test chose; MReleaseFreeF logs whether it got the block the test expected; HighlightRide logs.
 // The globals of other files the unit uses are defined here, zero at start like the Mac's bss.

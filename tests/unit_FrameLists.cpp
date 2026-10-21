@@ -1,5 +1,5 @@
-// Fakes and the test harness for the frame's lists (src/tb_renderlist.cpp, src/tb_sprites.cpp,
-// src/tb_starfield_frame.cpp): the render list, the sprite manager and the starfield.
+// Fakes and the test harness for the frame's lists (src/engine/RenderList.cpp, src/engine/SpriteManager.cpp,
+// src/engine/tb_starfield.cpp): the render list, the sprite manager and the starfield.
 //
 // Everything the three files call outside themselves is a fake here that records its name and
 // every argument through calllog (objects as the test's labels, pointers into a block as

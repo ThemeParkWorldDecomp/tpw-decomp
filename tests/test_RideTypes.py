@@ -1,5 +1,5 @@
-"""Differential test for src/RideTypes.cpp (LoadRideType, InstanceRide, DestroyRideInstance,
-DestroyAllRideTypes) and src/RideTick.cpp (AnimateRideSet, TickRideAnims), against
+"""Differential test for src/game/rides/TPRide.cpp (LoadRideType, InstanceRide, DestroyRideInstance,
+DestroyAllRideTypes) and src/game/rides/RideAnim.cpp (AnimateRideSet, TickRideAnims), against
 libtpw_unit_RideTypes.dylib.
 
 Every function the six call is a fake on both sides that records its name, its arguments and

@@ -1,5 +1,5 @@
 // Test library for BMP_Tick (unit v5682; libtpw_unit_BMP_Tick.dylib, tests/test_BMP_Tick.py), main app:
-//   src/BMP_Tick.cpp   BMP_Tick
+//   src/game/rides/BumperRide.cpp   BMP_Tick
 //
 // The callees outside the unit (BMP_AI, BMP_Move, BMP_Collision, BMP_InsideArea, BMP_OutsideArea, BMP_ControlSound, GetFinishLine,
 // SetNextBuoyTarget) are fakes that record the bump's index in the list, its flags word and the pointers as offsets from the arena base.

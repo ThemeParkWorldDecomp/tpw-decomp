@@ -1,6 +1,6 @@
 // Test library for the bumhole window's message function, ToggleGameWindow and SetOnOffText (unit v5143; libtpw_unit_bumhole.dylib,
 // tests/test_bumhole.py), main app:
-//   src/ui_mainpanel2_window_bumhole.cpp   bumhole, ToggleGameWindow, SetOnOffText and the globals at 0x10394984 / 0x10394a14
+//   src/game/ui/ui_mainpanel2.cpp, src/game/ui/ui_optionsPanel.cpp   bumhole, ToggleGameWindow, SetOnOffText and the globals at 0x10394984 / 0x10394a14
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The fake windows are real
 // InterfaceWindow objects of this library (the constructor, the virtual members and the destructor are fakes: the destructor records

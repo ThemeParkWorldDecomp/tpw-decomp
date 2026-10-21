@@ -1,4 +1,4 @@
-"""Differential tests for unit w155, the park analyser's staff queries (src/ParkAnalyser_staff.cpp), against libtpw_unit_ParkStaff.dylib
+"""Differential tests for unit w155, the park analyser's staff queries (src/game/park/analyser.cpp), against libtpw_unit_ParkStaff.dylib
 (tests/unit_ParkStaff.cpp), main app ("SimTheme Park"):
   HiredSomeone 0x100e4750, GetStaffHappinessLevel 0x100e4ebc, GetDaysSinceLastObjectBuilt 0x100e7098, GetDaysSinceLastStaffHired 0x100e7188,
   NumberOfStaff 0x100e8324, NumberOfStaffTooTiredToWork 0x100e84d4, NumberOfStaffTypeWithPatrolArea 0x100e86a4, AverageQualityOfStaffType 0x100e88a0,

@@ -1,5 +1,5 @@
 // Test library for ccServerInfo::~ccServerInfo (unit v5140; libtpw_unit_ccServerInfo_Dtor_ccServerInfo.dylib), main app:
-//   src/FS_Online_init_ccServerInfo_Dtor_ccServerInfo.cpp
+//   src/game/online/FS_Online.cpp
 //
 // free is a recording fake (this library's own definition wins over libc's inside the library); it logs the first word of the block,
 // the case's tag, only while the destructor runs.

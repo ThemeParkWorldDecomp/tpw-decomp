@@ -1,4 +1,4 @@
-"""Differential tests for TPSettings.cpp's player settings (src/TPSettings.cpp; Milestone 1
+"""Differential tests for TPSettings.cpp's player settings (src/game/TPResource.cpp, src/game/TPSettings.cpp; Milestone 1
 unit 6, part 1), against libtpw_unit_TPSettings.dylib (tests/unit_TPSettings.cpp's fakes;
 see calllog.py), with test_FSSystem.py's PowerPC strings.
 

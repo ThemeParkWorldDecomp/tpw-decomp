@@ -1,6 +1,6 @@
 // Test library for BogStatusPanel::InitStatusWindow and UpdateStatusWindow (unit v5519; libtpw_unit_BogStatusPanel_UpdateStatusWindow.dylib,
 // tests/test_BogStatusPanel_UpdateStatusWindow.py), main app:
-//   src/BogStatusPanel_InitViewWindow_BogStatusPanel_UpdateStatusWindow.cpp
+//   src/game/ui/ui_bogStatus.cpp
 //
 // The callees outside the unit are recording fakes; the windows are real InterfaceWindow objects whose virtuals are defined here
 // (Enable and SetValue record, the others do nothing). gStaffRoomPanelThing is defined here.

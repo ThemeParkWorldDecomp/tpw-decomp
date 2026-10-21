@@ -1,5 +1,5 @@
 """Differential tests for the text formatter's vector members and its line processor, against libtpw_unit_TextVectors.dylib
-(tests/unit_TextVectors.cpp), unit w44, src/ltms_textformatter_rest.cpp (ltms library):
+(tests/unit_TextVectors.cpp), unit w44, src/ltms/TbTextFormatter.cpp (ltms library):
 
   std::vector<CCharacterInfo>::clear 0x10007d74 and push_back 0x10007e0c
   std::vector<CLineInfo>::clear 0x10008454 and push_back 0x100084e4

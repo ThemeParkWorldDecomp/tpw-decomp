@@ -1,6 +1,6 @@
-// Differential library for unit w139: the six CWorld::Register overloads (src/World_register.cpp), CMap::Init (src/Map_init.cpp),
-// CMapCell::SetHFieldTile (src/MapCell_tile.cpp), MapDelta::Rotate (src/MapDelta.cpp), GetMapCellFromPointerWorldPosn
-// (src/TPEngine_pointedcell.cpp) and CTrackCell::ModifyType (src/TrackCell_modify.cpp).
+// Differential library for unit w139: the six CWorld::Register overloads (src/game/World.cpp), CMap::Init (src/game/park/Map.cpp),
+// CMapCell::SetHFieldTile (src/game/park/MapCell.cpp), MapDelta::Rotate (src/game/park/MapDelta.cpp), GetMapCellFromPointerWorldPosn
+// (src/game/TPPointer.cpp) and CTrackCell::ModifyType (src/game/park/TrackCell.cpp).
 //
 // Every callee outside them is a fake that records the same event as the PowerPC side's stub (see tests/test_MapCells.py): GetThingId, GetTile,
 // SingleHFieldTextureChange, the queue mesh calls, IsXYValid, the track cost getters, ValidTypeChange, IsJustTrack, GetMapCellEquiv,

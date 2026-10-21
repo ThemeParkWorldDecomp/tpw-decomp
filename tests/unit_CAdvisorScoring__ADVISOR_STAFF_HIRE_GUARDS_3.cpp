@@ -1,6 +1,6 @@
 // Test library for seven CAdvisorScoring staff scorers (unit v5265; libtpw_unit_CAdvisorScoring__ADVISOR_STAFF_HIRE_GUARDS_3.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_STAFF_HIRE_GUARDS_3.py), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_STAFF_HIRE_GUARDS_3.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The callees outside the unit (CWorld::IsParkClosed / GetParkAnalyser, the CParkAnalyser readers, CParkTime::GetFunnyTimeSinceSessionStart)
 // are fakes that record their arguments and answer from the test's queues. gGameWorld is defined here.

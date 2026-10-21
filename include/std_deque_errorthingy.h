@@ -52,7 +52,7 @@ void CursorSub(MslErrorDequeCursor* cursor, int32_t count);   // 0x101f5bdc
 // value (0 on the Mac's flat 32-bit space). The tests set it to the upper half of their allocations.
 extern uint64_t gMslMacAddressHigh;
 
-// Unit v5243: std::deque<errorthingy>::push_back 0x101f21ac and grow_buf_back 0x101f2e7c (src/UI_pump_std_deque_push_back.cpp).
+// Unit v5243: std::deque<errorthingy>::push_back 0x101f21ac and grow_buf_back 0x101f2e7c (src/game/MslSupport.cpp).
 // The record is the Mac's two words (a table pointer and an id). The iterator handed to the block table's do_assign is three words on
 // the Mac (cdeque, index, slot); native pointers here.
 struct MslErrorDequeAssignIter {
@@ -74,7 +74,7 @@ void CdequeDoAssign(void* cdeque, const MslErrorDequeAssignIter& first, const Ms
 }
 
 // Unit v5680: tear_down 0x101f4a74 (errdeque_callee::TearDown), the copy constructor 0x101f4d14 (errsinit_callee::DequeCopy) and
-// destroy 0x101f584c (src/sinit_ui_ErrorDisplay_cpp_std_deque_tear_down.cpp). destroy takes two iterators by value on the Mac
+// destroy 0x101f584c (src/game/MslSupport.cpp). destroy takes two iterators by value on the Mac
 // (24 bytes each: r4..r9 and r10 + the stack); const pointers here.
 extern uint32_t gMslErrorDequeBlockSize;   // 0x102b142c (0x40): records per block of a new deque
 extern uint32_t gMslErrorDequeFill;        // 0x102b1430 (0): the word whose address is passed to the block table's push_back

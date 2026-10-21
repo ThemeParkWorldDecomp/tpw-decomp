@@ -14,8 +14,8 @@ class _LbSemaLock {
 public:
     explicit _LbSemaLock(const _LbSemaphore& semaphore)
         : mState(semaphore.mState), mWaiting(0), mLocked(0) {}
-    ~_LbSemaLock();                   // 0x10024b00 (src/lb_semalock.cpp)
-    int32_t Lock(int32_t wait);       // 0x10024b6c (src/lb_semalock.cpp): always 1; `wait` is not used
+    ~_LbSemaLock();                   // 0x10024b00 (src/bullfrog/LbSemaphore.cpp)
+    int32_t Lock(int32_t wait);       // 0x10024b6c (src/bullfrog/LbSemaphore.cpp): always 1; `wait` is not used
     uint32_t mState;                 // Mac +0
     uint32_t mWaiting;               // +4
     uint32_t mLocked;                // +8

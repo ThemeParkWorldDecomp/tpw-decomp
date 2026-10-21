@@ -1,5 +1,5 @@
 // Test library for the progress bar (unit v5697; libtpw_unit_CreateUIProgressBar.dylib, tests/test_CreateUIProgressBar.py), main app:
-//   src/InterfaceWindow_virtuals_CreateUIProgressBar.cpp   CreateUIProgressBar (two), UpdateUIProgressBar; defines gUIProgressBar and gUIProgressBarText
+//   src/game/ui/ui_progressBar.cpp   CreateUIProgressBar (two), UpdateUIProgressBar; defines gUIProgressBar and gUIProgressBarText
 //
 // The callees are recording fakes with the PowerPC stubs' event names. The windows are raw blocks whose vtable pointer is a hand-made table
 // (no InterfaceWindow constructor is linked): Enable, SetValue and SetText are the only virtuals called. The two draw object constructors are
@@ -20,8 +20,8 @@
 
 using namespace calllog;
 
-InterfaceWindow* gUIRootWindow;   // 0x10395c24 (src/UI_focus.cpp)
-InterfaceWindow* gUIProgressBar;   // 0x10395c6c (src/ui_progress_cursor.cpp)
+InterfaceWindow* gUIRootWindow;   // 0x10395c24 (src/game/ui/UI_Base.cpp)
+InterfaceWindow* gUIProgressBar;   // 0x10395c6c (src/game/ui/ui_progressBar.cpp)
 int16_t gProgBarScript[8];        // 0x102afe24
 char gProgBarMeshName[16] = "progress.wct";   // 0x1024eda3
 

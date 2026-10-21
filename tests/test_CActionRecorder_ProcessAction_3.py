@@ -1,6 +1,6 @@
 """Unit v51072, the recorder stand-ins, the visitor panel stand-ins, three destructors, a constructor and some key table actions, against
 libtpw_unit_CActionRecorder_ProcessAction_3.dylib (tests/unit_CActionRecorder_ProcessAction_3.cpp), main app
-("SimTheme Park"), src/ActionRecorder_CActionRecorder_CActionRecorder_CActionRecorder_ProcessAction_3.cpp:
+("SimTheme Park"), src/game/ActionRecorder.cpp, src/game/ExitErr.cpp, src/game/InGame.cpp, src/game/keyboard.cpp, src/game/ui/ui_visitorStatus.cpp:
   CActionRecorder::ProcessAction 0x10146524 (count, text), GetNextCameraFileEntry 0x10145360, GetNextTimingFileEntry 0x10145318,
   SaveRecordingToDisk 0x10143cac, std::basic_string<wchar_t>::~basic_string 0x101468f8, bfl::FileSystem::CMemFile::~CMemFile 0x101437e0,
   VisitorStatusPanel::Remove / Locate / KidGone / DeInitWindow / DeInitStatusWindow / DeInitViewWindow / InitViewWindow, CWorldSavvy::GetMap,

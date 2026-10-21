@@ -1,1 +1,11 @@
-set(TPW_UNIT_LobbyIslandsTick src/lobby_islands_tick.cpp)
+set(TPW_UNIT_LobbyIslandsTick src/game/online/LBFlyingMesh.cpp src/game/online/lobby_island.cpp)
+set(TPW_UNIT_LobbyIslandsTick_KEEP
+  __ZN19CLBFlyingMeshSystem4InitEv   # CLBFlyingMeshSystem::Init()
+  __ZN19CLBFlyingMeshSystem4TickEv   # CLBFlyingMeshSystem::Tick()
+  __ZN19CLBFlyingMeshSystem6RenderEv   # CLBFlyingMeshSystem::Render()
+  __ZN25CLBScreenComponentIslands10CalcCameraEv   # CLBScreenComponentIslands::CalcCamera()
+  __ZN25CLBScreenComponentIslands11TickIslandsEv   # CLBScreenComponentIslands::TickIslands()
+  __ZN25CLBScreenComponentIslands14GotoNextIslandEv   # CLBScreenComponentIslands::GotoNextIsland()
+  __ZN25CLBScreenComponentIslands18GotoPreviousIslandEv   # CLBScreenComponentIslands::GotoPreviousIsland()
+  __ZN30CLBScreenComponentThemeIslands4TickEv   # CLBScreenComponentThemeIslands::Tick()
+)

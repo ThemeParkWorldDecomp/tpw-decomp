@@ -1,5 +1,5 @@
 """Unit v5927, CThing::Move, FinalDestroy and Serialise, against libtpw_unit_CThing_Move_2.dylib (tests/unit_CThing_Move_2.cpp), main app,
-src/Thing_receive_CThing_Move_2.cpp:
+src/game/Thing.cpp:
   CThing::Move 0x1012e5b4, CThing::FinalDestroy 0x1012e9f8, CThing::Serialise 0x1012e010
 
 A case is a thing (a 0x40 byte block with the 12 byte common part and a ride word at +0x1c), the map pointer, the selection global and the

@@ -1,18 +1,18 @@
 """Unit w143, the park click and the staff mouse modes, against libtpw_unit_StaffModes.dylib (tests/unit_StaffModes.cpp), main app
 ("SimTheme Park"):
-  src/ui_main_click.cpp   ContextMouseClick 0x10183320
-  src/Mouse_staff.cpp     CMMPlaceStaff (constructor 0x1007eb94, destructor 0x10081320, GetMode 0x100813b0, OnAssign 0x1007ec9c, OnRelease 0x1007eeb8,
+  src/game/ui/ui_main.cpp   ContextMouseClick 0x10183320
+  src/game/Mouse.cpp     CMMPlaceStaff (constructor 0x1007eb94, destructor 0x10081320, GetMode 0x100813b0, OnAssign 0x1007ec9c, OnRelease 0x1007eeb8,
                           OnLeftClick 0x1007ef80), CMMPickUpStaff (constructor 0x1007f46c, destructor 0x10081258, GetMode 0x100812e8, OnAssign
                           0x1007f4d8, OnLeftClick 0x1007f58c, OnRightClick 0x1007fa74, OnRelease 0x1007f948), CSpritePlaceMode (OnMouseMove
                           0x1007e528, destructor 0x1007ec14, OnRelease 0x10081550)
-  src/TPRide_pickup.cpp   GetPickupWorldPosn 0x10067220
+  src/game/TPPointer.cpp   GetPickupWorldPosn 0x10067220
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian) for the translation; the same code reads both back. Every callee outside
 the unit is a fake on both sides that records its arguments and answers from the case's queues: the cell predicates, the five staff
 constructors, DropStaff, the staff headquarters, the advisor, the bank and the object control getters, the script calls, the square face
 drawing, the cursor, CTRACE, GAME_ASSERTMSG, the sound event, the panels, the keyboard, the nothrow operator new, operator delete, CMMOnline
-and the CMMPathDraw (constructors and virtuals; unit w144 translates it) and a fake current mode. The landed src/Mouse.cpp (AssignMouseMode,
+and the CMMPathDraw (constructors and virtuals; unit w144 translates it) and a fake current mode. The landed src/game/Mouse.cpp (AssignMouseMode,
 CMMDefault) runs for real on both sides.
 
 The world of a case: gMouse, gMouseMode (none, the fake mode, or the staff mode under test), gKeyboard, the two mouse words, gGameWinWordC38,
@@ -46,7 +46,7 @@ SIZES = {CONTEXT: 2364, P_LEFT: 1208, P_ASSIGN: 492, P_RELEASE: 152, P_DTOR: 100
          K_LEFT: 904, K_RELEASE: 252, K_ASSIGN: 132, K_DTOR: 140, K_CTOR: 48, K_GETMODE: 8, K_RIGHT: 4,
          B_MOVE: 388, B_DTOR: 88, B_RELEASE: 68, PICKUP: 8}
 OWN = set(SIZES)
-# the landed originals of src/Mouse.cpp that run for real: AssignMouseMode, the CMMDefault constructor, destructor, GetMode, OnLeftClick, OnRightClick
+# the landed originals of src/game/Mouse.cpp that run for real: AssignMouseMode, the CMMDefault constructor, destructor, GetMode, OnLeftClick, OnRightClick
 LANDED = {0x1007E2E0, 0x1007EA78, 0x100813E8, 0x10081468, 0x1007EAC4, 0x1007EAF8, 0x1007EB2C}
 
 # ---- the callees faked on both sides

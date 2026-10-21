@@ -1,5 +1,5 @@
 // Test library for CGame::GetLocalisedThemeName (unit v5015; libtpw_unit_CGame_GetLocalisedThemeName.dylib), main app:
-//   src/Game_level_CGame_GetLocalisedThemeName.cpp
+//   src/game/Game.cpp
 //
 // Fakes: TPUniStrEq (answers 1 for the global the case's "theme" queue picks), TbITable::GetConstString, UIMain_ConvertMulti, the
 // char string's constructor and destructor, and the output string's operator=(const char16_t*) (a derived class that logs).

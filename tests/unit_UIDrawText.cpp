@@ -1,4 +1,4 @@
-// Fakes and test entry points for the interface's text drawing (src/UI_drawtext.cpp; libtpw_unit_UIDrawText.dylib, driven by
+// Fakes and test entry points for the interface's text drawing (src/game/ui/InterfaceFont.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_utils.cpp; libtpw_unit_UIDrawText.dylib, driven by
 // test_UIDrawText.py; see calllog.h).
 //
 // UI_DrawText calls the ltms text formatter and the font render parameters (unit w35a), the Bullfrog library's LbDraw_SetCurrent
@@ -35,7 +35,7 @@ InterfaceFont::InterfaceFont() {}   // the fake leaves the object as it finds it
 InterfaceFont::~InterfaceFont() {}
 InterfaceFontWrapper::InterfaceFontWrapper(TbIFont* font) : mFont(font) {}
 InterfaceFontWrapper::~InterfaceFontWrapper() {}
-// InterfaceFont's widths pass a wrapper on to its own (src/UI_drawtext.cpp), which live in a file this unit does not link; the
+// InterfaceFont's widths pass a wrapper on to its own (src/game/ui/InterfaceFont.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_utils.cpp), which live in a file this unit does not link; the
 // cases here ask a plain InterfaceFont.
 int32_t InterfaceFontWrapper::GetWidth(const char16_t*, int16_t, int16_t) { return 0; }
 int32_t InterfaceFontWrapper::LastCharIn(const char16_t*, int16_t, int16_t) { return 0; }
@@ -43,7 +43,7 @@ TbFontRenderParams::TbFontRenderParams() {}
 TbFontRenderParams::~TbFontRenderParams() {}
 // Fakes of the member TbFontRender that w35a's TbTextFormatter owns (include/TbTextFormatter.h):
 // this unit's fake formatter constructs and destroys it, and the real ones live in
-// src/ltms_fontrender.cpp, which is not part of this library (added at the merge, 2026-10-12).
+// src/ltms/TbFontRender.cpp, which is not part of this library (added at the merge, 2026-10-12).
 TbFontRender::TbFontRender() : mMethod(nullptr) {}
 TbFontRender::~TbFontRender() {}
 TbTextResourceManager::TbTextResourceManager() {}
@@ -137,7 +137,7 @@ TbError TbIUnicodeToMB::ConvertString(unsigned char* out, const char16_t* source
     return TbError(0);
 }
 
-// UIMain_ConvertMulti (src/ui_main.cpp, linked for UIMain_ConvertString since unit w44) calls this one; this unit never does.
+// UIMain_ConvertMulti (src/game/ui/ui_main.cpp, linked for UIMain_ConvertString since unit w44) calls this one; this unit never does.
 TbError TbIMBToUnicode::ConvertString(char16_t*, const unsigned char*, uint16_t) { return TbError(0); }
 
 // ---- MSL

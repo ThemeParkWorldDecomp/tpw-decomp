@@ -1,5 +1,5 @@
 """Unit v5344, the ride track counting, performance and teardown of the advisor world, against
-libtpw_unit_BMP_CountTrackSections.dylib (tests/unit_BMP_CountTrackSections.cpp), main app, src/BMP_FixRide_BMP_CountTrackSections.cpp:
+libtpw_unit_BMP_CountTrackSections.dylib (tests/unit_BMP_CountTrackSections.cpp), main app, src/game/rides/BumperRide.cpp:
   BMP_CountTrackSections 0x10026f20, BMP_FreeTrack 0x100270e0, BMP_SetRidePerformance 0x10026c98, BMP_DestroyRide 0x10027274
 
 A case is a world and a call. The world (the list at 0x102b56c0: magic, ride table, live ride count, bump slots, bump count; 256 ride

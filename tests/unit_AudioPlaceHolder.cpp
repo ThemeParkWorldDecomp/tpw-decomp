@@ -1,6 +1,6 @@
 // Fakes and test entry points for unit w79g2, CAudioPlaceHolder (libtpw_unit_AudioPlaceHolder.dylib, driven by
 // tests/test_AudioPlaceHolder.py in the program "sound symbols shared"; see calllog.h):
-//   src/AudioPlaceHolder.cpp  CAudioPlaceHolder, CDistPriority, CAudioPlaceHolderExtraData, TbSndCallback (the unit under test)
+//   src/sound/AudioPlaceHolder.cpp, src/sound/AudioPlaceHolderList.cpp, src/sound/TbAudioBody.cpp, src/sound/TbSoundSampleCallback.cpp  CAudioPlaceHolder, CDistPriority, CAudioPlaceHolderExtraData, TbSndCallback (the unit under test)
 // Real: the info records and positions (w77: TbSoundInfo.cpp), TbSoundSampleInfo::SetBank and CvtDblUl (w72: TbSoundBank.cpp),
 // TbRefRelease (w78), CAudioComponent (w79b), the command constructors (w79b). Everything else the code calls is a fake that
 // records what it is given (the PowerPC side records the same from its stubs):

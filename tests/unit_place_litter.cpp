@@ -1,5 +1,5 @@
 // Test library for the litter cheats (unit v5299; libtpw_unit_place_litter.dylib, tests/test_place_litter.py), main app:
-//   src/ui_Postcard_panel_spawn_handyman_place_litter.cpp   place_litter, place_bomb
+//   src/game/keyboard.cpp   place_litter, place_bomb
 //
 // CWorld::GetRand and CMapCell::PlaceLitter are recording fakes; the globals of other files are defined here.
 #include <cstddef>

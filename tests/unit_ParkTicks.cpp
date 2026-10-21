@@ -1,7 +1,7 @@
 // Differential library for unit w133: the park loop's small ticks (TickLevelLights, TickFlashObjects, TickRideHighlights, SetBaseBlendFlags,
 // LLCC_DrawInitialHoarding, CIntrface::DoPointedThingComputations, FLY_SetFlyZone, CActionRecorder::DoTick and ResetActionRecording).
 // Every callee outside those is a recording fake (tests/calllog.h). The meshes the flash and highlight ticks write into are built here
-// from a flat description (their Ptr32 fields come from the arena); the sun is a real CLightParallel from src/Light.cpp; the world is only an
+// from a flat description (their Ptr32 fields come from the arena); the sun is a real CLightParallel from src/game/Light.cpp; the world is only an
 // address (the code adds 0x2d8 to it and reads the turn word at 0x1da70c, which is a static block).
 #include <cstdarg>
 #include <cstdlib>
@@ -32,7 +32,7 @@
 
 using namespace calllog;
 
-// ---- the strings of gTPGlobals are never read: Format (the only member src/TbString.cpp leaves to the test) does nothing
+// ---- the strings of gTPGlobals are never read: Format (the only member src/bullfrog/FileSystem.cpp leaves to the test) does nothing
 template<> void TbDynamicStringTemplate<char>::Format(const char*, ...) {}
 template<> void TbDynamicStringTemplate<char16_t>::Format(const char16_t*, ...) {}
 template<> void TbStaticStringTemplate<char>::Format(const char*, ...) {}

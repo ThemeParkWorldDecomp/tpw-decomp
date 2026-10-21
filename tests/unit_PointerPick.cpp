@@ -1,4 +1,4 @@
-// Test library for CalculatePointerWorldPosn (libtpw_unit_PointerPick.dylib; see tests/test_PointerPick.py): src/TPRide_pointer.cpp, real.
+// Test library for CalculatePointerWorldPosn (libtpw_unit_PointerPick.dylib; see tests/test_PointerPick.py): src/game/TPPointer.cpp, real.
 //
 // The four callees are fakes that record through calllog: FindPointedRide (two events, the places and then the ray and the step; answers
 // from a queue of ride labels and fills gPointedRidePosition from the RidePos queue when it answers a ride), SetPotentiallyHighlightedRide,

@@ -1,5 +1,5 @@
 // CSaveableTime (main app): ReadSaveableTime, Save, Load and AdjustTime at
-// 0x1015763c..0x101577fc (src/GameClock.cpp). Inline construction recovered from
+// 0x1015763c..0x101577fc (src/game/save/SaveLoad.cpp). Inline construction recovered from
 // __sinit_Clock_cpp at 0x101476dc.
 #pragma once
 #include "CFixableTime.h"

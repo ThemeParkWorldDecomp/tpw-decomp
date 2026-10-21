@@ -1,5 +1,5 @@
 """Unit v5114: ResetHLSprites and DrawHLSprites (the script sprites), against libtpw_unit_DrawHLSprites.dylib (tests/unit_DrawHLSprites.cpp), main
-app ("SimTheme Park"), src/ESP_sprites_DrawHLSprites.cpp:
+app ("SimTheme Park"), src/game/HLSprite.cpp:
   ResetHLSprites 0x1007af24, DrawHLSprites 0x1007b02c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

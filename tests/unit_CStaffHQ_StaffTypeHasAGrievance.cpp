@@ -1,6 +1,6 @@
 // Test library for CStaffHQ::StaffTypeHasAGrievance (unit v5947; libtpw_unit_CStaffHQ_StaffTypeHasAGrievance.dylib,
 // tests/test_CStaffHQ_StaffTypeHasAGrievance.py), main app:
-//   src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_Serialise_CStaffHQ_StaffTypeHasAGrievance.cpp
+//   src/game/buildings/StaffHQ.cpp
 //   the function and gStaffHQGrievanceEnd.
 //
 // The callees outside the unit (CWorld::GetParkAnalyser, CParkAnalyser::GetNumWalkableCells / GetNumLitteredCells, GAME_ASSERTMSG, CTRACE)

@@ -1,5 +1,5 @@
 """Unit v5964, the all-rides and all-shops list panels, against libtpw_unit_CreateAllRidesPanel.dylib (tests/unit_CreateAllRidesPanel.cpp),
-main app, src/MainWindowCallback_CreateAllRidesPanel.cpp:
+main app, src/game/ui/ui_allItemsPanel.cpp:
   CreateAllRidesPanel 0x1019762c, CreateAllShopsPanel 0x101972ac
 
 A case is a world and a call. The world is built twice by one piece of Python code (PowerPC memory, host memory). Every callee outside

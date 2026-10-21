@@ -1,5 +1,5 @@
 // Test library for CUIGrapher::DrawGrid / DrawGraph (unit v5160; libtpw_unit_CUIGrapher_DrawGraph.dylib, tests/test_CUIGrapher_DrawGraph.py):
-//   src/ui_cursor_classes_CUIGrapher_DrawGraph.cpp
+//   src/game/ui/UIGrapher.cpp
 //
 // The callees outside the unit (LbDraw_Line, LbDraw_VerticalLine, LbDraw_HorizontalLine, swprintf, UI_DrawText, UI_MeasureText) are fakes
 // that record what the real ones read. The two globals of the unit are defined by the src file itself.

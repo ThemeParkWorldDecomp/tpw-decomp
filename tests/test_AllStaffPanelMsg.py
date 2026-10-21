@@ -1,5 +1,5 @@
 """Unit v51004: the all-staff panel's message function, the finance panel's message function and UIStatusPanel::RequestMaintenance,
-against libtpw_unit_AllStaffPanelMsg.dylib (tests/unit_AllStaffPanelMsg.cpp), main app, src/MainWindowCallback_CreateAllItemsPanel_AllStaffPanelMsg.cpp:
+against libtpw_unit_AllStaffPanelMsg.dylib (tests/unit_AllStaffPanelMsg.cpp), main app, src/game/ui/ui_FinancePanel.cpp, src/game/ui/ui_StatusPanel.cpp, src/game/ui/ui_allStaffPanel.cpp:
   AllStaffPanelMsg 0x10198ac4, UIStatusPanel::RequestMaintenance 0x101932a0, FinancePanelPanelMsg 0x1019f434
 
 Every callee outside the unit is a fake on both sides that logs its arguments as raw integers (pointers the unit never dereferences are

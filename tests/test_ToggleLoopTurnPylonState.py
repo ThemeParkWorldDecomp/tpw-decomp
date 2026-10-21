@@ -1,5 +1,5 @@
 """Unit v5144, the editor's pylon drag toggles, against libtpw_unit_ToggleLoopTurnPylonState.dylib (tests/unit_ToggleLoopTurnPylonState.cpp),
-main app ("SimTheme Park"), src/HandleCoasterDataChange_ToggleLoopTurnPylonState.cpp:
+main app ("SimTheme Park"), src/game/rides/CoasterEdit.cpp:
   ToggleLoopTurnPylonState 0x10052e5c, ToggleRotatePylonState 0x100530a8, ToggleBankInclinePylonState 0x100532f4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

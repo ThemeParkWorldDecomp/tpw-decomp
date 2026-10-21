@@ -1,6 +1,6 @@
 // Test library for CMessageCentre::Save, Load and UnsubscribeAll (unit v5760; libtpw_unit_CMessageCentre_Save.dylib,
 // tests/test_CMessageCentre_Save.py), main app:
-//   src/ThingLoop_CMessageCentre_Save.cpp
+//   src/game/ui/MessageCentre.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues: LbFile_Read,
 // LbFile_Write, CSubscriptionHeader::Save and Load, the subscription tree's clear, find and erase, CThing::GetThingId.

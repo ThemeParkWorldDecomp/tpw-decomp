@@ -1,6 +1,6 @@
 // Test library for the staff room / show status functions (unit v5951; libtpw_unit_sinit_ui_staffRoomStatus_cpp.dylib,
 // tests/test_sinit_ui_staffRoomStatus_cpp.py), main app:
-//   src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom_sinit_ui_staffRoomStatus_cpp.cpp
+//   src/game/ui/ui_showStatus.cpp, src/game/ui/ui_staffRoomStatus.cpp, src/game/ui/ui_staffStatus.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues; the globals of other files
 // the unit reads are defined here.
@@ -152,7 +152,7 @@ InterfaceDrawObject* NewCursorText() {
 void WindowSetText(InterfaceWindow* window, const char16_t* text) { ev("SetText", {lab(window), lab(const_cast<char16_t*>(text))}); }
 }  // namespace staffroom_callee
 
-// The tables the static initialisers store (src/ui_StatusPanel_tables.cpp, unit v5L31): blocks of the arena made on first use; the test
+// The tables the static initialisers store (src/game/ui/ui_StatusPanel.cpp, unit v5L31): blocks of the arena made on first use; the test
 // compares only where they are stored.
 uint32_t* ShowStatusPanelTable() {
     static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));

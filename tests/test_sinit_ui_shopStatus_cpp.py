@@ -1,5 +1,5 @@
 """Unit v5716, the static initialiser of ui_shopStatus.cpp, against libtpw_unit_sinit_ui_shopStatus_cpp.dylib
-(tests/unit_sinit_ui_shopStatus_cpp.cpp), main app ("SimTheme Park"), src/CreateStaffCostsPanel_UpdateStaffCost_sinit_ui_shopStatus_cpp.cpp:
+(tests/unit_sinit_ui_shopStatus_cpp.cpp), main app ("SimTheme Park"), src/game/ui/ui_shopStatus.cpp:
   __sinit_ui_shopStatus_cpp 0x101bdfb8
 
 The world: gShopStatusPanel's first word and its table pointer hold garbage before the call. The callee UIStatusPanel::UIStatusPanel

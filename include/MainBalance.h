@@ -67,14 +67,14 @@ constexpr int kMainBalanceDefaultReverb = 465;            // +0x74c  the reverb 
 constexpr int kMainBalanceRideOffsetX = 339;              // +0x554  CObject::UpdateEngine's x when the ride record has none
 constexpr int kMainBalanceRideOffsetZ = 340;              // +0x558  the same for z
 
-// Unit w155 (names inferred from the rows MaxResearchersInPark and ResearcherConstsPerGrade of src/MainBalance.cpp): the researcher slots.
+// Unit w155 (names inferred from the rows MaxResearchersInPark and ResearcherConstsPerGrade of src/game/balance/MainBalance.cpp): the researcher slots.
 constexpr int kMainBalanceMaxResearchersInPark = 172;     // +0x2b8
 constexpr int kMainBalanceResearchAbility = 261;          // +0x41c  ResearcherConstsPerGrade[grade].ResearchAbility
 constexpr int kMainBalanceResearcherGradeStride = 3;      // 12 bytes a grade, five grades; slot 273 (+0x44c) is grade 4's
 // Unit w188: the researcher's work time per grade (turns), read as mValues[slot + kMainBalanceResearcherGradeStride * grade].
 constexpr int kMainBalanceResearcherWorkDuration = 260;   // +0x418  ResearcherConstsPerGrade[grade].WorkDuration
 
-// Unit w178 (names inferred from the rows of src/MainBalance.cpp 107-124): the staff and entertainer constants per pay grade, 16 bytes a grade
+// Unit w178 (names inferred from the rows of src/game/balance/MainBalance.cpp 107-124): the staff and entertainer constants per pay grade, 16 bytes a grade
 // (four slots; grades 0 to 4). Each is read as mValues[slot + kMainBalanceStaffGradeStride * grade]. The listings' offsets win over the rows' own count
 // for WorkDuration (the rows give 210; the code reads +0x358 = slot 212).
 constexpr int kMainBalanceStaffIdleDuration = 186;               // +0x2f0  PerGradeStaffConsts[grade].IdleDuration
@@ -82,12 +82,12 @@ constexpr int kMainBalanceEntertainerWorkDuration = 212;         // +0x358  Ente
 constexpr int kMainBalanceEntertainerActivationDistance = 214;   // +0x360  EntertainerConstsPerGrade[grade].ActivationDistance
 constexpr int kMainBalanceStaffGradeStride = 4;                  // 16 bytes a grade, both tables
 
-// Unit w182 (names inferred from the rows of src/MainBalance.cpp 140-142): GuardConstsPerGrade[grade], 8 bytes a grade (WorkDuration, PoundsPerTrainingPoint).
+// Unit w182 (names inferred from the rows of src/game/balance/MainBalance.cpp 140-142): GuardConstsPerGrade[grade], 8 bytes a grade (WorkDuration, PoundsPerTrainingPoint).
 // Read as mValues[kMainBalanceGuardWorkDuration + kMainBalanceGuardGradeStride * grade]. ProcessIdle also reads kMainBalanceStaffIdleDuration (w178's).
 constexpr int kMainBalanceGuardWorkDuration = 276;   // +0x458  GuardConstsPerGrade[grade].WorkDuration
 constexpr int kMainBalanceGuardGradeStride = 2;      // 8 bytes a grade
 
-// Unit w184 (names inferred; the rows are in src/MainBalance.cpp): the handyman's per-grade table, 12 bytes a grade, read as mValues[slot + kMainBalanceHandymanGradeStride * grade].
+// Unit w184 (names inferred; the rows are in src/game/balance/MainBalance.cpp): the handyman's per-grade table, 12 bytes a grade, read as mValues[slot + kMainBalanceHandymanGradeStride * grade].
 constexpr int kMainBalanceHandymanWorkDuration = 233;      // +0x3ac  how long he cleans litter or a toilet (turns)
 constexpr int kMainBalanceHandymanDetectionRange = 234;    // +0x3b0  how far he looks for litter (cells) and the radius for a dirty toilet
 constexpr int kMainBalanceHandymanGradeStride = 3;         // 12 bytes a grade
@@ -96,7 +96,7 @@ constexpr int kMainBalanceHandymanGradeStride = 3;         // 12 bytes a grade
 constexpr int kMainBalanceMechanicWorkDuration = 249;   // +0x3ec  MechanicConstsPerGrade[grade].WorkDuration
 constexpr int kMainBalanceMechanicGradeStride = 2;      // 8 bytes a grade
 
-// Unit w190 (src/Staff_queries.cpp; names inferred from the rows of src/MainBalance.cpp): the staff pay and training slots, slot = (Mac offset - 8) / 4.
+// Unit w190 (src/game/people/staff.cpp; names inferred from the rows of src/game/balance/MainBalance.cpp): the staff pay and training slots, slot = (Mac offset - 8) / 4.
 constexpr int kMainBalanceRestLevel = 183;                   // +0x2e4  the energy below which a staff member is too tired to work
 constexpr int kMainBalanceBaseWage = 185;                    // +0x2ec  the wage of a grade, read as mValues[slot + kMainBalanceStaffGradeStride * grade]
 constexpr int kMainBalancePayMultiplier = 206;               // +0x340  one slot a staff type (0 to 4)
@@ -107,7 +107,7 @@ constexpr int kMainBalanceMechanicPoundsPerTrainingPoint = 250;      // +0x3f0  
 constexpr int kMainBalanceResearcherPoundsPerTrainingPoint = 262;    // +0x420  stride kMainBalanceResearcherGradeStride
 constexpr int kMainBalanceGuardPoundsPerTrainingPoint = 277;         // +0x45c  stride kMainBalanceGuardGradeStride
 
-// Unit w191 (src/Staff_behaviour.cpp; names inferred from the rows of src/MainBalance.cpp 107-114 and 197-212), slot = (Mac offset - 8) / 4.
+// Unit w191 (src/game/people/staff.cpp; names inferred from the rows of src/game/balance/MainBalance.cpp 107-114 and 197-212), slot = (Mac offset - 8) / 4.
 constexpr int kMainBalanceHappyHitCosNoRestArea = 184;            // +0x2e8  (integer) the happiness a staff member loses when he finds no rest area
 constexpr int kMainBalanceStaffRecuperationRate = 187;            // +0x2f4  (FLOAT) PerGradeStaffConsts[grade], stride kMainBalanceStaffGradeStride: energy a turn at rest
 constexpr int kMainBalanceStaffHappinessRecuperationRate = 188;   // +0x2f8  (FLOAT) the same, happiness a turn at rest
@@ -119,7 +119,7 @@ constexpr int kMainBalanceStrikeAreaStartY = 362;                 // +0x5b0
 constexpr int kMainBalanceStrikeAreaSizeX = 363;                  // +0x5b4
 constexpr int kMainBalanceStrikeAreaSizeY = 364;                  // +0x5b8
 
-// Unit w226 (src/StaffDB_pool.cpp; names inferred from the rows of src/MainBalance.cpp 68-97), slot = (Mac offset - 8) / 4.
+// Unit w226 (src/game/people/StaffDB.cpp, src/game/people/StaffInfo.cpp; names inferred from the rows of src/game/balance/MainBalance.cpp 68-97), slot = (Mac offset - 8) / 4.
 constexpr int kMainBalanceStaffAvgGrade = 148; // +0x258, five staff types
 constexpr int kMainBalanceStaffBeginningNumber = 153; // +0x26c, five staff types
 constexpr int kMainBalanceStaffMinInPool = 163; // +0x294, five staff types

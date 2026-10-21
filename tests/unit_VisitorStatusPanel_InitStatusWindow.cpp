@@ -1,6 +1,6 @@
 // Test library for VisitorStatusPanel::InitStatusWindow (unit v5521; libtpw_unit_VisitorStatusPanel_InitStatusWindow.dylib,
 // tests/test_VisitorStatusPanel_InitStatusWindow.py), main app:
-//   src/WorldSavvy_VisitorStatusPanel_InitStatusWindow.cpp   VisitorStatusPanel::InitStatusWindow
+//   src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_visitorStatus.cpp   VisitorStatusPanel::InitStatusWindow
 //
 // Every callee is a fake that records what the real one reads. The windows are small blocks whose first word is their id; the objects the
 // fake operator new makes carry their number (the count of news in the case) in the first word, so the log names them.

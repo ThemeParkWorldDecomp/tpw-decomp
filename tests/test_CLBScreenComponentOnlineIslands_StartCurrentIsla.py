@@ -1,6 +1,6 @@
 """Unit v51106, the online islands' small members and the globes' panel members, against
 libtpw_unit_CLBScreenComponentOnlineIslands_StartCurrentIsla.dylib (tests/unit_CLBScreenComponentOnlineIslands_StartCurrentIsla.cpp), main app
-("SimTheme Park"), src/CLBScreenComponentOnlineIslands_GotoNextIsland_CLBScreenComponentOnlineIslands_StartCurrentIsla.cpp:
+("SimTheme Park"), src/game/online/lobby_globe.cpp, src/game/online/lobby_island.cpp:
   OnlineIslands: StartCurrentIslandZoom 0x100b4574, SetCurrentIsland 0x100b4690, GotoPreviousIsland 0x100b4790, HidePanels 0x100b4354,
   ShowPanels 0x100b42d4, ShowInfoOverlayPanel 0x100b4828, Hide 0x100b4170, the destructor 0x100b4be0, WindowMessagesFn 0x100b3bc8;
   Islands::WindowMessagesFn 0x100b1e3c; PublishGlobe: destructor 0x100af1c8, IsCityValid 0x100af148, HidePanels 0x100aef20,

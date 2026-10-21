@@ -1,6 +1,6 @@
 // Test library for three states of the person (unit v5529; libtpw_unit_CPerson_ProcessStateWalksToLitterBin.dylib,
 // tests/test_CPerson_ProcessStateWalksToLitterBin.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_ProcessStateWalksToLitterBin.cpp
+//   src/game/people/PersonQueue.cpp
 //   ProcessStateWalksToLitterBin, ProcessStateStandingInQueue, ProcessStateWaitingForScriptToAdmitMe; defines gNoLitterRide, gNoAdmitState.
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The globals of

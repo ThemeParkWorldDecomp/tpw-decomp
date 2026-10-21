@@ -1,13 +1,13 @@
 """Unit w81, the lobby's small leaves part 7, against libtpw_unit_LobbyLeaves7.dylib (tests/unit_LobbyLeaves7.cpp), in the main app
 ("SimTheme Park"):
-  src/Game_theme_clear.cpp    CGame::ClearThemeResources 0x10149334
-  src/RideDB_clear.cpp        CRideDatabase::ClearDatabase 0x101546e8
-  src/NodeWrapping.cpp        StripNodeWrapping 0x101edafc
-  src/UI_activate.cpp         activateUI 0x101ca30c
-  src/UI_pause.cpp            UIInterface::Pause 0x101ef8a0
-  src/World_exit.cpp          CWorld::ExitLevel 0x1013a9fc, CWorld::Free 0x1013a264, CWorld::FreeThingHeap 0x1013ac08
-  src/StaffDB_dtor.cpp        CStaffDB::~CStaffDB 0x10128f68
-  src/SkyObjects_destroy.cpp  CSkyObjects::DestroySkyObjects 0x1015b804
+  src/game/Game.cpp    CGame::ClearThemeResources 0x10149334
+  src/game/rides/RideDB.cpp        CRideDatabase::ClearDatabase 0x101546e8
+  src/game/rides/RidePlacement.cpp        StripNodeWrapping 0x101edafc
+  src/game/ui/UI_Base.cpp         activateUI 0x101ca30c
+  src/game/ui/UIInterface.cpp            UIInterface::Pause 0x101ef8a0
+  src/game/World.cpp          CWorld::ExitLevel 0x1013a9fc, CWorld::Free 0x1013a264, CWorld::FreeThingHeap 0x1013ac08
+  src/game/people/StaffDB.cpp        CStaffDB::~CStaffDB 0x10128f68
+  src/game/park/SkyObjects.cpp  CSkyObjects::DestroySkyObjects 0x1015b804
 
 A case is a world of objects and an operation, built twice from one description: in emulator memory at the Mac's layouts for the original and by
 the unit's entry points (tpw_l7_*) for the translation. Every callee outside the unit is a fake that records the same event on both sides

@@ -1,10 +1,10 @@
 """Unit w104, the way out of the lobby, against libtpw_unit_LobbyExit.dylib (tests/unit_LobbyExit.cpp), in the main app ("SimTheme Park"):
-  src/Game_theme_set.cpp     CGame::SetCurrentTheme(int) 0x10149ba8, SetCurrentTheme(name) 0x10149c7c, SetCurrentThemeName 0x1014a08c,
+  src/game/Game.cpp     CGame::SetCurrentTheme(int) 0x10149ba8, SetCurrentTheme(name) 0x10149c7c, SetCurrentThemeName 0x1014a08c,
                              ConverttoCurrentTheme 0x1014a10c
-  src/lobby_exit.cpp         KeyParticlePOUFFE 0x101e1460, UIInterface::DeInitLobby 0x101ef7a4, DeInitLobbyUI 0x10186434,
+  src/game/TPCamera.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_islandLobbyController.cpp, src/game/ui/ui_main.cpp         KeyParticlePOUFFE 0x101e1460, UIInterface::DeInitLobby 0x101ef7a4, DeInitLobbyUI 0x10186434,
                              IsRideFirstPersonRide 0x100329cc
-  src/hlsprite_remove.cpp    ESP_RemoveSprites 0x1007c790
-  src/lobby_globe_close.cpp  CLBScreenComponentOnlineGlobe: destructor 0x100aca4c, Close 0x100ad50c, DeleteGlobeListEntries 0x100adf48,
+  src/game/HLSprite.cpp    ESP_RemoveSprites 0x1007c790
+  src/game/online/lobby_globe.cpp  CLBScreenComponentOnlineGlobe: destructor 0x100aca4c, Close 0x100ad50c, DeleteGlobeListEntries 0x100adf48,
                              DeleteCityListEntries 0x100ae104
 
 A case is a world (objects at the Mac's layout in emulator memory: the game and its theme list, the master save, the globe and its lists

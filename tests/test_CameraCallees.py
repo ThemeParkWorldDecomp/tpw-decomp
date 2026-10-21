@@ -1,4 +1,4 @@
-"""Differential test for src/TPCamera_callees.cpp and src/TPRide_height.cpp (main app, unit w140): GetNextGridsquare 0x10033e14,
+"""Differential test for src/game/TPCamera.cpp and src/game/park/TPHField.cpp (main app, unit w140): GetNextGridsquare 0x10033e14,
 DetermineHFieldHeight 0x1005ea70, DetermineHFieldHeightQuick 0x1005eda8, MatrixDifferenceTiny 0x10034784, ApplyHeadsOnRidesBumpage
 0x100336f4, RoundRotationToNearest90Degrees 0x100346a0, SetCameraPOI 0x10033650, RideRideIfRequired 0x100345f8 and
 AllowFullCameraZoomout 0x10032c08, against libtpw_unit_CameraCallees.dylib.

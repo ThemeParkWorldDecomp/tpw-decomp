@@ -1,5 +1,5 @@
 """Unit v5023, COnlineControl's chat commands, against libtpw_unit_COnlineControl_Locate.dylib (tests/unit_COnlineControl_Locate.cpp), main app
-("SimTheme Park"), src/COnlineControl_COnlineControl_COnlineControl_Locate.cpp:
+("SimTheme Park"), src/game/online/online.cpp:
   Locate 0x102187f4, Page 0x1021864c, Goto 0x1021899c, BlackMark 0x102184a0, BuddyOn 0x10218c44
 
 A case is a call on an object (a zeroed 0xe8c block) with a name string block. Every callee outside the unit (the string constructors and

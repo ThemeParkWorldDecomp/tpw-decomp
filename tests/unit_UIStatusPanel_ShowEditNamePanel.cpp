@@ -1,6 +1,6 @@
 // Test library for UIStatusPanel::ShowEditNamePanel (unit v5340; libtpw_unit_UIStatusPanel_ShowEditNamePanel.dylib,
 // tests/test_UIStatusPanel_ShowEditNamePanel.py), main app:
-//   src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_UIStatusPanel_ShowEditNamePanel.cpp
+//   src/game/ui/ui_StatusPanel.cpp
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads. The windows are blocks the test builds, whose
 // first word points to a fake vtable (SetText is the only virtual the function calls). The two constructors are fakes under the

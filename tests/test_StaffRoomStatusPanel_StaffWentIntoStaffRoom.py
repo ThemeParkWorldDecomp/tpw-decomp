@@ -1,6 +1,6 @@
 """Unit v5291, the staff room panel's member functions, against libtpw_unit_StaffRoomStatusPanel_StaffWentIntoStaffRoom.dylib
 (tests/unit_StaffRoomStatusPanel_StaffWentIntoStaffRoom.cpp), main app ("SimTheme Park"),
-src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom.cpp:
+src/game/ui/ui_staffRoomStatus.cpp:
   StaffWentIntoStaffRoom 0x101c3a80, UpdateWindow 0x101c39b8, StaffLeftStaffRoom 0x101c3bbc, Show 0x101c4014,
   UpdateStatusWindow 0x101c3054, DeInitViewWindow 0x101c2db4
 

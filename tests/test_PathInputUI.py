@@ -1,7 +1,7 @@
 """Unit v5L06, the build panel's small UI callees, against libtpw_unit_PathInputUI.dylib (tests/unit_PathInputUI.cpp), main app:
-  UIMain_TickRidePreview 0x10181570 and UIMain_NotEnoughDough 0x10182160 (src/ui_main_preview_tick.cpp), RemoveRideListPanel 0x101b8c28
-  (src/ui_ridepanel_remove.cpp), InterfaceWindow::FinishWithClientObjectSurface 0x101dbd1c and InterfaceTimer::SetSlice 0x101d84c8
-  (src/ui_window_surface.cpp); unit v5L16 adds InterfaceWindow::GetClientObjectSurface 0x101dbc98 (the same file).
+  UIMain_TickRidePreview 0x10181570 and UIMain_NotEnoughDough 0x10182160 (src/game/ui/ui_main.cpp), RemoveRideListPanel 0x101b8c28
+  (src/game/ui/ui_ridepanel.cpp), InterfaceWindow::FinishWithClientObjectSurface 0x101dbd1c and InterfaceTimer::SetSlice 0x101d84c8
+  (src/game/ui/InterfaceTimer.cpp, src/game/ui/InterfaceWindow.cpp); unit v5L16 adds InterfaceWindow::GetClientObjectSurface 0x101dbc98 (the same file).
 
 A case sets the ride preview (gRidePreview), the ui sound category (gSoundBanks[3]), the ride list panel (gRideListPanel), whether the
 window has a client draw object, and SetSlice's argument and the timer's old slice. The callees are fakes on both sides that record a

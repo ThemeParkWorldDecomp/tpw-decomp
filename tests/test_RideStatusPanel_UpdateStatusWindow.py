@@ -1,6 +1,6 @@
 """Unit v5191, the ride status panel's UpdateStatusWindow, ShowUpgradePanel and UpdateWhichButtons, against
 libtpw_unit_RideStatusPanel_UpdateStatusWindow.dylib (tests/unit_RideStatusPanel_UpdateStatusWindow.cpp), main app ("SimTheme Park"),
-src/LCPostFormat_RideStatusPanel_UpdateStatusWindow.cpp:
+src/game/ui/ui_RideStatus.cpp:
   RideStatusPanel::UpdateStatusWindow 0x101b9ac4, RideStatusPanel::ShowUpgradePanel 0x101ba6e8, RideStatusPanel::UpdateWhichButtons 0x101b8cc8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

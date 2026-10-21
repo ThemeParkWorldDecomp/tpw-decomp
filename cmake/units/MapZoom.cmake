@@ -1,1 +1,15 @@
-set(TPW_UNIT_MapZoom src/tb_mapzoom_class.cpp)
+set(TPW_UNIT_MapZoom src/engine/tb_mapzoom.cpp)
+set(TPW_UNIT_MapZoom_KEEP
+  __ZN8CMapZoom15EnableFilteringEv   # CMapZoom::EnableFiltering()
+  __ZN8CMapZoom16DisableFilteringEv   # CMapZoom::DisableFiltering()
+  __ZN8CMapZoom3UseEffff   # CMapZoom::Use(float, float, float, float)
+  __ZN8CMapZoom4InitEPviii   # CMapZoom::Init(void*, int, int, int)
+  __ZN8CMapZoom5CloseEv   # CMapZoom::Close()
+  __ZN8CMapZoom6UpdateEiiii   # CMapZoom::Update(int, int, int, int)
+  __ZN8CMapZoom6WindowEffff   # CMapZoom::Window(float, float, float, float)
+  __ZN8CMapZoom7ExecuteEv   # CMapZoom::Execute()
+  __ZN8CMapZoom7PrepareEv   # CMapZoom::Prepare()
+  __ZN8CMapZoomC1Ev   # CMapZoom::CMapZoom()
+  __ZN8CMapZoomD1Ev   # CMapZoom::~CMapZoom()
+  _gei_MapZoom
+)

@@ -1,4 +1,4 @@
-// Fakes and the entry point for the game clock unit (src/GameClock.cpp, with the two
+// Fakes and the entry point for the game clock unit (src/game/FixableTime.cpp, src/game/PausableTime.cpp, src/game/VariableTime.cpp, src/game/save/SaveLoad.cpp, src/game/ui/UI_Base.cpp, with the two
 // constructors and CClock). The only callees are the bullfrog clock, the file calls, the
 // debug print and the platform timer; each records its arguments and answers from the
 // queues the test fills (calllog.h). Nothing here reads the real clock.
@@ -64,7 +64,7 @@ TbError LbFile_Read(void* file, void* buffer, uint32_t length, uint32_t* transfe
 void SamsUtilities::UDebug(const char* format, ...) { ev("UDebug", {}, {format}); }
 
 // 0x10187994, the base class of the tick functions (not part of this unit); its vtable
-// and type information are what the derived class in src/GameClock.cpp needs.
+// and type information are what the derived class in src/game/FixableTime.cpp, src/game/PausableTime.cpp, src/game/VariableTime.cpp, src/game/save/SaveLoad.cpp, src/game/ui/UI_Base.cpp needs.
 uint32_t clockTickFunction::tickyticky() { return 0; }
 
 namespace {
@@ -109,7 +109,7 @@ const Operation kOperations[] = {
          timeGetTimeClockTickFunction tick;
          return tick.timeGetTimeClockTickFunction::tickyticky();
      }},
-    // The clock the game uses (src/Clock.cpp), on top of the real time classes.
+    // The clock the game uses (src/game/park/Clock.cpp), on top of the real time classes.
     {"CClock::Read", [](void* o, uint32_t, double, double*, void*) { return static_cast<uint32_t>(static_cast<CClock*>(o)->Read()); }},
     {"CClock::ReadFixed", [](void* o, uint32_t, double, double*, void*) { return static_cast<uint32_t>(static_cast<CClock*>(o)->ReadFixed()); }},
     {"CClock::Pause", [](void* o, uint32_t, double, double*, void*) { static_cast<CClock*>(o)->Pause(); return 0u; }},

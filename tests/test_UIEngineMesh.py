@@ -1,10 +1,10 @@
 """Differential tests for the engine mesh draw objects' instancing and changes, against libtpw_unit_UIEngineMesh.dylib
 (tests/unit_UIEngineMesh.cpp):
 
-  src/ui_DrawObjectEngineMesh.cpp  InterfaceDrawEngineMesh: InstanceMe, CalculateFrame, Change
+  src/game/TPMesh.cpp, src/game/ui/InterfaceDrawEngine.cpp  InterfaceDrawEngineMesh: InstanceMe, CalculateFrame, Change
                                    InterfaceDrawEngineVGradient::Change, InterfaceDrawEngineHGradient::Change and ::CalcVerts
                                    UpdateMeshLocalMatrix
-  src/ui_matrix.cpp                GetUIMatrix, CombineMatricesNoWDest1st
+  src/game/LMatrix.cpp, src/game/ui/InterfaceDrawEngine.cpp                GetUIMatrix, CombineMatricesNoWDest1st
 
 Real on both sides: those, SetMatrixIdentity and VectorThroughLMatrixNoW, __ptr_glue (the vertical gradient's virtual calls) and the rectangles.
 Fakes that record the same event on both sides: InstanceMesh (which answers one of the world's meshes or leaves its output alone), the engine mesh's

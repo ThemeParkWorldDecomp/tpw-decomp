@@ -1,5 +1,5 @@
 """Unit v5930, the park find panel's list functions, against libtpw_unit_LCPostFormat_7.dylib (tests/unit_LCPostFormat_7.cpp), main app
-("SimTheme Park"), src/OnlineParkFindPanelMsg_LCPostFormat_7.cpp:
+("SimTheme Park"), src/game/ui/ui_onlineParkFindPanel.cpp:
   LCFormat 0x101e96b0, LCPostFormat 0x101e9874, FillOnlineParkFindList 0x101e9bf0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

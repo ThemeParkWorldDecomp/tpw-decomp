@@ -1,5 +1,5 @@
 """Unit w165, the script sprites and the script save and load, against libtpw_unit_ScriptSprites.dylib (tests/unit_ScriptSprites.cpp),
-main app ("SimTheme Park"), src/ScriptSprites.cpp and src/ScriptSave.cpp:
+main app ("SimTheme Park"), src/game/Script.cpp, src/game/ScriptOps.cpp:
   ESP_ForceGoto 0x100da318, ESP_RURunningThis 0x100da46c, ESP_Spawn2DCopyOfScriptAt 0x100da590, ESP_Update2DScript 0x100da6d8,
   ESP_FixSpriteIDsFromDetail 0x100da884, the commands PK_SPAWN 0x100dc0e0, PK_SET_OBJ_ID 0x100dc160, PK_SET_OBJ_ACT 0x100dc1b8,
   PK_PutSpriteVAR 0x100dc214, PK_PutSpriteIM 0x100dc2d0, PK_Put3DSpriteIM 0x100dc384, PK_RemoveSprite 0x100dc418, PK_ResetScale 0x100dc45c,

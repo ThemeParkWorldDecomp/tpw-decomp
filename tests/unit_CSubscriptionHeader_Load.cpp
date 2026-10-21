@@ -1,6 +1,6 @@
 // Test library for CSubscriptionHeader::Save and ::Load (unit v5729; libtpw_unit_CSubscriptionHeader_Load.dylib,
 // tests/test_CSubscriptionHeader_Load.py), main app:
-//   src/MessageCentre_post_CSubscriptionHeader_Load.cpp   the two functions
+//   src/game/ui/MessageCentre.cpp   the two functions
 //
 // The callees outside the unit are fakes that record what the real ones read: LbFile_Read / LbFile_Write, CSubscription::Load / Save and
 // SubscriptionTree::insert_one. The tree walk (begin, increment) is the program's own code, linked from src/.

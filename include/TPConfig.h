@@ -1,5 +1,5 @@
 // TPConfig.cpp (main app 0x100591a4..0x1005999c, static initialiser 0x100599c8;
-// src/TPConfig.cpp): the game's start-up stages, the search path and the data file lookup.
+// src/game/TPConfig.cpp): the game's start-up stages, the search path and the data file lookup.
 // The inventory's other TPConfig.cpp rows are coaster and layout code filed there by
 // address; they are untranslated.
 #pragma once

@@ -1,5 +1,5 @@
 """Unit w186, the coaster instances, against libtpw_unit_CoasterInstances.dylib (tests/unit_CoasterInstances.cpp), main app
-("SimTheme Park"), src/TPCoaster_instances.cpp and src/CoasterBalance.cpp:
+("SimTheme Park"), src/game/rides/CoasterPylon.cpp, src/game/rides/CoasterType.cpp, src/game/rides/TPCoaster.cpp:
   SetCurrentEditCoaster 0x1003aca0, GetIntervalForHeight 0x10040e10, GetIntervalForHeightDelta 0x10040e64, GetHeightForInterval 0x10040eb8,
   FlagGenerateTrack 0x10040f08, FlagCollisionUpdateTrackAroundBrace 0x10040fa4, XZAngleBetweenPylons 0x10041018,
   GetPotentialPylonPositionArea 0x10041170, DestroyEndPylons 0x10042728, EndTrack 0x100427d0, SetCoasterState 0x10042bb8,

@@ -1,8 +1,8 @@
 // Test library for the interface's start-up (libtpw_unit_UIInit.dylib; see tests/test_UIInit.py):
-// src/UI_init.cpp (UI_InitSystem, the message queues, the timer table, the pointer, the cursors),
-// src/InterfaceWindow.cpp (the constructor, PointIn, MakeRectAbsolute), src/ui_cursors.cpp (the colour
-// cursors, InterfaceBFCursor, InitLobbyUI), and under them the real src/UI_Base.cpp (rectangles),
-// src/UI_focus.cpp (the globals), src/ui_DrawObject.cpp (cursors, the cursor table) and src/Light.cpp.
+// src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp (UI_InitSystem, the message queues, the timer table, the pointer, the cursors),
+// src/game/ui/InterfaceWindow.cpp (the constructor, PointIn, MakeRectAbsolute), src/game/ui/InterfaceBFCursor.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_main.cpp (the colour
+// cursors, InterfaceBFCursor, InitLobbyUI), and under them the real src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp (rectangles),
+// src/game/ui/UI_Base.cpp (the globals), src/game/ui/InterfaceCursor.cpp, src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceDrawObject.cpp (cursors, the cursor table) and src/game/Light.cpp.
 //
 // Everything else the unit calls is a fake that records through calllog: the window's untranslated
 // virtual members, the timers' constructor, the picture loaders and the platform's pixel and cursor
@@ -155,7 +155,7 @@ void InterfaceHelpText::OnMouseMovedOut() {}
 void InterfaceHelpText::OnMouseDown() {}
 void InterfaceHelpText::OnFrame() {}
 void InterfaceHelpText::OnHideOrDelete(InterfaceWindow*) {}
-// The constructor and the two virtuals unit w36 added to the class (src/ui_helptext.cpp; the vtable must link here too).
+// The constructor and the two virtuals unit w36 added to the class (src/game/ui/InterfaceHelpText.cpp; the vtable must link here too).
 InterfaceHelpText::InterfaceHelpText() {}
 void InterfaceHelpText::Init() {}
 void InterfaceHelpText::DeInit() {}

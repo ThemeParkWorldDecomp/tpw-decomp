@@ -1,5 +1,5 @@
 """Unit v5376, std::basic_string<char> assign(str, pos, n) and change_size, against libtpw_unit_std_basic_string_assign.dylib
-(tests/unit_std_basic_string_assign.cpp), main app ("SimTheme Park"), src/TPMain_std_basic_string_assign.cpp:
+(tests/unit_std_basic_string_assign.cpp), main app ("SimTheme Park"), src/game/MslSupport.cpp:
   std::basic_string<char,std::char_traits<char>,std::allocator<char>>::assign 0x10001c80
   std::basic_string<char,std::char_traits<char>,std::allocator<char>>::change_size 0x100027b0
 

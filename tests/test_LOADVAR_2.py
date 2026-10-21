@@ -1,5 +1,5 @@
 """Unit v5736, LOADVAR<CThoughts::ThoughtType>, against libtpw_unit_LOADVAR_2.dylib (tests/unit_LOADVAR_2.cpp), main app
-("SimTheme Park"), src/TrackCell_SAVEVARSTRUCT_SAVEVAR_4_LOADVAR_2.cpp:
+("SimTheme Park"), src/game/buildings/TrainingCentre.cpp:
   LOADVAR<CThoughts::ThoughtType> 0x1012f700
 
 A case is a world and a call. The world is built twice by ONE piece of Python code. The callees outside the unit

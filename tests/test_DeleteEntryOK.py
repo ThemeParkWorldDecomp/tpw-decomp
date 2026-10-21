@@ -1,6 +1,6 @@
 """Unit v51043: the postcard address delete button, the postcard and research list row makers, ResearchPanelCategoryComplete and
 InterfaceTimedMessages::Add, against libtpw_unit_DeleteEntryOK.dylib (tests/unit_DeleteEntryOK.cpp), main app
-("SimTheme Park"), src/ui_Postcard_panel_CreateAddressBook_DeleteEntryOK.cpp:
+("SimTheme Park"), src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_RideStatus.cpp, src/game/ui/ui_researchPanel.cpp:
   DeleteEntryOK 0x101b0368, LCFormat 0x101b0620, LCPostFormat 0x101b06d4, ResearchPanelCategoryComplete 0x101b5b4c,
   LCFormat 0x101b9ea8, InterfaceTimedMessages::Add 0x101c82ac
 

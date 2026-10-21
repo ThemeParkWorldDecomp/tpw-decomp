@@ -1,5 +1,5 @@
 // PlaceHolderTypes.h: the kinds of playing sound built on CAudioPlaceHolder (unit w79g3, "sound symbols shared", Code at 0x10000000,
-// TOC r2 = 0x1003abf0; the library's file is CSprocketsModule.cpp; the code is in src/PlaceHolderTypes.cpp with the addresses).
+// TOC r2 = 0x1003abf0; the library's file is CSprocketsModule.cpp; the code is in src/sound/PlaceHolderTypes.cpp, src/sound/PlaceHolderSentence.cpp, src/sound/ListSentence.cpp with the addresses).
 // This header REPLACES the merged placeholder of units w79g1 (the CreateObject statics) and w79g4 (CPlaceHolderOneShot); every
 // signature they compiled against is kept.
 //

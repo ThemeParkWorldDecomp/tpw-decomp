@@ -2,7 +2,7 @@
 // at 0x10017808..0x10018d70+, filed under tb_mapzoom.cpp by the inventory at medium
 // confidence; CMapWho::Render asserts with "tb_map.cpp", so the class is from tb_map.cpp).
 //
-// PARTIAL: construction, Close and SetFinalCallback are translated (src/tb_mapzoom.cpp);
+// PARTIAL: construction, Close and SetFinalCallback are translated (src/engine/MapWho.cpp);
 // the other methods are the ones RenderSystem_* (tb_resource_system.cpp) and CEZSprite
 // (tb_ezsprite.cpp) call. Link and Unlink return nonzero on success (CEZSprite tests it);
 // the other results are not used by those callers.
@@ -67,7 +67,7 @@ struct SMapLinkType {
 
     // Prepares the links from this one on while each says it is a light (GetLinkType 1).
     // Called on the list head, which may be NULL (the loop tests `this`;
-    // src/tb_lightmanager_frame.cpp).
+    // src/engine/MapWho.cpp).
     void PrepareLights();    // 0x10017454
 };
 
@@ -86,7 +86,7 @@ public:
     int32_t Init(int32_t width, int32_t height);                               // 0x10017984
     void QSetup_Game();                                                       // 0x10019640
     int32_t Link_Add(SMapLinkType** head, CMapLinkBase* link);                  // 0x10017808
-    // The engine's frame: every registered window, through RenderWindow (src/tb_map_render.cpp).
+    // The engine's frame: every registered window, through RenderWindow (src/engine/MapWho.cpp).
     // The original returns 1, 0 when the alt-tab recovery fails, or GetAltTabStatus()'s
     // answer when a window fails; both callers (RenderSystem_Render, the main app's
     // EngineTick2) ignore it, and the declaration predates the translation, so it stays void.
@@ -150,18 +150,18 @@ class CLoadSurface {
 public:
     // Copies the surface onto the back buffer (gei_DDraw->mBack); 0, with the DirectDraw
     // error pushed, when the blit fails.
-    int32_t Display();                 // 0x10017270 (src/tb_loadsurface.cpp)
+    int32_t Display();                 // 0x10017270 (src/engine/CsTexture.cpp)
 
     IDirectDrawSurface4* mSurface;     // 0x00
 };
 
-// The map zoom, CMapZoom and gei_MapZoom, is in tb_mapzoom.h (src/tb_mapzoom_class.cpp).
+// The map zoom, CMapZoom and gei_MapZoom, is in tb_mapzoom.h (src/engine/tb_mapzoom.cpp).
 
 int32_t MapWho_Init();    // 0x10017318
 int32_t MapWho_Close();   // 0x100173d0
 
 // The light manager (the inventory's tb_mapzoom.cpp range, 0x100143b0..0x10014e68; the
-// construction is in src/tb_mapzoom.cpp, the lighting in src/tb_lightmanager_frame.cpp).
+// construction is in src/engine/LightManager.cpp, the lighting in src/engine/LightManager.cpp, src/engine/MapWho.cpp).
 struct SVertex;
 struct _D3DVECTOR;
 struct tag_sNode;

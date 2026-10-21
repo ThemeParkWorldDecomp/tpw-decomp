@@ -1,6 +1,6 @@
 """Unit v5699: the bog status panel's window handler, its static constructor, the coaster place mouse mode and the coaster panel's check
 buttons, against libtpw_unit_BogStatusMsg.dylib (tests/unit_BogStatusMsg.cpp), main app ("SimTheme Park"),
-src/BogStatusPanel_InitViewWindow_BogStatusMsg.cpp:
+src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_coasterPanel.cpp:
   BogStatusMsg 0x1019a9b0, __sinit_ui_bogStatus_cpp 0x1019ad70, CoasterPlaceMouseMode 0x1019b018, WhichCheckButtonsAreDown 0x1019b120
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

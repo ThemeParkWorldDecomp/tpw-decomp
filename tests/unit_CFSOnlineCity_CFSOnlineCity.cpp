@@ -1,6 +1,6 @@
 // Test library for the online city, park, server and ride-list record functions (unit v5994; libtpw_unit_CFSOnlineCity_CFSOnlineCity.dylib,
 // tests/test_CFSOnlineCity_CFSOnlineCity.py), main app:
-//   src/CFSOnlineSystemRideList_RequestListFromServer_CFSOnlineCity_CFSOnlineCity.cpp
+//   src/game/online/FS_OnlineList.cpp
 //
 // The callees outside the unit are recording fakes: the strings' constructor, destructor and virtual assignments, the list calls of the
 // city and server records, the ride list's two callees, the online system's constructor, operator new (for the system's size only) and

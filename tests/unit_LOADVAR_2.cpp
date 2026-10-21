@@ -1,5 +1,5 @@
 // Test library for LOADVAR<CThoughts::ThoughtType> (unit v5736; libtpw_unit_LOADVAR_2.dylib, tests/test_LOADVAR_2.py), main app:
-//   src/TrackCell_SAVEVARSTRUCT_SAVEVAR_4_LOADVAR_2.cpp
+//   src/game/buildings/TrainingCentre.cpp
 //
 // The callees outside the unit (WriteSerialiseLog, LbFile_Read, GAME_ASSERTMSG) are recording fakes; gSaveLoad is defined here.
 #include <cstddef>

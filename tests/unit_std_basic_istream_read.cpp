@@ -1,5 +1,5 @@
 // Test library for std::basic_istream<char>::read and ::getline (unit v5014; libtpw_unit_std_basic_istream_read.dylib,
-// tests/test_std_basic_istream_read.py), main app: src/std_basic_istream_read.cpp.
+// tests/test_std_basic_istream_read.py), main app: src/game/MslSupport.cpp.
 //
 // The callees outside the unit are recording fakes answering from the test's queues; the two globals of the exception object are defined here.
 #include <cstddef>

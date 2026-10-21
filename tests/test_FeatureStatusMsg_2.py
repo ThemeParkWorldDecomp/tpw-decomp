@@ -1,6 +1,6 @@
 """Unit v5904, the feature status panel's window handler, its static initialiser and the finance graph's two loops, against
 libtpw_unit_FeatureStatusMsg_2.dylib (tests/unit_FeatureStatusMsg_2.cpp), main app ("SimTheme Park"),
-src/FeatureStatusPanel_UpdateStatusWindow_FeatureStatusMsg_2.cpp:
+src/game/ui/ui_FeatureStatus.cpp, src/game/ui/ui_FinancePanel.cpp:
   FeatureStatusMsg 0x1019eae4, __sinit_ui_FeatureStatus_cpp 0x1019eea0, GetMaxYValue 0x1019ef1c, KissMyLines 0x1019f25c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,9 +1,9 @@
 // Test library for the flags of the park (unit w128; libtpw_unit_DynamicFlags.dylib, tests/test_DynamicFlags.py), main app:
-//   src/DynamicFlags.cpp   DC_AnimateFlag, DC_DrawFlag (and gDynamicFlagClamp)
+//   src/game/park/DynamicCell.cpp   DC_AnimateFlag, DC_DrawFlag (and gDynamicFlagClamp)
 //
 // The only callee outside the file is DC_AddPolyFaceToList, a fake that records the arguments the real one reads: the texture and the type,
 // the twelve words of the positions, the u and v of the four texture coordinates (the z words are never written by DC_DrawFlag and the real
-// function does not read them) and the twelve words of the points, NaNs made one value. The two grids (defined by src/DynamicFaces.cpp in the
+// function does not read them) and the twelve words of the points, NaNs made one value. The two grids (defined by src/game/park/DynamicCell.cpp in the
 // program) and the engine's sine table are defined here, zero at start like the Mac's bss.
 #include <cstddef>
 #include <cstdint>
@@ -16,7 +16,7 @@
 
 using namespace calllog;
 
-// ---- the strings of gTPGlobals are never read: Format (the only member src/TbString.cpp leaves to the test) does nothing
+// ---- the strings of gTPGlobals are never read: Format (the only member src/bullfrog/FileSystem.cpp leaves to the test) does nothing
 template<> void TbDynamicStringTemplate<char>::Format(const char*, ...) {}
 template<> void TbDynamicStringTemplate<char16_t>::Format(const char16_t*, ...) {}
 template<> void TbStaticStringTemplate<char>::Format(const char*, ...) {}

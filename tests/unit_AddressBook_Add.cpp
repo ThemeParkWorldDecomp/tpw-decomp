@@ -1,5 +1,5 @@
 // Test library for AddressBook::Add and AddressBook::Remove (unit v5722; libtpw_unit_AddressBook_Add.dylib, tests/test_AddressBook_Add.py), main app:
-//   src/email_load_AddressBook_Save_AddressBook_Add.cpp
+//   src/game/online/email.cpp
 //
 // The host keeps a real std::list<std::string>; the wrapper loads it from a newline-joined text, calls the function and writes the
 // list back the same way.

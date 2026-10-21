@@ -1,6 +1,6 @@
-// Unit w86: Bitmap::load_wavelet (src/Bitmap.cpp) over a scripted file and a fake wavelet
+// Unit w86: Bitmap::load_wavelet (src/engine/Bitmap.cpp) over a scripted file and a fake wavelet
 // decompressor, and the fast-decoder dispatcher CWaveletImp::Decompress 0x10039694
-// (src/Wavelet_decode.cpp) over fake fast decoders. tests/test_WaveletLoad.py drives them.
+// (src/engine/EngineUtil.cpp, src/engine/Wavelet.cpp) over fake fast decoders. tests/test_WaveletLoad.py drives them.
 //
 // Fakes, each recording an event the PowerPC side records too (tests/test_WaveletLoad.py):
 //   kind 1  operator new[]: size

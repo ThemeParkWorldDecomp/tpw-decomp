@@ -129,8 +129,11 @@ void map_free(void* p) {
 #define TPW_SWAP_FILE_WORDS 1
 #define ArenaAlloc map_alloc
 #define ArenaFree map_free
-#include "../src/snd_containers.cpp"
-#include "../src/TbMapStreamer.cpp"
+// src/snd_containers.cpp of before the regroup: the definitions it had, in sliced copies of the files that hold them (TPW_UNIT_MapStreamer_INCLUDED).
+#include "src/sound/TbMapStreamer.cpp"
+// src/TbMapStreamer.cpp of before the regroup: the definitions it had, in sliced copies of the files that hold them (TPW_UNIT_MapStreamer_INCLUDED).
+#include "src/sound/TbAudioBody.cpp"
+#include "src/sound/TbSoundManager.cpp"
 #undef ArenaAlloc
 #undef ArenaFree
 

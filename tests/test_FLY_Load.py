@@ -1,5 +1,5 @@
 """Unit v5209: the fly file loader, the mesh restore and the object file loader, against libtpw_unit_FLY_Load.dylib
-(tests/unit_FLY_Load.cpp), main app ("SimTheme Park"), src/FLY_Load.cpp:
+(tests/unit_FLY_Load.cpp), main app ("SimTheme Park"), src/game/HLSprite.cpp, src/game/rides/FlyingRide.cpp:
   FLY_Load 0x10079aa8, FLY_RestoreMeshes 0x10079f8c, OBJECT_Load 0x1007a0b8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

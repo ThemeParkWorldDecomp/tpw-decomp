@@ -1,5 +1,5 @@
 // Test library for DoOrSetupSkirtDeform (unit v5221; libtpw_unit_DoOrSetupSkirtDeform.dylib, tests/test_DoOrSetupSkirtDeform.py), main app:
-//   src/Debug_overlays_DoOrSetupSkirtDeform.cpp   DoOrSetupSkirtDeform
+//   src/game/park/SkirtDeform.cpp   DoOrSetupSkirtDeform
 //
 // The callees outside the unit are fakes that record the matrices and points they read and answer from the test's queues:
 // CombineMatricesNoWDest2nd (records both matrices, changes nothing), InvertMatrix (records the source, copies it to the destination),

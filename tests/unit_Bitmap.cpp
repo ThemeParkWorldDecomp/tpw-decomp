@@ -16,7 +16,7 @@
 #include "Wavelet.h"
 #include "platform/samsutils.h"
 
-// Bitmap::load's callees (not under test here, but src/Bitmap.cpp links them).
+// Bitmap::load's callees (not under test here, but src/engine/Bitmap.cpp links them).
 TbFileReadFn gFileRead = nullptr;
 void SamsUtilities::_USwapBlock32(uint32_t*, int32_t) {}
 

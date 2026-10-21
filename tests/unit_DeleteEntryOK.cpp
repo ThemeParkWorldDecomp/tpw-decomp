@@ -1,6 +1,6 @@
 // Test library for the postcard address delete button, two list row makers, ResearchPanelCategoryComplete and the timed messages' Add
 // (unit v51043; libtpw_unit_DeleteEntryOK.dylib, tests/test_DeleteEntryOK.py), main app:
-//   src/ui_Postcard_panel_CreateAddressBook_DeleteEntryOK.cpp   DeleteEntryOK, PostcardLCFormat, PostcardLCPostFormat,
+//   src/game/ui/InterfaceMessageQueue.cpp, src/game/ui/ui_Postcard.cpp, src/game/ui/ui_RideStatus.cpp, src/game/ui/ui_researchPanel.cpp   DeleteEntryOK, PostcardLCFormat, PostcardLCPostFormat,
 //   ResearchPanelCategoryComplete, ResearchListLCFormat, InterfaceTimedMessages::Add
 //
 // The callees outside the unit are recording fakes (operator new, the constructors, Remove, FillAddressList, the font table and its

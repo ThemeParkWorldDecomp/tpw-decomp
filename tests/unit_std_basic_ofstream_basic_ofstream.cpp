@@ -1,5 +1,5 @@
 // Test library for the std::basic_ofstream<wchar_t> constructor (unit v5755; libtpw_unit_std_basic_ofstream_basic_ofstream.dylib), main app:
-//   src/std_basic_ofstream_basic_ofstream.cpp   OfstreamCtor 0x10221f20
+//   src/game/MslSupport.cpp   OfstreamCtor 0x10221f20
 //
 // The callees (basic_ostream<wchar_t> ctor, basic_filebuf<wchar_t> ctor) are recording fakes. The vtable globals are defined here.
 #include <cstddef>

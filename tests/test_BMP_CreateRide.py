@@ -1,5 +1,5 @@
 """Unit v5558, the ride creation, against libtpw_unit_BMP_CreateRide.dylib (tests/unit_BMP_CreateRide.cpp), main app
-("SimTheme Park"), src/BMP_FixRide_BMP_CountTrackSections_BMP_CreateRide.cpp:
+("SimTheme Park"), src/game/rides/BumperRide.cpp:
   BMP_CreateRide 0x1002756c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

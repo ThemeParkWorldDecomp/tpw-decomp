@@ -38,7 +38,7 @@ public:
     char16_t* mPEnd = nullptr;   // 0x18
 };
 
-// Unit v51044 (src/std_less_std_basic_string_operator.cpp)
+// Unit v51044 (src/game/online/online.cpp)
 namespace wstreambuf_callee {
 // The virtual call through slot 0x28 (underflow, a TVector via __ptr_glue 0x1023baa8); the test library fakes it.
 uint16_t Underflow(MslWStreambuf* self);

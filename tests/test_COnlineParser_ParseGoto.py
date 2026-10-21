@@ -1,5 +1,5 @@
 """Unit v5051, the COnlineParser line parsers, against libtpw_unit_COnlineParser_ParseGoto.dylib (tests/unit_COnlineParser_ParseGoto.cpp), main app
-("SimTheme Park"), src/COnlineParser_ParseGoto.cpp:
+("SimTheme Park"), src/game/online/OnlineParser.cpp:
   ParseBlackMark 0x1020fd70, ParseBuddy 0x1020ff0c, ParsePage 0x102100a4, ParseGoto 0x10210314, ParseLocate 0x102104ac
 
 A case is a parser object (the argument vector pointer at 0x3c) and a call. The callees (string constructors and destructors, wide string

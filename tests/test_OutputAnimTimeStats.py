@@ -1,5 +1,5 @@
 """Unit v5933, OutputAnimTimeStats and RestoreRideInstance, against libtpw_unit_OutputAnimTimeStats.dylib
-(tests/unit_OutputAnimTimeStats.cpp), main app ("SimTheme Park"), src/RideTypes_OutputAnimTimeStats.cpp:
+(tests/unit_OutputAnimTimeStats.cpp), main app ("SimTheme Park"), src/game/rides/TPRide.cpp:
   OutputAnimTimeStats 0x1006aa70, RestoreRideInstance 0x1006a140
 
 A case is a world and a call, built twice by ONE piece of Python code (Mac memory big-endian with 4-byte pointers for the original, host

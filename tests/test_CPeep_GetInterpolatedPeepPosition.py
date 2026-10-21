@@ -1,6 +1,6 @@
 """Unit v5533, CPeep::GetInterpolatedPeepPosition and CPeep::Serialise, against libtpw_unit_CPeep_GetInterpolatedPeepPosition.dylib
 (tests/unit_CPeep_GetInterpolatedPeepPosition.cpp), main app ("SimTheme Park"),
-src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_GetInterpolatedPeepPosition.cpp:
+src/game/people/Peep.cpp:
   CPeep::GetInterpolatedPeepPosition 0x101147e8, CPeep::Serialise 0x10113138
 
 A case is a peep block (0x1a8 bytes of random words, built twice by the same code: big-endian in the emulator, little-endian on the host) and a

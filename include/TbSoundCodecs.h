@@ -56,7 +56,7 @@ public:
 
     void Copy(void* dest, const void* source, uint32_t count);
 
-    static CCopy* _mpCopy; // 0x1003f34c: the global copier CMemoryCopyInit makes (defined in src/TbSoundCore.cpp)
+    static CCopy* _mpCopy; // 0x1003f34c: the global copier CMemoryCopyInit makes (defined in src/sound/ChannelState.cpp, src/sound/TbSoundCore.cpp)
 };
 
 class _TbSoundSampleWAV : public TbSoundSampleCodec {

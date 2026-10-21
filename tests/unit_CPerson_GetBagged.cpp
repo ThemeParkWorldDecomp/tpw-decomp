@@ -1,5 +1,5 @@
 // Test library for the CPerson balloon, happiness and catch helpers (unit v5293; libtpw_unit_CPerson_GetBagged.dylib, tests/test_CPerson_GetBagged.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged.cpp
+//   src/game/people/Person.cpp
 //
 // The callees outside the unit are recording fakes; gMainBalance is raw storage under the program's symbol name (its constructor lives in files this
 // library does not compile).

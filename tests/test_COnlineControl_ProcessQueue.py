@@ -1,6 +1,6 @@
 """Unit v5695, COnlineControl::ProcessQueue, AddBuddy and LoadBuddy, against libtpw_unit_COnlineControl_ProcessQueue.dylib
 (tests/unit_COnlineControl_ProcessQueue.cpp), main app ("SimTheme Park"),
-src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_ProcessQueue.cpp:
+src/game/online/online.cpp:
   ProcessQueue 0x10214c34, AddBuddy 0x1021baf8, LoadBuddy 0x1021d004
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

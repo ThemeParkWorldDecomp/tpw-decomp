@@ -1,5 +1,5 @@
 // Test library for the online outbox panel (unit v5239; libtpw_unit_OutboxPanelMsg.dylib, tests/test_OutboxPanelMsg.py), main app:
-//   src/UI_IslandLobby_CalcEmailAddressScrollBar_OutboxSendingMsg_OutboxPanelMsg.cpp   OutboxPanelMsg, SendAndDeleteOutbox
+//   src/game/ui/ui_onlineOutbox.cpp   OutboxPanelMsg, SendAndDeleteOutbox
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queues. The
 // globals of other files are defined here, zero at start like the Mac's bss. The objects the code reads (the user info, the list, the

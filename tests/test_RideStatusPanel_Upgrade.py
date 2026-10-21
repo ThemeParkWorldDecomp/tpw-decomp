@@ -1,6 +1,6 @@
 """Unit v5914, the ride status panel's knobs and buttons, against libtpw_unit_RideStatusPanel_Upgrade.dylib
 (tests/unit_RideStatusPanel_Upgrade.cpp), main app ("SimTheme Park"),
-src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Upgrade.cpp:
+src/game/ui/ui_RideStatus.cpp:
   RideStatusPanel::Upgrade 0x101bbb88, ApplyChanges 0x101bbacc, DoDial 0x101bb9b8, Edit 0x101bb71c, Show 0x101bc0bc,
   UpdateKnobsWindow 0x101bb494
 

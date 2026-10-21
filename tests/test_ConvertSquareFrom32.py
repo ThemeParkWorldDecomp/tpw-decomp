@@ -1,5 +1,5 @@
 """Unit v5953: ConvertSquareFrom32, PT_Load, CSwitch::Do and COpenGLPrintf::Close, against libtpw_unit_ConvertSquareFrom32.dylib
-(tests/unit_ConvertSquareFrom32.cpp), engine, src/tb_capture_ConvertSquareFrom32.cpp:
+(tests/unit_ConvertSquareFrom32.cpp), engine, src/engine/DirectDraw.cpp, src/engine/Switch.cpp, src/engine/tb_hfield.cpp, src/engine/tb_printf_opengl.cpp:
   ConvertSquareFrom32 0x10003454, PT_Load 0x1000bed0, CSwitch::Do 0x100328ac, COpenGLPrintf::Close 0x10046c64
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

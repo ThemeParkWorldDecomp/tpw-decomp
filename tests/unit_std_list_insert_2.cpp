@@ -1,6 +1,6 @@
 // Test library for std::list<unsigned int>::insert/merge/remove/splice (unit v5931; libtpw_unit_std_list_insert_2.dylib,
 // tests/test_std_list_insert_2.py), main app:
-//   src/std_list_insert_2.cpp
+//   src/game/MslSupport.cpp
 //
 // The callees outside the unit (operator new, new[], delete, strlen, strcpy, __throw) are fakes that record what the PowerPC stubs record.
 // Allocation comes from the arena (32-bit addressable). The globals of the library nobody names are defined here.

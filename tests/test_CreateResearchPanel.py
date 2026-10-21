@@ -1,5 +1,5 @@
 """Unit v5021, the research panel's creation, against libtpw_unit_CreateResearchPanel.dylib (tests/unit_CreateResearchPanel.cpp), main app
-("SimTheme Park"), src/CreateResearchPanel.cpp:
+("SimTheme Park"), src/game/ui/ui_researchPanel.cpp:
   CreateResearchPanel 0x101b4f74
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

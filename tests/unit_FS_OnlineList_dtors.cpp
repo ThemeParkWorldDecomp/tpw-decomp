@@ -1,7 +1,7 @@
 // Test library for the online list destructors of the teardown (unit v5L17; libtpw_unit_FS_OnlineList_dtors.dylib,
 // tests/test_FS_OnlineList_dtors.py), main app:
-//   src/FS_OnlineList_dtors.cpp   the city base, the by-park-id and the top-10 list destructors
-//   src/FS_Online_gametype_CFSOnlineSystemParkList_Dtor_CFSOnlineSystemPark.cpp, src/CFSOnlineSystemList_Dtor_CFSOnlineSystemList_2.cpp
+//   src/game/online/FS_Online.cpp   the city base, the by-park-id and the top-10 list destructors
+//   src/game/online/FS_Online.cpp
 //                                 the park list's destructor and the park instance of the base: the host's whole chain runs
 //   unit v51065's file (src/FS_Online_..._CFSOnlineSystemCityList_ReturnCityInfo.cpp)   the city list's destructor, for its chain
 //

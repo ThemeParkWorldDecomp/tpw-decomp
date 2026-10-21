@@ -1,6 +1,6 @@
 """Unit v5071, UIMain_GotoStatusPanelForThing against libtpw_unit_UIMain_GotoStatusPanelForThing.dylib
 (tests/unit_UIMain_GotoStatusPanelForThing.cpp), main app ("SimTheme Park"),
-src/ui_main_kbcapture_UIMain_ShowRidePreview_UIMain_GotoStatusPanelForThing.cpp:
+src/game/ui/ui_main.cpp:
   UIMain_GotoStatusPanelForThing 0x10181e2c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

@@ -1,6 +1,6 @@
 // Test library for std::deque<errorthingy>::push_back and grow_buf_back (unit v5243; libtpw_unit_std_deque_push_back.dylib,
 // tests/test_std_deque_push_back.py), main app:
-//   src/UI_pump_std_deque_push_back.cpp   push_back, grow_buf_back, gMslErrorDequePad
+//   src/game/MslSupport.cpp   push_back, grow_buf_back, gMslErrorDequePad
 //
 // The callees outside the unit are fakes that record what the real ones read: the runtime (new, new[], delete, strlen, strcpy,
 // __throw, the counted string constructor) and the block table (__cdeque<const void*>: operator[], reserve, resize, pop_front,

@@ -172,14 +172,14 @@ struct SRenderListEntry {
     uint8_t* mVertices;            // 0x0c  the node's vertices, transformed (render memory scratch space)
     void* mData;                   // 0x10  the node's points (node flag 0x1000000) or, four bytes in, its mesh words
 
-    // The blending mode of a face set drawn with a texture (src/tb_renderentry_setup.cpp).
+    // The blending mode of a face set drawn with a texture (src/engine/RenderList.cpp).
     int32_t GetFaceSetBlendMode(sFaceSet* faceSet, CTextureEntry* texture);   // 0x10025e8c
     // Starts the primitive for one face set; *extra is a value CalcRenderEntry takes back.
-    // NULL when there is nothing to draw (src/tb_renderentry_setup.cpp).
+    // NULL when there is nothing to draw (src/engine/RenderList.cpp).
     SPrimitive* SetupPrimitive(int32_t faceSet, int32_t* extra);   // 0x10026044
     // Adds one face set's vertices and the faces that turn to the viewer to the primitive;
     // `extra` is the vertex size SetupPrimitive gave back (0x20, or 0x28 with a second set of
-    // texture coordinates). Always 1 (src/tb_renderentry.cpp).
+    // texture coordinates). Always 1 (src/engine/RenderList.cpp).
     int32_t CalcRenderEntry(SPrimitive* primitive, int32_t faceSet, int32_t extra);   // 0x1002477c
 };
 
@@ -232,7 +232,7 @@ public:
 extern CRenderList* gei_RenderList;   // engine data 0x1016562c (not exported; name invented)
 
 // The dot product of two vectors passed by value (the file's range, between the entries and the
-// list); y times y first, then the x and z terms as fused multiply-adds. src/tb_mesh_frame.cpp.
+// list); y times y first, then the x and z terms as fused multiply-adds. src/engine/RenderList.cpp.
 float DotProduct(D3DVECTOR a, D3DVECTOR b);   // 0x10025cac
 
 // 1 when the list was made, 0 when there already is one (0x10024650); Close: whether

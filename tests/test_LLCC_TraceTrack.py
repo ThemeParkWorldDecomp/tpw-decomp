@@ -1,5 +1,5 @@
 """Unit v5988, the track tracer, against libtpw_unit_LLCC_TraceTrack.dylib (tests/unit_LLCC_TraceTrack.cpp), main app
-("SimTheme Park"), src/LLCC_TraceTrack.cpp:
+("SimTheme Park"), src/game/park/LLCellRide.cpp:
   LLCC_TraceTrack 0x1008ddfc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

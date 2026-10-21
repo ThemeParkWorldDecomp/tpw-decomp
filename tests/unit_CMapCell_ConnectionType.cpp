@@ -1,5 +1,5 @@
 // Test library for CMapCell::ConnectionType (unit v51027; libtpw_unit_CMapCell_ConnectionType.dylib, tests/test_CMapCell_ConnectionType.py), main app:
-//   src/MapDelta_map_CMapCell_ConnectionType.cpp   CMapCell::ConnectionType
+//   src/game/park/MapCell.cpp   CMapCell::ConnectionType
 //
 // The callees outside the unit are fakes that record what the real one reads and answer from the test's queues; cells are named in the log by
 // their offset from the world block (gGameWorld). The globals of other files the unit reads are defined here, zero at start like the Mac's bss.

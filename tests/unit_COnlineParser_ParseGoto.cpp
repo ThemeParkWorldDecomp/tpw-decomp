@@ -1,5 +1,5 @@
 // Test library for the COnlineParser Parse functions (unit v5051; libtpw_unit_COnlineParser_ParseGoto.dylib, tests/test_COnlineParser_ParseGoto.py), main app:
-//   src/COnlineParser_ParseGoto.cpp   ParseBlackMark, ParseBuddy, ParsePage, ParseGoto, ParseLocate
+//   src/game/online/OnlineParser.cpp   ParseBlackMark, ParseBuddy, ParsePage, ParseGoto, ParseLocate
 //
 // The callees (string constructors, Argument, vector push_back, CParser::GetString and IgnoreRemainingString) are fakes recording what they read.
 #include <cstddef>

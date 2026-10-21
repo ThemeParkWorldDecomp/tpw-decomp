@@ -1,5 +1,5 @@
 // Test library for CUI2DMap::CreateMapPanel (unit v5986; libtpw_unit_CUI2DMap_CreateMapPanel.dylib, tests/test_CUI2DMap_CreateMapPanel.py), main app:
-//   src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition_CUI2DMap_UnRegister_CUI2DMap_CreateMapPanel.cpp
+//   src/game/ui/ui_2dmap.cpp
 //   CUI2DMap::CreateMapPanel, gMapPanelScript and the weak stand-ins UI_2DMap_CallbackFn and mappanel_callee::NewTextSprite
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue. The globals of

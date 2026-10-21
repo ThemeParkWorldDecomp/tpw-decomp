@@ -1,6 +1,6 @@
 // Test library for the CSprocketsModule channel commands (unit v5250; libtpw_unit_CSprocketsModule_SetChannelVolume.dylib,
 // tests/test_CSprocketsModule_SetChannelVolume.py), sound symbols shared:
-//   src/TbSoundPipeChannel_CSprocketsModule_SetChannelVolume.cpp   StopChannel, StopAll, PauseChannel, PauseAll, GetPosition,
+//   src/sound/CSprocketsModule.cpp   StopChannel, StopAll, PauseChannel, PauseAll, GetPosition,
 //   SetListenerPosition, SetChannelVolume, SetSpeakerConfig
 //
 // The commands' constructors, SetImmediate, SetLocation, IfOk, the channel send (SendToChannel, the Mac's glue 0x1002f154), the speaker

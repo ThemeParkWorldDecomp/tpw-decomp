@@ -1,5 +1,5 @@
 // Test library for the park-goto callbacks (unit v5276; libtpw_unit_GotoPark_OK.dylib, tests/test_GotoPark_OK.py), main app:
-//   src/COnlinePerson_SetDest_GotoPark_OK.cpp   GotoPark_OK, GotoCallbackFn
+//   src/game/online/online.cpp   GotoPark_OK, GotoCallbackFn
 //
 // The callees are recording fakes (operator new, the constructor, GotoFailed, GotoStoredPerson, UDebug, GS_SetCurrentGameStatus).
 #include <cstdarg>

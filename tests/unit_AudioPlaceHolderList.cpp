@@ -1,7 +1,7 @@
 // Fakes and test entry point for unit w79g1, CAudioPlaceHolderList (libtpw_unit_AudioPlaceHolderList.dylib, driven by
 // tests/test_AudioPlaceHolderList.py in the program "sound symbols shared"; see calllog.h):
-//   src/AudioPlaceHolderList.cpp  CAudioPlaceHolderList and its CMemBlock (the unit under test)
-// Real: the sound lock (src/snd_handles.cpp) and the info and position records (w77). CAudioPlaceHolder (w79g2) is NOT linked: its
+//   src/sound/AudioPlaceHolderList.cpp, src/sound/PlaceHolderTypes.cpp, src/sound/TbSysCommand.cpp  CAudioPlaceHolderList and its CMemBlock (the unit under test)
+// Real: the sound lock (src/sound/AudioComponent.cpp, src/sound/ChannelState.cpp, src/sound/SystemCommand.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundPipe.cpp, src/sound/TbSoundPipeChannel.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/TbSoundSampleWAV.cpp) and the info and position records (w77). CAudioPlaceHolder (w79g2) is NOT linked: its
 // members the list calls are defined below (the small ones as copies of the translation, which the PowerPC side runs as the
 // original; the ones that need the sound manager, the map data or the file helpers as recording fakes), and the subclasses of
 // unit w79g3 are the test class TestHolder<N>, constructed into the pool's slots by recording fakes of the CreateObject statics.

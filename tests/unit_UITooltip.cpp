@@ -1,7 +1,7 @@
-// Test library for unit w56, the tooltip window (libtpw_unit_UITooltip.dylib; see tests/test_UITooltip.py): src/ui_tooltip.cpp (the 15
-// functions of the file), with the window's GetOriginalPosition, GetPosition, SetPosition and ShiftPosition (src/InterfaceWindow_draw.cpp),
-// the help text handler the class derives from (src/ui_helptext.cpp), the window's constructor (src/InterfaceWindow.cpp) and the rectangles
-// (src/UI_Base.cpp), all real: so the tooltip object's own words and the four test windows' rectangles are compared, as well as the log.
+// Test library for unit w56, the tooltip window (libtpw_unit_UITooltip.dylib; see tests/test_UITooltip.py): src/game/ui/ui_tooltip.cpp (the 15
+// functions of the file), with the window's GetOriginalPosition, GetPosition, SetPosition and ShiftPosition (src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/InterfaceWindow.cpp),
+// the help text handler the class derives from (src/game/ui/InterfaceHelpText.cpp, src/game/ui/InterfaceTimer.cpp, src/game/ui/UI_Base.cpp), the window's constructor (src/game/ui/InterfaceWindow.cpp) and the rectangles
+// (src/game/ui/CoolRect.cpp, src/game/ui/CoolRegion.cpp, src/game/ui/UI_Base.cpp), all real: so the tooltip object's own words and the four test windows' rectangles are compared, as well as the log.
 //
 // Every other callee is a fake that records through calllog, the same events as the PowerPC side's stubs: the window's other members
 // (CreateObject, the font, text and draw object setters, the extra parameters, the callback, Show, Enable and SetText, the default handler),

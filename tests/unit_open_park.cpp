@@ -1,5 +1,5 @@
 // Test library for the keyboard cheat actions (unit v51108; libtpw_unit_open_park.dylib, tests/test_open_park.py), main app:
-//   src/ui_Postcard_panel_spawn_handyman_WeatherUpLots_open_park.cpp
+//   src/game/keyboard.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read. Objects the fakes hand back are dummy blocks
 // (labels 3 research lab, 4 bank account, 5 world); only the weather block is real memory (the unit writes a byte of it).

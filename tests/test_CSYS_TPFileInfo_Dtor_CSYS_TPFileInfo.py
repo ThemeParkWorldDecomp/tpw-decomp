@@ -1,5 +1,5 @@
 """Unit v5714, CSYS_TPFileInfo::~CSYS_TPFileInfo, against libtpw_unit_CSYS_TPFileInfo_Dtor_CSYS_TPFileInfo.dylib, main app,
-src/FS_System_CSYS_TPFileInfo_Dtor_CSYS_TPFileInfo.cpp:
+src/game/ui/3DFont.cpp:
   CSYS_TPFileInfo::~CSYS_TPFileInfo 0x10005288
 
 A case is an object (or NULL) and a delete flag. The string destructor (0x102382f0) and operator delete (0x10238218) are fakes on both

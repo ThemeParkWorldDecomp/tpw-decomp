@@ -1,6 +1,6 @@
 """Unit v5077, CActionRecorder::ReadAndProcessNextAction, against libtpw_unit_CActionRecorder_ReadAndProcessNextAction.dylib
 (tests/unit_CActionRecorder_ReadAndProcessNextAction.cpp), main app ("SimTheme Park"),
-src/ActionRecorder_CActionRecorder_ReadAndProcessNextAction.cpp:
+src/game/ActionRecorder.cpp:
   CActionRecorder::ReadAndProcessNextAction 0x101453a8
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

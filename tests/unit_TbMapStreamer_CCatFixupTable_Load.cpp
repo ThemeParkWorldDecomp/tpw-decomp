@@ -1,5 +1,5 @@
 // Test library for TbMapStreamer::CCatFixupTable::Load (unit v5234; libtpw_unit_TbMapStreamer_CCatFixupTable_Load.dylib), main app:
-//   src/TbMapStreamer_TbMapStreamer_CCatFixupTable_Load.cpp
+//   src/sound/TbMapStreamer.cpp
 //
 // The callees outside the unit are fakes that record what the real ones read: Unload, Instance, FindCatagory, the file's Read and
 // operator new[].

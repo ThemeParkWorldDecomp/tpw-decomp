@@ -1,5 +1,5 @@
 """Unit v5770, InterfaceLightPanel::SetValue 0x101d0a50, against libtpw_unit_InterfaceLightPanel_SetValue.dylib
-(tests/unit_InterfaceLightPanel_SetValue.cpp), src/ui_whatami_InterfaceLightPanel_SetValue.cpp.
+(tests/unit_InterfaceLightPanel_SetValue.cpp), src/game/ui/InterfaceLightPanel.cpp.
 
 A case is an object with an old mValue and a call with a new value. The callees InterfaceWindow::GetWindow (answers from a queue),
 SetFrame and SetValue are fakes on both sides that record their arguments. Compared: the answer, the object's mValue, the event log.

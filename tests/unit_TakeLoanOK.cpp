@@ -1,5 +1,5 @@
 // Test library for TakeLoanOK (unit v5754; libtpw_unit_TakeLoanOK.dylib, tests/test_TakeLoanOK.py), main app:
-//   src/ui_allKidsPanel_AllKidsPanelMsg_LoansPanelMsg_TakeLoanOK.cpp
+//   src/game/ui/ui_loansPanel.cpp
 // Fakes: CWorld::GetBankAccount, CBankAccount::ApplyForLoan, InterfaceWindow::GetWindow, FillLenderList. Pointers are recorded as raw values.
 #include <cstddef>
 #include <cstdint>

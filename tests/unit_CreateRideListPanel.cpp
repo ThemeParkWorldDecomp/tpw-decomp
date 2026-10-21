@@ -1,5 +1,5 @@
 // Test library for the ride list panel (unit v5010; libtpw_unit_CreateRideListPanel.dylib, tests/test_CreateRideListPanel.py), main app:
-//   src/CreateRideListPanel.cpp   CreateRideListPanel and the globals nothing else names
+//   src/game/ui/ui_ridepanel.cpp   CreateRideListPanel and the globals nothing else names
 //
 // Every callee is a fake that records what the real one reads and answers from the test's queues or tables. The windows are blocks with a
 // vtable whose SetText slot records; GetWindow answers from a link table the test fills; objects the fakes return are named pointers.

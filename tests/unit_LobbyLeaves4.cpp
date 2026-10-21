@@ -1,14 +1,14 @@
 // Fakes and test entry points for unit w62, the lobby's small leaves part 4 (libtpw_unit_LobbyLeaves4.dylib, driven by
 // tests/test_LobbyLeaves4.py; see calllog.h):
-//   src/lobby_globe.cpp  CLBScreenComponentOnlineGlobe::CLBScreenComponentOnlineGlobe 0x100ac90c, the download and publish globes' Init
-//   src/FS_Online.cpp    CFSOnlineSystem::Tick 0x10170f80, StopProcessing 0x10171404
-//   src/email.cpp        Outbox::Outbox 0x10203940, AddressBook::AddressBook 0x102064cc, bthread_mutex::lock 0x10200d8c, unlock 0x10200de0
-//   src/Game.cpp         CGame::DeInit 0x1014965c
-//   src/InGame.cpp       CInGame::Init 0x1014b2bc
+//   src/game/online/lobby_globe.cpp  CLBScreenComponentOnlineGlobe::CLBScreenComponentOnlineGlobe 0x100ac90c, the download and publish globes' Init
+//   src/game/online/FS_Online.cpp    CFSOnlineSystem::Tick 0x10170f80, StopProcessing 0x10171404
+//   src/game/online/bthread.cpp, src/game/online/email.cpp        Outbox::Outbox 0x10203940, AddressBook::AddressBook 0x102064cc, bthread_mutex::lock 0x10200d8c, unlock 0x10200de0
+//   src/game/Game.cpp         CGame::DeInit 0x1014965c
+//   src/game/InGame.cpp       CInGame::Init 0x1014b2bc
 // Every callee outside the unit is a fake that records the same event as the PowerPC side's stub: the screen base class's constructor, the
 // nine online members, FuckOffUIProgressBar, ExitLevel, AssignMouseMode, CInGame::Start and the two critical section calls. The heap
-// allocation of the globe's two lists is a recorded nothrow new whose answer (NULL or a block) the case scripts. The rest of src/Game.cpp
-// and src/InGame.cpp that the library has to link (resources, strings, the game object) is quiet.
+// allocation of the globe's two lists is a recorded nothrow new whose answer (NULL or a block) the case scripts. The rest of src/game/Game.cpp
+// and src/game/InGame.cpp that the library has to link (resources, strings, the game object) is quiet.
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -33,7 +33,7 @@
 using namespace calllog;
 using String = TbDynamicStringTemplate<char>;
 
-// ---- what src/Game.cpp links to and these tests never reach (quiet)
+// ---- what src/game/Game.cpp links to and these tests never reach (quiet)
 #ifdef __APPLE__
 extern unsigned char gGameStorage[sizeof(CGame)] __asm__("_gGame");
 extern unsigned char gTPGlobalsStorage[sizeof(TPGlobals)] __asm__("_gTPGlobals");
@@ -103,7 +103,7 @@ CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
 void CLBScreenComponentOnlineGlobe::Render() {}
 void CLBScreenComponentOnlineGlobe::Close() {}
 uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
-// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp).
+// The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 CLBScreenComponentDownloadGlobe::~CLBScreenComponentDownloadGlobe() {}

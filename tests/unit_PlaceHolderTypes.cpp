@@ -1,9 +1,9 @@
 // Fakes and test entry point for unit w79g3, the placeholder subclasses (libtpw_unit_PlaceHolderTypes.dylib, driven by
 // tests/test_PlaceHolderTypes.py in the program "sound symbols shared"; see calllog.h):
-//   src/PlaceHolderTypes.cpp  CPlaceHolderOneShot, ...OneShotSentence, ...OneShotBranchingSentence, CPlaceHolderSentence and its
+//   src/sound/ListSentence.cpp, src/sound/PlaceHolderSentence.cpp, src/sound/PlaceHolderTypes.cpp  CPlaceHolderOneShot, ...OneShotSentence, ...OneShotBranchingSentence, CPlaceHolderSentence and its
 //                             Linear, Branching, Shuffle (with CListShuffle) and CListSentence (with CListData) subclasses (under test)
-// Real as well: the placeholder base CAudioPlaceHolder (w79g2, src/AudioPlaceHolder.cpp), the one-shot sentence Elements (w79g4,
-// src/PlaceHolderHelpers.cpp), the info records and positions (w77), TbSoundBank.cpp (w72), TbRefRelease (w78), CAudioComponent and
+// Real as well: the placeholder base CAudioPlaceHolder (w79g2, src/sound/AudioPlaceHolder.cpp, src/sound/AudioPlaceHolderList.cpp, src/sound/TbAudioBody.cpp, src/sound/TbSoundSampleCallback.cpp), the one-shot sentence Elements (w79g4,
+// src/sound/AudioPlaceHolder.cpp, src/sound/PlaceHolderSentence.cpp, src/sound/TbMapStreamer.cpp), the info records and positions (w77), TbSoundBank.cpp (w72), TbRefRelease (w78), CAudioComponent and
 // the command constructors (w79b). On the PowerPC side every one of them runs as the original, so a subclass runs over the real
 // base functions and the real vtable slots. Fakes that record what they are given (the PowerPC side records the same from its
 // stubs): the sound manager and the core under it (w79e is not linked: getters, Rolloff, PlaySample, ConstructSample, SystemCommand),

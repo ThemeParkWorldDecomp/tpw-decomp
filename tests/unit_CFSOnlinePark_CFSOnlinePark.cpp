@@ -1,5 +1,5 @@
 // Test library for CFSOnlinePark's constructor and destructor (unit v5542; libtpw_unit_CFSOnlinePark_CFSOnlinePark.dylib),
-//   src/CFSOnlinePark_CFSOnlinePark.cpp
+//   src/game/online/FS_OnlineList.cpp
 //
 // The string class, its virtual methods and the park list's Find/AddTail/RemoveAt are recording fakes (the same events as the
 // PowerPC stubs of tests/test_CFSOnlinePark_CFSOnlinePark.py).

@@ -1,6 +1,6 @@
 // Test library for the ride status panel's knobs and buttons (unit v5914; libtpw_unit_RideStatusPanel_Upgrade.dylib,
 // tests/test_RideStatusPanel_Upgrade.py), main app:
-//   src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Upgrade.cpp   Upgrade, ApplyChanges, DoDial, Edit, Show,
+//   src/game/ui/ui_RideStatus.cpp   Upgrade, ApplyChanges, DoDial, Edit, Show,
 //   UpdateKnobsWindow, and the globals gRideStatusShowThing and gRideStatusScript.
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queues (pointers the

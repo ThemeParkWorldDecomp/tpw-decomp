@@ -73,7 +73,7 @@ void TbMaskInfo::Set(uint32_t mask, uint32_t top) {
     mMask=mask; mShiftRight=0; mShiftLeft=static_cast<int16_t>(top);
 }
 const TbRenderArea& TbSurface::GetRenderArea() const { return mArea; }
-// The library's out-of-line constructor (0x10016630, unit w21's src/bfl_graphicfile.cpp): the masks are left alone.
+// The library's out-of-line constructor (0x10016630, unit w21's src/bullfrog/TbRenderArea.cpp): the masks are left alone.
 TbRenderArea::TbRenderArea() { mDepth=0; mPalettised=0; mData=nullptr; mWidth=0; mPictureHeight=0; mStride=0; }
 TbResult TbRenderArea::SetupClientRA(TbRenderArea& out, const TbRect& r) const {
     out=*this; out.mData=mData+r.top*mStride+r.left*((mDepth+7)/8);

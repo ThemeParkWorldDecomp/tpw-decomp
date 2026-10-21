@@ -1,5 +1,5 @@
 // Test library for StopTrainSounds and RestoreCoasterSounds (unit v5728; libtpw_unit_StopTrainSounds.dylib, tests/test_StopTrainSounds.py), main app:
-//   src/TPConfig_bend_StopTrainSounds.cpp
+//   src/game/rides/CoasterSounds.cpp
 //
 // The callees outside the unit are recording fakes; gActionRecorder is defined here.
 #include <cstddef>

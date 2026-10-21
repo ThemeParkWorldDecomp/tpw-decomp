@@ -1,5 +1,5 @@
 """Unit v5945, screen mode lookup, palette fade and the DirectDraw error switch, against libtpw_unit_LbScreen_IsModeAvailable_2.dylib
-(tests/unit_LbScreen_IsModeAvailable_2.cpp), bullfrog, src/LbSurface_LbScreen_IsModeAvailable_2.cpp:
+(tests/unit_LbScreen_IsModeAvailable_2.cpp), bullfrog, src/bullfrog/LbSurface.cpp, src/bullfrog/WinScrn.cpp:
   LbScreen_IsModeAvailable 0x10068298, LbScreen_FadePalette 0x100683ec, OS_dd_error 0x10067e70
 
 A case is a world and a call, built by one piece of Python in both memories. The callees (ModeFindFirst/Next/End, WaitVbi,

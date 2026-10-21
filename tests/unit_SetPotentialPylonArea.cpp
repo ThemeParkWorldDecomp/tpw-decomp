@@ -1,5 +1,5 @@
 // Test library for the editor's pylon placement (unit v5190; libtpw_unit_SetPotentialPylonArea.dylib, tests/test_SetPotentialPylonArea.py), main app:
-//   src/TPCoaster_trains_SetPotentialPylonArea.cpp   SetPotentialPylonArea, PlacePylon
+//   src/game/rides/CoasterPylon.cpp   SetPotentialPylonArea, PlacePylon
 //
 // The callees outside the unit (NewPylon, GetNewBraceLoftInterval, CTRACE, DetermineLinkLevel, NewTrackBrace, SetupBraceAnimFrameData,
 // RecalcTrackParams, CalculateBraceCost, FloatToCell, the bank account, RejoinTrack, SetCoasterEditState, CoasterPanelEndTrack, UIHandleEndLoop,

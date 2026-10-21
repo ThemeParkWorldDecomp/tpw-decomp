@@ -1,5 +1,5 @@
 """Unit v5265, seven CAdvisorScoring staff scorers, against libtpw_unit_CAdvisorScoring__ADVISOR_STAFF_HIRE_GUARDS_3.dylib
-(tests/unit_CAdvisorScoring__ADVISOR_STAFF_HIRE_GUARDS_3.cpp), main app, src/AdvisorScoring_CAdvisorScoring__ADVISOR_STAFF_HIRE_GUARDS_3.cpp:
+(tests/unit_CAdvisorScoring__ADVISOR_STAFF_HIRE_GUARDS_3.cpp), main app, src/game/advisor/AdvisorScoring.cpp:
   _ADVISOR_STAFF_HIRE_GUARDS_1 0x10011d4c, _GUARDS_2 0x10011e64, _GUARDS_3 0x10011f54, _HIRE_ENTERTAINERS_1 0x10012090,
   _HIRE_RESEARCHERS_2 0x10012328, _SET_MECHANIC_AREA 0x1001260c, _SET_HANDYMAN_AREA 0x100128a4
 

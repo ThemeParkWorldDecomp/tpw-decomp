@@ -1,5 +1,5 @@
 // Test library for the text formatter's vector members and line processor (libtpw_unit_TextVectors.dylib; see tests/test_TextVectors.py):
-// src/ltms_textformatter_rest.cpp, which has MslVector<CCharacterInfo>::clear and push_back, MslVector<CLineInfo>::clear and push_back,
+// src/ltms/TbTextFormatter.cpp, which has MslVector<CCharacterInfo>::clear and push_back, MslVector<CLineInfo>::clear and push_back,
 // MslVector<TbPoint>::clear, resize, erase and insert, ProcessLine and FixParenthesis. Nothing is faked: the only callees are operator new and
 // operator delete (the harness's, which count; the PowerPC side's are fakes that count the same way).
 //

@@ -1,5 +1,5 @@
 """Unit v5096, the online outbox panel, against libtpw_unit_LCPostFormat_2.dylib (tests/unit_LCPostFormat_2.cpp), main app
-("SimTheme Park"), src/LCPostFormat_2.cpp:
+("SimTheme Park"), src/game/ui/ui_onlineOutbox.cpp:
   LCFormat 0x101e4bdc (OutboxLCFormat), LCPostFormat 0x101e4d20 (OutboxLCPostFormat), CreateOnlineOutboxPanel 0x101e4f28
 
 A case is a world and a call. The world is built twice: in emulator memory at the Mac's addresses for the original, and through the host

@@ -1,5 +1,5 @@
 // Test library for the bump car's move (unit v5627; libtpw_unit_BMP_Move.dylib, tests/test_BMP_Move.py), main app:
-//   src/BMP_Move.cpp   BMP_Move; it defines gBumpTurnMax and gBumpTurnMin
+//   src/game/rides/BumperRide.cpp   BMP_Move; it defines gBumpTurnMax and gBumpTurnMin
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues (PAR_InitEmitter,
 // PossitionSound1, TrackRideIdToThingId, GAME_ASSERTMSG, RSSE_GetSoundEventCode, SOUND_SetParamValue, GetRideFromID,

@@ -1,9 +1,9 @@
 """Unit w88, the lobby's small leaves part 8, against libtpw_unit_LobbyLeaves8.dylib (tests/unit_LobbyLeaves8.cpp), in the main app
 ("SimTheme Park"):
-  src/RideDB_effects.cpp         CRideDatabase::DeleteCustomEffects 0x10156e34
-  src/ui_main_pause.cpp          PauseUI 0x1018679c, TogglePauseUI 0x10186854
-  src/ui_mainpanel2_window.cpp   ShowPauseWindow 0x101a86d0, TogglePauseWindow 0x101a87c4, PauseWindowMsg 0x101a8504
-  src/ui_pause_data.cpp          the pause window's script (0x102aacfc, 21 words) and animation (0x102aadbc, 5 frames)
+  src/game/rides/RideDB.cpp         CRideDatabase::DeleteCustomEffects 0x10156e34
+  src/game/ui/ui_main.cpp          PauseUI 0x1018679c, TogglePauseUI 0x10186854
+  src/game/ui/ui_mainpanel2.cpp   ShowPauseWindow 0x101a86d0, TogglePauseWindow 0x101a87c4, PauseWindowMsg 0x101a8504
+  src/game/ui/ui_mainpanel2.cpp          the pause window's script (0x102aacfc, 21 words) and animation (0x102aadbc, 5 frames)
 
 A case is a world (the ride database in emulator memory at the Mac's layout, the windows, the key table and the globals) and an operation, built
 twice from one description: for the original in emulator memory and for the translation by the unit's entry points (tpw_l8_*). Every callee

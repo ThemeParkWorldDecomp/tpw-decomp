@@ -1,5 +1,5 @@
 """Unit v5296, the keytable actions, against libtpw_unit_enter_hoarding_mode.dylib (tests/unit_enter_hoarding_mode.cpp), main app
-("SimTheme Park"), src/ui_Postcard_panel_win_ticket_1_show_person_history_info_enter_hoarding_mode.cpp:
+("SimTheme Park"), src/game/keyboard.cpp:
   win_ticket_7 0x1014f16c, win_ticket_8 0x1014f208, win_ticket_9 0x1014f2a4, enter_hoarding_mode 0x1014f494,
   force_ride_breakdown 0x1014f7e0, park_attraction_value 0x1014fa2c
 

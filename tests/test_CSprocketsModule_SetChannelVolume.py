@@ -1,5 +1,5 @@
 """Unit v5250, the channel commands of CSprocketsModule (sound symbols shared), against libtpw_unit_CSprocketsModule_SetChannelVolume.dylib
-(tests/unit_CSprocketsModule_SetChannelVolume.cpp), src/TbSoundPipeChannel_CSprocketsModule_SetChannelVolume.cpp:
+(tests/unit_CSprocketsModule_SetChannelVolume.cpp), src/sound/CSprocketsModule.cpp:
   StopChannel 0x1002c068, StopAll 0x1002c238, PauseChannel 0x1002c314, PauseAll 0x1002c670, GetPosition 0x1002cfa8,
   SetListenerPosition 0x1002d090, SetChannelVolume 0x1002d5b4, SetSpeakerConfig 0x1002d6cc
 

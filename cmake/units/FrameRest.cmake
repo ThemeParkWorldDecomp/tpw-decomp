@@ -1,1 +1,15 @@
-set(TPW_UNIT_FrameRest src/tb_hfield_conquad.cpp src/tb_texturecache_balance.cpp src/tb_rendermemory_execute.cpp)
+set(TPW_UNIT_FrameRest src/engine/tb_hfield.cpp src/engine/Gamut.cpp src/engine/TextureCache.cpp
+    src/engine/RenderMemory.cpp)
+set(TPW_UNIT_FrameRest_KEEP
+  __Z19CycleFrequencyTablev   # CycleFrequencyTable()
+  __ZN12CTextureLink9CalcUsageEi   # CTextureLink::CalcUsage(int)
+  __ZN13CRenderMemory27ExecuteUnrenderedPrimitivesEv   # CRenderMemory::ExecuteUnrenderedPrimitives()
+  __ZN13CRenderMemory29qSortPrimitivesAscending_ZPosEPiii   # CRenderMemory::qSortPrimitivesAscending_ZPos(int*, int, int)
+  __ZN13CRenderMemory30qSortPrimitivesDescending_ZPosEPiii   # CRenderMemory::qSortPrimitivesDescending_ZPos(int*, int, int)
+  __ZN13CRenderMemory32qSortPrimitivesAscending_TextureEPiii   # CRenderMemory::qSortPrimitivesAscending_Texture(int*, int, int)
+  __ZN13CTextureCache10AutoMipmapEPP13CTextureEntryi   # CTextureCache::AutoMipmap(CTextureEntry**, int)
+  __ZN13CTextureCache14Entry_CompressEPP13CTextureEntryi   # CTextureCache::Entry_Compress(CTextureEntry**, int)
+  __ZN13CTextureCache30BalanceCache_LevelSurfaceUsageEv   # CTextureCache::BalanceCache_LevelSurfaceUsage()
+  __ZN13CTextureCache35BalanceCache_FreeLockedTextureSpaceEv   # CTextureCache::BalanceCache_FreeLockedTextureSpace()
+  __ZN7CHField11TestConQuadEiiii   # CHField::TestConQuad(int, int, int, int)
+)

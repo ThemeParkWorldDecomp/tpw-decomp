@@ -1,4 +1,4 @@
-"""Unit v5208, GetCrossSectionFromParams 0x1004fd94 against libtpw_unit_GetCrossSectionFromParams.dylib, main app, src/TPConfig_extrude_GetCrossSectionFromParams.cpp.
+"""Unit v5208, GetCrossSectionFromParams 0x1004fd94 against libtpw_unit_GetCrossSectionFromParams.dylib, main app, src/game/rides/CoasterExtrude.cpp.
 
 A case is a type block (table pointer at 0x78, count at 0x7c) with a table of 0x2c-byte entries (eight range floats and an answer word
 at 0x20), an orientation block (floats at 4, 8, 0xc) and an angle. The world is built by one piece of code on both memories. Compared:

@@ -1,6 +1,6 @@
 """Unit v51112, small functions of the sound program (random, LB_MIN/LB_MAX, static initialisers, CAutoArrayPtr<CAudioPlaceHolder*>,
 CFile::Write, the CDiscFileStorage destructor ...), against libtpw_unit_LbMaths_RangedRandomSlow.dylib
-(tests/unit_LbMaths_RangedRandomSlow.cpp), src/AudioPlaceHolder_LbMaths_Random_LbMaths_RangedRandomSlow.cpp (the sound program,
+(tests/unit_LbMaths_RangedRandomSlow.cpp), src/sound/AudioPlaceHolder.cpp, src/sound/PlaceHolderSentence.cpp, src/sound/TbSoundCodecLoop.cpp, src/sound/TbSoundSampleCallback.cpp, src/sound/TbSoundSampleMPEG2.cpp, src/sound/TbSoundSamplePipe.cpp, src/sound/TbSoundSampleWAV.cpp (the sound program,
 PROGRAM "sound symbols shared"):
   LbMaths_RangedRandomSlow 0x10018c88, bfl::maths::RangedRandomSlow 0x10018c30, bfl::maths::Random 0x10019ad0, RotateRight<long> 0x10018d6c,
   LB_MAX/LB_MIN 0x100196b0 0x1001a17c 0x1001bdec 0x1001e470 0x100112f8 0x1000e7d8, TbRect::operator= 0x1001c31c, operator_new 0x1001d248,

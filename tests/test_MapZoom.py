@@ -1,4 +1,4 @@
-"""The map zoom, CMapZoom (src/tb_mapzoom_class.cpp): all ten methods and the global's construction,
+"""The map zoom, CMapZoom (src/engine/tb_mapzoom.cpp): all ten methods and the global's construction,
 original versus translation.
 
 A case is a script run on both sides: the zoom starts either constructed (the real

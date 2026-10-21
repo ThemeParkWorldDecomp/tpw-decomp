@@ -1,5 +1,5 @@
 // Test library for the outbox panel's ColumnClick (unit v5374; libtpw_unit_ColumnClick.dylib, tests/test_ColumnClick.py), main app:
-//   src/UI_IslandLobby_CalcEmailAddressScrollBar_OutboxSendingMsg_ColumnClick.cpp   ColumnClick
+//   src/game/ui/ui_onlineOutbox.cpp   ColumnClick
 //
 // The window lookup and the list's item functions are recording fakes; gOutboxWindow is defined here.
 #include <cstddef>

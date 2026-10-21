@@ -11,7 +11,7 @@ public:
     virtual void AppendUnicode(const char16_t*, uint32_t) = 0;
     virtual void AppendUnicode(char16_t) = 0;
 };
-// The string table's output buffer (src/CStaticUnicodeBuffer.cpp, unit w40; Mac size 0x14, vtable 0x10010f74 in the ltms library): a
+// The string table's output buffer (src/ltms/StaticUnicodeBuffer.cpp, unit w40; Mac size 0x14, vtable 0x10010f74 in the ltms library): a
 // window of 16-bit characters [mCursor, mEnd) that text is written into, one character at a time through the virtual AppendUnicode.
 // TbITable::FormatString builds one over the caller's array and closes it. The Mac object is vptr +0, cursor +4, end +8, converter +0xc,
 // overflow +0x10; the host's members are native.

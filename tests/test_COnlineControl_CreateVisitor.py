@@ -1,6 +1,6 @@
 """Unit v5285, COnlineControl's avatar moves, chat text and contact lookups, against libtpw_unit_COnlineControl_CreateVisitor.dylib
 (tests/unit_COnlineControl_CreateVisitor.cpp), main app ("SimTheme Park"),
-src/COnlineControl_COnlineControl_COnlineControl_Locate_COnlineControl_WantToShutDown_COnlineControl_CreateVisitor.cpp:
+src/game/online/online.cpp:
   CreateVisitor 0x102182c0, SetAvatarDestination 0x10218140, TeleportAvatar 0x1021802c, IsThisMe 0x10217f34, ReceiveText 0x10217dbc,
   Feedback 0x1021b784, GetDataForUser 0x1021b854, AddContact 0x1021b950.
 

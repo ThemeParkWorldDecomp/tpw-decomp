@@ -1,5 +1,5 @@
 // Test library for Antialiased<CTraits<__int128>> (unit v5559; libtpw_unit_Antialiased_2.dylib, tests/test_Antialiased_2.py), main app:
-//   src/Antialiased_2.cpp   tpw_antialias::Antialiased<1>
+//   src/game/ui/3DFont.cpp   tpw_antialias::Antialiased<1>
 //
 // The callees outside the unit are recording fakes: CColour::GetFormattedValue (answers from the queue) and IntensifyPix<1>.
 #include <cstddef>

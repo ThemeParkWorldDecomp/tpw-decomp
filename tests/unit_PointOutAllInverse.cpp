@@ -1,5 +1,5 @@
 // Test library for the collision list point tests (unit v5112; libtpw_unit_PointOutAllInverse.dylib, tests/test_PointOutAllInverse.py), main app:
-//   src/BMP_InsideArea_PointOutAllInverse.cpp   PointOutAllInverse, PointInAnyColObject, NavPointInArea
+//   src/game/rides/BumperRide.cpp   PointOutAllInverse, PointInAnyColObject, NavPointInArea
 //
 // PointInColObject is a fake that records x, y and the object's index in the list and answers from the test's queue.
 // gColList (defined by another file) is defined here.

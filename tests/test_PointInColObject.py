@@ -1,5 +1,5 @@
 """Unit v5367, the collision object tests, against libtpw_unit_PointInColObject.dylib (tests/unit_PointInColObject.cpp), main app,
-src/BMP_InsideArea_PointOutAllInverse_PointInColObject.cpp:
+src/game/rides/BumperRide.cpp:
   PointInColObject 0x1002bc34, DoAreasIntersect 0x1002b6c0, ClosestIntersectingColObjectToPoint 0x1002b4cc
 
 A case is a world and a call. The world is built twice by one piece of Python code (emulator memory big-endian, host memory little-endian).

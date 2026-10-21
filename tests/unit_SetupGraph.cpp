@@ -1,5 +1,5 @@
 // Test library for the graph helpers (unit v5202; libtpw_unit_SetupGraph.dylib, tests/test_SetupGraph.py), main app:
-//   src/MinAnalyserValue_SetupGraph.cpp   SetupGraph, DrawMeGraph, GraphLine (float and int)
+//   src/game/ui/ui_graph.cpp   SetupGraph, DrawMeGraph, GraphLine (float and int)
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the
 // globals of other files the unit reads are defined here.

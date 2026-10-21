@@ -1,5 +1,5 @@
 """Unit v5626, the tag system's text formatter, against libtpw_unit_CTagSystem_FormatTagText.dylib (tests/unit_CTagSystem_FormatTagText.cpp),
-main app ("SimTheme Park"), src/ThingLoop_CTagSystem_FormatTagText.cpp:
+main app ("SimTheme Park"), src/game/Thing.cpp:
   CTagSystem::FormatTagText 0x1012cc3c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

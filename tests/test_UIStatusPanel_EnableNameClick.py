@@ -1,6 +1,6 @@
 """Unit v51114: the status panel's small members, the SamsUtilities byte swaps next to them and the rank text object's destructor, against
 libtpw_unit_UIStatusPanel_EnableNameClick.dylib (tests/unit_UIStatusPanel_EnableNameClick.cpp), main app ("SimTheme Park"),
-src/ui_StatusPanel_SaveTags_UIStatusPanel_GetNextObject_UIStatusPanel_EnableNameClick.cpp:
+src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/ui_StatusPanel.cpp:
   UIStatusPanel::EnableNameClick 0x10194608, EditNamePanelGone 0x101945c4, ApplyChanges 0x10194674, GetName 0x1019387c, ChangeName 0x10193844,
   Remove 0x10193814, Show 0x101937dc, CloseWindow 0x10193774, DeInitViewWindow 0x10193564, DeInitStatusWindow 0x10193528, UpdateViewWindow
   0x101934ec, UpdateStatusWindow 0x101934b0, InitViewWindow 0x10193478, InitStatusWindow 0x1019343c, DeInitWindow 0x10193404, UpdateWindow

@@ -1,6 +1,6 @@
 // Test library for std::operator<<(basic_ostream<char>&, const char*) (unit v5700; libtpw_unit_std_operator_2.dylib,
 // tests/test_std_operator_2.py), main app:
-//   src/email_load_std_operator_2.cpp   OstreamWriteText
+//   src/game/MslSupport.cpp   OstreamWriteText
 //
 // The callees outside the unit (good, tie, flush, setstate, __putnumber, __throw, strlen, strcpy, operator new / new[]) are recording
 // fakes with the same event names and arguments as the module's PowerPC stubs. Pointers are logged as codes (0 NULL, 1 ios, 2 stream,

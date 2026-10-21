@@ -1,6 +1,6 @@
 """Unit w83, the engine's Bitmap pixel methods, against libtpw_unit_Bitmap.dylib (tests/unit_Bitmap.cpp), in the program
 "engine symbols shared":
-  src/Bitmap.cpp  colour_fill 0x10046e2c, copy_to 0x10046ee4, swizzle_for_gimex 0x10046f60, alphablt 0x10047910,
+  src/engine/Bitmap.cpp  colour_fill 0x10046e2c, copy_to 0x10046ee4, swizzle_for_gimex 0x10046f60, alphablt 0x10047910,
                   shadowblend 0x10047afc, colourblt 0x10047bb4, descimate 0x10047d24
 (Bitmap::clear, realloc and load of the same source file are tested by test_landscape.py.)
 

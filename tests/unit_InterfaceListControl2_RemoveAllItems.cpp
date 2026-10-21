@@ -1,6 +1,6 @@
 // Test library for InterfaceListControl2::RemoveAllItems / RemoveItem / RemoveMe (unit v5095;
 // libtpw_unit_InterfaceListControl2_RemoveAllItems.dylib, tests/test_InterfaceListControl2_RemoveAllItems.py), main app:
-//   src/InterfaceListControl2_items_InterfaceListControl2_RemoveAllItems.cpp
+//   src/game/ui/InterfaceListControl2.cpp
 //
 // The list object is raw zeroed memory (never constructed). The callees outside the unit are fakes that record what the real ones read:
 // AdvanceIndex and FindFreeEntry are small deterministic stand-ins over the item block, the windows' virtuals (scroll bar SetValue,

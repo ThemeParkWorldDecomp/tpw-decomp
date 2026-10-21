@@ -1,4 +1,4 @@
-"""Differential test for src/RideAnimTick.cpp (TickRideAnimSet, DoAnimateRideSet,
+"""Differential test for src/game/TPEmbed.cpp, src/game/TPMesh.cpp, src/game/rides/RideAnim.cpp (TickRideAnimSet, DoAnimateRideSet,
 RAAnimateTextureFrames, AnimateNode, GetAnimFrameData, IsMeshDrawEnabled, TPProcessEmbeddedData and
 DoWorldTransformsForEmbeddedData), against libtpw_unit_RideAnimTick.dylib.
 

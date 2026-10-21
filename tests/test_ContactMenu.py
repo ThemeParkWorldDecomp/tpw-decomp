@@ -1,5 +1,5 @@
 """Unit v5660, the online panel's contact helpers, against libtpw_unit_ContactMenu.dylib (tests/unit_ContactMenu.cpp), main app
-("SimTheme Park"), src/OnlineParkFindPanelMsg_ContactMenu.cpp:
+("SimTheme Park"), src/game/ui/ui_onlinePanel.cpp:
   FillBuddyList 0x101e8608, ButtonsMenuMsg 0x101e87b8, ContactMenu 0x101e8b98
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

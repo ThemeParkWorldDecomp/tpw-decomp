@@ -1,6 +1,6 @@
 """Unit v51113, the small functions at the edges of the sound library's CSprocketsModule.cpp and the codec files, against
 libtpw_unit_TbMapStreamer_FixUpCatagoryIndex.dylib (tests/unit_TbMapStreamer_FixUpCatagoryIndex.cpp), sound library
-("sound symbols shared"), src/TbMapStreamer_TbMapStreamer_FixUpCatagoryIndex.cpp:
+("sound symbols shared"), src/sound/CSprocketsModule.cpp, src/sound/TbMapStreamer.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSoundSampleStore.cpp, src/sound/TpBody.cpp:
   TbMapStreamer::FixUpCatagoryIndex 0x10023378, UnloadCatgoryFixupTable 0x10023310, UString operator char* 0x10023674,
   CDiscFileStorage ctor 0x10020cf8, CAudioFileSystem ctor 0x10027884, CSprocketsModule::RestartChannel 0x1002c51c and RestartAll
   0x1002c748, UCommandPlay ctor 0x1002c5fc, TpBody::Init 0x1002e3bc, Tick 0x1002e404, Close 0x1002e44c, SetFades 0x1002e494,

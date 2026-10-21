@@ -1,6 +1,6 @@
 """Unit v5095, InterfaceListControl2::RemoveAllItems / RemoveItem / RemoveMe, against libtpw_unit_InterfaceListControl2_RemoveAllItems.dylib
 (tests/unit_InterfaceListControl2_RemoveAllItems.cpp), main app ("SimTheme Park"),
-src/InterfaceListControl2_items_InterfaceListControl2_RemoveAllItems.cpp:
+src/game/ui/InterfaceListControl2.cpp:
   RemoveAllItems 0x101d3cc8, RemoveItem 0x101d39f0, RemoveMe 0x101d3818
 
 A case is a world and a call. The world (a list object, an item block of Mac words with guard words around it, a column array, string

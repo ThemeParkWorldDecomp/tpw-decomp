@@ -1,14 +1,14 @@
 """Differential tests for the ltms text formatter and font renderer, against libtpw_unit_TextFormatter.dylib
 (tests/unit_TextFormatter.cpp):
 
-  src/ltms_textformatter.cpp  TbTextFormatter: constructor, destructor, SetVerticalJustification, SetHorizontalJustification,
+  src/ltms/TbTextFormatter.cpp  TbTextFormatter: constructor, destructor, SetVerticalJustification, SetHorizontalJustification,
                               GetCharPositionArray, GetCharPositionArraySize, EmptyStringProcess, Draw, Measure, DrawText,
                               CreateInfoList, GetCharType, Layout, LayoutLines, GetCharIdxFromPosition and the three
                               std::vector tear-downs (characters, lines, points)
-  src/ltms_fontrender.cpp     TbFontRender: constructor, destructor, Initialise, DrawChar; TbFontRenderParams: UseReColour,
+  src/ltms/TbFontRender.cpp, src/ltms/TbFontRenderParams.cpp     TbFontRender: constructor, destructor, Initialise, DrawChar; TbFontRenderParams: UseReColour,
                               UsePreColoured, SetFont, GetFont (w44), operator=, GetStyle, GetType (w45a: real here since that unit)
 
-Real on both sides: those, plus the parameters' constructors and destructor (src/tb_fontrenderparams.cpp), which the formatter's
+Real on both sides: those, plus the parameters' constructors and destructor (src/ltms/TbFontRenderParams.cpp), which the formatter's
 render runs. Fakes that record the same event on both sides: the three fonts (a font's AddRef, Release, GetCharSize,
 GetVerticalSpacing, GetCaps, GetType and GetMBToUnicode) and the three multibyte converters they hand out, thirty render methods
 behind the method table, the vectors' clear, push_back and resize (a block that doubles from 1; a block is a labelled operator new

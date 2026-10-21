@@ -1,5 +1,5 @@
 // Test library for the coasters' ticks (unit w137; libtpw_unit_CoasterTicks.dylib, tests/test_CoasterTicks.py), main app:
-//   src/TPCoaster_ticks.cpp   CoasterTickPreRender, CoasterTickPostRender, CoasterUserInputTick
+//   src/game/rides/CoasterEdit.cpp, src/game/rides/TPCoaster.cpp   CoasterTickPreRender, CoasterTickPostRender, CoasterUserInputTick
 //
 // Every callee is a fake that records its arguments (floats as bits, objects as labels) and the live state the order of the calls
 // shows (the ticks: gCoasterCurrent and the instance's flags). The scripted answers (the cost, the rounded cost, the brace angle) come

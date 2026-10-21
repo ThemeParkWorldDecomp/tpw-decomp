@@ -1,6 +1,6 @@
 // Test library for the staff room panel's member functions (unit v5291; libtpw_unit_StaffRoomStatusPanel_StaffWentIntoStaffRoom.dylib,
 // tests/test_StaffRoomStatusPanel_StaffWentIntoStaffRoom.py), main app:
-//   src/LCPostFormat_StaffRoomStatusPanel_StaffWentIntoStaffRoom.cpp
+//   src/game/ui/ui_staffRoomStatus.cpp
 //
 // The callees outside the unit are recording fakes. The objects of a case (panel, windows, thing, tables) are persistent arena blocks
 // numbered like the module's OBJ; the windows are FakeWin objects whose virtual SetValue / SetText record.

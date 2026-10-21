@@ -1,4 +1,4 @@
-"""Unit v5656, the bump's route and steering, against libtpw_unit_SetNavRoute.dylib (tests/unit_SetNavRoute.cpp), main app, src/BMP_Move_SetNavRoute.cpp:
+"""Unit v5656, the bump's route and steering, against libtpw_unit_SetNavRoute.dylib (tests/unit_SetNavRoute.cpp), main app, src/game/rides/BumperRide.cpp:
   SetNavRoute 0x100297cc, BumpToPoint 0x1002992c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian, host memory little-endian).

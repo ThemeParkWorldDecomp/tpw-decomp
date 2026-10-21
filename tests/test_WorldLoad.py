@@ -1,5 +1,5 @@
-"""Unit w207, the world's load, against libtpw_unit_WorldLoad.dylib (tests/unit_WorldLoad.cpp), main app ("SimTheme Park"), src/World_load.cpp
-and src/Serialise_basic.cpp:
+"""Unit w207, the world's load, against libtpw_unit_WorldLoad.dylib (tests/unit_WorldLoad.cpp), main app ("SimTheme Park"), src/game/Thing.cpp, src/game/World.cpp, src/game/rides/rsse.cpp
+and src/game/ControlManager.cpp, src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/rides/FlyingRide.cpp, src/game/save/FS_MasterSave.cpp:
   CWorld::Load 0x1013c9f0, LOADVAR<CWorld::WorldState> 0x101415b4, LOADVAR<CThing::ThingModel> 0x101416f0, CThing::ForceThingId 0x1012dfa8
 
 A case is a file and a call. The file holds what a saved park holds, little-endian: a version word, the 25 fields of the world, the three parts of

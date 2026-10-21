@@ -1,4 +1,4 @@
-// Test library for src/CBalanceTable.cpp (libtpw_unit_BalanceTable.dylib; see
+// Test library for src/game/balance/BalanceLoader.cpp (libtpw_unit_BalanceTable.dylib; see
 // tests/test_BalanceTable.py and calllog.h): the balance table reader with the real table
 // classes (src/*Balance.cpp) and one synthetic table the test describes row by row.
 // Everything the reader calls outside itself is a fake that records: the report function,

@@ -1,5 +1,5 @@
 // Test library for InterfaceKnob::ChangeValue (unit v5264; libtpw_unit_InterfaceKnob_ChangeValue.dylib, tests/test_InterfaceKnob_ChangeValue.py):
-//   src/InterfaceKnob_InterfaceKnob_ChangeValue.cpp
+//   src/game/ui/InterfaceKnob.cpp
 //
 // UI_PostMessage is a recording fake. The client draw object is a fake class with the same vtable slot for Change as
 // InterfaceDrawObject (destructor, two Draws, Change), recording the flags and the angle the real one would be told.

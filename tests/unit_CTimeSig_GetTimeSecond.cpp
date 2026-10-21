@@ -1,5 +1,5 @@
 // Test library for the small stand-ins of unit v51118 (libtpw_unit_CTimeSig_GetTimeSecond.dylib, tests/test_CTimeSig_GetTimeSecond.py), main app:
-//   src/TPOptions_CTimeSig_GetTimeSecond.cpp   CSkyObjects, CSaveLoad logs, InterfaceFontWrapper::GetHeight, destructors, constructors.
+//   src/game/park/SkyObjects.cpp, src/game/save/SaveLoad.cpp, src/game/ui/InterfaceFont.cpp, src/game/ui/MessageCentre.cpp   CSkyObjects, CSaveLoad logs, InterfaceFontWrapper::GetHeight, destructors, constructors.
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the PowerPC stubs); the globals of other files
 // (gWorld, gClock) are defined here.

@@ -3,11 +3,11 @@
 // tb_error.cpp by the inventory).
 //
 // PARTIAL: the virtual interface as far as translated callers use it. The constructor and
-// destructor are in src/tb_drawprimitive.cpp, the primitive buffer (GetNextPrimitive to
-// RoundOffPrimitive, below) in src/tb_drawprimitive_buffer.cpp, the polygon adder and the
-// sprite (AddPoly_TLCTEX, DrawSprite) in src/tb_drawprimitive_sprite.cpp and the batching
+// destructor are in src/engine/DrawPrimitive.cpp, the primitive buffer (GetNextPrimitive to
+// RoundOffPrimitive, below) in src/engine/DrawPrimitive.cpp, the polygon adder and the
+// sprite (AddPoly_TLCTEX, DrawSprite) in src/engine/DrawPrimitive.cpp and the batching
 // sprite (AddSprite, with the vertex record's four small members) in
-// src/tb_drawprimitive_addsprite.cpp; QSortFaces_float is still to do. CDrawPrimitive is a virtual base of
+// src/engine/tb_error.cpp, src/engine/DrawPrimitive.cpp; QSortFaces_float is still to do. CDrawPrimitive is a virtual base of
 // COpenGLDrawPrimitive; on the Mac
 // its vtable pointer is at +0x2c, and gei_DrawPrimitive points at that subobject. The
 // slots, in order: the destructor, Init, SetBlendingMode, SetTexture, Execute,
@@ -35,7 +35,7 @@ struct SFVF_TLCTEX {
     uint32_t specular;               // 0x14
     float u, v;                      // 0x18
 
-    // The vertex record's small members, out of line in the original (src/tb_drawprimitive_addsprite.cpp). Their names
+    // The vertex record's small members, out of line in the original (src/engine/tb_error.cpp). Their names
     // are the mangled ones; the parameters' names are invented.
     // The record `index` records on, `size` bytes apart (the product is taken in 32 bits, as the Mac does).
     SFVF_TLCTEX* ReturnPtr(int32_t size, int32_t index);   // 0x100087e8
@@ -62,7 +62,7 @@ struct ClipCodeType {
 // use the same nine globals), which keeps the nine values in globals first and compares two
 // fused multiply-subtracts. Name invented; the globals are engine data 0x1017319c..0x101731bc
 // (laid out in the reverse order of the declaration below: gFaceX0 at 0x101731bc, gFaceW2 at
-// 0x1017319c; names invented, defined in src/tb_hfield_execute.cpp).
+// 0x1017319c; names invented, defined in src/engine/tb_hfield.cpp).
 extern float gFaceX0, gFaceX1, gFaceX2, gFaceY0, gFaceY1, gFaceY2, gFaceW0, gFaceW1, gFaceW2;
 inline bool SFVF_FacesViewer(const SFVF_TLCTEX& a, const SFVF_TLCTEX& b, const SFVF_TLCTEX& c) {
     gFaceX0 = a.x;
@@ -175,7 +175,7 @@ public:
     virtual int32_t DrawEdgeBox() { return 0; }
     // The other drawing members, in the original's order after DrawEdgeBox. Pure in the
     // original too, with bodies here for the same reason. COpenGLDrawPrimitive's are in
-    // src/tb_opengl_draw.cpp.
+    // src/engine/DrawPrimitiveOpenGL.cpp.
     virtual int32_t DrawPoly(XZType* points, int32_t count, int32_t colour, float scale) { return 0; }
     virtual int32_t DrawProfileBox() { return 0; }
     virtual float GetPixelFillRate() { return 0.0f; }
@@ -188,7 +188,7 @@ public:
     int32_t EmbossMode() const { return static_cast<int32_t>(mFields[8]); }
     uint32_t mFields[11]; // original 0x00..0x28; vptr at 0x2c
 
-    // The primitive buffer (src/tb_drawprimitive_buffer.cpp; the asserts name
+    // The primitive buffer (src/engine/DrawPrimitive.cpp; the asserts name
     // tb_drawprimitive.cpp, the stride inline tb_typedef.h). A primitive is made in the
     // render memory's table, filled with vertices and indices by the caller (AddClipPolyList
     // and the callers' own writes, then counted in the record), and executed. `flags` is
@@ -246,7 +246,7 @@ public:
     // Adds a polygon of `count` vertices `stride` bytes apart to the current primitive: clipped
     // against the planes `clip` names (worked out here when `clip` is NULL), its vertices
     // appended and a fan of triangles added to the indices, wound the other way with `flags` & 2.
-    // Always answers 1, drawn or not (src/tb_drawprimitive_sprite.cpp).
+    // Always answers 1, drawn or not (src/engine/DrawPrimitive.cpp).
     int32_t AddPoly_TLCTEX(SFVF_TLCTEX* vertices, int32_t count, int32_t stride, ClipCodeType* clip,
                            int32_t flags);                                          // 0x100078c0
 

@@ -1,5 +1,5 @@
 // Test library for the track editor's preview brace (unit v5366; libtpw_unit_LinkPreviewBrace.dylib, tests/test_LinkPreviewBrace.py), main app:
-//   src/LinkPreviewBrace.cpp   LinkPreviewBrace, LinkPreviewBraceToPylon and the globals of the copies they keep
+//   src/game/rides/CoasterPylon.cpp   LinkPreviewBrace, LinkPreviewBraceToPylon and the globals of the copies they keep
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of
 // other files the unit reads are defined here, zero at start like the Mac's bss.

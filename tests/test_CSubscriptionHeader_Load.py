@@ -1,5 +1,5 @@
 """Unit v5729, CSubscriptionHeader::Save and ::Load, against libtpw_unit_CSubscriptionHeader_Load.dylib
-(tests/unit_CSubscriptionHeader_Load.cpp), main app, src/MessageCentre_post_CSubscriptionHeader_Load.cpp:
+(tests/unit_CSubscriptionHeader_Load.cpp), main app, src/game/ui/MessageCentre.cpp:
   CSubscriptionHeader::Save 0x10152928, CSubscriptionHeader::Load 0x10152a10
 
 A case is a header and a call. The world is built twice by one piece of Python code (Mac layout in the emulator, host layout in the

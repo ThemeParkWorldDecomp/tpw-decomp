@@ -1,5 +1,5 @@
 // Test library for IntensifyPix<CTraits<N>> (unit v5003; libtpw_unit_unnamed_IntensifyPix.dylib), main app:
-//   src/Light_unnamed_IntensifyPix.cpp   four template instances. No callees, no globals.
+//   src/game/ui/3DFont.cpp   four template instances. No callees, no globals.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

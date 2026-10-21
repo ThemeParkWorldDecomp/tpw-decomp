@@ -1,9 +1,9 @@
-// Test library for src/RideAnimChange.cpp (libtpw_unit_RideAnimChange.dylib; see
+// Test library for src/game/rides/RideAnim.cpp (libtpw_unit_RideAnimChange.dylib; see
 // tests/test_RideAnimChange.py): IsValidAnimation, SetupAnimationFlags,
 // ResetRideAnimationSingleChannel, SetNewAnim, SetCurRideAnim, InterpolateCMorphData,
 // InterpolateCMorphBoundData and RADecompressMorph.
 //
-// The unit also links the real ResetAnimTimeStats (src/RideAnimInit.cpp), which SetNewAnim calls
+// The unit also links the real ResetAnimTimeStats (src/game/rides/RideAnim.cpp, src/game/rides/TPRide.cpp), which SetNewAnim calls
 // for the clock words. The one other callee, EnableMeshDraw (the matrix form), is a fake that
 // records its arguments and the matrix it is given (tests/calllog.h) and sets the mesh flags
 // the real one sets. The mesh file's records (headers, nodes, animations, morphs) are built by

@@ -1,5 +1,5 @@
 """Unit w214, a coaster car bent to the track and a running train's sounds and screams, against libtpw_unit_CarBend.dylib
-(tests/unit_CarBend.cpp), main app ("SimTheme Park"), src/TPConfig_bend.cpp:
+(tests/unit_CarBend.cpp), main app ("SimTheme Park"), src/game/rides/CoasterSounds.cpp, src/game/rides/CoasterSpline.cpp:
   InterpAngles 0x1004dd5c, AccumulateBendAngles 0x10045ad8, RotateNodeVertexPosns 0x10046620, BendCarToTrack 0x1004688c,
   HandleScreams 0x10046d78, TickTrainSounds 0x1004702c
 

@@ -1,5 +1,5 @@
 """Unit v51048, eight small main-app functions, against libtpw_unit_CGame_GetLocalisedThemeName_3.dylib
-(tests/unit_CGame_GetLocalisedThemeName_3.cpp), main app ("SimTheme Park"), src/Game_level_CGame_GetLocalisedThemeName_3.cpp:
+(tests/unit_CGame_GetLocalisedThemeName_3.cpp), main app ("SimTheme Park"), src/game/ActionRecorder.cpp, src/game/Game.cpp, src/game/people/ParkTime.cpp, src/game/ui/InterfaceBar.cpp, src/game/ui/UI_Base.cpp, src/game/ui/ui_visitorStatus.cpp:
   CGame::GetLocalisedThemeName 0x1014a478 (narrow theme name), CGame::TogglePause 0x10149a74, __sinit_ActionRecorder_cpp 0x10146e9c,
   TbTList<IDX..>::RemoveAll 0x10141f1c, CParkTime::GetFunnyTimeForGameTurns 0x10112928, InterfaceBar::SetValue 0x101c887c,
   InterfaceBar::operator- 0x101c89a0, UI_PutDeferredMessage 0x101c95f8

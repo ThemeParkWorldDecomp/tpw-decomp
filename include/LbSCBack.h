@@ -54,7 +54,7 @@ void LbApp_ProcessWindowMessages();     // 0x10014018
 void LbApp_GetWindowsScreenMode(TbScreenMode& mode);   // 0x10014374
 void __sinit_LbSCBack_cpp();     // 0x10014b4c
 
-// Unit v5461 (src/LbFile_LbApp_GetWindowsScreenMode_LbSystemEventCallback_Dtor__LbSystemEventCallbac.cpp).
+// Unit v5461 (src/bullfrog/LbSCBack.cpp).
 #include "TbTList.h"
 class _LbSystemEventCallback;
 // One registered callback. The Mac's callback is a pointer to a TVector (called through __ptr_glue); the host keeps a function pointer.
@@ -78,7 +78,7 @@ extern "C" void __destroy_arr(void* array, void* destructor, int32_t size, int32
 // _LbSystemEventCallback::~_LbSystemEventCallback 0x10014564 (flag: the hidden delete-storage short); answers this.
 _LbSystemEventCallback* LbSystemEventCallback_DtorBody(_LbSystemEventCallback* self, int16_t flag);
 
-// Unit v5732 (src/LbFile_LbApp_GetWindowsScreenMode_LbSystemEventCallback_Dtor__LbSystemEventCallbac_CritLock_Dtor_CritLock.cpp).
+// Unit v5732 (src/bullfrog/FileSystem.cpp).
 class CritLock {
 public:
     void** mSection;   // 0x00 (a Mac pointer, 4 bytes)
@@ -86,7 +86,7 @@ public:
 // CritLock::~CritLock 0x10014738 (flag: the hidden delete-storage short); answers this.
 CritLock* CritLock_DtorBody(CritLock* self, int16_t flag);
 
-// Unit v51127 (src/LbFile_LbApp_GetWindowsScreenMode_LbApp_SetWindowIcon.cpp).
+// Unit v51127 (src/bullfrog/LbApp.cpp).
 struct TbPoint;
 class CConverter;
 class TbJPEGLoader;

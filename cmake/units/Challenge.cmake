@@ -1,2 +1,47 @@
 # Unit w174: one challenge (CChallenge: constructor, Serialise, DidThisWinIt, the four message id getters; the ChallengeType and StaffType serialise instances). The callees outside the unit are recording fakes in tests/unit_Challenge.cpp; the serialise instances run real on both sides (the file is the fake).
-set(TPW_UNIT_Challenge src/Challenge.cpp src/Serialise_basic.cpp platform/arena.cpp)
+set(TPW_UNIT_Challenge src/game/park/ChallengeHQ.cpp src/game/ControlManager.cpp src/game/Object.cpp
+    src/game/advisor/Advisor.cpp src/game/park/BankAccount.cpp src/game/park/analyser.cpp src/game/rides/FlyingRide.cpp
+    src/game/save/FS_MasterSave.cpp platform/arena.cpp)
+set(TPW_UNIT_Challenge_KEEP
+  __Z13LOADVARSTRUCTI11TbTimeStampEiPvPT_PKci   # int LOADVARSTRUCT<TbTimeStamp>(void*, TbTimeStamp*, char const*, int)
+  __Z13LOADVARSTRUCTI12tag_IDX_TYPEI22IDXTYPEUniqueNameMapIdtEEiPvPT_PKci   # int LOADVARSTRUCT<tag_IDX_TYPE<IDXTYPEUniqueNameMapId, unsigned short>>(void*, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, unsigned short>*, char const*, int)
+  __Z13LOADVARSTRUCTI12tag_IDX_TYPEI24IDXTYPEUniqueNameThingIdtEEiPvPT_PKci   # int LOADVARSTRUCT<tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>>(void*, tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>*, char const*, int)
+  __Z13LOADVARSTRUCTI12tag_IDX_TYPEI25IDXTYPEUniqueNameObjectIdtEEiPvPT_PKci   # int LOADVARSTRUCT<tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, unsigned short>>(void*, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, unsigned short>*, char const*, int)
+  __Z13SAVEVARSTRUCTI11TbTimeStampEiPvPT_PKci   # int SAVEVARSTRUCT<TbTimeStamp>(void*, TbTimeStamp*, char const*, int)
+  __Z13SAVEVARSTRUCTI12tag_IDX_TYPEI22IDXTYPEUniqueNameMapIdtEEiPvPT_PKci   # int SAVEVARSTRUCT<tag_IDX_TYPE<IDXTYPEUniqueNameMapId, unsigned short>>(void*, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, unsigned short>*, char const*, int)
+  __Z13SAVEVARSTRUCTI12tag_IDX_TYPEI24IDXTYPEUniqueNameThingIdtEEiPvPT_PKci   # int SAVEVARSTRUCT<tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>>(void*, tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>*, char const*, int)
+  __Z13SAVEVARSTRUCTI12tag_IDX_TYPEI25IDXTYPEUniqueNameObjectIdtEEiPvPT_PKci   # int SAVEVARSTRUCT<tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, unsigned short>>(void*, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, unsigned short>*, char const*, int)
+  __Z7LOADVARI13ChallengeTypeEiPvPT_PKci   # int LOADVAR<ChallengeType>(void*, ChallengeType*, char const*, int)
+  __Z7LOADVARI7MacLongEiPvPT_PKci   # int LOADVAR<MacLong>(void*, MacLong*, char const*, int)
+  __Z7LOADVARI8MacULongEiPvPT_PKci   # int LOADVAR<MacULong>(void*, MacULong*, char const*, int)
+  __Z7LOADVARI9StaffTypeEiPvPT_PKci   # int LOADVAR<StaffType>(void*, StaffType*, char const*, int)
+  __Z7LOADVARIDsEiPvPT_PKci   # int LOADVAR<char16_t>(void*, char16_t*, char const*, int)
+  __Z7LOADVARIbEiPvPT_PKci   # int LOADVAR<bool>(void*, bool*, char const*, int)
+  __Z7LOADVARIcEiPvPT_PKci   # int LOADVAR<char>(void*, char*, char const*, int)
+  __Z7LOADVARIhEiPvPT_PKci   # int LOADVAR<unsigned char>(void*, unsigned char*, char const*, int)
+  __Z7LOADVARIiEiPvPT_PKci   # int LOADVAR<int>(void*, int*, char const*, int)
+  __Z7LOADVARIjEiPvPT_PKci   # int LOADVAR<unsigned int>(void*, unsigned int*, char const*, int)
+  __Z7LOADVARIsEiPvPT_PKci   # int LOADVAR<short>(void*, short*, char const*, int)
+  __Z7LOADVARItEiPvPT_PKci   # int LOADVAR<unsigned short>(void*, unsigned short*, char const*, int)
+  __Z7SAVEVARI13ChallengeTypeEiPvPT_PKci   # int SAVEVAR<ChallengeType>(void*, ChallengeType*, char const*, int)
+  __Z7SAVEVARI7MacLongEiPvPT_PKci   # int SAVEVAR<MacLong>(void*, MacLong*, char const*, int)
+  __Z7SAVEVARI8MacULongEiPvPT_PKci   # int SAVEVAR<MacULong>(void*, MacULong*, char const*, int)
+  __Z7SAVEVARI9StaffTypeEiPvPT_PKci   # int SAVEVAR<StaffType>(void*, StaffType*, char const*, int)
+  __Z7SAVEVARIDsEiPvPT_PKci   # int SAVEVAR<char16_t>(void*, char16_t*, char const*, int)
+  __Z7SAVEVARIbEiPvPT_PKci   # int SAVEVAR<bool>(void*, bool*, char const*, int)
+  __Z7SAVEVARIcEiPvPT_PKci   # int SAVEVAR<char>(void*, char*, char const*, int)
+  __Z7SAVEVARIhEiPvPT_PKci   # int SAVEVAR<unsigned char>(void*, unsigned char*, char const*, int)
+  __Z7SAVEVARIiEiPvPT_PKci   # int SAVEVAR<int>(void*, int*, char const*, int)
+  __Z7SAVEVARIjEiPvPT_PKci   # int SAVEVAR<unsigned int>(void*, unsigned int*, char const*, int)
+  __Z7SAVEVARIsEiPvPT_PKci   # int SAVEVAR<short>(void*, short*, char const*, int)
+  __Z7SAVEVARItEiPvPT_PKci   # int SAVEVAR<unsigned short>(void*, unsigned short*, char const*, int)
+  __ZN10CChallenge12DidThisWinItERib   # CChallenge::DidThisWinIt(int&, bool)
+  __ZN10CChallenge9SerialiseEPviij   # CChallenge::Serialise(void*, int, int, unsigned int)
+  __ZN10CChallengeC1E13ChallengeTypeiiS0_bi12tag_IDX_TYPEI25IDXTYPEUniqueNameObjectIdtES3_9StaffTypeb   # CChallenge::CChallenge(ChallengeType, int, int, ChallengeType, bool, int, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, unsigned short>, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, unsigned short>, StaffType, bool)
+  __ZN12tag_IDX_TYPEI24IDXTYPEUniqueNameThingIdtE8ByteswapEv   # tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>::Byteswap()
+  __ZN12tag_IDX_TYPEI25IDXTYPEUniqueNameObjectIdtE8ByteswapEv   # tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, unsigned short>::Byteswap()
+  __ZNK10CChallenge10GetOfferIdEv   # CChallenge::GetOfferId() const
+  __ZNK10CChallenge11GetActiveIdEv   # CChallenge::GetActiveId() const
+  __ZNK10CChallenge8GetWinIdEv   # CChallenge::GetWinId() const
+  __ZNK10CChallenge9GetLoseIdEv   # CChallenge::GetLoseId() const
+)

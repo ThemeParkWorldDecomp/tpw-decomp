@@ -1,5 +1,5 @@
 """Unit v51018, ShowStatusPanel::InitStatusWindow, against libtpw_unit_ShowStatusPanel_InitStatusWindow.dylib
-(tests/unit_ShowStatusPanel_InitStatusWindow.cpp), main app, src/ShowStatusPanel_UpdateStatusWindow_ShowStatusPanel_InitStatusWindow.cpp:
+(tests/unit_ShowStatusPanel_InitStatusWindow.cpp), main app, src/game/ui/ui_showStatus.cpp:
   ShowStatusPanel::InitStatusWindow 0x101c0f80
 
 A case is a panel whose window at +0x10 is NULL or a window with sixteen children (ids 0xa092 to 0xa0a1). The world is built by one piece

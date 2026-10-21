@@ -1,4 +1,4 @@
-// Test entry point for src/TPGlobals.cpp (library unit_TPGlobals, with the real bullfrog
+// Test entry point for src/game/TPGlobals.cpp (library unit_TPGlobals, with the real bullfrog
 // strings): every string of a freshly constructed TPGlobals, in memory order.
 #include <cstdio>
 #include <cstring>

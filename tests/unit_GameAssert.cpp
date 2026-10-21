@@ -1,4 +1,4 @@
-// Test library for src/GameAssert.cpp (libtpw_unit_GameAssert.dylib; see
+// Test library for src/game/advisor/Advisor.cpp (libtpw_unit_GameAssert.dylib; see
 // tests/test_BalanceTable.py): GAME_ASSERTMSG called through one entry point. The original
 // does nothing observable on the host, so the test only checks that the call returns and
 // leaves a canary and a global alone.

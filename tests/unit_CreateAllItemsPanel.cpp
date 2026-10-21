@@ -1,6 +1,6 @@
 // Test library for the all-items panel builder, its entry handler and the staff list functions (unit v5066;
 // libtpw_unit_CreateAllItemsPanel.dylib, tests/test_CreateAllItemsPanel.py), main app:
-//   src/MainWindowCallback_CreateAllItemsPanel.cpp   CreateAllItemsPanel, AllItemsLCEntryHandler, FillAllStaffListCallback,
+//   src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allStaffPanel.cpp   CreateAllItemsPanel, AllItemsLCEntryHandler, FillAllStaffListCallback,
 //                                                    FillAllStaffList, UpdateListEntries, and the globals gAllItemsScript,
 //                                                    gAllItemsNoParent, gStaffListControl
 //

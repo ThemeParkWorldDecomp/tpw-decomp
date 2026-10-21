@@ -1,6 +1,6 @@
 // Test library for the ride status panel's UpdateStatusWindow, ShowUpgradePanel and UpdateWhichButtons (unit v5191;
 // libtpw_unit_RideStatusPanel_UpdateStatusWindow.dylib, tests/test_RideStatusPanel_UpdateStatusWindow.py), main app:
-//   src/LCPostFormat_RideStatusPanel_UpdateStatusWindow.cpp   the three functions and gUpgradePanelScript
+//   src/game/ui/ui_RideStatus.cpp   the three functions and gUpgradePanelScript
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues or from the pointer
 // table the test fills (tpw_rsp_setptr). The windows are real InterfaceWindow objects whose constructor and virtual members are defined here

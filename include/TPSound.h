@@ -87,11 +87,11 @@ void SND_SetParkMusicLevel(int32_t level);  // 0x100dec30
 void SND_SetChatterLevel(int32_t level);    // 0x100dec9c
 void SND_SetChatterOnOff(int32_t on);       // 0x100deda4
 void SND_SetRainLevel(int32_t level);       // 0x100dee84
-// The sound event code of (a, b) from RSSE_GetSoundEventCode (0x100d6d04, src/rsse_scream.cpp); 0 answers 0, else
+// The sound event code of (a, b) from RSSE_GetSoundEventCode (0x100d6d04, src/game/rides/rsse.cpp); 0 answers 0, else
 // SOUND_SendEvent(entity, category, code, p5, p6, p7).
 int32_t SND_SendIndirectedEvent(int32_t a, int32_t entity, int32_t category, int32_t b, int32_t p5, int32_t p6,
                                 int32_t p7);   // 0x100df858
-int32_t RSSE_GetSoundEventCode(int32_t a, int32_t b);   // 0x100d6d04 (src/rsse_scream.cpp, 328 bytes, unit w171)
+int32_t RSSE_GetSoundEventCode(int32_t a, int32_t b);   // 0x100d6d04 (src/game/rides/rsse.cpp, 328 bytes, unit w171)
 // The game save's sound block (SoundPark.cpp): the system-on word, the wanted word, the size 0x54 and the settings block
 // (little-endian in the file), then the audio object's own data (TbSysCommand::Save); the load reads the same.
 void SOUND_SaveStatus(void* file);          // 0x100de1a0

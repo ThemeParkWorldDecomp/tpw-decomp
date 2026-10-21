@@ -3,7 +3,7 @@ HFieldCellStatus, CCellBase::RemoveNeighbour and ModifyDirection, CMap::LoadAttr
 ReadFile, the destructor), the handler virtuals CIndividualChunkHandler::IsThisMyChunk and CMapChunkHandler::ParseChunk, the four
 TbTList<CIndividualChunkHandler*> members and the script check table (SCR_InitCheckTable, SCR_CloseCheckTable).
 
-The functions run as the original on the PowerPC side and as src/MapReset.cpp, src/ChunkFile.cpp and src/ScriptCheckTable.cpp on the
+The functions run as the original on the PowerPC side and as src/game/park/CellBase.cpp, src/game/park/LLCellSystem.cpp, src/game/park/MapCell.cpp, src/game/park/TPHField.cpp, src/game/park/TrackCell.cpp, src/game/World.cpp, src/game/park/Map.cpp, src/game/save/ChunkFileReader.cpp and src/game/Script.cpp on the
 host (libtpw_unit_MapReset.dylib, tests/unit_MapReset.cpp). Everything they call outside those files is a fake that records the same
 event on both sides (see calllog.py): the three untranslated cell members CalculateNeighbours, SetHFieldTile and ModifyType (the
 cell's index or label and a hash of its bytes at the call; the cases can make a callee write into the cell), TPFile_Open, the file

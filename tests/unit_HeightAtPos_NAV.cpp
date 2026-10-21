@@ -1,5 +1,5 @@
 // Test library for HeightAtPos_NAV and GetNextHoldingWaypoint (unit v5216; libtpw_unit_HeightAtPos_NAV.dylib, tests/test_HeightAtPos_NAV.py), main app:
-//   src/GetNextWaypoint_HeightAtPos_NAV.cpp
+//   src/game/rides/FlyingRide.cpp
 //
 // GetWorldGSquareHeight is a recording fake answering from the test's queue. The globals of other files are defined here.
 #include <cstddef>

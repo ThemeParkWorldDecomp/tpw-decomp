@@ -1,5 +1,5 @@
 // Test entry points for the OpenGL draw primitive's drawing members (library unit_OpenGLDraw:
-// src/tb_opengl_draw.cpp). A test runs a script of operations on one draw primitive, three
+// src/engine/DrawPrimitiveOpenGL.cpp). A test runs a script of operations on one draw primitive, three
 // texture pages, a block of vertices and a block of indices; tests/test_OpenGLDraw.py runs
 // the original on the same script and compares the result of every operation, the state of
 // the draw primitive and the calls of everything outside the unit.

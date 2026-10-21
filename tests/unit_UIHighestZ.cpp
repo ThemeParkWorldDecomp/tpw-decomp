@@ -1,5 +1,5 @@
-// Fakes and the driver for the highestZ unit (src/UI_Base_highestz.cpp, InterfaceListControl2::GetZOfEntries in
-// src/ui_controls_small.cpp). Real: highestZ, GetZOfEntries, InterfaceWindow's constructor, GetPosition, the rectangles. Fakes: the
+// Fakes and the driver for the highestZ unit (src/game/ui/UI_Base.cpp, InterfaceListControl2::GetZOfEntries in
+// src/game/ui/CoolRegion.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceListBox.cpp, src/game/ui/InterfaceListControl2.cpp). Real: highestZ, GetZOfEntries, InterfaceWindow's constructor, GetPosition, the rectangles. Fakes: the
 // window's other members and the three tree walkers (copies of UI_pump.cpp's, tested in test_UIPump), the list control's
 // constructor and virtuals (WhatAmI answers 7 as the real one does), the shapes' virtuals, and the UI calls the constructor makes.
 //

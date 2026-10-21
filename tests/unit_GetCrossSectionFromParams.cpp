@@ -1,5 +1,5 @@
 // Test library for GetCrossSectionFromParams (unit v5208; libtpw_unit_GetCrossSectionFromParams.dylib), main app:
-//   src/TPConfig_extrude_GetCrossSectionFromParams.cpp
+//   src/game/rides/CoasterExtrude.cpp
 // No callees and no globals.
 #include <cstddef>
 #include <cstdint>

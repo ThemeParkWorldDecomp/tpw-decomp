@@ -1,5 +1,5 @@
 """Unit v5148, Outbox::ReadMailData against libtpw_unit_Outbox_ReadMailData.dylib (tests/unit_Outbox_ReadMailData.cpp), main app
-("SimTheme Park"), src/email_load_Outbox_ReadMailData.cpp:
+("SimTheme Park"), src/game/online/email.cpp:
   Outbox::ReadMailData 0x102049fc
 
 A case is a world and a call. The Outbox is built twice by ONE piece of Python code: in emulator memory at the Mac's offsets for the

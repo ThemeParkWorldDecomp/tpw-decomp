@@ -1,5 +1,5 @@
 // Test library for the pylon brace functions (unit v5667; libtpw_unit_RestorePylonDetails.dylib, tests/test_RestorePylonDetails.py), main app:
-//   src/GetNewBraceLoftInterval_RestorePylonDetails.cpp   CalculateBraceHeight, RestorePylonDetails, SquishPylonBracesIfRequired, InsertBraceIntoPylon
+//   src/game/rides/CoasterPylon.cpp   CalculateBraceHeight, RestorePylonDetails, SquishPylonBracesIfRequired, InsertBraceIntoPylon
 //
 // The callees outside the unit (GetHeightForInterval, GetIntervalForHeight, SetupBraceAnimFrameData, UpdatePylonStackMeshes) are recording
 // fakes that answer from the test's queues. The globals of other files the unit reads or writes are defined here.

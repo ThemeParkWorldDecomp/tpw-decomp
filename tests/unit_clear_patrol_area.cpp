@@ -1,6 +1,6 @@
 // Test library for the key actions start_strike, clear_patrol_area, wheres_my_script and abort_all_requesters (unit v5341;
 // libtpw_unit_clear_patrol_area.dylib, tests/test_clear_patrol_area.py), main app:
-//   src/turn_object_counterclockwise_clear_patrol_area.cpp
+//   src/game/keyboard.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The globals
 // of other files the unit reads are defined here, zero at start like the Mac's bss.

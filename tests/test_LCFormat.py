@@ -1,5 +1,5 @@
 """Unit v5210, the online park list panel's row functions, message function and fill, against libtpw_unit_LCFormat.dylib
-(tests/unit_LCFormat.cpp), main app ("SimTheme Park"), src/PublishPanelMsg_LCFormat.cpp:
+(tests/unit_LCFormat.cpp), main app ("SimTheme Park"), src/game/ui/ui_onlineParkListPanel.cpp:
   LCFormat 0x101ebd58, LCPostFormat 0x101ebef4, OnlineParkListPanelMsg 0x101ebba8, FillParkList 0x101ec1d4
 (the C++ names of the first two are OnlineParkListLCFormat and OnlineParkListLCPostFormat: LCFormat and LCPostFormat exist at other addresses).
 

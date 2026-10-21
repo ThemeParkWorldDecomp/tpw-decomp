@@ -1,5 +1,5 @@
 """Unit v5230, the main menu's and the lobby menu's makers, against libtpw_unit_InitialiseLobbyMenu.dylib
-(tests/unit_InitialiseLobbyMenu.cpp), main app ("SimTheme Park"), src/ui_main_kbcapture_InitialiseLobbyMenu.cpp:
+(tests/unit_InitialiseLobbyMenu.cpp), main app ("SimTheme Park"), src/game/ui/ui_mainmenu.cpp:
   InitialiseMainMenu 0x101fb760, InitialiseLobbyMenu 0x101fbcd0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

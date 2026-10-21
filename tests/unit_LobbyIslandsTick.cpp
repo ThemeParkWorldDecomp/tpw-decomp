@@ -1,4 +1,4 @@
-// Test library for src/lobby_islands_tick.cpp (libtpw_unit_LobbyIslandsTick.dylib; see
+// Test library for src/game/online/LBFlyingMesh.cpp, src/game/online/lobby_island.cpp (libtpw_unit_LobbyIslandsTick.dylib; see
 // tests/test_LobbyIslandsTick.py): the islands screen's per-frame work, driven by scripts.
 //
 // Real: CLBScreenComponentIslands::TickIslands, CalcCamera, GotoNextIsland and
@@ -144,9 +144,9 @@ CLBScreenComponentIslands::~CLBScreenComponentIslands() {}
 void CLBScreenComponentIslands::Init() {}
 void CLBScreenComponentIslands::Render() {}
 void CLBScreenComponentIslands::Close() {}
-void CLBScreenComponentIslands::Show() {}   // the base vtable's slots 0x24 and 0x28 (translated in src/lobby_islands.cpp, not linked here)
+void CLBScreenComponentIslands::Show() {}   // the base vtable's slots 0x24 and 0x28 (translated in src/game/online/lobby_island.cpp, not linked here)
 void CLBScreenComponentIslands::Hide() {}
-// Slot 0x54, faked on both sides (the base's 0x100b25d0 is translated in src/lobby_islands.cpp,
+// Slot 0x54, faked on both sides (the base's 0x100b25d0 is translated in src/game/online/lobby_island.cpp,
 // which this unit does not link; the theme islands' 0x100b3540 is not translated).
 void CLBScreenComponentIslands::SetCurrentIsland(const CLBIsland* island) {
     ev("Screen.SetCurrentIsland", {lab(this), lab(island)});
@@ -155,7 +155,7 @@ void CLBScreenComponentIslands::SetCurrentIsland(const CLBIsland* island) {
 CLBScreenComponentThemeIslands::~CLBScreenComponentThemeIslands() {}
 void CLBScreenComponentThemeIslands::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 uint32_t CLBScreenComponentThemeIslands::ProcessCancel() { return 0; }
-// (The tests' screen overrides EnterCurrentIsland; the theme class's own is src/lobby_islands_rest.cpp's.)
+// (The tests' screen overrides EnterCurrentIsland; the theme class's own is src/game/online/lobby_island.cpp's.)
 void CLBScreenComponentThemeIslands::EnterCurrentIsland() {}
 void CLBScreenComponentThemeIslands::Show() {}
 void CLBScreenComponentThemeIslands::Hide() {}
@@ -335,7 +335,7 @@ void tpw_li_op(int32_t op) {
     switch (op) {
     case 1: gScreen->TickIslands(); break;
     case 2: gScreen->CalcCamera(); break;
-    // (The base class's, as the unit tests them; the theme islands' own are src/lobby_islands_rest.cpp's.)
+    // (The base class's, as the unit tests them; the theme islands' own are src/game/online/lobby_island.cpp, src/game/online/lobby_parser.cpp, src/game/online/LBFlyingMesh.cpp's.)
     case 3: gScreen->CLBScreenComponentIslands::GotoNextIsland(); break;
     case 4: gScreen->CLBScreenComponentIslands::GotoPreviousIsland(); break;
     case 5: gScreen->Tick(); break;

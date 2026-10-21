@@ -1,5 +1,5 @@
 """Unit v5022, the congratulations and bankrupt windows of the main app, against libtpw_unit_UI_Congratulations.dylib
-(tests/unit_UI_Congratulations.cpp), main app ("SimTheme Park"), src/ui_main_panel_UI_Congratulations.cpp:
+(tests/unit_UI_Congratulations.cpp), main app ("SimTheme Park"), src/game/ui/ui_main.cpp:
   UI_Congratulations 0x1018724c, UI_Bankrupt 0x10186f34, __sinit_ui_main_cpp 0x101877b8, CongratsWindowMsg 0x10186b9c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

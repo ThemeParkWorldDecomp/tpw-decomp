@@ -1,5 +1,5 @@
 """Unit v5218, Outbox::Send and Outbox::NextMail, against libtpw_unit_Outbox_Send.dylib (tests/unit_Outbox_Send.cpp), main app
-("SimTheme Park"), src/email_load_Outbox_Send.cpp:
+("SimTheme Park"), src/game/online/email.cpp:
   Outbox::Send 0x102059fc, Outbox::NextMail 0x10205ed0
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian,

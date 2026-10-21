@@ -1,4 +1,4 @@
-"""Differential test for src/lobby_islands.cpp (the lobby's island screen: set-up, the list of
+"""Differential test for src/game/online/lobby_island.cpp (the lobby's island screen: set-up, the list of
 islands, show and hide; CLBIsland's constructor), against libtpw_unit_LobbyIslands.dylib
 (tests/unit_LobbyIslands.cpp).
 

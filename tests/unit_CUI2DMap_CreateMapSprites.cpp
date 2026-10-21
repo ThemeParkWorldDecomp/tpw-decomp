@@ -1,5 +1,5 @@
 // Test library for the 2D map's sprite maker (unit v5058; libtpw_unit_CUI2DMap_CreateMapSprites.dylib, tests/test_CUI2DMap_CreateMapSprites.py):
-//   src/CUI2DMap_CreateMapSprites.cpp   CUI2DMap::CreateMapSprites
+//   src/game/ui/ui_2dmap.cpp   CUI2DMap::CreateMapSprites
 //
 // The callees outside the unit are fakes that record what the real ones read: the world's two thing list walkers (answers from the queues
 // "Head" and "Next"), the sprite constructor, UpdateSpritePosition and GAME_ASSERTMSG. The globals of other files the unit reads are defined here.

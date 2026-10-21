@@ -1,7 +1,7 @@
 """Differential tests for the 4-bit font render method's core and the render parameters' last members (unit w45a), against
 libtpw_unit_FontRenderMethod.dylib (tests/unit_FontRenderMethod.cpp), all in the ltms library ("ltms symbols shared"):
 
-  src/ltms_fontrender_method.cpp  Tb4BitFontRenderMethod: constructor 0x10000bf0 (the vtable store, nothing the host can show),
+  src/ltms/StaticUnicodeBuffer.cpp, src/ltms/TbFontRender.cpp  Tb4BitFontRenderMethod: constructor 0x10000bf0 (the vtable store, nothing the host can show),
                                   ~Tb4BitFontRenderMethod 0x10000cb4, DrawChar 0x10000d40, CalculateSourceRect 0x10001dbc, GetRotate
                                   0x10001f64; TbFontRenderMethod::~TbFontRenderMethod 0x10000c38; FourBit::FontData::I 0x100018d8 and
                                   ~FontData 0x10001d30
@@ -9,7 +9,7 @@ libtpw_unit_FontRenderMethod.dylib (tests/unit_FontRenderMethod.cpp), all in the
                                   0x1000a68c current; FourBit::NybbleWriter 0x10001c9c ctor, 0x10001b28 Write, 0x10001ae8 Nybbles;
                                   OneBit::BitIterator 0x10001a98 ctor, 0x100019e0 operator*, 0x10001a28 operator++, BitReference
                                   0x1000197c operator unsigned char
-  src/ltms_fontrender.cpp         TbFontRenderParams: operator= 0x100025e8, UseTexture 0x10002718, UseBlendedMode 0x100028f8, GetStyle
+  src/ltms/TbFontRender.cpp, src/ltms/TbFontRenderParams.cpp         TbFontRenderParams: operator= 0x100025e8, UseTexture 0x10002718, UseBlendedMode 0x100028f8, GetStyle
                                   0x10002ab8, GetType 0x10002b70
 
 Real on both sides besides those: TbFontRenderParams::GetFont (0x10002af4) and the font's GetCharHeader and GetCharData (0x100046f8,

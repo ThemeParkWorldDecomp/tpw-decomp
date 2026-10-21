@@ -11,21 +11,21 @@ class CGoldenTicketControl;
 
 class CParkTime {
 public:
-    CParkTime();     // 0x10111f14 (164 bytes, src/ParkTime.cpp)
+    CParkTime();     // 0x10111f14 (164 bytes, src/game/people/ParkTime.cpp)
     // 0x1011275c (76 bytes): the funny time starts at 2000-01-01 00:00:00.000; nothing else is touched.
     void Reset();
-    // 0x101127d0 (280 bytes, src/ParkTime_funny.cpp, unit w123b): the funny time now: the start plus (rate * the world's turn / 4) * 10,000,000 ticks, with
+    // 0x101127d0 (280 bytes, src/game/people/ParkTime.cpp, unit w123b): the funny time now: the start plus (rate * the world's turn / 4) * 10,000,000 ticks, with
     // eight optional calendar outputs (year, month, day, day of week, hour, minute, second, millisecond; passed on to TbTimeStamp::GetTime).
     TbTimeStamp GetFunnyTime(int32_t*, int32_t*, int32_t*, int32_t*, int32_t*, int32_t*, int32_t*, int32_t*) const;
 
-    // Unit w123c (src/ParkTime_season.cpp). 0x101129e8 (256 bytes): the season of the funny time now: the calendar month (1 to 12) of the start plus
+    // Unit w123c (src/game/people/ParkTime.cpp). 0x101129e8 (256 bytes): the season of the funny time now: the calendar month (1 to 12) of the start plus
     // (rate * the world's turn / 4) * 10,000,000 ticks, divided by 3 with no offset (January and February are 0, December 4).
     int32_t GetSeason() const;
     TbTimeStamp* FunnyTimeStart() { return reinterpret_cast<TbTimeStamp*>(mFunnyTimeStart); }
     const TbTimeStamp* FunnyTimeStart() const { return reinterpret_cast<const TbTimeStamp*>(mFunnyTimeStart); }   // unit w123b
     TbTimeStamp* SessionStart() { return reinterpret_cast<TbTimeStamp*>(mSessionStart); }
 
-    // Unit w129 (src/ParkTime_update.cpp). 0x10112694 (160 bytes): the month at the last update is the local calendar month now minus 1 (the funny
+    // Unit w129 (src/game/people/ParkTime.cpp). 0x10112694 (160 bytes): the month at the last update is the local calendar month now minus 1 (the funny
     // time's), the year at the last update is its raw year (not minus 1900).
     void Init();
     // 0x10112214 (752 bytes): the funny time's calendar date into the global gParkDate (the year minus 1900, the month minus 1); a changed day posts a

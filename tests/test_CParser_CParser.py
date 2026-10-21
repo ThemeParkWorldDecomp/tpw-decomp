@@ -1,5 +1,5 @@
 """Unit v5727, CParser::CParser and CParser::SetupWhitespaceSet, against libtpw_unit_CParser_CParser.dylib (tests/unit_CParser_CParser.cpp),
-main app ("SimTheme Park"), src/COnlineParser_ParseGoto_COnlineParser_COnlineParser_cmp_nocase_CParser_CParser.cpp:
+main app ("SimTheme Park"), src/game/online/Parser.cpp:
   CParser::CParser 0x10211064, CParser::SetupWhitespaceSet 0x10211344
 
 The callees (std::wstring ctor, the two std::set tree ctors, SetupSeparatorSet, AddWhitespace) are fakes on both sides recording which

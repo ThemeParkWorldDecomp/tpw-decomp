@@ -1,5 +1,5 @@
 // Test library for the static initialiser of tb_starfield.cpp (unit v5283), main app:
-//   src/tb_switch_sinit_tb_starfield_cpp.cpp  __sinit_tb_starfield_cpp, gStarfieldAtExitNode
+//   src/engine/tb_starfield.cpp  __sinit_tb_starfield_cpp, gStarfieldAtExitNode
 //
 // __register_global_object is a recording fake. gStarfield and ~CStarfield are defined here.
 #include <cstddef>

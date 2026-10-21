@@ -25,7 +25,7 @@ struct IDXTYPEUniqueNameMapId;
 struct IDXTYPEUniqueNameObjectId;
 template<class Tag, class T> struct tag_IDX_TYPE;
 
-// Unit w149: the index type of CPeep::DrawMySpriteAt (the values used are 2 and 3). Unit w177 (src/DelayedScript.cpp): the rest of the class, a handle to a
+// Unit w149: the index type of CPeep::DrawMySpriteAt (the values used are 2 and 3). Unit w177 (src/game/DelayedScript.cpp): the rest of the class, a handle to a
 // sprite script and the one waiting to be switched to. ScriptIdx stays opaque: its values are the thirteen indices of the table at 0x102a08fc.
 class CDelayedScript {
 public:
@@ -71,7 +71,7 @@ public:
     // Unit v5052 (untranslated, 168 bytes): notes an event about a thing (the id is the HIGH halfword of the Mac's register).
     enum EventType : int32_t {};
     void RecordEvent(EventType type, tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> thing);   // 0x1012f3d4
-    // Unit v5067: an entry of the action history (SAVEVARSTRUCT<CThoughts::EventHistType> 0x1012f9a0, src/TrackCell_SAVEVARSTRUCT.cpp):
+    // Unit v5067: an entry of the action history (SAVEVARSTRUCT<CThoughts::EventHistType> 0x1012f9a0, src/game/buildings/TrainingCentre.cpp):
     // two 16-bit fields, each swapped on saving. Field names invented.
     struct EventHistType {
         uint16_t mFirst;    // 0x00
@@ -85,10 +85,10 @@ public:
 static_assert(sizeof(CThoughts::EventHistType) == 4, "EventHistType is four bytes");
 template<class Value> int32_t SAVEVARSTRUCT(void* file, Value* value, const char* name, int32_t noLog);
 template<> int32_t SAVEVARSTRUCT<CThoughts::EventHistType>(void*, CThoughts::EventHistType*, const char*, int32_t);   // 0x1012f9a0, 260 B
-// Unit v5643: SAVEVAR<CThoughts::ThoughtType> 0x1012f844 (260 B, src/TrackCell_SAVEVARSTRUCT_SAVEVAR_4.cpp): one swapped word.
+// Unit v5643: SAVEVAR<CThoughts::ThoughtType> 0x1012f844 (260 B, src/game/buildings/TrainingCentre.cpp): one swapped word.
 template<class Value> int32_t SAVEVAR(void* file, Value* value, const char* name, int32_t noLog);
 template<> int32_t SAVEVAR<CThoughts::ThoughtType>(void*, CThoughts::ThoughtType*, const char*, int32_t);   // 0x1012f844, 260 B
-// Unit v5736: LOADVAR<CThoughts::ThoughtType> 0x1012f700 (236 B, src/TrackCell_SAVEVARSTRUCT_SAVEVAR_4_LOADVAR_2.cpp): one word read and swapped.
+// Unit v5736: LOADVAR<CThoughts::ThoughtType> 0x1012f700 (236 B, src/game/buildings/TrainingCentre.cpp): one word read and swapped.
 template<class Value> int32_t LOADVAR(void* file, Value* value, const char* name, int32_t noLog);
 template<> int32_t LOADVAR<CThoughts::ThoughtType>(void*, CThoughts::ThoughtType*, const char*, int32_t);   // 0x1012f700, 236 B
 
@@ -119,17 +119,17 @@ public:
     void UpdateTurn();   // 0x101158c8
     void SetStandScript();   // 0x1011524c
     void SpawnParticleEffect(int32_t effect);   // 0x101152a4 (unit w190, untranslated): SackMe asks for effect 0x13
-    // Unit v5048 (src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded.cpp). The peep is reached by offset: the cell x/y bytes at +4/+6, the script handle
+    // Unit v5048 (src/game/people/Peep.cpp). The peep is reached by offset: the cell x/y bytes at +4/+6, the script handle
     // at +0xc, the CThoughts at +0x30 and the turn stamp it became stranded at (a word) at +0x198.
     bool IsLocalAreaUnchangedSinceBecomingStranded();   // 0x101156fc (388 bytes)
     void ReportAllEvents() const;                       // 0x10115c3c (1,340 bytes)
-    // Unit v5281 (src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound.cpp): the stranded stamp at +0x198.
+    // Unit v5281 (src/game/people/Peep.cpp): the stranded stamp at +0x198.
     bool IsStranded();                                  // 0x1011566c (104 bytes)
     void SetStranded(int32_t stranded);                 // 0x101155bc (136 bytes)
     // Unit v5298 (src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_Dtor_CPeep.cpp): the destructor, 0x10116d18 (104 bytes). Runs
     // Vehicle::~Vehicle on the bytes at +0xd4; the Mac's delete-storage flag (r4) is not modelled: the host never frees.
     ~CPeep();
-    // Unit v5533 (src/CPeep_IsLocalAreaUnchangedSinceBecomingStranded_CPeep_PlaySound_CPeep_GetInterpolatedPeepPosition.cpp): the position between the
+    // Unit v5533 (src/game/people/Peep.cpp): the position between the
     // last (+0x190, +0x194) and the current pilot position at share `t` (clamped to -1..2 when `ranged` is 0, to 0..1 otherwise); x and z come out in
     // tenths of 1/65536, y is 0, `stamp` is the word at +0x1c.
     void GetInterpolatedPeepPosition(float t, int32_t ranged, float& x, float& y, float& z, uint32_t& stamp);   // 0x101147e8 (416 bytes)
@@ -155,7 +155,7 @@ public:
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x101170b4 (3,456 bytes)
     // Unit w176: 0x10116634 (1488 bytes, untranslated): CArrival::CreatePerson builds one at the bus stop cell (the id is the HIGH halfword of the Mac's register).
     explicit CPerson(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);
-    // Unit w132 (untranslated callee of CObject::UpdateTurn; ForceRideAdmittance 0x1011df70 and DismissFromQueue 0x1011f1b8 are declared by their Mac names in the sources, as src/Object.cpp does):
+    // Unit w132 (untranslated callee of CObject::UpdateTurn; ForceRideAdmittance 0x1011df70 and DismissFromQueue 0x1011f1b8 are declared by their Mac names in the sources, as src/game/Object.cpp does):
     int32_t InQueueingState() const;   // 0x10120b2c
     // Unit w182 (untranslated): the guard catches a kid, carries him to the entrance and lets him go.
     void GetBagged();   // 0x1011b508 (100 bytes)
@@ -168,14 +168,14 @@ public:
     void FinalDestroy();   // 0x10116da4
     void ReceiveMessage(const CMsg& message);   // 0x10116e24, 604 bytes, kind 1
 
-    // Unit v5006 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark.cpp). The person's state word is not declared here (SetState is untranslated).
+    // Unit v5006 (src/game/people/PersonQueue.cpp). The person's state word is not declared here (SetState is untranslated).
     enum PersonState : int32_t {};
     void SetState(PersonState state);   // 0x10120354 (1,944 bytes, untranslated)
     void ProcessStateWaitingToCrossRoadOutOfPark();   // 0x1011e42c (480 bytes)
     void ProcessStateLeavingPark();                   // 0x1011e2e8 (268 bytes): +0x1bc, +0x19c (float), +0x188 (int32) are read or written by offset
     void ProcessStateWaitingForBusOuttaHere();        // 0x1011e654 (852 bytes)
 
-    // Unit v5052 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_CPerson.cpp): the constructor and ReceiveMessage above; the
+    // Unit v5052 (src/game/people/Person.cpp): the constructor and ReceiveMessage above; the
     // fields are reached by Mac offset (+0x19c float, +0x1a0, +0x1bc, +0x1c0 byte, +0x1d4, +0x1d8, +0x1dc and +0x1de halfwords,
     // +0x1e0 and +0x1e8 four halfwords each, +0x204, +0x220 state, +0x228 and +0x22a halfwords; the CPeep base is 0x19c bytes).
     enum Amount : int32_t {};
@@ -183,7 +183,7 @@ public:
     void DismissFromQueue();              // 0x1011f1b8 (272 bytes, untranslated)
     // Unit v5078: 0x1011962c (68 bytes, untranslated): the game turns the person has been in the park.
     uint32_t GetTimeInPark() const;
-    // Unit v5098 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_ProcessStateIdle.cpp). The person is reached by offset (+0x4 and +0x6 the
+    // Unit v5098 (src/game/people/PersonQueue.cpp). The person is reached by offset (+0x4 and +0x6 the
     // cell bytes, +0x1c the angle, +0x30 the CThoughts, +0x188, +0x19c / +0x1b0 / +0x1b4 floats, +0x1bc, +0x1c0 byte, +0x1dc halfword, +0x1fc, +0x208,
     // +0x210, +0x220 state). The ids come back through a hidden pointer (one halfword).
     void ProcessStateIdle();   // 0x1011baa8 (2,796 bytes)
@@ -193,28 +193,28 @@ public:
     void MakeBalloonPop();     // 0x1011b11c (76 bytes, untranslated)
     void MakeMajorDecision();  // 0x10118430 (408 bytes, untranslated)
     void SetSpotAnim(CDelayedScript::ScriptIdx script);   // 0x10117e64 (212 bytes, untranslated)
-    // Unit v5217 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_UpdateTurn.cpp): UpdateTurn and FindNearestFireworks are above.
+    // Unit v5217 (src/game/people/PersonQueue.cpp): UpdateTurn and FindNearestFireworks are above.
     void DoSomeThinking();           // 0x10117fd4 (872 bytes, untranslated)
     void UpdateTemporaryHistory();   // 0x10119b68 (108 bytes, untranslated)
-    // Unit v5238 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_TooPricey.cpp). Fields by Mac offset: +0x19c, +0x1a4, +0x1a8, +0x1b0 floats, +0x1a0 word.
+    // Unit v5238 (src/game/people/Person.cpp). Fields by Mac offset: +0x19c, +0x1a4, +0x1a8, +0x1b0 floats, +0x1a0 word.
     uint8_t GetPreferredExcitement() const;                  // 0x1011b4b4 (28 bytes, untranslated; the listing masks the answer with 0xff)
     bool TooPricey(CObject* object) const;                   // 0x10119eec (1,092 bytes): tells the park analyser what it thinks of the price
     void ExtraExcitementEffects(const CObject* object);      // 0x10119c0c (672 bytes): the ride's excitement moves +0x19c and +0x1b0
-    // Unit v5245 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin.cpp). Fields by Mac offset: +0x1dc ride, +0x1de minor destination halfwords.
+    // Unit v5245 (src/game/people/PersonQueue.cpp). Fields by Mac offset: +0x1dc ride, +0x1de minor destination halfwords.
     void ProcessStateBeingUnloaded();   // 0x1011e0e4 (460 bytes)
     void ProcessStateBeingLoaded();     // 0x1011dcc0 (632 bytes)
     int32_t FindQueueDestination();     // 0x1011ef14 (368 bytes, untranslated)
-    // Unit v5293 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged.cpp). +0x19c happiness float,
+    // Unit v5293 (src/game/people/Person.cpp). +0x19c happiness float,
     // +0x210 balloon script handle, +0x218 and +0x21c balloon floats, +0x220 state.
     void RaiseHappiness(Amount amount);                       // 0x1011b258 (236 bytes)
     uint32_t GetHappinessAmount(Amount amount) const;         // 0x1011b198 (124 bytes)
     void DrawBalloon(float x, float y, float z, int32_t mode);   // 0x1011b084 (104 bytes)
     void LosingMods(CObject* object);                         // 0x1011b004 (76 bytes)
-    // Unit v5150 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_DismissFromQueue.cpp): the ride is at +0x1dc (halfword), the ride's queue place at +0x1f1 (byte).
+    // Unit v5150 (src/game/people/PersonQueue.cpp): the ride is at +0x1dc (halfword), the ride's queue place at +0x1f1 (byte).
     void EvaluateQueueEdit();        // 0x1011f2f8 (636 bytes)
     int32_t ExitRide();              // 0x1011f5a4 (516 bytes)
     void UseObject(class CObject* object); // 0x101196a0 (864 bytes, untranslated)
-    // Unit v5529 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_ProcessStateWalksToLitterBin.cpp).
+    // Unit v5529 (src/game/people/PersonQueue.cpp).
     // Fields by Mac offset: +0x4 and +0x6 cell bytes, +0x1c angle, +0x19c / +0x1ac / +0x1b4 floats, +0x1dc ride, +0x1f1 queue place (byte),
     // +0x1f4 queue patience, +0x1f8 admit flag, +0x1fc and +0x208 turn stamps, +0x228 halfword.
     void ProcessStateWalksToLitterBin();           // 0x1011d400 (432 bytes)
@@ -242,7 +242,7 @@ public:
     int32_t FeelingAboutEntryFee();   // 0x1011c63c (540 bytes): 0 to 3
     // Unit v5962: 0x1011836c (148 bytes, untranslated): the head sprite id (bit 31 set: a custom sprite) EnableRideHead gives a ride's head.
     uint32_t GetHeadSpriteID();
-    // Unit v51002 (src/ParkMessages_SAVEVARSTRUCT_3.cpp): the person pays the ride's price per use (+0x1a0 word, the money).
+    // Unit v51002 (src/game/people/Person.cpp): the person pays the ride's price per use (+0x1a0 word, the money).
     void PayPricePerUseForObject(CObject* object);   // 0x1011a4ac (132 bytes)
     // Unit v51016 (src/..._CPerson_EveryTimeMods_2.cpp): +0x1c4 / +0x1c8 / +0x1cc ride-kind counters, +0x1b8 float, +0x1d4 turn stamp, +0x1e6 to +0x1ee history halfwords.
     void EveryTimeMods(CObject* object);   // 0x1011a364 (276 bytes)
@@ -278,10 +278,10 @@ extern uint16_t gNoThingRide;      // 0x102a0fae: CalculateOptionScore skips the
 extern uint8_t gNeedMatchTable[0x79];   // 0x102a0f1e: 11 x 11 bytes, row = need / 10, column = amount / 10
 extern uint8_t gAmountMatchTable[0x15]; // 0x102a0f97: indexed by (amount + 4) / 5
 
-// Unit v5315 (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_LOADVAR.cpp).
+// Unit v5315 (src/game/people/Person.cpp).
 template<class Value> int32_t LOADVAR(void* file, Value* value, const char* name, int32_t noLog);
 template<> int32_t LOADVAR<CPerson::PersonState>(void*, CPerson::PersonState*, const char*, int32_t);   // 0x1011b7cc, 236 B
-// Unit v51002 (src/ParkMessages_SAVEVARSTRUCT_3.cpp).
+// Unit v51002 (src/game/buildings/StaffHQ.cpp, src/game/people/Person.cpp, src/game/buildings/ResearchLab.cpp).
 template<class Value> int32_t SAVEVAR(void* file, Value* value, const char* name, int32_t noLog);
 template<> int32_t SAVEVAR<CPerson::PersonState>(void*, CPerson::PersonState*, const char*, int32_t);   // 0x1011b90c, 260 B
 extern uint32_t gBalloonPopTarget;   // 0x1029fd84 (names invented): its address is the code ESP_ForceGoto restarts the balloon script at
@@ -324,7 +324,7 @@ extern uint16_t gPersonCellB;         // 0x102a0f16
 // flags +4, the person's id +8, the id modulo 3 at +0xc; the type it answers is not recovered).
 class CMsgPersonIdle : public CMsg {
 public:
-    int32_t GetType() const override;   // placeholder (src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_ProcessStateIdle.cpp); key function
+    int32_t GetType() const override;   // placeholder (src/game/people/PersonQueue.cpp); key function
     uint16_t mThingId;   // 0x08 on the Mac
     uint32_t mValue;     // 0x0c on the Mac
 };
@@ -339,7 +339,7 @@ int32_t LbMaths_ArcTan(int32_t x, int32_t y);   // 0x1023b1b8 (glue import)
 extern uint16_t gThingListEnd;   // 0x102a1008
 extern uint16_t gQueueLinkA;     // 0x102a100a
 extern uint16_t gQueueLinkB;     // 0x102a100c
-// CObject (unit w126, src/Object.cpp): a ride, shop or other object of the park (0x448 bytes on the Mac; the host layout equals it: no
+// CObject (unit w126, src/game/Object.cpp): a ride, shop or other object of the park (0x448 bytes on the Mac; the host layout equals it: no
 // member holds a pointer). The names are mine. The constructor leaves the halfword at +0x3a, the byte run +0x4d..+0x4f and the halfword
 // at +0x6a unwritten (a block of 0xa5 keeps them); the ring buffers of the histories are never written either.
 class CObject {
@@ -351,20 +351,20 @@ public:
     // Unit w123a: direct dispatch callees, untranslated.
     void UpdateTurn();   // 0x1010d634
     void ModelState();   // 0x1010daa0
-    // 0x10105d74, 1,800 bytes (src/Object.cpp, unit w126): the map cell the object stands on, its object type, the rotation and one more long.
+    // 0x10105d74, 1,800 bytes (src/game/Object.cpp, unit w126): the map cell the object stands on, its object type, the rotation and one more long.
     CObject(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> map, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> type, int32_t a, int32_t b);
-    // 0x1010dc94, 2,000 bytes (src/Object.cpp, unit w126): see there.
+    // 0x1010dc94, 2,000 bytes (src/game/Object.cpp, unit w126): see there.
     void SetState(ObjectState state);
     // Unit w152 (untranslated callees of the analyser's shop and sideshow queries):
-    using ShopType = CObjectShopType;   // the ride record's kRideSlot_ShopType values (0 to 7, src/RideDB_balance.cpp 95); names unknown. The enum itself is
+    using ShopType = CObjectShopType;   // the ride record's kRideSlot_ShopType values (0 to 7, src/game/rides/RideDB.cpp 95); names unknown. The enum itself is
                                         // declared in analyser.h (this header includes it, and CParkAnalyser's queries take it before CObject exists).
     void UpdateEngine(int32_t flag);             // 0x10107d38
     void CreateRideScript();                     // 0x101076b0
     // Unit w132 (untranslated callees of CObject::UpdateTurn, ModelState, CreateRideScript):
-    bool IsClosed() const;   // 0x1010cae8 (24 bytes, src/Object_queries.cpp, unit w151): mF64 is 0
+    bool IsClosed() const;   // 0x1010cae8 (24 bytes, src/game/Object.cpp, unit w151): mF64 is 0
     bool IsBrokenDown() const;   // 0x1010c878 (24 bytes, unit w151): mState is 1
 
-    // Unit w197 (src/Object_queue.cpp): the ride's queue. The queue is a list of people (the head in mQueuedPerson, the link to the person behind at +0x228 and
+    // Unit w197 (src/game/Object.cpp): the ride's queue. The queue is a list of people (the head in mQueuedPerson, the link to the person behind at +0x228 and
     // to the person ahead at +0x22a of each person) and, for a ride with the queue flag (mFlags 8), a line of map cells from the entry cell (mF32) back to the
     // back of the queue (mF36, cached; mF3C is its length in cells). The tags are one halfword through a hidden pointer or the high half of a register.
     void AddPersonToQueue(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> person);   // 0x10108a28 (412 bytes)
@@ -384,7 +384,7 @@ public:
     int32_t ConvertPhysicalQPositionToMapPos(uint32_t position, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>* cell, uint8_t* x, uint8_t* y);   // 0x10109eb4 (920 bytes)
     int32_t ConvertVirtualQPositionToMapPos(uint32_t position, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>* cell, uint8_t* x, uint8_t* y);   // 0x1010a2c0 (456 bytes)
 
-    // Unit w198 (src/Object_takings.cpp): the ride's takings, costs, prizes and satisfaction. The money words are mF17C (the takings so far), mF180
+    // Unit w198 (src/game/Object.cpp): the ride's takings, costs, prizes and satisfaction. The money words are mF17C (the takings so far), mF180
     // (the costs so far), mCostOfGoods (the prize value), mF188 (the product quality), mChanceOfNotLoosing, mPricePerUse and mF194 (the amount of the
     // special ingredient); the customers are counted in mF19C and mF1A0 (walked away) and the histories at 0x6c (takings), 0xf4 (costs), 0x1a4
     // (customers), 0x22c (walked away), 0x2b4 (winners) and 0x33c (satisfaction). The names of the fields are the ones above, the meanings are mine.
@@ -418,7 +418,7 @@ public:
     bool WillIWin(CPerson* person) const;   // 0x101103e0 (252 bytes): the sideshow's draw
     void SetPricePerUse(int32_t price);   // 0x101105f4 (8 bytes)
 
-    // Unit w199 (src/Object_upkeep.cpp): the ride's wear, breakdown, maintenance, repair, upgrade and cleaning. The staff member assigned to the ride is
+    // Unit w199 (src/game/Object.cpp): the ride's wear, breakdown, maintenance, repair, upgrade and cleaning. The staff member assigned to the ride is
     // the halfword mF5A (0 for nobody) with the world turn mF5C it was assigned on; GetAssignedStaffMember and IsBeingWorkedUpon take the staff member
     // off again once 100 turns have passed and the staff member is no longer allocated to this ride.
     tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> GetAssignedStaffMember();   // 0x1010c5a0 (256 bytes; a two-byte answer through a hidden pointer)
@@ -439,7 +439,7 @@ public:
     void SetWornFlag();   // 0x1010d994 (56 bytes): script variable 8 to 1
     double GetProspectiveDamagePerTurn(float speed, float capacity, float duration, bool useCapacity) const;   // 0x1010ae5c (816 bytes; the third float is never read)
     int32_t GetProspectiveReliability(float speed, float capacity, float duration) const;   // 0x1010b1cc (60 bytes)
-    // Unit w200 (src/Object_opening.cpp): whether the ride opens, the close and reopen steps, whether it runs and may be chosen, the upgrade request and
+    // Unit w200 (src/game/Object.cpp): whether the ride opens, the close and reopen steps, whether it runs and may be chosen, the upgrade request and
     // the upgrade parent, the blocked exit, the operating speed, duration and capacity, the ride record of the object type and the messages the ride
     // receives. The ride is closed while mF64 is 0. Callers: the park gates (IsOpenable, CloseObject, Reopen), the handyman (Reopen), the park analyser's rating (IsAvailableToChoose).
     int32_t IsOpenable();   // 0x1010aaac (192 bytes): not broken down, condemned, flagged for maintenance or wanting an upgrade, the queue connected, a coaster's track usable
@@ -459,7 +459,7 @@ public:
     void SetOperatingCapacity(uint8_t capacity);   // 0x10108248 (356 bytes): clamped to the record's minimum and maximum capacity
     void ReceiveMessage(const CMsg& message);   // 0x10107ba0 (256 bytes, kind 3): a staff member's death (type 0x1b) and the month end (type 0xb)
 
-    // Unit w202 (src/Object_admit.cpp): the ride takes its guests on and off and judges its queue. The ride script's variable 0 is the person the
+    // Unit w202 (src/game/Object.cpp): the ride takes its guests on and off and judges its queue. The ride script's variable 0 is the person the
     // script has let on (0 for nobody), variable 1 the person it lets off, variable 2 its capacity and variable 7 asks for the ride to break down
     // or to be condemned. A guest's state word (+0x220) is 0xd while it is being loaded, 0xe while it waits to be admitted and 0x10 while it rides.
     int32_t HasFreeQueueSpace() const;   // 0x101085a0 (80 bytes; w200's IsAvailableToChoose calls it): the queue holds fewer people than four to each unit of mF3C. The Mac answers 0 or 1.
@@ -475,10 +475,10 @@ public:
     void ProcessStateFunctioning();   // 0x1010eb44 (528 bytes): LetPeopleOn; then LetPeopleOff, or (variable 7 set) broken down while mF44 shows life, else condemned
     void GoFirstPerson(int32_t on) const;   // 0x1010ed8c (264 bytes; unit w140, called by RideRideIfRequired): the first person view of the ride's camera mesh or fly tour
 
-    // Unit w229 (src/Object_serialise.cpp)
+    // Unit w229 (src/game/Object.cpp)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x10106570 (4,368 bytes)
 
-    // Unit w210 (src/Object_info.cpp): a ride's names, kind, excitement, stand point and final destroy. Each function fetches the ride record again with
+    // Unit w210 (src/game/Object.cpp): a ride's names, kind, excitement, stand point and final destroy. Each function fetches the ride record again with
     // CRideDatabase::GetRideInfo of mObjectType for every slot it reads (the original calls it each time). The sign text is two wide strings of 0x21
     // characters (mSignA at +0x3c4, mSignB at +0x406); a full 0x21 character mSignA has no terminator and runs on into mSignB.
     tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> UpgradesWhat();   // 0x1011050c (72 bytes): the record's UpgradesId slot (+0x284), a halfword through a hidden pointer (not const on the Mac)
@@ -489,7 +489,7 @@ public:
     void GetSignNameB(char16_t* out, uint32_t size);   // 0x101108dc (60 bytes): mSignB
     void SetSignNameA(const char16_t* text);   // 0x10110948 (412 bytes): copies the text (the Mac takes wchar_t*) into mSignA, tells the master save when this is the gates thing and the game is not online, records action 0x50
     void SetSignNameB(const char16_t* text);   // 0x10110b10 (412 bytes): the same for mSignB, records action 0x55
-    int32_t IsCoaster() const;   // 0x10110cd8 (76 bytes, src/gameplay_leaves.cpp, unit v5L07)
+    int32_t IsCoaster() const;   // 0x10110cd8 (76 bytes, src/game/Object.cpp, unit v5L07)
     int32_t IsTrackRide() const;   // 0x10110d50 (200 bytes)
     int32_t GetProspectiveExcitementLevel(int32_t a, int32_t b, int32_t c) const;   // 0x1010cba0 (976 bytes): the excitement the ride would have with these settings; for a sideshow a is the prize value, b the price per use and c the chance of winning, for another ride a is the operating speed and b the duration (c is unused; a coaster uses none of them)
     uint8_t GetExcitementLevel(bool flag) const;   // 0x1010cfb0 (252 bytes; the listings mask the answer with 0xff)
@@ -554,11 +554,11 @@ static_assert(offsetof(CObject, mQueuedPerson) == 0x38 && offsetof(CObject, mF3C
 static_assert(offsetof(CObject, mPersonLoaded) == 0x68 && offsetof(CObject, mHistory6C) == 0x6c && offsetof(CObject, mHistoryF4) == 0xf4, "CObject layout");
 static_assert(offsetof(CObject, mState) == 0x198 && offsetof(CObject, mHistory1A4) == 0x1a4 && offsetof(CObject, mHistory33C) == 0x33c, "CObject layout");
 static_assert(offsetof(CObject, mSignA) == 0x3c4 && offsetof(CObject, mSignB) == 0x406, "CObject layout");
-// Unit w202 (src/Object_admit.cpp): GetIdealQueueLength and QueueTooLong store the speed ratio they work out in this float (the name is mine).
+// Unit w202 (src/game/Object.cpp): GetIdealQueueLength and QueueTooLong store the speed ratio they work out in this float (the name is mine).
 extern float gObjectQueueSpeedRatio;   // 0x1034c35c
 // Unit w142: the staff class by its two untranslated members ContextMouse calls (kind 1 of the thing at gIntrface+4).
 // Unit w155 reads +0x1e4 (grade, int32), +0x1f4 (happiness, float) and +0x20c (next researcher id, uint16) through casts.
-// Unit w189 (src/Staff.cpp) makes it plain data of 0x20c bytes at the Mac's offsets (the CPeep part is built by the CPeep constructor, the subclasses
+// Unit w189 (src/game/people/staff.cpp) makes it plain data of 0x20c bytes at the Mac's offsets (the CPeep part is built by the CPeep constructor, the subclasses
 // add their own members from +0x20c); the names marked "invented" are guesses from the code that uses them.
 class CStaff {
 public:
@@ -568,12 +568,12 @@ public:
     int32_t HasPatrolArea() const;   // 0x10127a78 (84 bytes, unit w191)
     void GetPatrolArea(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>* start, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>* end) const;   // 0x1012798c (20 bytes, unit w191)
 
-    // Unit w178: the members the entertainer calls (all untranslated except the destructor, src/Entertainer.cpp). The enums are 32-bit values.
+    // Unit w178: the members the entertainer calls (all untranslated except the destructor, src/game/people/Entertainer.cpp). The enums are 32-bit values.
     enum PayGrade : int32_t {};
     enum StaffState : int32_t {};
     CStaff(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, CThing::ThingModel model);   // 0x1012482c (120 bytes, unit w189)
     CStaff(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, CThing::ThingModel model, PayGrade grade, uint8_t costume);   // 0x10124908 (136 bytes, unit w189)
-    ~CStaff();   // 0x100fb194 (108 bytes, src/Entertainer.cpp, nonvirtual): the Vehicle at +0xd4 is destroyed; the deleting form frees the block
+    ~CStaff();   // 0x100fb194 (108 bytes, src/game/people/Entertainer.cpp, nonvirtual): the Vehicle at +0xd4 is destroyed; the deleting form frees the block
     void FinalDestroy();   // 0x10124b88 (36 bytes, unit w189)
     void ReceiveMessage(const CMsg& message);   // 0x10124bd8 (220 bytes, unit w189)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x10124ce8 (1,268 bytes, unit w189)
@@ -586,7 +586,7 @@ public:
     void ProcessWalkingToRestArea();   // 0x10126008 (492 bytes, unit w191)
     void ProcessResting();   // 0x101262a8 (368 bytes, unit w191)
 
-    // Unit w189 (src/Staff.cpp).
+    // Unit w189 (src/game/people/staff.cpp).
     void Init();   // 0x10124a08 (348 bytes)
     void UpdateMonthly();   // 0x10125598 (156 bytes): the month's wages are withdrawn and added to the analyser's staff wages history
 
@@ -602,7 +602,7 @@ public:
     void ProcessStriking();   // 0x10126504
     void ProcessBeingStunned();   // 0x10126688
 
-    // Unit w190 (src/Staff_queries.cpp): staff.cpp part 2.
+    // Unit w190 (src/game/people/staff.cpp): staff.cpp part 2.
     void SackMe();   // 0x10125660 (464 bytes)
     void TrainMe(int32_t amount);   // 0x10125854 (404 bytes)
     int32_t GetEmploymentDuration() const;   // 0x10125a10 (168 bytes): days since hiring
@@ -647,7 +647,7 @@ public:
     tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> mPatrolRegionBL;       // 0x206 the Serialise name
     tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> mPatrolRegionTR;       // 0x208 the Serialise name
     uint8_t mF20A[2];                     // 0x20a
-    // Unit w191 (src/Staff_behaviour.cpp): staff.cpp part 3.
+    // Unit w191 (src/game/people/staff.cpp): staff.cpp part 3.
     tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> FindNearestRestingPlace();   // 0x10127108 (368 bytes; a two-byte answer through a hidden pointer, as GoToRestArea)
     void SetPatrolArea(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> bottomLeft, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> topRight);   // 0x101278f0 (28 bytes; the HIGH halfwords of r4 and r5)
     int32_t InsidePatrolArea(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell) const;   // 0x10127af8 (188 bytes)
@@ -677,11 +677,11 @@ static_assert(offsetof(CStaff, mJobsDone) == 0x200, "mJobsDone at 0x200");
 static_assert(offsetof(CStaff, mRestArea) == 0x204, "mRestArea at 0x204");
 static_assert(offsetof(CStaff, mPatrolRegionBL) == 0x206, "mPatrolRegionBL at 0x206");
 static_assert(offsetof(CStaff, mPatrolRegionTR) == 0x208, "mPatrolRegionTR at 0x208");
-// Unit w189 (src/Staff.cpp): the two words __sinit_staff_cpp 0x10128350 stores (names invented; nothing reads either).
+// Unit w189 (src/game/people/staff.cpp): the two words __sinit_staff_cpp 0x10128350 stores (names invented; nothing reads either).
 extern uint32_t gStaffSinitLow;      // 0x1034c4dc stored 0
 extern uint32_t gStaffSinitHigh;     // 0x1034c4d8 stored 0x10000
 
-// Unit w178 (src/Entertainer.cpp): the entertainer, 0x214 bytes on the Mac. A standalone class of plain data at the Mac's offsets (the Mac's CStaff base
+// Unit w178 (src/game/people/Entertainer.cpp): the entertainer, 0x214 bytes on the Mac. A standalone class of plain data at the Mac's offsets (the Mac's CStaff base
 // and the CDelayedScript are built by the CStaff constructor; here they are reached through casts, as the staff classes are elsewhere). Every member is
 // trivial. The Vehicle subobject at +0xd4 is kept as raw bytes up to the state word.
 // Unit w143 (untranslated): the constructor CMMPlaceStaff::OnLeftClick calls on a fresh object; the pay grade is a CStaff::PayGrade on the Mac
@@ -696,7 +696,7 @@ public:
     void FinalDestroy();   // 0x100fb600 (124 bytes)
     void ReceiveMessage(const CMsg& message);   // 0x100fb448, 36 bytes, kind 6
 
-    // Unit w178 (src/Entertainer.cpp).
+    // Unit w178 (src/game/people/Entertainer.cpp).
     explicit CEntertainer(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);   // 0x100fb094 (172 bytes): picks the costume 0, 1, 2, 0, ... from a static counter
     void Init(uint8_t costume);   // 0x100fb33c (224 bytes)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x100fb4a8 (292 bytes)
@@ -736,12 +736,12 @@ static_assert(offsetof(CEntertainer, mGrade) == 0x1e4, "mGrade at 0x1e4");
 static_assert(offsetof(CEntertainer, mStateTurn) == 0x1fc, "mStateTurn at 0x1fc");
 static_assert(offsetof(CEntertainer, mNext) == 0x20c, "mNext at 0x20c");
 static_assert(offsetof(CEntertainer, mTimeStartedEntertaining) == 0x210, "mTimeStartedEntertaining at 0x210");
-// Unit w178 (src/Entertainer.cpp): the constructor's two function statics and the two words __sinit_Entertainer_cpp stores (names invented).
+// Unit w178 (src/game/people/Entertainer.cpp): the constructor's two function statics and the two words __sinit_Entertainer_cpp stores (names invented).
 extern uint8_t gEntertainerCostumeGuard;    // 0x1034c1d4 the "counter is set up" flag
 extern int32_t gEntertainerCostumeCounter;  // 0x1034c1d8 the next costume (0, 1, 2, 0, ...)
 extern uint32_t gEntertainerSinitLow;       // 0x1034c1e0 __sinit_Entertainer_cpp stores 0
 extern uint32_t gEntertainerSinitHigh;      // 0x1034c1dc ... and 0x10000 (nothing reads either)
-// Unit w182 (src/Guard.cpp): the guard, 0x214 bytes on the Mac. Plain data at the Mac's offsets like CEntertainer above (the CStaff base, the CDelayedScript and
+// Unit w182 (src/game/people/guard.cpp): the guard, 0x214 bytes on the Mac. Plain data at the Mac's offsets like CEntertainer above (the CStaff base, the CDelayedScript and
 // the Vehicle are built by the CStaff constructor and reached through casts). Every member is trivial. The Vehicle subobject at +0xd4 is kept as raw bytes
 // except the word at +0x188 (its +0xb4), which the guard sets to 1 before its second try for the ticket booth and to 0 on the walk to the entrance (name unknown).
 class CGuard {
@@ -756,7 +756,7 @@ public:
     void FinalDestroy();   // 0x100fdd60
     void ReceiveMessage(const CMsg& message);   // 0x100fdec0, 160 bytes, kind 7
 
-    // Unit w182 (src/Guard.cpp).
+    // Unit w182 (src/game/people/guard.cpp).
     explicit CGuard(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);   // 0x100fda68 (84 bytes)
     void Init();   // 0x100fdc10 (300 bytes)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x100fdf94 (372 bytes)
@@ -808,7 +808,7 @@ static_assert(offsetof(CGuard, mStateTurn) == 0x1fc, "mStateTurn at 0x1fc");
 static_assert(offsetof(CGuard, mNext) == 0x20c, "mNext at 0x20c");
 static_assert(offsetof(CGuard, mPerp) == 0x20e, "mPerp at 0x20e");
 static_assert(offsetof(CGuard, mProsecutionTimestamp) == 0x210, "mProsecutionTimestamp at 0x210");
-// Unit w184 (src/Handyman.cpp): the handyman, 0x218 bytes on the Mac. Plain data at the Mac's offsets like CGuard above (the CStaff base, the CDelayedScript, the
+// Unit w184 (src/game/people/Handyman.cpp): the handyman, 0x218 bytes on the Mac. Plain data at the Mac's offsets like CGuard above (the CStaff base, the CDelayedScript, the
 // thoughts and the Vehicle are built by the CStaff constructor and reached through casts). Every member is trivial. Names marked "invented" are guesses.
 // Unit w143 (untranslated before w184): the constructor CMMPlaceStaff::OnLeftClick calls on a fresh object; the pay grade is a CStaff::PayGrade on the Mac
 // (an int32_t here), the cell is the HIGH halfword of the register, `flag` is the sprite index and `value` the text id of the name.
@@ -822,7 +822,7 @@ public:
     void FinalDestroy();   // 0x100ff2e0 (180 bytes)
     void ReceiveMessage(const CMsg& message);   // 0x100ff3c4 (196 bytes), kind 5
 
-    // Unit w184 (src/Handyman.cpp).
+    // Unit w184 (src/game/people/Handyman.cpp).
     explicit CHandyman(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);   // 0x100fefd0 (132 bytes): the sprite index comes from a function static
     void Init(uint8_t sprite);   // 0x100ff1b8 (256 bytes)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x100ff4c0 (452 bytes)
@@ -881,12 +881,12 @@ static_assert(offsetof(CHandyman, mNext) == 0x20c, "mNext at 0x20c");
 static_assert(offsetof(CHandyman, mTimeStartedCleaning) == 0x210, "mTimeStartedCleaning at 0x210");
 static_assert(offsetof(CHandyman, mTargetLitterCell) == 0x214, "mTargetLitterCell at 0x214");
 static_assert(offsetof(CHandyman, mToiletToClean) == 0x216, "mToiletToClean at 0x216");
-// Unit w184 (src/Handyman.cpp): the constructor's function static (the sprite index it hands Init; names invented) and the two words __sinit_Handyman_cpp stores.
+// Unit w184 (src/game/people/Handyman.cpp): the constructor's function static (the sprite index it hands Init; names invented) and the two words __sinit_Handyman_cpp stores.
 extern uint8_t gHandymanSpriteGuard;    // 0x1034c20c the "sprite index is set up" flag
 extern int32_t gHandymanSprite;         // 0x1034c210 the sprite index (never incremented)
 extern uint32_t gHandymanSinitLow;      // 0x1034c218 __sinit_Handyman_cpp stores 0
 extern uint32_t gHandymanSinitHigh;     // 0x1034c214 ... and 0x10000 (nothing reads either)
-// Unit w187 (src/Mechanic.cpp): the mechanic, 0x218 bytes on the Mac. Plain data at the Mac's offsets like CHandyman above (the CStaff base, the CDelayedScript and
+// Unit w187 (src/game/people/mechanic.cpp): the mechanic, 0x218 bytes on the Mac. Plain data at the Mac's offsets like CHandyman above (the CStaff base, the CDelayedScript and
 // the Vehicle are built by the CStaff constructor and reached through casts). Every member is trivial. Names marked "invented" are guesses.
 // Unit w143 (untranslated before w187): the constructor CMMPlaceStaff::OnLeftClick calls on a fresh object; the pay grade is a CStaff::PayGrade on the Mac
 // (an int32_t here), the cell is the HIGH halfword of the register.
@@ -900,7 +900,7 @@ public:
     void FinalDestroy();   // 0x101043b0 (296 bytes)
     void ReceiveMessage(const CMsg& message);   // 0x10104508, 168 bytes, kind 4
 
-    // Unit w187 (src/Mechanic.cpp).
+    // Unit w187 (src/game/people/mechanic.cpp).
     explicit CMechanic(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);   // 0x1010409c (132 bytes): the sprite index comes from a function static
     void Init(uint8_t sprite);   // 0x10104284 (260 bytes)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x101045e8 (372 bytes)
@@ -944,12 +944,12 @@ static_assert(offsetof(CMechanic, mStateTurn) == 0x1fc, "mStateTurn at 0x1fc");
 static_assert(offsetof(CMechanic, mNext) == 0x20c, "mNext at 0x20c");
 static_assert(offsetof(CMechanic, mDurationOfRepair) == 0x210, "mDurationOfRepair at 0x210");
 static_assert(offsetof(CMechanic, mObjectToRepair) == 0x214, "mObjectToRepair at 0x214");
-// Unit w187 (src/Mechanic.cpp): the constructor's function static (the sprite index it hands Init) and the two words __sinit_mechanic_cpp stores (names invented).
+// Unit w187 (src/game/people/mechanic.cpp): the constructor's function static (the sprite index it hands Init) and the two words __sinit_mechanic_cpp stores (names invented).
 extern uint8_t gMechanicSpriteGuard;    // 0x1034c2c0 the "sprite index is set up" flag
 extern int32_t gMechanicSprite;         // 0x1034c2c4 the sprite index (never incremented)
 extern uint32_t gMechanicSinitLow;      // 0x1034c2cc __sinit_mechanic_cpp stores 0
 extern uint32_t gMechanicSinitHigh;     // 0x1034c2c8 ... and 0x10000 (nothing reads either)
-// Unit w188 (src/Researcher.cpp): the researcher, 0x214 bytes on the Mac. Plain data at the Mac's offsets like CHandyman and CMechanic above (the CStaff base, the
+// Unit w188 (src/game/people/Researcher.cpp): the researcher, 0x214 bytes on the Mac. Plain data at the Mac's offsets like CHandyman and CMechanic above (the CStaff base, the
 // CDelayedScript and the Vehicle are built by the CStaff constructor and reached through casts). Every member is trivial. Names marked "invented" are guesses.
 // There is no CResearcher::SetState on the Mac: the two forms its callers need are inlined in each of them.
 // Unit w143 (untranslated before w188): the constructor CMMPlaceStaff::OnLeftClick calls on a fresh object; the pay grade is a CStaff::PayGrade on the Mac
@@ -964,7 +964,7 @@ public:
     void FinalDestroy();   // 0x1012123c (120 bytes)
     void ReceiveMessage(const CMsg& message);   // 0x101212e4 (36 bytes), kind 8
 
-    // Unit w188 (src/Researcher.cpp).
+    // Unit w188 (src/game/people/Researcher.cpp).
     explicit CResearcher(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);   // 0x10120e34 (100 bytes): the sprite index comes from ESP_GetRandomSpritesFrom
     void Init(uint8_t sprite);   // 0x10121004 (180 bytes)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x101210e4 (292 bytes)
@@ -1004,7 +1004,7 @@ static_assert(offsetof(CResearcher, mGrade) == 0x1e4, "mGrade at 0x1e4");
 static_assert(offsetof(CResearcher, mStateTurn) == 0x1fc, "mStateTurn at 0x1fc");
 static_assert(offsetof(CResearcher, mNext) == 0x20c, "mNext at 0x20c");
 static_assert(offsetof(CResearcher, mTimeStartedResearching) == 0x210, "mTimeStartedResearching at 0x210");
-// Unit w188 (src/Researcher.cpp): the two words __sinit_Researcher_cpp stores (names invented; nothing reads either).
+// Unit w188 (src/game/people/Researcher.cpp): the two words __sinit_Researcher_cpp stores (names invented; nothing reads either).
 extern uint32_t gResearcherSinitLow;    // 0x1034c4b4 __sinit_Researcher_cpp stores 0
 extern uint32_t gResearcherSinitHigh;   // 0x1034c4b0 ... and 0x10000
 class CStaffHQ {
@@ -1019,19 +1019,19 @@ public:
     void StopStrikeInProgress(StaffType type);   // 0x1012be24 (20 bytes)
     void PickUpStaff(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> staff);   // 0x1012c100 (the id is the HIGH halfword of the register)
 
-    // Unit v5037: toggles the forced strike flag (mF64) for the staff type (src/ParkMessages_CStaffHQ_DropStaff.cpp).
+    // Unit v5037: toggles the forced strike flag (mF64) for the staff type (src/game/buildings/StaffHQ.cpp).
     void ForceStrike(StaffType type);   // 0x1012c04c (128 bytes)
 
-    // Unit v5681 (src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_ConsiderStriking.cpp): the monthly strike check for one staff type.
+    // Unit v5681 (src/game/buildings/StaffHQ.cpp): the monthly strike check for one staff type.
     void ConsiderStriking(StaffType type);   // 0x1012b084 (1076 bytes)
     int32_t StaffTypeHasAGrievance(StaffType type);   // 0x1012b56c (2100 bytes, stand-in)
 
     // Unit w123a: direct dispatch callees, untranslated.
     void FinalDestroy();   // 0x1012a998
-    CStaffHQ();   // 0x1012a7fc, 304 bytes (0x68 bytes on the Mac; src/ThingCtors.cpp, unit w122a)
+    CStaffHQ();   // 0x1012a7fc, 304 bytes (0x68 bytes on the Mac; src/game/buildings/StaffHQ.cpp, unit w122a)
     void ReceiveMessage(const CMsg& message);   // 0x1012a9e8, 492 bytes, kind 9
 
-    // Unit v5918 (src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_Serialise.cpp).
+    // Unit v5918 (src/game/buildings/StaffHQ.cpp).
     void UpdateMonthly();   // 0x1012ae40 (532 bytes)
     // 0x1012be78 (368 bytes; hidden result pointer): the id of the available guard nearest to this object's own cell (0 when none).
     tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> FindNearestAvailableGuard(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);
@@ -1055,7 +1055,7 @@ static_assert(offsetof(CStaffHQ, mTraining) == 0xc, "CStaffHQ::mTraining at 0xc"
 static_assert(offsetof(CStaffHQ, mStrikes) == 0x24, "CStaffHQ::mStrikes at 0x24");
 static_assert(offsetof(CStaffHQ, mF60) == 0x60, "CStaffHQ::mF60 at 0x60");
 static_assert(offsetof(CStaffHQ, mF64) == 0x64, "CStaffHQ::mF64 at 0x64");
-// Unit v51002 (src/ParkMessages_SAVEVARSTRUCT_3.cpp).
+// Unit v51002 (src/game/buildings/StaffHQ.cpp, src/game/people/Person.cpp, src/game/buildings/ResearchLab.cpp).
 template<class Value> int32_t LOADVARSTRUCT(void* file, Value* value, const char* name, int32_t noLog);
 template<class Value> int32_t SAVEVARSTRUCT(void* file, Value* value, const char* name, int32_t noLog);
 template<> int32_t SAVEVARSTRUCT<CStaffHQ::StrikeType>(void*, CStaffHQ::StrikeType*, const char*, int32_t);   // 0x1012c3d4, 264 B
@@ -1065,11 +1065,11 @@ class CMsgStaffHQPrank : public CMsg {
 public:
     uint16_t mPerp;   // 0x08
 };
-// Unit v5918: halfwords of initialised data (zero), defined in src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_Serialise.cpp (names invented).
+// Unit v5918: halfwords of initialised data (zero), defined in src/game/buildings/StaffHQ.cpp (names invented).
 extern uint16_t gStaffHQNoGuard;        // 0x102a11bc
 extern uint16_t gStaffHQNoStaff[5];     // 0x102a11be .. 0x102a11c6, indexed by staff type
 extern uint16_t gStaffHQGuardListEnd;   // 0x102a11dc
-// 0x102a11c8 .. 0x102a11da (names invented; src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_Serialise_CStaffHQ_StaffTypeHasAGrievance.cpp): the id that ends
+// 0x102a11c8 .. 0x102a11da (names invented; src/game/buildings/StaffHQ.cpp): the id that ends
 // each staff list StaffTypeHasAGrievance walks, two per staff type (fatigue, then unhappiness); zero at start.
 extern uint16_t gStaffHQGrievanceEnd[10];
 // Unit v5681: the lazy creation of the message centre, split out so the test library can fake it. The src file gives weak
@@ -1085,7 +1085,7 @@ public:
 
     // Unit w123a: direct dispatch callees, untranslated.
     void FinalDestroy();   // 0x101052f4
-    CMechanicHQ();   // 0x1010521c, 176 bytes (0xe bytes; src/ThingCtors.cpp, unit w122a)
+    CMechanicHQ();   // 0x1010521c, 176 bytes (0xe bytes; src/game/buildings/MechanicHQ.cpp, unit w122a)
     void ReceiveMessage(const CMsg& message);   // 0x10105988, 876 bytes, kind 10
     // Unit w187 (untranslated): the mechanic's next job, the ride to repair (0 for none). The Mac answers the two-byte id through a hidden pointer.
     tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> GetNewJob(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> mechanic);   // 0x10105450 (876 bytes)
@@ -1103,11 +1103,11 @@ public:
 
     // Unit w123a: direct dispatch callees, untranslated.
     void FinalDestroy();   // 0x1012c5f8
-    CTagSystem();   // 0x1012c57c, 84 bytes (0x80e bytes; src/ThingCtors.cpp, unit w122a)
+    CTagSystem();   // 0x1012c57c, 84 bytes (0x80e bytes; src/game/Thing.cpp, unit w122a)
     void ReceiveMessage(const CMsg& message);   // 0x1012c90c, 760 bytes, kind 12
     void Init();    // 0x1012c6b8 (556 bytes, untranslated): subscribes to the message types 7, 0xc, 0x14, 0x18, 0x19 and 0x13; writes no field
 
-    // Unit v5626: 0x1012cc3c (4308 bytes, src/ThingLoop_CTagSystem_FormatTagText.cpp). The tag's text into mF0C (0x400 wide
+    // Unit v5626: 0x1012cc3c (4308 bytes, src/game/Thing.cpp). The tag's text into mF0C (0x400 wide
     // characters): a NULL element gives the empty text and 0; otherwise by the element's format (0 to 0x24, a jump table) the UI
     // string table formats the element's text id with integer and string tags built from `value`, the balance table or the
     // challenge. Answers 0 when the thing or the ride type is the "none" id or the thing is gone, else 1. The thing id rides in
@@ -1128,7 +1128,7 @@ struct TagTableElement {
 };
 extern uint16_t gTagNoThingId;    // 0x102a1214, original name unknown: the thing id FormatTagText's format 1 refuses
 extern uint16_t gTagNoRideType;   // 0x102a1216, original name unknown: the ride type FormatTagText's format 2 refuses
-// Unit v5960 (src/MsgDeath_CThoughts_Serialise_LOADVARSTRUCT_3.cpp). The tag table: 0x17e elements of 0x20 bytes at 0x102a12c0, the first word of
+// Unit v5960 (src/game/Thing.cpp). The tag table: 0x17e elements of 0x20 bytes at 0x102a12c0, the first word of
 // element i is normally i. Elements 0x17e and 0x17f are never answered. The bytes at +4 (word), +8 (halfword), +0x10, +0x14, +0x18 (words) are copied into the tag.
 extern TagTableElement gTagTable[0x17e];   // 0x102a12c0, original name unknown
 class CTagTable {
@@ -1159,13 +1159,13 @@ public:
     // Unit w205 (untranslated): a stand-in called by CWorld::Save.
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x10121ce8 (744 bytes)
 
-    CResearchLab();   // 0x10121ad0, 128 bytes (0x146c bytes; src/ThingCtors.cpp, unit w122a)
-    void Init();      // 0x10121bd4 (232 bytes, src/ResearchLab_init.cpp, unit w130): CWorld::SetupNewLevel calls it on the world's research lab
+    CResearchLab();   // 0x10121ad0, 128 bytes (0x146c bytes; src/game/buildings/ResearchLab.cpp, unit w122a)
+    void Init();      // 0x10121bd4 (232 bytes, src/game/buildings/ResearchLab.cpp, unit w130): CWorld::SetupNewLevel calls it on the world's research lab
     void SetupProjects();     // 0x10122004 (368 bytes, unit w130)
     void SetupCategories();   // 0x101221a8 (208 bytes, unit w130)
     void ReceiveMessage(const CMsg& message);   // 0x10123144, 716 bytes, kind 14
 
-    // Unit w211 (src/ResearchLab_projects.cpp): the projects, the efforts and the outputs. A category is 0 to 4 (a group: 4 is the statistics
+    // Unit w211 (src/game/buildings/ResearchLab.cpp): the projects, the efforts and the outputs. A category is 0 to 4 (a group: 4 is the statistics
     // upgrades), 5 means all of them where a function accepts it; the group arguments index the five categories unchecked (as the Mac does).
     void FinalDestroy();                                          // 0x10121b7c (36 bytes): the thing's own FinalDestroy
     void ContributeResearch(uint32_t points);                     // 0x101222ac (260 bytes; the Mac's unsigned long): the points shared over the categories by effort
@@ -1232,17 +1232,17 @@ public:
 
     // Unit w123a: direct dispatch callees, untranslated.
     void UpdateTurn();   // 0x10138670
-    void FinalDestroy();   // 0x10137f3c, 52 bytes (src/Weather.cpp, unit w181)
-    CWeather();   // 0x10137da0, 376 bytes (0x68 bytes; src/ThingCtors.cpp, unit w122a)
-    void ReceiveMessage(const CMsg& message);   // 0x1013855c, 224 bytes, kind 15 (src/Weather.cpp, unit w181)
+    void FinalDestroy();   // 0x10137f3c, 52 bytes (src/game/park/Weather.cpp, unit w181)
+    CWeather();   // 0x10137da0, 376 bytes (0x68 bytes; src/game/park/Weather.cpp, unit w122a)
+    void ReceiveMessage(const CMsg& message);   // 0x1013855c, 224 bytes, kind 15 (src/game/park/Weather.cpp, unit w181)
     // 0x10138e70 (352 bytes, untranslated): the new weather quality (the name is inferred); it draws one to three random numbers.
     uint32_t FindNewQuality() const;
-    // Unit w124 (src/Weather_turn.cpp): untranslated callees of UpdateTurn, and the two stamps it compares (held as plain words, see TbTimeDiff.h).
-    void SetPrecipitationType(PrecipitationType type);   // 0x10139388, 256 bytes (src/Things2_small.cpp, unit w130)
-    void FindLightningCoords(D3DVECTOR& start, D3DVECTOR& end, int32_t strikesLeft);   // 0x10138c10, 528 bytes (src/Weather.cpp, unit w181; strikesLeft unused)
+    // Unit w124 (src/game/park/Weather.cpp): untranslated callees of UpdateTurn, and the two stamps it compares (held as plain words, see TbTimeDiff.h).
+    void SetPrecipitationType(PrecipitationType type);   // 0x10139388, 256 bytes (src/game/park/Weather.cpp, unit w130)
+    void FindLightningCoords(D3DVECTOR& start, D3DVECTOR& end, int32_t strikesLeft);   // 0x10138c10, 528 bytes (src/game/park/Weather.cpp, unit w181; strikesLeft unused)
     TbTimeStamp* ForecastTime() { return reinterpret_cast<TbTimeStamp*>(&mForecast); }   // the forecast's time, +0x20
     TbTimeStamp* StampF10() { return reinterpret_cast<TbTimeStamp*>(&mF10); }            // +0x10
-    // Unit w181 (src/Weather.cpp)
+    // Unit w181 (src/game/park/Weather.cpp)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x10137f9c, 1424 bytes
     void SetQuality(int32_t quality);   // 0x10139000, 860 bytes
     void SetWindDirection(float direction);   // 0x101394d0, 168 bytes
@@ -1261,7 +1261,7 @@ public:
     float mF48, mF4C, mF50;     // 0x48  mLastLightningLocation (D3DVECTOR_SWAPABLE); never written by the constructor
     uint32_t mF54;              // 0x54  mRainSoundHandle (a MacLong in the save); cleared
     uint32_t mF58;              // 0x58  mPType (PrecipitationType); never written by the constructor
-    float mWindDirection;       // 0x5c  mWindDir (the save name); 0.0f, then 90.0f (src/DynamicCells.cpp reads it as degrees)
+    float mWindDirection;       // 0x5c  mWindDir (the save name); 0.0f, then 90.0f (src/game/park/DynamicCell.cpp reads it as degrees)
     float mWindForce;           // 0x60  mWindForce; 0.5f
     uint8_t mF64;               // 0x64  mOverridden (bool; ReceiveMessage ignores a quality message when set); cleared
 };
@@ -1276,14 +1276,14 @@ class CBankAccount {
 public:
 
     // Unit w123a: direct dispatch callees, untranslated.
-    void FinalDestroy();   // 0x100f2cb8 (36 bytes, src/BankAccount_loans.cpp, unit w177)
-    CBankAccount();   // 0x100f29f4, 664 bytes, src/BankAccount_ctor.cpp, unit w122b (0x128 bytes)
-    void ReceiveMessage(const CMsg& message);   // 0x100f3564, 264 bytes, kind 16 (src/BankAccount_loans.cpp, unit w177)
-    void SetAdmissionFee(uint32_t fee);   // 0x100f3a40 (80 bytes, src/BankAccount_ctor.cpp, unit w122b)
-    void MakeWithdrawal(uint32_t amount);   // 0x100f33b0 (172 bytes, src/Things2_small.cpp, unit w130; unit w126: CObject::CObject pays the ride's cost of upgrade with it)
-    int32_t GetBalance() const;   // 0x100f32b4 (src/ParkMessages.cpp, unit w161; unit w139's CTrackCell::ModifyType asks it): mBalance
-    void MakeDeposit(uint32_t amount);   // 0x100f32ec (144 bytes, src/BankAccount_loans.cpp, unit w177)
-    // Unit w177 (src/BankAccount_loans.cpp)
+    void FinalDestroy();   // 0x100f2cb8 (36 bytes, src/game/park/BankAccount.cpp, unit w177)
+    CBankAccount();   // 0x100f29f4, 664 bytes, src/game/park/BankAccount.cpp, unit w122b (0x128 bytes)
+    void ReceiveMessage(const CMsg& message);   // 0x100f3564, 264 bytes, kind 16 (src/game/park/BankAccount.cpp, unit w177)
+    void SetAdmissionFee(uint32_t fee);   // 0x100f3a40 (80 bytes, src/game/park/BankAccount.cpp, unit w122b)
+    void MakeWithdrawal(uint32_t amount);   // 0x100f33b0 (172 bytes, src/game/park/BankAccount.cpp, unit w130; unit w126: CObject::CObject pays the ride's cost of upgrade with it)
+    int32_t GetBalance() const;   // 0x100f32b4 (src/game/park/BankAccount.cpp, unit w161; unit w139's CTrackCell::ModifyType asks it): mBalance
+    void MakeDeposit(uint32_t amount);   // 0x100f32ec (144 bytes, src/game/park/BankAccount.cpp, unit w177)
+    // Unit w177 (src/game/park/BankAccount.cpp)
     // 0x100f3490 (160 bytes): the funny time since the balance went negative (ticks 0 when the last balance is not negative).
     TbTimeDiff BeenInTheRedFor();
     // 0x100f3ac8 (212 bytes): deposits the admission fee, adds it to the admissions history and tells the analyser a visitor paid it.
@@ -1300,7 +1300,7 @@ public:
     int32_t GetProfitThisYear() const;
     // 0x100f43dc (84 bytes): the sum of OutstandingOnLoan over the eight loans.
     uint32_t TotalOutstandingOnLoans() const;
-    // Unit w173 (src/BankAccount.cpp)
+    // Unit w173 (src/game/park/BankAccount.cpp)
     // 0x100f2d10 (1,392 bytes): CThing::Serialise, then (versions 0 and 1 only) the seven account words and the eight loans' eight words, by the save flag.
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);
     // 0x100f36a8 (752 bytes): adds the batch to the balance, pays every bought loan's monthly instalment, and posts a CMsgEvent(2) once six months in the red.
@@ -1334,7 +1334,7 @@ public:
 
     // Unit w123a: direct dispatch callees, untranslated.
     void FinalDestroy();   // 0x101308d0
-    CUIMsgReceiver();   // 0x101305b0, 756 bytes (0xc bytes; src/ThingCtors.cpp, unit w122a)
+    CUIMsgReceiver();   // 0x101305b0, 756 bytes (0xc bytes; src/game/ui/vector2d.cpp, unit w122a)
     void ReceiveMessage(const CMsg& message);   // 0x10130998, 364 bytes, kind 17
 
     CThing mBase;   // 0x00  model 17: the whole object
@@ -1353,7 +1353,7 @@ public:
     int32_t SetDest(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell);   // 0x102131e0
     int32_t SetDest(MapPos x, MapPos y);   // 0x102132a0
     void Teleport(MapPos x, MapPos y);   // 0x1021334c
-    // Unit v5133 (src/COnlinePerson_SetDest.cpp): fields by Mac offset: +4/+6 MapPos, +0xc CDelayedScript, +0x19c name, +0x39c state, +0x3a0 own-avatar byte.
+    // Unit v5133 (src/game/online/OnlinePerson.cpp): fields by Mac offset: +4/+6 MapPos, +0xc CDelayedScript, +0x19c name, +0x39c state, +0x3a0 own-avatar byte.
     void ProcessIdle();             // 0x102133e4 (4 bytes, untranslated)
     void ProcessWalkingToDest();    // 0x1021341c (240 bytes)
 };
@@ -1363,23 +1363,23 @@ public:
 
     // Unit w123a: direct dispatch callees, untranslated.
     void UpdateTurn();   // 0x100f6b98
-    void FinalDestroy();   // 0x100f6b60 (translated in src/ChallengeHQ_progress.cpp, unit w175)
-    CChallengeHQ();   // 0x100f6640, 416 bytes, src/ChallengeHQ_ctor.cpp, unit w122b (0x3e4 bytes)
-    void ReceiveMessage(const CMsg& message);   // 0x100f75e4, 1656 bytes, kind 19 (translated in src/ChallengeHQ_progress.cpp, unit w175)
-    void Init();                     // 0x100f6904 (412 bytes, src/ChallengeHQ_init.cpp, unit w123b)
-    // Unit w130 (src/ChallengeHQ_offer.cpp): AddChallenge, ClearInvalidFollowups, IsSystemOn and OfferNextChallenge are translated.
-    bool TellPlayerChallengeOffered(CChallenge* challenge, bool force);   // 0x100f8194 (translated in src/ChallengeHQ_progress.cpp, unit w175)
+    void FinalDestroy();   // 0x100f6b60 (translated in src/game/park/ChallengeHQ.cpp, unit w175)
+    CChallengeHQ();   // 0x100f6640, 416 bytes, src/game/park/ChallengeHQ.cpp, unit w122b (0x3e4 bytes)
+    void ReceiveMessage(const CMsg& message);   // 0x100f75e4, 1656 bytes, kind 19 (translated in src/game/park/ChallengeHQ.cpp, unit w175)
+    void Init();                     // 0x100f6904 (412 bytes, src/game/park/ChallengeHQ.cpp, unit w123b)
+    // Unit w130 (src/game/park/ChallengeHQ.cpp): AddChallenge, ClearInvalidFollowups, IsSystemOn and OfferNextChallenge are translated.
+    bool TellPlayerChallengeOffered(CChallenge* challenge, bool force);   // 0x100f8194 (translated in src/game/park/ChallengeHQ.cpp, unit w175)
     // Unit w123b: untranslated (launcher stand-ins). Init builds a CChallenge for each of the level's challenge rows and hands it to AddChallenge, then
     // calls ClearInvalidFollowups once.
     void AddChallenge(CChallenge& challenge);   // 0x100f7498 (164 bytes)
     void ClearInvalidFollowups();               // 0x100f680c (188 bytes)
-    // Unit w124 (src/ChallengeHQ_turn.cpp): untranslated callees of UpdateTurn.
+    // Unit w124 (src/game/park/ChallengeHQ.cpp): untranslated callees of UpdateTurn.
     bool IsSystemOn();                          // 0x100f7c98
-    CChallenge* GetCurrentChallenge();          // 0x100f757c (translated in src/ChallengeHQ_progress.cpp, unit w175)
+    CChallenge* GetCurrentChallenge();          // 0x100f757c (translated in src/game/park/ChallengeHQ.cpp, unit w175)
     void OfferNextChallenge(bool force);        // 0x100f7dd8
-    void EndCurrentChallenge();                 // 0x100f86d8 (translated in src/ChallengeHQ_progress.cpp, unit w175)
-    void WonCurrentChallenge();                 // 0x100f87d4 (translated in src/ChallengeHQ_progress.cpp, unit w175)
-    // Unit w175 (src/ChallengeHQ_progress.cpp)
+    void EndCurrentChallenge();                 // 0x100f86d8 (translated in src/game/park/ChallengeHQ.cpp, unit w175)
+    void WonCurrentChallenge();                 // 0x100f87d4 (translated in src/game/park/ChallengeHQ.cpp, unit w175)
+    // Unit w175 (src/game/park/ChallengeHQ.cpp)
     int32_t Serialise(void* file, int32_t save, int32_t version, uint32_t unused);   // 0x100f6fe0 (784 bytes)
     void AddToCounter(ChallengeType type, int32_t amount, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> obj,
                       tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> thing);   // 0x100f7324 (216 bytes)
@@ -1405,7 +1405,7 @@ static_assert(offsetof(CChallengeHQ, mNextChallengeEventTime) == 0x3d0, "CChalle
 static_assert(offsetof(CChallengeHQ, mSystemSwitchedOn) == 0x3d8, "CChallengeHQ::mSystemSwitchedOn");
 static_assert(offsetof(CChallengeHQ, mValue) == 0x3dc, "CChallengeHQ::mValue");
 static_assert(offsetof(CChallengeHQ, mActualThing) == 0x3e0, "CChallengeHQ::mActualThing");
-// Unit v5889 (src/Mechanic_CMechanicHQ_GetNewJob.cpp): the halfwords the mechanic HQ compares thing ids with (all zero; original names unknown).
+// Unit v5889 (src/game/buildings/MechanicHQ.cpp): the halfwords the mechanic HQ compares thing ids with (all zero; original names unknown).
 extern uint16_t gMechHQId102a0b9a;   // 0x102a0b9a  GetNewJob: the cursor means "start from the head"
 extern uint16_t gMechHQId102a0b9c;   // 0x102a0b9c  GetNewJob: end of the list walk looking for the cursor
 extern uint16_t gMechHQId102a0b9e;   // 0x102a0b9e  GetNewJob: the walk ended without finding the cursor
@@ -1418,7 +1418,7 @@ extern uint16_t gMechHQId102a0baa;   // 0x102a0baa  ReceiveMessage: the mechanic
 extern uint16_t gMechHQId102a0bac;   // 0x102a0bac  ReceiveMessage: end of the mechanic list
 extern uint16_t gMechHQId102a0bae;   // 0x102a0bae  ReceiveMessage: a mechanic with no ride to repair
 
-// Unit v51052 (src/ParkMessages_CStaffHQ_DropStaff_CStaffHQ_Serialise_CStaffHQ_PickUpStaff.cpp). The static initialisers store 0x10000 in the first
+// Unit v51052 (src/game/buildings/StaffHQ.cpp, src/game/Thing.cpp). The static initialisers store 0x10000 in the first
 // word and 0 in the second (names invented). The destructors are the Mac's deleting forms as free functions (flag in r4, answer this).
 namespace v51052_callee { void OperatorDelete(void* block); }   // 0x10238218
 void UIMain_DestroyWString(void* object);   // 0x103bcbb8

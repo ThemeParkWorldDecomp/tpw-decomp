@@ -1,5 +1,5 @@
 """Unit v5370, CPerson::SetState, against libtpw_unit_CPerson_SetState.dylib (tests/unit_CPerson_SetState.cpp), main app
-("SimTheme Park"), src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_SetState.cpp:
+("SimTheme Park"), src/game/people/PersonQueue.cpp:
   CPerson::SetState 0x10120354
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

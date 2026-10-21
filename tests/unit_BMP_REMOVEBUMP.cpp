@@ -1,5 +1,5 @@
 // Test library for the bump removal (unit v5087; libtpw_unit_BMP_REMOVEBUMP.dylib, tests/test_BMP_REMOVEBUMP.py), main app:
-//   src/BMP_REMOVEBUMP.cpp   BMP_REMOVEBUMP, BMP_DOCK, RemovePeepsFromBump, FindTargetBump (and gAdvisorThingId)
+//   src/game/rides/BumperRide.cpp   BMP_REMOVEBUMP, BMP_DOCK, RemovePeepsFromBump, FindTargetBump (and gAdvisorThingId)
 //
 // The callees outside the unit are recording fakes (same event names and arguments as the PowerPC stubs, answers from the
 // test's queues); the globals of other files the unit reads are defined here, zero at start like the Mac's bss.

@@ -1,5 +1,5 @@
-"""Unit w209, against libtpw_unit_VehiclePath.dylib (tests/unit_VehiclePath.cpp), main app ("SimTheme Park"), src/Vehicle_path.cpp and
-src/VehicleCallbacks_map.cpp:
+"""Unit w209, against libtpw_unit_VehiclePath.dylib (tests/unit_VehiclePath.cpp), main app ("SimTheme Park"), src/game/rides/vehicle.cpp and
+src/game/rides/VehicleCallbacks.cpp:
   vehicle.cpp       Follow_Path::calculate 0x10132d7c, Vehicle::next_step 0x10133564, Vehicle::recalc_path 0x10133be4, Vehicle::is_stuck 0x101342ac,
                     Pilot::init_behaviours 0x10134404, Pilot::Pilot 0x10134610
   VehicleCallbacks  map_global_to_local 0x101359e8, map_fn 0x10135fd4
@@ -83,7 +83,7 @@ def s32(v):
 
 
 def fixmul(a, b):
-    """FixMul as src/fixmath.cpp (and the module test_vector2d) define it: rounds half away from zero, saturates."""
+    """FixMul as src/game/park/GoldenTickets.cpp (and the module test_vector2d) define it: rounds half away from zero, saturates."""
     p = a * b
     p += 0x8000 if p >= 0 else -0x8000
     return max(INT_MIN, min(INT_MAX, p >> 16))

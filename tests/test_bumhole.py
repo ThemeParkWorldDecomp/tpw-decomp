@@ -1,5 +1,5 @@
 """Unit v5143, the bumhole window's message function, ToggleGameWindow and SetOnOffText, against libtpw_unit_bumhole.dylib
-(tests/unit_bumhole.cpp), main app ("SimTheme Park"), src/ui_mainpanel2_window_bumhole.cpp:
+(tests/unit_bumhole.cpp), main app ("SimTheme Park"), src/game/ui/ui_mainpanel2.cpp, src/game/ui/ui_optionsPanel.cpp:
   bumhole 0x101a886c, ToggleGameWindow 0x101a8ac0, SetOnOffText 0x101a8e60
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

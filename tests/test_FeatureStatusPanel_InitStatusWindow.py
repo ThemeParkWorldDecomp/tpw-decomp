@@ -1,5 +1,5 @@
 """Unit v5676, FeatureStatusPanel::InitStatusWindow, against libtpw_unit_FeatureStatusPanel_InitStatusWindow.dylib
-(tests/unit_FeatureStatusPanel_InitStatusWindow.cpp), main app ("SimTheme Park"), src/FeatureStatusPanel_UpdateStatusWindow_FeatureStatusPanel_InitStatusWindow.cpp:
+(tests/unit_FeatureStatusPanel_InitStatusWindow.cpp), main app ("SimTheme Park"), src/game/ui/ui_FeatureStatus.cpp:
   FeatureStatusPanel::InitStatusWindow 0x1019e454
 
 A case is a panel whose +0x10 is NULL or a parent block holding four child windows (offset 0x200 * (id - 0x1583)), each with a table

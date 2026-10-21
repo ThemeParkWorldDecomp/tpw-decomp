@@ -1,4 +1,4 @@
-// Differential library for unit w211: the research lab's projects, efforts and outputs (src/ResearchLab_projects.cpp: CResearchLab::FinalDestroy to
+// Differential library for unit w211: the research lab's projects, efforts and outputs (src/game/buildings/ResearchLab.cpp: CResearchLab::FinalDestroy to
 // GetResearchOutputFromCategory, 21 functions, and CResearchProject::SetupProject to GetRemainingPoints, 5 functions).
 //
 // Every callee outside those is a fake that records the same event as the PowerPC side's stub (see test_ResearchProjects.py): the ride database, both

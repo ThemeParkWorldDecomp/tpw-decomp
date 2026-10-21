@@ -1,11 +1,11 @@
 // Test entry points for the version 0x13 wavelet decoder (library unit_WaveletDecode:
-// src/Wavelet_decode.cpp, and src/tb_resource_texture.cpp for CTextureSettings::GetAlphaMask,
+// src/engine/EngineUtil.cpp, src/engine/Wavelet.cpp, and src/engine/tb_resource_texture.cpp for CTextureSettings::GetAlphaMask,
 // which the decoder calls). tests/test_WaveletDecode.py drives them.
 //
-// Fakes: the rest of CWaveletImp is src/Wavelet.cpp's (unit EngineStartup) or untranslated;
+// Fakes: the rest of CWaveletImp is src/engine/Wavelet.cpp's (unit EngineStartup) or untranslated;
 // its vtable still needs every virtual member, so they are defined here. The only one the
 // unit can reach is Decompress_v12 (the dispatch's version 0x12), a recording fake. The
-// decoder's workspace pointer belongs to src/Wavelet.cpp too; the test points it at a buffer.
+// decoder's workspace pointer belongs to src/engine/EngineUtil.cpp, src/engine/Wavelet.cpp too; the test points it at a buffer.
 #include <cstdint>
 #include <cstring>
 #include <new>
@@ -25,7 +25,7 @@ CWaveletImp::~CWaveletImp() {}
 int32_t CWaveletImp::AddRef() { return ++mReferences; }
 int32_t CWaveletImp::GetRefCount() { return mReferences; }
 int32_t CWaveletImp::Release() { return --mReferences; }
-// The fast path's decoders (untranslated; the dispatcher is src/Wavelet_decode.cpp's).
+// The fast path's decoders (untranslated; the dispatcher is src/engine/EngineUtil.cpp, src/engine/Wavelet.cpp's).
 void CWaveletImp::DecompressColorFast(uint32_t, uint32_t, const uint8_t*, uint8_t*, float, float, float) {
     ev("DecompressColorFast");
 }

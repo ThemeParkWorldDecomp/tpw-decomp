@@ -1,5 +1,5 @@
 """Unit v5534, the ride status panel's window handler, against libtpw_unit_RideStatusMsg.dylib (tests/unit_RideStatusMsg.cpp), main app
-("SimTheme Park"), src/sinit_ui_RideStatus_cpp_RideStatusMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_RideStatus.cpp:
   RideStatusMsg 0x101bbd78
 
 A case is a message with its two arguments. The world is built twice by one piece of Python code. Every callee (the panel's methods, the

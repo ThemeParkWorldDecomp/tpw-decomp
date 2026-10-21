@@ -1,4 +1,4 @@
-// Unit w85: TrueTypeRender (src/TrueTypeRender.cpp). Every callee outside the unit is a fake that appends a line to a text
+// Unit w85: TrueTypeRender (src/game/rides/RideSign.cpp). Every callee outside the unit is a fake that appends a line to a text
 // log (tpw_ttr_log); tests/test_TrueTypeRender.py builds the same lines on the PowerPC side and compares the two logs.
 //
 // What is faked: the file read (TPFile_Read, over a byte blob the test hands in) and _USwapBlock32; the eleven GDI calls

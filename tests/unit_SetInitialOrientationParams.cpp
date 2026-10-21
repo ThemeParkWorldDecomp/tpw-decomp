@@ -1,6 +1,6 @@
 // Test library for the small coaster, heightfield and mesh helpers (unit v51074; libtpw_unit_SetInitialOrientationParams.dylib,
 // tests/test_SetInitialOrientationParams.py), main app:
-//   src/DestroyCoasterPylons_SetupBraceBezierCtrlParams_SetInitialOrientationParams.cpp
+//   src/game/TPLevel.cpp, src/game/TPMesh.cpp, src/game/park/TPHField.cpp, src/game/park/TPHoardings.cpp, src/game/rides/CoasterEdit.cpp, src/game/rides/CoasterSpline.cpp, src/game/rides/CoasterTrack.cpp
 //
 // The callees outside the unit are fakes that record what the real one reads (BezierPosition, CTRACE, FlagGenerateTrack,
 // FindCoasterInstanceFromEntranceID, DisableCurrentPylonEditState, SetPylonType, DeleteLastTrackBrace, RecordAction,

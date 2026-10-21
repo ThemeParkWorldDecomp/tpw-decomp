@@ -1,5 +1,5 @@
 """Unit v5912, Email::Email (the constructor) and Email::Callback (the mail connection's callback), against
-libtpw_unit_Email_Callback_2.dylib (tests/unit_Email_Callback_2.cpp), main app ("SimTheme Park"), src/Email_Send_Email_Callback_2.cpp:
+libtpw_unit_Email_Callback_2.dylib (tests/unit_Email_Callback_2.cpp), main app ("SimTheme Park"), src/game/online/EmailMessage.cpp:
   Email::Callback 0x10202a54, Email::Email 0x10202244
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory for the original, host memory for the

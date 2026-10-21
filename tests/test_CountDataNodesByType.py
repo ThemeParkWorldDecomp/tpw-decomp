@@ -1,6 +1,6 @@
 """Unit v5962, the embedded-entry counters, EnableRideHead, bthread_cond and CalculateOrientFromTrackMorph, against
 libtpw_unit_CountDataNodesByType.dylib (tests/unit_CountDataNodesByType.cpp), main app ("SimTheme Park"),
-src/advisor_leaves_CountDataNodesByType.cpp:
+src/game/TPEmbed.cpp, src/game/online/bthread.cpp:
   CountDataNodesByType 0x101fff0c, FindNthDataNodeIndex 0x101ffe74, EnableRideHead 0x10200230, bthread_cond::bthread_cond 0x10200e34,
   bthread_cond::~bthread_cond 0x10200ea8, bthread_cond::wait 0x10200f30, CalculateOrientFromTrackMorph 0x101fec54
 

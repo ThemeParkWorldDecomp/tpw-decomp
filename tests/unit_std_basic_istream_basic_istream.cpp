@@ -1,6 +1,6 @@
 // Test library for nine functions of the main app (unit v51047; libtpw_unit_std_basic_istream_basic_istream.dylib,
 // tests/test_std_basic_istream_basic_istream.py), main app:
-//   src/std_basic_istream_basic_istream.cpp   std::basic_istream<char>::basic_istream, CUIGrapher::Clear and constructor,
+//   src/game/save/FS_LoadSave.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/UIGrapher.cpp, src/game/ui/ui_2dmap.cpp   std::basic_istream<char>::basic_istream, CUIGrapher::Clear and constructor,
 //   CFSLoadSave::GetNextSaveFileDetails, CUI2DMapSprite destructor, SetVisibility, SetScale, entry, InterfaceKnob::operator-.
 //
 // The callees outside the unit are recording fakes (std::ios_base::init, basic_ios::widen, LbDraw_RectangleFilled, TPUniStrEq,

@@ -211,7 +211,7 @@ public:
     }
 };
 
-// The two formats the cursor pictures go through (InterfaceBFCursor::LoadData, src/ui_cursors.cpp):
+// The two formats the cursor pictures go through (InterfaceBFCursor::LoadData, src/game/ui/InterfaceBFCursor.cpp):
 // NOT translations of the Mac's (0x28-byte 8-bit and 32ARGB implementations, untranslated and
 // untested), only what reading those pictures needs. Format 9: bytes alpha, red, green, blue.
 class UPixels32ARGB : public UPixelsImplementation {

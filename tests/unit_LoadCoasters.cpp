@@ -1,5 +1,5 @@
 // Test library for LoadCoasters (unit v5372; libtpw_unit_LoadCoasters.dylib, tests/test_LoadCoasters.py), main app:
-//   src/LoadCoasters.cpp   LoadCoasters
+//   src/game/rides/TPCoaster.cpp   LoadCoasters
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; LbFile_Read hands out
 // the case's file bytes. The globals of other files the unit reads, defined here, are zero at start like the Mac's bss.

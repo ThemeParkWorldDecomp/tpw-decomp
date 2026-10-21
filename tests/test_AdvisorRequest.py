@@ -1,5 +1,5 @@
 """w103: the advisor request's constructors and SetScore, CAdvisor::CancelMessage, PlayLastTutorialMessage and GetTypePlaying,
-and CWorld::GetAdvisor, original code on one side and src/AdvisorRequest.cpp and src/World_GetAdvisor.cpp on the other.
+and CWorld::GetAdvisor, original code on one side and src/game/advisor/Advisor.cpp and src/game/World.cpp on the other.
 
 Run for real on both sides: the request constructors, Valid, the queue's CanIQueueThis and the two slot scans (unit w100) and the
 CTimeSig reads they make. Recording fakes at their real addresses: the scoring constructor and queries (GetScoreFor also records the

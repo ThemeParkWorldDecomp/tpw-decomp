@@ -1,4 +1,4 @@
-// Test library for src/tb_loadmanager.cpp (libtpw_unit_LoadManager.dylib; see
+// Test library for src/engine/CsTexture.cpp, src/engine/TextureLoadManager.cpp (libtpw_unit_LoadManager.dylib; see
 // tests/test_LoadManager.py): two CsTexture objects, two texture records, the texture
 // load manager's table and the delayed-load list, driven by scripts.
 //

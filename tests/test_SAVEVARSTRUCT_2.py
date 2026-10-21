@@ -1,5 +1,5 @@
 """Unit v5937, the advisor's save struct, last minute check and request serialiser, against libtpw_unit_SAVEVARSTRUCT_2.dylib
-(tests/unit_SAVEVARSTRUCT_2.cpp), main app ("SimTheme Park"), src/Serialise_basic_SAVEVARSTRUCT_2.cpp:
+(tests/unit_SAVEVARSTRUCT_2.cpp), main app ("SimTheme Park"), src/game/advisor/Advisor.cpp, src/game/advisor/AdvisorScoring.cpp:
   SAVEVARSTRUCT<AdvisorHistory> 0x1000f96c, CAdvisorScoring::LastMinuteCheck 0x100102d8, CAdvisorRequest::Serialise 0x1000e568
 
 A case is a world and a call, built twice by one piece of Python code (emulator memory big-endian, host memory little-endian). The callees

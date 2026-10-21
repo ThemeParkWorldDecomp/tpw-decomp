@@ -1,5 +1,5 @@
 // Test library for the swear filter (unit v5094; libtpw_unit_SwearFilter_Filter.dylib, tests/test_SwearFilter_Filter.py), main app:
-//   src/SwearFilter_Filter.cpp   SwearFilter::Filter, SwearFilter::LoadWordList
+//   src/game/online/IPBase.cpp   SwearFilter::Filter, SwearFilter::LoadWordList
 //
 // The callees outside the unit (stristr, _wcsnicmp, the stream pieces, the exception pieces) are fakes that record the arguments the
 // real ones read and answer from the test's queues. The globals of other files the unit reads are defined here.

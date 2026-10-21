@@ -1,6 +1,6 @@
 // Test library for the coaster Bezier and alignment helpers (unit v5970; libtpw_unit_GetAlignmentParamsQuick.dylib,
 // tests/test_GetAlignmentParamsQuick.py), main app:
-//   src/TPConfig_bend_GetAlignmentParamsQuick.cpp   BezierPosition, BezierTangent, GetAlignmentParamsQuick, GetBankParams, GetAlignmentParamsSlow
+//   src/game/rides/CoasterSpline.cpp   BezierPosition, BezierTangent, GetAlignmentParamsQuick, GetBankParams, GetAlignmentParamsSlow
 //
 // The callees outside the unit (the three rotation getters, SetInitialOrientationParams) are fakes that record their arguments and
 // answer from the test's queues; gTPGlobals is defined here.

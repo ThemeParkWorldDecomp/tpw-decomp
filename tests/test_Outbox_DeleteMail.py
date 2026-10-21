@@ -1,5 +1,5 @@
 """Unit v5690, Outbox::DeleteMail 0x1020638c, against libtpw_unit_Outbox_DeleteMail.dylib (tests/unit_Outbox_DeleteMail.cpp), main app,
-src/email_load_Outbox_Send_Outbox_WriteMailData_Outbox_DeleteMail.cpp.
+src/game/online/email.cpp.
 
 A case is an Outbox whose path string mF00 is a short text, and a mail id. The MSL string functions (ctor, assign, append, dtor) are
 fakes on the PowerPC side that keep a rep block (text at +0xc); unlink is a fake on both sides that records the path (length and

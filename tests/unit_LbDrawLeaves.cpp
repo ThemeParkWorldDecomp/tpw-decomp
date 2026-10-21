@@ -1,5 +1,5 @@
 // Fakes and test entry points for the Bullfrog library's rectangle, viewport, clip and palette leaves
-// (src/bfl_lbdraw_leaves.cpp; libtpw_unit_LbDrawLeaves.dylib, driven by test_LbDrawLeaves.py; see calllog.h).
+// (src/bullfrog/LbDraw.cpp, src/bullfrog/LbDrawText.cpp, src/bullfrog/LbRect.cpp; libtpw_unit_LbDrawLeaves.dylib, driven by test_LbDrawLeaves.py; see calllog.h).
 //
 // The only callee outside the unit is TbPixelCaps::Set, which LbDraw_SetCurrent calls. Its fake records the capabilities
 // object, the format it is given (by label, so that an area passed as the format is told from any other) and the format's

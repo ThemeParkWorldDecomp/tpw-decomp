@@ -1,9 +1,9 @@
 // Test library for the red-black tree's balance_insert, the subscription tree's insert_node_at and CSubscription::Load (unit v5942;
 // libtpw_unit_std___red_black_tree_balance_insert.dylib, tests/test_std___red_black_tree_balance_insert.py), main app:
-//   src/GameClock_std___red_black_tree_balance_insert.cpp   the three functions
+//   src/game/ui/MessageCentre.cpp   the three functions
 //
 // The callees outside the unit (operator new, new[], strlen, strcpy, _RefCountedPtr ctor, __throw, LbFile_Read, DEBUG_MESSAGE) are fakes
-// that record what the PowerPC recorders record. The rotations are the real ones (src/msl_red_black_tree.cpp).
+// that record what the PowerPC recorders record. The rotations are the real ones (src/game/MslSupport.cpp).
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

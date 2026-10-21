@@ -1,6 +1,6 @@
 """Unit v5063, the park list "in the world by player name", against libtpw_unit_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor.dylib
 (tests/unit_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor.cpp), main app ("SimTheme Park"),
-src/FS_Online_CFSOnlineSystemParkList_InWorldByPlayerName_Dtor.cpp:
+src/game/online/FS_Online.cpp, src/game/online/FS_OnlineList.cpp:
   CFSOnlineSystemParkList_InWorldByPlayerName::~CFSOnlineSystemParkList_InWorldByPlayerName 0x101709b0,
   CFSOnlineSystemParkList_InWorldByPlayerName::GetList 0x101794e8
 

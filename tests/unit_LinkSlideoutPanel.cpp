@@ -1,5 +1,5 @@
 // Test library for the main panel's slide-out slot (unit v5262; libtpw_unit_LinkSlideoutPanel.dylib, tests/test_LinkSlideoutPanel.py), main app:
-//   src/ui_mainpanel2_window_LinkSlideoutPanel.cpp   LinkSlideoutPanel, RemoveSlideoutPanel
+//   src/game/ui/ui_mainpanel2.cpp   LinkSlideoutPanel, RemoveSlideoutPanel
 //
 // The callees outside the unit (GetWindow, getExtraParam, setExtraParam, UI_SendMessage, UI_PostMessage, SetState) are recording fakes.
 // gMainPanel and gGameWindow are defined here. Six zeroed blocks (labels 1..5; 0 is NULL) stand for the windows.

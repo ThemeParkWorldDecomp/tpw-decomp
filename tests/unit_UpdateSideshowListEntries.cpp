@@ -1,6 +1,6 @@
 // Test library for the sideshows list rows and the all-items row window (unit v5335; libtpw_unit_UpdateSideshowListEntries.dylib,
 // tests/test_UpdateSideshowListEntries.py), main app:
-//   src/AddItemToAllRidesList_UpdateSideshowListEntries.cpp   UpdateSideshowListEntries, AllItemsListLCFormat (the Mac's LCFormat 0x10196388),
+//   src/game/ui/ui_allItemsPanel.cpp   UpdateSideshowListEntries, AllItemsListLCFormat (the Mac's LCFormat 0x10196388),
 //                                                             gAllItemsRowHeight, gAllItemsFontIndex
 //
 // The callees outside the unit are recording fakes: the list's GetData and ChangeItem, the history's GetSumOfLast, the four CObject

@@ -1,5 +1,5 @@
 // Test library for a person in a ride's queue (unit v5150; libtpw_unit_CPerson_DismissFromQueue.dylib, tests/test_CPerson_DismissFromQueue.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_DismissFromQueue.cpp  DismissFromQueue, EvaluateQueueEdit, FindQueueDestination, ExitRide
+//   src/game/people/PersonQueue.cpp  DismissFromQueue, EvaluateQueueEdit, FindQueueDestination, ExitRide
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the module's PowerPC stubs). People and rides are
 // named by their thing id halfword (+0), map cells by their index in the map; texts by a hash.

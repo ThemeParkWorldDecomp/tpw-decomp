@@ -1,6 +1,6 @@
 // Test library for std::basic_string<char> replace and init (unit v5941; libtpw_unit_std_basic_string_replace_2.dylib,
 // tests/test_std_basic_string_replace_2.py), main app:
-//   src/std_basic_string_replace_2.cpp   replace 0x10002d20, init 0x10072e6c; the three terminator globals.
+//   src/game/MslSupport.cpp   replace 0x10002d20, init 0x10072e6c; the three terminator globals.
 //
 // The callees outside the unit (strlen, strcpy, new, new[], delete, memcpy, memset, __throw) are recording fakes with the same
 // events as the PowerPC stubs; memmove is the real one on both sides. Globals of other files are defined here.

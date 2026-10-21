@@ -1,6 +1,6 @@
 // Test library for the coaster destroyers and the track position control (unit v5038; libtpw_unit_DestroyCoasterPylons.dylib,
 // tests/test_DestroyCoasterPylons.py), main app:
-//   src/DestroyCoasterPylons.cpp   DestroyCoasterPylons, DestroyCoasterTrack, Increment/DecrementTrackPosnControl, GetTrackPosition
+//   src/game/rides/CoasterTrack.cpp   DestroyCoasterPylons, DestroyCoasterTrack, Increment/DecrementTrackPosnControl, GetTrackPosition
 //
 // The callees outside the unit are fakes that record what the real ones read. Objects are named in the log by the id word the test puts at
 // their word 0 (a pylon control: its word +4; a node: its +8), never by address.

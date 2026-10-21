@@ -1,5 +1,5 @@
 // Test library for the small bullfrog functions of unit v51127 (libtpw_unit_LbApp_SetWindowIcon.dylib, tests/test_LbApp_SetWindowIcon.py), bullfrog:
-//   src/LbFile_LbApp_GetWindowsScreenMode_LbApp_SetWindowIcon.cpp
+//   src/bullfrog/AndyGLL.cpp, src/bullfrog/Colour.cpp, src/bullfrog/Draw.cpp, src/bullfrog/LbApp.cpp, src/bullfrog/LbSCBack.cpp, src/bullfrog/LbZLib.cpp, src/bullfrog/TbJPEGSaver.cpp
 //
 // Callees outside the unit are recording fakes: operator delete (LbSE_OperatorDelete), the TbTList constructor, CConverter::Release,
 // the loader base constructor and destructor, and the platform's _USwapBlock32. gLbWindowIcon is defined here.

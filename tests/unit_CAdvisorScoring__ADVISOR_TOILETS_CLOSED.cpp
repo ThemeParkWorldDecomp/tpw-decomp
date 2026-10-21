@@ -1,6 +1,6 @@
 // Test library for eight advisor scorers (unit v5040; libtpw_unit_CAdvisorScoring__ADVISOR_TOILETS_CLOSED.dylib,
 // tests/test_CAdvisorScoring__ADVISOR_TOILETS_CLOSED.py), main app:
-//   src/AdvisorScoring.cpp   the _ADVISOR_* scorers at 0x1001a5e4..0x1001aef8 and gSideshowNoneId
+//   src/game/advisor/AdvisorScoring.cpp, src/game/advisor/Advisor.cpp   the _ADVISOR_* scorers at 0x1001a5e4..0x1001aef8 and gSideshowNoneId
 //
 // The callees (CWorld::GetParkAnalyser and the CParkAnalyser and CGoldenTicketControl queries) are fakes that record the arguments the real
 // ones read and answer from the test's queues. gGameWorld, gGameWorldRef and gMainBalance (raw storage, no constructor) are defined here.

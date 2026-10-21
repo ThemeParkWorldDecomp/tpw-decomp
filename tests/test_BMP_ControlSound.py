@@ -1,5 +1,5 @@
 """Unit v5966: the bump sound control and three ride record functions, against libtpw_unit_BMP_ControlSound.dylib
-(tests/unit_BMP_ControlSound.cpp), main app, src/BMP_Tick_BMP_ControlSound.cpp:
+(tests/unit_BMP_ControlSound.cpp), main app, src/game/rides/BumperRide.cpp:
   BMP_ControlSound 0x10028e30, FreeBuoysForRide 0x10027494, BMP_GetCarsOnRide 0x10026e74, BMP_SetRideModelSelection 0x10026be4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory at the Mac's addresses, host library

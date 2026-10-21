@@ -1,6 +1,6 @@
 // Fakes and test entry points for unit w136, the game window's message functions (libtpw_unit_GameWin.dylib, driven by tests/test_GameWin.py;
 // see calllog.h):
-//   src/ui_main_gamewin.cpp  Engine_GameWinMsg 0x10183c84, Engine_GameFirstPersonMsg 0x10184628
+//   src/game/ui/ui_main.cpp  Engine_GameWinMsg 0x10183c84, Engine_GameFirstPersonMsg 0x10184628
 // Every callee is a fake that records the same event as the PowerPC side's stub: the key tables, the pointer capture, the cursor, the mouse and
 // its default mode, the cheat object, the camera, the context menu and the first-person functions. Answers come from per-case queues. The
 // nothrow operator new answers from the queue "New" and records the Mac's sizes (1 for the mouse, 8 for its default mode).

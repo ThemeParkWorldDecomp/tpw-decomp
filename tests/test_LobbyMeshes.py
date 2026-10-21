@@ -1,4 +1,4 @@
-"""Differential test for src/lobby_meshes.cpp (CLBLobbyMeshes, CLBMeshType, CLBMeshInstance
+"""Differential test for src/game/online/LBLobbyMeshes.cpp (CLBLobbyMeshes, CLBMeshType, CLBMeshInstance
 and their lists) and GetUniqueID, against libtpw_unit_LobbyMeshes.dylib.
 
 A case is a small world (six ride sets, the first the height field's, each with a mesh

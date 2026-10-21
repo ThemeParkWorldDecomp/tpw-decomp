@@ -1,5 +1,5 @@
 """Unit v51013, the entrance camera and the collision object helpers, against libtpw_unit_GetThingAtPosnIfEntrance.dylib
-(tests/unit_GetThingAtPosnIfEntrance.cpp), main app ("SimTheme Park"), src/lobby_exit_IsRideRideable_GetThingAtPosnIfEntrance.cpp:
+(tests/unit_GetThingAtPosnIfEntrance.cpp), main app ("SimTheme Park"), src/game/TPCamera.cpp, src/game/rides/BumperRide.cpp:
   GetThingAtPosnIfEntrance 0x10032618, MoveCameraOverRideExit 0x10032838, FreeTrackForRide 0x1002ef00,
   BMP_StartColObject 0x1002edfc, BMP_StartColObjectForRide 0x1002ed74
 

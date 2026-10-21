@@ -1,5 +1,5 @@
 """Unit v51111, the small members of the interface controls and panels, against libtpw_unit_InterfaceKnob_GetValue.dylib
-(tests/unit_InterfaceKnob_GetValue.cpp), main app ("SimTheme Park"), src/InterfaceKnob_InterfaceKnob_GetValue.cpp:
+(tests/unit_InterfaceKnob_GetValue.cpp), main app ("SimTheme Park"), src/game/ui/InterfaceBar.cpp, src/game/ui/InterfaceImage.cpp, src/game/ui/InterfaceKnob.cpp, src/game/ui/InterfaceLightPanel.cpp, src/game/ui/InterfaceTextBox.cpp, src/game/ui/InterfaceVaryBox.cpp, src/game/ui/InterfaceWindow.cpp, src/game/ui/UI_Base.cpp, src/game/ui/ui_progressBar.cpp, src/game/ui/ui_upgradeStatus.cpp, src/game/ui/ui_yearEndPanel.cpp:
   InterfaceKnob::GetValue 0x101d0354, SetValue 0x101d02e8, ~InterfaceKnob 0x101d0194, InterfaceImage::GetValue 0x101d0054,
   InterfaceLightPanel::~InterfaceLightPanel 0x101d097c, GetValue 0x101d0b5c, UI_HelpTextEnabled 0x101cab08,
   InterfaceBar::GetValue 0x101c8968, InterfaceTextBox::DrawFunction 0x101d80f8, InterfaceVaryBox::~InterfaceVaryBox 0x101d8d74,

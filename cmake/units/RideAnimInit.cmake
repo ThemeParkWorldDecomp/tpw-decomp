@@ -1,1 +1,10 @@
-set(TPW_UNIT_RideAnimInit src/RideAnimInit.cpp src/EmbeddedData.cpp platform/arena.cpp)
+set(TPW_UNIT_RideAnimInit src/game/rides/RideAnim.cpp src/game/rides/TPRide.cpp src/game/TPEmbed.cpp platform/arena.cpp)
+set(TPW_UNIT_RideAnimInit_KEEP
+  __Z10RAInitTypeP9tag_sMeshP15tag_sAnimHeader   # RAInitType(tag_sMesh*, tag_sAnimHeader*)
+  __Z15InitRideAnimSetP16tag_sRideAnimSetiii   # InitRideAnimSet(tag_sRideAnimSet*, int, int, int)
+  __Z17CorrectNodeFlags1P16tag_sRideAnimSet   # CorrectNodeFlags1(tag_sRideAnimSet*)
+  __Z18ResetAnimTimeStatsP16sAnimTimeControlP15tag_sAnimHeaderif   # ResetAnimTimeStats(sAnimTimeControl*, tag_sAnimHeader*, int, float)
+  __Z19RAInitNodeAnimNodesP9tag_sMeshP15tag_sAnimHeaderi   # RAInitNodeAnimNodes(tag_sMesh*, tag_sAnimHeader*, int)
+  __Z24TPInitialiseEmbeddedDataP9tag_sMesh   # TPInitialiseEmbeddedData(tag_sMesh*)
+  __Z24TPSetupEmbeddedHeirarchyP9tag_sMeshP9tag_sNodeP15tag_sM3D2Header   # TPSetupEmbeddedHeirarchy(tag_sMesh*, tag_sNode*, tag_sM3D2Header*)
+)

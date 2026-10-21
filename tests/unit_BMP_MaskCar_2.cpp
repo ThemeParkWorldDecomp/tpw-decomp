@@ -1,5 +1,5 @@
 // Test library for the bump AI and its helpers (unit v5926; libtpw_unit_BMP_MaskCar_2.dylib, tests/test_BMP_MaskCar_2.py), main app:
-//   src/BMP_InsideArea_PointOutAllInverse_BMP_Distance_BMP_MaskCar_2.cpp   BMP_MaskCar, BMP_Thrust, SetNextBuoyTarget, BMP_AI
+//   src/game/rides/BumperRide.cpp   BMP_MaskCar, BMP_Thrust, SetNextBuoyTarget, BMP_AI
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the globals of
 // other files the unit reads are defined here (zero at start like the Mac's bss).

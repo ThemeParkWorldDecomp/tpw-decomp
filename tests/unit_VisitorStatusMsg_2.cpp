@@ -1,5 +1,5 @@
 // Test library for the visitor status panel (unit v5929; libtpw_unit_VisitorStatusMsg_2.dylib, tests/test_VisitorStatusMsg_2.py), main app:
-//   src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2.cpp   VisitorStatusPanel::Show, InitWindow, UpdateWindow,
+//   src/game/ui/ui_visitorStatus.cpp   VisitorStatusPanel::Show, InitWindow, UpdateWindow,
 //   VisitorStatusMsg and __sinit_ui_visitorStatus_cpp, and the globals gVisitorStatusThing, gVisitorStatusScript, gVisitorStatusWordEC3C,
 //   gVisitorStatusWordEC40 and gVisitorStatusTable.
 //
@@ -128,7 +128,7 @@ int32_t TbITable::FormatString(char16_t* out, uint32_t size, uint32_t id, ...) c
     return 0;
 }
 
-// The tables the static initialisers store (src/ui_StatusPanel_tables.cpp, unit v5L31): blocks of the arena made on first use; the test
+// The tables the static initialisers store (src/game/ui/ui_StatusPanel.cpp, unit v5L31): blocks of the arena made on first use; the test
 // compares only where they are stored.
 uint32_t* VisitorStatusPanelTable() {
     static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));

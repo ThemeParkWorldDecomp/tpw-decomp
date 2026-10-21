@@ -1,6 +1,6 @@
 // Test library for InitialiseMainMenu and InitialiseLobbyMenu (unit v5230; libtpw_unit_InitialiseLobbyMenu.dylib,
 // tests/test_InitialiseLobbyMenu.py), main app:
-//   src/ui_main_kbcapture_InitialiseLobbyMenu.cpp
+//   src/game/ui/ui_mainmenu.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues: the menu's
 // constructor, Init and AddItem, UIMain_GetString, the online system's constructor and its two questions, the game type's constructor and

@@ -1,5 +1,5 @@
 // Test library for the park status graph panel's message handler (unit v5894; libtpw_unit_GraphPanelMsg.dylib, tests/test_GraphPanelMsg.py), main app:
-//   src/ParkInfoLines_GraphPanelMsg.cpp   GraphPanelMsg
+//   src/game/ui/ui_parkStatus.cpp   GraphPanelMsg
 //
 // The callees outside the unit (GetParkAnalyser, MaxAnalyserValue x2, SetupGraph, SetXRange, SetYRange, DrawMeGraph, GetClientRect,
 // CallDefaultWindowHandler) are recording fakes; the globals of other files are defined here.

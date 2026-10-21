@@ -1,5 +1,5 @@
 // Test library for the loans panel (unit v5195; libtpw_unit_LoansPanelMsg.dylib, tests/test_LoansPanelMsg.py), main app:
-//   src/ui_allKidsPanel_AllKidsPanelMsg_LoansPanelMsg.cpp   LoansPanelMsg, Payback, UpdateListHeadings (and gLoansPanel)
+//   src/game/ui/ui_loansPanel.cpp   LoansPanelMsg, Payback, UpdateListHeadings (and gLoansPanel)
 //
 // The callees outside the unit are fakes that record what the real ones read and answer from the test's queues. The windows are real
 // InterfaceWindow objects (the constructor and the virtuals are fakes, so that the class has a vtable here); the test makes six.

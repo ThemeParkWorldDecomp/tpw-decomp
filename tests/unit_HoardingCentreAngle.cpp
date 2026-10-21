@@ -1,5 +1,5 @@
 // Test library for HoardingCentreAngle (unit v5646; libtpw_unit_HoardingCentreAngle.dylib), main app:
-//   src/LevelSystems_GenerateHoardingMeshes_HoardingCentreAngle.cpp
+//   src/game/park/TPHoardings.cpp
 // atan2 and fmod are the host's C library functions; no other callees and no globals.
 #include <cstdint>
 

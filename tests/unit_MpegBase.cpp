@@ -1,6 +1,6 @@
 // Fakes and test entry points for unit w71a, the MPEG audio decoder object CMpegBase, part 1 (libtpw_unit_MpegBase.dylib,
 // driven by tests/test_MpegBase.py; see calllog.h). The program under test is "sound symbols shared":
-//   src/TbMpegBase.cpp  the pool (new, delete, TopUp, SetLevel, ClearCache), the constructor and destructor, OpenSynth, OpenLayer,
+//   src/sound/FileAccess.cpp, src/sound/LbMpeg.cpp, src/sound/MpegDecode.cpp  the pool (new, delete, TopUp, SetLevel, ClearCache), the constructor and destructor, OpenSynth, OpenLayer,
 //                       Open (two forms), Close, Reset, GetBits, SeekBits, ProcessHeader, DecodeHeader, GetHeader (two forms),
 //                       Decode, Read, Decode_Layer1, get_sb_stereo, muldiv and the two static objects
 // Real: all of those. Fakes (each records what the original's callee would be given; the PowerPC side records the same):

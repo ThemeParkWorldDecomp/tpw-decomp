@@ -1,5 +1,5 @@
 """Unit v5142, the park status panel, against libtpw_unit_sinit_ui_parkStatus_cpp.dylib (tests/unit_sinit_ui_parkStatus_cpp.cpp), main app
-("SimTheme Park"), src/ui_loginpanel_msg_sinit_ui_parkStatus_cpp.cpp:
+("SimTheme Park"), src/game/ui/ui_parkStatus.cpp:
   __sinit_ui_parkStatus_cpp 0x101adbe4, UI_ParkStatusPanelDateChange 0x101ada64
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (emulator memory big-endian, host memory little-endian).

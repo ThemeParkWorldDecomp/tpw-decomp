@@ -1,6 +1,6 @@
 // Test library for the online globe's Tick and WindowMessagesFn (unit v5571; libtpw_unit_CLBScreenComponentOnlineGlobe_Tick.dylib,
 // tests/test_CLBScreenComponentOnlineGlobe_Tick.py), main app:
-//   src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Tick.cpp   Tick, WindowMessagesFn, gGlobeCentre, gGlobeViewTarget
+//   src/game/online/lobby_globe.cpp   Tick, WindowMessagesFn, gGlobeCentre, gGlobeViewTarget
 //
 // The callees outside the unit (TransformVertex, IsKeyDown, UpdateOnlineCityInfoOverlay, the Globe moves, WorldLobbySetZoomButton) are
 // fakes that record what the real ones read and answer from the test's queues. The globals of other files are defined here.

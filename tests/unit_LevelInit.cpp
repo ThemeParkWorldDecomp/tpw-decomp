@@ -42,7 +42,7 @@ bool gLogStorage = false;
 bool gDerived = false;
 }  // namespace
 
-TPGlobals gTPGlobals;   // src/GlobalOrder.cpp's: the default names
+TPGlobals gTPGlobals;   // src/game/TPGlobals.cpp's: the default names
 
 // ---- The strings -------------------------------------------------------------------------------
 template<> void TbDynamicStringTemplate<char>::Format(const char*, ...) {}
@@ -109,7 +109,7 @@ CTPSharedTextureResource::CTPSharedTextureResource(const String& name, const Str
     if (gRecordResources) ev("Shared", {newlab(this)}, {name.mData, path.mData});
 }
 CTPSharedTextureResource::~CTPSharedTextureResource() {}
-// The real ~CTPItemListResource and OpenFile overrides are unit v5375's (src/TPSettings_itemres_CTPItemListResource_OpenFile.cpp,
+// The real ~CTPItemListResource and OpenFile overrides are unit v5375's (src/game/TPResource.cpp,
 // not linked here): the destructor keeps the base destructors' work only, and nothing here opens a file through the list.
 CTPItemListResource::~CTPItemListResource() {}
 int32_t CTPItemListResource::OpenFile(bfl::FileSystem::CFile&, const String&, uint32_t) { return 0; }
@@ -154,13 +154,13 @@ TbError bfl::FileSystem::CFileStorage::Delete(const char*) { return TbError(0); 
 TbError bfl::FileSystem::CFileStorage::Move(const char*, const char*) { return TbError(0); }
 
 // ---- The script system, the flies ------------------------------------------------------------------
-RSSEState gRSSEState = {};   // src/rsse_close.cpp's
+RSSEState gRSSEState = {};   // src/game/rides/rsse.cpp's
 void GAME_ASSERTMSG(int32_t condition, const char* format, ...) { ev("GAME_ASSERTMSG", {condition}, {format}); }
 namespace {
 // The block LbMem_Alloc answers: the table, then a guard of 16 bytes the table must not reach.
 alignas(16) unsigned char gFlyBlock[0x4000 + 16];
 }  // namespace
-// FLY_Close (src/hlsprite_flies.cpp, linked for the flies' globals) is not run by any case.
+// FLY_Close (src/game/rides/FlyingRide.cpp, linked for the flies' globals) is not run by any case.
 void LbMem_Free(void*) {}
 void FLY_RemoveBase(int32_t) {}
 void* LbMem_Alloc(uint32_t size) {
@@ -199,7 +199,7 @@ int32_t msl_rand() {
     return value;
 }
 
-// The light CreateGlobalLight answers: a record holding a directional light (a real CLightParallel, built by src/Light.cpp)
+// The light CreateGlobalLight answers: a record holding a directional light (a real CLightParallel, built by src/game/Light.cpp)
 // whose flags the case sets.
 CLight* gev_LightChain;            // engine data: Light.cpp's Prepare chains the lights here (not run)
 CMapLinkBase::~CMapLinkBase() {}   // engine 0x1001980c

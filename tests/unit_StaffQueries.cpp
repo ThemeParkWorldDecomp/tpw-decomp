@@ -1,6 +1,6 @@
 // Test library for the staff member, part 2 (unit w190; libtpw_unit_StaffQueries.dylib, tests/test_StaffQueries.py), main app:
-//   src/Staff_queries.cpp   the 19 CStaff members of staff.cpp from SackMe to GetSalary (the list is in the file's first comment)
-//   src/WorldSavvy.cpp      CWorldSavvy::GetWorld (answers *gWorld), which GetEmploymentDuration calls
+//   src/game/people/staff.cpp   the 19 CStaff members of staff.cpp from SackMe to GetSalary (the list is in the file's first comment)
+//   src/game/ui/ui_visitorStatus.cpp      CWorldSavvy::GetWorld (answers *gWorld), which GetEmploymentDuration calls
 //
 // The callees outside them are fakes that record the same events as the PowerPC stubs: the CPeep members, CThing::GetThingId and KillMe, the staff
 // member's SetState, the delayed script's SpawnSpriteScript, the world's getters, the bank account, the two headquarters, the mechanic's ChooseNextAction,

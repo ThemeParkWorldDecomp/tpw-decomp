@@ -1,5 +1,5 @@
 // Test library for the FTPClient members of unit v5273 (libtpw_unit_FTPClient_ParseFileSize.dylib, tests/test_FTPClient_ParseFileSize.py), main app:
-//   src/FTPClient_RecvData_FTPClient_ParseFileSize.cpp
+//   src/game/online/FTPClient.cpp
 //
 // The callees outside the unit are recording fakes (the same event names and arguments as the PowerPC stubs). _Download and _threadfn
 // and the destructor (the vtable's key function) are defined here.

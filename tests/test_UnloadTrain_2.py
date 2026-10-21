@@ -1,5 +1,5 @@
 """Unit v5900, the coaster train loading, against libtpw_unit_UnloadTrain_2.dylib (tests/unit_UnloadTrain_2.cpp), main app
-("SimTheme Park"), src/AllocateQueue_UnloadTrain_2.cpp:
+("SimTheme Park"), src/game/rides/CoasterQueue.cpp:
   UnloadTrain 0x100499e4, KickPeepsFromEntranceQueue 0x10049858, LoadTrain 0x10049bf4, CoasterSetCapacity 0x10049758,
   SetEntranceLinearSamples 0x10049ddc, GetCarsInStation 0x10049e8c, HandleTrainLoading 0x10049fbc
 

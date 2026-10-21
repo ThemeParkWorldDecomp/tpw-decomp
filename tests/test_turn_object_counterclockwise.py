@@ -1,5 +1,5 @@
 """Unit v5034, eight key actions, against libtpw_unit_turn_object_counterclockwise.dylib (tests/unit_turn_object_counterclockwise.cpp), main app
-("SimTheme Park"), src/turn_object_counterclockwise.cpp:
+("SimTheme Park"), src/game/keyboard.cpp:
   turn_object_counterclockwise 0x1014cafc, turn_object_clockwise 0x1014ca74, quickload_layout 0x1014c97c, quicksave_layout 0x1014c89c,
   place_vomit 0x1014ce2c, quickload 0x1014c7bc, quicksave 0x1014c6dc, TestAdvisor 0x1014c454
 

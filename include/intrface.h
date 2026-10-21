@@ -9,9 +9,9 @@ class CThing;
 class CIntrface {
 public:
     void DrawFPSCounter(float fps);         // 0x1007dae8
-    void Process();                         // 0x1007db78, src/intrface_process.cpp (unit w131): mProcessCount += 1, then mPointedThing = 0
-    void DoPointedThingComputations();      // 0x1007dbb8, src/intrface_pointed.cpp (unit w133)
-    void SetCurrentThing(CThing* thing);    // 0x1007dde8 (8 bytes, src/intrface_current.cpp, unit v5L06): mPointedThing = thing
+    void Process();                         // 0x1007db78, src/game/ui/intrface.cpp (unit w131): mProcessCount += 1, then mPointedThing = 0
+    void DoPointedThingComputations();      // 0x1007dbb8, src/game/ui/intrface.cpp (unit w133)
+    void SetCurrentThing(CThing* thing);    // 0x1007dde8 (8 bytes, src/game/ui/intrface.cpp, unit v5L06): mPointedThing = thing
 
     // On the Mac three 32-bit pointers; native pointers here, so the object is larger than the Mac's (the layout assert below is the Mac's
     // offsets of the words other code reads and writes).
@@ -30,7 +30,7 @@ static_assert(offsetof(CIntrface, mThingUnderPointer) == 2 * sizeof(void*), "thr
 static_assert(sizeof(void*) != 4 || (offsetof(CIntrface, mF24) == 0x24 && offsetof(CIntrface, mProcessCount) == 0xc &&
                                       offsetof(CIntrface, mThingUnderPointer) == 8), "the Mac's layout");
 extern CIntrface gIntrface;   // 0x102dc1ac, original name unknown
-// Unit v51063 (src/LLCR_OverRide_LLCR_OverRide_3_LLCR_GetRideCell.cpp): the static initialiser of intrface.cpp.
+// Unit v51063 (src/game/ui/intrface.cpp): the static initialiser of intrface.cpp.
 extern int32_t gIntrfaceDC1D8;   // 0x102dc1d8  0x10000 after __sinit_intrface_cpp
 extern int32_t gIntrfaceDC1DC;   // 0x102dc1dc  0 after __sinit_intrface_cpp
 void __sinit_intrface_cpp();     // 0x1007de28 (52 bytes): also mF24 = 1, mShowFPS = 0

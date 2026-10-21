@@ -1,5 +1,5 @@
 // Test library for the Sound Sprockets channel (unit v5263; libtpw_unit_CSprocketsChannel_Callback.dylib, tests/test_CSprocketsChannel_Callback.py), main app:
-//   src/TbAudioBody_create_CSprocketsChannel_Callback.cpp   CSprocketsChannel: constructor, destructor, Cleanup, Callback, Play, Set3D
+//   src/sound/PlaceHolderSentence.cpp   CSprocketsChannel: constructor, destructor, Cleanup, Callback, Play, Set3D
 //
 // The callees outside the unit are recording fakes: the USoundChannel base and Sound Manager imports, the command constructors and
 // SetImmediate (a constructor writes a tag word into its command, so the later events name which command they carry), the send glue,

@@ -1,5 +1,5 @@
 """Unit v5341, four key actions, against libtpw_unit_clear_patrol_area.dylib (tests/unit_clear_patrol_area.cpp), main app
-("SimTheme Park"), src/turn_object_counterclockwise_clear_patrol_area.cpp:
+("SimTheme Park"), src/game/keyboard.cpp:
   clear_patrol_area 0x1014cfe4, wheres_my_script 0x1014d114, start_strike 0x1014ceac, abort_all_requesters 0x1014cb8c
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

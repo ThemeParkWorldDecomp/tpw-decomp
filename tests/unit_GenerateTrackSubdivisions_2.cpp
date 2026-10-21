@@ -1,6 +1,6 @@
 // Test library for the track subdivisions, coaster speed, bank, end pylon flashing and the key action (unit v51008;
 // libtpw_unit_GenerateTrackSubdivisions_2.dylib, tests/test_GenerateTrackSubdivisions_2.py), main app:
-//   src/TPConfig_extrude_GenerateTrackSubdivisions_2.cpp   GenerateTrackSubdivisions, CoasterSetSpeed, GetBankAtBrace, FlashEndPylons, DecCoasterConst1
+//   src/game/rides/CoasterExtrude.cpp, src/game/rides/CoasterTrack.cpp, src/game/rides/CoasterTrain.cpp   GenerateTrackSubdivisions, CoasterSetSpeed, GetBankAtBrace, FlashEndPylons, DecCoasterConst1
 //
 // The callees outside the unit are recording fakes; the globals of other files are defined here.
 #include <cstdarg>

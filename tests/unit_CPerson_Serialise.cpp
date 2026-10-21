@@ -1,5 +1,5 @@
 // Test library for CPerson::Serialise (unit v5972; libtpw_unit_CPerson_Serialise.dylib, tests/test_CPerson_Serialise.py), main app:
-//   src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_FindNearestReachableLitterBin_CPerson_GetBagged_CPerson_Serialise.cpp
+//   src/game/people/Person.cpp
 //
 // The callees outside the unit (CPeep::Serialise and every SAVEVAR / LOADVAR instance it calls) are recording fakes. A save fake records
 // the file, the name (as an index into the name table), noLog and the value it is given; a load fake records the same but the value, and

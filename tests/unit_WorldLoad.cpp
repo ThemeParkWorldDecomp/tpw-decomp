@@ -1,6 +1,6 @@
 // Test library for the world's load (unit w207; libtpw_unit_WorldLoad.dylib, tests/test_WorldLoad.py), main app:
-//   src/World_load.cpp       CWorld::Load, LOADVAR<CWorld::WorldState>, LOADVAR<CThing::ThingModel>, CThing::ForceThingId
-//   src/Serialise_basic.cpp  the basic LOADVAR instances (REAL on both sides: the file is the fake)
+//   src/game/Thing.cpp, src/game/World.cpp, src/game/rides/rsse.cpp       CWorld::Load, LOADVAR<CWorld::WorldState>, LOADVAR<CThing::ThingModel>, CThing::ForceThingId
+//   src/game/ControlManager.cpp, src/game/Object.cpp, src/game/advisor/Advisor.cpp, src/game/park/BankAccount.cpp, src/game/park/analyser.cpp, src/game/rides/FlyingRide.cpp, src/game/save/FS_MasterSave.cpp  the basic LOADVAR instances (REAL on both sides: the file is the fake)
 //
 // The fake file: LbFile_Read serves the bytes the case gives (little-endian, as the game's files are) from a cursor and answers from its queues
 // ("LbFile_Read" the result, "LbFile_Read:xfer" the transferred count). Every other callee of Load is a fake that records what the real one

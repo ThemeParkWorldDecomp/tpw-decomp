@@ -1,5 +1,5 @@
 """Unit v5979, the aerial window's message function and the window-tree hider, against libtpw_unit_HideIfUnder.dylib
-(tests/unit_HideIfUnder.cpp), main app ("SimTheme Park"), src/ui_mainpanel2_msg_HideIfUnder.cpp:
+(tests/unit_HideIfUnder.cpp), main app ("SimTheme Park"), src/game/ui/ui_mainpanel2.cpp:
   HideIfUnder 0x101a6c44, AerialCallback 0x101a68d0
 
 A case is a window tree and a call. Eight zeroed blocks stand for windows 1..8 (label = number); every InterfaceWindow member and

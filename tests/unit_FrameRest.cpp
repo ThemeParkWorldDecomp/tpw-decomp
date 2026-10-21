@@ -1,5 +1,5 @@
-// Harness for the last stand-ins of the lobby's frame (library unit_FrameRest: src/tb_hfield_conquad.cpp
-// and src/tb_texturecache_balance.cpp): CHField::TestConQuad, CycleFrequencyTable, CTextureLink::CalcUsage,
+// Harness for the last stand-ins of the lobby's frame (library unit_FrameRest: src/engine/tb_hfield.cpp
+// and src/engine/Gamut.cpp, src/engine/TextureCache.cpp): CHField::TestConQuad, CycleFrequencyTable, CTextureLink::CalcUsage,
 // CTextureCache::AutoMipmap, Entry_Compress, BalanceCache_FreeLockedTextureSpace and
 // BalanceCache_LevelSurfaceUsage.
 //
@@ -15,7 +15,7 @@
 //                   assertion. The answer and the state of everything the call could change come back as a
 //                   flat list in the order the test reads the original's.
 //
-//   tpw_fr_render   the render memory's deferred drawing (src/tb_rendermemory_execute.cpp): one call of
+//   tpw_fr_render   the render memory's deferred drawing (src/engine/RenderMemory.cpp): one call of
 //                   ExecuteUnrenderedPrimitives or of one of the three sorts on a table of primitives described
 //                   by the test. The fakes are CDrawPrimitive::ExecutePrimitiveIfInstant and ExternExecute,
 //                   the engine's malloc and free callbacks and CErrorHandler::Push.
@@ -93,8 +93,8 @@ CSystem::CSystem() {}
 CSystem gei_System;
 CDisplay::CDisplay() {}
 CDisplay gei_Display;
-uint32_t gFrequencyIndex = 0;   // defined in src/tb_texturecache_frame.cpp (another unit)
-int32_t gFrequencyTable[16];    // defined in src/tb_texturecache.cpp (another unit)
+uint32_t gFrequencyIndex = 0;   // defined in src/engine/TextureCache.cpp (another unit)
+int32_t gFrequencyTable[16];    // defined in src/engine/Gamut.cpp (another unit)
 
 // The assertion records. In a case that takes the math unit away it also throws: the original goes on to
 // read through the NULL pointer (the PowerPC side faults there), which the host must not do.

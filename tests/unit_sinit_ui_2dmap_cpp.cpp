@@ -1,5 +1,5 @@
 // Test library for the static initialiser of ui_2dmap.cpp (unit v5194; libtpw_unit_sinit_ui_2dmap_cpp.dylib, tests/test_sinit_ui_2dmap_cpp.py), main app:
-//   src/sinit_ui_2dmap_cpp.cpp   __sinit_ui_2dmap_cpp and the globals it sets up
+//   src/game/ui/ui_2dmap.cpp   __sinit_ui_2dmap_cpp and the globals it sets up
 //
 // The callees outside the unit (the render area and string constructors, the two runtime glue functions) are fakes that record what the real
 // ones read. gUI2DMap and the string destructor glue belong to other files and are defined here.

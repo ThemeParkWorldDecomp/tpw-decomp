@@ -1,8 +1,8 @@
 // Fakes and test entry points for unit w80c, the sound library's MPEG file player (libtpw_unit_MpegFilePlayer.dylib, driven by
 // tests/test_MpegFilePlayer.py; see calllog.h). The program under test is "sound symbols shared":
-//   src/TbMpegFilePlayer.cpp  CMpegMacFilePlayerUnpooled (Open, GetHeader, DecodeHeader, SeekBits, NextBuffer, ReadBuffered,
+//   src/sound/CSprocketsModule.cpp, src/sound/LbMpeg.cpp, src/sound/MpegDecode.cpp, src/sound/StreamableMpeg2.cpp  CMpegMacFilePlayerUnpooled (Open, GetHeader, DecodeHeader, SeekBits, NextBuffer, ReadBuffered,
 //                             RequestBuffer, Close), the pool SamsUtilities::UPooled<CMpegMacFilePlayerUnpooled, 10> and its queue
-// Real beside them: src/TbMpegBase.cpp (CMpegBase, unit w71a: the decoder the player extends; Open calls its OpenSynth, OpenLayer
+// Real beside them: src/sound/FileAccess.cpp, src/sound/LbMpeg.cpp, src/sound/MpegDecode.cpp (CMpegBase, unit w71a: the decoder the player extends; Open calls its OpenSynth, OpenLayer
 // and Reset, ProcessHeader reads the frame header, Read decodes through the player's virtuals). Fakes (each records what the
 // original's callee would be given; the PowerPC side records the same):
 //   tpw::ReadFileReference: the host's read of the bank file, answered from the case's file image (the PowerPC side's PBReadAsync

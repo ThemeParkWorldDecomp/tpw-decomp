@@ -1,5 +1,5 @@
 // Test library for the CONGRAT_PRICING scorers (unit v5122; libtpw_unit_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.dylib), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The analyser and world getter are recording fakes answering from the test's queues ("id", "val").
 #include <cstddef>

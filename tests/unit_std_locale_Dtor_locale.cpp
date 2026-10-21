@@ -1,5 +1,5 @@
 // Test library for the eight functions of unit v51049 (libtpw_unit_std_locale_Dtor_locale.dylib, tests/test_std_locale_Dtor_locale.py), main app:
-//   src/std_locale_Dtor_locale.cpp   LocaleStdDestroy, BasicFilebufChar::imbue / pbackfail, DisableRideHighlight, ESP_GetRandomSpritesFrom,
+//   src/game/HLSprite.cpp, src/game/TPInstance.cpp, src/game/TPPointer.cpp, src/game/advisor/Advisor.cpp   LocaleStdDestroy, BasicFilebufChar::imbue / pbackfail, DisableRideHighlight, ESP_GetRandomSpritesFrom,
 //                                    ToggleProceduralTexturing, DestroyDynamicMeshSetInstance, CAdvisor::SetPlayingFor
 //
 // The callees outside the unit are fakes that record what the PowerPC stubs record; the globals of other files are defined here.

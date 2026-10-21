@@ -1,6 +1,6 @@
-// Test library for unit w47 (libtpw_unit_PlayerDialogs.dylib; see tests/test_PlayerDialogs.py): src/ui_newname_msg.cpp (CreatePlayerMsg,
-// NewNameOK, GameConfirmQuit_OK, GameConfirmDelPlayer_OK), src/ui_dialogbox_callback.cpp (DialogBoxCallback, DefaultDialogCallback,
-// UIMain_EnableAllKeyTables, UI_UnPauseTimerSystem) and src/InterfaceCheckButtons_current.cpp (GetCurrent), with the real string class and
+// Test library for unit w47 (libtpw_unit_PlayerDialogs.dylib; see tests/test_PlayerDialogs.py): src/game/ui/ui_playerLogin.cpp (CreatePlayerMsg,
+// NewNameOK, GameConfirmQuit_OK, GameConfirmDelPlayer_OK), src/game/ui/InterfaceTimer.cpp, src/game/ui/ui_ErrorDisplay.cpp, src/game/ui/ui_main.cpp (DialogBoxCallback, DefaultDialogCallback,
+// UIMain_EnableAllKeyTables, UI_UnPauseTimerSystem) and src/game/ui/InterfaceButton.cpp (GetCurrent), with the real string class and
 // wcslen.
 //
 // Everything else the functions call is a fake that records through calllog: the window's GetWindow, Show, getExtraParam, GetParent and
@@ -120,7 +120,7 @@ int32_t UI_PostMessage(InterfaceWindow* window, int32_t message, int32_t a, int3
 }
 void UIMain_DecideKbCapture() { ev("UIMain_DecideKbCapture"); }
 void EnableAllKeytables() { ev("EnableAllKeytables"); }
-// The real one (src/ui_dialogbox.cpp) disables the tables and sets the bookkeeping byte.
+// The real one (src/game/ui/ui_main.cpp) disables the tables and sets the bookkeeping byte.
 void UIMain_DisableAllKeyTables() {
     ev("UIMain_DisableAllKeyTables");
     gUIMainKeyTablesDisabled = 1;

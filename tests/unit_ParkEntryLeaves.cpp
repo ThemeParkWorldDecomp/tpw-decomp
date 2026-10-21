@@ -1,11 +1,11 @@
 // Test library for the park entry leaves (libtpw_unit_ParkEntryLeaves.dylib; see tests/test_ParkEntryLeaves.py, unit w114):
-//   src/World_rides.cpp       CWorld::DoIHaveTheseRides 0x10140fac (and the masks gRidesOwned, gParkRequiredRides)
-//   src/RideDB_walk.cpp       CRideDatabase::GetFirstRide 0x101547b4, GetNextRide 0x10154800
-//   src/hlsprite_flybase.cpp  FLY_RemoveBase 0x100781f4
-//   src/TPEmbed_destroy.cpp   DisableRideHead 0x1020039c, TPDestroyEmbeddedData 0x101ffa58
-//   src/analyser_kill.cpp     SCR_KillScript 0x100d9478
-//   src/TPRide_proctex.cpp    LoadProceduralTextureSet 0x1005b8fc
-//   src/rsse_proctex.cpp      CorrectOrientationFlagsForDiffProceduralMode 0x100b7fa0
+//   src/game/World.cpp       CWorld::DoIHaveTheseRides 0x10140fac (and the masks gRidesOwned, gParkRequiredRides)
+//   src/game/rides/RideDB.cpp       CRideDatabase::GetFirstRide 0x101547b4, GetNextRide 0x10154800
+//   src/game/rides/FlyingRide.cpp  FLY_RemoveBase 0x100781f4
+//   src/game/TPEmbed.cpp   DisableRideHead 0x1020039c, TPDestroyEmbeddedData 0x101ffa58
+//   src/game/Script.cpp     SCR_KillScript 0x100d9478
+//   src/game/park/TPHField.cpp    LoadProceduralTextureSet 0x1005b8fc
+//   src/game/MeshLoad.cpp      CorrectOrientationFlagsForDiffProceduralMode 0x100b7fa0
 //
 // Real under each other: the walk under DoIHaveTheseRides, DisableRideHead and SCR_KillScript under FLY_RemoveBase, the corrector under
 // LoadProceduralTextureSet. Fakes that record through calllog: FindDataNodeIndexByID (answers from a queue), DestroyRideInstance,
@@ -116,7 +116,7 @@ void LbMem_Free(void* block) {
     if (word >= kScriptBase && word < kScriptBase + 16u * kTableWords && (word - kScriptBase) % 16 == 0) entry = gTable[(word - kScriptBase) / 16];
     ev("LbMem_Free", {lab(block), entry});
 }
-// SCR_KillScript frees a script block through SCR_FreeScriptBlock (host only, src/ScriptBlocks.cpp): the same event as the Mac's LbMem_Free
+// SCR_KillScript frees a script block through SCR_FreeScriptBlock (host only, src/game/park/analyser.cpp): the same event as the Mac's LbMem_Free
 // of the block, with the table entry of that script (as the Mac's word, kScriptBase + 16 * handle, or 0) at that moment
 void SCR_FreeScriptBlock(tagSCRIPT* script) {
     int64_t entry = -1;

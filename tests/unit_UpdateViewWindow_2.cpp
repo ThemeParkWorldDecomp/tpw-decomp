@@ -1,5 +1,5 @@
 // Test library for the hire panel's functions (unit v5984; libtpw_unit_UpdateViewWindow_2.dylib, tests/test_UpdateViewWindow_2.py), main app:
-//   src/sinit_ui_FinancePanel_cpp_UpdateViewWindow_2.cpp   UI_FinancePanelPanelDateChange, FillHireList, UpdateViewWindow, HirePanelMsg,
+//   src/game/ui/ui_FinancePanel.cpp, src/game/ui/ui_hirePanel.cpp   UI_FinancePanelPanelDateChange, FillHireList, UpdateViewWindow, HirePanelMsg,
 //                                                          HireListLCFormat (LCFormat) and the global gHireListFormat
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The globals of other

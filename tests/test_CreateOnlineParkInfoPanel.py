@@ -1,5 +1,5 @@
 """Unit v5537, the online park info panel, against libtpw_unit_CreateOnlineParkInfoPanel.dylib (tests/unit_CreateOnlineParkInfoPanel.cpp),
-main app ("SimTheme Park"), src/CreateOnlineParkInfoPanel.cpp:
+main app ("SimTheme Park"), src/game/ui/ui_onlineParkInfoPanel.cpp:
   CreateOnlineParkInfoPanel 0x101eabb4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

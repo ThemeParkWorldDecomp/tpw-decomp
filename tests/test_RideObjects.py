@@ -1,5 +1,5 @@
 """Script objects of the ride scripts (unit w150), against libtpw_unit_RideObjects.dylib (tests/unit_RideObjects.cpp), main app
-("SimTheme Park"), src/rsse_objects.cpp:
+("SimTheme Park"), src/game/rides/RideEffects.cpp, src/game/rides/rsse.cpp:
   ExtractData 0x100cece4, KillLinkedObject 0x100ced44, CreateObject 0x100cee2c, KillObject 0x100ceedc, SetObjParam 0x100cefb0,
   StartEvent 0x100cf064, InitObject 0x100cf6c8, ProcessObjects 0x100cf884, ReadScript 0x100cfbf8, Push 0x100cfc9c, Pop 0x100cfd44,
   GetRidePosition 0x100d2e60, GetRideCentrePosition 0x100cc778, RSSE_Setvar 0x100d6734, RSSE_SetRideSpeed 0x100d6ac0,

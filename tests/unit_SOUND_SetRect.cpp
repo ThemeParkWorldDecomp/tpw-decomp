@@ -1,5 +1,5 @@
 // Test library for SOUND_SetRect (unit v5294; libtpw_unit_SOUND_SetRect.dylib, tests/test_SOUND_SetRect.py), main app:
-//   src/SoundRuntime_SOUND_SetRect.cpp   SOUND_SetRect
+//   src/game/Sound.cpp   SOUND_SetRect
 //
 // The audio object is a fake whose SystemCommand records the command's words. The sound globals of other files are defined here.
 #include <cstddef>

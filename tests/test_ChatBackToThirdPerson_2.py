@@ -1,5 +1,5 @@
 """Unit v5919, the online chat panel's first-person switches, against libtpw_unit_ChatBackToThirdPerson_2.dylib
-(tests/unit_ChatBackToThirdPerson_2.cpp), main app ("SimTheme Park"), src/LCPostFormat_2_ChatPrePostCard_ChatBackToThirdPerson_2.cpp:
+(tests/unit_ChatBackToThirdPerson_2.cpp), main app ("SimTheme Park"), src/game/ui/ui_onlinePanel.cpp:
   ChatBackToThirdPerson 0x101e5ba0, ChatGoFirstPerson 0x101e5968, UpdateAvatarPos 0x101e5e08, ChatGoFullScreen 0x101e57bc
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

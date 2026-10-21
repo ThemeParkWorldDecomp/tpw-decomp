@@ -36,7 +36,7 @@ bool KeepBlock(void* p, bool);
 #include "calllog.cpp"
 using namespace calllog;
 
-// ---- the globals the unit does not define (UI_Base.cpp owns the screen size and src/ui_staffPanel.cpp, which is not linked, the staff panels)
+// ---- the globals the unit does not define (UI_Base.cpp owns the screen size and src/game/ui/ui_staffPanel.cpp, which is not linked, the staff panels)
 InterfaceWindow* gUIRootWindow;
 InterfaceWindow* gGameWindow;
 InterfaceWindow* gStaffPanelA;
@@ -177,7 +177,7 @@ TbTextFormatter::TbTextFormatter() { ev("Formatter.ctor", {lab(this)}); }
 TbTextFormatter::~TbTextFormatter() { ev("Formatter.dtor", {lab(this)}); }
 
 // The sprite object and the text sprite: only their constructors and destructors are reached (the Mac's constructor and destructor of the
-// number and cash objects have these inlined). The text sprite's own constructor is the real one (src/ui_DrawObjectText_ctor.cpp).
+// number and cash objects have these inlined). The text sprite's own constructor is the real one (src/game/ui/InterfaceTextObjectSprite.cpp).
 InterfaceDrawObjectSprite::InterfaceDrawObjectSprite(void* data) : InterfaceDrawObject(data) {}
 InterfaceDrawObjectSprite::~InterfaceDrawObjectSprite() {}
 void InterfaceDrawObjectSprite::Draw(int16_t, CoolRect*, int16_t) {}
@@ -278,7 +278,7 @@ CALLBACK(StaffPanelMsg)
 CALLBACK(ModifiedCheckButtonsCallback)
 CALLBACK(StaffLocMsg)
 
-// ---- what unit w131's five handlers in src/ui_mainpanel2_msg.cpp reach (they are tested in tests/unit_UIPanels.cpp; here they only have to link)
+// ---- what unit w131's five handlers in src/game/ui/ui_mainpanel2.cpp reach (they are tested in tests/unit_UIPanels.cpp; here they only have to link)
 CWorld* gGameWorld;
 CWorld*& gGameWorldRef = gGameWorld;
 CFSGlobalMasterSave* gMasterSave;

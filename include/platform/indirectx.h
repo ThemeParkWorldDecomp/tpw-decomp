@@ -16,7 +16,7 @@ public:
     virtual ~IUnknown();
     virtual int32_t QueryInterface(const _GUID&, void**);
     uint32_t Release();
-    // Unit w231 (src/LbSurface.cpp): macdoze imported member, glue 0x1006bc4c.
+    // Unit w231 (src/bullfrog/LbSurface.cpp): macdoze imported member, glue 0x1006bc4c.
     uint32_t AddRef();
 };
 }
@@ -46,7 +46,7 @@ public:
     int32_t SetDisplayMode(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
     int32_t RestoreDisplayMode();
     int32_t GetCaps(DDCAPS_DX6*, DDCAPS_DX6*);
-    // Unit w231 (src/LbSurface.cpp): original descriptor import, glue 0x1006bd24.
+    // Unit w231 (src/bullfrog/LbSurface.cpp): original descriptor import, glue 0x1006bd24.
     int32_t CreateSurface(DDSURFACEDESC*, class IDirectDrawSurface**, NS_MacDoze::IUnknown*);
 };
 class IDirectDraw4 : public IDirectDraw {
@@ -65,7 +65,7 @@ public:
     int32_t Unlock(void* rect);
     int32_t Restore();
     int32_t SetClipper(IDirectDrawClipper*);
-    // Unit w231 (src/LbSurface.cpp): original nonvirtual imports (bullfrog glue).
+    // Unit w231 (src/bullfrog/LbSurface.cpp): original nonvirtual imports (bullfrog glue).
     int32_t GetSurfaceDesc(DDSURFACEDESC*); // 0x1006ba6c
     int32_t Lock(SamsUtilities::URectangle::LongRect*, DDSURFACEDESC*, uint32_t,
                  NS_MacDoze::InternalHandle*); // 0x1006bc7c

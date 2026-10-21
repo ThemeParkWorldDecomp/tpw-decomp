@@ -1,4 +1,4 @@
-// Unit v5064: the publish park panel and the online park list panel (src/PublishPanelMsg.cpp; the inventory files them under
+// Unit v5064: the publish park panel and the online park list panel (src/game/ui/ui_publishParkPanel.cpp; the inventory files them under
 // ui_publishParkPanel.cpp and ui_onlineParkListPanel.cpp). The globals below have no known names (invented); the Mac addresses are in
 // the comments and the Mac offsets of the members.
 #pragma once
@@ -43,7 +43,7 @@ void PostRequestUploadCallbackFunction(int32_t error, const void* context);     
 int32_t OnlineParkListPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101ebba8
 void OnlineParkListPostGetAllParksInCityCallbackFn(int32_t error, const void* context, TbPtrList<CFSOnlinePark>* parks);   // 0x101ec444
 
-// Unit v5210 (src/PublishPanelMsg_LCFormat.cpp): the list panel's row functions and its fill. LCFormat and LCPostFormat of
+// Unit v5210 (src/game/ui/ui_onlineParkListPanel.cpp): the list panel's row functions and its fill. LCFormat and LCPostFormat of
 // ui_onlineParkListPanel.cpp (the names exist at other addresses; CreateOnlineParkListPanel above still names the wrong ones).
 class SwearFilter;
 InterfaceWindow* OnlineParkListLCFormat();                 // 0x101ebd58 (LCFormat)

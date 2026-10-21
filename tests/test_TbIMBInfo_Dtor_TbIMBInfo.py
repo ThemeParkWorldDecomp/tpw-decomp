@@ -1,6 +1,6 @@
 """Unit v51128: the ltms destructors TbIMBInfo, TbIFont, TbResource, CStaticMBBuffer, CStaticBuffer, CCharacterHandler, the
 CCharacterHandler constructor and bfl::FileSystem::CFile::Read, against libtpw_unit_TbIMBInfo_Dtor_TbIMBInfo.dylib
-(tests/unit_TbIMBInfo_Dtor_TbIMBInfo.cpp), program "ltms symbols shared", src/TbIMBToUnicode_TbIMBInfo_Dtor_TbIMBInfo.cpp.
+(tests/unit_TbIMBInfo_Dtor_TbIMBInfo.cpp), program "ltms symbols shared", src/ltms/StaticUnicodeBuffer.cpp.
 
 A case builds an object (Mac layout in the emulator; the host wrapper builds the native object at the same block), calls the destructor
 with a hidden delete flag (a short in r4) or the constructor or Read. Fakes on both sides record events: delete (operator delete),

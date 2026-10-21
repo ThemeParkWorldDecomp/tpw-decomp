@@ -1,5 +1,5 @@
 // Test library for std::list<CToken>::insert (unit v5069; libtpw_unit_std_list_insert.dylib, tests/test_std_list_insert.py), main app:
-//   src/COnlineParser_ParseGoto_std_list_insert.cpp
+//   src/game/online/OnlineParser.cpp
 // The callees (operator new, new[], strlen, strcpy, the counted pointer, __throw, CToken's copy constructor) are fakes that record their
 // arguments; the library globals are defined here.
 #include <cstddef>

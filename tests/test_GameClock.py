@@ -1,7 +1,7 @@
-"""Differential test for src/GameClock.cpp: the game clock's 28 functions (CFixedTime,
+"""Differential test for src/game/FixableTime.cpp, src/game/PausableTime.cpp, src/game/VariableTime.cpp, src/game/save/SaveLoad.cpp, src/game/ui/UI_Base.cpp: the game clock's 28 functions (CFixedTime,
 CVariableTime, CPausableTime, CPausableFixedTime, CFixableTime, CSaveableTime and
 CSaveableFixedTime, and the user interface's timeGetTimeClockTickFunction), against
-libtpw_unit_GameClock.dylib. CClock's ten methods (src/Clock.cpp) run on top of them as a
+libtpw_unit_GameClock.dylib. CClock's ten methods (src/game/park/Clock.cpp) run on top of them as a
 chain test, with every time function real on both sides.
 
 A case is an object (a CSaveableTime of 0x44 bytes, a CSaveableFixedTime of 0x20, or a CClock

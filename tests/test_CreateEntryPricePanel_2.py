@@ -1,5 +1,5 @@
 """Unit v5885, the entry price panel (the admission fee panel), against libtpw_unit_CreateEntryPricePanel_2.dylib
-(tests/unit_CreateEntryPricePanel_2.cpp), main app ("SimTheme Park"), src/ShowEditParkNamePanel_CreateEntryPricePanel_2.cpp:
+(tests/unit_CreateEntryPricePanel_2.cpp), main app ("SimTheme Park"), src/game/ui/ui_entryPricePanel.cpp:
   CreateEntryPricePanel 0x1019d660, EntryPricePanelTitleMsg 0x1019d544, EntryPricePanelMsg 0x1019d350
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

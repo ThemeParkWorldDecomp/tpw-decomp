@@ -11,7 +11,7 @@ public:
         void* mData;
         int32_t mSize;
     };
-    // 0x100f46ec (20 bytes, src/BlockSave.cpp): entry `block` = {data, size}. The name is never read.
+    // 0x100f46ec (20 bytes, src/game/save/BlockSave.cpp): entry `block` = {data, size}. The name is never read.
     void RegisterSaveBlock(SaveBlock block, void* data, int32_t size, const char* name);
 
     Entry mBlocks[2];

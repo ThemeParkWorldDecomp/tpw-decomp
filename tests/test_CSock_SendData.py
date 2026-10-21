@@ -1,5 +1,5 @@
 """Unit v5304, the socket wrapper's constructor and SendData, against libtpw_unit_CSock_SendData.dylib (tests/unit_CSock_SendData.cpp),
-main app ("SimTheme Park"), src/Email_Send_CSock_SendData.cpp:
+main app ("SimTheme Park"), src/game/online/Connection.cpp:
   CSock::CSock 0x10201f50, CSock::SendData 0x10202058
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory (big-endian) for the original,

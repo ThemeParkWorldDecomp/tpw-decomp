@@ -1,8 +1,8 @@
 """Unit v5L06, the path tool's pointer and selection accessors, against libtpw_unit_PathInput.dylib (tests/unit_PathInput.cpp), main app:
-  UI_GetMouseXY 0x101ca900 (src/UI_Base_mouse.cpp), SetPotentiallyHighlightedRide 0x1006cfa4 (src/Debug_pointer.cpp),
-  GetPointedAtRide 0x10067254 and LockPointedAtRide 0x10067288 (src/TPRide_pointed.cpp), CIntrface::SetCurrentThing 0x1007dde8
-  (src/intrface_current.cpp), UI_GetSelectedPeep 0x101946f8, UI_GetSelectedObject 0x10194730, UI_SetSelectedObject 0x10194768 and
-  UI_CheckSelected 0x101947e4 (src/ui_allKidsPanel_select.cpp); unit v5L16 adds UI_SetSelectedPeep 0x101947a8 (the same file).
+  UI_GetMouseXY 0x101ca900 (src/game/ui/UI_Base.cpp), SetPotentiallyHighlightedRide 0x1006cfa4 (src/game/rides/RidePreview.cpp),
+  GetPointedAtRide 0x10067254 and LockPointedAtRide 0x10067288 (src/game/TPPointer.cpp), CIntrface::SetCurrentThing 0x1007dde8
+  (src/game/ui/intrface.cpp), UI_GetSelectedPeep 0x101946f8, UI_GetSelectedObject 0x10194730, UI_SetSelectedObject 0x10194768 and
+  UI_CheckSelected 0x101947e4 (src/game/ui/ui_allKidsPanel.cpp); unit v5L16 adds UI_SetSelectedPeep 0x101947a8 (the same file).
 
 A case is the eleven global words the functions touch (the pointer's x and y, the highlighted and potential rides, the keep word, the
 interface's three pointer words, the selection's thing, peep and object), one argument and the function. Both

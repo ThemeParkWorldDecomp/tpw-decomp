@@ -1,6 +1,6 @@
 """Four leaves of the main app that the effect manager calls (original Advisor.cpp and TPAdvisor.cpp ranges):
 RealTimePauseAdjusted 0x10007c68, HOST_Sin 0x100218f4, HOST_Cos 0x10021928 and BMP_GenerateSinTab 0x100259d0
-(src/host_leaves.cpp, library unit_HostLeaves).
+(src/game/advisor/Advisor.cpp, src/game/rides/BumperRide.cpp, library unit_HostLeaves).
 
 A case is a script run on both sides over the same starting state: the table of 512 sines (main app data
 0x102b4ec0) and the three words of the advisor's state the clock keeps its pauses in (0x102b354c + 0x11c, 0x120 and

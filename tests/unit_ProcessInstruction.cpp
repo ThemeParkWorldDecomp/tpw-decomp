@@ -1,5 +1,5 @@
 // Test library for the ride script interpreter (unit v5882; libtpw_unit_ProcessInstruction.dylib, tests/test_ProcessInstruction.py), main app:
-//   src/rsse_objects_ProcessInstruction.cpp   ProcessInstruction 0x100cfdf4
+//   src/game/rides/rsse.cpp   ProcessInstruction 0x100cfdf4
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads (pointers as labels, floats as bits) and answers
 // from the test's queues: the script's program words (ReadScript), the operands' values (ExtractData), the clock, the random numbers, the

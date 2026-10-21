@@ -24,7 +24,7 @@ public:
     uint32_t mColorWord;        // 0x54: RGBA bytes
     CLight* mNext;              // 0x58
 
-    // The setters (src/LevelLights.cpp, unit w110). Each starts with gei_System.UpdateLights().
+    // The setters (src/game/Light.cpp, src/game/TPLevel.cpp, unit w110). Each starts with gei_System.UpdateLights().
     // 0x1000784c (236 bytes): the four colour floats (alpha, red, green, blue), then the colour word from them:
     // alpha in the low byte, blue in bits 8..15, green in bits 16..23, red in the top byte, each as (int)(255.0f * value).
     void SetColor(float alpha, float red, float green, float blue);
@@ -34,7 +34,7 @@ public:
     void SetRadius(float radius);
 };
 
-// The two kinds of light CreateGlobalLight (0x10063d24, src/LevelLights.cpp) makes, 0x74 bytes each on the Mac:
+// The two kinds of light CreateGlobalLight (0x10063d24, src/game/TPLevel.cpp) makes, 0x74 bytes each on the Mac:
 // +0 a pointer to the CLight part at +0x10, +4 the class's vtable, +8 the shared CMapLinkBase. They add no members and no
 // overrides to the light; the Mac gives each its own destructor (CLightParallel::~CLightParallel 0x10007750,
 // CLightPoint::~CLightPoint 0x1006427c, 208 bytes each, untranslated: the host's compiler writes them).
@@ -53,13 +53,13 @@ void IntensifyPix(const CTraits<N>& traits, uint8_t* pix, double alpha, uint32_t
                   uint32_t mask3, uint32_t keepMask, int32_t x, int32_t y, const TbRect& rect);
 }  // namespace tpw_intensify
 
-// Unit v5109: the 3DFont.cpp static initialiser (0x1000757c, src/Light_sinit_3DFont_cpp.cpp). It builds one CLightParallel
+// Unit v5109: the 3DFont.cpp static initialiser (0x1000757c, src/game/ui/3DFont.cpp). It builds one CLightParallel
 // (Mac global 0x102b34c8, 0x74 bytes) and its registration node (Mac 0x102b353c); the host's storage is declared here.
 extern unsigned char gSinit3DFontLight[0x100];
 extern unsigned char gSinit3DFontNode[16];
 void __sinit_3DFont_cpp();   // 0x1000757c
 
-// Unit v5272: the light-node helpers (src/LevelSystems_SetLightColourExplicit.cpp). Each starts with gei_System.UpdateLights().
+// Unit v5272: the light-node helpers (src/game/TPLevel.cpp). Each starts with gei_System.UpdateLights().
 // The parameter block of a light node: mLight points at a slot holding the CLight (Mac +0), mColour at three floats r, g, b (Mac +4).
 struct sNodeLightParams {
     CLight** mLight;   // Mac 0x00
@@ -79,7 +79,7 @@ extern unsigned char gCLightParallelVt3[0x40];   // 0x10278cb4
 void CLightParallel_Delete(void* block);   // operator delete (0x10238218), replaceable by tests
 CLightParallel* CLightParallel_DtorMac(CLightParallel* self, int16_t flag);
 
-// Unit v51119 (src/lobby_globe_close_CLBScreenComponentOnlineGlobe_Show_2_CLBScreenComponentOnlineGlobe_GlobeRight.cpp): destructors
+// Unit v51119 (src/game/rides/RideAnim.cpp, src/game/park/LLCellMouse.cpp, src/game/HLSprite.cpp): destructors
 // with the hidden delete flag on the Mac's raw layout, and the byte swaps (one function per address, names invented).
 class Bitmap;
 struct MapDelta;

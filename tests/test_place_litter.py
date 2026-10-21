@@ -1,5 +1,5 @@
 """Unit v5299, the litter cheats, against libtpw_unit_place_litter.dylib (tests/unit_place_litter.cpp), main app
-("SimTheme Park"), src/ui_Postcard_panel_spawn_handyman_place_litter.cpp:
+("SimTheme Park"), src/game/keyboard.cpp:
   place_litter 0x1014dac8, place_bomb 0x1014db74
 
 A case is a world and a call. The world is written twice by ONE piece of Python code: in emulator memory at the Mac's addresses and in

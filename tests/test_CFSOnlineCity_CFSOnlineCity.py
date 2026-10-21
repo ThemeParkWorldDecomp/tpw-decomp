@@ -1,6 +1,6 @@
 """Unit v5994: the online city record's constructor and destructor, the park record's assignment, the server record's destructor and the
 ride list's post-login callback, against libtpw_unit_CFSOnlineCity_CFSOnlineCity.dylib (tests/unit_CFSOnlineCity_CFSOnlineCity.cpp), main app
-("SimTheme Park"), src/CFSOnlineSystemRideList_RequestListFromServer_CFSOnlineCity_CFSOnlineCity.cpp:
+("SimTheme Park"), src/game/online/FS_OnlineList.cpp:
   CFSOnlineCity::CFSOnlineCity 0x1017bcb4, CFSOnlineCity::~CFSOnlineCity 0x1017be40 (the body is CFSOnlineCity::Destruct),
   CFSOnlinePark::operator= 0x1017c2e4, RideListPostLoginCallbackFn 0x1017b604, CFSOnlineServer::~CFSOnlineServer 0x1017c96c
 

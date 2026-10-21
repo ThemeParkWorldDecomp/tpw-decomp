@@ -1,4 +1,112 @@
-# Unit w210: a ride's names, kind, excitement and stand point, and its final destroy (CObject::UpgradesWhat ... FinalDestroy in src/Object_info.cpp,
-# CMsgRideDeleted's constructor in src/ThingMessages2.cpp, CRideDatabase::GetFileName in src/RideDB_names.cpp). The callees outside the unit are recording
+# Unit w210: a ride's names, kind, excitement and stand point, and its final destroy (CObject::UpgradesWhat ... FinalDestroy in src/game/Object.cpp,
+# CMsgRideDeleted's constructor in src/game/Object.cpp, src/game/ui/MessageCentre.cpp, CRideDatabase::GetFileName in src/game/rides/RideDB.cpp, src/game/save/SaveLoad.cpp). The callees outside the unit are recording
 # fakes in tests/unit_ObjectInfo.cpp; the strings and the 16-bit C library (swprintf, wcslen, wcsncpy) are real.
-set(TPW_UNIT_ObjectInfo src/Object_info.cpp src/gameplay_leaves.cpp src/ThingMessages2.cpp src/RideDB_names.cpp src/TbString.cpp src/TbStringBuffer.cpp platform/arena.cpp platform/msl.cpp)
+set(TPW_UNIT_ObjectInfo src/game/Object.cpp src/game/advisor/Advisor.cpp src/game/park/SkirtDeform.cpp
+    src/game/ui/ui_staffPanel.cpp src/game/ui/MessageCentre.cpp src/game/rides/RideDB.cpp src/game/save/SaveLoad.cpp
+    src/bullfrog/FileSystem.cpp platform/arena.cpp platform/msl.cpp)
+set(TPW_UNIT_ObjectInfo_KEEP
+  __Z10CellIsRide10CELL_MODES   # CellIsRide(CELL_MODES)
+  __Z16LocatorByeByeKidP6CThing   # LocatorByeByeKid(CThing*)
+  __ZN11CMsgNewRideC1E12tag_IDX_TYPEI24IDXTYPEUniqueNameThingIdtE   # CMsgNewRide::CMsgNewRide(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>)
+  __ZN11CMsgNewRideD1Ev   # CMsgNewRide::~CMsgNewRide()
+  __ZN11CRideNameDB7GetNameEiPDsi   # CRideNameDB::GetName(int, char16_t*, int)
+  __ZN11CRideNameDB8GetNameAEiPDsib   # CRideNameDB::GetNameA(int, char16_t*, int, bool)
+  __ZN11CRideNameDB8GetNameBEiPDsi   # CRideNameDB::GetNameB(int, char16_t*, int)
+  __ZN13CRideDatabase11GetFileNameE12tag_IDX_TYPEI25IDXTYPEUniqueNameObjectIdtE   # CRideDatabase::GetFileName(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, unsigned short>)
+  __ZN13CRideDatabase11GetTypeNameEt   # CRideDatabase::GetTypeName(unsigned short)
+  __ZN13CRideDatabase11GetTypeNameEtPDsj   # CRideDatabase::GetTypeName(unsigned short, char16_t*, unsigned int)
+  __ZN13CRideDatabase12GetSignNameAEtPDsj   # CRideDatabase::GetSignNameA(unsigned short, char16_t*, unsigned int)
+  __ZN13CRideDatabase12GetSignNameBEtPDsj   # CRideDatabase::GetSignNameB(unsigned short, char16_t*, unsigned int)
+  __ZN15CMsgBlockedExitC1E12tag_IDX_TYPEI24IDXTYPEUniqueNameThingIdtE   # CMsgBlockedExit::CMsgBlockedExit(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>)
+  __ZN15CMsgBlockedExitD1Ev   # CMsgBlockedExit::~CMsgBlockedExit()
+  __ZN15CMsgRideDeletedC1E12tag_IDX_TYPEI24IDXTYPEUniqueNameThingIdtE   # CMsgRideDeleted::CMsgRideDeleted(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>)
+  __ZN15CMsgRideDeletedD1Ev   # CMsgRideDeleted::~CMsgRideDeleted()
+  __ZN17CMsgRideCondemnedC1E12tag_IDX_TYPEI24IDXTYPEUniqueNameThingIdtE   # CMsgRideCondemned::CMsgRideCondemned(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>)
+  __ZN17CMsgRideCondemnedD1Ev   # CMsgRideCondemned::~CMsgRideCondemned()
+  __ZN18CMsgRideBrokenDownC1E12tag_IDX_TYPEI24IDXTYPEUniqueNameThingIdtE   # CMsgRideBrokenDown::CMsgRideBrokenDown(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>)
+  __ZN18CMsgRideBrokenDownD1Ev   # CMsgRideBrokenDown::~CMsgRideBrokenDown()
+  __ZN20CMsgRideWantsUpgradeC1E12tag_IDX_TYPEI24IDXTYPEUniqueNameThingIdtE   # CMsgRideWantsUpgrade::CMsgRideWantsUpgrade(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, unsigned short>)
+  __ZN20CMsgRideWantsUpgradeD1Ev   # CMsgRideWantsUpgrade::~CMsgRideWantsUpgrade()
+  __ZN7CObject10GetControlEv   # CObject::GetControl()
+  __ZN7CObject12FinalDestroyEv   # CObject::FinalDestroy()
+  __ZN7CObject12GetSignNameAEPDsj   # CObject::GetSignNameA(char16_t*, unsigned int)
+  __ZN7CObject12GetSignNameBEPDsj   # CObject::GetSignNameB(char16_t*, unsigned int)
+  __ZN7CObject12SetSignNameAEPKDs   # CObject::SetSignNameA(char16_t const*)
+  __ZN7CObject12SetSignNameBEPKDs   # CObject::SetSignNameB(char16_t const*)
+  __ZN7CObject12UpgradesWhatEv   # CObject::UpgradesWhat()
+  __ZN7CObject13GetStandPointEiP6MapPosS1_   # CObject::GetStandPoint(int, MapPos*, MapPos*)
+  __ZN7CObject9GetUINameEPDsj   # CObject::GetUIName(char16_t*, unsigned int)
+  __ZN8CAdvisor12FinalDestroyEv   # CAdvisor::FinalDestroy()
+  __ZNK11CMsgNewRide7GetTypeEv   # CMsgNewRide::GetType() const
+  __ZNK15CMsgBlockedExit7GetTypeEv   # CMsgBlockedExit::GetType() const
+  __ZNK15CMsgRideDeleted7GetTypeEv   # CMsgRideDeleted::GetType() const
+  __ZNK17CMsgRideCondemned7GetTypeEv   # CMsgRideCondemned::GetType() const
+  __ZNK18CMsgRideBrokenDown7GetTypeEv   # CMsgRideBrokenDown::GetType() const
+  __ZNK20CMsgRideWantsUpgrade7GetTypeEv   # CMsgRideWantsUpgrade::GetType() const
+  __ZNK7CObject11GetFileNameEv   # CObject::GetFileName() const
+  __ZNK7CObject11IsTrackRideEv   # CObject::IsTrackRide() const
+  __ZNK7CObject18GetExcitementLevelEb   # CObject::GetExcitementLevel(bool) const
+  __ZNK7CObject29GetProspectiveExcitementLevelEiii   # CObject::GetProspectiveExcitementLevel(int, int, int) const
+  __ZNK7CObject9IsCoasterEv   # CObject::IsCoaster() const
+  _gObjectSignNameBuffer
+  _gObjectUINameBuffer
+  _gRideMissingName
+  _gRideNameTable
+  __ZN22TbStaticStringTemplateIcE8ResizeToEj   # template void TbStaticStringTemplate<char>::ResizeTo(uint32_t) (explicit instantiation)
+  __ZN22TbStaticStringTemplateIcEC1EPcji   # template TbStaticStringTemplate<char>::TbStaticStringTemplate(char*, uint32_t, int32_t) (explicit instantiation)
+  __ZN22TbStaticStringTemplateIcED1Ev   # template TbStaticStringTemplate<char>::~TbStaticStringTemplate() (explicit instantiation)
+  __ZN22TbStaticStringTemplateIcEaSEPKc   # template TbStaticStringTemplate<char>& TbStaticStringTemplate<char>::operator=(const char*) (explicit instantiation)
+  __ZN22TbStaticStringTemplateIcEaSERK12TbStringBaseIcE   # template TbStaticStringTemplate<char>& TbStaticStringTemplate<char>::operator=(const TbStringBase<char>&) (explicit instantiation)
+  __ZN22TbStaticStringTemplateIcEaSERKc   # template TbStaticStringTemplate<char>& TbStaticStringTemplate<char>::operator=(const char&) (explicit instantiation)
+  __ZN22TbStaticStringTemplateIcEpLEPKc   # template TbStaticStringTemplate<char>& TbStaticStringTemplate<char>::operator+=(const char*) (explicit instantiation)
+  __ZN22TbStaticStringTemplateIcEpLERK12TbStringBaseIcE   # template TbStaticStringTemplate<char>& TbStaticStringTemplate<char>::operator+=(const TbStringBase<char>&) (explicit instantiation)
+  __ZN22TbStaticStringTemplateIcEpLERKc   # template TbStaticStringTemplate<char>& TbStaticStringTemplate<char>::operator+=(const char&) (explicit instantiation)
+  __ZTS12TbStringBaseIDsE   # template class TbStringBase<char16_t> (explicit instantiation)
+  __ZTS12TbStringBaseIcE   # template class TbStringBase<char> (explicit instantiation)
+  __ZTS23TbDynamicStringTemplateIDsE   # template class TbDynamicStringTemplate<char16_t> (explicit instantiation)
+  __ZTS23TbDynamicStringTemplateIcE   # template class TbDynamicStringTemplate<char> (explicit instantiation)
+  tmpl_10f1a43abff8@bullfrog/FileSystem.cpp   # operator+= (a template definition src/TbString.cpp had before the regroup)
+  tmpl_12b48e599676@bullfrog/FileSystem.cpp   # TbDynamicStringTemplate<Char> (a template definition src/TbString.cpp had before the regroup)
+  tmpl_13aaac678a90@bullfrog/FileSystem.cpp   # ~TbDynamicStringTemplate<Char> (a template definition src/TbString.cpp had before the regroup)
+  tmpl_156c9453e350@bullfrog/FileSystem.cpp   # ResizeTo (a template definition src/TbStringBuffer.cpp had before the regroup)
+  tmpl_177fef366926@bullfrog/FileSystem.cpp   # SBCstrcpy (a template definition src/TbString.cpp had before the regroup)
+  tmpl_1b2c80ece410@bullfrog/FileSystem.cpp   # FindOneOf (a template definition src/TbString.cpp had before the regroup)
+  tmpl_1eedb09deef3@bullfrog/FileSystem.cpp   # SBCstrncat (a template definition src/TbString.cpp had before the regroup)
+  tmpl_1fb948d1a8d7@bullfrog/FileSystem.cpp   # operator== (a template definition src/TbString.cpp had before the regroup)
+  tmpl_31520eb2cde0@bullfrog/FileSystem.cpp   # operator< (a template definition src/TbString.cpp had before the regroup)
+  tmpl_3b898e0ec42d@bullfrog/FileSystem.cpp   # Length (a template definition src/TbString.cpp had before the regroup)
+  tmpl_3f76b5cf6898@bullfrog/FileSystem.cpp   # operator= (a template definition src/TbString.cpp had before the regroup)
+  tmpl_4209e9eb338a@bullfrog/FileSystem.cpp   # TbDynamicStringTemplate<Char> (a template definition src/TbString.cpp had before the regroup)
+  tmpl_444e69a72b25@bullfrog/FileSystem.cpp   # operator= (a template definition src/TbStringBuffer.cpp had before the regroup)
+  tmpl_47746be482c6@bullfrog/FileSystem.cpp   # Right (a template definition src/TbString.cpp had before the regroup)
+  tmpl_5072774eb760@bullfrog/FileSystem.cpp   # Find (a template definition src/TbString.cpp had before the regroup)
+  tmpl_56b8c8679dbb@bullfrog/FileSystem.cpp   # operator= (a template definition src/TbString.cpp had before the regroup)
+  tmpl_58045e5a0a73@bullfrog/FileSystem.cpp   # AllocBuffer (a template definition src/TbStringBuffer.cpp had before the regroup)
+  tmpl_5e6789bb3ff3@bullfrog/FileSystem.cpp   # TbDynamicStringTemplate<Char> (a template definition src/TbString.cpp had before the regroup)
+  tmpl_62d628fca008@bullfrog/FileSystem.cpp   # FindReverseOneOf (a template definition src/TbString.cpp had before the regroup)
+  tmpl_67728c1f6bc2@bullfrog/FileSystem.cpp   # ResizeTo (a template definition src/TbStringBuffer.cpp had before the regroup)
+  tmpl_6fee3b71ae69@bullfrog/FileSystem.cpp   # LockBuffer (a template definition src/TbString.cpp had before the regroup)
+  tmpl_7a81918ce0ed@bullfrog/FileSystem.cpp   # operator+= (a template definition src/TbStringBuffer.cpp had before the regroup)
+  tmpl_7d7b5671d9c8@bullfrog/FileSystem.cpp   # operator+= (a template definition src/TbString.cpp had before the regroup)
+  tmpl_7f7c954a7476@bullfrog/FileSystem.cpp   # operator= (a template definition src/TbStringBuffer.cpp had before the regroup)
+  tmpl_8078b9a106a6@bullfrog/FileSystem.cpp   # Find (a template definition src/TbString.cpp had before the regroup)
+  tmpl_89c56dab9bda@bullfrog/FileSystem.cpp   # Left (a template definition src/TbString.cpp had before the regroup)
+  tmpl_90c753af4ad8@bullfrog/FileSystem.cpp   # operator= (a template definition src/TbStringBuffer.cpp had before the regroup)
+  tmpl_923c787ed96b@bullfrog/FileSystem.cpp   # operator+= (a template definition src/TbString.cpp had before the regroup)
+  tmpl_9329dea9cdff@bullfrog/FileSystem.cpp   # operator== (a template definition src/TbString.cpp had before the regroup)
+  tmpl_966b985e3b04@bullfrog/FileSystem.cpp   # TbDynamicStringTemplate<Char> (a template definition src/TbString.cpp had before the regroup)
+  tmpl_a2ea62013ee7@bullfrog/FileSystem.cpp   # SBCstrlen (a template definition src/TbString.cpp had before the regroup)
+  tmpl_a65764511fd4@bullfrog/FileSystem.cpp   # ReleaseBuffer (a template definition src/TbString.cpp had before the regroup)
+  tmpl_aa572ba6c8bb@bullfrog/FileSystem.cpp   # ~TbStaticStringTemplate<Char> (a template definition src/TbString.cpp had before the regroup)
+  tmpl_b04e950cbb16@bullfrog/FileSystem.cpp   # FindReverse (a template definition src/TbString.cpp had before the regroup)
+  tmpl_be6e319ad7a7@bullfrog/FileSystem.cpp   # TbStaticStringTemplate<Char> (a template definition src/TbString.cpp had before the regroup)
+  tmpl_bf7094367fc1@bullfrog/FileSystem.cpp   # operator= (a template definition src/TbString.cpp had before the regroup)
+  tmpl_c2f8bf00de94@bullfrog/FileSystem.cpp   # operator+= (a template definition src/TbStringBuffer.cpp had before the regroup)
+  tmpl_c4b2c4a972d6@bullfrog/FileSystem.cpp   # Mid (a template definition src/TbString.cpp had before the regroup)
+  tmpl_cd6077897b68@bullfrog/FileSystem.cpp   # operator!= (a template definition src/TbString.cpp had before the regroup)
+  tmpl_d3aef466ce77@bullfrog/FileSystem.cpp   # SBCstrcat (a template definition src/TbString.cpp had before the regroup)
+  tmpl_d3d969d3322f@bullfrog/FileSystem.cpp   # SBCstrncpy (a template definition src/TbString.cpp had before the regroup)
+  tmpl_d4a4fb92aa5f@bullfrog/FileSystem.cpp   # Mid (a template definition src/TbString.cpp had before the regroup)
+  tmpl_d809f9651e41@bullfrog/FileSystem.cpp   # operator+= (a template definition src/TbStringBuffer.cpp had before the regroup)
+  tmpl_feba63a511e0@bullfrog/FileSystem.cpp   # operator= (a template definition src/TbString.cpp had before the regroup)
+)

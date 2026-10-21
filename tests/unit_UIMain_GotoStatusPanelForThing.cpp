@@ -1,6 +1,6 @@
 // Test library for UIMain_GotoStatusPanelForThing (unit v5071; libtpw_unit_UIMain_GotoStatusPanelForThing.dylib,
 // tests/test_UIMain_GotoStatusPanelForThing.py), main app:
-//   src/ui_main_kbcapture_UIMain_ShowRidePreview_UIMain_GotoStatusPanelForThing.cpp   the function and the two halfword globals
+//   src/game/ui/ui_main.cpp   the function and the two halfword globals
 //
 // The callees outside the unit (the panels' Show, CObject::GetDBInfo, GetUpgradeParent, UpgradesWhat) are fakes that record the arguments
 // the real ones read; the thing array and the panel objects of other files are defined here, zero at start like the Mac's bss.

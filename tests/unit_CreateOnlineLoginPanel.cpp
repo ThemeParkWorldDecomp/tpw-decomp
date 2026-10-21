@@ -1,5 +1,5 @@
 // Test library for CreateOnlineLoginPanel (unit v5339; libtpw_unit_CreateOnlineLoginPanel.dylib, tests/test_CreateOnlineLoginPanel.py), main app:
-//   src/UI_IslandLobby_UpdateOnlineCityInfoOverlay_CreateOnlineLoginPanel.cpp
+//   src/game/ui/ui_onlineLogin.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read. The windows are six fixed blocks in the arena (the
 // dialog and its five children); their virtual SetText is a fake. The constructors of the draw objects are fakes under their real symbols.

@@ -1,5 +1,5 @@
 // Test library for BMP_DrawCarsForRide (unit v5672; libtpw_unit_BMP_DrawCarsForRide.dylib, tests/test_BMP_DrawCarsForRide.py), main app:
-//   src/BMP_DrawCarsForRide.cpp   BMP_DrawCarsForRide and its five data words (gDrawCars*)
+//   src/game/rides/BumperRide.cpp   BMP_DrawCarsForRide and its five data words (gDrawCars*)
 //
 // The callees outside the unit are recording fakes (GetMeshPtrAtHFieldCell, SetRideSpritePosnFocus, GetRideHeightAtPoint,
 // SetLMatrixIdentityNoTrans, RotateLMatrixXYZNoTrans, PAR_InitEmitter); the globals of other files the unit reads are defined here.

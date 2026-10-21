@@ -1,5 +1,5 @@
 // Test library for the staff and kid locator panels (unit v5343; libtpw_unit_ShowKidLocatorPanel.dylib, tests/test_ShowKidLocatorPanel.py), main app:
-//   src/ui_staffPanel_ShowKidLocatorPanel.cpp   ShowStaffPanel, ShowKidLocatorPanel
+//   src/game/ui/ui_staffPanel.cpp   ShowStaffPanel, ShowKidLocatorPanel
 //
 // The callees outside the unit are fakes that record the arguments the real ones read; the globals of other files are defined here.
 #include <cstddef>

@@ -1,10 +1,10 @@
 """Unit w68, the online system's construction, against libtpw_unit_OnlineInit.dylib (tests/unit_OnlineInit.cpp), in the main app
 ("SimTheme Park"):
-  src/FS_Online_init.cpp  CFSOnlineSystem::CFSOnlineSystem 0x1016f7d0, InitLogin 0x101719f8, ReleaseLoginConnection 0x10171b68,
+  src/game/online/FS_Online.cpp  CFSOnlineSystem::CFSOnlineSystem 0x1016f7d0, InitLogin 0x101719f8, ReleaseLoginConnection 0x10171b68,
                           InitNews 0x10172238, ReleaseNewsConnection 0x1017249c, InitCity 0x101735cc, ReleaseCityServerConnection
                           0x10174ac8, InitUpload 0x10175a18, ReleaseUploadServerConnection 0x1017598c, InitFTPDownload 0x10176cec,
                           ReleaseFTPDownloadServerConnection 0x101770dc, TickLogin 0x10171adc
-  src/FS_OnlineList.cpp   CFSOnlineSystemThemeList 0x10179a28, CFSOnlineSystemServerList 0x1017a604, CFSOnlineSystemRideList
+  src/game/online/FS_OnlineList.cpp   CFSOnlineSystemThemeList 0x10179a28, CFSOnlineSystemServerList 0x1017a604, CFSOnlineSystemRideList
                           0x1017b1ac constructors, CFSOnlinePark::CFSOnlinePark() 0x1017bf30
 
 A case is a script on one online system: the object is made over filler bytes (the constructor, traced for the constructor cases),

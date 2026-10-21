@@ -1,5 +1,5 @@
 // Test library for std::basic_string<wchar_t>::operator[] (unit v5099; libtpw_unit_std_basic_string_operator.dylib,
-// tests/test_std_basic_string_operator.py), main app: src/std_basic_string_operator.cpp.
+// tests/test_std_basic_string_operator.py), main app: src/game/MslSupport.cpp.
 // The callees (operator new, wmemcpy) are fakes that record their arguments.
 #include <cstddef>
 #include <cstdint>

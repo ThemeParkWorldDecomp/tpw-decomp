@@ -1,5 +1,5 @@
 """Unit v5975, the text box, the string heap and a timer's operator delete, against libtpw_unit_InterfaceTextBox_CalcTextPos_2.dylib
-(tests/unit_InterfaceTextBox_CalcTextPos_2.cpp), main app ("SimTheme Park"), src/ui_whatami_InterfaceTextBox_CalcTextPos_2.cpp:
+(tests/unit_InterfaceTextBox_CalcTextPos_2.cpp), main app ("SimTheme Park"), src/game/ui/InterfaceStringHeap.cpp, src/game/ui/InterfaceTextBox.cpp:
   InterfaceTextBox::CalcTextPos 0x101d7dac, InterfaceTextBox::SetText 0x101d7f50, InterfaceStringHeap::GetAndCopy 0x101d7b60,
   InterfaceStringHeap::GetString 0x101d79ec, InterfaceTimer::operator_delete 0x101d822c
 

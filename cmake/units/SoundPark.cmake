@@ -3,4 +3,30 @@
 # SOUND_FadeSoundEffect), RSSE_GetSoundEventCode, LbFile_Read/Write/Seek, the SamsUtilities swaps and the audio object are fakes in
 # the unit file.
 # The game builds TbSysCommand objects whose Execute bodies are the library's (unit w79h): tests/fake_syscommands.cpp answers 0 for them.
-set(TPW_UNIT_SoundPark src/SoundPark.cpp src/TPSound.cpp tests/fake_syscommands.cpp)
+set(TPW_UNIT_SoundPark src/game/Sound.cpp src/game/park/ParkSound.cpp tests/fake_syscommands.cpp)
+set(TPW_UNIT_SoundPark_KEEP
+  __Z12SND_DipMusici   # SND_DipMusic(int)
+  __Z14SND_DuckVolumei   # SND_DuckVolume(int)
+  __Z16SND_SetRainLeveli   # SND_SetRainLevel(int)
+  __Z16SOUND_LoadStatusPv   # SOUND_LoadStatus(void*)
+  __Z16SOUND_SaveStatusPv   # SOUND_SaveStatus(void*)
+  __Z17SND_StopParkMusicv   # SND_StopParkMusic()
+  __Z18SND_StartParkMusicv   # SND_StartParkMusic()
+  __Z18SOUND_SetSfxStatusj   # SOUND_SetSfxStatus(unsigned int)
+  __Z19SND_SetChatterLeveli   # SND_SetChatterLevel(int)
+  __Z19SND_SetChatterOnOffi   # SND_SetChatterOnOff(int)
+  __Z20SOUND_SetMusicStatusj   # SOUND_SetMusicStatus(unsigned int)
+  __Z21SND_SetParkMusicLeveli   # SND_SetParkMusicLevel(int)
+  __Z21SOUND_SetSpeechStatusj   # SOUND_SetSpeechStatus(unsigned int)
+  __Z23SND_SendIndirectedEventiiiiiii   # SND_SendIndirectedEvent(int, int, int, int, int, int, int)
+  _gAudioSystem
+  _gLobbyIslandSoundCount
+  _gLobbyIslandSounds
+  _gLobbyThunderBank
+  _gLocalParkMusicBank
+  _gSoundAllocations
+  _gSoundBanks
+  _gSoundSettings
+  _gSoundSystemOn
+  _gSoundWanted
+)

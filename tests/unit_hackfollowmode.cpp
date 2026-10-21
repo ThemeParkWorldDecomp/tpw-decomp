@@ -1,5 +1,5 @@
 // Test library for the staff panel's status and location leaves (unit v5076; libtpw_unit_hackfollowmode.dylib, tests/test_hackfollowmode.py), main app:
-//   src/ui_staffPanel_msg_hackfollowmode.cpp   UpdateStatus, UpdateLocator, StaffLocationSwitch, hackfollowmode
+//   src/game/ui/ui_staffPanel.cpp   UpdateStatus, UpdateLocator, StaffLocationSwitch, hackfollowmode
 //
 // The callees outside the unit are recording fakes (GetNextStaffMember, the window members, the CStaff queries, TbITable::FormatString, the
 // drawing and zoom calls). The windows are real InterfaceWindow objects of this library whose constructor and virtuals are defined here: SetValue

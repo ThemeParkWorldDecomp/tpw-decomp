@@ -1,6 +1,6 @@
 // Test library for the FTP client's RecvData, destructor body, Connect and _EnterPassiveMode (unit v5101;
 // libtpw_unit_FTPClient_RecvData.dylib, tests/test_FTPClient_RecvData.py), main app:
-//   src/FTPClient_RecvData.cpp
+//   src/game/online/FTPClient.cpp
 //
 // Every callee outside the unit is a fake that records what the real one reads and answers from the test's queues.
 #include <cstddef>

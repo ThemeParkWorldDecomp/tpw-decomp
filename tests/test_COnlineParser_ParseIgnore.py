@@ -1,5 +1,5 @@
 """Unit v5555, COnlineParser::ParseIgnore and DoParse, against libtpw_unit_COnlineParser_ParseIgnore.dylib
-(tests/unit_COnlineParser_ParseIgnore.cpp), main app, src/COnlineParser_ParseGoto_COnlineParser_ParseIgnore.cpp:
+(tests/unit_COnlineParser_ParseIgnore.cpp), main app, src/game/online/OnlineParser.cpp:
   ParseIgnore 0x1020fbd4, DoParse 0x1020e608
 
 A case builds a parser object (arguments vector pointer, text pointer) twice, calls the function and compares the answer, the

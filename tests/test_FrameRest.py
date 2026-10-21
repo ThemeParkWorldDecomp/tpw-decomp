@@ -1,5 +1,5 @@
-"""The last stand-ins of the lobby's frame (engine library, src/tb_hfield_conquad.cpp,
-src/tb_texturecache_balance.cpp and src/tb_rendermemory_execute.cpp), original versus translation:
+"""The last stand-ins of the lobby's frame (engine library, src/engine/tb_hfield.cpp,
+src/engine/Gamut.cpp, src/engine/TextureCache.cpp and src/engine/RenderMemory.cpp), original versus translation:
 CHField::TestConQuad, CycleFrequencyTable, CTextureLink::CalcUsage, CTextureCache::AutoMipmap,
 Entry_Compress, BalanceCache_FreeLockedTextureSpace, BalanceCache_LevelSurfaceUsage and the render
 memory's CRenderMemory::ExecuteUnrenderedPrimitives with its three sorts.

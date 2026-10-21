@@ -1,5 +1,5 @@
 // Test library for PlaceEndPylons and CoasterUVAnimTick (unit v5641; libtpw_unit_PlaceEndPylons.dylib, tests/test_PlaceEndPylons.py), main app:
-//   src/LevelSystems_PlaceEndPylons.cpp   PlaceEndPylons, CoasterUVAnimTick
+//   src/game/rides/TPCoaster.cpp   PlaceEndPylons, CoasterUVAnimTick
 //
 // The callees outside the unit (FindDataNodeIndexByID, NewPylon, NewTrackBrace, GetRideAnimTime, FloatToCell) are fakes that record the
 // arguments the real ones read and answer from the test's queues. gRideAnimSets is defined here, zero at start like the Mac's bss.

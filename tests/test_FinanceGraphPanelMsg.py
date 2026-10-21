@@ -1,5 +1,5 @@
 """Unit v5073, the finance graph panel message handler, against libtpw_unit_FinanceGraphPanelMsg.dylib (tests/unit_FinanceGraphPanelMsg.cpp), main app
-("SimTheme Park"), src/FinanceGraphPanelMsg.cpp:
+("SimTheme Park"), src/game/ui/ui_FinancePanel.cpp:
   FinanceGraphPanelMsg 0x1019f5e4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

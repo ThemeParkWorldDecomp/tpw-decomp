@@ -1,5 +1,5 @@
 // Test library for LLCR_OverRide (unit v5033; libtpw_unit_LLCR_OverRide.dylib, tests/test_LLCR_OverRide.py), main app:
-//   src/LLCR_OverRide.cpp   LLCR_OverRide(uint16_t*, int32_t, int32_t)
+//   src/game/park/LLCellRide.cpp   LLCR_OverRide(uint16_t*, int32_t, int32_t)
 //
 // The callee at 0x1008905c is a fake that records the two ints it is given the addresses of and writes a queued halfword to the output.
 // gMainBalance and gGameWorld are defined here (raw storage for the balance, whose constructor is not compiled).

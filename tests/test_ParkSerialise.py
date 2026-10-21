@@ -1,5 +1,5 @@
 """Differential test for unit w162, CParkAnalyser::Serialise 0x100e3004 (4,432 bytes), against libtpw_unit_ParkSerialise.dylib
-(tests/unit_ParkSerialise.cpp), main app ("SimTheme Park"), src/ParkAnalyser_serialise.cpp.
+(tests/unit_ParkSerialise.cpp), main app ("SimTheme Park"), src/game/park/analyser.cpp.
 
 A case is an analyser image of 0x21c48 bytes with 0x40 guard bytes on each side, filled with random bytes (the same bytes on both sides), and a call
 (save, version, unused). Every callee is a fake on both sides that writes nothing: CThing::Serialise 0x1012e010, CParkAnalyserCell::Serialise 0x100e60a0,

@@ -1,6 +1,6 @@
 // Test library for the static initialiser of AdvisorScoring.cpp (unit v5018; libtpw_unit_sinit_AdvisorScoring_cpp.dylib,
 // tests/test_sinit_AdvisorScoring_cpp.py), main app:
-//   src/sinit_AdvisorScoring_cpp.cpp   __sinit_AdvisorScoring_cpp, the string storage and node, DestroyAdvisorString
+//   src/game/advisor/AdvisorScoring.cpp   __sinit_AdvisorScoring_cpp, the string storage and node, DestroyAdvisorString
 //
 // The string constructor and __register_global_object are fakes that record what the real ones read. The scorer sources and the
 // message table are defined here (other files define them in the program).

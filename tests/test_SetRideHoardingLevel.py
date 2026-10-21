@@ -1,5 +1,5 @@
 """Unit v5987, the ride hoardings, against libtpw_unit_SetRideHoardingLevel.dylib (tests/unit_SetRideHoardingLevel.cpp), main app
-("SimTheme Park"), src/LevelSystems_SetRideHoardingLevel.cpp:
+("SimTheme Park"), src/game/park/TPHoardings.cpp:
   SetRideHoardingLevel 0x10061268, EnableRideHoardings 0x10061060, ActivateHoardings 0x100614a0, ReactivateHoardings 0x10061840
 
 A case is a world and a call. The world (a ride animation set, its mesh, the dynamic mesh set with its entry, face set, vertices and UVs,

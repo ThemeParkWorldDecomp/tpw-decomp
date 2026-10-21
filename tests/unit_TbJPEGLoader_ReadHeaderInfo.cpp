@@ -1,5 +1,5 @@
 // Test library for the Bullfrog JPEG loader (unit v5528; libtpw_unit_TbJPEGLoader_ReadHeaderInfo.dylib, tests/test_TbJPEGLoader_ReadHeaderInfo.py), bullfrog:
-//   src/Lbgfsave_iffgiftim_TbJPEGLoader_ReadHeaderInfo.cpp   TbJPEGLoader::ReadHeaderInfo, ReadData, ValidImage
+//   src/bullfrog/TbJPEGSaver.cpp   TbJPEGLoader::ReadHeaderInfo, ReadData, ValidImage
 //
 // The callees are recording fakes: the file's Seek (through its vtable), the eight libjpeg imports (the fakes write the
 // fields of the decompress struct the loader reads), TbRenderArea's constructors, AllocMemory, FreeMemory, SetupClientRA,

@@ -1,5 +1,5 @@
 // Test library for six advisor scorers (unit v5973; libtpw_unit_CAdvisorScoring__ADVISOR_RIDES_POOR_SELECTION_2.dylib), main app:
-//   src/AdvisorScoring_CAdvisorScoring__ADVISOR_WEALTH_HIGH_REPAY_LOAN_CAdvisorScoring__ADVISOR_RIDES_POOR_SELECTION_2.cpp
+//   src/game/advisor/AdvisorScoring.cpp
 //
 // The analyser, research lab, park time, history and map callees are recording fakes answering from the test's queues.
 #include <cstddef>

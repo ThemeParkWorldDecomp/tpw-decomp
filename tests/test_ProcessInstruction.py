@@ -1,6 +1,6 @@
 """Unit v5882, the ride script interpreter (one instruction of a script's program per call), against
 libtpw_unit_ProcessInstruction.dylib (tests/unit_ProcessInstruction.cpp), main app ("SimTheme Park"),
-src/rsse_objects_ProcessInstruction.cpp:
+src/game/rides/rsse.cpp:
   ProcessInstruction 0x100cfdf4
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

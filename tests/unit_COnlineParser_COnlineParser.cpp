@@ -1,6 +1,6 @@
 // Test library for the COnlineParser constructor, destructor and four simple commands (unit v5131;
 // libtpw_unit_COnlineParser_COnlineParser.dylib, tests/test_COnlineParser_COnlineParser.py), main app:
-//   src/COnlineParser_ParseGoto_COnlineParser_COnlineParser.cpp
+//   src/game/online/OnlineParser.cpp
 //
 // Every callee is a fake recording its pointers as (range tag * 0x10000 + offset), the module registers the ranges.
 #include <cstddef>

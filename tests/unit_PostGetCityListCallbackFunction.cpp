@@ -1,5 +1,5 @@
 // Test library for PostGetCityListCallbackFunction (unit v5128), main app:
-//   src/lobby_globe_close_PostGetCityListCallbackFunction.cpp
+//   src/game/online/lobby_globe.cpp
 //
 // The context is a screen whose two virtual slots (0x30, 0x34) are recording fakes.
 #include <cstddef>

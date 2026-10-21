@@ -1,4 +1,45 @@
 # Fast transforms share the decoder's real planes and CIgArray, and use the real zlib bridge.
-set(TPW_UNIT_WaveletFast src/Wavelet_fast.cpp src/Wavelet_decode.cpp src/lb_zlib.cpp src/tb_resource_texture.cpp)
+set(TPW_UNIT_WaveletFast src/engine/Wavelet.cpp src/engine/EngineUtil.cpp src/bullfrog/LbZLib.cpp
+    src/engine/tb_resource_texture.cpp)
+set(TPW_UNIT_WaveletFast_KEEP
+  __Z10SwapHeaderP14ZLibCompHeader   # SwapHeader(ZLibCompHeader*)
+  __Z10read_resetv   # read_reset()
+  __Z14LzssDecompressPvS_   # LzssDecompress(void*, void*)
+  __Z20LbZLib_MemDecompressPvS_S_   # LbZLib_MemDecompress(void*, void*, void*)
+  __Z24ConvertSurfaceSizeToFlagi   # ConvertSurfaceSizeToFlag(int)
+  __Z9read_codej   # read_code(unsigned int)
+  __ZN11CWaveletImp10DecompressEiiiiPvS0_S0_ffff   # CWaveletImp::Decompress(int, int, int, int, void*, void*, void*, float, float, float, float)
+  __ZN11CWaveletImp10DecompressEiiiiiiiPvS0_S0_ffff   # CWaveletImp::Decompress(int, int, int, int, int, int, int, void*, void*, void*, float, float, float, float)
+  __ZN11CWaveletImp10DecompressEjjbPKhPhfff   # CWaveletImp::Decompress(unsigned int, unsigned int, bool, unsigned char const*, unsigned char*, float, float, float)
+  __ZN11CWaveletImp14Decompress_v13EiiiPvS0_S0_ffff   # CWaveletImp::Decompress_v13(int, int, int, void*, void*, void*, float, float, float, float)
+  __ZN11CWaveletImp15ConvertAndBlendEjjjPh   # CWaveletImp::ConvertAndBlend(unsigned int, unsigned int, unsigned int, unsigned char*)
+  __ZN11CWaveletImp18DecompressMonoFastEjjPKhPhf   # CWaveletImp::DecompressMonoFast(unsigned int, unsigned int, unsigned char const*, unsigned char*, float)
+  __ZN11CWaveletImp18ReverseChannelFastEPfS0_jj   # CWaveletImp::ReverseChannelFast(float*, float*, unsigned int, unsigned int)
+  __ZN11CWaveletImp19DecompressColorFastEjjPKhPhfff   # CWaveletImp::DecompressColorFast(unsigned int, unsigned int, unsigned char const*, unsigned char*, float, float, float)
+  __ZN11CWaveletImp20ReverseTransformVertEPKfPfii   # CWaveletImp::ReverseTransformVert(float const*, float*, int, int)
+  __ZN16CTextureSettings12GetAlphaMaskEv   # CTextureSettings::GetAlphaMask()
+  __ZN16CTextureSettings15OutputDebugInfoEv   # CTextureSettings::OutputDebugInfo()
+  __ZN16CTextureSettings16CalculateUVFixupEv   # CTextureSettings::CalculateUVFixup()
+  __ZN16CTextureSettingsC1Ev   # CTextureSettings::CTextureSettings()
+  __ZNK3bfl8compress5CZLib13MemDecompressEPhS2_S2_   # bfl::compress::CZLib::MemDecompress(unsigned char*, unsigned char*, unsigned char*) const
+  __ZNK3bfl8compress5CZLib21CompressWorkspaceSizeEv   # bfl::compress::CZLib::CompressWorkspaceSize() const
+  _gLzssBitBuffer
+  _gLzssBitCount
+  _gLzssDest
+  _gLzssSource
+  _gLzssSourcePos
+  _gLzssUnused
+  _gWaveletH0
+  _gWaveletH1
+  _gWaveletH2
+  _gWaveletH3
+  _gWaveletPlanes
+  _gei_TextureSettings
+  __ZTS8CIgArrayIffE   # template class CIgArray<float, float> (explicit instantiation)
+  tmpl_1103eef775d0@engine/Wavelet.cpp   # ~CIgArray<TYPE, ARG_TYPE> (a template definition src/Wavelet_decode.cpp had before the regroup)
+  tmpl_3e204a388746@engine/Wavelet.cpp   # SetSize (a template definition src/Wavelet_decode.cpp had before the regroup)
+  tmpl_85479d03856e@engine/Wavelet.cpp   # CIgArray<TYPE, ARG_TYPE> (a template definition src/Wavelet_decode.cpp had before the regroup)
+  tmpl_d3d5f0f93447@engine/Wavelet.cpp   # GetData (a template definition src/Wavelet_decode.cpp had before the regroup)
+)
 set(TPW_UNIT_WaveletFast_OWN_CALLLOG ON)
 cmake_language(DEFER CALL target_link_libraries tpw_unit_WaveletFast PRIVATE ZLIB::ZLIB)

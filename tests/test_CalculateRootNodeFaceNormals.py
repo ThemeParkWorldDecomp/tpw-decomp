@@ -1,5 +1,5 @@
 """Unit v5338, ride mesh helpers, against libtpw_unit_CalculateRootNodeFaceNormals.dylib (tests/unit_CalculateRootNodeFaceNormals.cpp), main app
-("SimTheme Park"), src/RideTypes_CalculateRootNodeFaceNormals.cpp:
+("SimTheme Park"), src/game/rides/TPRide.cpp:
   CalculateRootNodeFaceNormals 0x100694c8, GetBlendedBaseTextures 0x10069770, GetNodeWorldVertPosnsIntoGeomBuffer 0x10068dec
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

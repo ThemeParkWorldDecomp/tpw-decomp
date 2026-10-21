@@ -4,13 +4,13 @@
 // tb_sprite.cpp (SSpriteEngineData, SSpriteGameData) and tb_spritelist.cpp (next to
 // CSpriteList), so this header should be split into those files when they are translated.
 //
-// PARTIAL. Translated (src/tb_spritefileio.cpp, with the sprite file reader of
+// PARTIAL. Translated (src/engine/SpriteData.cpp, src/engine/SpriteManager.cpp, with the sprite file reader of
 // include/sprite_engine.h): SSpriteEngineData's constructor, destructor, CreateTextureEntry,
 // Load_WCT, Load_RLE, Init(int, int), RefreshPartialTexture and Close; SSpriteGameData's
 // constructor, SetUsedPosition and SetUsedSize; CSpriteList's constructor, destructor and Init.
-// src/tb_sprites_partial.cpp and src/tb_sprites_shadow.cpp (unit w41b): SSpriteGameData's DrawPartial,
+// src/engine/SpriteData.cpp (unit w41b): SSpriteGameData's DrawPartial,
 // CreateShadow, DrawRegularShadow and AddRegularShadow.
-// src/tb_spritelist_rest.cpp (unit w38): SSpriteEngineData's Init(char*), SetUsedPart and the partial
+// src/engine/SpriteData.cpp, src/engine/SpriteManager.cpp (unit w38): SSpriteEngineData's Init(char*), SetUsedPart and the partial
 // texture trio, CSpriteList's Close, Prepare, GetData and GetLinkType. The rest is declared for what its
 // callers use (tb_ezsprite.cpp, the sprite manager) and is not translated: the sprite drawing
 // (SSpriteGameData's frame members; CMatrix::operator*, emitted in this range, is in tb_matrix.h).
@@ -33,7 +33,7 @@ struct SVertex;
 
 // A loaded sprite (0x18 bytes on the Mac). The destructor is not virtual. Three things make one:
 // a file (CSpriteFileIO::Load fills an array of them and an array of texture entries they point
-// into, src/tb_spritefileio.cpp), a TGA file (Init(char*)) or a size (Init(int, int): a pixel
+// into, src/engine/SpriteData.cpp), a TGA file (Init(char*)) or a size (Init(int, int): a pixel
 // block the partial textures point into).
 struct SSpriteEngineData {
     SSpriteEngineData();             // 0x1002e0e0: leaves mAspect alone
@@ -145,17 +145,17 @@ struct SSpriteGameData {
     float mF2C;                      // 0x2c  10.0 from CreateSpriteInstance
 
     // The frame's members. Each answers 0 when the renderer fails, except Prepare, which answers 1.
-    // Prepare is in src/tb_sprites_draw.cpp: it lists the sprite for the frame and has the texture cache prepare its texture.
+    // Prepare is in src/engine/SpriteData.cpp: it lists the sprite for the frame and has the texture cache prepare its texture.
     int32_t Prepare();                           // 0x1002f3d0
     // The drawing of a regular sprite: works out the quad (four corners of SVertex, the picture's corners, the blending mode
     // and the flags) in `params` for DrawSprite and AddSprite. Asserts (tb_sprite.cpp line 0x4e4) and goes on when the
     // sprite is not listed this frame (flag 0x10000000); always 1.
-    int32_t CalcRegular(SSpriteDrawParameters* params);   // 0x1003042c (src/tb_sprites_draw.cpp)
+    int32_t CalcRegular(SSpriteDrawParameters* params);   // 0x1003042c (src/engine/SpriteData.cpp)
     // Spreads the four corners (copies of one point) into the sprite's quad: the used rectangle of the sprite's image,
     // scaled by xScale and yScale (0.0 means "20 times the sprite's size", the x one also times the display's aspect),
     // turned by the angle and flipped by the flags; sets gHotSprite and the hot sprite test on the way. Answers 1 when
     // the quad's winding has to be reversed (an odd number of flips), else 0.
-    int32_t SetupVertices(SVertex* vertices, float xScale, float yScale);   // 0x1002f688 (src/tb_sprites_draw.cpp)
+    int32_t SetupVertices(SVertex* vertices, float xScale, float yScale);   // 0x1002f688 (src/engine/SpriteData.cpp)
     // Two kinds of sprite use the bytes from 0x30 to 0x3f in different ways. A partial sprite (a pixel block cut into
     // texture entries, drawn by DrawPartial) keeps the part of the picture in use; a regular sprite (drawn by CalcRegular
     // and the shadow members) keeps its turn and the frames of its sprite file. The constructor makes the partial words zero.
@@ -181,7 +181,7 @@ struct SSpriteGameData {
     };
     SSpriteGameData* mNext;          // 0x40  the next sprite of the same group while the frame sorts (0x48 on the host)
 
-    // The frame's members. The shadows and DrawPartial are translated (src/tb_sprites_shadow.cpp, src/tb_sprites_partial.cpp,
+    // The frame's members. The shadows and DrawPartial are translated (src/engine/SpriteData.cpp,
     // unit w41b); Prepare, DrawRegular and AddRegular are not. Each answers 0 when the renderer fails, except Prepare,
     // which answers 1 (and DrawPartial, which answers 1 whatever the renderer does).
     // The sprite's shadows drawn one by one (a primitive of their own each, DrawSprite) / added to the primitive being
@@ -242,8 +242,8 @@ struct SSpriteGroup {
 extern SSpriteGroup gSpriteGroups[0x800];   // engine data 0x10169154 (not exported; name invented)
 
 // The sprite manager (engine). 0x2410 bytes on the Mac; the pointer tables make the host's
-// longer. Construction and shutdown are in src/tb_starfield.cpp, the rest in
-// src/tb_sprites.cpp. Every frame the game resets it, adds the sprites and sprite lists to
+// longer. Construction and shutdown are in src/engine/SpriteManager.cpp, the rest in
+// src/engine/SpriteManager.cpp. Every frame the game resets it, adds the sprites and sprite lists to
 // draw, prepares and renders them.
 class CSpriteManager {
 public:
@@ -314,7 +314,7 @@ public:
     CMatrix* mMatrix;                      // 0x18  multiplied with the final matrix when set (0x20 on the host)
 };
 extern CStarfield gStarfield;   // engine data 0x10173158 (not exported; name invented)
-// The static initialiser (src/tb_switch_sinit_tb_starfield_cpp.cpp): constructs gStarfield, registers its destructor.
+// The static initialiser (src/engine/tb_starfield.cpp): constructs gStarfield, registers its destructor.
 void __sinit_tb_starfield_cpp();                // 0x1003266c
 void StarfieldDestructorThunk(void* object);    // stands for the TVector of ~CStarfield (0x10050750)
 extern uint32_t gStarfieldAtExitNode[4];        // engine data 0x10173174 (name invented)

@@ -1,4 +1,4 @@
-// Test entry point for LbDraw_GetClipRect (src/bfl_lbdraw_leaves.cpp, libtpw_unit_LbDrawGetClipRect.dylib; see
+// Test entry point for LbDraw_GetClipRect (src/bullfrog/LbDraw.cpp, src/bullfrog/LbDrawText.cpp, src/bullfrog/LbRect.cpp, libtpw_unit_LbDrawGetClipRect.dylib; see
 // tests/test_LbDrawGetClipRect.py). The library's other leaves are linked but not run; TbPixelCaps::Set, which
 // LbDraw_SetCurrent calls, is a fake that is never reached.
 #include <cstdint>

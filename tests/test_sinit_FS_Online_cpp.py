@@ -1,5 +1,5 @@
 """Unit v5742, the static initialiser of FS_Online.cpp, against libtpw_unit_sinit_FS_Online_cpp.dylib (tests/unit_sinit_FS_Online_cpp.cpp),
-main app ("SimTheme Park"), src/FS_Online_init_CFSOnlineSystem_CompleteFTPDownload_sinit_FS_Online_cpp.cpp:
+main app ("SimTheme Park"), src/game/online/FS_Online.cpp:
   __sinit_FS_Online_cpp 0x10178308
 
 The function takes no input. The string constructor and __register_global_object are fakes on both sides that record their arguments

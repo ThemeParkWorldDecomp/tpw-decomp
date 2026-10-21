@@ -1,16 +1,16 @@
 """Unit w79b, the sound library's core, against libtpw_unit_SoundCore.dylib (tests/unit_SoundCore.cpp), in the program
 "sound symbols shared" (the Mac's sound library, Code at 0x10000000, TOC base r2 = 0x1003abf0):
-  src/TbSoundCore.cpp   TbSoundCore: constructor 0x1000b618, destructor 0x1000b738, ModifyMaxBuffers 0x1000b7e8, Init 0x1000b85c,
+  src/sound/ChannelState.cpp, src/sound/ServiceQueue.cpp, src/sound/TbSoundCore.cpp   TbSoundCore: constructor 0x1000b618, destructor 0x1000b738, ModifyMaxBuffers 0x1000b7e8, Init 0x1000b85c,
                         Close 0x1000bb50, GetSystemInfo 0x1000bc8c, StopAndReleasePipe 0x1000bf50, GetSampleInfo 0x1000c058,
                         NewSample 0x1000c220, NewControl 0x1000c404, SystemCommand 0x1000c470, GetSystemModule 0x1000c500,
                         GetSampleStore 0x1000c53c; CModuleFactory: GenerateModule 0x10006ff8, CloseModule 0x10007120;
                         CMemoryCopyInit: constructor 0x10014b78, destructor 0x1000b6ac; CMemoryCopy::CStandardCopy constructor
                         0x10014bfc and Copy 0x10014cac, CMemoryCopy::CCopy constructor 0x10014c70
-  src/CAudioComponent.cpp  CAudioComponentAccess constructor 0x100013f4; CAudioComponent: constructor 0x10001364, destructor
+  src/sound/AudioComponent.cpp  CAudioComponentAccess constructor 0x100013f4; CAudioComponent: constructor 0x10001364, destructor
                         0x10001434, Init 0x100014ec, Chain 0x100015e4, UnchainAndRelease 0x100016d0, GetComponent 0x10001778,
                         and the forwarders GetSystemInfo 0x100017f4, GetSampleInfo 0x10001878, NewSample 0x10001900, NewControl
                         0x10001978, GetSystemModule 0x100019f0, GetSampleStore 0x10001a58, SystemCommand 0x10001ac0
-  src/snd_commands.cpp  the SystemCommand constructors: Command 0x1000ba38, HandleCommand 0x1000c380, SetSystemInfo 0x1000b9a0,
+  src/sound/AudioPlaceHolder.cpp, src/sound/TbSoundCore.cpp, src/sound/TbSysCommand.cpp  the SystemCommand constructors: Command 0x1000ba38, HandleCommand 0x1000c380, SetSystemInfo 0x1000b9a0,
                         SetSampleInfo 0x1000c2e8, Stop 0x10019c34, Pause 0x1001a60c, Restart 0x1001a748, Start 0x10027eb4,
                         UpdateAllVolumes 0x10027a64, Process 0x100280a4, StopAll 0x10028270, PauseAll 0x10028404,
                         RestartAll 0x1002852c
@@ -22,7 +22,7 @@ state of every node after each operation. Every callee outside the unit is a fak
 the runtime's new (the Mac's size and a label; blocks are filled with 0xA5) and delete (a labelled block), the sample store
 (placeholder for w79c), the channel getters (w79c), CSprocketsModule (p-sound; the Mac side's module fake has a recording
 function in each slot the core uses and a recorder in every other slot, so that a wrong slot number shows as another name), the
-command Execute bodies (w79d), the TbRefRelease imports (a count at +8, as src/TbRefRelease.cpp). The unit's own functions, the
+command Execute bodies (w79d), the TbRefRelease imports (a count at +8, as src/bullfrog/TbRefRelease.cpp). The unit's own functions, the
 w77 info records and the w79a handle and module code run as the original. TbError is returned through a hidden r3 buffer (this
 in r4) and read from the buffer.
 
@@ -243,7 +243,7 @@ def build_fakes(e):
     for address, fn in internals.items():
         T.stub_internal(e, address, fn)
 
-    # the TbRefRelease imports of the bullfrog library (src/TbRefRelease.cpp): the count is the word after the vptr
+    # the TbRefRelease imports of the bullfrog library (src/bullfrog/TbRefRelease.cpp): the count is the word after the vptr
     def ref_ctor(e):
         e.write(e.r(3) + 4, pack([1]))
 

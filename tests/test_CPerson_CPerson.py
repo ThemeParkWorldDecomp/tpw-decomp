@@ -1,5 +1,5 @@
 """Unit v5052: CPerson::CPerson (the constructor of a person) and CPerson::ReceiveMessage, against libtpw_unit_CPerson_CPerson.dylib
-(tests/unit_CPerson_CPerson.cpp), main app ("SimTheme Park"), src/CPerson_ProcessStateWaitingToCrossRoadOutOfPark_CPerson_CPerson.cpp:
+(tests/unit_CPerson_CPerson.cpp), main app ("SimTheme Park"), src/game/people/Person.cpp:
   CPerson::CPerson 0x10116634, CPerson::ReceiveMessage 0x10116e24
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)

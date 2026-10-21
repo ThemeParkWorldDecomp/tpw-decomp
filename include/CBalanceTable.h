@@ -3,7 +3,7 @@
 // The Mac vptr is at +4, after mRows at +0. Native C++ supplies its own vptr/layout.
 // The two virtual slots are GetBalanceDescription and GetBalanceValuesStart;
 // destruction is NONVIRTUAL. The reader (Init, UnInit, Load, Parse and their helpers) is
-// translated in src/CBalanceTable.cpp.
+// translated in src/game/balance/BalanceLoader.cpp.
 #pragma once
 #include <cstddef>
 #include <cstdint>
@@ -67,7 +67,7 @@ static_assert(sizeof(RideShapeCell) == 8, "ride shape cell");
 static_assert(sizeof(RideShape) == 0xc88, "ride shape");
 
 // One map character: what a cell gets when the map text shows `mSymbol`. 12 bytes. The two
-// tables of src/CBalanceTable.cpp are the ones the original keeps at 0x1028e730 (19 keys,
+// tables of src/game/balance/BalanceLoader.cpp are the ones the original keeps at 0x1028e730 (19 keys,
 // description flags 1) and 0x1028e814 (16 keys, flags 2).
 struct SymbolKey {
     char mSymbol;              // 0x00

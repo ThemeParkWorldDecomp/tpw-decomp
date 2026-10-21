@@ -1,5 +1,5 @@
 """Unit v5111: TestAdvisor2/3/4 and delete_ride, against libtpw_unit_TestAdvisor3.dylib (tests/unit_TestAdvisor3.cpp), main app,
-src/turn_object_counterclockwise_TestAdvisor3.cpp:
+src/game/keyboard.cpp:
   TestAdvisor2 0x1014c2b0, TestAdvisor3 0x1014c33c, TestAdvisor4 0x1014c3c8, delete_ride 0x1014bf74
 
 The callees ADV_Stat, ADV_Call, LLCC_SystemSetMode and LLCM_LeftMouseButtonUp are fakes on both sides recording their arguments.

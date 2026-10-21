@@ -1,6 +1,6 @@
 // Test library for the std tree constructors, insert_one, destroyers, deque tear_down and four UI forwarders (unit v51126;
 // libtpw_unit_std___tree_std_pair_std_map_nocase_string_BuddyI.dylib, tests/test_std___tree_std_pair_std_map_nocase_string_BuddyI.py), main app:
-//   src/std___tree_std_pair_std_map_nocase_string_BuddyI.cpp   the 20 functions and the seven globals of the trees
+//   src/game/MslSupport.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_FeatureStatus.cpp   the 20 functions and the seven globals of the trees
 //
 // The callees outside the unit (operator delete, the string destructors, the string compares, insert_node_at, the vector tear_down, the
 // deque make_iterator and destroy, the cdeque iterator operations, InitOnlineUI, CloseWindow) are fakes that record their arguments and

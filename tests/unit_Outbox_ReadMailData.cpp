@@ -1,5 +1,5 @@
 // Test library for Outbox::ReadMailData (unit v5148; libtpw_unit_Outbox_ReadMailData.dylib, tests/test_Outbox_ReadMailData.py), main app:
-//   src/email_load_Outbox_ReadMailData.cpp   Outbox::ReadMailData
+//   src/game/online/email.cpp   Outbox::ReadMailData
 //
 // The stream functions (ctor, open, widen, getline, close, destroy) and the exception raiser are recording fakes; the lines they
 // deliver come from a table the test fills, and the stream's state bits, mask and buffer come from the case's queues. The test

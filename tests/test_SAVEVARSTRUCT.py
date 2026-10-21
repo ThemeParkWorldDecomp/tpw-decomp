@@ -1,5 +1,5 @@
 """Unit v5067, SAVEVARSTRUCT<CThoughts::EventHistType>, against libtpw_unit_SAVEVARSTRUCT.dylib (tests/unit_SAVEVARSTRUCT.cpp), main app,
-src/TrackCell_SAVEVARSTRUCT.cpp:
+src/game/buildings/TrainingCentre.cpp:
   SAVEVARSTRUCT<CThoughts::EventHistType> 0x1012f9a0
 
 The world is built twice by one piece of code. Callees WriteSerialiseLog, GAME_ASSERTMSG and LbFile_Write are fakes on both sides recording

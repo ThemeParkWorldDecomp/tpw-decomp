@@ -1,5 +1,5 @@
 // Test library for the all-staff panel's row functions and button handler (unit v5153; libtpw_unit_LCFormat_2.dylib, tests/test_LCFormat_2.py), main app:
-//   src/CreateAllStaffPanel_LCFormat.cpp   AllStaffLCFormat (LCFormat), AllStaffLCPostFormat (LCPostFormat), AllStaffPanelLCHandler;
+//   src/game/ui/ui_allStaffPanel.cpp   AllStaffLCFormat (LCFormat), AllStaffLCPostFormat (LCPostFormat), AllStaffPanelLCHandler;
 //                                          gStaffListFormat and gStaffListFont
 //
 // The callees outside the unit are recording fakes (window members, draw object constructors, the font, the analyser, the world, strings);

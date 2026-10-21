@@ -1,6 +1,6 @@
 // Test library for CResearchLab::ReceiveMessage and CResearchLab::Serialise (unit v5024; libtpw_unit_CResearchLab_ReceiveMessage.dylib,
 // tests/test_CResearchLab_ReceiveMessage.py), main app:
-//   src/ResearchLab_projects_CResearchLab_ReceiveMessage.cpp
+//   src/game/buildings/ResearchLab.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real one reads and answer from the test's queues. The globals of
 // other files (gWorld, gMessageCentre, gMasterSave, gRideDatabase) are defined here, zero at start like the Mac's bss. The global

@@ -1,6 +1,6 @@
 """Unit v5983, the cash, password, null cash, percent and visitor number text objects' Change and the password object's destructor, against
 libtpw_unit_InterfaceCashTextObject_Change.dylib (tests/unit_InterfaceCashTextObject_Change.cpp), main app ("SimTheme Park"),
-src/ui_TextObjects_InterfaceCashTextObject_Change.cpp:
+src/game/ui/InterfaceTextObjectSprite.cpp:
   InterfaceCashTextObject::Change 0x1018e02c, InterfacePasswordTextObject::Change 0x1018dd50,
   InterfacePasswordTextObject::~InterfacePasswordTextObject 0x1018dcb0, InterfaceNullCashTextObject::Change 0x1018e768,
   InterfacePercentTextObject::Change 0x1018ea44, InterfaceVisitorNumTextObject::Change 0x1018ed10

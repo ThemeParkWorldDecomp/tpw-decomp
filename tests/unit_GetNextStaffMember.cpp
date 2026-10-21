@@ -1,6 +1,6 @@
 // Test library for GetNextStaffMember and ShowStatusPanel::InitWindow (unit v51001; libtpw_unit_GetNextStaffMember.dylib,
 // tests/test_GetNextStaffMember.py), main app:
-//   src/ui_staffPanel_msg_hackfollowmode_GetNextStaffMember.cpp
+//   src/game/ui/ui_showStatus.cpp, src/game/ui/ui_staffPanel.cpp
 //
 // The callees outside the unit are recording fakes. Pointers the fakes hand back (things, windows, the font, the string) come from a
 // pool of arena blocks, chosen by the case's queues (index 0 is NULL). The globals of other files are defined here.

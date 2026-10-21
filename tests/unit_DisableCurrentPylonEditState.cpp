@@ -1,6 +1,6 @@
 // Test library for the pylon edit states of the track editor (unit v5084; libtpw_unit_DisableCurrentPylonEditState.dylib,
 // tests/test_DisableCurrentPylonEditState.py), main app:
-//   src/DisableCurrentPylonEditState.cpp   ExchangeTrackBraces, ToggleSwapUpPylonState, ToggleSwapDownPylonState, SetTrackPreview2ndBrace,
+//   src/game/rides/CoasterEdit.cpp   ExchangeTrackBraces, ToggleSwapUpPylonState, ToggleSwapDownPylonState, SetTrackPreview2ndBrace,
 //                                          DisableCurrentPylonEditState and the three words it clears
 //
 // The callees outside the unit are fakes that record what the real ones read; the globals of other files are defined here.

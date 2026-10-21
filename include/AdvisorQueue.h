@@ -11,7 +11,7 @@
 // Play, PlayWithoutScore and Serialise remain untranslated.
 struct IDXTYPEUniqueNameThingId;   // (unit w101)
 struct CAdvisorRequest {
-    // Unit w103 (src/AdvisorRequest.cpp): 0x1000deb4, 208 bytes. The thing id rides in the high half of one word; `score` below 0
+    // Unit w103 (src/game/advisor/Advisor.cpp): 0x1000deb4, 208 bytes. The thing id rides in the high half of one word; `score` below 0
     // is looked up (CAdvisorScoring::GetScoreFor) and above or equal is taken as it is.
     CAdvisorRequest() { mValid = 0; }   // 0x1000a0b4 (12 bytes; inline here so every unit that holds a request builds without the source)
     CAdvisorRequest(AdvisorMessage message, tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> thingId, uint32_t secondary,
@@ -59,8 +59,8 @@ public:
 
     // Unit w123a: direct dispatch callees, untranslated.
     void UpdateTurn();   // 0x1000a8c8
-    void FinalDestroy();   // 0x1000a0ec (src/gameplay_leaves.cpp, unit v5L07)
-    CAdvisor();   // 0x10009f9c (172 bytes, src/ThingCtors.cpp, unit w122a; 0x16f0 bytes on the Mac; CWorld::SetupNewLevel makes the advisor)
+    void FinalDestroy();   // 0x1000a0ec (src/game/advisor/Advisor.cpp, unit v5L07)
+    CAdvisor();   // 0x10009f9c (172 bytes, src/game/advisor/Advisor.cpp, unit w122a; 0x16f0 bytes on the Mac; CWorld::SetupNewLevel makes the advisor)
     int32_t QueueRequest(const CAdvisorRequest& request); // 0x1000ae48
     void ReceiveMessage(const CMsg& message);              // 0x1000c874 (5,440 bytes, untranslated; CThing::ReceiveMessage kind 11)
     // 0x1000b048 (unit w103): drops the message from the last tutorial request and the queue and, if he is saying it, cuts him short.
@@ -74,19 +74,19 @@ public:
     bool CanIQueueThis(AdvisorMessage message, bool force) const; // 0x1000b3d4
     int32_t FindFirstInvalidSlotInQueue();                // 0x1000b740
     int32_t FindLowestScoringSlotInQueue();               // 0x1000b7e8
-    // Unit w124 (src/Advisor_turn.cpp): untranslated callees of UpdateTurn.
+    // Unit w124 (src/game/advisor/Advisor.cpp): untranslated callees of UpdateTurn.
     bool IsPlaying();                                     // 0x1000c6e0
     void SetPlayingFor(uint32_t length);                  // 0x1000c7fc
     int32_t FindHighestScoringSlotInQueue();              // 0x1000b900
     CTimeSig& Clock() { return *reinterpret_cast<CTimeSig*>(&mF0C[0]); }   // the clock word at +0xc
 
-    // Unit v5223 (src/AdvisorQueue_CAdvisor_HandleStaffInfo.cpp): 0x1000c40c, 660 bytes. Builds the request for the staff type and
+    // Unit v5223 (src/game/advisor/Advisor.cpp): 0x1000c40c, 660 bytes. Builds the request for the staff type and
     // situation and queues it like QueueRequest does.
     void HandleStaffInfo(const class CMsgStaffInfo& info);
 
     int32_t Init();   // 0x1000a13c (664 bytes, untranslated): subscribes to seven message types, clears +0x10, +0xd4, +0xdc and +0xd8; answers 1
 
-    // Unit v5631 (src/AdvisorQueue_CAdvisor_ReceiveMessage.cpp calls it): 0x1000ba18 (2,496 bytes, untranslated), the event message's word.
+    // Unit v5631 (src/game/advisor/Advisor.cpp calls it): 0x1000ba18 (2,496 bytes, untranslated), the event message's word.
     void HandleEvent(EventType event);
 
     CThing mBase;                                        // 0x00  model 0xb (unit w122a: was mF00[0x14])
@@ -106,7 +106,7 @@ static_assert(offsetof(CAdvisor, mQueue) == 0x14, "the advisor's queue at 0x14")
 // Unit v5223: the save templates CAdvisor::Serialise uses (AdvisorHistory on the Mac is AdvisorMessageState here).
 template<> int32_t SAVEVAR<AdvisorMessage>(void*, AdvisorMessage*, const char*, int32_t);   // 0x1000f820
 template<> int32_t LOADVAR<AdvisorMessage>(void*, AdvisorMessage*, const char*, int32_t);   // 0x1000f250
-// Unit v51069 (src/AdvisorScoring_sinit_Advisor_cpp.cpp): Advisor.cpp's static initialiser 0x1000fff0 (a global wide string).
+// Unit v51069 (src/game/advisor/Advisor.cpp): Advisor.cpp's static initialiser 0x1000fff0 (a global wide string).
 extern unsigned char gAdvisorMsgStringStorage[];   // 0x102b3aa8 the string (TbDynamicStringTemplate<char16_t>)
 extern unsigned char gAdvisorMsgStringNode[8];     // 0x102b3abc its registration node
 extern const char16_t gAdvisorMsgText[];           // 0x1023c316 its text (only "gm" of it is known)
@@ -117,7 +117,7 @@ template<> int32_t LOADVARSTRUCT<AdvisorMessageState>(void*, AdvisorMessageState
 // Shared scoring singleton: Mac object 0x102b3ac8, guard byte 0x102b4100.
 CAdvisorScoring& TheScoring();
 
-// Unit v51003: the message CAdvisorRequest::Play builds on the stack (CMsgTag on the Mac, constructor 0x10151f7c, src/MsgTag.cpp).
+// Unit v51003: the message CAdvisorRequest::Play builds on the stack (CMsgTag on the Mac, constructor 0x10151f7c, src/game/ui/MessageCentre.cpp).
 // Its fields are in the Mac's order, which is CMsgTagShow's (include/ThingReceivers.h), the view CTagSystem::ReceiveMessage reads
 // a type 0x18 message through: the constructor's fourth argument goes to +0x14 and its fifth to +0x10.
 #include "CMsg.h"

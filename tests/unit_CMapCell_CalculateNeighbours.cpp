@@ -1,6 +1,6 @@
 // Test library for CMapCell::CalculateNeighbours (unit v5632; libtpw_unit_CMapCell_CalculateNeighbours.dylib,
 // tests/test_CMapCell_CalculateNeighbours.py), main app:
-//   src/MapDelta_map_CMapCell_CalculateNeighbours.cpp   CMapCell::CalculateNeighbours and the seven globals it keeps (gCalcNeighbours*)
+//   src/game/park/MapCell.cpp   CMapCell::CalculateNeighbours and the seven globals it keeps (gCalcNeighbours*)
 //
 // The callees outside the unit are fakes that record the arguments the real ones read: the two GetNeighbouringCell answer the cell the test's
 // tables give for the caller and the offset (or direction bit), ADD_DIRECTION computes the real rotation, the getters answer from the queues.
@@ -111,7 +111,7 @@ int32_t SOUND_SendEvent(int32_t entity, int32_t bank, int32_t event, int32_t a, 
     return 0;
 }
 
-// The real rotation (src/MapDelta_map.cpp), so the loop of the mode 1 path ends as on the Mac.
+// The real rotation (src/game/park/Map.cpp), so the loop of the mode 1 path ends as on the Mac.
 uint8_t ADD_DIRECTION(uint8_t a, uint8_t b) {
     ev("ADD_DIRECTION", {a, b});
     int32_t n = 0;

@@ -1,5 +1,5 @@
 // Test library for the script interpreter's flow and arithmetic (unit w164; libtpw_unit_ScriptFlow.dylib, tests/test_ScriptFlow.py), main app:
-//   src/ScriptFlow.cpp   SCR_FindNextEndif, SCR_FindNextElseOrEndif and PK_IF, ENDIF, ELSE, REPEAT, UNTIL, DO, LOOP, ADD, SUB, MUL, MULVAR,
+//   src/game/Script.cpp, src/game/ScriptOps.cpp   SCR_FindNextEndif, SCR_FindNextElseOrEndif and PK_IF, ENDIF, ELSE, REPEAT, UNTIL, DO, LOOP, ADD, SUB, MUL, MULVAR,
 //                        DIV, DIVVAR, MOD, AND, MODVAR, ADDVAR, COPYVAR, RANDOM
 //
 // Callees outside the unit are fakes that record what the real ones read: SCR_Error (the message), SCR_Push (the value), SCR_Pop (answers

@@ -1,5 +1,5 @@
 // Test library for TestAdvisor2/3/4 and delete_ride (unit v5111; libtpw_unit_TestAdvisor3.dylib, tests/test_TestAdvisor3.py), main app:
-//   src/turn_object_counterclockwise_TestAdvisor3.cpp
+//   src/game/keyboard.cpp
 //
 // Callees ADV_Stat, ADV_Call, LLCC_SystemSetMode, LLCM_LeftMouseButtonUp are recording fakes.
 #include <cstddef>

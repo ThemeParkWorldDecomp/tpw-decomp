@@ -1,4 +1,4 @@
-// The park's second initialisation and teardown (unit w110, src/LevelInit2.cpp): the callees LevelInit2 and LevelDeInit reach
+// The park's second initialisation and teardown (unit w110, src/game/TPLevel.cpp): the callees LevelInit2 and LevelDeInit reach
 // that are not translated yet (main application, TPRide.cpp unless noted). Each is a stand-in in the launcher.
 #pragma once
 #include <cstdint>

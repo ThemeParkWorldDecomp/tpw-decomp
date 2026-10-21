@@ -1,6 +1,6 @@
 """Unit v5239, the online outbox panel's message function and the function that sends and deletes the outbox, against
 libtpw_unit_OutboxPanelMsg.dylib (tests/unit_OutboxPanelMsg.cpp), main app ("SimTheme Park"),
-src/UI_IslandLobby_CalcEmailAddressScrollBar_OutboxSendingMsg_OutboxPanelMsg.cpp:
+src/game/ui/ui_onlineOutbox.cpp:
   OutboxPanelMsg 0x101e458c, SendAndDeleteOutbox 0x101e4378
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
