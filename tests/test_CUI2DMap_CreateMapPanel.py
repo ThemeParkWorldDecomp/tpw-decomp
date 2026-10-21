@@ -34,7 +34,7 @@ WIN_IDS = [0x990, 0x991, 0x995, 0x982, 0x987, 0x989, 0x993, 0x994, 0x983, 0x98b,
 OBJ_NAMES = ["root", "gamew", "panel", "font", "mapwho", "tcache"] + ["w%x" % i for i in WIN_IDS]
 LABELS = {n: i + 1 for i, n in enumerate(OBJ_NAMES)}
 GLOBAL_LABELS = {"game": 23, "display": 24, "mapzoom": 25, "map": 26, "script": 27, "cbfn": 28, "areacb": 29}
-HOST_LAYOUT = [360, 96, 0x8bc, 0x20100]   # InterfaceWindow::mZ and CGame::mF3C sit elsewhere on the host (Mac 0xdc and 0x3c)
+HOST_LAYOUT = [360, 96, 0x8bc, 0x20130]   # InterfaceWindow::mZ and CGame::mF3C sit elsewhere on the host (Mac 0xdc and 0x3c)
 OBJ_SIZE = 0x200
 MAPW = [0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x44, 0x48, 0x4c, 0x50, 0x54, 0x58, 0x5c]
 
@@ -315,6 +315,11 @@ def build(s, case):
     s.words(m + 0x20068, case["p1"])
     s.words(m + 0x20084, [case["p2"]])
     s.words(m + 0x20088, [case["p3"]])
+    if s.fmt == "<I":
+        # the host map's render area (CUI2DMap::HostArea at 0x20100) holds the data pointer (+0x18) and the row bytes (+0x28) that
+        # the Mac's has at 0x44 and 0x50
+        s.write(m + 0x20100 + 0x18, struct.pack("<Q", case["mapw"][MAPW.index(0x44)]))
+        s.words(m + 0x20100 + 0x28, [case["mapw"][MAPW.index(0x50)]])
 
 
 def observe(s, case, answer):

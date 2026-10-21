@@ -58,7 +58,7 @@ uint64_t tpw_sm_addr(const char* name) {
     uint8_t* map = gUI2DMap.mBytes;
     const Entry entries[] = {
         {"map", map},
-        {"map2c", map + 0x2c},
+        {"map2c", gUI2DMap.HostArea()},   // the Mac's area at 0x2c is the host area here
         {"map60", map + 0x60},
         {"tbl", gUI2DMapColours},
         {"ca", &gUI2DMapCounterA},

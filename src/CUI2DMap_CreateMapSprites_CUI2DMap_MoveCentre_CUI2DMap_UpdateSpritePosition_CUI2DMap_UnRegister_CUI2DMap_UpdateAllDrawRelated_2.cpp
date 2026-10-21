@@ -84,7 +84,7 @@ const int8_t kBlock[13] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 void CUI2DMap::UpdateAllDrawRelated() {
     const uint8_t* map = reinterpret_cast<const uint8_t*>(this);
     bfl::draw::CDraw draw;
-    draw.SetCurrent(reinterpret_cast<TbRenderArea*>(const_cast<uint8_t*>(map) + 0x2c));
+    draw.SetCurrent(HostArea());   // the Mac's area at 0x2c (ui_main.h)
     int32_t flags = 8;
     const int32_t perX = static_cast<int32_t>(ppc_fctiwz(static_cast<double>(480.0f / static_cast<float>(SWord(map, 0x24)))));
     const int32_t perY = static_cast<int32_t>(ppc_fctiwz(static_cast<double>(425.0f / static_cast<float>(SWord(map, 0x28)))));

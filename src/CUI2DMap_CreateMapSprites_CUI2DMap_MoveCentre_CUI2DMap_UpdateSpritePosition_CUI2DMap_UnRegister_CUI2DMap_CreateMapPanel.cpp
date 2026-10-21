@@ -170,8 +170,8 @@ void CUI2DMap::CreateMapPanel() {
     StoreMapGridDetails();
     InitSprites();
     LoadMap(0);
-    gei_MapZoom.Init(reinterpret_cast<void*>(static_cast<uintptr_t>(MacAt<uint32_t>(self, 0x44))), MacAt<int32_t>(self, 0x48),
-                     MacAt<int32_t>(self, 0x4c), MacAt<int32_t>(self, 0x50));
+    // The Mac passes its area's data word (0x44) and row bytes (0x50); the host's pixels are in HostArea() (ui_main.h).
+    gei_MapZoom.Init(HostArea()->mData, MacAt<int32_t>(self, 0x48), MacAt<int32_t>(self, 0x4c), HostArea()->mStride);
     gei_MapZoom.DisableFiltering();
     UpdateMap();
     UIMain_AdvisorMessage(static_cast<AdvisorMessage>(0x130));

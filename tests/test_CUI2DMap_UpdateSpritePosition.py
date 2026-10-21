@@ -333,7 +333,7 @@ class Host(Side):
         self.lib = lib
         bind(lib)
         m, sp = self.obj("map"), self.obj("sprite")
-        CL.host_begin(lib, {1: m, 2: sp, 4: m + 0x2C}, case["queues"])
+        CL.host_begin(lib, {1: m, 2: sp, 4: m + 0x20100}, case["queues"])   # the host map's render area (CUI2DMap::HostArea)
 
     def done(self):
         pass

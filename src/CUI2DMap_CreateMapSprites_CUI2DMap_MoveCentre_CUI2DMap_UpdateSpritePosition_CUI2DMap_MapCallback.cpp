@@ -76,7 +76,7 @@ int32_t CUI2DMap::MapCallback(InterfaceWindow* window, int32_t message, int32_t 
         return goDefault();
     case 0x14:
         self->CloseSprites();
-        reinterpret_cast<TbRenderArea*>(self->mBytes + 0x2c)->FreeMemory();
+        self->HostArea()->FreeMemory();   // the Mac's area at 0x2c (ui_main.h)
         gei_Display.SetFogColor(U(self, 8));
         gei_MapWho->SetRenderOptions(W(self, 0xc));
         gGame.mF3C = 1;

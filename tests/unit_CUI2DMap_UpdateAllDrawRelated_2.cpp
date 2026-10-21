@@ -78,7 +78,11 @@ CDraw::CDraw() {
 }
 CDraw::~CDraw() { ev("draw_del", {}); }
 void CDraw::SetCurrent(TbRenderArea* area) {
-    ev("setcur", {static_cast<int64_t>(reinterpret_cast<uint64_t>(area) - gMapBase)});
+    // the host map's render area is at CUI2DMap::kHostAreaOffset, the Mac's at 0x2c; the two are swapped so that
+    // a host build drawing into the Mac words at 0x2c shows up as a mismatch
+    const int64_t host = static_cast<int64_t>(CUI2DMap::kHostAreaOffset);
+    const int64_t offset = static_cast<int64_t>(reinterpret_cast<uint64_t>(area) - gMapBase);
+    ev("setcur", {offset == host ? 0x2c : offset == 0x2c ? host : offset});
     mRenderContext = gUseCtx ? static_cast<void*>(static_cast<CUI2DMapDrawOps*>(&gOps)) : nullptr;
 }
 }  // namespace draw

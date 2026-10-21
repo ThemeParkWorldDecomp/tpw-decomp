@@ -31,7 +31,7 @@ OWN = set(SIZES)
 ADDR = dict(gGame=0x1037f134, settings=0x1038071c, gameWindow=0x103949e4, mapWho=0x103bc908, display=0x103bc8d0)
 # the data imports (gei_Display, gei_MapWho) live where the TOC slots of the image say, not at the listing's addresses
 TOC = dict(display=0x1026067c, mapWho=0x102607e4)
-HOST_LAYOUT =[96, 0x38, 0x20100]    # gGame's word 0x3c is at 96 on the host (the class has a vtable and pointers)
+HOST_LAYOUT =[96, 0x38, 0x20130]    # gGame's word 0x3c is at 96 on the host (the class has a vtable and pointers)
 
 OBJ_WORDS = 0x60 // 4
 
@@ -208,9 +208,9 @@ class Host(Side):
         self.lib = lib
         bind(lib)
         self.off3c = HOST_LAYOUT[0]
-        self.map = lib.tpw_mc_alloc(0x20100)
+        self.map = lib.tpw_mc_alloc(0x20130)   # the host map has its render area at 0x20100 (CUI2DMap::HostArea)
         self.blocks = {k: lib.tpw_mc_alloc(0x40) for k in ("win", "gw", "panel", "mw")}
-        fixed = {1: self.map, 2: self.map + 0x2c, 3: self.g("display"), 4: self.g("gGame"), 5: self.blocks["win"], 6: self.blocks["gw"],
+        fixed = {1: self.map, 2: self.map + 0x20100, 3: self.g("display"), 4: self.g("gGame"), 5: self.blocks["win"], 6: self.blocks["gw"],
                  7: self.blocks["panel"], 8: self.blocks["mw"]}
         CL.host_begin(lib, fixed, case["queues"])
 

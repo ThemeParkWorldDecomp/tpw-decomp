@@ -458,6 +458,7 @@ CUI2DMapSprite* CUI2DMapSpriteDtor(CUI2DMapSprite* self, int16_t flags);   // 0x
 void UI2DMapDelete(void* object);   // operator delete 0x10238218 (a fake in the test)
 enum EUI2DMapZoom : int32_t {};   // unit v5526: 0 in, 1 out
 enum EUI2DMapMoveDirection : int32_t {};   // unit v5083: 0 left, 1 right, 2 down (y up), 3 up (y down)
+struct TbRenderArea;
 class CUI2DMap {
 public:
     void CreateMapPanel();             // 0x1022c080
@@ -473,12 +474,19 @@ public:
     void UpdateMapZoom();              // 0x1022f4d4 (928 bytes)
     void UpdateAllSpritePositions();   // 0x10230974 (96 bytes, untranslated)
     // Unit v5194: the object's storage, so the static initialiser can write the Mac offsets 0, 4, 0x10 .. 0x20, 0x5c and 0x20060 of the global.
-    alignas(16) uint8_t mBytes[0x20100];
+    // Unit v5L47b: 0x30 more bytes for the host render area below.
+    alignas(16) uint8_t mBytes[0x20130];
     // Host only: the six sprite images InitSprites loads, as native pointers at 0x200b8 .. 0x200e7 (the Mac's Ptr32 words at
     // 0x20068 .. 0x2007c cannot hold a host heap pointer; 0x200a0 .. 0x200b7 are MapAreaCallback's host-only places). Image k is
     // the one of the Mac word at 0x20068 + 4 * k.
     static constexpr size_t kHostImagesOffset = 0x200b8;
     void*& HostImage(int32_t k) { return reinterpret_cast<void**>(mBytes + kHostImagesOffset)[k]; }
+    // Unit v5L47b. Host only: the map picture's render area. The Mac's TbRenderArea is at 0x2c (data word 0x44, width 0x48,
+    // height 0x4c, row bytes 0x50, centre x next at 0x54); the host's has an eight-byte data pointer, so in that place its width,
+    // height and row bytes would sit four bytes on, over the Mac's height, row bytes and centre x. The Mac words at 0x2c .. 0x50
+    // stay as the Mac's; LoadMap sets this area up from them and the drawing, MapZoom and FreeMemory use this one.
+    static constexpr size_t kHostAreaOffset = 0x20100;
+    TbRenderArea* HostArea() { return reinterpret_cast<TbRenderArea*>(mBytes + kHostAreaOffset); }
     // Unit v5200 (src/CUI2DMap_CreateMapSprites_CUI2DMap_MoveCentre_CUI2DMap_UpdateSpritePosition.cpp). More Mac offsets: the render area
     // (a TbRenderArea) at 0x2c whose depth word at 0x3c gives the bytes per pixel, and the map grid of 128 x 128 eight-byte entries at 0x60
     // (a type int, a thing id halfword at +4).

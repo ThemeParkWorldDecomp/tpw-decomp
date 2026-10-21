@@ -292,7 +292,7 @@ def bind(lib):
 
 def build(s, case):
     sp = s.sp
-    m = s.alloc(0x20100)
+    m = s.alloc(0x20130)   # the host map has its render area at 0x20100 (CUI2DMap::HostArea)
     s.setmap(m)
     s.words(m + 0x18, [case["mask"], case["m1c"], case["m20"], case["w"], case["h"]])
     for (x, y, t, i) in case["cells"]:

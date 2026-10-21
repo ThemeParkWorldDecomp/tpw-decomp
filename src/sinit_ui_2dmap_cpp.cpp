@@ -56,7 +56,8 @@ extern "C" void __sinit_ui_2dmap_cpp() {
     StoreWord(map, 0x00, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&gUI2DMapVtableSlot)));
     StoreWord(map, 0x10, 0);
     StoreWord(map, 0x14, 0);
-    new (map + 0x2c) TbRenderArea();
+    // The Mac constructs the map's render area at 0x2c; the host's lives at CUI2DMap::kHostAreaOffset (see ui_main.h).
+    new (gUI2DMap.HostArea()) TbRenderArea();
     __construct_array(map + 0x60, gUI2DMapCtorVector, 0, 8, 0x4000);
     StoreWord(map, 0x04, 0);
     StoreWord(map, 0x18, 1);

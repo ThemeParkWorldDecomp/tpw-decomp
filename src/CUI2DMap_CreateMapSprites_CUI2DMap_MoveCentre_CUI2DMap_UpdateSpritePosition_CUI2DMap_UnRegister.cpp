@@ -104,7 +104,8 @@ void CUI2DMap::Zoom(EUI2DMapZoom zoom, float amount) {
 }
 
 // 0x1022dbdc (460 bytes): loads <theme path>:<2dmap.tga> into a local area; with reload 0 first sets the map's own area (at 0x2c) up
-// from the texture format and allocates it; the picture is converted into the map's area.
+// from the texture format and allocates it; the picture is converted into the map's area. The host's area is HostArea() (ui_main.h):
+// it gets the same format, width and height; the Mac words at 0x44 and 0x50 (data, row bytes) are left, as nothing on the host reads them.
 void CUI2DMap::LoadMap(int32_t reload) {
     TbDynamicStringTemplate<char> path(get_theme_path());
     path += gUI2DMapSeparator;
@@ -114,7 +115,7 @@ void CUI2DMap::LoadMap(int32_t reload) {
     loader.ReadHeader(path.mData, nullptr, &area);
     area.AllocMemory();
     loader.Load(area, path.mData, nullptr, nullptr);
-    TbRenderArea* mapArea = reinterpret_cast<TbRenderArea*>(reinterpret_cast<uint8_t*>(this) + 0x2c);
+    TbRenderArea* mapArea = HostArea();
     if (reload == 0) {
         Field<int32_t>(this, 0x48) = area.mWidth;
         Field<int32_t>(this, 0x4c) = area.mPictureHeight;
@@ -128,6 +129,11 @@ void CUI2DMap::LoadMap(int32_t reload) {
         Field<uint32_t>(this, 0x38) = w[7];
         Field<uint32_t>(this, 0x3c) = w[3];
         Field<uint32_t>(this, 0x40) = w[1] & 0x20;
+        std::memcpy(mapArea->mF00, mBytes + 0x2c, sizeof(mapArea->mF00));   // the four masks
+        mapArea->mDepth = Field<int32_t>(this, 0x3c);
+        mapArea->mPalettised = Field<int32_t>(this, 0x40);
+        mapArea->mWidth = area.mWidth;
+        mapArea->mPictureHeight = area.mPictureHeight;
         mapArea->AllocMemory();
     }
     TbRAConv converter;

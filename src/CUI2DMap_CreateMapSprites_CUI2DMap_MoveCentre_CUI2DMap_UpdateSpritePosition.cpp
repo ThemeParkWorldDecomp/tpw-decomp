@@ -93,7 +93,7 @@ void CUI2DMap::UpdateSpritePosition(CUI2DMapSprite* sprite) {
 void CUI2DMap::DrawCoasterTracks() {
     void* self = this;
     bfl::draw::CDraw draw;
-    draw.SetCurrent(reinterpret_cast<TbRenderArea*>(static_cast<char*>(self) + 0x2c));
+    draw.SetCurrent(HostArea());   // the Mac's area at 0x2c (ui_main.h)
     const float mapW = static_cast<float>(At<int32_t>(self, 0x24));
     const float scale = 480.0f / (10.0f * mapW);   // f31
     const uint32_t tracks = static_cast<uint32_t>(ui_GetNumCoasterTracks());
@@ -129,7 +129,7 @@ void CUI2DMap::DrawCoasterTracks() {
                         to.x = ppc_fctiwz(static_cast<double>(toX)) + 0xf;
                         to.y = ppc_fctiwz(static_cast<double>(toZ)) + 0x2a;
                         const TbRect& clip = draw.GetClipRect();
-                        const TbRenderArea& area = *reinterpret_cast<TbRenderArea*>(static_cast<char*>(self) + 0x2c);
+                        const TbRenderArea& area = *HostArea();
                         const uint32_t kind = static_cast<uint32_t>(At<int32_t>(self, 0x3c) + 7) >> 3;
                         if (kind == 3) {
                             tpw_antialias::Antialiased<3>(tpw_intensify::CTraits<3>(), area, clip, colour, from, to);

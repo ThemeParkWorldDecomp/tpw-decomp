@@ -263,9 +263,9 @@ class Host(Side):
         self.lib = lib
         bind(lib)
         p = lib.tpw_c2m_alloc
-        self.map = lib.tpw_c2m_alloc(0x20100)
+        self.map = lib.tpw_c2m_alloc(0x20130)   # the host map has its render area at 0x20100 (CUI2DMap::HostArea)
         self.sprites = [lib.tpw_c2m_newsprite() for _ in range(NSPR)]
-        fixed = {1: self.map, 2: self.map + 0x2C, 3: self.g("ez"), 4: self.g("mz"), 5: self.g("tga")}
+        fixed = {1: self.map, 2: self.map + 0x20100, 3: self.g("ez"), 4: self.g("mz"), 5: self.g("tga")}
         for i, sp in enumerate(self.sprites):
             fixed[10 + i] = sp
         CL.host_begin(lib, fixed, case["queues"])
