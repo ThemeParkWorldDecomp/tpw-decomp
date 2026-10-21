@@ -6,8 +6,8 @@
 //
 // Every OpenGL call is a fake that records its arguments (floats by their bits, a NaN as one
 // value). The vertex arrays are recorded by contents: glLockArraysEXT dumps the vertices it
-// locks, glDrawElements the indices it draws, and the array pointers are recorded as
-// offsets from the vertex pointer. The draw primitive's own setters, the math unit and the
+// locks (the colour words as the bytes GL reads, which must be the Mac's), glDrawElements the
+// indices it draws, and the array pointers are recorded as offsets from the vertex pointer. The draw primitive's own setters, the math unit and the
 // engine's error stack and profiler are fakes that record too.
 #include <cstdarg>
 #include <cstdlib>
@@ -59,12 +59,27 @@ int64_t offset_of(const void* pointer) {
     return static_cast<const uint8_t*>(pointer) - base;
 }
 
-// The vertices [first, first + count) of the base, a NaN in a float place as one value.
-void dump_vertices(const char* name, int32_t first, int32_t count) {
+// A colour word as GL reads it: its four bytes in memory order, the first as the high byte.
+// The original's fake reads the same word from its big-endian memory, so the two sides agree
+// when GL is given the Mac's bytes.
+uint32_t memory_order(const uint8_t* bytes) {
+    return static_cast<uint32_t>(bytes[0]) << 24 | static_cast<uint32_t>(bytes[1]) << 16 |
+           static_cast<uint32_t>(bytes[2]) << 8 | bytes[3];
+}
+
+// The vertices [first, first + count) of the base, a NaN in a float place as one value. With
+// `asRead`, the colour and specular words are the bytes GL reads (glLockArraysEXT); without,
+// the words as the engine holds them (the math unit's Project).
+void dump_vertices(const char* name, int32_t first, int32_t count, bool asRead = false) {
     if (gBase == nullptr || count <= 0 || count > 256) return;
     for (int32_t i = first; i < first + count; ++i) {
         uint32_t w[8];
-        std::memcpy(w, gBase + 0x20 * i, sizeof w);
+        const uint8_t* vertex = gBase + 0x20 * i;
+        std::memcpy(w, vertex, sizeof w);
+        if (asRead) {
+            w[4] = memory_order(vertex + 0x10);
+            w[5] = memory_order(vertex + 0x14);
+        }
         ev(name, {i, canonical(w[0]), canonical(w[1]), canonical(w[2]), canonical(w[3]), w[4], w[5], canonical(w[6]),
                   canonical(w[7])});
     }
@@ -100,7 +115,7 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
 }
 void glLockArraysEXT(GLint first, GLsizei count) {
     ev("glLockArraysEXT", {first, count});
-    dump_vertices("Vertex", first, count);
+    dump_vertices("Vertex", first, count, true);
 }
 // A script may make the draw leave a DirectDraw error behind (queue DDResult, -1: no change).
 void glUnlockArraysEXT() {

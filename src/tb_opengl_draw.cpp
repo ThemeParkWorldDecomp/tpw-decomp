@@ -73,6 +73,21 @@ constexpr float kBoxDepth = 0.001f;        // engine data 0x10050110
 constexpr float kEdgeDepth = 0.0001f;      // 0x100500f8
 constexpr uint16_t kTwoTriangles[6] = {0, 2, 1, 0, 3, 2};   // 0x10052148, 0x1005213c, 0x100521c4
 
+// The colour and specular words of the first `count` vertices, byte-reversed in place. The
+// words are 0xRRGGBBAA and glColorPointer(4, GL_UNSIGNED_BYTE) reads their bytes in memory
+// order, which on the Mac is red first. The host is little-endian, so the words are turned
+// into the Mac's memory order for the draw and turned back after it (twice is the identity).
+void ReverseColourBytes(uint8_t* vertices, uint32_t count) {
+    for (uint32_t i = 0; i < count; ++i) {
+        uint32_t words[2];
+        uint8_t* colours = vertices + static_cast<size_t>(kVertexStride) * i + 0x10;
+        std::memcpy(words, colours, sizeof words);
+        words[0] = __builtin_bswap32(words[0]);
+        words[1] = __builtin_bswap32(words[1]);
+        std::memcpy(colours, words, sizeof words);
+    }
+}
+
 }  // namespace
 
 // ---- Execute and DrawIndexedPrimitive --------------------------------------------------------
@@ -111,6 +126,9 @@ int32_t COpenGLDrawPrimitive::DrawIndexedPrimitive(int32_t primitiveType, uint32
     }
     uint8_t* bytes = static_cast<uint8_t*>(vertices);
     if (vertexType == kVertexFormat) {
+        // GL is given the colours of the vertices it locks in the Mac's byte order; they are
+        // put back after the unlock.
+        ReverseColourBytes(bytes, vertexCount);
         glVertexPointer(4, kFloat, kVertexStride, vertices);
         glTexCoordPointer(2, kFloat, kVertexStride, bytes + 0x18);
         glColorPointer(4, GL_UNSIGNED_BYTE, kVertexStride, bytes + 0x10);
@@ -134,6 +152,7 @@ int32_t COpenGLDrawPrimitive::DrawIndexedPrimitive(int32_t primitiveType, uint32
         glPopAttrib();
     }
     glUnlockArraysEXT();
+    if (vertexType == kVertexFormat) ReverseColourBytes(bytes, vertexCount);
     if ((flags & 1) != 0) glFinish();
     return 0;
 }

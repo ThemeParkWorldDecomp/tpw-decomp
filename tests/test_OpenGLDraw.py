@@ -589,6 +589,60 @@ def random_indexed(r):
     return case_of(r, [(DRAW_INDEXED, dip_args(r)) for _ in range(r.randrange(1, 5))], fail=r.random() < 0.2, fields=False)
 
 
+# ---- The colour bytes GL reads
+
+# Colour and specular words (0xRRGGBBAA) whose bytes GL must read red first, as the Mac's GL
+# did: the ESC menu's idle colour, a grey of its hover fade, a shaded terrain corner, white and
+# a fog specular word. The host is little-endian, so passing the words through as stored gives
+# GL alpha, blue, green, red (the idle colour becomes fully transparent).
+KNOWN_COLOURS = [(0x00AFBEFF, 0x40008080), (0x808080FF, 0x00000000), (0x7F7F7F00, 0x123456FF), (0xFFFFFFFF, 0xFF0000FF)]
+
+
+def known_colour_cases():
+    r = random.Random(113)
+    words = vertex_words(r)
+    for i, (colour, specular) in enumerate(KNOWN_COLOURS):
+        words[8 * i + 4], words[8 * i + 5] = colour, specular
+    indices = [0, 1, 2, 0, 2, 3] + [0] * (INDEX_CAPACITY - 6)
+    for flags in (0, 0x8000):
+        yield dict(q={}, vwords=words, iwords=indices, expect=KNOWN_COLOURS,
+                   script=[(DRAW_INDEXED, [4, VERTEX_TYPE, 4, 6, flags])])
+    yield dict(q={}, vwords=words, iwords=indices, expect=KNOWN_COLOURS, script=[(EXECUTE, [0x80000, 0, 4, VERTEX_TYPE, 4, 6])])
+    # Two draws of the same vertices: the words are back as they were after the first.
+    yield dict(q={}, vwords=words, iwords=indices, expect=KNOWN_COLOURS * 2,
+               script=[(DRAW_INDEXED, [4, VERTEX_TYPE, 4, 6, 0x8000]), (DRAW_INDEXED, [4, VERTEX_TYPE, 4, 6, 0])])
+    for colour in (0x00AFBEFF, 0x808080FF):
+        yield dict(q={}, vwords=words, iwords=indices, expect=[(colour, 0)] * 4,
+                   script=[(SET_DISPLAY, [fb(T.f32(2.0 / 640)), fb(T.f32(2.0 / 480)), 640, 480]),
+                           (FILLED_BOX, [fb(10.0), fb(20.0), fb(110.0), fb(220.0), colour, -1])])
+
+
+def random_colours(r):
+    """Any colour and specular words in the vertices of one draw."""
+    words = vertex_words(r)
+    count = r.randrange(1, 9)
+    expect = [(words[8 * i + 4], words[8 * i + 5]) for i in range(count)]
+    indices = [r.randrange(0, count) for _ in range(INDEX_CAPACITY)]
+    flags = r.choice([0, 0x8000, 0x8001])
+    return dict(q={}, vwords=words, iwords=indices, expect=expect, script=[(DRAW_INDEXED, [r.choice(GOOD_TYPES), VERTEX_TYPE, count, 12, flags])])
+
+
+def channels(word):
+    return list(struct.pack(">I", word))
+
+
+def expected_colours(e, case):
+    """The red, green, blue and alpha bytes GL must read for each vertex it locks, colour then
+    specular: the bytes of the word from its high end."""
+    return dict(read=[channels(colour) + channels(specular) for colour, specular in case["expect"]])
+
+
+def host_colours(lib, case):
+    """The bytes the host gave GL, from its glLockArraysEXT dumps (recorded in memory order)."""
+    log = host(lib, case)["log"]
+    return dict(read=[channels(ints[5]) + channels(ints[6]) for name, ints, _ in log if name == "Vertex"])
+
+
 # ---- Execute
 
 def edge_execute():
@@ -831,6 +885,8 @@ def random_mixed(r):
 TESTS = [
     FnTest("COpenGLDrawPrimitive::DrawIndexedPrimitive", ppc, host, edge=edge_indexed, rnd=random_indexed),
     FnTest("COpenGLDrawPrimitive::Execute", ppc, host, edge=edge_execute, rnd=random_execute),
+    FnTest("COpenGLDrawPrimitive, the colour bytes GL reads", expected_colours, host_colours, edge=known_colour_cases,
+           rnd=random_colours),
     FnTest("COpenGLDrawPrimitive::DrawFilledBox", ppc, host, edge=edge_box, rnd=random_box),
     FnTest("COpenGLDrawPrimitive::DrawPoly", ppc, host, edge=edge_poly, rnd=random_poly),
     FnTest("COpenGLDrawPrimitive::DrawEdgeBox", ppc, host, edge=edge_edge_box, rnd=random_edge_box),
