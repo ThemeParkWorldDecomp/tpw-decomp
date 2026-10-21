@@ -22,6 +22,11 @@
 #include "ui_DrawObject.h"
 #include "ui_Postcard.h"
 #include "ui_main.h"
+#include "image_copies.h"
+
+// The tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY(colours, gUIObjectStateColours);
+TPW_IMAGE_COPY(strings, gUIObjectStateStrings);
 
 using namespace calllog;
 

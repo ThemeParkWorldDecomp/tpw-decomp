@@ -276,7 +276,7 @@ extern int32_t gLLCC9F18;        // 0x1029df18  -1 (initialised data): the curre
 extern int32_t gLLCC9F1C;        // 0x1029df1c  -1: its cell y
 extern int32_t gLLCC9F20;        // 0x1029df20  -1: its rotation
 extern uint16_t gLLCCE028;       // 0x1029e028  0: the upgrade parent LLCM_SetCurrentObject compares with
-extern uint16_t gLLCCE02A;       // 0x1029e02a  0xffff: the cell id LLCM_StartTrackEditMode compares gLLCCDB68 with
+extern uint16_t gLLCCE02A;       // 0x1029e02a  0 (image): the cell id LLCM_StartTrackEditMode compares gLLCCDB68 with
 extern int32_t gLLCCE034;        // 0x1029e034  -1: the track end x
 extern int32_t gLLCCE038;        // 0x1029e038  -1: the track end y
 extern CTrackCell* gLLCCDB48;    // 0x102ddb48  0 (BSS, a pointer): the current object's track cell
@@ -389,7 +389,7 @@ void __sinit_LLCellMouse_cpp();   // 0x10088ff4 (60 bytes): also gLLCCDB68, gLLC
 // Unit v5982 (src/LLCellRide_offsets_LLCC_SetTrackAnimReverse_LLCC_BuildTrackDB_2.cpp defines the two words; names are the addresses).
 struct tag_sRideAnimSet;
 extern uint16_t gLLCCE0B0;     // 0x1029e0b0  0 (halfword): the cell answer LLCC_BuildTrackDB compares a straight section's ride with
-extern uint16_t gLLCCE0B2;     // 0x1029e0b2  0xffff (halfword): the cell answer it compares a start-flag cell's ride with
+extern uint16_t gLLCCE0B2;     // 0x1029e0b2  0 (halfword, image): the cell answer it compares a start-flag cell's ride with
 // Callees of LLCC_BuildTrackDB (stand-ins in the launcher).
 // 0x1002ef98 (4,080 bytes, unit v5566, declared in BMP_InsideArea.h too): answers 1 placed, 0 refused; LLCC_BuildTrackDB ignores it.
 int32_t BMP_TrackSectionPlaceSection(int32_t ride, int32_t x, int32_t z, int32_t kind, int32_t count, uint32_t thing, int32_t info);

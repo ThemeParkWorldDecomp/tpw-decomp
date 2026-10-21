@@ -11,6 +11,10 @@ The world: the peep block (0x240 bytes: kind, cell bytes, script handles, last p
 guard bytes, the balloon offset table, the sprite halfword. Compared: the answer, the log, the peep block, every static.
 
 Fused operations (fmadds) and fctiwz go through ROUNDING. Not tested: positions whose fctiwz would overflow (Unicorn saturates wrongly).
+
+A last test (unit v5L39), "the balloon offsets": the host's gPeepBalloonOffsets as the library was loaded against the program image's
+words (tests/imagedata.py), one case per row, the floats compared as bits. The cases above write their own rows; before v5L39 the host's
+rows were zero, so balloons did not bob.
 """
 import ctypes as C
 import random
@@ -19,6 +23,7 @@ import struct
 from unicorn import UC_HOOK_CODE
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 from test_DynamicMesh import HardwareRounding
@@ -450,4 +455,5 @@ def walk_edges():
 TESTS = [
     FnTest("CPeep::UpdatePositionInEngine", ppc, host, edge=upd_edges, rnd=upd_random),
     FnTest("CPeep::PeepWalks", ppc, host, edge=walk_edges, rnd=walk_random),
+    imagedata.table_test("the balloon offsets", [("offsets", ADDR["offsets"], "III", 20)]),
 ]

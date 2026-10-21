@@ -16,12 +16,17 @@ address of the thought state, or the object, as a name), the globals read back a
 No fused operations. Not tested: the rank format at 0x1024dd1a+0x16 is read by the original from the image and by the host from a
 copy (its text is compared through the swprintf log); a pass-through Change with flag 0x100 (the fake would read the text through the
 change block); a state outside 0..26 (reads past the tables).
+
+A last test (unit v5L39), "the object state tables": the host's colour and string id tables as the library was loaded against the program
+image's words (tests/imagedata.py), one case per entry. The cases above write their own tables; before v5L39 the host had only the first
+colour and no string ids.
 """
 import ctypes as C
 import random
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -385,4 +390,5 @@ TESTS = [
     FnTest("LendersItemsCallback", ppc, host, edge=lenditems_edges, rnd=msg_random("lenditems", [0x403, 0x1E], [0, 1])),
     FnTest("ThoughtMsg", ppc, host, edge=thought_edges, rnd=msg_random("thought", [0xC], [0, 1])),
     FnTest("NameEditMsg", ppc, host, edge=nameedit_edges, rnd=msg_random("nameedit", [0x1000B], [0xD, 0xC])),
+    imagedata.table_test("the object state tables", [("colours", ADDR["colours"], "I", 27), ("strings", ADDR["strings"], "I", 27)]),
 ]

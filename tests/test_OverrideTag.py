@@ -13,12 +13,16 @@ the five window globals. What is compared: the answer, the globals, the three bu
 
 No fused operations. Not tested: GetWindow answering NULL where the original reads the window's Z at once, a NULL destination buffer, a
 NULL pending window when the dialog opens (the original calls startAnim on it, the fake never reads it, but that is not a real input).
+
+A last test (unit v5L39), "the tag animations": the host's gTagSlideAnim and gTagShiftAnim (both defined in this file since v5L39) as the
+library was loaded against the program image's frames (tests/imagedata.py), one case per frame.
 """
 import ctypes as C
 import random
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -483,4 +487,5 @@ def td_edges():
 TESTS = [
     FnTest("OverrideTag", ppc, host, edge=ot_edges, rnd=lambda r: ot_case(r)),
     FnTest("TagDlgCallback", ppc, host, edge=td_edges, rnd=lambda r: td_case(r)),
+    imagedata.table_test("the tag animations", [("slide", ADDR["anim"], "hhhh", 7), ("shift", 0x102A83EA, "hhhh", 15)]),
 ]

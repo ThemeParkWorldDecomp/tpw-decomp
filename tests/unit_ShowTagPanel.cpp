@@ -26,7 +26,7 @@ InterfaceWindow* gTagPanelSource;
 sStaticTag gStaticTags[10];
 InterfaceWindow* gTagFirstWindow;
 InterfaceWindow* gAerialWindow;
-UI_RectDelta gTagShiftAnim[1];
+UI_RectDelta gTagShiftAnim[15];
 
 namespace {
 

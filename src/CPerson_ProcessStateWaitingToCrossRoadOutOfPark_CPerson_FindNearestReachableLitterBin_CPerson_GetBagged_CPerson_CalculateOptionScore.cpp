@@ -11,8 +11,26 @@
 // Names invented, zero at start (declared in ThingReceivers.h).
 uint16_t gNoBackOfQueue = 0;                 // 0x102a0fac
 uint16_t gNoThingRide = 0;                   // 0x102a0fae
-uint8_t gNeedMatchTable[0x79] = {};          // 0x102a0f1e
-uint8_t gAmountMatchTable[0x15] = {};        // 0x102a0f97
+
+// The image's initialised data. gNeedMatchTable is 11 x 11: the row is the option's tenth of its need effect (thirst or
+// hunger), the column the person's tenth of the need. gAmountMatchTable is indexed by (amount + 4) / 5 (toilet, illness).
+uint8_t gNeedMatchTable[0x79] = {            // 0x102a0f1e
+      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   // 0
+      0,   0,   1,   2,   5,   7,  11,  15,  20,  25,  31,   // 1
+      0,   0,   1,   4,   7,  11,  16,  21,  28,  36,  44,   // 2
+      0,   0,   2,   4,   8,  13,  19,  26,  35,  44,  54,   // 3
+      0,   0,   2,   5,  10,  15,  22,  30,  40,  51,  63,   // 4
+      0,   0,   2,   6,  11,  17,  25,  34,  45,  57,  70,   // 5
+      0,   0,   3,   6,  12,  19,  27,  37,  49,  62,  77,   // 6
+      0,   0,   3,   7,  13,  20,  30,  40,  53,  67,  83,   // 7
+      0,   0,   3,   8,  14,  22,  32,  43,  57,  72,  89,   // 8
+      0,   0,   3,   8,  15,  23,  34,  46,  60,  76,  94,   // 9
+      0,   1,   4,   9,  16,  25,  36,  49,  64,  81, 100,   // 10
+};
+uint8_t gAmountMatchTable[0x15] = {          // 0x102a0f97
+      0,   0,   0,   0,   0,   0,   0,   0,   0,   1,   2,
+      5,  10,  20,  30,  40,  50,  60,  75,  90, 100,
+};
 
 namespace {
 

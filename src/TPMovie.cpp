@@ -12,7 +12,7 @@
 
 Movie gMovie;   // 0x102e49ec (name invented)
 
-uint32_t gMovieVolume;   // 0x1029eb88 (name invented): 0 .. 0x100
+uint32_t gMovieVolume = 0x100;   // 0x1029eb88 (name invented): 0 .. 0x100, full at start (the image's word)
 
 // The game's 0 .. 0x3ff scaled to 0 .. 0x100.
 void MOVIE_SetVolume(uint32_t volume) { gMovieVolume = (volume * 0x100) / 0x3ff; }

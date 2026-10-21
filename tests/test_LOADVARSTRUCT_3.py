@@ -14,12 +14,15 @@ GetElement answers, and the event log (every argument, the tag parameters in ful
 
 No fused operations. Not tested: GetElement with an id from 0x180 up or negative (it reads past the table, whose neighbours are
 other globals).
+
+Unit v5L39: an image test of the tag table as loaded (tests/imagedata.py); the other cases write their own tables.
 """
 import ctypes as C
 import random
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -399,4 +402,5 @@ TESTS = [
     FnTest("LOADVARSTRUCT<CThoughts::EventHistType>", ppc(do_load), host(do_load), edge=load_edges, rnd=load_random),
     FnTest("CTagTable::GetElement", ppc(do_get), host(do_get), edge=get_edges, rnd=get_random),
     FnTest("CTagSystem::ReceiveMessage", ppc(do_recv), host(do_recv), edge=recv_edges, rnd=recv_random),
+    imagedata.table_test("the tag table", [("tags", ADDR["table"], "IIIIIIII", 0x17E)]),
 ]

@@ -15,6 +15,10 @@ the person's ride, gWorld and gWorldMap. What is compared: the answer, the event
 No fused operations (the float paths use fsubs, fdivs, fadds, fmuls; ROUNDING is kept for fctiwz). Not tested: needs and amounts outside 0 to 100
 and record bytes above 109 (the table index would run past the two tables, which sit side by side on the Mac but are separate arrays on the
 host); a ride capacity whose times four wraps to 0 (divwu by 0: the emulator answers the dividend, the hardware is undefined); a person ride index of 0x2800 or more (past gThingArray).
+
+A second test (unit v5L39), "the match tables": the host's two tables as the library was loaded against the program image's bytes
+(tests/imagedata.py), one case per byte. The cases above write their own tables, so they cannot see the host's initial data; with both
+tables zero every guest scored thirst, hunger, toilet and illness as no match.
 """
 import ctypes as C
 import random
@@ -23,6 +27,7 @@ import struct
 from unicorn import UC_HOOK_CODE
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 from test_DynamicMesh import HardwareRounding
@@ -499,4 +504,5 @@ def rnd(r):
 
 TESTS = [
     FnTest("CPerson::CalculateOptionScore", ppc, host, edge=edges, rnd=rnd),
+    imagedata.table_test("the match tables", [("needs", ADDR["tabA"], "B", 0x79), ("amounts", ADDR["tabB"], "B", 0x15)]),
 ]

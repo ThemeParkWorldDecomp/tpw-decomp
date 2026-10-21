@@ -31,7 +31,14 @@ float gPeepStepLag;          // 0x1034c464: 0.35
 float gPeepScriptHeight = 2.5f;      // 0x102a0d98
 float gPeepBalloonBase = 1.0f;       // 0x102a0d9c
 uint32_t gPeepBalloonRows = 20;      // 0x102a0da0
-float gPeepBalloonOffsets[20][3];    // 0x102a0da4: 12 bytes a row (contents not recovered)
+// 0x102a0da4: 12 bytes a row, the balloon's x, y, z offset by frame (the image's data): it bobs up 0.2 and back over the 20 rows.
+float gPeepBalloonOffsets[20][3] = {
+    {0.0f, 0.0f, 0.0f}, {0.0f, 0.02f, 0.0f}, {0.0f, 0.04f, 0.0f}, {0.0f, 0.06f, 0.0f},
+    {0.0f, 0.08f, 0.0f}, {0.0f, 0.1f, 0.0f}, {0.0f, 0.12f, 0.0f}, {0.0f, 0.14f, 0.0f},
+    {0.0f, 0.16f, 0.0f}, {0.0f, 0.18f, 0.0f}, {0.0f, 0.2f, 0.0f}, {0.0f, 0.18f, 0.0f},
+    {0.0f, 0.16f, 0.0f}, {0.0f, 0.14f, 0.0f}, {0.0f, 0.12f, 0.0f}, {0.0f, 0.1f, 0.0f},
+    {0.0f, 0.08f, 0.0f}, {0.0f, 0.06f, 0.0f}, {0.0f, 0.04f, 0.0f}, {0.0f, 0.0f, 0.0f},
+};
 
 namespace {
 

@@ -14,6 +14,7 @@
 #include "World.h"
 #include "DynamicMesh.h"
 #include "CPeep_SAVEVAR_2.h"
+#include "image_copies.h"
 
 using namespace calllog;
 
@@ -28,6 +29,8 @@ extern float gPeepBalloonTime, gPeepBalloonRate, gPeepBalloonScale, gPeepC474, g
 extern float gPeepScriptHeight, gPeepBalloonBase;
 extern uint32_t gPeepBalloonRows;
 extern float gPeepBalloonOffsets[20][3];
+// The table as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY(offsets, gPeepBalloonOffsets);
 
 namespace {
 

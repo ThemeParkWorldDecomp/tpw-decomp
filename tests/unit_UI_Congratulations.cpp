@@ -32,6 +32,11 @@
 #include "ui_ErrorDisplay.h"
 #include "ui_Postcard.h"
 #include "ui_main.h"
+#include "image_copies.h"
+
+// The tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY_SIZE(canim, gCongratsAnim, 29 * sizeof(UI_RectDelta));
+TPW_IMAGE_COPY_SIZE(banim, gBankruptAnim, 24 * sizeof(UI_RectDelta));
 
 using namespace calllog;
 

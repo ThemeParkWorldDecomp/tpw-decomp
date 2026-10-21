@@ -13,11 +13,16 @@
 #include "InterfaceWindow.h"
 #include "UI_Base.h"
 #include "ui_main.h"
+#include "image_copies.h"
+
+// The tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY(slide, gAerialSlide);
 
 using namespace calllog;
 
 // ---- globals of other files the unit reads or writes
 InterfaceWindow* gTagFirstWindow;
+sStaticTag gStaticTags[10];   // no tag window: every window word of a case is an arena offset (unit v5L39)
 
 namespace {
 

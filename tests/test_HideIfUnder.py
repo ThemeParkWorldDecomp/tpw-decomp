@@ -11,12 +11,16 @@ queues. What is compared: the answer, gTagFirstWindow (as a label) and the event
 
 No fused operations. Not tested: a NULL window in AerialCallback (the original calls the default handler on it, which the fake
 accepts, but it is not a case the game makes).
+
+A last test (unit v5L39), "the bobble slide": the host's gAerialSlide as the library was loaded against the program image's frames
+(tests/imagedata.py), one case per frame. Before v5L39 the host had one frame.
 """
 import ctypes as C
 import random
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -467,4 +471,5 @@ def aerial_random(r):
 TESTS = [
     FnTest("HideIfUnder", ppc, host, edge=hide_edges, rnd=hide_random),
     FnTest("AerialCallback", ppc, host, edge=aerial_edges, rnd=aerial_random),
+    imagedata.table_test("the bobble slide", [("slide", ADDR["delta"], "hhhh", 15)]),
 ]

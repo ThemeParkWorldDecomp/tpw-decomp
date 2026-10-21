@@ -11,8 +11,11 @@
 #include "ui_main.h"
 
 uint32_t gContactsFontIndex = 7;                                                  // 0x102b0c4c
-uint8_t gMessagesLCColours[32] = {0x00, 0xe2, 0x06, 0x00};                        // 0x102b0c58
-uint32_t gContactsLCColours[4] = {0xffffff00u, 0, 0, 0};                          // 0x102b0c78
+uint8_t gMessagesLCColours[32] = {                                                // 0x102b0c58: red, green, blue, spare
+    0x00, 0xe2, 0x06, 0x00,  0xff, 0xff, 0xff, 0x00,  0x51, 0x89, 0xef, 0x00,  0xfe, 0x30, 0x30, 0x00,
+    0xff, 0xff, 0xff, 0x00,  0x51, 0x89, 0xef, 0x00,  0xfe, 0x30, 0x30, 0x00,  0xf0, 0xff, 0x00, 0x00,
+};
+uint32_t gContactsLCColours[4] = {0xffffff00u, 0x5189ef00u, 0x00e20600u, 0xfe303000u};   // 0x102b0c78
 int32_t gOnlineContactsBusy = 0;                                                  // 0x10395e7c
 
 // 0x101e7648: message 0x403 sets the font colour from the table by the low bits of b (bit 0 clear: word 0; else bit 1 clear: word 3;

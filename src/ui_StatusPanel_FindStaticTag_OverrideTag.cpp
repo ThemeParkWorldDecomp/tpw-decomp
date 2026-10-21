@@ -7,8 +7,20 @@
 
 // 0x1038cd7c, in bss: set elsewhere (the window to slide in); the Mac's word is zero at start.
 InterfaceWindow* gTagPanelPending;
-// 0x102a83b2: the Mac's bytes are not known beyond the first word (0xfffefffe).
-UI_RectDelta gTagSlideAnim[1] = {{-2, -2, 0, 0}};
+// 0x102a83b2: the frames TagDlgCallback slides the panel with (the image's data): it grows three steps, shrinks three, then again.
+UI_RectDelta gTagSlideAnim[7] = {
+    {-2, -2, 2, 2}, {-2, -2, 2, 2}, {-2, -2, 2, 2},
+    {2, 2, -2, -2}, {2, 2, -2, -2}, {2, 2, -2, -2},
+    {kAnimGoto, 0, 0, 0},
+};
+// 0x102a83ea: the frames TagCallback (src/ui_StatusPanel_SetButton_ShowTagPanel.cpp) shifts the other tags with (the image's data).
+UI_RectDelta gTagShiftAnim[15] = {
+    {-2, 2, 2, 0}, {-2, 2, 2, 0}, {-2, 2, 2, 0},
+    {-2, 2, 2, 0}, {-2, 2, 2, 0}, {-2, 2, 2, 0},
+    {4, -4, -4, 0}, {4, -4, -4, 0}, {-2, 2, 2, 0},
+    {-2, 2, 2, 0}, {2, -2, -2, 0}, {2, -2, -2, 0},
+    {2, -2, -2, 0}, {2, -2, -2, 0}, {kAnimEnd, 0, 0, 0},
+};
 
 // Looks over the sibling windows from gTagFirstWindow on for the tag windows that hold these parameters (extras 1, 3, 8). When
 // the id equals the second field the text is copied into the window (extra 2) and shown when it is the panel source, and the

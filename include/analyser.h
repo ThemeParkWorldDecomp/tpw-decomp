@@ -430,8 +430,7 @@ void SCR_InitScriptSystem();
 void SCR_InitCheckTable();
 void SCR_CloseCheckTable();                 // 0x100d900c (68 bytes): frees the table and clears the pointer
 // The script data the table is built from (src/ScriptCheckTable.cpp). The Mac words are addresses in its data segment (the code
-// array of the compiled scripts and the zero ended list of command descriptors); the port has no such arrays yet, so the host
-// defaults are empty: the table has no entries and nothing is read.
+// array of the compiled scripts and the zero ended list of command descriptors); the host holds the image's words (unit v5L39).
 extern uint8_t* gScriptCheckTable;          // 0x102f7c10  the table (NULL: none)
 extern const uint32_t* gScriptCodeWords;    // 0x1029f20c  the first code word (TOC slot 0x10261140)
 extern const uint32_t* gScriptCodeWordsEnd; // 0x1029ffd8  one past the last (TOC slot 0x10261128, 883 words on the Mac)

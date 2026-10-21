@@ -19,6 +19,10 @@
 #include "TrackCell.h"
 #include "UIInterface.h"
 #include "World.h"
+#include "image_copies.h"
+
+// The tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY(e02a, gLLCCE02A);
 
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 

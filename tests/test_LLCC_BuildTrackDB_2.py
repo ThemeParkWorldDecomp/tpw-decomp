@@ -19,11 +19,14 @@ and mini node arrays after the call.
 No fused operations (the single precision products are plain fmuls; the values are small, so fctiwz does not saturate). Not tested: a
 thing id whose gThingArray row is NULL on the first thing (the original reads 0x24 of it), a NULL neighbour in the three-neighbour branch
 (the original reads it), ride anim indices beyond the four sets (the original reads past the table).
+
+Unit v5L39: an image test of gLLCCE0B0 and gLLCCE0B2 as loaded (tests/imagedata.py); the other cases write their own values.
 """
 import ctypes as C
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -498,4 +501,5 @@ def rnd(r):
 
 TESTS = [
     FnTest("LLCC_BuildTrackDB", ppc, host, edge=edges, rnd=rnd),
+    imagedata.table_test("the two words", [("b0", 0x1029E0B0, "H", 1), ("b2", 0x1029E0B2, "H", 1)]),
 ]

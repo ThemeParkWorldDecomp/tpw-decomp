@@ -5,12 +5,16 @@ InterfaceFont and its wrapper, UIMain_ConvertMulti, CExitError::SetError.
 One operation per case, run on both sides; the results are a list of numbers (and a text)
 read in the same order as tests/unit_StartupSmall.cpp writes the host's, plus the events
 of the fakes (_strdup, CTRACE, the TPFile calls, the text converter, deleted bitmaps).
+
+A last test (unit v5L39), "the movie volume": the host's gMovieVolume as the library was loaded against the program image's word
+(tests/imagedata.py). Before v5L39 the host started it at 0 (silent) where the Mac starts it at 0x100.
 """
 import ctypes as C
 import random
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -427,4 +431,5 @@ TESTS = [
            rnd=lambda r: dict(op=10, a=[r.randrange(2) for _ in range(4)], text=rnd_text(r))),
     FnTest("CExitError::SetError", ppc, host, edge=error_edges,
            rnd=lambda r: dict(op=11, a=[r.randrange(-2, 20), r.getrandbits(32), r.randrange(2)], text=rnd_text(r, 140))),
+    imagedata.table_test("the movie volume", [("movievol", MOVIE_VOLUME, "I", 1)]),
 ]

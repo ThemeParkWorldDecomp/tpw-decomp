@@ -254,10 +254,10 @@ extern int32_t gMaxTags;                        // 0x102a8464, initially 10
 extern int32_t gTagCount;                       // 0x1038cd74
 // Unit v5531 (src/ui_StatusPanel_FindStaticTag_OverrideTag.cpp)
 extern InterfaceWindow* gTagPanelPending;       // 0x1038cd7c: the window TagDlgCallback makes gTagPanelSource when it opens; message 0x1d (1) clears it
-extern UI_RectDelta gTagSlideAnim[1];           // 0x102a83b2: the frames TagDlgCallback slides the panel with (content unknown; first word 0xfffefffe)
+extern UI_RectDelta gTagSlideAnim[7];           // 0x102a83b2: the frames TagDlgCallback slides the panel with (7 frames, the last a goto)
 extern InterfaceWindow* gTagFirstWindow;        // 0x103949d0
 // Unit v5565 (src/ui_StatusPanel_SetButton_ShowTagPanel.cpp)
-extern UI_RectDelta gTagShiftAnim[1];           // 0x102a83ea: the frames TagCallback shifts the other tags with (first word 0xfffe0002)
+extern UI_RectDelta gTagShiftAnim[15];          // 0x102a83ea: the frames TagCallback shifts the other tags with (15 frames, the last an end)
 void UIMain_MidWindowParticles(int32_t id, InterfaceWindow* window);   // 0x10182404, stand-in
 extern void* gUISelectedThing;          // 0x103947b8, unknown word 0 of the selection
 extern void* gUISelectedPeep;           // 0x103947b4
@@ -295,7 +295,7 @@ int32_t RailsCallback(InterfaceWindow*, int32_t, int32_t, int32_t);             
 // Unit v5979 (src/ui_mainpanel2_msg_HideIfUnder.cpp)
 struct UI_RectDelta;
 void HideIfUnder(InterfaceWindow* window, int16_t limit);   // 0x101a6c44: shows each window of the tree (4 levels, then recursion) whose right edge is above the limit
-extern UI_RectDelta gAerialSlide;                           // 0x102aad44: the bobble window's slide (first word 0xfffe0002)
+extern UI_RectDelta gAerialSlide[15];                       // 0x102aad44: the bobble window's slide (15 frames, the last an end)
 int32_t HappyBarMsg(InterfaceWindow*, int32_t, int32_t, int32_t);                   // 0x101a76f0 (unit w131) (window 0x1f)
 int32_t MainPanelButtonsMsg(InterfaceWindow*, int32_t, int32_t, int32_t);           // 0x101a5a2c (unit w131) (window 0x25)
 int32_t StaffPanelMsg(InterfaceWindow*, int32_t, int32_t, int32_t);                 // 0x101bfdd8 (unit w131) (windows 0x95c and 0x963)

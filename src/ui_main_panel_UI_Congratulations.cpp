@@ -22,11 +22,33 @@
 
 extern "C" void __register_global_object(void* object, void* destructor, void* node);   // runtime glue 0x10239940
 
-// ---- the image's data (only the first word of each is known) and the file's globals
+// ---- the image's data (of the two window scripts only the first word is known) and the file's globals
 int16_t gCongratsScript[] = {0, 1};                // 0x102a772c
 int16_t gBankruptScript[] = {0, 1};                // 0x102a7756
-UI_RectDelta gCongratsAnim[] = {{0x10, 0, 0, 0}};  // 0x102a79d4
-UI_RectDelta gBankruptAnim[] = {{-1, -1, 0, 0}};   // 0x102a7914
+// The window animations (the image's frames): the congratulations window slides in, rises, spins once, drops and slides out, then again
+// from the start; the bankrupt window shakes, sinks and closes in, then again.
+UI_RectDelta gCongratsAnim[] = {                   // 0x102a79d4 (29 frames)
+    {16, 0, -16, 0}, {16, 0, -16, 0}, {16, 0, -16, 0},
+    {16, 0, -16, 0}, {16, 0, -16, 0}, {16, 0, -16, 0},
+    {0, -4, 0, -4}, {0, -4, 0, -4}, {0, -4, 0, -4},
+    {0, -4, 0, -4}, {kAnimZRot, 512, 0, 0}, {kAnimZRot, 1024, 0, 0},
+    {kAnimZRot, 1536, 0, 0}, {kAnimZRot, 2048, 0, 0}, {kAnimZRot, 2560, 0, 0},
+    {kAnimZRot, 3072, 0, 0}, {kAnimZRot, 3584, 0, 0}, {kAnimZRot, 4096, 0, 0},
+    {0, 4, 0, 4}, {0, 4, 0, 4}, {0, 4, 0, 4},
+    {0, 4, 0, 4}, {-16, 0, 16, 0}, {-16, 0, 16, 0},
+    {-16, 0, 16, 0}, {-16, 0, 16, 0}, {-16, 0, 16, 0},
+    {-16, 0, 16, 0}, {kAnimGoto, 0, 0, 0},
+};
+UI_RectDelta gBankruptAnim[] = {                   // 0x102a7914 (24 frames)
+    {-1, -1, 1, 1}, {0, -1, 0, 1}, {-1, -1, 1, 1},
+    {0, -1, 0, 1}, {-1, -1, 1, 1}, {0, -1, 0, 1},
+    {-1, -1, 1, 1}, {0, -1, 0, 1}, {-1, -1, 1, 1},
+    {0, 1, 0, -1}, {0, 1, 0, -1}, {0, 1, 0, -1},
+    {0, 1, 0, -1}, {0, 1, 0, -1}, {0, 1, 0, -1},
+    {0, 1, 0, -1}, {0, 1, 0, -1}, {0, 1, 0, -1},
+    {1, 0, -1, 0}, {1, 0, -1, 0}, {1, 0, -1, 0},
+    {1, 0, -1, 0}, {1, 0, -1, 0}, {kAnimGoto, 0, 0, 0},
+};
 int32_t gCongratsTicks;                            // 0x10380b78
 int32_t gUIMainWordCCF8;                           // 0x1038ccf8
 int32_t gUIMainWordCCFC;                           // 0x1038ccfc

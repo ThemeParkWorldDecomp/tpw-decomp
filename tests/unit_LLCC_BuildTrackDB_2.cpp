@@ -22,6 +22,11 @@
 #include "analyser.h"
 #include "BMP_InsideArea.h"
 #include "ObjectParts.h"
+#include "image_copies.h"
+
+// The tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY(b0, gLLCCE0B0);
+TPW_IMAGE_COPY(b2, gLLCCE0B2);
 
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 

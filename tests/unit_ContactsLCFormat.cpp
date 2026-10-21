@@ -15,6 +15,11 @@
 #include "platform/arena.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "image_copies.h"
+
+// The tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY(msgcol, gMessagesLCColours);
+TPW_IMAGE_COPY(concol, gContactsLCColours);
 
 using namespace calllog;
 

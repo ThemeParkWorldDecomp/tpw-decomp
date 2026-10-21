@@ -17,9 +17,19 @@
 #include "ui_Postcard.h"
 #include "ui_main.h"
 
-// ---- data (contents other than the first colour are not known here; the game's tables are in the image)
-uint32_t gUIObjectStateColours[27] = {0xffffffffu};   // 0x102a7780
-uint32_t gUIObjectStateStrings[27] = {};              // 0x102a77ec
+// ---- data (the image's initialised data)
+// The state's text colour, 0xRRGGBBAA (SetObjectStateText uses the top three bytes).
+uint32_t gUIObjectStateColours[27] = {   // 0x102a7780
+    0xffffffffu, 0x808080ffu, 0xff321effu, 0xff321effu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu,
+    0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu,
+    0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0x5064ffffu, 0xff961effu, 0xff961effu, 0xff961effu, 0xff961effu, 0xff961effu,
+};
+// The state's string id in the text table of resource 6 (GetConstString's index, not a pointer).
+uint32_t gUIObjectStateStrings[27] = {   // 0x102a77ec
+    0x000, 0x16d, 0x16e, 0x16f, 0x170, 0x174, 0x172, 0x173, 0x171,
+    0x175, 0x176, 0x17a, 0x178, 0x179, 0x177, 0x17b, 0x17c, 0x180,
+    0x17e, 0x17f, 0x17d, 0x181, 0x184, 0x185, 0x186, 0x182, 0x183,
+};
 uint32_t gThoughtState[2] = {};                       // 0x10394a20
 
 namespace {

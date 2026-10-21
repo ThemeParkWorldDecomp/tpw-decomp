@@ -46,6 +46,12 @@ bool ObserveRelease(void* block, bool array);
 #include "fake_file_slots.h"
 #include "m3d2.h"
 #include "platform/arena.h"
+#include "image_copies.h"
+
+// The tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY_SIZE(code, *gScriptCodeWords, (gScriptCodeWordsEnd - gScriptCodeWords) * sizeof(uint32_t));
+TPW_IMAGE_COPY_SIZE(commands, *gScriptCommandList, 43 * sizeof(uint32_t));
+TPW_IMAGE_COPY(first, gScriptCommandFirst);
 
 using calllog::ev;
 using calllog::forget;

@@ -9,6 +9,7 @@
 #include <cstring>
 
 #include "calllog.h"
+#include "image_copies.h"
 #include "platform/arena.h"
 #include "ThingReceivers.h"
 #include "Debug.h"
@@ -25,6 +26,10 @@ CMap* gWorldMap;
 CThingArrayEntry gThingArray[kThingArraySize];
 // gMainBalance without its constructor (CBalanceTable::Init is not in this library): same symbol, raw storage.
 alignas(16) uint8_t gMainBalanceStorage[sizeof(CMainBalance)] __asm__("_gMainBalance");
+
+// The match tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY(needs, gNeedMatchTable);
+TPW_IMAGE_COPY(amounts, gAmountMatchTable);
 
 namespace {
 

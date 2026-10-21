@@ -10,12 +10,16 @@ fakes on both sides that record their arguments; objects are named by labels.
 The world of a case: the font index, the screen height, the two colour tables, the busy flag, gOnlinePanel (set or NULL). What is compared: the
 answer (the handlers' default-handler answer, the format function's window as a label), the globals read back and the event log.
 No fused operations. Not tested: a screen height of 0 (division by zero, undefined on the host).
+
+A last test (unit v5L39), "the list colours": the host's two colour tables as the library was loaded against the program image's bytes
+(tests/imagedata.py), one case per colour. The cases above write their own tables; before v5L39 the host had only the first colour of each.
 """
 import ctypes as C
 import random
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -311,3 +315,4 @@ TESTS = [FnTest(n, ppc, host, edge=edges(op, i), rnd=rnd(op))
                                       ("MessagesLCEntryHandler", "msgh"), ("ContactsLCEntryHandler", "conh"),
                                       ("_OnlineAddContact", "add"), ("_OnlineRemoveContact", "rem"),
                                       ("_OnlineUpdateContact", "upd")], 1)]
+TESTS.append(imagedata.table_test("the list colours", [("msgcol", ADDR["msgcol"], "BBBB", 8), ("concol", ADDR["concol"], "I", 4)]))

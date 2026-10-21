@@ -17,6 +17,11 @@
 #include "ui_DrawObject.h"
 #include "ui_main.h"
 #include "analyser.h"
+#include "image_copies.h"
+
+// The tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY(slide, gTagSlideAnim);
+TPW_IMAGE_COPY(shift, gTagShiftAnim);
 
 using namespace calllog;
 

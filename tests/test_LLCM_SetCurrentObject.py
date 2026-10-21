@@ -19,12 +19,15 @@ dereferences it), a NULL selected object in LLCM_StartTrackEditMode (read uncond
 
 Unit v5L28: the host ride record is the host RideInfo (8-byte balance values behind a 64-bit table header), so the host side writes each
 ride word at the host offset of the same balance slot (tpw_slc_rideoff).
+
+Unit v5L39: an image test of gLLCCE02A as loaded (tests/imagedata.py); the other cases write their own value.
 """
 import ctypes as C
 import random
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -555,4 +558,5 @@ def start_random(r):
 TESTS = [
     FnTest("LLCM_SetCurrentObject", ppc, host, edge=set_edges, rnd=set_random),
     FnTest("LLCM_StartTrackEditMode", ppc, host, edge=start_edges, rnd=start_random),
+    imagedata.table_test("the cell id word", [("e02a", 0x1029E02A, "H", 1)]),
 ]

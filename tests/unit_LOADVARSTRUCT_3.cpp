@@ -23,6 +23,10 @@
 #include "ui_main.h"
 #include "UIInterface.h"
 #include "platform/samsutils.h"
+#include "image_copies.h"
+
+// The tables as loaded, for the image test (unit v5L39).
+TPW_IMAGE_COPY(tags, gTagTable);
 
 using namespace calllog;
 

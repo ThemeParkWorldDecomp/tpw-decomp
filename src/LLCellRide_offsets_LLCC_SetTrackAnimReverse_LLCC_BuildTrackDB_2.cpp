@@ -21,7 +21,7 @@
 
 // Two words of the image that no other file names (initialised data).
 uint16_t gLLCCE0B0 = 0;        // 0x1029e0b0
-uint16_t gLLCCE0B2 = 0xffff;   // 0x1029e0b2
+uint16_t gLLCCE0B2 = 0;        // 0x1029e0b2  (the image holds 0; unit v5L39, was 0xffff)
 
 namespace {
 

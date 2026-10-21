@@ -4,7 +4,7 @@
 // each, the transition vector of a PK_ function) followed by its operand words (numbers, variable indexes, or code addresses for the jumps).
 //
 // Host design (area note ride-scripts 6.3): code addresses stay Mac addresses (uint32_t) in every 32-bit place, so the code words stay the
-// Mac's. The array itself is gScriptCodeWords (src/ScriptCheckTable.cpp, empty on the host until a data unit ports it); SCR_CodeWord reads
+// Mac's. The array itself is gScriptCodeWords (src/ScriptCheckTable.cpp, the image's words since unit v5L39); SCR_CodeWord reads
 // it by Mac address and SCR_CodeAddress turns a host pointer into it back into one. DoScript calls the PK_ functions through a table in
 // descriptor order. HOST GUARD: a check table index outside the array stops DoScript as a 0 check byte would (the Mac reads whatever
 // follows the table), so a script started on a block that is not in the array (the host copies of src/MapDelta_save.cpp and

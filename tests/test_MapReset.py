@@ -15,6 +15,9 @@ offset into the file buffer, length and first words); LoadAttribMap and ParseChu
 Cells are built from field values (big endian on the PowerPC side, little endian on the host), so the same Python values mean the
 same on both sides; the cell is compared field by field afterwards, with guard cells next to it. LLCC_ResetMap works on the world's
 whole cell arrays (raw storage on the host): their hash and the first cells are compared, and the fakes' log shows the order.
+
+Unit v5L39: an image test of the script data as loaded (tests/imagedata.py): the code array (its size checks gScriptCodeWordsEnd), the
+command list with its ending 0 and gScriptCommandFirst against its TOC word. The other cases write their own.
 """
 import ctypes as C
 import hashlib
@@ -22,6 +25,7 @@ import random
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -1453,4 +1457,5 @@ TESTS = [
     t("CIndividualChunkHandler::IsThisMyChunk", ismine_ppc, ismine_host, edge_ismine, rnd_ismine),
     t("CMapChunkHandler::ParseChunk", parse_ppc, parse_host, edge_parse, rnd_parse),
     t("cell layout", layout_ppc, layout_host, lambda: [{"q": {}}], lambda r: {"q": {}}),
+    imagedata.table_test("the script data", [("code", 0x1029F20C, "I", 883), ("commands", 0x1029FFEC, "I", 43), ("first", 0x1026111C, "I", 1)]),
 ]

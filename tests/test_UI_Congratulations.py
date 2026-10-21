@@ -19,12 +19,17 @@ No fused operations (the only floats are the constants 0.0 and 1.0 the initialis
 NULL converter (the original calls through them and the fakes only log), a guard byte other than 0 or 1 (the host's guard test looks
 at bit 0, the Mac's at the whole byte), a game type outside 0..3 (the host holds it in an enum), the contents of the scripts and the
 animations (only their addresses are used).
+
+A last test (unit v5L39), "the window animations": the host's congratulations and bankrupt animations as the library was loaded against
+the program image's frames (tests/imagedata.py), one case per frame. Before v5L39 the host had one frame of each, and the animation ran on
+into the memory after it.
 """
 import ctypes as C
 import random
 import struct
 
 import calllog as CL
+import imagedata
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -578,4 +583,5 @@ TESTS = [
     FnTest("UI_Bankrupt", ppc, host, edge=bank_edges, rnd=bank_random),
     FnTest("__sinit_ui_main_cpp", ppc, host, edge=sinit_edges, rnd=sinit_random),
     FnTest("CongratsWindowMsg", ppc, host, edge=msg_edges, rnd=msg_random),
+    imagedata.table_test("the window animations", [("canim", ADDR["canim"], "hhhh", 29), ("banim", ADDR["banim"], "hhhh", 24)]),
 ]

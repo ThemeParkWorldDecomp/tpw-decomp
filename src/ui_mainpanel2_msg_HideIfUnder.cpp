@@ -10,8 +10,14 @@
 #include "ppc_math.h"
 #include "ui_main.h"
 
-// 0x102aad44: the animation the bobble window gets when the aerial window moves; only the first word is known.
-UI_RectDelta gAerialSlide = {-2, 2, 0, 0};
+// 0x102aad44: the animation the bobble window gets when the aerial window moves (the image's frames; the same as gTagShiftAnim).
+UI_RectDelta gAerialSlide[15] = {
+    {-2, 2, 2, 0}, {-2, 2, 2, 0}, {-2, 2, 2, 0},
+    {-2, 2, 2, 0}, {-2, 2, 2, 0}, {-2, 2, 2, 0},
+    {4, -4, -4, 0}, {4, -4, -4, 0}, {-2, 2, 2, 0},
+    {-2, 2, 2, 0}, {2, -2, -2, 0}, {2, -2, -2, 0},
+    {2, -2, -2, 0}, {2, -2, -2, 0}, {kAnimEnd, 0, 0, 0},
+};
 
 namespace {
 // One level of HideIfUnder: a window whose right edge is above the limit is shown, any other hidden.
@@ -23,10 +29,17 @@ void Apply(InterfaceWindow* window, CoolRect& rect, int16_t limit) {
     }
 }
 
-// The Mac passes windows through the message arguments as 32-bit words; on the host such a word is the window's offset in the arena
-// (platform/arena.h; 0 is NULL).
+// The Mac passes windows through the message arguments as 32-bit words. The senders (AddATag, OverrideTag and the tag windows'
+// callbacks) put there the low 32 bits of a tag window, which the host keeps above 4 GB, so such a word is matched against the ten
+// tag windows (gStaticTags) to get the window back (unit v5L39: read as an arena offset it crashed the launcher once the tag table
+// let a tag appear). Any other word is the window's offset in the arena (platform/arena.h; the unit test's windows; 0 is NULL).
 InterfaceWindow* AsWindow(int32_t word) {
-    return word != 0 ? reinterpret_cast<InterfaceWindow*>(tpw::gArenaBase + static_cast<uint32_t>(word)) : nullptr;
+    if (word == 0) return nullptr;
+    for (const sStaticTag& tag : gStaticTags) {
+        if (tag.mWindow != nullptr && static_cast<uint32_t>(reinterpret_cast<uintptr_t>(tag.mWindow)) == static_cast<uint32_t>(word))
+            return tag.mWindow;
+    }
+    return reinterpret_cast<InterfaceWindow*>(tpw::gArenaBase + static_cast<uint32_t>(word));
 }
 }  // namespace
 
@@ -76,7 +89,7 @@ int32_t AerialCallback(InterfaceWindow* window, int32_t message, int32_t a, int3
             window->setExtraParam(0, extra0);
             window->setExtraParam(1, extra1);
             InterfaceWindow* bobble = window->GetWindow(0x2e);
-            if (bobble != nullptr && bobble->mAnimating == 0) bobble->startAnim(&gAerialSlide, 0x32);
+            if (bobble != nullptr && bobble->mAnimating == 0) bobble->startAnim(gAerialSlide, 0x32);
         }
     } else if (message < 0x100001) {
         if (message == 0x14) gTagFirstWindow = nullptr;
