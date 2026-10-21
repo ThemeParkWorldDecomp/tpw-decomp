@@ -110,6 +110,10 @@ endif()
 if(TARGET tpw_unit_ParticleSwap)
   target_compile_definitions(tpw_unit_ParticleSwap PRIVATE TPW_SWAP_FILE_WORDS=1)
 endif()
+# Unit v5L44: the ride height map's three byte swaps (src/std_exception_what.cpp) really swap in the test library, as the Mac's do.
+if(TARGET tpw_unit_std_exception_what)
+  target_compile_definitions(tpw_unit_std_exception_what PRIVATE TPW_SWAP_FILE_WORDS=1)
+endif()
 # Unit w192: the Swap library's trains save and load really swap (the plain library's do not, so that its files compare byte for byte).
 if(TARGET tpw_unit_CoasterTrainsSwap)
   target_compile_definitions(tpw_unit_CoasterTrainsSwap PRIVATE TPW_SWAP_FILE_WORDS=1)

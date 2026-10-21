@@ -47,7 +47,6 @@ uint32_t gHireLCFontIndex;
 int16_t gUIRealScreenHeight;
 CUIGrapher gFinanceGrapher;
 InterfaceWindow* gFinanceGraphPanel;
-uint8_t gFinanceKissMyLines[16];
 uint32_t gStaffRoomSpawnBlock[1];
 char16_t gUIMainConvertBuffer[0x4000];
 extern "C" {
@@ -237,6 +236,7 @@ int32_t InterfaceFont::GetHeight() {
 }
 
 void RemoveHireListPanel() { ev("RemoveHireListPanel", {0}); }
+void KissMyLines(CUIGrapher&) { ev("KissMyLines", {0}); }     // only its address is used (DrawMeGraph is a fake)
 
 void CreateRideListPanel(UIObjType type, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> selected) {
     ev("CreateRideListPanel", {static_cast<int64_t>(static_cast<int32_t>(type)),static_cast<int64_t>(selected.mIndex)});
@@ -291,7 +291,7 @@ uint64_t tpw_hmsg_addr(const char* name) {
         {"table", &reinterpret_cast<CText*>(gTextStorage)->mResourcePointers[6]},
         {"graphpanel", &gFinanceGraphPanel},
         {"grapher", &gFinanceGrapher},
-        {"kiss", gFinanceKissMyLines},
+        {"kiss", reinterpret_cast<const void*>(&KissMyLines)},
         {"spawn", gStaffRoomSpawnBlock},
         {"cbuf", gUIMainConvertBuffer},
     };

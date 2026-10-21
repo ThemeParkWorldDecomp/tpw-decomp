@@ -51,8 +51,8 @@ MK_SET, MK_TEXT, MK_HEIGHT = 0x7A000024, 0x7A00002C, 0x7A00000C   # what the fak
 
 ADDR = dict(world=0x1037EBFC, hirewin=0x10394924, hiretype=0x10394920, script=0x1039490C, selA=0x102AA328, selB=0x102AA32C,
             sort=0x102AA324, w10=0x10394910, w14=0x10394914, dep=0x1039491C, fmt=0x10394908, fontidx=0x102AA31C,
-            screenh=0x10395BBA, table=0x1037FF18 + 0x564, graphpanel=0x10394904, grapher=0x10394894, kiss=0x10267BA0,
-            spawn=0x1029FF70, cbuf=0x10380C48)
+            screenh=0x10395BBA, table=0x1037FF18 + 0x564, graphpanel=0x10394904, grapher=0x10394894, kiss=0x1019F25C,
+            spawn=0x1029FF70, cbuf=0x10380C48)   # kiss: KissMyLines, the code word of the TVector 0x10267ba0 the Mac passes to DrawMeGraph
 # staff name 4, pay grade 8, sub type 9, salary 0x10, the window's z 0xdc
 HOST_LAYOUT = [4, 8, 9, 0x10, 360]   # the last: the host's offset of a window's mZ (the Mac's is 0xdc; the host class is not laid out like the Mac's)
 
@@ -318,7 +318,7 @@ def st_setyrange(e):
 
 def st_draw(e):
     L = e.cl
-    L.rec("DrawMeGraph", (L.lab(e.r(3)), L.lab(e.r(4)), L.lab(e.r(5))))
+    L.rec("DrawMeGraph", (L.lab(e.r(3)), L.lab(e.r(4)), L.lab(e.u32(e.r(5)))))     # the callback: the function its TVector holds
 
 
 for _a, _f in [(C_GETWINDOW, st_getwindow), (C_GETCLIENTRECT, st_getclientrect), (C_CREATEOBJECT, st_createobject), (C_SETANIM, st_setanim),

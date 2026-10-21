@@ -52,6 +52,7 @@ InterfaceWindow* InterfaceWindow::GetWindow(int32_t id) {
     return ret("child") ? reinterpret_cast<InterfaceWindow*>(gTestChild) : nullptr;
 }
 
+void ParkInfoLines(CUIGrapher&) { ev("ParkInfoLines", {}); }     // only its address is used (DrawMeGraph is a fake)
 void DrawMeGraph(InterfaceWindow* window, CUIGrapher& grapher, void (*callback)(CUIGrapher&)) {
     ev("DrawMeGraph", {lab(window), lab(&grapher), lab(reinterpret_cast<const void*>(callback))});
 }
@@ -77,7 +78,7 @@ uint64_t tpw_parkstatus_addr(const char* name) {
         {"panel", &gParkStatusPanel},
         {"flags", &gParkStatusFlags},
         {"world", &gGameWorld},
-        {"lines", gParkInfoLines},
+        {"lines", reinterpret_cast<const void*>(&ParkInfoLines)},
         {"palette", &_lbGlobalPalette},
     };
     for (const Entry& entry : entries)
@@ -95,7 +96,6 @@ void tpw_parkstatus_set(uint64_t analyser, uint64_t child) {
 int32_t tpw_parkstatus_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = static_cast<int64_t>(sizeof(gParkStatusColours));
-    out[n++] = static_cast<int64_t>(sizeof(gParkInfoLines));
     return n;
 }
 

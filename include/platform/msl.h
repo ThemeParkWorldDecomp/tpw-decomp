@@ -36,6 +36,6 @@ const char16_t* wcsstr(const char16_t* text, const char16_t* needle);
 // swprintf with 16-bit characters (the Mac's wchar_t): formats into at most `size` characters, the last of them the terminator
 // (nothing at all is written for a size of 0), and answers the length written, or -1 when the text did not fit. Conversions:
 // %ls (a wide string) and %s (a plain, narrow string, widened a byte at a time), %d %i %u %x %X %c (the
-// argument is a number; %c a character) and %%, with the flags
+// argument is a number; %c a character), %f %F %e %E %g %G (a double) and %%, with the flags
 // - + space # 0, a width and a precision (a number or *). Used by the game for its wide texts (platform/msl.cpp).
 int32_t swprintf(char16_t* buffer, uint32_t size, const char16_t* format, ...);

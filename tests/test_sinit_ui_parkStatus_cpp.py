@@ -35,8 +35,8 @@ DRAW_GRAPH = 0x101F66C0
 GRAPHER_CTOR = 0x101FD6E8
 
 ADDR = dict(colours=0x10394A6C, grapher=0x10394A28, range=0x10394A88, panel=0x10394A8C, flags=0x102ABBAC,
-            world=0x1037EBFC, lines=0x10267CA8, palette=0x103BCD28)
-HOST_LAYOUT = [25, 16]
+            world=0x1037EBFC, lines=0x101ABB90, palette=0x103BCD28)   # lines: ParkInfoLines, the code word of the TVector 0x10267ca8 the Mac passes to DrawMeGraph
+HOST_LAYOUT = [25]
 
 STUBS = CL.Stubs()
 STUBS.real.update(OWN)
@@ -76,7 +76,7 @@ def stub_window(e):
 
 def stub_draw(e):
     L = e.cl
-    L.rec("DrawMeGraph", (L.lab(e.r(3)), L.lab(e.r(4)), L.lab(e.r(5))))
+    L.rec("DrawMeGraph", (L.lab(e.r(3)), L.lab(e.r(4)), L.lab(e.u32(e.r(5)))))     # the callback: the function its TVector holds
 
 
 def stub_ctor(e):

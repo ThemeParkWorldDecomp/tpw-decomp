@@ -39,7 +39,7 @@ void ParkStatusXRange() {
 void ParkStatusRedraw(InterfaceWindow* window) {
     int32_t value = ParkStatusMaxValue();
     gParkStatusGrapher.SetYRange(0, value, 10);
-    DrawMeGraph(window, gParkStatusGrapher, reinterpret_cast<void (*)(CUIGrapher&)>(gParkInfoLines));
+    DrawMeGraph(window, gParkStatusGrapher, ParkInfoLines);
 }
 
 }  // namespace
@@ -69,7 +69,7 @@ int32_t GraphPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32
         int32_t value = ParkStatusMaxValue();
         SetupGraph(gParkStatusGrapher, rect, 0, value, 10, 0, 0xb, 0xc);
         ParkStatusXRange();
-        DrawMeGraph(window, gParkStatusGrapher, reinterpret_cast<void (*)(CUIGrapher&)>(gParkInfoLines));
+        DrawMeGraph(window, gParkStatusGrapher, ParkInfoLines);
     } else if (message == 0x101) {
         bool hit = false;
         switch (a) {

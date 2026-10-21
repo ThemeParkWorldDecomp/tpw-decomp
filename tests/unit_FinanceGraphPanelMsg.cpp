@@ -61,6 +61,7 @@ void DrawMeGraph(InterfaceWindow* w, CUIGrapher& g, void (*cb)(CUIGrapher&)) {
     ev("DrawMeGraph", {Low(w), lab(&g), lab(reinterpret_cast<void*>(cb))});
 }
 void RemoveFinancePanelPanel() { ev("RemoveFinancePanelPanel", {}); }
+void KissMyLines(CUIGrapher&) { ev("KissMyLines", {}); }     // only its address is used (DrawMeGraph is a fake)
 
 extern "C" {
 
@@ -74,7 +75,7 @@ uint64_t tpw_fin_addr(const char* name) {
         {"mode", &gFinanceGraphMode},
         {"panel", &gFinanceGraphPanel},
         {"grapher", &gFinanceGrapher},
-        {"kiss", &gFinanceKissMyLines},
+        {"kiss", reinterpret_cast<const void*>(&KissMyLines)},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));

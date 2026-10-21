@@ -51,7 +51,6 @@ void SetupGraph(CUIGrapher& grapher, CoolRect& rect, int32_t a, int32_t b, int32
 void DrawMeGraph(InterfaceWindow* window, CUIGrapher& grapher, void (*callback)(CUIGrapher&));   // 0x101f66c0
 void RemoveFinancePanelPanel();                                                         // 0x101a0c8c
 
-extern uint8_t gFinanceKissMyLines[16];     // 0x10267ba0: TVector of KissMyLines (its address is passed to DrawMeGraph)
 extern uint32_t gFinanceGraphFlags;         // 0x102a9ee4: selected-button bits, 1 at start
 extern CUIGrapher gFinanceGrapher;          // 0x10394894
 extern int32_t gFinanceGraphMode;           // 0x10394900
@@ -67,7 +66,6 @@ extern uint8_t gParkStatusColours[5][5];        // 0x10394a6c, 71, 76, 7b, 80: a
 extern int32_t gParkStatusRange;                // 0x10394a88
 extern InterfaceWindow* gParkStatusPanel;       // 0x10394a8c
 extern uint32_t gParkStatusFlags;               // 0x102abbac: bits 0..4 select the histories, 8 at start
-extern uint8_t gParkInfoLines[16];              // 0x10267ca8: TVector of ParkInfoLines (its address is passed to DrawMeGraph)
 
 // Unit v5202: GraphLine (src/MinAnalyserValue_SetupGraph.cpp)
 extern int32_t gGraphLineBuffer[160];   // 0x10396480: the values handed to DrawGraph
@@ -79,7 +77,7 @@ extern int32_t gParkStatusLastTotal;     // 0x10394a18: the visitors since the b
 extern int32_t gParkStatusLastInPark;    // 0x10394a1c: the visitors in the park the panel shows
 void RemoveParkStatusPanel();            // 0x101ada00 (stand-in, 56 bytes)
 void DoDominantThoughts();               // 0x101aba14
-void ParkInfoLines(CUIGrapher& grapher);   // 0x101abb90
+void ParkInfoLines(CUIGrapher& grapher);   // 0x101abb90; DrawMeGraph's callback (the Mac passes its TVector 0x10267ca8 = 101abb90 10267cc0)
 
 // Unit v5377: __sinit_ui_FinancePanel_cpp (src/sinit_ui_FinancePanel_cpp.cpp)
 void __sinit_ui_FinancePanel_cpp();            // 0x101a0dbc
@@ -87,7 +85,7 @@ extern uint8_t gFinancePanelColours[8][5];     // 0x103948d8, dd, e2, e7, ec, f1
 int32_t ParkStatusPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101abce4
 
 // Unit v5904
-void KissMyLines(CUIGrapher& grapher);   // 0x1019f25c (424 bytes)
+void KissMyLines(CUIGrapher& grapher);   // 0x1019f25c (424 bytes); DrawMeGraph's callback (the Mac passes its TVector 0x10267ba0 = 1019f25c 10267cc0)
 
 // Unit v5160: CUIGrapher::DrawGrid / DrawGraph (src/ui_cursor_classes_CUIGrapher_DrawGraph.cpp)
 // Object offsets (Mac): 0x00 x span, 0x04 y span, 0x08 left, 0x0c top, 0x10 right, 0x14 bottom, 0x1c y min, 0x24 y max,

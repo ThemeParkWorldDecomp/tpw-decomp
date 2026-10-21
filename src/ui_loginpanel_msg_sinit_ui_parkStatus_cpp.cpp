@@ -13,7 +13,6 @@ uint8_t gParkStatusColours[5][5];               // 0x10394a6c
 int32_t gParkStatusRange;                       // 0x10394a88
 InterfaceWindow* gParkStatusPanel;              // 0x10394a8c
 uint32_t gParkStatusFlags = 8;                  // 0x102abbac
-uint8_t gParkInfoLines[16];                     // 0x10267ca8 (its Mac initial contents are not modelled)
 
 // 0x101ada64: the Y range of the graph is the largest of the selected histories; the argument is unused.
 void UI_ParkStatusPanelDateChange(int32_t month) {
@@ -33,7 +32,7 @@ void UI_ParkStatusPanelDateChange(int32_t month) {
     if (flags & 0x10) MaxAnalyserValue(reinterpret_cast<CHistory<int, 144>*>(analyser + 0x213b0), maxValue, gParkStatusRange);
     gParkStatusGrapher.SetYRange(0, maxValue, 10);
     InterfaceWindow* window = gParkStatusPanel->GetWindow(0x4a68bb);
-    DrawMeGraph(window, gParkStatusGrapher, reinterpret_cast<void (*)(CUIGrapher&)>(gParkInfoLines));
+    DrawMeGraph(window, gParkStatusGrapher, ParkInfoLines);
 }
 
 static void SetColour(uint8_t* c, uint8_t r, uint8_t g, uint8_t b) {

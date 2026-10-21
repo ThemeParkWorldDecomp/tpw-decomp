@@ -23,7 +23,6 @@ using namespace calllog;
 CUIGrapher gParkStatusGrapher;
 int32_t gParkStatusRange;
 uint32_t gParkStatusFlags;
-uint8_t gParkInfoLines[16];
 CWorld* gGameWorld;
 
 namespace {
@@ -53,6 +52,7 @@ void SetupGraph(CUIGrapher& grapher, CoolRect& rect, int32_t a, int32_t b, int32
 void CUIGrapher::SetXRange(int32_t a, int32_t b, int32_t c) { ev("SetXRange", {lab(this), a, b, c}); }
 void CUIGrapher::SetYRange(int32_t a, int32_t b, int32_t c) { ev("SetYRange", {lab(this), a, b, c}); }
 
+void ParkInfoLines(CUIGrapher&) { ev("ParkInfoLines", {}); }     // only its address is used (DrawMeGraph is a fake)
 void DrawMeGraph(InterfaceWindow* window, CUIGrapher& grapher, void (*callback)(CUIGrapher&)) {
     ev("DrawMeGraph", {lab(window), lab(&grapher), lab(reinterpret_cast<void*>(callback))});
 }
@@ -80,7 +80,7 @@ uint64_t tpw_gpm_addr(const char* name) {
     };
     const Entry entries[] = {
         {"grapher", &gParkStatusGrapher}, {"range", &gParkStatusRange}, {"flags", &gParkStatusFlags},
-        {"lines", gParkInfoLines},        {"world", &gGameWorld},
+        {"lines", reinterpret_cast<const void*>(&ParkInfoLines)},        {"world", &gGameWorld},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));

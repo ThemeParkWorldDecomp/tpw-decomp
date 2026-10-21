@@ -77,10 +77,18 @@ TbTimeStamp* stdexc::TbTimeStampCtor(TbTimeStamp* self) {
     return self;
 }
 
-// ---- the byte swaps 0x1005e5b4, 0x1005e610, 0x1005e658
+// ---- the byte swaps 0x1005e5b4, 0x1005e610, 0x1005e658. Their one caller, LoadRideHeightMap, swaps a .hmp's little-endian words to the
+// Mac's order: the swaps are real only where the host's order differs from the file's (or when a test asks, TPW_SWAP_FILE_WORDS), like
+// platform/sams_swaps.cpp's; a little-endian host's real swaps turned every .hmp's magic and rejected it (unit v5L44).
+#if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) || defined(TPW_SWAP_FILE_WORDS)
 uint32_t USwap32UCharPtr_1005e5b4(uint32_t word) { return __builtin_bswap32(word); }
 void USwapInplace16UShort_1005e610(uint16_t& half) { half = __builtin_bswap16(half); }
 void USwapInplace32ULong_1005e658(uint32_t& word) { word = __builtin_bswap32(word); }
+#else
+uint32_t USwap32UCharPtr_1005e5b4(uint32_t word) { return word; }
+void USwapInplace16UShort_1005e610(uint16_t&) {}
+void USwapInplace32ULong_1005e658(uint32_t&) {}
+#endif
 
 // ---- std::__tree<unsigned short>::destroy 0x1016e65c. The compiler inlined two levels of the recursion: a child of `subtree` is
 // handled by hand (its children are freed by the recursive call, the value destroyed and the node given back through the allocator),

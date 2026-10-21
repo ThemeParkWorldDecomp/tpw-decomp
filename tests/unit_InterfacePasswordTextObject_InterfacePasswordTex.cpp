@@ -36,6 +36,7 @@ const void* gFmt = nullptr;
 const void* gList = nullptr;
 const void* gEngine = nullptr;
 const void* gMesh = nullptr;
+int32_t gChangeRan = -1;   // which Change a virtual call reached: 0 the text sprite's, 1 cash, 2 null cash, 3 percent, 4 visitor number, 5 time
 
 int64_t Lab(const void* p) {
     if (p == gObj) return 1;
@@ -76,7 +77,7 @@ void InterfaceDrawObjectSprite::UpdateTextures(char16_t*) {}
 void InterfaceDrawObjectSprite::CreateTextures(char16_t*) {}
 
 InterfaceTextObjectSprite::~InterfaceTextObjectSprite() {}
-void InterfaceTextObjectSprite::Change(uint32_t, DOChange*) {}
+void InterfaceTextObjectSprite::Change(uint32_t, DOChange*) { gChangeRan = 0; }
 void InterfaceTextObjectSprite::UpdateTextures(char16_t*) {}
 
 InterfaceCursorPosTextObjectSprite::InterfaceCursorPosTextObjectSprite(void* data)
@@ -87,7 +88,11 @@ InterfaceCursorPosTextObjectSprite::InterfaceCursorPosTextObjectSprite(void* dat
 InterfaceCursorPosTextObjectSprite::~InterfaceCursorPosTextObjectSprite() {}
 intptr_t InterfaceCursorPosTextObjectSprite::Query(uint32_t, intptr_t) { return 0; }
 
-void InterfaceVisitorTimeTextObject::Change(uint32_t, DOChange*) {}
+void InterfaceVisitorTimeTextObject::Change(uint32_t, DOChange*) { gChangeRan = 5; }
+void InterfaceCashTextObject::Change(uint32_t, DOChange*) { gChangeRan = 1; }
+void InterfaceNullCashTextObject::Change(uint32_t, DOChange*) { gChangeRan = 2; }
+void InterfacePercentTextObject::Change(uint32_t, DOChange*) { gChangeRan = 3; }
+void InterfaceVisitorNumTextObject::Change(uint32_t, DOChange*) { gChangeRan = 4; }
 
 int32_t UIMenu_DefaultItemCallback(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
 uint32_t UIMenuHandlerHandle(int32_t (*handler)(InterfaceWindow*, int32_t, int32_t, int32_t)) {
@@ -221,6 +226,13 @@ void tpw_vi_password(uint64_t mem, uint32_t data) {
     int64_t out[12];
     tpw_vi_label(mem);
     tpw_vi_ctor(0, mem, data, out);
+}
+
+// Calls Change through the vtable of a constructed object; answers which Change ran (see gChangeRan).
+int32_t tpw_vi_change(uint64_t mem) {
+    gChangeRan = -1;
+    reinterpret_cast<InterfaceTextObjectSprite*>(static_cast<uintptr_t>(mem))->Change(0x80, nullptr);
+    return gChangeRan;
 }
 
 uint32_t tpw_vi_ctor_label(uint64_t mem) {

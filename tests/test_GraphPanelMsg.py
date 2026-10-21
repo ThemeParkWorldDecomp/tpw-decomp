@@ -32,7 +32,7 @@ F_DRAW = 0x101f66c0
 F_CLIENT = 0x101dba4c
 F_DEFAULT = 0x101de318
 
-ADDR = dict(grapher=0x10394a28, range=0x10394a88, flags=0x102abbac, lines=0x10267ca8, world=0x1037ebfc)
+ADDR = dict(grapher=0x10394a28, range=0x10394a88, flags=0x102abbac, lines=0x101abb90, world=0x1037ebfc)   # lines: ParkInfoLines, the code word of the TVector 0x10267ca8 the Mac passes to DrawMeGraph
 HOST_LAYOUT = [4]
 WINDOW = 0x30100000
 ABASE = 0x30000000
@@ -75,7 +75,7 @@ def mk_range(name):
 
 def stub_draw(e):
     L = e.cl
-    L.rec("DrawMeGraph", (L.lab(e.r(3)), L.lab(e.r(4)), L.lab(e.r(5))))
+    L.rec("DrawMeGraph", (L.lab(e.r(3)), L.lab(e.r(4)), L.lab(e.u32(e.r(5)))))     # the callback: the function its TVector holds
 
 
 def stub_client(e):

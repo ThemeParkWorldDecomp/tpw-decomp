@@ -1,7 +1,6 @@
 // FinanceGraphPanelMsg 0x1019f5e4: the message handler of the finance graph panel.
 #include "FinanceGraphPanelMsg.h"
 
-uint8_t gFinanceKissMyLines[16];
 uint32_t gFinanceGraphFlags = 1;
 CUIGrapher gFinanceGrapher;
 int32_t gFinanceGraphMode = 0;
@@ -13,7 +12,7 @@ void Redraw(InterfaceWindow* window) {
     int32_t maxY = GetMaxYValue();
     int32_t minY = GetMinYValue();
     gFinanceGrapher.SetYRange(minY, maxY, 10);
-    DrawMeGraph(window, gFinanceGrapher, reinterpret_cast<void (*)(CUIGrapher&)>(gFinanceKissMyLines));
+    DrawMeGraph(window, gFinanceGrapher, KissMyLines);
 }
 
 void Release(InterfaceWindow* parent, int32_t id) {
@@ -84,7 +83,7 @@ int32_t FinanceGraphPanelMsg(InterfaceWindow* window, int32_t message, int32_t a
             int32_t maxY = GetMaxYValue();
             int32_t minY = GetMinYValue();
             SetupGraph(gFinanceGrapher, rect, minY, maxY, 10, 0, 0xb, 0xc);
-            DrawMeGraph(window, gFinanceGrapher, reinterpret_cast<void (*)(CUIGrapher&)>(gFinanceKissMyLines));
+            DrawMeGraph(window, gFinanceGrapher, KissMyLines);
         }
     } else if (message < 0x102) {
         bool hit = false;

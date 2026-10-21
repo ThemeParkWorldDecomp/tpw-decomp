@@ -7,8 +7,9 @@ for the original, and in the host library's memory (little-endian) for the trans
 panels, the bank, the window members, the mouse, the cell system, operator new, abs and the virtual calls through __ptr_glue) are fakes on
 both sides that record their arguments and answer from the case. The CoolRect constructor and destructor run as the real code on both sides.
 
-The world of a case: the last-panel globals and MainMenuUp's answer; the cash globals, the colour table, the balance, the mouse and mouse
-mode, the session cost, which children exist. What is compared: the event log and every global written.
+The world of a case: the last-panel globals and MainMenuUp's answer; the cash globals, the colour table (random, or the initial data of the
+image and of the host's initialiser), the balance, the mouse and mouse mode, the session cost, which children exist. What is compared:
+the event log and every global written.
 
 No fused operations. Not tested: abs is a pure function and is computed, not logged; a NULL child 0x31 or 0x32 (read unconditionally).
 """
@@ -299,6 +300,7 @@ def bind(lib):
     lib.bound = True
 
 
+INITIAL = {}    # (side, emulator or library) -> the colour table's initial data, read before the first case writes it
 GLOBALS = ("cashword", "colouridx", "initdone", "sessioncost", "fontcur", "mouse1e0", "mouse1e4", "lastfin", "lastpark", "lastlists")
 
 
@@ -309,7 +311,10 @@ def build(s, case):
             s.write(s.g(name), bytes([g[name]]))
         else:
             s.words(s.g(name), [g[name]])
-    s.write(s.g("colours"), bytes(g["colours"]))
+    key = (type(s).__name__, id(s.e if isinstance(s, Ppc) else s.lib))
+    if key not in INITIAL:
+        INITIAL[key] = s.read(s.g("colours"), 24)          # the table as the image (or the host's initialiser) has it, before any case
+    s.write(s.g("colours"), INITIAL[key] if g["colours"] is None else bytes(g["colours"]))
     s.setptr("world", 7)
     s.setptr("mouse", 6 if g["hasmouse"] else 0)
     s.setptr("mode", 5 if g["hasmode"] else 0)
@@ -416,6 +421,8 @@ def cash_edges():
     for b in (-5, 0, 1500, 7000):
         for fc in (-1, 999, 0, 1, 2, 3, 4, 5):
             yield cash_case(r, b, cashword=1, fontcur=fc)
+    for b in (-1000, 0, 1, 1000, 1001, 2001, 3001, 4000, 4001, 100000):       # the initial table: each balance band's colour
+        yield cash_case(r, b, cashword=b ^ 1, fontcur=999, colours=None)
     for mode in (-1, 0, 1, 2, 3, 4, 5, 7, 8, 9):
         for loft in (0, 1):
             for cost in COSTS:

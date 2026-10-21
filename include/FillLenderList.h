@@ -12,6 +12,7 @@ class InterfacePercentTextObject : public InterfaceTextObjectSprite {
 public:
     explicit InterfacePercentTextObject(void* data);   // 0x1018e874
     ~InterfacePercentTextObject() override;            // 0x1018e950 (unit v51115)
+    void Change(uint32_t flags, DOChange* change) override;   // 0x1018ea44 (vtable 0x102a8058)
 };
 
 // Globals of ui_mainpanel2.cpp's neighbourhood (names invented).

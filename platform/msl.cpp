@@ -147,7 +147,7 @@ int32_t swprintf(char16_t* buffer, uint32_t size, const char16_t* format, ...) {
             }
         }
         bool longModifier = false;
-        while (*p == u'l' || *p == u'h') longModifier |= *p++ == u'l';
+        while (*p == u'l' || *p == u'h' || *p == u'L') longModifier |= *p++ == u'l';
         const char16_t conversion = *p;
         if (conversion == 0) break;
         ++p;
@@ -183,9 +183,15 @@ int32_t swprintf(char16_t* buffer, uint32_t size, const char16_t* format, ...) {
             int n = std::snprintf(spec, sizeof spec, "%%%s", flags);
             if (width > 0) n += std::snprintf(spec + n, sizeof spec - n, "%d", width);
             if (precision >= 0) n += std::snprintf(spec + n, sizeof spec - n, ".%d", precision);
-            const char letter = (conversion == u'd' || conversion == u'i') ? 'd' : conversion == u'u' ? 'u' : conversion == u'X' ? 'X' : 'x';
+            // %f %F %e %E %g %G take a double (a float argument is promoted to one, as the Mac's was) and go to snprintf in the C locale,
+            // like MSL's; before they were read as %x of an int, which is the empty or wrong text the "%.2f %%" of the number text showed.
+            const bool real = conversion == u'f' || conversion == u'F' || conversion == u'e' || conversion == u'E' || conversion == u'g' ||
+                              conversion == u'G';
+            const char letter = real ? static_cast<char>(conversion)
+                                : (conversion == u'd' || conversion == u'i') ? 'd' : conversion == u'u' ? 'u' : conversion == u'X' ? 'X' : 'x';
             std::snprintf(spec + n, sizeof spec - n, "%c", letter);
-            if (letter == 'd') std::snprintf(number, sizeof number, spec, va_arg(args, int));
+            if (real) std::snprintf(number, sizeof number, spec, va_arg(args, double));
+            else if (letter == 'd') std::snprintf(number, sizeof number, spec, va_arg(args, int));
             else std::snprintf(number, sizeof number, spec, va_arg(args, unsigned));
             for (const char* digit = number; *digit != 0; ++digit) sink.put(static_cast<char16_t>(*digit));
         }

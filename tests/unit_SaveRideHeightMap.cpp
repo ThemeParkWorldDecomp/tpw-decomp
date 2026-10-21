@@ -1,16 +1,19 @@
 // Test library for SaveRideHeightMap (unit v5644; libtpw_unit_SaveRideHeightMap.dylib, tests/test_SaveRideHeightMap.py), main app:
 //   src/RideDestroy_LoadFileIntoMemory_SaveRideHeightMap.cpp
 //
-// The callees outside the unit are fakes recording what the real ones read: MReleaseAllocF, MReleaseFreeF, CTRACE, fopen, fwrite, fclose.
+// The callees outside the unit are fakes recording what the real ones read: MReleaseAllocF, MReleaseFreeF, CTRACE, fopen, fwrite, fclose,
+// and (built with the port fixes on, unit v5L44) tpw::GamePathForWriting, the port's user-folder write path.
 // memcpy is the real one on both sides.
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <string>
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "platform/macdoze.h"
 #include "TPEngine.h"
 #include "Debug.h"
 #include "m3d2.h"
@@ -19,6 +22,15 @@ using namespace calllog;
 
 namespace {
 void* gBlock = nullptr;
+}
+
+// The user folder's copy of a game path, faked: "<user>/" and the path with its ':' made '/' (test_SaveRideHeightMap.user_path).
+std::string tpw::GamePathForWriting(const char* gamePath) {
+    ev("GamePathForWriting", std::initializer_list<int64_t>{}, {gamePath});
+    std::string host = std::string("<user>/") + gamePath;
+    for (char& c : host)
+        if (c == ':') c = '/';
+    return host;
 }
 
 void* MReleaseAllocF(uint32_t size, uint32_t flags) {
@@ -70,6 +82,11 @@ int fclose(FILE* file) {
 }
 
 uint64_t tpw_srhm_addr(const char*) { return 0; }
+
+// 1 when the library is built with the port fixes on (the .hmp goes to the user folder's copy of its path), else 0.
+int32_t tpw_srhm_portfix() {
+    return 0;
+}
 
 // The arena offset a Ptr32 word holds for a host address.
 uint32_t tpw_srhm_off(uint64_t address) { return tpw::ArenaOffset(reinterpret_cast<const void*>(static_cast<uintptr_t>(address))); }

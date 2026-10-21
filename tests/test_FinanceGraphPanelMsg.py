@@ -9,7 +9,8 @@ CallDefaultWindowHandler) are fakes on both sides that record their arguments; w
 number computed from the parent and the id, so the chain of calls is compared.
 
 The world of a case: the flag word, the mode word, the panel pointer, the window and the three message numbers, the answer queues.
-What is compared: the answer, the flag and mode words, the event log.
+What is compared: the answer, the flag and mode words, the event log (DrawMeGraph's callback as the function: the code word of the Mac's
+TVector, the host's function pointer).
 
 No fused operations. Not tested: nothing is skipped.
 """
@@ -29,7 +30,7 @@ SIZES = {FN: 2552}
 OWN = set(SIZES)
 
 ADDR = dict(flags=0x102A9EE4, mode=0x10394900, panel=0x10394904)
-GRAPHER, KISS = 0x10394894, 0x10267BA0
+GRAPHER, KISS = 0x10394894, 0x1019F25C       # KISS: KissMyLines, the code word of the TVector 0x10267ba0 the Mac passes to DrawMeGraph
 HOST_LAYOUT = [4, 4]
 
 CALLEES = dict(
@@ -62,7 +63,7 @@ st("maxy", lambda e: e.set_r(3, e.cl.ret("GetMaxYValue") & MASK))
 st("miny", lambda e: e.set_r(3, e.cl.ret("GetMinYValue") & MASK))
 st("setup", lambda e: e.cl.rec("SetupGraph", (lab(e, e.r(3)), lab(e, e.r(4)), s32(e.r(5)), s32(e.r(6)), s32(e.r(7)),
                                               s32(e.r(8)), s32(e.r(9)), s32(e.r(10)))))
-st("draw", lambda e: e.cl.rec("DrawMeGraph", (s32(e.r(3)), lab(e, e.r(4)), lab(e, e.r(5)))))
+st("draw", lambda e: e.cl.rec("DrawMeGraph", (s32(e.r(3)), lab(e, e.r(4)), lab(e, e.u32(e.r(5))))))     # the callback: the function its TVector holds
 st("remove", lambda e: e.cl.rec("RemoveFinancePanelPanel", ()))
 st("setx", lambda e: e.cl.rec("SetXRange", (lab(e, e.r(3)), s32(e.r(4)), s32(e.r(5)), s32(e.r(6)))))
 st("sety", lambda e: e.cl.rec("SetYRange", (lab(e, e.r(3)), s32(e.r(4)), s32(e.r(5)), s32(e.r(6)))))

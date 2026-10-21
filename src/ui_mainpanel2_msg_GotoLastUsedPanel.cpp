@@ -18,7 +18,9 @@ int32_t gCashColourIndex;                                    // 0x103949a0
 uint8_t gCashInitDone;                                       // 0x103949a4
 int32_t gCashSessionCost;                                    // 0x103949a8
 int32_t gCashFontCurrent = 999;                              // 0x102aad28
-uint8_t gCashFontColours[24] = {0xff, 0x00, 0x00, 0xff};     // 0x102aad2c (only the first entry is known)
+// 0x102aad2c: red, orange, amber, yellow, pale yellow and white, from a balance of 0 or less up to 4001 and more (read from the image).
+uint8_t gCashFontColours[24] = {0xff, 0x00, 0x00, 0xff, 0xfa, 0x5a, 0x00, 0xff, 0xff, 0xaf, 0x00, 0xff,
+                                0xff, 0xc8, 0x00, 0xff, 0xff, 0xff, 0x96, 0xff, 0xff, 0xff, 0xff, 0xff};
 
 // 0x101a587c (380 bytes): opens the panel last used of the toolbar's group (1 lists, 2 park, 3 finance), unless a menu is up.
 void GotoLastUsedPanel(int32_t type) {

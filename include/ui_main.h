@@ -614,7 +614,7 @@ extern int32_t gCashColourIndex;                // 0x103949a0 (name invented): t
 extern uint8_t gCashInitDone;                   // 0x103949a4: set to 1 by the first DoCashWin
 extern int32_t gCashSessionCost;                // 0x103949a8: the session cost last shown (-999 none)
 extern int32_t gCashFontCurrent;                // 0x102aad28: initialised data, 999: the colour index last given to SetFontColour
-extern uint8_t gCashFontColours[24];            // 0x102aad2c: initialised data, 6 entries of red, green, blue, spare (the first is ff 00 00 ff)
+extern uint8_t gCashFontColours[24];            // 0x102aad2c: initialised data, 6 entries of red, green, blue, spare (red up to white)
 
 // ---- Unit w136 (src/ui_main_gamewin.cpp): the game window's message functions. The names below are invented by w136; the addresses are the
 // Mac's (ui_main.cpp BSS). The function statics of Engine_GameWinMsg sit behind guard bytes, kept here as globals so that a test can reset them.

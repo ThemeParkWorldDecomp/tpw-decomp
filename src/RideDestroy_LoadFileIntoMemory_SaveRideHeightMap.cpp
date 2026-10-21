@@ -9,6 +9,7 @@
 
 #include "Debug.h"
 #include "platform/arena.h"
+#include "platform/macdoze.h"
 
 namespace {
 // The stored pointer words are arena offsets on the host (Ptr32); 0 is null.

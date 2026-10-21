@@ -7,6 +7,10 @@ that record their arguments; fwrite also records a hash of the whole block it is
 then the plane bytes), so the written block is compared. fopen and fwrite answer from the case's queues. memcpy is the real one on both sides.
 
 Compared: the answer and the event log. No fused operations. Not tested: nothing excluded.
+
+Port fix (unit v5L44): a library built with the port fixes on opens the user folder's copy of the path (tpw::GamePathForWriting, a recording fake
+that answers user_path) in place of the Mac path. There each host fopen must follow a GamePathForWriting of the Mac path and open user_path of
+it; that pair is then compared as the Mac's one fopen of the path, and any other host fopen is marked unmapped, so it fails.
 """
 import ctypes as C
 import random
@@ -26,7 +30,12 @@ OWN = set(SIZES)
 ALLOC, FREE, CTRACE = 0x10064BD4, 0x10064C54, 0x1006FCBC
 HOST_LAYOUT = [0xC, 0x18, 0x30]
 
-PATHS = [b"ride.hm", b"a", b"dir/some file.bin"]
+PATHS = [b"ride.hm", b"a", b"dir/some file.bin", b"data:levels:jungle:Features:1x1east:1x1east.hmp", b":lead.hmp"]
+
+
+def user_path(path):
+    """The unit's fake tpw::GamePathForWriting: "<user>/" and the path with ':' made '/'."""
+    return "<user>/" + path.replace(":", "/")
 BLOCK = [0]
 
 
@@ -147,7 +156,20 @@ class Host(Side):
         C.memmove(a, data, len(data))
 
     def log(self):
-        return CL.host_end(self.lib)
+        log = CL.host_end(self.lib)
+        if self.lib.tpw_srhm_portfix() == 0:
+            return log
+        out = []
+        for ev in log:
+            if ev[0] != "fopen":
+                out.append(ev)
+                continue
+            prev = out[-1] if out else None
+            if prev is not None and prev[0] == "GamePathForWriting" and ev[2][0] == user_path(prev[2][0]):
+                out[-1] = ("fopen", ev[1], (prev[2][0],) + ev[2][1:])
+            else:
+                out.append(("fopen unmapped",) + ev[1:])
+        return out
 
     def save(self, m, p):
         return self.lib.tpw_srhm_save(m, p) & MASK
@@ -160,6 +182,7 @@ def bind(lib):
     lib.tpw_srhm_off.restype, lib.tpw_srhm_off.argtypes = C.c_uint32, [C.c_uint64]
     lib.tpw_srhm_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_srhm_save.restype, lib.tpw_srhm_save.argtypes = C.c_uint32, [C.c_uint64, C.c_uint64]
+    lib.tpw_srhm_portfix.restype, lib.tpw_srhm_portfix.argtypes = C.c_int32, []
     out = (C.c_int64 * 32)()
     n = lib.tpw_srhm_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -230,6 +253,11 @@ def edges():
             yield mk(r, 2, 2, False, False, True, fo, wr)
             yield mk(r, 1, 1, True, True, True, fo, wr)
     yield mk(r, 0xFFFF, 1, False, False, False, True, 1) if False else mk(r, 200, 3, False, False, False, True, 1)
+    for path in PATHS[3:]:  # the Mac paths the game writes its .hmp files at (unit v5L44)
+        for fo in (True, False):
+            c = mk(r, 3, 2, False, False, False, fo, 1)
+            c["path"] = path
+            yield c
 
 
 def rnd(r):

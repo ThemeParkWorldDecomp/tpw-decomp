@@ -343,6 +343,7 @@ class InterfaceNullCashTextObject : public InterfaceTextObjectSprite {
 public:
     explicit InterfaceNullCashTextObject(void* data);               // 0x1018e594
     ~InterfaceNullCashTextObject() override;                        // 0x1018e674 (unit v51115)
+    void Change(uint32_t flags, DOChange* change) override;         // 0x1018e768 (vtable 0x102a80b0)
 };
 
 // The title: the same text drawn twice, first in grey, two pixels left and down, then in white (the Mac's vtable 0x102a7e8c).
@@ -414,6 +415,7 @@ class InterfaceCashTextObject : public InterfaceTextObjectSprite {
 public:
     explicit InterfaceCashTextObject(void* data);                   // 0x1018de60
     ~InterfaceCashTextObject() override;                            // 0x1018df3c (unit v51115, src/ui_TextObjects_InterfacePasswordTextObject_InterfacePasswordTex.cpp)
+    void Change(uint32_t flags, DOChange* change) override;         // 0x1018e02c (vtable 0x102a8160)
 };
 
 // Unit v51115: the number-window text objects the main panels make (Mac 0x19c bytes like the text sprite; the constructors are the text
@@ -422,15 +424,17 @@ class InterfaceVisitorNumTextObject : public InterfaceTextObjectSprite {
 public:
     explicit InterfaceVisitorNumTextObject(void* data);             // 0x1018eb38
     ~InterfaceVisitorNumTextObject() override;                      // 0x1018ec18
+    void Change(uint32_t flags, DOChange* change) override;         // 0x1018ed10 (vtable 0x102a8000)
 };
 class InterfaceRankTextObject : public InterfaceTextObjectSprite {
 public:
     explicit InterfaceRankTextObject(void* data);                   // 0x1018f93c
 };
 
-// Unit v5983 (src/ui_TextObjects_InterfaceCashTextObject_Change.cpp): the Change overrides of five text objects as free functions (their
-// classes' vtables would need the whole draw object chain). Flag 0x80 (0x100 for the password) makes the text and draws it with flag 0x100;
-// any other flags go straight to InterfaceTextObjectSprite::Change.
+// Unit v5983 (src/ui_TextObjects_InterfaceCashTextObject_Change.cpp): the Change overrides of five text objects as free functions. Flag 0x80
+// (0x100 for the password) makes the text and draws it with flag 0x100; any other flags go straight to InterfaceTextObjectSprite::Change.
+// Unit v5L33: the cash, null cash, percent and visitor number classes' Change members (their Mac vtables' Change slots) call these; the
+// password class has no member yet (its vtable has no key function, so the member would pull the draw object chain into that unit).
 class InterfacePasswordTextObject;
 void InterfaceCashTextObject_Change(InterfaceTextObjectSprite* self, uint32_t flags, DOChange* change);       // 0x1018e02c
 void InterfacePasswordTextObject_Change(InterfaceTextObjectSprite* self, uint32_t flags, DOChange* change);   // 0x1018dd50

@@ -16,7 +16,8 @@ destroy) are fakes on both sides that record the object they were given as a lab
 engine data, 5 its mesh set).
 
 What is compared: the event log, the style bytes a constructor sets (justification, wrap, font, colour mode, offsets, the colour), the UIMenu
-words, the shown state, the colour answer, and the bytes of the objects the one-liners must not touch. Not tested: the vtable words the Mac stores
+words, the shown state, the colour answer, the bytes of the objects the one-liners must not touch, and which Change the vtable of a
+constructed cash, null cash, percent, visitor number or time object reaches (unit v5L33; 0 on the host is the text sprite's). Not tested: the vtable words the Mac stores
 (the host has native vtables), the delete flag value the Mac passes on to the callees (the host's members have no flag), a NULL object (the
 compiler's check, not a translated function). No fused operations.
 """
@@ -41,6 +42,10 @@ CTORS = {
     "InterfaceCashTextObject::InterfaceCashTextObject": (6, 0x1018DE60),   # unit v5L16
 }
 PASSWORD = "InterfacePasswordTextObject::InterfacePasswordTextObject"
+# Unit v5L33: the classes whose vtable Change slot is checked (their own Change; the host's are fakes answering the id). The password and rank
+# objects are left out: the host classes have no Change member yet (see include/ui_DrawObject.h).
+CHANGE_IDS = {0x1018E02C: 1, 0x1018E768: 2, 0x1018EA44: 3, 0x1018ED10: 4, 0x1018EFCC: 5}
+CHANGE_CLASSES = {n for n in CTORS if "Rank" not in n}
 PASSWORD_ADDR = 0x1018DC38
 DTORS = {
     "InterfaceCashTextObject::~InterfaceCashTextObject": (0, 0x1018DF3C),
@@ -186,6 +191,7 @@ def bind(lib):
     g("menu").restype, g("menu").argtypes = None, [C.c_uint64, C.POINTER(C.c_int64)]
     g("colour").restype, g("colour").argtypes = C.c_uint32, [C.c_int32]
     g("nop").restype, g("nop").argtypes = None, [C.c_int32, C.c_uint64]
+    g("change").restype, g("change").argtypes = C.c_int32, [C.c_uint64]
     lib.bound = True
 
 
@@ -209,6 +215,13 @@ def run_ctor(s, case):
     r = {"log": s.log()}
     if name != PASSWORD:
         r["fields"] = fields
+    if name in CHANGE_CLASSES:
+        # which Change the object's vtable reaches (Mac: the code word of the TVector in the slot at +0x14 of the vtable stored at +0x38)
+        if isinstance(s, Ppc):
+            code = s.e.u32(s.e.u32(s.e.u32(obj + 0x38) + 0x14))
+            r["change"] = CHANGE_IDS.get(code, -1)
+        else:
+            r["change"] = getattr(s.lib, P + "change")(obj)
     return r
 
 

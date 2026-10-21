@@ -1,6 +1,7 @@
 // Change of the cash, null cash, percent, visitor number and password text objects, and the password object's destructor.
 #include <cstdint>
 #include <cstring>
+#include "FillLenderList.h"
 #include "TbITable.h"
 #include "TbVTag.h"
 #include "Text.h"
@@ -31,6 +32,12 @@ void Show(InterfaceTextObjectSprite* self, char16_t* text) {
 }
 
 }  // namespace
+
+// labs (glue 0x10239928): neg when below 0, so INT_MIN stays INT_MIN. Weak: the test library fakes it. (Unit v5L33: it had no definition,
+// so the launcher's generated stand-in answered 0 and a negative balance showed as "-$ 0".)
+__attribute__((weak)) int32_t textobj_callee::Labs(int32_t value) {
+    return value < 0 ? static_cast<int32_t>(0u - static_cast<uint32_t>(value)) : value;
+}
 
 // 0x1018e02c: flag 0x80: the signed cash value as string 0x1c1 (kind 0xd), or 0x1c2 with labs(value) (kind 0x13) when negative.
 void InterfaceCashTextObject_Change(InterfaceTextObjectSprite* self, uint32_t flags, DOChange* change) {
@@ -120,3 +127,9 @@ void InterfaceVisitorNumTextObject_Change(InterfaceTextObjectSprite* self, uint3
     }
     Show(self, text);
 }
+
+// The classes' own Change (each Mac vtable's Change slot holds the function above): InterfaceWindow::SetValue reaches the text through these.
+void InterfaceCashTextObject::Change(uint32_t flags, DOChange* change) { InterfaceCashTextObject_Change(this, flags, change); }
+void InterfaceNullCashTextObject::Change(uint32_t flags, DOChange* change) { InterfaceNullCashTextObject_Change(this, flags, change); }
+void InterfacePercentTextObject::Change(uint32_t flags, DOChange* change) { InterfacePercentTextObject_Change(this, flags, change); }
+void InterfaceVisitorNumTextObject::Change(uint32_t flags, DOChange* change) { InterfaceVisitorNumTextObject_Change(this, flags, change); }

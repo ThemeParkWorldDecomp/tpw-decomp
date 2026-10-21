@@ -3,6 +3,7 @@
 // (analysis/platform-layer-design.md).
 #pragma once
 #include <cstdint>
+#include <string>
 #include "platform/samsutils.h"
 
 struct GrafPort;
@@ -271,4 +272,8 @@ namespace tpw {
 // the bytes read (fewer than asked at the end of the file), or -1 for a reference no open file has. The File Manager read the
 // sound library's MPEG file player (src/TbMpegFilePlayer.cpp) makes in place of PBReadAsync (platform/file_handles.cpp).
 int32_t ReadFileReference(int32_t reference, uint32_t offset, void* buffer, uint32_t count);
+// The host file a game path ("data:levels:jungle:Features:x:x.hmp") is created or written as: the user folder's copy of that path,
+// its folders made (files.cpp's HostPathForWriting). CreateFile, and so TPFile_Open, finds that copy before the game folder's. For the
+// game's own fopen writes that the Mac made beside its data (unit v5L44, SaveRideHeightMap).
+std::string GamePathForWriting(const char* gamePath);
 }  // namespace tpw

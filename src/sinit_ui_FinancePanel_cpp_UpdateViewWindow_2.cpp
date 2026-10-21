@@ -34,7 +34,7 @@ void UI_FinancePanelPanelDateChange(int32_t month) {
     int32_t low = GetMinYValue();
     gFinanceGrapher.SetYRange(low, high, 10);
     InterfaceWindow* window = gFinanceGraphPanel->GetWindow(0x12272);
-    DrawMeGraph(window, gFinanceGrapher, reinterpret_cast<void (*)(CUIGrapher&)>(gFinanceKissMyLines));
+    DrawMeGraph(window, gFinanceGrapher, KissMyLines);
 }
 
 // 0x101a0fc8 (252 bytes): fills the hire list (window 0x248e) with the staff of `type`: name and salary, the slot as the entry's data.

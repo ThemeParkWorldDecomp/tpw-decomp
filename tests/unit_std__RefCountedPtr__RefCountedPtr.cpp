@@ -70,9 +70,13 @@ void MslRefCountedCharsDtor(MslRefCountedCharsBlock* self, int16_t flag) {
 int32_t swprintf(char16_t* buffer, uint32_t size, const char16_t* format, ...) {
     va_list ap;
     va_start(ap, format);
-    uint32_t a = va_arg(ap, uint32_t);
-    uint32_t b = va_arg(ap, uint32_t);
+    // the one variadic argument is a double (the Mac's r5:r6 pair, which the PPC fake reads as r6 and r7): its high and low words
+    const double value = va_arg(ap, double);
     va_end(ap);
+    uint64_t bits;
+    std::memcpy(&bits, &value, sizeof bits);
+    uint32_t a = static_cast<uint32_t>(bits >> 32);
+    uint32_t b = static_cast<uint32_t>(bits);
     int64_t n = ret("swprintf");
     int64_t f[6] = {0, 0, 0, 0, 0, 0};
     for (int i = 0; i < 6 && format[i] != 0; i++) f[i] = format[i];   // only the text up to the terminator
