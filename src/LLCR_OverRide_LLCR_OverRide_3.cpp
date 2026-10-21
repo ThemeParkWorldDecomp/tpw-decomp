@@ -18,12 +18,14 @@
 uint16_t gLLCCE04C = 0;
 uint16_t gLLCCE092 = 0;
 int32_t gLLCCE094 = 0;
+const uint8_t* gLLCRRideShape = nullptr;
 RideInfo* gLLCCE098 = nullptr;
 uint16_t gLLCCE09C = 0;
 
 namespace {
-inline char* RideBytes(RideInfo* ride) { return reinterpret_cast<char*>(ride); }
-inline int32_t RideWord(RideInfo* ride, int32_t offset) { return *reinterpret_cast<int32_t*>(RideBytes(ride) + offset); }
+// A balance value of a ride record (the Mac reads the word at 0x00c + 4 * slot; the host record keeps 8-byte values behind a
+// 64-bit table header, so the Mac's offsets name other bytes here). Unit v5L28.
+inline int32_t RideValue(RideInfo* ride, RideBalanceSlot slot) { return ride->Value(slot).mInteger; }
 }  // namespace
 
 // 0x1008905c: x and y are updated in place; the answer is the thing id of the cell under (x, y), 0 when there is none.
@@ -75,7 +77,11 @@ void LLCR_SetRide(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id) {
     gLLCCE09C = id.mIndex;
     tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> again{gLLCCE09C};
     gLLCCE098 = gRideDatabase.GetRideInfo(again);
-    gLLCCE094 = RideWord(gLLCCE098, 0x18);
+    // The word 0x18 is the shape slot: a native pointer here, to a block the balance loader takes from the heap, so the host keeps
+    // it whole beside the word. (Unit v5L28: the word at the Mac's offset 0x18 of the host record, read as an arena offset, sent
+    // LLCR_GetWidthHeight and LLCR_GetRideCell to random addresses while a bought ride was placed.)
+    gLLCRRideShape = static_cast<const uint8_t*>(gLLCCE098->Value(kRideSlot_Shape).mShape);
+    gLLCCE094 = static_cast<int32_t>(reinterpret_cast<uintptr_t>(gLLCRRideShape));
 }
 
 // 0x1008be1c. A rotation other than 0, 0x5a, 0xb4 or 0x10e leaves the track kind (r28) unset on the Mac: it is taken as 0 here.
@@ -83,27 +89,27 @@ CObject* LLCR_AddRideToDB(int32_t rotation) {
     tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> rideId{gLLCCE09C};
     RideInfo* ride = gRideDatabase.GetRideInfo(rideId);
     int32_t built = 0;
-    if (RideWord(ride, 0xa0) != 0) {
+    if (RideValue(ride, kRideSlot_BumperType) != 0) {
         uint16_t cellId = gLLCCE092;
         int32_t x = static_cast<int32_t>(cellId - 1) & 0x7f;
         int32_t y = static_cast<int32_t>(static_cast<uint32_t>(static_cast<int32_t>(cellId - 1)) >> 7);
         int32_t kind = 0;
         if (rotation == 0xb4) {
             kind = 6;
-            x += RideWord(ride, 0xb4);
-            y += RideWord(ride, 0xb8);
+            x += RideValue(ride, kRideSlot_SouthXAdjust);
+            y += RideValue(ride, kRideSlot_SouthYAdjust);
         } else if (rotation == 0x5a) {
             kind = 5;
-            x += RideWord(ride, 0xac);
-            y += RideWord(ride, 0xb0);
+            x += RideValue(ride, kRideSlot_EastXAdjust);
+            y += RideValue(ride, kRideSlot_EastYAdjust);
         } else if (rotation == 0) {
             kind = 0;
-            x += RideWord(ride, 0xa4);
-            y += RideWord(ride, 0xa8);
+            x += RideValue(ride, kRideSlot_NorthXAdjust);
+            y += RideValue(ride, kRideSlot_NorthYAdjust);
         } else if (rotation == 0x10e) {
             kind = 1;
-            x += RideWord(ride, 0xbc);
-            y += RideWord(ride, 0xc0);
+            x += RideValue(ride, kRideSlot_WestXAdjust);
+            y += RideValue(ride, kRideSlot_WestYAdjust);
         }
         LLCR_OffsetStartOfTrack(&x, &y, rotation);
         float fy = static_cast<float>(x);   // x goes to the second argument
@@ -114,14 +120,14 @@ CObject* LLCR_AddRideToDB(int32_t rotation) {
         fx = 307.2f * fx;
         int32_t a = ppc_fctiwz(fy);
         int32_t b = ppc_fctiwz(fx);
-        built = BMP_CreateRide(RideWord(ride, 0xa0), a, b, kind, 0, gLLCCE09C);
+        built = BMP_CreateRide(RideValue(ride, kRideSlot_BumperType), a, b, kind, 0, gLLCCE09C);
     }
-    MapDelta delta = reinterpret_cast<MapDelta*>(RideBytes(ride) + 0x7ac)->Rotate(rotation);
+    MapDelta delta = reinterpret_cast<MapDelta*>(&ride->mMapOffsetX)->Rotate(rotation);   // the record's 0x7ac
     uint16_t at = static_cast<uint16_t>(delta.mX + static_cast<int32_t>(static_cast<uint32_t>(delta.mY) << 7) + gLLCCE092);
     CObject* object = new CObject(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>{at},
                                   tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{gLLCCE09C}, rotation, built);
     if (object != nullptr) {
-        if (gLLCCE0DC != 0 && RideWord(ride, 0x288) != 2) {
+        if (gLLCCE0DC != 0 && RideValue(ride, kRideSlot_UpgradeType) != 2) {
             CObject* current = LLCM_GetCurrentObject();
             object->SetUpgradeParent(reinterpret_cast<CThing*>(current)->GetThingId());
         } else {

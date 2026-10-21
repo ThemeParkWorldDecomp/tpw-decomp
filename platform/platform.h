@@ -145,6 +145,9 @@ void GameSize(int& wide, int& high);
 // The game sets its resolution (SetDisplayMode, MoveWindow); with the fit the window is fitted to it again.
 void SetGameSize(int wide, int high);
 bool FitActive();
+// The largest width or height this machine's OpenGL renders a frame at (platform/offscreen.cpp's LargestSize), asked of a
+// hidden 1 x 1 window before the game's own exists; 0 when it cannot be asked. The launcher picks a preset that fits.
+int LargestGameSize();
 // A mouse position in window points as a game pixel: through the letterbox and clamped to the game's pixels with the
 // fit, unchanged without it.
 void MouseToGame(double x, double y, double& gameX, double& gameY);

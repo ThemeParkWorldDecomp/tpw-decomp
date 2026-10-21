@@ -28,10 +28,11 @@ int32_t gIntrfaceDC1D8; // 0x102dc1d8
 int32_t gIntrfaceDC1DC; // 0x102dc1dc
 
 namespace {
-// gLLCCE094 is a 32-bit pointer on the Mac (the selected ride record's word 0x18): an offset from the arena base here, like every Ptr32.
+// gLLCCE094 is a 32-bit pointer on the Mac (the selected ride record's word 0x18, its shape); the host reads the shape through
+// gLLCRRideShape, the whole pointer LLCR_SetRide keeps beside it (unit v5L28; it was read as an arena offset).
 inline const uint8_t* RideCellAddress(int32_t col, int32_t row, uint32_t extra) {
-    uint32_t offset = static_cast<uint32_t>(gLLCCE094) + static_cast<uint32_t>(row) * 0xa0u + static_cast<uint32_t>(col) * 8u + extra;
-    return tpw::gArenaBase + offset;
+    // (32-bit address arithmetic on the Mac: a negative row or column steps back from the shape)
+    return gLLCRRideShape + static_cast<int32_t>(static_cast<uint32_t>(row) * 0xa0u + static_cast<uint32_t>(col) * 8u + extra);
 }
 }  // namespace
 
@@ -52,9 +53,9 @@ void LLCR_SetTopLeft(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell) {
 
 // 0x1008bdcc
 void LLCR_GetWidthHeight(int32_t* width, int32_t* height) {
-    const uint8_t* record = tpw::gArenaBase + static_cast<uint32_t>(gLLCCE094);
+    const uint8_t* record = gLLCRRideShape;
     *width = *reinterpret_cast<const int32_t*>(record);
-    record = tpw::gArenaBase + static_cast<uint32_t>(gLLCCE094);
+    record = gLLCRRideShape;
     *height = *reinterpret_cast<const int32_t*>(record + 4);
 }
 

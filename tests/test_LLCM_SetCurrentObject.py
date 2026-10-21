@@ -16,6 +16,9 @@ the floats as bits).
 
 No fused operations. Not tested: a thing table row past 0x2800 (the original reads past the table), a NULL ride record (the original
 dereferences it), a NULL selected object in LLCM_StartTrackEditMode (read unconditionally by the original).
+
+Unit v5L28: the host ride record is the host RideInfo (8-byte balance values behind a 64-bit table header), so the host side writes each
+ride word at the host offset of the same balance slot (tpw_slc_rideoff).
 """
 import ctypes as C
 import random
@@ -260,6 +263,9 @@ class Ppc(Side):
     def log(self):
         return self.L.log
 
+    def roff(self, off):
+        return off
+
     def call_set(self, flag):
         T.call_ppc(self.e, FN_SET, [flag & MASK])
 
@@ -296,6 +302,9 @@ class Host(Side):
     def log(self):
         return CL.host_end(self.lib)
 
+    def roff(self, off):
+        return self.lib.tpw_slc_rideoff(off)
+
     def call_set(self, flag):
         self.lib.tpw_slc_set_current(flag)
 
@@ -312,6 +321,7 @@ def bind(lib):
     lib.tpw_slc_setup.argtypes = [C.POINTER(C.c_uint64), C.c_uint32, C.c_uint64]
     lib.tpw_slc_set_current.argtypes = [C.c_int32]
     lib.tpw_slc_start.argtypes = [C.c_int32, C.c_int32, C.c_uint32]
+    lib.tpw_slc_rideoff.restype, lib.tpw_slc_rideoff.argtypes = C.c_int64, [C.c_uint32]
     out = (C.c_int64 * 32)()
     n = lib.tpw_slc_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -344,7 +354,7 @@ def build(s, case):
         s.put(a + 0x28, "w", o["f28"])
     s.write(s.info, bytes(0x800))
     for off, v in case["info"].items():
-        s.put(s.info + off, "w", v)
+        s.put(s.info + s.roff(off), "w", v)
     th = s.g("things")
     s.put(th, "p", s.objs[case["thing0"] - 1] if case["thing0"] else 0)
     for idx, k in case["things"].items():

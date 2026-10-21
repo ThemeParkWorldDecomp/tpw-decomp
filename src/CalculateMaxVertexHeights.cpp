@@ -41,7 +41,7 @@ inline void ClampToLimit(float& value, const float& limit, tag_sNode* node, tag_
 
 int32_t CalculateMaxVertexHeights(tag_sNode* node, tag_sM3D2Header* header, sMatrix matrix, sRideHeightMap* map,
                                   tag_sNode** badNode, tag_sAnimHeader* anim, int32_t unused, int32_t* flag) {
-    CombineMatricesNoWDest2nd(reinterpret_cast<s3DAxis*>(&node->mMatrix), &matrix);
+    CombineMatricesNoWDest2nd(&node->mMatrix, &matrix);
     int32_t ok = 1;
     if ((node->mFlags & 0x200) == 0 && (node->mFlags & 0x8010) == 0) {
         uint8_t* vertices = reinterpret_cast<uint8_t*>(node->mVertices.get());

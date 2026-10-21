@@ -48,7 +48,7 @@ float FromBits(int64_t b) {
 }  // namespace
 
 // ---- the fakes
-void CombineMatricesNoWDest2nd(s3DAxis* source, sMatrix* destination) { ev("Combine", {Hash(source, 16), Hash(destination, 16)}); }
+void CombineMatricesNoWDest2nd(sMatrix* source, sMatrix* destination) { ev("Combine", {Hash(source, 16), Hash(destination, 16)}); }
 
 void GetNodeWorldVertPosnsIntoGeomBuffer(tag_sNode* node, sMatrix* matrix) {
     ev("NodeVerts", {node->mName.mOffset, Hash(matrix, 16)});

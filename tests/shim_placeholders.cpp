@@ -720,6 +720,9 @@ TPW_WEAK GLenum glGetError() {
     tpw_gl(8);
     return 0;
 }
+// The widescreen splash's black sides (the v5L26 port fix in the splash).
+TPW_WEAK void glClearColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a) { tpw_gl(9, 0, 0, 0, 0, r, g, b + a); }
+TPW_WEAK void glClear(GLbitfield mask) { tpw_gl(10, mask); }
 
 TPW_WEAK void SystemTask() { tpw_systemtask_calls++; }
 

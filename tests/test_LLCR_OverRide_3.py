@@ -15,6 +15,11 @@ compared: the answers, x and y, the words of the unit, the boundary outputs and 
 No fused operations. Not tested: a rotation other than 0, 0x5a, 0xb4, 0x10e in LLCR_AddRideToDB (the Mac leaves r28, the track kind,
 unset: it is the caller's register); a cell id 0 in LLCR_AddRideToDB with a ride that builds (the float result passes 2^31 and the
 emulator's fctiwz saturates differently).
+
+Unit v5L28: the host ride record is the host RideInfo (8-byte balance values behind a 64-bit table header), so the host side writes each
+word at the host offset of the same balance slot (tpw_lcro3_rideoff) and the Rotate fake names the map offset by the Mac's 0x7ac. The
+shape slot (0x18) holds a native pointer on the host: LLCR_SetRide keeps it whole in gLLCRRideShape beside the word 0x102de094, and the
+case compares which block both name (the shape block, none, or another).
 """
 import ctypes as C
 import random
@@ -150,6 +155,17 @@ class Ppc(Side):
     def ptr(self, a, v):
         self.write(a, struct.pack(">I", v))
 
+    ride_size = 0x900
+
+    def roff(self, off):
+        return off
+
+    def set_shape(self, ride, blk):
+        self.ptr(ride + 0x18, blk)
+
+    def shape_label(self, blk):
+        return lab(self, self.rd_words(self.g("g094"), 1)[0], blk)
+
     def rd_ptr(self, a):
         return self.rd_words(a, 1)[0]
 
@@ -191,6 +207,22 @@ class Host(Side):
     def ptr(self, a, v):
         self.write(a, struct.pack("<Q", v))
 
+    @property
+    def ride_size(self):
+        return self.lib.ridesize
+
+    def roff(self, off):
+        return self.lib.tpw_lcro3_rideoff(off)
+
+    def set_shape(self, ride, blk):
+        self.ptr(ride + self.roff(0x18), blk)
+
+    def shape_label(self, blk):
+        whole = self.rd_ptr(self.g("shape"))
+        if self.rd_words(self.g("g094"), 1)[0] != whole & MASK:
+            return -2
+        return lab(self, whole, blk)
+
     def rd_ptr(self, a):
         return struct.unpack("<Q", self.read(a, 8))[0]
 
@@ -226,10 +258,12 @@ def bind(lib):
     lib.tpw_lcro3_boundary.restype, lib.tpw_lcro3_boundary.argtypes = None, [I32, I32, U64, U64, U64, U64]
     lib.tpw_lcro3_setride.restype, lib.tpw_lcro3_setride.argtypes = None, [C.c_uint32]
     lib.tpw_lcro3_addride.restype, lib.tpw_lcro3_addride.argtypes = U64, [I32]
+    lib.tpw_lcro3_rideoff.restype, lib.tpw_lcro3_rideoff.argtypes = C.c_int64, [C.c_uint32]
     out = (C.c_int64 * 32)()
     n = lib.tpw_lcro3_layout(out)
     assert list(out)[:3] == HOST_LAYOUT, list(out)[:n]
     lib.estride = out[3]
+    lib.ridesize = out[4]
     lib.bound = True
 
 
@@ -251,11 +285,13 @@ def build_common(s, c):
 
 
 def build_ride(s, c):
-    ride = s.alloc(0x900)
+    ride = s.alloc(s.ride_size)
     for off, v in c["ride"].items():
-        s.words(ride + off, [v])
+        s.words(ride + s.roff(off), [v])
+    shape = s.alloc(0x40) if c.get("shape") else 0
+    s.set_shape(ride, shape)
     s.setvar("ride", ride)
-    return ride
+    return ride, shape
 
 
 def build_over(s, c):
@@ -286,9 +322,11 @@ def build_boundary(s, c):
     return blk
 
 
-def observe_common(s):
-    return {"g04C": s.rd_half(s.g("g04C")), "g092": s.rd_half(s.g("g092")), "g094": s.rd_words(s.g("g094"), 1),
-            "g09C": s.rd_half(s.g("g09C"))}
+def observe_common(s, op):
+    res = {"g04C": s.rd_half(s.g("g04C")), "g092": s.rd_half(s.g("g092")), "g09C": s.rd_half(s.g("g09C"))}
+    if op != "set":
+        res["g094"] = s.rd_words(s.g("g094"), 1)
+    return res
 
 
 def run(s, c):
@@ -303,17 +341,17 @@ def run(s, c):
             s.call(FN_BOUND, [c["x"], c["y"], blk, blk + 4, blk + 8, blk + 12])
             return {"w": s.rd_words(blk, 4), "log": s.log()}
         build_common(s, c)
-        ride = build_ride(s, c)
+        ride, shape = build_ride(s, c)
         s.setvar("cur", 0)
         if op == "set":
             s.call(FN_SET, [c["id"] << 16])
-            res = {}
+            res = {"shape": s.shape_label(shape)}
         else:
             cur = s.alloc(0x40)
             s.words(cur, [c["marker"]])
             s.setvar("cur", cur)
             res = {"ans": 0 if s.call(FN_ADD, [c["rot"]]) == 0 else 1}
-        res.update(observe_common(s))
+        res.update(observe_common(s, op))
         res["g098"] = lab(s, s.rd_ptr(s.g("g098")), ride)
         res["log"] = s.log()
         return res
@@ -391,22 +429,23 @@ def bound_random(r):
 
 
 def ride_words(r, build=True):
-    d = {0x18: r.randrange(-1000, 1000), 0xA0: r.choice([0, 1, 5, 77]) if build else 0, 0x288: r.choice([0, 1, 2, 3])}
+    d = {0xA0: r.choice([0, 1, 5, 77]) if build else 0, 0x288: r.choice([0, 1, 2, 3])}
     for off in range(0xA4, 0xC4, 4):
         d[off] = r.choice([0, 1, -1, 5, -9, r.randrange(-30, 30)])
     return d
 
 
-def set_case(r, i=None):
+def set_case(r, i=None, shape=None):
     c = {"op": "set", "id": rid(r) if i is None else i, "g04C": 0, "g092": 0, "g094": r.randrange(1 << 32), "g09C": rid(r),
-         "g0DC": 0, "ride": ride_words(r), "queues": {}}
+         "g0DC": 0, "ride": ride_words(r), "shape": r.choice([0, 1, 1]) if shape is None else shape, "queues": {}}
     return c
 
 
 def set_edges():
     r = random.Random(5933)
     for i in (0, 1, 0x7FFF, 0x8000, 0xFFFF, 0x1234):
-        yield set_case(r, i)
+        yield set_case(r, i, 1)
+    yield set_case(r, 2, 0)
 
 
 def set_random(r):

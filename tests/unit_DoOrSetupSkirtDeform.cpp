@@ -43,7 +43,7 @@ void LogMatrix(const char* low, const char* high, const float* m) {
 }  // namespace
 
 // ---- the fakes
-void CombineMatricesNoWDest2nd(s3DAxis* source, sMatrix* destination) {
+void CombineMatricesNoWDest2nd(sMatrix* source, sMatrix* destination) {
     LogMatrix("CombineSrc0", "CombineSrc3", reinterpret_cast<const float*>(source));
     LogMatrix("CombineDst0", "CombineDst3", &destination->m[0][0]);
 }

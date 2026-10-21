@@ -374,7 +374,10 @@ int32_t PlacePylon(uint32_t x, uint32_t z, int32_t flag, uint32_t* meshSlot);   
 struct RideInfo;
 extern uint16_t gLLCCE04C;     // 0x1029e04c  0 (halfword): the thing id LLCR_OverRide's cell answer is compared with
 extern uint16_t gLLCCE092;     // 0x102de092  0 (halfword): the cell id of the ride being placed
-extern int32_t gLLCCE094;      // 0x102de094  0: the selected ride record's word 0x18
+extern int32_t gLLCCE094;      // 0x102de094  0: the selected ride record's word 0x18 (its shape; on the host the low half of the pointer)
+// Host only: the selected ride's shape whole (balance slot Shape, a native pointer to a block outside the arena), set beside
+// gLLCCE094 by LLCR_SetRide and read by LLCR_GetRideCell, LLCR_GetRideCellDirection and LLCR_GetWidthHeight.
+extern const uint8_t* gLLCRRideShape;
 extern RideInfo* gLLCCE098;    // 0x102de098  0 (a pointer): the selected ride record
 extern uint16_t gLLCCE09C;     // 0x102de09c  0 (halfword; the Mac reads it as the high half of a word): the selected ride's id
 // Unit v51063 (src/LLCR_OverRide_LLCR_OverRide_3_LLCR_GetRideCell.cpp): the static initialiser of LLCellMouse.cpp.

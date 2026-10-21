@@ -65,7 +65,7 @@ void SetMatrixIdentity(sMatrix* matrix) {
     for (uint32_t i = 0; i < 16; ++i) w[i] = 0x3f000000u + i * 0x10000u;
 }
 
-void CombineMatricesNoWDest2nd(s3DAxis* source, sMatrix* destination) {
+void CombineMatricesNoWDest2nd(sMatrix* source, sMatrix* destination) {
     const uint32_t* s = reinterpret_cast<const uint32_t*>(source);
     uint32_t* d = reinterpret_cast<uint32_t*>(destination);
     ev("CombineMatricesNoWDest2nd", {NodeId(reinterpret_cast<const uint8_t*>(source) - 0x10), Chk(s), Chk(d)});

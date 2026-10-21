@@ -8,7 +8,8 @@ window has a client draw object, and SetSlice's argument and the timer's old sli
 code and their arguments (pointers as 32-bit labels); the draw object's Refresh is the virtual at +0x20 of the vtable at object +0x38
 on the Mac. SetSlice also gives back the timer's slice and its id word (which must stay). GetClientObjectSurface's GetWritableDataArea
 is the virtual at +0x24: the fake records whether it got the object and the two size pointers (or NULL), writes the case's sizes
-through them and answers the case's pixel word; the answer, both sizes and the events are compared.
+through them and answers the case's pixel word; the answer, both sizes and the events are compared. Unit v5L28: the host answers
+the arena address whose low half is the word, so the answer is compared as the word plus where it lies (1 in the arena, 0 for none).
 """
 import struct
 
@@ -77,7 +78,7 @@ def ppc(e, case):
         obj = e.alloc(0x40, b"\0" * 0x38 + struct.pack(">I", vtable) + b"\0" * 4)
         window = e.alloc(0x120, b"\0" * 0x98 + struct.pack(">I", obj if w[3] else 0) + b"\0" * (0x120 - 0x9c))
         r3, _, _ = T.call_ppc(e, FUNCS[fn][1], [T.I(window), T.I(wp), T.I(hp)])
-        events.extend([8, r3 & MASK, s32(e.u32(sizes)), s32(e.u32(sizes + 4))])
+        events.extend([8, r3 & MASK, s32(e.u32(sizes)), s32(e.u32(sizes + 4)), 1 if r3 & MASK else 0])
     elif fn == 4:
         timer = e.alloc(0x20, struct.pack(">4i", 0, 0, s32(w[5]), 0x5A5A) + b"\0" * 0x10)
         T.call_ppc(e, FUNCS[fn][1], [T.I(timer), T.I(w[4] & MASK)])

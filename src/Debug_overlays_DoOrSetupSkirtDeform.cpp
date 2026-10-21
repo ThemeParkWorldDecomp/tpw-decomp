@@ -33,7 +33,7 @@ void DoOrSetupSkirtDeform(tag_sNode* a, tag_sNode* b, uint16_t** list, sMatrix m
         tolerance = 0.1f;
         yTolerance = 100.0f;
     }
-    CombineMatricesNoWDest2nd(reinterpret_cast<s3DAxis*>(&b->mMatrix), &matrix);
+    CombineMatricesNoWDest2nd(&b->mMatrix, &matrix);
     const uint32_t nodeFlags = b->mFlags;
     const bool plain = (nodeFlags & 0x20000) == 0;   // r25
     bool ok;

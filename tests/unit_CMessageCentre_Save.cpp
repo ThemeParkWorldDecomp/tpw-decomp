@@ -13,6 +13,7 @@
 #include "CMessageCentre.h"
 #include "LbFile.h"
 #include "MslSubscriptionTree.h"
+#include "World.h"
 #include "analyser.h"
 
 using namespace calllog;
@@ -58,6 +59,7 @@ SubscriptionTree::node_base* SubscriptionTree::find(const CSubscription& key) {
 }
 
 void SubscriptionTree::erase(node_base* position) { ev("Erase", {IndexOf(this), position == &gFoundNode ? 1 : 0}); }
+
 
 tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> CThing::GetThingId() const {
     ev("GetThingId", {lab(this)});

@@ -51,6 +51,9 @@ struct tagPOINT {
 // GetAsyncKeyState: nonzero while the key (a Windows virtual-key code; 1 and 2 are the
 // left and right mouse buttons) is down.
 int16_t GetAsyncKeyState(int32_t virtualKey);
+// GetKeyState: the same (macdoze 0x10002974; the Mac's GetAsyncKeyState 0x10002bc8 only calls it): negative while the key
+// is down. The online code's CheckShifts asks for shift, control and option (0x10, 0x11, 0x12) at every button down.
+int16_t GetKeyState(int32_t virtualKey);
 // ScreenToClient: screen to window-content coordinates.
 int32_t ScreenToClient(GrafPort* window, tagPOINT* point);
 // _stricmp: case-insensitive compare.

@@ -21,7 +21,7 @@ int32_t gParkDarkeningFlag;   // 0x102c1e04 (name invented): cleared at the end 
 // 0x1005c2b0 (676 bytes): the matrix (by value, like the Mac) is combined with the node's own; unless the node has flag 0x200 each
 // of its normals is scaled to length 1 (0.225 where the height field cell under its vertex has quad bit 0x400); then the children.
 void UpdateHFieldDarkeningNormals(tag_sNode* node, sMatrix matrix) {
-    CombineMatricesNoWDest2nd(reinterpret_cast<s3DAxis*>(&node->mMatrix), &matrix);
+    CombineMatricesNoWDest2nd(&node->mMatrix, &matrix);
     if ((node->mFlags & 0x200) == 0) {
         const uint16_t* map = node->mF94.get();
         const sHField* field = gHeightfieldHeader->mHField.get();

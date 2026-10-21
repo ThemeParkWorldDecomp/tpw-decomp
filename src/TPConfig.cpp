@@ -56,6 +56,7 @@ void SetScreenSize(int32_t width, int32_t height) {
     gScreenHeight = height;
 }
 
+
 }  // namespace
 
 void InitialiseGameStage1() {

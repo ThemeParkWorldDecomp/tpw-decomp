@@ -153,8 +153,10 @@ const uint8_t kIllegalCase[0x37] = {
 
 // The ride placement modes 4 and 0x3b after the prelude (block A): the ride, its track start and its queue start.
 void PlaceRideClick(int32_t& x, int32_t& y, uint16_t shift, bool editMode) {
-    const int32_t placement = LLCR_PlaceRide(x, y, 4, LLCC_GetRideRotation(), 1, 0);
-    LLCR_PRR* const block = reinterpret_cast<LLCR_PRR*>(static_cast<uintptr_t>(static_cast<uint32_t>(placement)));
+    // LLCR_PlaceRide answers its block (gLLCRPlacement) as a 32-bit word, on the host the low half of the address; the host takes
+    // the block from LLCR_PlaceRideBlock, the body that answers it whole. (Unit v5L28: the word, widened, was an address in the
+    // unmapped first 4 GB; placing a bought ride faulted in LLCR_StartQueue.)
+    LLCR_PRR* const block = reinterpret_cast<LLCR_PRR*>(LLCR_PlaceRideBlock(x, y, 4, LLCC_GetRideRotation(), 1, 0));
     if (LLCC_SystemGetRideQueue() == 0) {
         if (shift != 0xc) LLCC_SystemSetModeNR(0, false);
     } else {

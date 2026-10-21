@@ -6,6 +6,7 @@
 #include "BMP_InsideArea.h"
 #include "Debug.h"
 #include "LbFile.h"
+#include "SaveLoad.h"
 #include "TbSoundBank.h"
 #include "platform/macdoze.h"
 

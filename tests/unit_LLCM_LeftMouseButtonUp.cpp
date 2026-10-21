@@ -234,6 +234,19 @@ int32_t LLCR_PlaceRide(int32_t x, int32_t y, int32_t a, int32_t rotation, int32_
     ev("PlaceRide", {x, y, a, rotation, b, c});
     return Ret("PlaceRide");
 }
+// The ride placement takes the block whole from the body (unit v5L28): the fake answers the Mac's word under a high half no
+// truncated word has, and the queue and track starts record whether the block they get kept it.
+constexpr uintptr_t kPlacementHigh = static_cast<uintptr_t>(0x5a5a) << 32;
+LLCRPlacement* LLCR_PlaceRideBlock(int32_t x, int32_t y, int32_t a, int32_t rotation, int32_t b, int32_t c) {
+    ev("PlaceRide", {x, y, a, rotation, b, c});
+    const uint32_t word = static_cast<uint32_t>(Ret("PlaceRide"));
+    return word == 0 ? nullptr : reinterpret_cast<LLCRPlacement*>(kPlacementHigh | word);
+}
+// 1 for a block with the fake's high half, 0 for none, -1 for a word widened on its own.
+int64_t WholeBlock(const LLCR_PRR* placement) {
+    if (placement == nullptr) return 0;
+    return (reinterpret_cast<uintptr_t>(placement) >> 32) == (kPlacementHigh >> 32) ? 1 : -1;
+}
 void LLCM_RebuildUpgradeBridges(int32_t x, int32_t y) { ev("Rebuild", {x, y}); }
 uint8_t LLCR_OffsetStartOfTrack(int32_t* x, int32_t* y, int32_t rotation) {
     ev("OffStart", {*x, *y, rotation});
@@ -271,13 +284,13 @@ int32_t LLCC_SystemGetRideTrack() {
     return Ret("RideTrack");
 }
 CCellBase* LLCR_StartQueue(LLCR_PRR* placement, int32_t* x, int32_t* y) {
-    ev("StartQueue", {static_cast<int64_t>(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(placement))), *x, *y});
+    ev("StartQueue", {static_cast<int64_t>(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(placement))), *x, *y, WholeBlock(placement)});
     *x = Ret("SQX");
     *y = Ret("SQY");
     return reinterpret_cast<CCellBase*>(gQueueBlock);
 }
 CTrackCell* LLCR_StartTrack(LLCR_PRR* placement, int32_t* x, int32_t* y, int32_t track) {
-    ev("StartTrack", {static_cast<int64_t>(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(placement))), *x, *y, track});
+    ev("StartTrack", {static_cast<int64_t>(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(placement))), *x, *y, track, WholeBlock(placement)});
     *x = Ret("STX");
     *y = Ret("STY");
     return reinterpret_cast<CTrackCell*>(gTrackBlock);

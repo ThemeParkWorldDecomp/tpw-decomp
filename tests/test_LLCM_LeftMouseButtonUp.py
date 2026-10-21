@@ -230,7 +230,7 @@ def stub_thing_id(e):
 def stub_start_queue(e):
     L = e.cl
     pa, pb = e.r(4), e.r(5)
-    L.rec("StartQueue", (e.r(3) & MASK, e.s32(pa), e.s32(pb)))
+    L.rec("StartQueue", (e.r(3) & MASK, e.s32(pa), e.s32(pb), 1 if e.r(3) & MASK else 0))
     e.write(pa, struct.pack(">I", L.ret("SQX") & MASK))
     e.write(pb, struct.pack(">I", L.ret("SQY") & MASK))
     e.set_r(3, PPC[SQ])
@@ -240,7 +240,7 @@ def stub_start_queue(e):
 def stub_start_track(e):
     L = e.cl
     pa, pb = e.r(4), e.r(5)
-    L.rec("StartTrack", (e.r(3) & MASK, e.s32(pa), e.s32(pb), s32(e.r(6))))
+    L.rec("StartTrack", (e.r(3) & MASK, e.s32(pa), e.s32(pb), s32(e.r(6)), 1 if e.r(3) & MASK else 0))
     e.write(pa, struct.pack(">I", L.ret("STX") & MASK))
     e.write(pb, struct.pack(">I", L.ret("STY") & MASK))
     e.set_r(3, PPC[ST])

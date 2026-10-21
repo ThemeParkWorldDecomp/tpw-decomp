@@ -200,6 +200,15 @@ int32_t tpw_slc_layout(int64_t* out) {
     return n;
 }
 
+// The host offset of a ride record's balance value at the Mac's offset (0x00c + 4 * slot): the host record keeps 8-byte values behind a
+// 64-bit table header (unit v5L28).
+int64_t tpw_slc_rideoff(uint32_t macOffset) {
+    alignas(16) static unsigned char probe[sizeof(RideInfo)];
+    RideInfo* ride = reinterpret_cast<RideInfo*>(probe);
+    const RideBalanceSlot slot = static_cast<RideBalanceSlot>((macOffset - 0x00c) / 4);
+    return reinterpret_cast<const char*>(&ride->Value(slot)) - reinterpret_cast<const char*>(ride);
+}
+
 void tpw_slc_set_current(int32_t flag) { LLCM_SetCurrentObject((flag & 0xff) != 0); }   // a bool is its low byte
 void tpw_slc_start(int32_t x, int32_t y, uint32_t unused) { LLCM_StartTrackEditMode(x, y, static_cast<uint16_t>(unused)); }
 

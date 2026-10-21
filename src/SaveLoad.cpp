@@ -9,6 +9,9 @@
 #include "platform/arena.h"
 #include "platform/samsutils.h"
 
+#include <cstdio>
+#include <cstring>
+
 uint32_t gSaveLoadOpenTestWord;   // 0x102a6cb8, 0 in the binary
 
 namespace {
@@ -35,6 +38,7 @@ constexpr int32_t kNewestVersion = 500;
 constexpr uint32_t kTraceSaveLoad = 0x499602d2;
 
 }  // namespace
+
 
 // Reads a park file: the version word, the header, then the rest of the file, which is a zlib block of the modules. The block is
 // unpacked into a memory file and LoadModules reads that. Type 0 stops after the header; type 1 (a downloaded park) skips the

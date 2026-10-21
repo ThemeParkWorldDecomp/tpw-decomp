@@ -49,9 +49,10 @@ void SetCurrent(CObject* object) {
     gLLCCDB6C = static_cast<int32_t>(reinterpret_cast<uintptr_t>(object));
 }
 
-// A word of a ride record at a Mac offset.
-int32_t RideWord(const RideInfo* info, uint32_t offset) {
-    return *reinterpret_cast<const int32_t*>(reinterpret_cast<const uint8_t*>(info) + offset);
+// A balance value of a ride record (the Mac reads the word at 0x00c + 4 * slot; the host record keeps 8-byte values behind a
+// 64-bit table header, so the Mac's offsets name other bytes here). Unit v5L28.
+int32_t RideValue(const RideInfo* info, RideBalanceSlot slot) {
+    return info->Value(slot).mInteger;
 }
 
 // The cell id of an object's cell (its x and y bytes).
@@ -94,7 +95,7 @@ void LLCM_SetCurrentObject(bool flag) {
                 GAME_ASSERTMSG(gThingArray[0].mThing == nullptr, "Thing has been allocated in ThingArray index 0 - shouldn't happen\n");
                 CObject* upgrade = static_cast<CObject*>(gThingArray[parent].mThing);
                 RideInfo* info = gRideDatabase.GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{Current()->mObjectType});
-                if (RideWord(info, 0x288) == 1) {
+                if (RideValue(info, kRideSlot_UpgradeType) == 1) {
                     SetCurrent(upgrade);
                     gUIInterface.SetSelectedObject(upgrade);
                 }
@@ -124,8 +125,8 @@ void LLCM_StartTrackEditMode(int32_t x, int32_t y, uint16_t) {
     if (Current() != nullptr) {
         RideInfo* info = Current()->GetDBInfo();
         if (info != nullptr) {
-            LLCC_SystemSetRideQueue(RideWord(info, 0x40) != 0 ? 1 : 0);
-            LLCC_SystemSetRideTrack(RideWord(info, 0x9c));
+            LLCC_SystemSetRideQueue(RideValue(info, kRideSlot_HasQueue) != 0 ? 1 : 0);
+            LLCC_SystemSetRideTrack(RideValue(info, kRideSlot_WhichTrackType));
         }
     }
     int32_t track = LLCC_SystemGetRideTrack();

@@ -19,7 +19,7 @@ s3DPoint gPointedRideNormal = {0, 0, 0};   // 0x102c6cd8
 
 int32_t RayPolyCheckOnRide(tag_sNode* node, sMatrix matrix) {
     int32_t result = 0;
-    CombineMatricesNoWDest2nd(reinterpret_cast<s3DAxis*>(&node->mMatrix), &matrix);
+    CombineMatricesNoWDest2nd(&node->mMatrix, &matrix);
     if ((node->mFlags & 0x10) == 0 && (node->mFlags & 0x8210) == 0) {
         GetNodeWorldVertPosnsIntoGeomBuffer(node, &matrix);
         uint16_t* indices = node->mF94;

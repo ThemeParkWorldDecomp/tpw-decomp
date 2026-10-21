@@ -150,3 +150,4 @@ extern uint32_t gSaveRidesTbErrorZero;    // 0x1029d050 (name invented; nothing 
 
 // Unit v51006: what PreLoadOperations calls first.
 void RestoreLevelHeightfield();           // 0x10063cc0 (52 bytes, stand-in)
+

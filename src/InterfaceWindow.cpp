@@ -7,6 +7,7 @@
 
 InterfaceWindow* gUILastWindow;   // 0x10395c18, the window the last constructor made
 
+
 // The window's state is the Mac's field by field. The members that are not set here
 // (0x68..0x87, 0xec, 0xf0 and 0x100..0x10f) are left as the allocation had them. The
 // constructor reaches the base class's CalcClientArea, as the Mac's does while its vtable

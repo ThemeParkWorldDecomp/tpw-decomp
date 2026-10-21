@@ -69,6 +69,8 @@ int32_t BMP_CreateRide(int32_t kind, int32_t x, int32_t y, int32_t rotation, int
 
 MapDelta MapDelta::Rotate(int32_t rotation) const {
     int64_t offset = static_cast<int64_t>(reinterpret_cast<uintptr_t>(this)) - static_cast<int64_t>(gTestRide);
+    // the record's map offset is logged at the Mac's offset (0x7ac); any other host offset is logged apart from every Mac offset
+    offset = offset == static_cast<int64_t>(offsetof(RideInfo, mMapOffsetX)) ? 0x7ac : -1 - offset;
     ev("Rotate", {offset, rotation});
     MapDelta d;
     d.mX = static_cast<int32_t>(ret("RotX"));
@@ -109,7 +111,7 @@ uint64_t tpw_lcro3_addr(const char* name) {
     };
     const Entry entries[] = {
         {"gworld", &gGameWorld},   {"tarr", &gThingArray[0]}, {"g04C", &gLLCCE04C}, {"g092", &gLLCCE092},
-        {"g094", &gLLCCE094},      {"g098", &gLLCCE098},      {"g09C", &gLLCCE09C}, {"g0DC", &gLLCCE0DC},
+        {"g094", &gLLCCE094},      {"g098", &gLLCCE098},      {"shape", &gLLCRRideShape},      {"g09C", &gLLCCE09C}, {"g0DC", &gLLCCE0DC},
         {"rdb", &gRideDatabase},   {"ui", &gUIInterface},     {"ride", &gTestRide}, {"cur", &gTestCurrent},
     };
     for (const Entry& entry : entries)
@@ -125,7 +127,18 @@ int32_t tpw_lcro3_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(CWorld, mMapCells));
     out[n++] = static_cast<int64_t>(offsetof(MapDelta, mY));
     out[n++] = static_cast<int64_t>(sizeof(CThingArrayEntry));
+    out[n++] = static_cast<int64_t>(sizeof(RideInfo));
     return n;
+}
+
+// The host offset of a ride record word at the Mac's offset: a balance value (0x00c + 4 * slot on the Mac) or the map offset (0x7ac).
+int64_t tpw_lcro3_rideoff(uint32_t macOffset) {
+    alignas(16) static unsigned char probe[sizeof(RideInfo)];
+    RideInfo* ride = reinterpret_cast<RideInfo*>(probe);
+    const char* base = reinterpret_cast<const char*>(ride);
+    if (macOffset == 0x7ac) return static_cast<int64_t>(offsetof(RideInfo, mMapOffsetX));
+    const RideBalanceSlot slot = static_cast<RideBalanceSlot>((macOffset - 0x00c) / 4);
+    return reinterpret_cast<const char*>(&ride->Value(slot)) - base;
 }
 
 void tpw_lcro3_over(uint64_t out, uint64_t x, uint64_t y) {

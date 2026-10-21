@@ -5,6 +5,7 @@
 int16_t gUIRealScreenWidth;
 int16_t gUIRealScreenHeight;
 
+
 void UI_SetRealScreenRez(int16_t width, int16_t height) {
     gUIRealScreenWidth = width;
     gUIRealScreenHeight = height;

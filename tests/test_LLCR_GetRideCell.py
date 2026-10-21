@@ -192,8 +192,8 @@ class Ppc(Side):
     def alloc(self, n):
         return self.e.alloc(n)
 
-    def ptr32(self, a):
-        return a
+    def set_shape(self, blk):
+        self.words(self.g("ce094"), [blk])
 
     def read(self, a, n):
         return self.e.read(a, n)
@@ -228,8 +228,10 @@ class Host(Side):
     def alloc(self, n):
         return self.lib.tpw_llcr_alloc(n)
 
-    def ptr32(self, a):
-        return self.lib.tpw_llcr_offset(a)
+    def set_shape(self, blk):
+        # the host reads the shape through the whole pointer LLCR_SetRide keeps beside the word (unit v5L28)
+        self.words(self.g("ce094"), [blk & MASK])
+        self.write(self.g("shape"), struct.pack("<Q", blk))
 
     def read(self, a, n):
         return C.string_at(a, n)
@@ -297,7 +299,7 @@ def build(s, case):
             s.write(blk, b"".join(struct.pack(">I", w) for w in case["blk"]))
         else:
             s.words(blk, case["blk"])
-        s.words(s.g("ce094"), [s.ptr32(blk)])
+        s.set_shape(blk)
         if op == "LLCR_GetWidthHeight":
             ctx["out"] = s.alloc(8)
             s.words(ctx["out"], [0xDEADBEEF, 0x12345678])

@@ -35,6 +35,7 @@ uint16_t gLLCCDB5C;
 uint16_t gLLCCDB68;
 uint16_t gLLCCE092;
 int32_t gLLCCE094;
+const uint8_t* gLLCRRideShape;   // host only: the shape the cells are read from (unit v5L28)
 CIntrface gIntrface;
 uint8_t gESPDrawEnabled;
 ESPSpriteGroup gESPGroups[kESPGroups];
@@ -122,7 +123,7 @@ uint64_t tpw_llcr_addr(const char* name) {
         const void* address;
     };
     const Entry entries[] = {
-        {"illegal", &gLLCMIllegalPlacement}, {"curobj", &gLLCCDB6C}, {"ce092", &gLLCCE092}, {"ce094", &gLLCCE094},
+        {"illegal", &gLLCMIllegalPlacement}, {"curobj", &gLLCCDB6C}, {"ce092", &gLLCCE092}, {"ce094", &gLLCCE094}, {"shape", &gLLCRRideShape},
         {"db58", &gLLCCDB58}, {"db5a", &gLLCCDB5A}, {"db5c", &gLLCCDB5C}, {"db68", &gLLCCDB68},
         {"db74", &gLLCCDB74}, {"db78", &gLLCCDB78}, {"dc1d8", &gIntrfaceDC1D8}, {"dc1dc", &gIntrfaceDC1DC},
         {"intrface", &gIntrface}, {"espdraw", &gESPDrawEnabled}, {"groups", gESPGroups}, {"sprites", gESPSprites},

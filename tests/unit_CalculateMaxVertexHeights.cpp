@@ -31,7 +31,7 @@ float FromBits(int64_t bits) {
 
 }  // namespace
 
-void CombineMatricesNoWDest2nd(s3DAxis* source, sMatrix* destination) {
+void CombineMatricesNoWDest2nd(sMatrix* source, sMatrix* destination) {
     const float* s = reinterpret_cast<const float*>(source);
     float* d = &destination->m[0][0];
     ev("Combine", {Bits(s[0]), Bits(s[12]), Bits(d[0]), Bits(d[12]), Bits(d[13])});

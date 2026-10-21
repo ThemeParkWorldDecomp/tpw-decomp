@@ -17,6 +17,7 @@
 #include "UI_Base.h"
 #include "ui_DrawObject.h"
 #include "ui_main.h"
+#include "platform/arena.h"
 
 // ---- globals of other files
 sRidePreviewInfo* gRidePreview;
@@ -125,7 +126,11 @@ int32_t tpw_piu_run(int32_t fn, const int32_t* w, int64_t* out, int32_t* slice) 
         gArea = w;
         gSizes[0] = gSizes[1] = 0x5a5a5a5a;
         uint8_t* pixels = window->GetClientObjectSurface((w[1] & 1) != 0 ? nullptr : &gSizes[0], (w[1] & 2) != 0 ? nullptr : &gSizes[1]);
-        Ev({8, static_cast<int64_t>(reinterpret_cast<uintptr_t>(pixels)), gSizes[0], gSizes[1]});
+        // The pixels as the Mac's word (the low half) and where they are: 1 in the 4 GB from the arena's base up (unit v5L28: the
+        // engine blocks are arena blocks), 0 for none, -1 elsewhere (the word widened on its own).
+        const uintptr_t at = reinterpret_cast<uintptr_t>(pixels);
+        const int64_t where = pixels == nullptr ? 0 : (at - reinterpret_cast<uintptr_t>(tpw::ArenaBase()) <= 0xFFFFFFFFu ? 1 : -1);
+        Ev({8, static_cast<int64_t>(static_cast<uint32_t>(at)), gSizes[0], gSizes[1], where});
         break;
     }
     case 4: {

@@ -12,6 +12,7 @@
 #include "Debug.h"
 #include "LbFile.h"
 #include "RideDB.h"
+#include "SaveLoad.h"
 #include "TPEngine.h"
 #include "analyser.h"
 #include "rsse.h"

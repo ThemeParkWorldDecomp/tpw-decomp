@@ -1,5 +1,6 @@
 // CMessageCentre::Save 0x10152758, Load 0x10152840, UnsubscribeAll 0x10152448 (unit v5760).
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <initializer_list>
 #include <new>
@@ -14,6 +15,7 @@
 #include "ThingReceivers.h"
 #include "World.h"
 #include "MslSubscriptionTree.h"
+#include "SaveLoad.h"
 #include "analyser.h"
 
 // 0x10152758: writes the count 0x1d (the Mac's big-endian swap of the word; the host's bytes 1d 00 00 00 are the same),
@@ -57,3 +59,5 @@ int32_t CMessageCentre::UnsubscribeAll(const CThing& thing) {
     }
     return total;
 }
+
+
