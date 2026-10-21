@@ -29,16 +29,10 @@ void Apply(InterfaceWindow* window, CoolRect& rect, int16_t limit) {
     }
 }
 
-// The Mac passes windows through the message arguments as 32-bit words. The senders (AddATag, OverrideTag and the tag windows'
-// callbacks) put there the low 32 bits of a tag window, which the host keeps above 4 GB, so such a word is matched against the ten
-// tag windows (gStaticTags) to get the window back (unit v5L39: read as an arena offset it crashed the launcher once the tag table
-// let a tag appear). Any other word is the window's offset in the arena (platform/arena.h; the unit test's windows; 0 is NULL).
+// The Mac passes windows through the message arguments as 32-bit words; on the host such a word is the window's offset in the arena
+// (platform/arena.h; 0 is NULL). The tag windows are the exception the port fix below handles (unit v5L39b).
 InterfaceWindow* AsWindow(int32_t word) {
     if (word == 0) return nullptr;
-    for (const sStaticTag& tag : gStaticTags) {
-        if (tag.mWindow != nullptr && static_cast<uint32_t>(reinterpret_cast<uintptr_t>(tag.mWindow)) == static_cast<uint32_t>(word))
-            return tag.mWindow;
-    }
     return reinterpret_cast<InterfaceWindow*>(tpw::gArenaBase + static_cast<uint32_t>(word));
 }
 }  // namespace

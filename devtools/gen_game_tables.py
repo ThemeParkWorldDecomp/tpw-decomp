@@ -367,6 +367,20 @@ WINDOW_SCRIPTS = [
     (0x102ACA9C, 541, "gRideListScript"),
     (0x102ADC20, 674, "gStaffCostsScript"),
     (0x102B2366, 674, "gMapPanelScript"),
+    # Unit v5L42: the scripts the launcher had as zero stand-ins (src/ui_window_scripts.cpp) and those its files held as two-word
+    # placeholders. Each address is the one its building function loads from the TOC; each walk ends where the next named data begins
+    # (the year end panel's 28 bytes before it are RTTI pointers, not script).
+    (0x102A772C, 21, "gCongratsScript"),
+    (0x102A7756, 21, "gBankruptScript"),
+    (0x102A8B42, 125, "gAllShowsScript"),
+    (0x102AA330, 186, "gLoadSaveScript"),
+    (0x102AADE4, 1090, "gOptionsPanelScript"),
+    (0x102AC1E6, 184, "gAddressBookDescription"),
+    (0x102AF524, 478, "gYearEndScript"),
+    (0x102AFE24, 43, "gProgBarScript"),
+    (0x102B0288, 58, "gCityInfoOverlayScript"),
+    (0x102B05C4, 311, "gOutboxPanelData"),
+    (0x102B0E58, 279, "gOnlineParkInfoScript"),
 ]
 
 

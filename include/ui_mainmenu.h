@@ -51,7 +51,7 @@ extern uint8_t gOptionsPanelGameRunning;    // 0x10394a08  0 when opening the pa
 extern int32_t gOptionsPanelF0C;            // 0x10394a0c  cleared when the panel opens
 extern int32_t gOptionsPanelRenderOptions;  // 0x10394a10  the map's render options from before the panel set 0x21
 extern uint32_t gOptionsPanelFontIndex;     // 0x102ab668  the font table index of the panel's texts (6 at start)
-// 0x102aade4: the panel's window script (data, first word 1; its records are not transcribed yet, so no src file defines it).
+// 0x102aade4: the panel's window script, 1090 words (the image's words, generated at configure time; src/ui_window_scripts.cpp).
 extern int16_t gOptionsPanelScript[];
 // 0x101a9d94 (untranslated; its TVector is 0x10267c90): the panel's message function.
 int32_t OptionsPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
@@ -71,7 +71,7 @@ class InterfaceListControl2;
 void FillLoadList(InterfaceListControl2* list);          // 0x101a33c0 (428)
 void FillSaveList(InterfaceListControl2* list);          // 0x101a35a8 (456): the same with an unused wide string made and destroyed around it
 void LoadSaveLCPostFormat(InterfaceWindow* window);      // 0x101a3258 (LCPostFormat of ui_mainpanel2.cpp's save/load list)
-extern int16_t gLoadSaveScript[2];     // 0x102aa330 (name invented): the panels' window script, initial word 1
+extern int16_t gLoadSaveScript[];      // 0x102aa330 (name invented): the panels' window script, 186 words (the image's words, generated at configure time)
 extern char gLoadSaveHilight[8];       // 0x1024e0db: "hilight"
 extern char16_t gLoadSaveFormat[0x40]; // 0x1024e0e4 (name invented): the row time format; at +0x24 the characters the name box refuses
 namespace loadsave_callee {

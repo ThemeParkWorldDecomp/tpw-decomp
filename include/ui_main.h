@@ -1230,7 +1230,7 @@ int32_t BankruptWindowMsg(InterfaceWindow* window, int32_t message, int32_t a, i
 // 0x101877b8 (436 bytes): ui_main.cpp's static initialiser: the interface light, the cursor table and the four name strings are built and
 // registered for destruction. (The vtable words it stores into gUIClockTick are that object's own construction; not repeated here.)
 void __sinit_ui_main_cpp();
-// Data of the image (names invented; only the first word of each is known, the rest of the script and of the animation is not).
+// Data of the image (names invented; the scripts are generated at configure time and the animations hold the image's frames).
 extern int16_t gCongratsScript[];          // 0x102a772c
 extern int16_t gBankruptScript[];          // 0x102a7756
 extern UI_RectDelta gCongratsAnim[];       // 0x102a79d4
@@ -1434,7 +1434,7 @@ void HideButtonsMenu();          // 0x101e8b18 (88 bytes, stand-in)
 
 // ---- Unit v5913 (src/UpgradeStatusMsg_UpgradeStatusPanel_InitStatusWindow_2_CreateYearEndPanel.cpp). Names invented.
 extern InterfaceWindow* gYearEndPanel;   // 0x10395b70: the year end panel, NULL while it is not up (a 32-bit pointer on the Mac)
-extern int16_t gYearEndScript[2];        // 0x102af524: the panel's window script (initial word 1; the rest is not kept here)
+extern int16_t gYearEndScript[];         // 0x102af524: the panel's window script, 478 words (the image's words, generated at configure time)
 int32_t YearEndPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101c67b4 (TVector 0x10268078; unit v51007 translates it in src/ShowStatusPanel_UpdateStatusWindow_ShowStatusPanel_UpdateWindow_2.cpp)
 // Unit v51007
 void RemoveYearEndPanel();   // 0x101c73e4 (56 bytes, stand-in)

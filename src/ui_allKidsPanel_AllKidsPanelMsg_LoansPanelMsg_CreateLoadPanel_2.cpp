@@ -20,9 +20,9 @@
 #include "ui_controls.h"
 #include "ui_main.h"
 #include "ui_mainmenu.h"
+#include "WindowScripts.inc"
 
-// 0x102aa330: the load and save panels' window script (initial word 1; the rest is not kept here).
-int16_t gLoadSaveScript[2] = {1, 0};
+int16_t gLoadSaveScript[] = {TPW_WINDOW_SCRIPT_102AA330};   // 0x102aa330: the load and save panels' window script (the image's words, generated)
 // 0x1024e0db: the string "hilight" (the selection bar's and the cursor's draw object).
 char gLoadSaveHilight[8] = "hilight";
 // 0x1024e0e4: the list rows' time format (its first characters, "%l", are what the binary shows; the rest is a guess), and at +0x24 the

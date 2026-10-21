@@ -14,6 +14,7 @@
 #include "TbITable.h"
 #include "TbVTag.h"
 #include "Text.h"
+#include "WindowScripts.inc"
 #include "email.h"
 #include "platform/msl.h"
 #include "ui_DrawObject.h"
@@ -26,9 +27,8 @@ InterfaceWindow* gAddressBookPanel;        // 0x103956f8, original name unknown
 char16_t gAddressEditText[0x40];           // 0x10394ba6, original name unknown: the edit box's text (capacity 0x3f)
 char16_t gAddressRemoveName[0x40];         // 0x10394b24, original name unknown: the address the removal dialog names
 
-// 0x102ac1e6: the panel's script. QUIRK: only the word the listing shows (0x00000001) is known here; the rest of the script is
-// not extracted yet.
-int16_t gAddressBookDescription[] = {0, 1};
+// 0x102ac1e6: the panel's script, the image's 184 words (generated at configure time, unit v5L42).
+int16_t gAddressBookDescription[] = {TPW_WINDOW_SCRIPT_102AC1E6};
 
 // 0x1024e1e1: "%ls" and, 4 bytes on, "hilight" (the selection and cursor draw object's name).
 static const char kAddressStrings[] = "%ls\0hilight";

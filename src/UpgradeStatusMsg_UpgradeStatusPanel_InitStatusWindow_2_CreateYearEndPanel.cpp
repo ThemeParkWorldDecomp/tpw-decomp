@@ -4,12 +4,13 @@
 #include "FillLenderList.h"
 #include "InterfaceWindow.h"
 #include "ThingReceivers.h"
+#include "WindowScripts.inc"
 #include "World.h"
 #include "analyser.h"
 #include "ui_main.h"
 
 InterfaceWindow* gYearEndPanel = nullptr;           // 0x10395b70
-int16_t gYearEndScript[2] = {0, 1};                 // 0x102af524 (initial word 1)
+int16_t gYearEndScript[] = {TPW_WINDOW_SCRIPT_102AF524};   // 0x102af524: the image's 478 words (generated, unit v5L42)
 
 // Untranslated (0x101c67b4): a weak stand-in so that the program links.
 __attribute__((weak)) int32_t YearEndPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b) {

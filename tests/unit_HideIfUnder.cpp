@@ -22,13 +22,22 @@ using namespace calllog;
 
 // ---- globals of other files the unit reads or writes
 InterfaceWindow* gTagFirstWindow;
-sStaticTag gStaticTags[10];   // no tag window: every window word of a case is an arena offset (unit v5L39)
+sStaticTag gStaticTags[10];   // a "tag" case puts its windows here and passes their low 32 bits (unit v5L39b)
 
 namespace {
 
 InterfaceWindow* gWins[16];
 
 InterfaceWindow* Win(int64_t label) { return (label > 0 && label < 16) ? gWins[label] : nullptr; }
+
+// The window a message argument names: a tag window by its low 32 bits, else an arena offset (as AsWindow reads it)
+void* WordWindow(int32_t word) {
+    for (const sStaticTag& tag : gStaticTags) {
+        if (tag.mWindow != nullptr && static_cast<uint32_t>(reinterpret_cast<uintptr_t>(tag.mWindow)) == static_cast<uint32_t>(word))
+            return tag.mWindow;
+    }
+    return tpw::gArenaBase + static_cast<uint32_t>(word);
+}
 
 int64_t Q(const char* base, void* window) {
     char key[64];
@@ -115,8 +124,9 @@ int32_t InterfaceWindow::startAnim(UI_RectDelta* anim, int32_t ticks) {
     return 1;
 }
 int32_t InterfaceWindow::CallDefaultWindowHandler(int32_t message, int32_t a, int32_t b) {
-    // a window travelling as the argument is logged as its label (its word is an arena offset here, an address on the Mac)
-    int64_t la = a != 0 ? lab(tpw::gArenaBase + static_cast<uint32_t>(a)) : 0;
+    // a window travelling as the argument is logged as its label (its word is an arena offset or a tag window's low 32 bits here, an
+    // address on the Mac)
+    int64_t la = a != 0 ? lab(WordWindow(a)) : 0;
     ev("CallDefaultWindowHandler", {lab(this), message, la == -1 ? static_cast<int64_t>(a) : la, b});
     return static_cast<int32_t>(ret("default"));
 }
@@ -147,6 +157,15 @@ uint64_t tpw_hiu_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret
 uint32_t tpw_hiu_off(uint64_t address) { return tpw::ArenaOffset(reinterpret_cast<const void*>(static_cast<uintptr_t>(address))); }
 
 void tpw_hiu_setwin(int32_t label, uint64_t address) { gWins[label] = reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(address)); }
+
+void tpw_hiu_settag(int32_t index, uint64_t address) {
+    gStaticTags[index].mWindow = reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(address));
+}
+
+// 1 when the library is built with the port's fixes: a tag case then passes its windows as their senders do, by their low 32 bits
+int32_t tpw_hiu_portfix() {
+    return 0;
+}
 
 int32_t tpw_hiu_layout(int64_t* out) {
     int32_t n = 0;

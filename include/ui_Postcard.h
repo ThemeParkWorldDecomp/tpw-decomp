@@ -56,7 +56,7 @@ void NewEntryInAddressBook();      // 0x101b0168
 extern InterfaceWindow* gAddressBookPanel;     // 0x103956f8, original name unknown
 extern char16_t gAddressEditText[0x40];        // 0x10394ba6, original name unknown: the edit box's text
 extern char16_t gAddressRemoveName[0x40];      // 0x10394b24, original name unknown: the removal dialog's address
-extern int16_t gAddressBookDescription[];      // 0x102ac1e6, original name unknown: the panel's script (placeholder data)
+extern int16_t gAddressBookDescription[];      // 0x102ac1e6, original name unknown: the panel's script, 184 words (generated)
 // Untranslated neighbours the unit points at (Mac TVectors 0x10267d20, 0x10267d18, 0x10267d10, 0x10267d08, 0x10267d00).
 int32_t AddressBookMsg(InterfaceWindow*, int32_t, int32_t, int32_t);   // 0x101afb34
 int32_t NameEditMsg(InterfaceWindow*, int32_t, int32_t, int32_t);      // 0x101afea4

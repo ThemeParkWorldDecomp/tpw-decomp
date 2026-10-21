@@ -268,6 +268,10 @@ class Host(Side):
         self.wa = [0] + [lib.tpw_hiu_alloc(lib.lay[5]) for _ in range(NW)]
         for i in range(1, NW + 1):
             lib.tpw_hiu_setwin(i, self.wa[i])
+        # a tag case: windows 2..NW are the tag windows (gStaticTags), and travel by their low 32 bits when the port's fixes are built
+        self.tag = bool(case.get("tag")) and lib.tpw_hiu_portfix() == 1
+        for i in range(10):
+            lib.tpw_hiu_settag(i, self.wa[i + 2] if case.get("tag") and i + 2 <= NW else 0)
         self.rev = {w: i for i, w in enumerate(self.wa) if i}
         fixed = {i: self.wa[i] for i in range(1, NW + 1)}
         fixed[DELTA_LABEL] = lib.tpw_hiu_addr(b"delta")
@@ -305,8 +309,11 @@ class Host(Side):
         return self.lib.tpw_hiu_aerial(win, s32(m), s32(a), s32(b)) & MASK
 
     def word_of(self, w):
-        """The 32-bit word a window travels as in a message argument: its arena offset."""
-        return self.lib.tpw_hiu_off(w) if w else 0
+        """The 32-bit word a window travels as in a message argument: its arena offset, or in a tag case built with the port's fixes the
+        low 32 bits of its address, as AddATag, OverrideTag and TagCallback post a tag window (unit v5L39b)."""
+        if not w:
+            return 0
+        return w & MASK if self.tag else self.lib.tpw_hiu_off(w)
 
 
 def bind(lib):
@@ -316,6 +323,8 @@ def bind(lib):
     lib.tpw_hiu_alloc.restype, lib.tpw_hiu_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_hiu_off.restype, lib.tpw_hiu_off.argtypes = C.c_uint32, [C.c_uint64]
     lib.tpw_hiu_setwin.argtypes = [C.c_int32, C.c_uint64]
+    lib.tpw_hiu_settag.argtypes = [C.c_int32, C.c_uint64]
+    lib.tpw_hiu_portfix.restype, lib.tpw_hiu_portfix.argtypes = C.c_int32, []
     lib.tpw_hiu_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_hiu_hide.argtypes = [C.c_uint64, C.c_int16]
     lib.tpw_hiu_aerial.restype, lib.tpw_hiu_aerial.argtypes = C.c_int32, [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
@@ -443,7 +452,7 @@ def aerial_case(r, msg=None, akind=None):
     if msg in (0x100002, 0x100001) and akind == "v":
         a = ("w", 4)
     return {"op": "aerial", "queues": q, "msg": msg, "a": a, "b": r.choice([0, 0, 1, -1, r.randrange(-1000, 1000)]),
-            "first": r.choice([0, 2, 2, 5]), "anim": r.choice([0, 0, 1, 0x80, 0xff])}
+            "first": r.choice([0, 2, 2, 5]), "anim": r.choice([0, 0, 1, 0x80, 0xff]), "tag": r.random() < 0.5}
 
 
 def aerial_edges():
@@ -462,6 +471,16 @@ def aerial_edges():
     c = aerial_case(r, 0x100001, "w")
     c["queues"]["dimh"] = [32767]
     yield c
+    # the tag windows' words as their senders post them (unit v5L39b): every message, then 0x100001 and 0x100002 for each window
+    for msg in (0x100001, 0x100002, 0x100003, 0x14, 0):
+        c = aerial_case(r, msg, "w")
+        c["tag"] = True
+        yield c
+    for msg in (0x100001, 0x100002):
+        for v in range(2, NW + 1):
+            c = aerial_case(r, msg, "w")
+            c["a"], c["tag"] = ("w", v), True
+            yield c
 
 
 def aerial_random(r):
