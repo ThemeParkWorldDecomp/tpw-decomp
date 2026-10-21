@@ -75,7 +75,7 @@ BIG_SIZE = 0x2000000
 
 OPS = ["f_ctor", "f_dtor", "set_v", "set_h", "get_arr", "get_arr_size", "idx", "char_type", "create", "layout", "lines", "drawtext",
        "empty", "draw", "measure", "r_ctor", "r_dtor", "r_init", "r_drawchar", "p_ctor", "p_dtor", "recolour", "precol", "setfont",
-       "teardown", "getfont"]
+       "teardown", "getfont", "f_dtor_glue"]
 SETUP_OPS = ["chars", "poke", "mode"]   # operations that are not functions of the unit: they set the world up on both sides
 STATELESS = {"char_type", "idx", "get_arr_size"}   # no dump after these (the last operation of a script always dumps)
 
@@ -401,6 +401,8 @@ class Ppc:
         self.F[n] = 0
         return 0, [0] * 8
 
+    op_f_dtor_glue = op_f_dtor   # (the glue 0x10238e18 is the destructor's; the host goes through rank_callee::FormatterDtor)
+
     def op_set_v(self, n, v):
         return self.returning(SET_V, self.F[n], v), [0] * 8
 
@@ -686,7 +688,7 @@ def apply_presence(alive, op):
     name = op[0]
     if name == "f_ctor":
         alive["F"][op[1]] = True
-    elif name == "f_dtor":
+    elif name in ("f_dtor", "f_dtor_glue"):
         alive["F"][op[1]] = False
     elif name == "p_ctor":
         alive["P"][op[1]] = True
@@ -968,19 +970,19 @@ def g_ctor_random(b):
 FLAGS = [-1, 0, 1, 2, 0x7FFF, -0x8000]
 
 
-def g_dtor_edges():
+def g_dtor_edges(dtor="f_dtor"):
     out = []
     for flag in FLAGS:
-        out.append(("fresh, flag %d" % flag, lambda b, flag=flag: b.f_ctor(0).add("f_dtor", 0, flag)))
+        out.append(("fresh, flag %d" % flag, lambda b, flag=flag: b.f_ctor(0).add(dtor, 0, flag)))
         out.append(("used, flag %d" % flag, lambda b, flag=flag: (b.params(0, 0, 1).formatter(0, 4, 0).create(0, 3, 0), b.layout(0, RECTS[1]),
-                                                                  b.add("drawtext", 0, 0, 1, 1), b.add("f_dtor", 0, flag))))
-    out.append(("blocks of one vector", lambda b: (b.params(0, 0, 1).formatter(0), b.create(0, 1, 0), b.add("f_dtor", 0, 1))))
+                                                                  b.add("drawtext", 0, 0, 1, 1), b.add(dtor, 0, flag))))
+    out.append(("blocks of one vector", lambda b: (b.params(0, 0, 1).formatter(0), b.create(0, 1, 0), b.add(dtor, 0, 1))))
     out.append(("after the render took the font", lambda b: (b.params(0, 1, 1).formatter(0, 5, 2), b.add("draw", 0, 0, 0, 90, 40, 3, 0, 1),
-                                                             b.add("f_dtor", 0, 1))))
+                                                             b.add(dtor, 0, 1))))
     return out
 
 
-def g_dtor_random(b):
+def g_dtor_random(b, dtor="f_dtor"):
     r = b.r
     b.params(0, r.randrange(NFONT), r.choice([0, 1, 2]), r.randrange(2))
     b.formatter(0, r.choice([2, 4, 5]), r.choice([0, 1, 2]))
@@ -996,9 +998,9 @@ def g_dtor_random(b):
             b.add("draw", 0, *r.choice(RECTS), r.randrange(4), 0, r.randrange(2))
         else:
             b.add("measure", 0, *r.choice(RECTS), r.randrange(4), 0, r.randrange(2))
-    b.add("f_dtor", 0, r.choice(FLAGS))
+    b.add(dtor, 0, r.choice(FLAGS))
     if r.random() < 0.3:
-        b.f_ctor(0).add("f_dtor", 0, r.choice(FLAGS))
+        b.f_ctor(0).add(dtor, 0, r.choice(FLAGS))
 
 
 # ---- the justification setters
@@ -1840,6 +1842,7 @@ def script_edges():
 TESTS = [
     Group("TbTextFormatter::TbTextFormatter", E(g_ctor_edges), random_of(g_ctor_random)),
     Group("TbTextFormatter::~TbTextFormatter", E(g_dtor_edges), random_of(g_dtor_random)),
+    Group("rank_callee::FormatterDtor", E(lambda: g_dtor_edges("f_dtor_glue")), random_of(lambda b: g_dtor_random(b, "f_dtor_glue"))),
     Group("TbTextFormatter::SetVerticalJustification", E(lambda: g_set_edges("set_v")), random_of(g_set_random("set_v"))),
     Group("TbTextFormatter::SetHorizontalJustification", E(lambda: g_set_edges("set_h")), random_of(g_set_random("set_h"))),
     Group("TbTextFormatter::GetCharPositionArray", E(lambda: g_arr_edges("get_arr")), random_of(g_arr_random("get_arr"))),

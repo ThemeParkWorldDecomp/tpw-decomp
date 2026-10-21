@@ -146,7 +146,7 @@ __attribute__((weak)) void USwapInplace16(int16_t& half) { half = static_cast<in
 // 0x1018fa18: with the hidden delete flag; NULL does nothing. The sprite chain's destructors run in the order the Mac inlines them.
 InterfaceRankTextObject* InterfaceRankTextObject_Dtor(InterfaceRankTextObject* self, int16_t deleteFlag) {
     if (self != nullptr) {
-        rank_callee::FormatterDtor(self, -1);
+        rank_callee::FormatterDtor(&self->mFormatter, -1);   // (the Mac passes self + 0xe8, the formatter)
         rank_callee::SpriteListDtor(self, -1);
         rank_callee::EngineDataDtor(self, -1);
         rank_callee::DrawObjectDtor(self, 0);

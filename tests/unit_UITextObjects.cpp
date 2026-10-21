@@ -652,7 +652,18 @@ void tpw_uitx_op(int32_t op, const int64_t* a, int64_t* out) {
         break;
     }
     case 23:   // the destructor through the vtable: slot, flag (a positive short deletes the object; it is gone either way)
-        if (static_cast<int16_t>(a[1]) > 0) {
+    case 24:   // (unit v5L49) a cursor object's destructor through textobj_callee::CursorDtor, the Mac-form one with the flag
+        if (op == 24) {
+            textobj_callee::CursorDtor(object, static_cast<int16_t>(a[1]));
+            if (static_cast<int16_t>(a[1]) > 0) {
+                tpw_cl_label(kGameDataLabel + static_cast<int32_t>(a[0]), nullptr);
+                tpw_cl_label(kSurfaceLabel + static_cast<int32_t>(a[0]), nullptr);
+                tpw_cl_label(kListLabel + static_cast<int32_t>(a[0]), nullptr);
+                tpw_cl_label(kFormatterLabel + static_cast<int32_t>(a[0]), nullptr);
+            } else {
+                Bury(object);
+            }
+        } else if (static_cast<int16_t>(a[1]) > 0) {
             delete static_cast<InterfaceDrawObject*>(object);
             // (the parts' labels go too: a new object may be given the same memory)
             tpw_cl_label(kGameDataLabel + static_cast<int32_t>(a[0]), nullptr);

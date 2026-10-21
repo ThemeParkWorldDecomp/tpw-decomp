@@ -29,6 +29,11 @@
 #include "TbResource.h"
 #include "TbTextFormatter.h"
 
+// (unit v5L49) the game's glue to the destructor, weak in src/ltms_textformatter.cpp (declared with its callers in include/ui_DrawObject.h)
+namespace rank_callee {
+void FormatterDtor(void* self, int16_t deleteFlag);
+}  // namespace rank_callee
+
 using namespace calllog;
 
 namespace {
@@ -544,7 +549,7 @@ enum Op {
     kOpCharType, kOpCreateInfoList, kOpLayout, kOpLayoutLines, kOpDrawText, kOpEmptyString, kOpDraw, kOpMeasure,
     kOpRenderCtor, kOpRenderDtor, kOpRenderInitialise, kOpRenderDrawChar,
     kOpParamsCtor, kOpParamsDtor, kOpUseReColour, kOpUsePreColoured, kOpSetFont,
-    kOpTearDown, kOpGetFont,
+    kOpTearDown, kOpGetFont, kOpFormatterDtorGlue,
 };
 
 static TbRect RectOf(const int64_t* a) {
@@ -569,6 +574,10 @@ int64_t tpw_tf_op(int32_t op, const int64_t* a, int64_t* out) {
             } else {
                 gFormatter[n]->~TbTextFormatter();   // the block stays (and is forgotten): its vectors' blocks are gone
             }
+            gFormatter[n] = nullptr;
+            break;
+        case kOpFormatterDtorGlue:   // (unit v5L49) the same through rank_callee::FormatterDtor, the game's glue 0x10238e18
+            rank_callee::FormatterDtor(gFormatter[n], static_cast<int16_t>(a[1]));
             gFormatter[n] = nullptr;
             break;
         case kOpSetVertical: result = gFormatter[n]->SetVerticalJustification(static_cast<TbTextFormatter::eJustification>(a[1])); break;

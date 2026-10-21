@@ -240,6 +240,16 @@ InterfaceCursorPosTextObjectSprite::InterfaceCursorPosTextObjectSprite(void* dat
 
 InterfaceCursorPosTextObjectSprite::~InterfaceCursorPosTextObjectSprite() {}
 
+// The password object's destructor's callees (textobj_callee, include/ui_DrawObject.h). Unit v5L49: weak, so the test library's fakes win;
+// the launcher's generated stand-ins did nothing. 0x1018f2b8 with the hidden delete flag: NULL does nothing; the destructor, then the block
+// goes back through operator delete (glue 0x10238218) for a positive flag.
+__attribute__((weak)) void textobj_callee::CursorDtor(void* self, int16_t deleteFlag) {
+    if (self == nullptr) return;
+    static_cast<InterfaceCursorPosTextObjectSprite*>(self)->InterfaceCursorPosTextObjectSprite::~InterfaceCursorPosTextObjectSprite();
+    if (deleteFlag > 0) textobj_callee::Delete(self);
+}
+__attribute__((weak)) void textobj_callee::Delete(void* self) { ::operator delete(self); }
+
 // what 1: where character `value` is, in the UI's units, as the left and top of the rectangle (the right and bottom are 0); the end of the
 // text when the index is negative or past the last character laid out (or nothing has been). what 2: the rectangle the text at
 // `value` (an address; 0 answers 0) would take, measured in the object's box with its justification and font, less nothing drawn; its

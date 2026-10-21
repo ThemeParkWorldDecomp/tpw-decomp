@@ -54,6 +54,19 @@ TbTextFormatter::~TbTextFormatter() {
     mChars.tear_down();
 }
 
+// The game's glue 0x10238e18 to the destructor above with the hidden delete flag (0x100061a8: NULL does nothing; the destructor, then the
+// block goes back for a positive flag), as the rank text object's destructor calls it: rank_callee::FormatterDtor, declared with the other
+// rank_callee callees in include/ui_DrawObject.h (not included by this library). Unit v5L49: weak, so the test library's fake wins; the
+// launcher's generated stand-in did nothing.
+namespace rank_callee {
+void FormatterDtor(void* self, int16_t deleteFlag);
+}  // namespace rank_callee
+__attribute__((weak)) void rank_callee::FormatterDtor(void* self, int16_t deleteFlag) {
+    if (self == nullptr) return;
+    static_cast<TbTextFormatter*>(self)->TbTextFormatter::~TbTextFormatter();
+    if (deleteFlag > 0) ::operator delete(self);
+}
+
 // 0x10006288: the vertical justifications are 2, 4 and 5. Anything else is refused and changes nothing.
 TbError TbTextFormatter::SetVerticalJustification(eJustification value) {
     if (value != 2 && value != 4 && value != 5) return TbError(-1);

@@ -22,6 +22,9 @@ that the sprite's Change would read through NULL. They are skipped on both sides
 caller had are tested with those registers cleared: a justification code outside 0 to 2 (the text box is then four zeros) and a font
 id outside 0 to 12 (the font word is read from address 0x14, which the test maps as a page of zeros).
 
+Unit v5L49: textobj_callee::CursorDtor (the password object's call of 0x1018f2b8, src/ui_DrawObjectText.cpp) is the cursor object's
+destructor test again with the host going through that glue (operation 24) instead of the language's delete.
+
 Quirks the tests pin: the text objects do not call UI_DrawText but do the same job inline; the Title draws the text twice (grey, two
 pixels left and down, then white) and passes the second draw what the first reported; Change ignores the style unless one of the
 flags 0x100 or 0x400..0x40000 is given; flag 0x40000 also writes the sprite's colour word; Query(1) answers the pen position for an
@@ -229,7 +232,7 @@ class Ppc:
             self.kinds[slot] = kind
             self.call(CTOR[kind], block, self.tokens[token] if token >= 0 else 0)
             return [L.lab(block), 0, 0, 0, 0]
-        if code in (2, 3, 4, 7, 8) or 20 <= code <= 23:
+        if code in (2, 3, 4, 7, 8) or 20 <= code <= 24:
             if not self.obj(a[0]):
                 return None
         if code in (2, 3, 4, 7, 8):
@@ -337,6 +340,8 @@ class Ppc:
                     return value == 0
                 return value >= len(self.texts) or value < 0 or self.screen_ok()
             return True
+        if code == 24:
+            return self.kinds[a[0]] == KIND_CURSOR
         return True
 
     def function(self, code, a):
@@ -356,7 +361,7 @@ class Ppc:
             value = self.text_address(a[3]) if a[2] == 1 else a[3] & MINUS
             result = self.call(QUERY[kind], s, a[1], value)
             answer[0] = LAB_QUERY if result == G["query_rect"] else T.s32(result)
-        elif code == 23:   # the destructor: slot, flag
+        elif code in (23, 24):   # the destructor: slot, flag (24: the host goes through textobj_callee::CursorDtor)
             self.call(DTOR[kind], s, a[1])
             if s16(a[1]) > 0:
                 for offset in (0x54, 0x9C, 0xB4, 0xB4 + 0x20, 0xE8):
@@ -776,6 +781,10 @@ def destroy(slot, flag=1):
     return (23, (slot, flag))
 
 
+def glue_destroy(slot, flag=1):
+    return (24, (slot, flag))
+
+
 def staged_style(justify=0, vjustify=1, wrap=0, f0df=0, font=0, mode=0, ox=0, oy=0, colour=(255, 255, 255, 0), text=0, no_style=0):
     return (10, (justify, vjustify, wrap, f0df, font, mode, ox, oy) + tuple(colour) + (text, no_style))
 
@@ -994,7 +1003,7 @@ TESTS.append(FnTest("InterfaceTitleTextObject::UpdateTextures", ui_ppc, ui_host,
 FLAGS_DTOR = [1, 0, -1, 2, 0x7FFF, 0x8000, -0x8000, 0x10000, 0x10001, 0xFFFF, 0x18000, -2]
 
 
-def dtor_edges(kind):
+def dtor_edges(kind, destroy=destroy):
     def edges():
         for flag in FLAGS_DTOR:
             yield case_of([make(0, kind), destroy(0, flag)])
@@ -1007,7 +1016,7 @@ def dtor_edges(kind):
     return edges
 
 
-def dtor_random(kind):
+def dtor_random(kind, destroy=destroy):
     def rnd(r):
         w, h = random_screen(r)
         ops = scene(kind, w=w, h=h, st=random_style(r), sprite=random_sprite(r))
@@ -1032,6 +1041,8 @@ TESTS.append(FnTest("InterfaceTextObjectSprite::~InterfaceTextObjectSprite", ui_
 TESTS.append(FnTest("InterfaceTitleTextObject::~InterfaceTitleTextObject", ui_ppc, ui_host, edge=dtor_edges(KIND_TITLE), rnd=dtor_random(KIND_TITLE)))
 TESTS.append(FnTest("InterfaceCursorPosTextObjectSprite::~InterfaceCursorPosTextObjectSprite", ui_ppc, ui_host, edge=dtor_edges(KIND_CURSOR),
                     rnd=dtor_random(KIND_CURSOR)))
+TESTS.append(FnTest("textobj_callee::CursorDtor", ui_ppc, ui_host, edge=dtor_edges(KIND_CURSOR, glue_destroy),
+                    rnd=dtor_random(KIND_CURSOR, glue_destroy)))
 
 
 # ======================================================================= test 7: Change
