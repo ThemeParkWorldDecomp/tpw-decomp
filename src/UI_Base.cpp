@@ -2,6 +2,10 @@
 // (0x101c9ed8), the rectangle classes and the name hash so far.
 #include "UI_Base.h"
 
+#include <algorithm>
+
+#include "TbIRLE4bitFont.h"
+
 int16_t gUIRealScreenWidth;
 int16_t gUIRealScreenHeight;
 

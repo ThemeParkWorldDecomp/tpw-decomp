@@ -33,6 +33,10 @@ TPW_IMAGE_COPY(movievol, gMovieVolume);
 
 using namespace calllog;
 
+// InterfaceFont::GetHeight passes a wrapper on to its own (src/InterfaceFont.cpp), which lives in a file this unit does not link;
+// no case here asks a wrapper for its height.
+int32_t InterfaceFontWrapper::GetHeight() { return 0; }
+
 namespace {
 const char* gCommandText = "";   // what the fake _strdup hands the command line
 char gFile;                      // stands for an open file (label 7)

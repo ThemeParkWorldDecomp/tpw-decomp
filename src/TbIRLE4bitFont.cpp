@@ -60,7 +60,9 @@ TbFontCharSize TbIRLE4bitFont::GetCharSize(uint16_t index) {
     return {0, 0};
 }
 
-uint8_t TbIRLE4bitFont::GetVerticalSpacing() { return mData == nullptr ? 0 : mHeader[5]; }
+uint8_t TbIRLE4bitFont::GetVerticalSpacing() {
+    return mData == nullptr ? 0 : mHeader[5];
+}
 uint32_t TbIRLE4bitFont::GetType() { return mData == nullptr ? 5 : 4; }
 uint32_t TbIRLE4bitFont::GetCaps() { return mData == nullptr ? 3 : 0xe; }
 TbIMBToUnicode* TbIRLE4bitFont::GetMBToUnicode() { return mMBToUnicode; }

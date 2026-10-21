@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "LbPalette.h"
+#include "TbIRLE4bitFont.h"
 #include "Text.h"
 #include "ui_DrawObject.h"
 

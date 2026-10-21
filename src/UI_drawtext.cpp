@@ -7,6 +7,7 @@
 #include <cstring>
 
 #include "InterfaceFont.h"
+#include "InterfaceFontWrapper.h"
 #include "LbDraw.h"
 #include "TbColour.h"
 #include "TbFontRenderParams.h"
@@ -122,6 +123,8 @@ uint8_t* UIMain_ConvertString(const char16_t* text) { return UIMain_ConvertStrin
 
 // 0x1016915c
 int32_t InterfaceFont::GetWidth(const char16_t* text, int16_t first, int16_t last) {
+    // (the Mac's call is virtual: a wrapper answers with its own; see src/InterfaceFont.cpp)
+    if (auto* const wrapper = dynamic_cast<InterfaceFontWrapper*>(this)) return wrapper->GetWidth(text, first, last);
     int32_t width = 0;
     if (text == nullptr || mBitmap == nullptr) return 0;
     const int32_t length = static_cast<int32_t>(wcslen(text));
@@ -137,9 +140,13 @@ int32_t InterfaceFont::GetWidth(const char16_t* text, int16_t first, int16_t las
 
 // 0x10169264
 int32_t InterfaceFont::GetCharWidth(char16_t character) {
+    if (auto* const wrapper = dynamic_cast<InterfaceFontWrapper*>(this)) return wrapper->GetCharWidth(character);
     if (mBitmap != nullptr && character < mF00) return mF02 + static_cast<int8_t>(mBitmap[static_cast<uint32_t>(character) * 8]);
     return 0;
 }
 
 // 0x101692d4
-int32_t InterfaceFont::LastCharIn(const char16_t*, int16_t, int16_t) { return 0; }
+int32_t InterfaceFont::LastCharIn(const char16_t* text, int16_t first, int16_t last) {
+    if (auto* const wrapper = dynamic_cast<InterfaceFontWrapper*>(this)) return wrapper->LastCharIn(text, first, last);
+    return 0;
+}

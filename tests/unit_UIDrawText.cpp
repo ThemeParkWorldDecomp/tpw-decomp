@@ -35,6 +35,10 @@ InterfaceFont::InterfaceFont() {}   // the fake leaves the object as it finds it
 InterfaceFont::~InterfaceFont() {}
 InterfaceFontWrapper::InterfaceFontWrapper(TbIFont* font) : mFont(font) {}
 InterfaceFontWrapper::~InterfaceFontWrapper() {}
+// InterfaceFont's widths pass a wrapper on to its own (src/UI_drawtext.cpp), which live in a file this unit does not link; the
+// cases here ask a plain InterfaceFont.
+int32_t InterfaceFontWrapper::GetWidth(const char16_t*, int16_t, int16_t) { return 0; }
+int32_t InterfaceFontWrapper::LastCharIn(const char16_t*, int16_t, int16_t) { return 0; }
 TbFontRenderParams::TbFontRenderParams() {}
 TbFontRenderParams::~TbFontRenderParams() {}
 // Fakes of the member TbFontRender that w35a's TbTextFormatter owns (include/TbTextFormatter.h):

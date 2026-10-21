@@ -10,6 +10,7 @@
 
 class TbIResourceIndex;
 
+
 class TbIRLE4bitFont : public TbIFont {
 public:
     TB_RESOURCE_IN_ARRAY_BLOCK

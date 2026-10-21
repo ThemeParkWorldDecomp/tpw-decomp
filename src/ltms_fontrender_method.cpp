@@ -4,6 +4,7 @@
 // (include/TbFontBits.h) are inline. The writers (DrawCharTo*) and the four method objects are unit w45b's.
 #include <cstring>
 #include <new>
+#include <vector>
 
 #include "LbDraw.h"
 #include "TbFontBits.h"
@@ -119,6 +120,7 @@ uint8_t* BufferFor(uint32_t dataSize) {
     return buffer.mBlock;
 }
 
+
 }  // namespace
 
 // 0x10000d40. The font comes from the parameters with a reference taken (GetFont); every path after that lets it go
@@ -172,8 +174,12 @@ TbError Tb4BitFontRenderMethod::DrawChar(const TbPoint& at, uint16_t glyph, TbRe
             out.Write(static_cast<uint8_t>(bit) != 0 ? 0xf : 0);
         }
     }
-    const uint16_t width = HalfAt(header, 0x10);
-    const uint16_t height = HalfAt(header, 0x12);
+    uint16_t width = HalfAt(header, 0x10);
+    uint16_t height = HalfAt(header, 0x12);
+    const uint8_t* pixels = data;
+    if ((flags & 3) != 0) pixels = FourBit::FontData::I().mBlock;
+    int32_t offsetX = static_cast<int8_t>(header[0x14]);
+    int32_t offsetY = static_cast<int8_t>(header[0x15]);
     const TbRect glyphRect = {0, 0, width, height};
     TbPoint point = at;
     if (HalfAt(header, 0) == 0x20) {
@@ -182,8 +188,8 @@ TbError Tb4BitFontRenderMethod::DrawChar(const TbPoint& at, uint16_t glyph, TbRe
         font->Release();
         return TbError(0);
     }
-    point.x += static_cast<int8_t>(header[0x14]);
-    point.y += static_cast<int8_t>(header[0x15]);
+    point.x += offsetX;
+    point.y += offsetY;
     const TbRect source = CalculateSourceRect(glyphRect, point, *area);
     if (source.left == source.right || source.top == source.bottom) {
         font->Release();
@@ -193,8 +199,6 @@ TbError Tb4BitFontRenderMethod::DrawChar(const TbPoint& at, uint16_t glyph, TbRe
     if (point.x < clip->left) point.x = clip->left;
     if (point.y < clip->top) point.y = clip->top;
     drawn = {point.x, point.y, point.x + (source.right - source.left), point.y + (source.bottom - source.top)};
-    const uint8_t* pixels = data;
-    if ((flags & 3) != 0) pixels = FourBit::FontData::I().mBlock;
     C4BitFontRenderMethodParameters record;
     record.mPoint = &point;
     record.mData = pixels;

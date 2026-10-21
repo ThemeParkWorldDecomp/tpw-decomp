@@ -16,6 +16,7 @@
 
 #include "LbPalette.h"
 #include "TbFontRenderParams.h"
+#include "TbIRLE4bitFont.h"
 #include "TbGraphicFile.h"
 #include "TbColour.h"
 #include "UI_Base.h"
