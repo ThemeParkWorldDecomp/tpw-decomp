@@ -11,6 +11,7 @@
 #include "UI_Base.h"
 #include "ui_main.h"
 #include "ui_mainmenu.h"
+#include "ui_menu.h"
 
 using namespace calllog;
 
@@ -56,9 +57,12 @@ uint64_t tpw_uimenu_alloc(uint32_t size) { return static_cast<uint64_t>(reinterp
 
 void tpw_uimenu_set_extra(uint64_t p) { gExtra0 = reinterpret_cast<void*>(static_cast<uintptr_t>(p)); }
 
+// The host menu's layout: out[0] the offset of mWindow, out[1] its size, out[2] sizeof(UIMenu).
 int32_t tpw_uimenu_layout(int64_t* out) {
-    out[0] = 0;
-    return 0;
+    out[0] = static_cast<int64_t>(offsetof(UIMenu, mWindow));
+    out[1] = static_cast<int64_t>(sizeof(InterfaceWindow*));
+    out[2] = static_cast<int64_t>(sizeof(UIMenu));
+    return 3;
 }
 
 uint32_t tpw_uimenu_item(uint64_t w, int32_t m, int32_t a, int32_t b) {

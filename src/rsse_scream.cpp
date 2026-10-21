@@ -80,14 +80,15 @@ int32_t SCREAM_Start(int32_t handle, int32_t count, int32_t a, int32_t b, int32_
     return started;
 }
 
-// 0x100cccc0 (84 bytes): the sound parameter 6 of the handle becomes (a + b) / 2 (the sum wraps), clamped to 0..100. Handle 0: nothing.
-void SCREAM_SetLevel(int32_t handle, int32_t a, int32_t b) {
-    if (handle == 0) return;
+// 0x100cccc0 (84 bytes): the sound parameter 6 of the handle becomes (a + b) / 2 (the sum wraps), clamped to 0..100. Handle 0: nothing
+// and 0 (the original returns with the handle in r3); else SOUND_SetParamValue's answer.
+int32_t SCREAM_SetLevel(int32_t handle, int32_t a, int32_t b) {
+    if (handle == 0) return 0;
     const int32_t sum = static_cast<int32_t>(static_cast<uint32_t>(a) + static_cast<uint32_t>(b));
     int32_t level = sum / 2;
     if (level > 100) level = 100;
     if (level < 0) level = 0;
-    SOUND_SetParamValue(handle, 6, static_cast<uint32_t>(level));
+    return SOUND_SetParamValue(handle, 6, static_cast<uint32_t>(level));
 }
 
 // 0x100ccd3c (52 bytes)

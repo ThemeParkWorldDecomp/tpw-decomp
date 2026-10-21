@@ -81,7 +81,7 @@ uint32_t PlayAnim(RSSE_SCRIPT* script, uint32_t a, uint32_t anim, uint32_t loop,
 uint32_t CurrentAnim(RSSE_SCRIPT* script, uint32_t* kind, uint32_t control) {
     uint32_t id = script->mRideAnim;
     if (id == 0) return 0;
-    return processinstruction_callee::GetCurrentAnim(*GetRideFromID(id), kind, nullptr, control);
+    return GetCurrentAnim(*GetRideFromID(id), kind, nullptr, control);
 }
 
 // The animation's length less 300, at least 300 (signed).
@@ -834,7 +834,7 @@ void ProcessInstruction(RSSE_SCRIPT* script) {
     }
     case 89: {   // the screams' level; the original keeps the callee's r3 as the handle
         const int32_t level = Operand(s);
-        s->mFCC[1] = static_cast<uint32_t>(ScreamSetLevel(static_cast<int32_t>(s->mFCC[1]), level, s->mSpeed));
+        s->mFCC[1] = static_cast<uint32_t>(SCREAM_SetLevel(static_cast<int32_t>(s->mFCC[1]), level, s->mSpeed));
         break;
     }
     case 90: {   // a random script of the same kind (the same text at its mF74[0] offset): its handle

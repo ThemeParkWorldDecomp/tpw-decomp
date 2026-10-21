@@ -196,8 +196,8 @@ void tpw_ra_all(uint64_t set, float speed) { UpdateRideAnimSpeedAllChannels(rein
 void tpw_ra_imm(uint64_t set, float speed, int32_t index) {
     UpdateRideAnimSpeedImmediate(reinterpret_cast<tag_sRideAnimSet*>(set), speed, index);
 }
-void tpw_ra_cur(uint64_t set, uint64_t kind, uint64_t index, uint32_t control) {
-    GetCurrentAnim(reinterpret_cast<tag_sRideAnimSet*>(set), reinterpret_cast<uint32_t*>(kind), reinterpret_cast<uint32_t*>(index), control);
+uint32_t tpw_ra_cur(uint64_t set, uint64_t kind, uint64_t index, uint32_t control) {
+    return GetCurrentAnim(reinterpret_cast<tag_sRideAnimSet*>(set), reinterpret_cast<uint32_t*>(kind), reinterpret_cast<uint32_t*>(index), control);
 }
 void tpw_ra_flush(uint64_t set, uint32_t control) { FlushDeferredAnim(reinterpret_cast<tag_sRideAnimSet*>(set), control); }
 float tpw_ra_remain(uint64_t control) { return GetAnimRemainingMilliseconds(reinterpret_cast<sAnimTimeControl*>(control)); }

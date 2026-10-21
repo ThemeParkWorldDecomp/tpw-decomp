@@ -93,10 +93,11 @@ void SetCurRideAnim(tag_sRideAnimSet* set, uint32_t a, uint32_t anim, uint32_t l
 
 void BMP_MaskCar(tagBUMP* bump, int32_t mask) { ev("BMP_MaskCar", {lab(bump), mask}); }
 
-void GetCurrentAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control) {
+uint32_t GetCurrentAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control) {
     ev("GetCurrentAnim", {lab(set), control});
     *kind = static_cast<uint32_t>(ret("CurKind"));
     *index = static_cast<uint32_t>(ret("CurIdx"));
+    return 0;   // BMP_Move does not read the answer
 }
 
 void GetDeferredAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control) {

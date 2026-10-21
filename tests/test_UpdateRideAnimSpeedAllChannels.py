@@ -15,9 +15,9 @@ __register_global_object, ShowCityLobbyController, UIInterface::EndCoasterEdit, 
 sides that record their arguments (the strings as length and hash).
 
 The world of a case: a ride set with time controls (random words), the fly base table, the highlighted ride pointers, the clock words.
-What is compared: the answer, the control words, the out words, the globals and the event log. No fused operations. Not tested: the answers
-of GetCurrentAnim (the original leaves the flags word in r3), FlushDeferredAnim (1 or 0 in r3) and FLY_SetRunway (garbage in r3), whose
-headers declare void or an unread answer; a control index past the count (reads past the block).
+What is compared: the answer (GetCurrentAnim's is the flags word, which ProcessInstruction's ops 19 and 20 read), the control words, the
+out words, the globals and the event log. No fused operations. Not tested: the answers of FlushDeferredAnim (1 or 0 in r3) and FLY_SetRunway
+(garbage in r3), whose headers declare void or an unread answer; a control index past the count (reads past the block).
 """
 import ctypes as C
 import random
@@ -259,7 +259,7 @@ def bind(lib):
     lib.tpw_ra_addr.restype, lib.tpw_ra_addr.argtypes = u64, [C.c_char_p]
     lib.tpw_ra_alloc.restype, lib.tpw_ra_alloc.argtypes = u64, [u32]
     lib.tpw_ra_layout.argtypes = [C.POINTER(C.c_int64)]
-    sigs = {"all": (None, [u64, f32]), "imm": (None, [u64, f32, i32]), "cur": (None, [u64, u64, u64, u32]),
+    sigs = {"all": (None, [u64, f32]), "imm": (None, [u64, f32, i32]), "cur": (u32, [u64, u64, u64, u32]),
             "flush": (None, [u64, u32]), "remain": (f32, [u64]), "gettime": (u32, [i32]), "settime": (None, [u32]),
             "sinit": (None, [i32]), "cb": (None, []), "flyset": (None, [i32, i32]), "flyget": (i32, [i32]),
             "dbg": (None, []), "abort": (i32, []), "slow": (i32, []), "speed": (i32, [])}
@@ -322,8 +322,8 @@ def op_cur(s, c):
         if a:
             s.words(a, [0xA5A5A5A5, 0x5A5A5A5A])
         outs.append(a)
-    s.call(c["fn"], [s.x["set"], outs[0], outs[1], c["idx"]])
-    return 0, {"ctl": ctl_words(s), "kout": s.rd_words(outs[0], 2) if outs[0] else None, "iout": s.rd_words(outs[1], 2) if outs[1] else None}
+    r, _ = s.call(c["fn"], [s.x["set"], outs[0], outs[1], c["idx"]])
+    return r, {"ctl": ctl_words(s), "kout": s.rd_words(outs[0], 2) if outs[0] else None, "iout": s.rd_words(outs[1], 2) if outs[1] else None}
 
 
 def op_flush(s, c):

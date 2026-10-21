@@ -3,8 +3,10 @@ src/InterfaceWindow_virtuals_UIMenu_DefaultItemCallback.cpp:
   UIMenu_DefaultItemCallback 0x1018aa48, UIMenu_DefaultCallback 0x1018ab78
 
 Callees (getExtraParam, ReleaseString, UIMain_UISound, GetID, GetParent, UI_SendMessage, CallDefaultWindowHandler) are fakes on
-both sides recording their arguments; answers come from the case's queues. Extra parameter 0 answers a block that the case
-fills with nonzero words; the block is compared after the call. Not tested: DefaultCallback with message 0x14 and a NULL extra.
+both sides recording their arguments; answers come from the case's queues. Extra parameter 0 answers a menu block that the case
+fills with nonzero words. After the call the menu is compared by field: the four words, the window (UIMenu::mWindow, 4 bytes at
+0x10 on the Mac, a full pointer on the host whose initial value has a nonzero high half, so a 32-bit store shows) as "kept" or its
+new value, and whether the bytes past the menu are unchanged. Not tested: DefaultCallback with message 0x14 and a NULL extra.
 """
 import ctypes as C
 import random
@@ -106,6 +108,12 @@ class Ppc:
     def set_extra(self, a):
         self.L.extra = a
 
+    def layout(self):
+        return 0x10, 4, 0x14
+
+    def window(self):
+        return 0x55555555
+
     def call(self, fn, w, m, a, b):
         r3, _, _ = T.call_ppc(self.e, fn, [w & MASK, m & MASK, a & MASK, b & MASK])
         return r3 & MASK
@@ -137,6 +145,14 @@ class Host:
     def set_extra(self, a):
         self.lib.tpw_uimenu_set_extra(a)
 
+    def layout(self):
+        out = (C.c_int64 * 3)()
+        self.lib.tpw_uimenu_layout(out)
+        return tuple(out)
+
+    def window(self):
+        return 0x0000007855555555
+
     def call(self, fn, w, m, a, b):
         f = self.lib.tpw_uimenu_item if fn == FN_ITEM else self.lib.tpw_uimenu_def
         return f(w, s32(m), s32(a), s32(b)) & MASK
@@ -147,6 +163,7 @@ def bind(lib):
         return
     lib.tpw_uimenu_alloc.restype, lib.tpw_uimenu_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_uimenu_set_extra.restype, lib.tpw_uimenu_set_extra.argtypes = None, [C.c_uint64]
+    lib.tpw_uimenu_layout.restype, lib.tpw_uimenu_layout.argtypes = C.c_int32, [C.POINTER(C.c_int64)]
     for n in ("item", "def"):
         f = getattr(lib, "tpw_uimenu_" + n)
         f.restype, f.argtypes = C.c_uint32, [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
@@ -157,10 +174,18 @@ def run(s, case):
     try:
         blk = s.alloc(64)
         s.write(blk, b"".join(struct.pack(s.fmt, 0x11111111 * (i % 15 + 1)) for i in range(16)))
+        wo, wn, size = s.layout()
+        order = "big" if s.fmt[0] == ">" else "little"
+        s.write(blk + wo, s.window().to_bytes(wn, order))
+        before = s.read(blk, 64)
         s.set_extra(blk)
         w = s.alloc(16)
         ans = s.call(case["fn"], w, *case["args"])
-        return {"answer": ans, "log": s.log(), "block": list(struct.unpack(s.fmt[0] + "16I", s.read(blk, 64)))}
+        after = s.read(blk, 64)
+        win = after[wo:wo + wn]
+        return {"answer": ans, "log": s.log(), "fields": list(struct.unpack(s.fmt[0] + "4I", after[:16])),
+                "window": "kept" if win == before[wo:wo + wn] else int.from_bytes(win, order),
+                "tail unchanged": after[size:] == before[size:]}
     finally:
         s.done()
 

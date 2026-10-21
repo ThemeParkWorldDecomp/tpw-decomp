@@ -273,18 +273,18 @@ int32_t GetNodePos(RSSE_SCRIPT* script, JCPOINT3D* pos, JCPOINT3D* dir, int32_t 
     return I(ret("GetNodePos"));
 }
 
-namespace processinstruction_callee {
-
 uint32_t GetCurrentAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control) {
     ev("GetCurrentAnim", {lab(set), lab(index), control});
     *kind = U(ret("GetCurrentAnim.kind"));
     return U(ret("GetCurrentAnim"));
 }
 
-int32_t ScreamSetLevel(int32_t handle, int32_t a, int32_t b) {
+int32_t SCREAM_SetLevel(int32_t handle, int32_t a, int32_t b) {
     ev("SCREAM_SetLevel", {handle, a, b});
     return I(ret("SCREAM_SetLevel"));
 }
+
+namespace processinstruction_callee {
 
 int32_t Labs(int32_t value) {
     ev("labs", {value});

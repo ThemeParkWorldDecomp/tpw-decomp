@@ -215,7 +215,7 @@ void tpw_rsc_state(int32_t initialised, uint64_t head) {
 // ---- the functions, one wrapper each with C types only (pointers as uint64_t)
 static RSSE_SCRIPT* S(uint64_t p) { return reinterpret_cast<RSSE_SCRIPT*>(static_cast<uintptr_t>(p)); }
 int32_t tpw_rsc_start(int32_t h, int32_t count, int32_t a, int32_t b, int32_t p, int32_t q, int32_t r) { return SCREAM_Start(h, count, a, b, p, q, r); }
-void tpw_rsc_setlevel(int32_t h, int32_t a, int32_t b) { SCREAM_SetLevel(h, a, b); }
+int32_t tpw_rsc_setlevel(int32_t h, int32_t a, int32_t b) { return SCREAM_SetLevel(h, a, b); }
 int32_t tpw_rsc_move(int32_t h, int32_t x, int32_t y, int32_t z) { return SCREAM_Move(h, x, y, z); }
 void tpw_rsc_stop(int32_t h) { SCREAM_Stop(h); }
 int32_t tpw_rsc_single(int32_t count, int32_t a, int32_t b, int32_t p, int32_t q, int32_t r) { return SCREAM_Single(count, a, b, p, q, r); }

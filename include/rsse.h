@@ -1078,7 +1078,9 @@ int32_t RSSE_Load(void* file);   // 0x100d56bc
 // ---- Unit w171 (src/rsse_scream.cpp): a ride script's screams, the repair particle effect, DrawPeep and two getters of rsse.cpp.
 // The screams: the sound bank is gSoundBanks[1]; the handle is SOUND_SendEvent's answer. A negative count takes the group of 2 and 3.
 int32_t SCREAM_Start(int32_t handle, int32_t count, int32_t a, int32_t b, int32_t p, int32_t q, int32_t r);   // 0x100ccb30 (356 bytes)
-void SCREAM_SetLevel(int32_t handle, int32_t a, int32_t b);          // 0x100cccc0 (84 bytes): the level (a + b) / 2 clamped to 0..100
+// 0x100cccc0 (84 bytes): the level (a + b) / 2 clamped to 0..100. Answers 0 for handle 0 (r3 is the handle), else
+// SOUND_SetParamValue's answer (ProcessInstruction's op 89 keeps it as the handle).
+int32_t SCREAM_SetLevel(int32_t handle, int32_t a, int32_t b);
 int32_t SCREAM_Move(int32_t handle, int32_t x, int32_t y, int32_t z);   // 0x100ccd3c (52 bytes)
 void SCREAM_Stop(int32_t handle);                                    // 0x100ccd98 (44 bytes)
 int32_t SCREAM_Single(int32_t count, int32_t a, int32_t b, int32_t p, int32_t q, int32_t r);   // 0x100ccde8 (644 bytes)
@@ -1158,13 +1160,9 @@ void QuickCopyUnmaskedMeshVertices(tag_sMesh* from, tag_sMesh* to, int32_t force
 struct sNodeLightParams;
 // 0x100647ec (56 bytes, untranslated): the light of the ride `ride`'s data node `index` (FindDataNodeIndexByID's answer for mask 0x20000).
 sNodeLightParams* GetLightsourceHandle(uint32_t ride, uint32_t index);
-// ProcessInstruction uses the answer (r3) of calls the declarations above make void, and reaches the C library through glue imports:
-// these are those forms, the callee and the import by another name (the test library fakes them; the program has no definitions yet).
+// ProcessInstruction (and FLY_ForceExtractPeep's Labs) reach the C library through glue imports: these are the imports by another
+// name, so that the test libraries can record them. The program's definitions are platform/rsse_dispatch.cpp.
 namespace processinstruction_callee {
-// 0x100c7a00 (GetCurrentAnim, BMP_InsideArea.h): the answer's bit 2 (4) tells the animation ended.
-uint32_t GetCurrentAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control);
-// 0x100cccc0 (SCREAM_SetLevel above): r3 after it is the handle (0: returned at once) or SOUND_SetParamValue's answer; op 89 stores it.
-int32_t ScreamSetLevel(int32_t handle, int32_t a, int32_t b);
 int32_t Labs(int32_t value);                             // labs, glue 0x10239928
 char* StrCpy(char* to, const char* from);                // strcpy, glue 0x10238410
 char* StrCat(char* to, const char* from);                // strcat, glue 0x102385c0

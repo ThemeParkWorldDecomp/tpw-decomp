@@ -190,7 +190,8 @@ int32_t BumpToPoint(tagBUMP* bump, int32_t x, int32_t y);   // 0x1002992c
 int32_t SetNavRoute(tagBUMP* bump, int32_t x, int32_t y);   // 0x100297cc
 void BMP_MaskCar(tagBUMP* bump, int32_t mask);      // 0x1002ae74 (outside the unit)
 void PossitionSound1(tagBUMP* bump);                // 0x1002b248 (outside the unit)
-void GetCurrentAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control);   // 0x100c7a00 (outside the unit)
+// 0x100c7a00 (outside the unit): the playing animation's kind and place; answers the time control's flags word (4: it ended).
+uint32_t GetCurrentAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control);
 
 // Unit v5630: the advisor save (src/host_leaves_Write_BumpToChunk_BMP_Save.cpp). The views BMP_Save reads by Mac offset (names
 // invented). The ride record's words it writes: 0x04, 0x10, 0x14, 0x18, 0x1c, 0x50, 0xb0, 0xb4, 0xb8; its lists at 0xbc

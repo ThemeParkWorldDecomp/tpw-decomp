@@ -55,7 +55,7 @@ HOST_LAYOUT = [0xF4, 32, 12, 4, 8, 0xC, 0x4000, 24, 0xE, 0x10]
 # (name, argument kinds: p pointer, i int32; the answer: None void, "u" a word)
 OPS = {
     "start": (FN_START, "start", "iiiiiii", "u"),
-    "setlevel": (FN_SETLEVEL, "setlevel", "iii", None),
+    "setlevel": (FN_SETLEVEL, "setlevel", "iii", "u"),
     "move": (FN_MOVE, "move", "iiii", "u"),
     "stop": (FN_STOP, "stop", "i", None),
     "single": (FN_SINGLE, "single", "iiiiii", "u"),

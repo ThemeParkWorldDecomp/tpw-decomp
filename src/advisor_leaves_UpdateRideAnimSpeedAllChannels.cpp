@@ -34,10 +34,12 @@ void UpdateRideAnimSpeedImmediate(tag_sRideAnimSet* set, float speed, int32_t fl
     static_cast<sAnimTimeControl*>(set->mTimeControls)[static_cast<uint32_t>(flag)].mF0C = speed;
 }
 
-void GetCurrentAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control) {
+// The answer is the time control's flags word (r3 is loaded from it last).
+uint32_t GetCurrentAnim(tag_sRideAnimSet* set, uint32_t* kind, uint32_t* index, uint32_t control) {
     const sAnimTimeControl& time = static_cast<sAnimTimeControl*>(set->mTimeControls)[control];
     if (kind != nullptr) *kind = time.mF04;
     if (index != nullptr) *index = time.mF08;
+    return time.mFlags;
 }
 
 void FlushDeferredAnim(tag_sRideAnimSet* set, uint32_t flag) {

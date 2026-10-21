@@ -99,7 +99,10 @@ int32_t SCREAM_Move(int32_t handle, int32_t x, int32_t y, int32_t z) {
     return static_cast<int32_t>(ret("SCREAM_Move", 0));
 }
 
-void SCREAM_SetLevel(int32_t handle, int32_t a, int32_t b) { ev("SCREAM_SetLevel", {handle, a, b}); }
+int32_t SCREAM_SetLevel(int32_t handle, int32_t a, int32_t b) {   // the bend does not read the answer
+    ev("SCREAM_SetLevel", {handle, a, b});
+    return 0;
+}
 
 void SCREAM_Stop(int32_t handle) { ev("SCREAM_Stop", {handle}); }
 
