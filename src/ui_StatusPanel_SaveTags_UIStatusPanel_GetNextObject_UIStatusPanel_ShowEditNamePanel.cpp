@@ -23,7 +23,7 @@ void UIStatusPanel::ShowEditNamePanel() {
     CObject* object = reinterpret_cast<CObject*>(thing);
 
     InterfaceWindow* parent = parentField.get();
-    int16_t z = *reinterpret_cast<int16_t*>(reinterpret_cast<uint8_t*>(parent) + 0xdc);
+    int16_t z = parent->mZ;   // the Mac's +0xdc, by name: the host window is laid out differently
     InterfaceWindow* window = parent->Build(gEditNamePanelScript, TwoEditsMsg);
     windowField.set(window);
     window->setZ(static_cast<int16_t>(z + 0x11));

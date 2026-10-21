@@ -23,6 +23,7 @@
 #include "analyser.h"
 #include "calllog.h"
 #include "platform/arena.h"
+#include "ride_layout.h"
 #include "platform/d3d_types.h"
 #include "ui_main.h"
 

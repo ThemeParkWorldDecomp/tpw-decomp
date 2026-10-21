@@ -18,6 +18,7 @@
 #include "analyser.h"
 #include "BMP_InsideArea.h"
 #include "ThingReceivers.h"
+#include "RideDB.h"
 
 // Two words of the image that no other file names (initialised data).
 uint16_t gLLCCE0B0 = 0;        // 0x1029e0b0
@@ -146,7 +147,7 @@ int32_t LLCC_BuildTrackDB(bool flag) {
                         CObject* object = static_cast<CObject*>(gThingArray[found].mThing);
                         if (object != nullptr) {
                             thing = *reinterpret_cast<uint32_t*>(reinterpret_cast<char*>(object) + 0x1c);
-                            info = *reinterpret_cast<int32_t*>(reinterpret_cast<char*>(object->GetDBInfo()) + 0x10);
+                            info = object->GetDBInfo()->Value(kRideSlot_Id).mInteger;   // the Mac's +0x10, by name: the host's record is laid out wider
                         }
                     }
                 } else {

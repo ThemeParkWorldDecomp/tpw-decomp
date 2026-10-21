@@ -15,6 +15,7 @@
 #include "ActionRecorder.h"
 #include "TPEngine.h"
 #include "ThingReceivers.h"
+#include "RideDB.h"
 
 namespace {
 // 0x1023e42d: the assertion text of the thing table's entry 0.
@@ -45,7 +46,7 @@ int32_t CMapCell::ConnectionType(CELL_MODES modeIn, int32_t flag) {
             tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> objectType;
             objectType.mIndex = *reinterpret_cast<const uint16_t*>(thing + 0xe);
             RideInfo* const ride = gRideDatabase.GetRideInfo(objectType);
-            gLLCCDE0B4 = *reinterpret_cast<const int32_t*>(reinterpret_cast<const char*>(ride) + 0x54);
+            gLLCCDE0B4 = ride->Value(kRideSlot_OverwritePriority).mInteger;   // the Mac's +0x54, by name: the host's record is laid out wider
         }
     }
     if (gLLCCC214 == 0 && mode == 0x15 && static_cast<int32_t>(mType) == 0x15 && IsFlag(0x100) != 0 && mParentID == gLLCCDB68) {

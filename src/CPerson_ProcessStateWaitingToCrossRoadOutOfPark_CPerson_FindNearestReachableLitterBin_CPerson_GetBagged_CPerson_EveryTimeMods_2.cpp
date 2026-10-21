@@ -2,6 +2,7 @@
 // (unit v51016). The person and the objects are reached by Mac offset.
 #include <cstdint>
 #include "ThingReceivers.h"
+#include "RideDB.h"
 #include "Debug.h"
 #include "analyser.h"
 #include "MainBalance.h"
@@ -32,7 +33,8 @@ template <class T>
 inline T& Fld(uint8_t* base, uint32_t offset) { return *reinterpret_cast<T*>(base + offset); }
 
 // The rider counts and the opinion buckets switch on the ride record's +0x7a8 (the UI type).
-inline int32_t UIType(CObject* object) { return Fld<int32_t>(Raw(object->GetDBInfo()), 0x7a8); }
+// The ride record's words are read by name (the Mac's +0x7a8, +0xe8, +0x158, +0x15c): the host's record is laid out wider.
+inline int32_t UIType(CObject* object) { return object->GetDBInfo()->mUIType; }
 
 }  // namespace
 
@@ -51,7 +53,7 @@ void CPerson::EveryTimeMods(CObject* object) {
     }
     PayPricePerUseForObject(object);
     object->HadCustomer();
-    float cost = static_cast<float>(Fld<int32_t>(Raw(object->GetDBInfo()), 0xe8));
+    float cost = static_cast<float>(object->GetDBInfo()->Value(kRideSlot_FatigueEffect).mInteger);
     float happy = Fld<float>(self, 0x1b8);
     float after = -cost + happy;
     if (after > 100.0f) {
@@ -88,7 +90,7 @@ void CPerson::UseObject(CObject* object) {
     EveryTimeMods(object);
     if (Fld<uint8_t>(self, 0x1f1) == 0) {
         LosingMods(object);
-        if (Fld<int32_t>(Raw(gRideDatabase.GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{Fld<uint16_t>(Raw(object), 0xe)})), 0x7a8) == 2) {
+        if (gRideDatabase.GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{Fld<uint16_t>(Raw(object), 0xe)})->mUIType == 2) {
             thoughts->ShowThoughtBubble(static_cast<CThoughts::ThoughtType>(6), false);
             thoughts->RecordEvent(static_cast<CThoughts::EventType>(0x19), thingObject->GetThingId());
         }
@@ -107,7 +109,7 @@ void CPerson::UseObject(CObject* object) {
     if (kind == 2) {
         gWorld->GetParkAnalyser()->OfferOpinionOn(0x12, value);
     } else if (kind < 2 && kind > 0) {
-        int32_t a = Fld<int32_t>(Raw(object->GetDBInfo()), 0x158);
+        int32_t a = object->GetDBInfo()->Value(kRideSlot_SpecialIngredient).mInteger;
         if (a == 2) {
             gWorld->GetParkAnalyser()->OfferOpinionOn(0xb, value);
         } else if (a < 2) {
@@ -117,7 +119,7 @@ void CPerson::UseObject(CObject* object) {
         } else if (a < 4) {
             gWorld->GetParkAnalyser()->OfferOpinionOn(0xc, value);
         }
-        int32_t b = Fld<int32_t>(Raw(object->GetDBInfo()), 0x15c);
+        int32_t b = object->GetDBInfo()->Value(kRideSlot_AppearanceEffect).mInteger;
         if (b == 1) {
             gWorld->GetParkAnalyser()->OfferOpinionOn(0xf, value);
         } else if (b > 0 && b < 3) {
@@ -125,7 +127,7 @@ void CPerson::UseObject(CObject* object) {
         }
     }
     object->HadAWinner();
-    if (Fld<int32_t>(Raw(gRideDatabase.GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{Fld<uint16_t>(Raw(object), 0xe)})), 0x7a8) == 2) {
+    if (gRideDatabase.GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{Fld<uint16_t>(Raw(object), 0xe)})->mUIType == 2) {
         thoughts->ShowThoughtBubble(static_cast<CThoughts::ThoughtType>(5), false);
         thoughts->RecordEvent(static_cast<CThoughts::EventType>(0x18), thingObject->GetThingId());
     }

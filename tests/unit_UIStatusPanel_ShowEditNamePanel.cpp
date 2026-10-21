@@ -163,8 +163,10 @@ uint64_t tpw_ses_addr(const char* name) {
 uint64_t tpw_ses_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
 
 int32_t tpw_ses_layout(int64_t* out) {
-    (void)out;
-    return 0;
+    int32_t n = 0;
+    out[n++] = static_cast<int64_t>(offsetof(InterfaceWindow, mZ));
+    out[n++] = static_cast<int64_t>(sizeof(InterfaceWindow));
+    return n;
 }
 
 void tpw_ses_setworld(const uint64_t* world) { std::memcpy(gWorld, world, sizeof gWorld); }

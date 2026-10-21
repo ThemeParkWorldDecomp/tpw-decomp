@@ -1,5 +1,6 @@
 #include <cstdint>
 #include "ThingReceivers.h"
+#include "RideDB.h"
 #include "Debug.h"
 #include "analyser.h"
 #include "MainBalance.h"
@@ -129,7 +130,8 @@ void CPerson::ProcessStateStandingInQueue() {
             leave = true;
         } else {
             RideInfo* info = object->GetDBInfo();
-            if (Fld<int32_t>(Raw(info), 0x9c) == 1 && Fld<int32_t>(obj, 0x28) == 0) leave = true;
+            // The WhichTrackType slot (the Mac's +0x9c) by name: the host's record is laid out wider.
+            if (info->Value(kRideSlot_WhichTrackType).mInteger == 1 && Fld<int32_t>(obj, 0x28) == 0) leave = true;
         }
         if (leave) {
             thoughts->ShowThoughtBubble(static_cast<CThoughts::ThoughtType>(0xd), false);

@@ -8,6 +8,7 @@
 #include "Debug.h"
 #include "MapCell.h"
 #include "Ptr32.h"
+#include "RideDB.h"
 #include "TPCamera.h"
 #include "ThingReceivers.h"
 #include "World.h"
@@ -46,7 +47,8 @@ CObject* GetThingAtPosnIfEntrance(int32_t gridX, int32_t gridZ) {
                 char* const thing = static_cast<char*>(gThingArray[id].mThing);
                 if (At<uint8_t>(thing, 2) == 3) {
                     const RideInfo* info = reinterpret_cast<CObject*>(thing)->GetDBInfo();
-                    if (At<int32_t>(const_cast<RideInfo*>(info), 0x118) == 0) return reinterpret_cast<CObject*>(thing);
+                    // The CannotRide slot (the Mac's +0x118) by name: the host's record is laid out wider.
+                    if (info->Value(kRideSlot_CannotRide).mInteger == 0) return reinterpret_cast<CObject*>(thing);
                 }
                 id = At<uint16_t>(thing, 0xa);
             }

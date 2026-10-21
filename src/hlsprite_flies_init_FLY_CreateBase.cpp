@@ -8,6 +8,7 @@
 #include "analyser.h"
 #include "HLSprite.h"
 #include "LbFile.h"
+#include "RideDB.h"
 #include "TPEngine.h"
 #include "TPSound.h"
 #include "World.h"
@@ -110,8 +111,7 @@ int32_t EmployEric(int32_t index) {
     uint16_t rideType;
     std::memcpy(&rideType, static_cast<uint8_t*>(gThingArray[thingNo].mThing) + 0xe, 2);
     RideInfo* info = gRideDatabase.GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{rideType});
-    uint32_t rideNo;
-    std::memcpy(&rideNo, reinterpret_cast<uint8_t*>(info) + 0x7b8, 4);
+    const uint32_t rideNo = info->mSubRideTypes[0];   // the Mac's +0x7b8, by name: the host's record is laid out wider
     Wd(p, 0xc0) = static_cast<int32_t>(InstanceRide(rideNo, 0x101, nullptr, 0, 0, nullptr, 0, 0, 0xffffffffu, 0));
     uint8_t* q = static_cast<uint8_t*>(*entry) + k * 0xe4 + 0x5c;
     if (Wd(q, 0xc0) != 0 && (Wd(q, 0xcc) != 0 || Wd(q, 0xd0) != 0 || Wd(q, 0xd4) != 0)) {

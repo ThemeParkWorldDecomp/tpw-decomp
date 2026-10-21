@@ -12,7 +12,9 @@ arguments (pointers as labels, texts as a hash of their 16-bit units) and answer
 The world of a case: the lobby (window, state), the screen system (three screens), the root window, the online system pointer, the find
 panel, the info panel pointer, the park block's id, the two function pointer globals, what GetParent answers (NULL, a block whose first
 byte is nonzero or zero, the lobby window, the root window) and the queues of the fakes. What is compared: the answer, the event log, the
-pointer globals (as set / not set), the lobby state and the start of the conversion buffer.
+pointer globals (as set / not set), the lobby state and the start of the conversion buffer. The parent block's destroying flag is
+written at the Mac's byte 0 on the PPC side and at the host window's mDestroying (from tpw_opi_layout) on the host side: the host
+window has its vtable pointer first.
 
 Not fused operations. Not tested: the guard byte 0 of GeneralParkDownloadCompleteCallback (the host's function-local static cannot be put
 back to "not constructed" between cases; the host object is made before every case, so only the guard nonzero path is compared), a NULL
@@ -46,7 +48,7 @@ ADDR = dict(gLobby=0x102E4888, gLobbyScreens=0x102E49B8, gOnlineSystem=0x10380AB
             info=0x103961E4, ctx=0x1039610C, fnpost=0x10396110, fnclose=0x10396114, park=0x10396118, strA=0x103960CC,
             nodeA=0x103960E0, strB=0x103960EC, nodeB=0x10396100, buf=0x10380C48, gametype=0x102B3AA0, guard=0x102B3AA4,
             pool=0x1024F01E)
-MAC_OFF = dict(lw=4, ls=0x14, on=8, dl=0xC, adv=0x14, pid=8)
+MAC_OFF = dict(lw=4, ls=0x14, on=8, dl=0xC, adv=0x14, pid=8, dest=0)
 
 # the blocks of a case and their labels
 BLOCKS = [("win", 1), ("parentp", 2), ("lobbywin", 3), ("rootwin", 4), ("lobby", 5), ("screens", 6), ("scr_online", 7), ("scr_dl", 8),
@@ -344,7 +346,7 @@ def bind(lib):
     out = (C.c_int64 * 32)()
     n = lib.tpw_opi_layout(out)
     v = list(out)[:n]
-    lib.off = dict(lw=v[0], ls=v[1], on=v[2], dl=v[3], adv=v[4], pid=v[5])
+    lib.off = dict(lw=v[0], ls=v[1], on=v[2], dl=v[3], adv=v[4], pid=v[5], dest=v[7])
     lib.bound = True
 
 
@@ -368,7 +370,7 @@ def build(s, case):
     s.ptr(s.g("info"), o["win"])
     s.ptr(s.g("ctx"), case["ctx"])
     s.words(s.g("park") + off["pid"], [case["parkid"]])
-    s.write(o["parentp"], bytes([case["pbyte"] if case["parent"] == 1 else 0]))
+    s.write(o["parentp"] + off["dest"], bytes([case["pbyte"] if case["parent"] == 1 else 0]))
     s.write(s.g("buf"), b"\0" * 128)
     s.setup_calls(case, parent)
 

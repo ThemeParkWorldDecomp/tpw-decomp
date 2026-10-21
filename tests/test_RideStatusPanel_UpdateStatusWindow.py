@@ -13,7 +13,8 @@ window blocks hold a table of TVectors that point at the real functions' address
 The world of a case: the panel (state, the windows, the table, the three figures), the ride object (object type, the condition float), the
 ride record's word at +0x9c, the windows by id (some missing), the strings, fonts and draw objects the getters answer, gStaffRoomPanelThing
 and the table that gText holds at its resource 6. What is compared: the event log, the panel's fields (the windows as labels), the object's
-type and condition and the upgrade script's first words.
+type and condition and the upgrade script's first words. The ride record's word is written at the Mac's +0x9c on the PPC side and at the
+host field of the same name on the host side (tests/ridelayout.py).
 
 No fused operations; the fctiwz of the condition is run under HardwareRounding (the values stay within +-1e9). The conversion the Mac does
 through the runtime at 0x10237cd8 (a double sum to a 32-bit integer) is a fake on the PowerPC side (the low word of the truncation).
@@ -28,6 +29,7 @@ import struct
 from unicorn import UC_HOOK_CODE
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 from test_DynamicMesh import HardwareRounding
@@ -229,6 +231,9 @@ class Ppc(Side):
     def poff(self, name):
         return MAC_PANEL[name]
 
+    def rec(self, mac):
+        return mac
+
     def alloc(self, n):
         return self.e.alloc(n)
 
@@ -299,6 +304,9 @@ class Host(Side):
     def poff(self, name):
         return HOST[name]
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
     def alloc(self, n):
         return self.lib.tpw_rsp_alloc(n)
 
@@ -361,6 +369,7 @@ def bind(lib):
     keys = ["state", "f08", "win", "swin", "ops", "uwin", "speed", "capacity", "duration", "size", "res6", "z"]
     HOST.update(dict(zip(keys, v[4:])))
     HOST["objsize"] = v[3]
+    ridelayout.bind(lib)
     lib.bound = True
 
 
@@ -374,7 +383,7 @@ def make_world(s, case):
     objsize = 0x500
     obj = s.alloc(objsize + 16)
     panel = s.alloc(s.panel_size())
-    info = s.alloc(0x400)
+    info = s.alloc(s.rec(0x9C) + 4)
     table = s.alloc(0x40)
     font, draw = s.alloc(16), s.alloc(16)
     main = s.newwindow()
@@ -385,7 +394,7 @@ def make_world(s, case):
     # the object
     s.write(obj + 0x0E, struct.pack(s.fmt[0] + "H", case["objtype"]))
     s.words(obj + 0x40, [case["f40"]])
-    s.words(info + 0x9C, [case["info9c"]])
+    s.words(info + s.rec(0x9C), [case["info9c"]])
     # the panel
     s.setf(panel, "state", case["state"])
     s.setf(panel, "f08", case["f08"])

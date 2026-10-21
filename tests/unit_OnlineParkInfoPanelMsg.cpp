@@ -214,6 +214,7 @@ int32_t tpw_opi_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(CLBScreenSystem, mAdvisor));
     out[n++] = static_cast<int64_t>(offsetof(CFSOnlinePark, mParkID));
     out[n++] = static_cast<int64_t>(sizeof(CFSOnlinePark));
+    out[n++] = static_cast<int64_t>(offsetof(InterfaceWindow, mDestroying));
     return n;
 }
 

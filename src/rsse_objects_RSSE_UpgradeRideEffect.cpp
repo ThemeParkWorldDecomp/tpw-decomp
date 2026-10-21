@@ -41,7 +41,8 @@ void RSSE_UpgradeRideEffect(int32_t handle) {
     GAME_ASSERTMSG(gThingArray[0].mThing == nullptr, kRowZero);
     const CObject* thing = static_cast<const CObject*>(gThingArray[thingId].mThing);
     RideInfo* info = gRideDatabase.GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{thing->mObjectType});
-    const int32_t emitterType = *reinterpret_cast<const int32_t*>(reinterpret_cast<const char*>(info) + 0x6c);
+    // The UpgradeParticleEffect slot (the Mac's +0x6c) by name: the host's record is laid out wider (a vtable and 8-byte slots).
+    const int32_t emitterType = info->Value(kRideSlot_UpgradeParticleEffect).mInteger;
     if (emitterType == 0) return;
 
     float x;

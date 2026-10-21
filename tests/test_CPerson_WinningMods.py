@@ -7,7 +7,8 @@ A case is a world and a call. The world is built twice by ONE piece of Python co
 for the original, and in the host library's memory (little-endian) for the translation; the same code reads both back. The callees
 outside the unit (the thing id, the thoughts, the ride record, the ride's takings and quality, the sound, the happiness helpers, the
 world's random numbers, the sprite scripts, CTRACE and GAME_ASSERTMSG) are fakes on both sides that record their arguments and answer from
-the case. The ride record (GetDBInfo) is one block with the words at +0x144 .. +0x15c and +0x7a8.
+the case. The ride record (GetDBInfo) is one block with the words at +0x144 .. +0x15c and +0x7a8: the Mac's offsets on the PPC side, the
+host fields of the same names on the host side (tests/ridelayout.py).
 
 The world of a case: the person (random bytes with the floats, words and halfwords the function touches set), the object (flag halfword
 at +0x2e), the ride record, the world pointer, the sound bank word, the person table halfword and the answer queues. What is compared:
@@ -21,6 +22,7 @@ import random
 import struct
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -196,6 +198,9 @@ class Ppc(Side):
         self.L = e.cl = CL.PpcLog({self.person: 1, self.obj: 2, self.person + 0x30: 3, self.world: 4}, case["queues"])
         self.saved = STUBS.activate(e)
 
+    def rec(self, mac):
+        return mac
+
     def done(self):
         CL.Stubs.deactivate(self.e, self.saved)
 
@@ -228,7 +233,7 @@ class Host(Side):
         self.person = lib.tpw_wm_alloc(PERSON_SIZE)
         self.obj = lib.tpw_wm_alloc(0x40)
         self.world = lib.tpw_wm_alloc(0x40)
-        self.info = lib.tpw_wm_alloc(INFO_SIZE)
+        self.info = lib.tpw_wm_alloc(max(INFO_SIZE, ridelayout.host_size(lib)))
         CL.host_begin(lib, {1: self.person, 2: self.obj, 3: self.person + 0x30, 4: self.world}, case["queues"])
 
     def done(self):
@@ -236,6 +241,9 @@ class Host(Side):
 
     def g(self, name):
         return self.lib.tpw_wm_addr(name.encode())
+
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
 
     def ptr(self, a, v):
         self.write(a, struct.pack("<Q", v))
@@ -260,6 +268,7 @@ def bind(lib):
     lib.tpw_wm_alloc.restype, lib.tpw_wm_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_wm_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_wm_winning.restype, lib.tpw_wm_winning.argtypes = None, [C.c_uint64, C.c_uint64]
+    ridelayout.bind(lib)
     out = (C.c_int64 * 32)()
     n = lib.tpw_wm_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -278,8 +287,9 @@ def build(s, case):
     for off, h in zip(HALFS, case["halfs"]):
         s.half(s.person + off, h)
     s.half(s.obj + 0x2E, case["flag"])
-    s.words(s.info + 0x144, case["d"])        # 0x144 .. 0x15c: seven words
-    s.words(s.info + 0x7A8, [case["ui"]])
+    for i, w in enumerate(case["d"]):         # 0x144 .. 0x15c: seven words
+        s.words(s.info + s.rec(0x144 + 4 * i), [w])
+    s.words(s.info + s.rec(0x7A8), [case["ui"]])
     s.ptr(s.g("gworld"), s.world)
     s.words(s.g("sound") + 4, [case["snd"]])
     s.half(s.g("ptable") + 2, case["ptab"])

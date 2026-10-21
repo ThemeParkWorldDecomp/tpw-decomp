@@ -9,6 +9,8 @@ argument and answer from the case.
 
 The world of a case: the script list (the target among others), the skipped thing id, the thing table, the ride anim sets (a chain down to
 the float at node +0x44), the ride record's emitter word (+0x6c), the sound bank. What is compared: the event log (every call and argument).
+The ride record's word is written at the Mac's +0x6c on the PPC side and at the host field of the same name on the host side
+(tests/ridelayout.py).
 
 No fused operations; fctiwz stays far below 2^31. Not tested: the system not initialised or an unknown handle (the original then reads
 a NULL script).
@@ -18,6 +20,7 @@ import random
 import struct
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -129,6 +132,9 @@ class Ppc(Side):
     def set_info(self, a):
         self.e.info_block = a
 
+    def rec(self, mac):
+        return mac
+
     def make_anim(self, idx, bits):
         node = self.alloc(0x100)
         self.words(node + 0x44, [bits])
@@ -185,6 +191,9 @@ class Host(Side):
     def set_info(self, a):
         self.lib.tpw_ur_set_info(a)
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
     def make_anim(self, idx, bits):
         self.lib.tpw_ur_make_anim(idx, bits)
 
@@ -208,6 +217,7 @@ def bind(lib):
     out = (C.c_int64 * 32)()
     n = lib.tpw_ur_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    ridelayout.bind(lib)
     lib.bound = True
 
 
@@ -229,8 +239,8 @@ def build(s, case):
         s.link(a, b)
     for i, typ in case["things"].items():
         s.set_thing(i, typ)
-    info = s.alloc(0x100)
-    s.words(info + 0x6C, [case["emitter"]])
+    info = s.alloc(max(0x100, s.rec(0x6C) + 4))
+    s.words(info + s.rec(0x6C), [case["emitter"]])
     s.set_info(info)
     for idx, bits in case["anims"].items():
         s.make_anim(idx, bits)

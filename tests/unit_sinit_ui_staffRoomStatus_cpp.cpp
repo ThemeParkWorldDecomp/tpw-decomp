@@ -191,6 +191,8 @@ void tpw_sr_setobjs(const uint64_t* values) {
 int32_t tpw_sr_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = static_cast<int64_t>(offsetof(StaffRoomPanelFields, mScript));
+    out[n++] = static_cast<int64_t>(offsetof(InterfaceWindow, mZ));
+    out[n++] = static_cast<int64_t>(sizeof(InterfaceWindow));
     return n;
 }
 

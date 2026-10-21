@@ -10,6 +10,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "ride_layout.h"
 #include "ThingReceivers.h"
 #include "Debug.h"
 #include "analyser.h"

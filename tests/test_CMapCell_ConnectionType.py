@@ -8,7 +8,8 @@ original, and in the host library's memory (little-endian) for the translation. 
 each), the track cells 0x110000 further (0x28 each), a ride record, eight things and a bank account behind them. The callees outside the unit
 (IsFlag, GetObjectThingId, GAME_ASSERTMSG, GetRideInfo, the LLCC cost getters, GetTrackCellEquiv, the track cell predicates, ValidTypeChange,
 CMapCell::IsTrack, the neighbour getters, GetBankAccount, GetBalance, LLCM_SetIllegalPlacement) are fakes on both sides that record their
-arguments (cells as the offset from the world block) and answer from the case's queues.
+arguments (cells as the offset from the world block) and answer from the case's queues. The ride record's overwrite priority is written at
+the Mac's +0x54 on the PPC side and at the host field of the same name on the host side (tests/ridelayout.py); it stays below the things.
 
 The world of a case: the mode and flag, the cell's type, parent id, the track cells and map cells, the cell system's globals, the thing table,
 the action recorder's state. What is compared: the answer, the five reason flags, gLLCCDE0B4 and the event log.
@@ -20,6 +21,7 @@ import random
 import struct
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -212,6 +214,9 @@ class Ppc(Side):
     def alloc(self, n):
         return self.e.alloc(n, bytes(n))
 
+    def rec(self, mac):
+        return mac
+
     def read(self, a, n):
         return self.e.read(a, n)
 
@@ -247,6 +252,9 @@ class Host(Side):
     def alloc(self, n):
         return self.lib.tpw_cmct_alloc(n)
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
     def read(self, a, n):
         return C.string_at(a, n)
 
@@ -272,6 +280,7 @@ def bind(lib):
     n = getattr(lib, p + "layout")(out)
     assert list(out)[:n - 1] == HOST_LAYOUT, list(out)[:n]
     lib.stride = out[n - 1]
+    ridelayout.bind(lib)
     lib.bound = True
 
 
@@ -298,7 +307,8 @@ def build(s, case):
         s.byte(th + 2, case["kind"][i])
         s.half(th + 0xE, case["objtype"][i])
         s.ptr(s.g("thingarray") + i * s.stride, 0 if (i == 0 and case["slot0null"]) else th)
-    s.words(w + RIDE + 0x54, [case["ride"]])
+    assert s.rec(0x54) + 4 <= THINGS - RIDE
+    s.words(w + RIDE + s.rec(0x54), [case["ride"]])
     for name in ("c200", "c204", "c208", "c210", "c214", "db40", "db60", "de0b4", "de0b8", "e0dc", "lock", "join", "recording"):
         s.words(s.g(name), [case[name]])
     s.half(s.g("db68"), case["db68"])

@@ -9,6 +9,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "ride_layout.h"
 #include "ObjectParts.h"
 #include "MapCell.h"
 #include "TrackCell.h"

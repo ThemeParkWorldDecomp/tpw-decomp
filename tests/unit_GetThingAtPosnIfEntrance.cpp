@@ -18,6 +18,7 @@
 #include "World.h"
 #include "calllog.h"
 #include "platform/arena.h"
+#include "ride_layout.h"
 
 using namespace calllog;
 

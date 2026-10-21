@@ -93,7 +93,8 @@ int32_t OnlineParkInfoPanelMsg(InterfaceWindow* window, int32_t message, int32_t
     } else if (message < 0x100) {
         if (message == 0x14) {
             gOnlineParkInfoPanel = nullptr;
-            if (window->GetParent() != nullptr && *reinterpret_cast<const int8_t*>(window->GetParent()) == 0)
+            // The parent's destroying flag (the Mac's byte 0) by name: the host window has its vtable pointer first.
+            if (window->GetParent() != nullptr && window->GetParent()->mDestroying == 0)
                 window->GetParent()->CaptureKb(0);
             else
                 UIMain_DecideKbCapture();

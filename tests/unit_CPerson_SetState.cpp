@@ -9,6 +9,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "ride_layout.h"
 #include "ThingReceivers.h"
 #include "World.h"
 #include "Debug.h"

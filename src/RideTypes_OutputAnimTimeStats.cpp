@@ -95,8 +95,9 @@ uint32_t RestoreRideInstance(uint32_t instance, uint32_t type, uint32_t flags, s
                 break;
             }
             if (info != nullptr) {
-                uint32_t word = *reinterpret_cast<const uint32_t*>(reinterpret_cast<const char*>(info) + 0x18);
-                if (word != static_cast<uint32_t>(reinterpret_cast<uintptr_t>(params->mF0C))) continue;
+                // The record's Shape slot (the Mac's +0x18) against the params' shape: whole pointers, by name (the Mac's compare is of
+                // its 32-bit pointers; the host's record is laid out wider and its slot holds a native pointer).
+                if (info->Value(kRideSlot_Shape).mShape != params->mF0C) continue;
                 found = true;
                 instance = i;
                 break;

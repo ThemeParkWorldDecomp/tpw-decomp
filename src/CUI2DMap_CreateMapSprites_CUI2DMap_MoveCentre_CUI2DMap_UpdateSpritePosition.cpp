@@ -8,6 +8,7 @@
 #include "DrawRenderClasses.h"
 #include "DrawState.h"
 #include "Light.h"
+#include "RideDB.h"
 #include "TPCoaster.h"
 #include "TPMain.h"
 #include "TbGraphicFile.h"
@@ -189,7 +190,7 @@ void CUI2DMap::StoreMapGridDetails() {
                     if (static_cast<CThing*>(gThingArray[thingId].mThing)->mKind == 3) {
                         GAME_ASSERTMSG(gThingArray[0].mThing == nullptr, kThingZeroMessage);
                         CObject* object = static_cast<CObject*>(gThingArray[thingId].mThing);
-                        const int32_t databaseKind = At<int32_t>(object->GetDBInfo(), 0x7a8);
+                        const int32_t databaseKind = object->GetDBInfo()->mUIType;   // the Mac's +0x7a8, by name
                         if (databaseKind == 2) {
                             found = true;
                             At<int32_t>(slot, 0) = 3;

@@ -15,6 +15,8 @@ unit's own function on both sides.
 The world of a case: a heap block (the person at +0, objects from +0x400 in 0x80 steps, two ride records at +0x1000 and +0x1800, the analyser
 at +0x2400), the world block (the turn at +0x1da70c), the map (the cell owners at +0x24 of 0x44 byte cells), the thing array rows, the five
 "none" halfwords. What is compared: the answer, the event log and the person's fields (words, halfwords, bytes, floats canonical).
+The ride records' words are written at the Mac's offsets on the PPC side and at the host fields of the same names on the host side
+(tests/ridelayout.py). The host's records are longer than their 0x800 byte spacing; the words a case writes do not meet.
 
 No fused operations. Not tested: float values outside the int range for UseObject's fctiwz (Unicorn and the hardware answer differently),
 a thing row that is NULL where the original dereferences it, circular object lists (the original would not end).
@@ -24,6 +26,7 @@ import random
 import struct
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -180,6 +183,9 @@ class Ppc(Side):
     def set_heap(self, h):
         HEAP[0] = h
 
+    def rec(self, mac):
+        return mac
+
     def log(self):
         return self.L.log
 
@@ -218,6 +224,9 @@ class Host(Side):
     def set_heap(self, h):
         self.lib.tpw_cem2_setheap(h)
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
     def log(self):
         return CL.host_end(self.lib)
 
@@ -238,6 +247,7 @@ def bind(lib):
         f = getattr(lib, p + n)
         f.restype, f.argtypes = None, [C.c_uint64] * k
     getattr(lib, p + "gtip").restype, getattr(lib, p + "gtip").argtypes = C.c_uint32, [C.c_uint64]
+    ridelayout.bind(lib)
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -275,9 +285,9 @@ def build(s, case):
         for off, v in ob["h"].items():
             s.half(base + off, v)
     for off, v in case["ra"].items():
-        s.words(heap + 0x1000 + off, [v])
+        s.words(heap + 0x1000 + s.rec(off), [v])
     for off, v in case["rb"].items():
-        s.words(heap + 0x1800 + off, [v])
+        s.words(heap + 0x1800 + s.rec(off), [v])
     for name, v in zip(("NoRide", "NoQueue", "ListEnd", "NoDest", "NoDest2"), case["sent"]):
         s.half(s.g(name), v)
     mp = s.alloc(0x110000)

@@ -8,6 +8,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "ride_layout.h"
 #include "analyser.h"
 #include "RideDB.h"
 #include "TPEngine.h"
@@ -24,7 +25,7 @@ tag_sRideAnimSet* gRideTypes[400];
 uint32_t gRideTypeCount;
 CRideDatabase gRideDatabase;
 
-static uint32_t gInfoBlock[16];
+alignas(RideInfo) static uint8_t gInfoBlock[sizeof(RideInfo)];   // the host's ride record (the test writes it by host field)
 
 void CTRACE(uint32_t level, const char* format, ...) { ev("CTRACE", {static_cast<int64_t>(level)}, {format}); }
 

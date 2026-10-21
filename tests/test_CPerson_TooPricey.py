@@ -10,6 +10,8 @@ the first time and block B afterwards (the original keeps the first answer in a 
 
 The world of a case: a person block (floats at +0x19c, +0x1a4, +0x1a8, +0x1b0, the word at +0x1a0), the four balance words of gMainBalance
 (+0x24 to +0x30), the ride records and the control block, gGameWorld. What is compared: the answer, the whole person block, the event log.
+The ride records' words are written at the Mac's offsets on the PPC side and at the host fields of the same names on the host side
+(tests/ridelayout.py).
 
 No fused operations (the floats are single adds and compares). Not tested: a balance divisor of 0 (divw by 0 is undefined on the hardware),
 floats outside the int range, infinite or NaN in the fields that go through fctiwz (TooPricey's four, ExtraExcitementEffects' +0x1a8) (Unicorn and the hardware answer differently).
@@ -19,6 +21,7 @@ import random
 import struct
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -152,6 +155,12 @@ class Ppc(Side):
     def setptrs(self, a, b, c):
         self.L.blockA, self.L.blockB, self.L.control = a, b, c
 
+    def rec(self, mac):
+        return mac
+
+    def rec_size(self):
+        return 0x7C0
+
     def call(self, fn, person):
         r3, _, _ = T.call_ppc(self.e, fn, [person, OBJ])
         return r3 & 0xFF if fn == FN_PRICEY else 0
@@ -186,6 +195,12 @@ class Host(Side):
     def setptrs(self, a, b, c):
         self.lib.tpw_t_set(a, b, c)
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
+    def rec_size(self):
+        return max(0x7C0, ridelayout.host_size(self.lib))
+
     def call(self, fn, person):
         f = self.lib.tpw_t_pricey if fn == FN_PRICEY else self.lib.tpw_t_extra
         return f(person, OBJ) & 0xFF if fn == FN_PRICEY else (f(person, OBJ) and 0)
@@ -198,6 +213,7 @@ def bind(lib):
     lib.tpw_t_alloc.restype, lib.tpw_t_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_t_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_t_set.argtypes = [C.c_uint64, C.c_uint64, C.c_uint64]
+    ridelayout.bind(lib)
     lib.tpw_t_pricey.restype, lib.tpw_t_pricey.argtypes = C.c_uint32, [C.c_uint64, C.c_uint64]
     lib.tpw_t_extra.restype, lib.tpw_t_extra.argtypes = C.c_uint32, [C.c_uint64, C.c_uint64]
     out = (C.c_int64 * 32)()
@@ -215,10 +231,10 @@ def build(s, case):
     s.words(p + 0x1B0, [case["f1b0"]])
     s.words(s.g("gMainBalance") + 0x24, case["bal"])
     s.words(s.g("gGameWorld"), [WORLD])
-    a, b, c = s.alloc(0x7C0), s.alloc(0x7C0), s.alloc(0x10)
+    a, b, c = s.alloc(s.rec_size()), s.alloc(s.rec_size()), s.alloc(0x10)
     for blk, fields in ((a, case["dbA"]), (b, case["dbB"])):
         for off, v in fields.items():
-            s.words(blk + off, [v])
+            s.words(blk + s.rec(off), [v])
     s.words(c + 0xC, [case["ctrl"]])
     s.setptrs(a, b, c)
     return p

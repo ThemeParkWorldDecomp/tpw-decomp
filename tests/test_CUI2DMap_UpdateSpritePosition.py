@@ -11,7 +11,9 @@ the line as two events each), the cell queries (the cell as its number in the wo
 
 The world of a case: the map object (width, height, depth, centre, zoom), the sprite, the screen size, the world with its cells and track
 cells, the thing table with its things, the coaster tracks (controls linked through their next pointers; the host's pointers are 8 bytes, the
-Mac's 4) and the clip rectangle. What is compared: the map object's fields, the sprite, the whole map grid, and the event log.
+Mac's 4) and the clip rectangle. What is compared: the map object's fields, the sprite, the whole map grid, and the event log. A thing's ride
+record follows it at +0x40; its UI type is written at the Mac's +0x7a8 on the PPC side and at the host field of the same name on the host
+side (tests/ridelayout.py).
 
 Fused operations: UpdateSpritePosition has two fmadds and DrawCoasterTracks fctiwz; the PowerPC side runs under HardwareRounding. Not tested:
 a map wider or higher than 128 (the original then writes through a NULL entry), thing ids past the end of the thing table or a thing id of
@@ -25,6 +27,7 @@ import struct
 from unicorn import UC_HOOK_CODE
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 from test_DynamicMesh import HardwareRounding
@@ -290,6 +293,12 @@ class Ppc(Side):
     def alloc(self, n):
         return self.e.alloc(n)
 
+    def rec(self, mac):
+        return mac
+
+    def rec_size(self):
+        return 0x7B0
+
     def read(self, a, n):
         return self.e.read(a, n)
 
@@ -344,6 +353,12 @@ class Host(Side):
     def alloc(self, n):
         return self.lib.tpw_cm_alloc(n)
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
+    def rec_size(self):
+        return max(0x7B0, ridelayout.host_size(self.lib))
+
     def read(self, a, n):
         return C.string_at(a, n)
 
@@ -385,6 +400,7 @@ def bind(lib):
     getattr(lib, p + "update").argtypes = [C.c_uint64, C.c_uint64]
     getattr(lib, p + "draw").argtypes = [C.c_uint64]
     getattr(lib, p + "store").argtypes = [C.c_uint64]
+    ridelayout.bind(lib)
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
     got = list(out)[:n]
@@ -431,15 +447,15 @@ def build(s, case):
         s.h(s.g("end"), 0)
         s.write(m + 0x60, FILL)
         for i, th in enumerate(case["things"], 1):
-            a = s.alloc(0x7F0)
-            b = bytearray(0x7F0)
+            a = s.alloc(0x40 + s.rec_size())
+            b = bytearray(0x40 + s.rec_size())
             E = s.endian
             struct.pack_into(E + "H", b, 0, i)
             b[2] = th["kind"]
             struct.pack_into(E + "H", b, 0xA, th["next"])
             struct.pack_into(E + "H", b, 0x2E, th["flags"])
             struct.pack_into(E + "H", b, 0x30, i)
-            struct.pack_into(E + "i", b, 0x7E8, th["db"])
+            struct.pack_into(E + "i", b, 0x40 + s.rec(0x7A8), th["db"])
             s.write(a, bytes(b))
             s.ptr(s.entry(i), a)
         s.ptr(s.entry(0), s.alloc(16) if case["e0"] else 0)

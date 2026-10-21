@@ -5,7 +5,8 @@
 A case is a world and a call, built twice by ONE piece of Python code (Mac memory big-endian with 4-byte pointers for the original, host
 memory little-endian with 8-byte pointers and the host struct offsets for the translation). Callees outside the unit are fakes on both
 sides: CTRACE (level and text), GetRideInfo (the id, answers a block or NULL), SetCoasterCObject (both arguments); sprintf is the C
-library's on both sides.
+library's on both sides. The ride info's Shape slot is written at the Mac's +0x18 (a 4-byte pointer) on the PPC side and at the host field
+of the same name (an 8-byte pointer) on the host side (tests/ridelayout.py).
 
 The world: the ride tables (instances, types, counts), set blocks, a params block, a ride info block, a time control block. Compared:
 the answer, the log, the flags word of every set. No fused operations. Not tested: NaN or infinite floats (the two C libraries print
@@ -16,6 +17,7 @@ import random
 import struct
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -132,6 +134,9 @@ class Ppc(Side):
     def alloc(self, n):
         return self.e.alloc(n)
 
+    def rec(self, mac):
+        return mac
+
     def read(self, a, n):
         return self.e.read(a, n)
 
@@ -170,6 +175,9 @@ class Host(Side):
     def alloc(self, n):
         return self.lib.tpw_ots_alloc(n)
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
     def read(self, a, n):
         return C.string_at(a, n)
 
@@ -203,6 +211,7 @@ def bind(lib):
     n = lib.tpw_ots_layout(out)
     assert n == len(KEYS), n
     lib.hoff = dict(zip(KEYS, list(out)[:n]))
+    ridelayout.bind(lib)
     lib.bound = True
 
 
@@ -263,7 +272,7 @@ def build_restore(s, case):
             pair = s.alloc(16)
             s.words(pair, [pr["w"], pr["dp"]])
             s.ptr(p + s.off["f0c"], pair)
-    s.words(s.g("info") + 0x18, [pair if case["infomatch"] else case["infoword"]])
+    s.ptr(s.g("info") + s.rec(0x18), pair if case["infomatch"] else case["infoword"])
     return p
 
 

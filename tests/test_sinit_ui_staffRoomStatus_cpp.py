@@ -11,7 +11,8 @@ members, font table, strings, draw objects, the staff members' name and rest tes
 default window handler, and the virtual calls through __ptr_glue) is a fake on both sides that records its arguments.
 
 The world of a case: the globals and blocks (panel, parent window, thing, windows, font) written before the call, the answer queues. What is
-compared: the answer, the globals and blocks read back after the call, the event log.
+compared: the answer, the globals and blocks read back after the call, the event log. The parent window's z is written at the Mac's
++0xdc on the PPC side and at the host window's mZ (from tpw_sr_layout) on the host side: the host window is laid out differently.
 
 No fused operations (fctiwz only on values below 2^31). Not tested: a zero screen height (divw by zero is undefined on the hardware), a
 NULL parent window with the edit window clear (the original reads through it).
@@ -37,6 +38,7 @@ ADDR = dict(thing=0x103947A4, room=0x10395A9C, show=0x10395A58, staffpanel=0x103
             screen=0x10395BBA, font=0x102AED60, fmt=0x10395A8C, valueA=0x10395ACC, valueB=0x10395AD0, editname=0x10395AD4,
             script=0x102AF16C, callback=0x10267F90, table_room=0x102AED88, table_show=0x102AE980)
 HOST_LAYOUT = [0x24]
+PPC_WINDOW = (0xDC, 0x140)   # the parent window: its z offset and size
 
 # the blocks of a case: name -> size; labels of the objects the log names
 BLOCKS = [("built", 0x140), ("title", 0x140), ("edit", 0x140), ("thing", 0x240), ("parent", 0x140), ("panel", 0x40), ("tstr", 16),
@@ -158,7 +160,8 @@ class Side:
         return self.rd_words(a, 1)[0]
 
     def alloc_blocks(self):
-        self.b = {name: self.alloc(size) for name, size in BLOCKS}
+        sizes = dict(BLOCKS, parent=self.window_layout()[1])
+        self.b = {name: self.alloc(sizes[name]) for name, size in BLOCKS}
 
 
 class Ppc(Side):
@@ -193,6 +196,9 @@ class Ppc(Side):
 
     def ptr(self, a, v):
         self.words(a, [v])
+
+    def window_layout(self):
+        return PPC_WINDOW
 
     def log(self):
         return self.L.log
@@ -239,6 +245,9 @@ class Host(Side):
     def ptr(self, a, v):
         self.write(a, struct.pack("<Q", v))
 
+    def window_layout(self):
+        return self.lib.window_layout
+
     def log(self):
         return CL.host_end(self.lib)
 
@@ -274,7 +283,8 @@ def bind(lib):
     lib.tpw_sr_sinit_show.restype, lib.tpw_sr_sinit_show.argtypes = None, []
     out = (C.c_int64 * 32)()
     n = lib.tpw_sr_layout(out)
-    assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    assert list(out)[:len(HOST_LAYOUT)] == HOST_LAYOUT, list(out)[:n]
+    lib.window_layout = tuple(out[len(HOST_LAYOUT):n])
     lib.bound = True
 
 
@@ -286,7 +296,7 @@ def build(s, case):
     for w in ("title", "edit"):
         s.words(b[w] + 0x118, [b["wvt"]])
     s.words(b["wvt"] + 0x2C, [WIN_SLOT])
-    s.half(b["parent"] + 0xDC, case["z"])
+    s.half(b["parent"] + s.window_layout()[0], case["z"])
     s.words(b["panel"] + 8, [case["win8"]])
     s.words(b["panel"] + 0xC, [s.p32(b["parent"])])
     s.write(b["thing"] + 2, bytes([case["type"]]))

@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <cmath>
 #include "ThingReceivers.h"
+#include "RideDB.h"
 #include "Debug.h"
 #include "analyser.h"
 #include "MainBalance.h"
@@ -31,7 +32,6 @@ constexpr char kSideshow[] = "Sideshow won - happiness up %d points to %d\n";   
 
 inline float& Fl(uint8_t* s, uint32_t off) { return *reinterpret_cast<float*>(s + off); }
 inline uint32_t& Wd(uint8_t* s, uint32_t off) { return *reinterpret_cast<uint32_t*>(s + off); }
-inline int32_t Info(const uint8_t* info, uint32_t off) { return *reinterpret_cast<const int32_t*>(info + off); }
 
 // The original's compare chain: above 100 -> 100, below 0 -> 0, else the sum (a NaN falls through to the store).
 inline float Clamp(float sum, float stored) {
@@ -50,74 +50,76 @@ void CPerson::WinningMods(CObject* object) {
     const CThing* selfThing = reinterpret_cast<const CThing*>(this);
 
     thoughts->RecordEvent(static_cast<CThoughts::EventType>(8), objThing->GetThingId());
-    const uint8_t* info = reinterpret_cast<const uint8_t*>(object->GetDBInfo());
-    if (Info(info, 0x7a8) == 2) {
+    // The ride record's words are read by name (the Mac's offsets: the UI type +0x7a8, the effect slots +0x144 to +0x15c): the host's
+    // record is laid out wider (a vtable and 8-byte balance slots).
+    const RideInfo* info = object->GetDBInfo();
+    if (info->mUIType == 2) {
         object->RecordACost(object->GetPrizeValue());
         Wd(self, 0x1a0) = Wd(self, 0x1a0) + object->GetPrizeValue();
     } else {
-        info = reinterpret_cast<const uint8_t*>(object->GetDBInfo());
-        if (Info(info, 0x7a8) == 1) object->RecordACost(static_cast<uint32_t>(object->GetCostOfGoods()));
+        info = object->GetDBInfo();
+        if (info->mUIType == 1) object->RecordACost(static_cast<uint32_t>(object->GetCostOfGoods()));
     }
     ExtraExcitementEffects(object);
-    info = reinterpret_cast<const uint8_t*>(object->GetDBInfo());
+    info = object->GetDBInfo();
 
     {
-        float v = static_cast<float>(Info(info, 0x144));
+        float v = static_cast<float>(info->Value(kRideSlot_ThirstEffect).mInteger);
         float f = Fl(self, 0x1a4);
         float sum = -v + f;
         Fl(self, 0x1a4) = Clamp(sum, f - v);
     }
     {
-        float v = static_cast<float>(Info(info, 0x148));
+        float v = static_cast<float>(info->Value(kRideSlot_HungerEffect).mInteger);
         float f = Fl(self, 0x1a8);
         float sum = -v + f;
         Fl(self, 0x1a8) = Clamp(sum, f - v);
     }
-    if (Info(info, 0x144) > Info(info, 0x148)) {
+    if (info->Value(kRideSlot_ThirstEffect).mInteger > info->Value(kRideSlot_HungerEffect).mInteger) {
         reinterpret_cast<CPeep*>(this)->PlaySound(gSoundBanks[1], 0x83);
-    } else if (Info(info, 0x144) < Info(info, 0x148)) {
+    } else if (info->Value(kRideSlot_ThirstEffect).mInteger < info->Value(kRideSlot_HungerEffect).mInteger) {
         reinterpret_cast<CPeep*>(this)->PlaySound(gSoundBanks[1], 0x84);
     }
     {
-        float v = static_cast<float>(Info(info, 0x14c));
+        float v = static_cast<float>(info->Value(kRideSlot_VomitEffect).mInteger);
         float f = Fl(self, 0x1b0);
         float sum = v + f;
         Fl(self, 0x1b0) = Clamp(sum, sum);
     }
     {
-        float v = static_cast<float>(Info(info, 0x150));
+        float v = static_cast<float>(info->Value(kRideSlot_HappinessEffect).mInteger);
         float f = Fl(self, 0x19c);
         float sum = v + f;
         Fl(self, 0x19c) = Clamp(sum, sum);
     }
     {
-        float v = static_cast<float>(Info(info, 0x154));
+        float v = static_cast<float>(info->Value(kRideSlot_LitterEffect).mInteger);
         float f = Fl(self, 0x1b4);
         float sum = v + f;
         Fl(self, 0x1b4) = Clamp(sum, sum);
     }
-    if (Info(info, 0x154) > 0) {
-        CTRACE(2, kLitter, Info(info, 0x154), static_cast<uint32_t>(ppc_fctiwz(Fl(self, 0x1b4))) & 0xffu);
+    if (info->Value(kRideSlot_LitterEffect).mInteger > 0) {
+        CTRACE(2, kLitter, info->Value(kRideSlot_LitterEffect).mInteger, static_cast<uint32_t>(ppc_fctiwz(Fl(self, 0x1b4))) & 0xffu);
     }
     uint32_t ingredient = object->GetAmountOfSpecialIngredient() & 0xffu;
-    if (Info(info, 0x148) != 0) {
+    if (info->Value(kRideSlot_HungerEffect).mInteger != 0) {
         uint32_t r = gWorld->GetRand();
-        uint32_t total = static_cast<uint32_t>(Info(info, 0x148)) + (ingredient + (r & 7u));
+        uint32_t total = static_cast<uint32_t>(info->Value(kRideSlot_HungerEffect).mInteger) + (ingredient + (r & 7u));
         if (total < 0x1eu) LowerHappiness(static_cast<Amount>(0));
     }
-    if (Info(info, 0x144) != 0) {
+    if (info->Value(kRideSlot_ThirstEffect).mInteger != 0) {
         uint32_t r = gWorld->GetRand();
-        uint32_t total = static_cast<uint32_t>(Info(info, 0x144)) + (ingredient + (r & 7u));
+        uint32_t total = static_cast<uint32_t>(info->Value(kRideSlot_ThirstEffect).mInteger) + (ingredient + (r & 7u));
         if (total < 0x1eu) LowerHappiness(static_cast<Amount>(0));
     }
     {
-        int32_t product = static_cast<int32_t>(static_cast<uint32_t>(Info(info, 0x150)) * ingredient);
+        int32_t product = static_cast<int32_t>(static_cast<uint32_t>(info->Value(kRideSlot_HappinessEffect).mInteger) * ingredient);
         float v = static_cast<float>(product / 100);
         float f = Fl(self, 0x19c);
         float sum = v + f;
         Fl(self, 0x19c) = Clamp(sum, sum);
     }
-    switch (Info(info, 0x158)) {
+    switch (info->Value(kRideSlot_SpecialIngredient).mInteger) {
     case 2: {
         float v = static_cast<float>(static_cast<int32_t>(ingredient));
         float f = Fl(self, 0x1a4);
@@ -133,7 +135,7 @@ void CPerson::WinningMods(CObject* object) {
         break;
     }
     case 3: {
-        int32_t product = static_cast<int32_t>(static_cast<uint32_t>(Info(info, 0x144)) * ingredient);
+        int32_t product = static_cast<int32_t>(static_cast<uint32_t>(info->Value(kRideSlot_ThirstEffect).mInteger) * ingredient);
         float v = static_cast<float>(product / 100);
         float f = Fl(self, 0x1a4);
         float sum = v + f;
@@ -148,7 +150,7 @@ void CPerson::WinningMods(CObject* object) {
     default: break;
     }
 
-    int32_t kind = Info(info, 0x15c);
+    int32_t kind = info->Value(kRideSlot_AppearanceEffect).mInteger;
     if (kind == 1) {
         CTRACE(2, kBought);
         GAME_ASSERTMSG(Wd(self, 0x210) == 0 ? 1 : 0, kHasOne);
@@ -195,8 +197,8 @@ void CPerson::WinningMods(CObject* object) {
         *reinterpret_cast<uint16_t*>(self + 0xc2) = gPersonTable[1];
     }
 
-    info = reinterpret_cast<const uint8_t*>(object->GetDBInfo());
-    if (Info(info, 0x7a8) == 2) {
+    info = object->GetDBInfo();
+    if (info->mUIType == 2) {
         Wd(self, 0x1d0) = Wd(self, 0x1d0) + 1;
         uint32_t prize = object->GetPrizeValue();
         uint32_t price = object->GetPricePerUse();

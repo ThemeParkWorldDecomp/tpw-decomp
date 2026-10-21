@@ -11,7 +11,9 @@ case's queues or from blocks the case set up.
 
 The world of a case: the map cells (link halfword +0x10, first thing id +0x24), the thing table rows, things (kind byte +2, next id +0x0a,
 cell +0x34), the terminator halfword, the camera position and angle, a ride record with its track pieces and links, the collision object
-table. What is compared: the answer (an index of the thing or object built), the globals and blocks read back, the event log.
+table. What is compared: the answer (an index of the thing or object built), the globals and blocks read back, the event log. The ride
+record's cannot-ride word is written at the Mac's +0x118 on the PPC side and at the host field of the same name on the host side
+(tests/ridelayout.py).
 
 MoveCameraOverRideExit has fused multiply-adds: the PowerPC side runs under HardwareRounding. Not tested: a NULL object table walked by
 BMP_StartColObjectForRide (the original writes through NULL + 0x14); a thing id past the table or a cell outside the world block.
@@ -23,6 +25,7 @@ import struct
 from unicorn import UC_HOOK_CODE
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 from test_DynamicMesh import HardwareRounding
@@ -149,6 +152,9 @@ class Ppc(Side):
     def alloc(self, n):
         return self.e.alloc(n)
 
+    def rec(self, mac):
+        return mac
+
     def read(self, a, n):
         return self.e.read(a, n)
 
@@ -196,6 +202,9 @@ class Host(Side):
 
     def alloc(self, n):
         return self.lib.tpw_gtp_alloc(n)
+
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
 
     def read(self, a, n):
         return C.string_at(a, n)
@@ -256,6 +265,7 @@ def bind(lib):
     out = (C.c_int64 * 32)()
     n = lib.tpw_gtp_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    ridelayout.bind(lib)
     lib.bound = True
 
 
@@ -268,8 +278,9 @@ def build(s, case):
     s.labs = {}
     op = case["op"]
     if op == "get":
-        A, B = s.alloc(0x120), s.alloc(0x120)
-        s.words(B + 0x118, [case["flag"]])
+        size = max(0x120, s.rec(0x118) + 4)
+        A, B = s.alloc(size), s.alloc(size)
+        s.words(B + s.rec(0x118), [case["flag"]])
         s.set_ret(0, A)
         s.set_ret(1, B)
         s.half(s.g("end"), case["end"])

@@ -9,7 +9,9 @@ are fakes on both sides that record every argument and answer from the case's qu
 
 The world of a case: the four fly zone limits, gGameWorld, the sound bank 7, the thing array's first entries (with the ride type at +0xe),
 the ride info's +0x7b8 word, gRideAnimSets 0 to 7 (fake constants), gFlyBases, the base block. What is compared: the answer, the event log,
-which gFlyBases slots are set (and whether kept), and every word of the base (the halfword at +0x58 as a halfword).
+which gFlyBases slots are set (and whether kept), and every word of the base (the halfword at +0x58 as a halfword). The ride info's word is
+written at the Mac's +0x7b8 on the PPC side and at the host field of the same name (the first sub ride type) on the host side
+(tests/ridelayout.py).
 
 No fused operations. Not tested: a zone span of 0 (divw by 0), a failed LbMem_Alloc (the original then reads address 0x4c), thing number
 0 with no thing in entry 0 (the original reads the thing's +0xe at NULL).
@@ -19,6 +21,7 @@ import random
 import struct
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -143,6 +146,9 @@ class Ppc(Side):
     def ri(self):
         return self.L.ri
 
+    def rec(self, mac):
+        return mac
+
     def alloc(self, n):
         return self.e.alloc(n)
 
@@ -195,6 +201,9 @@ class Host(Side):
     def ri(self):
         return self.g("ri")
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
     def alloc(self, n):
         return self.lib.tpw_fe_alloc(n)
 
@@ -242,6 +251,7 @@ def bind(lib):
     out = (C.c_int64 * 32)()
     n = lib.tpw_fe_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    ridelayout.bind(lib)
     lib.bound = True
 
 
@@ -253,7 +263,7 @@ def build(s, c):
     s.words(g("zc"), [c["zones"][3]])
     s.words(g("world"), [WORLD])
     s.words(g("banks") + 0x1C, [c["bank7"]])
-    s.words(s.ri() + 0x7B8, [c["rideno"]])
+    s.words(s.ri() + s.rec(0x7B8), [c["rideno"]])
     for i in range(8):
         s.setset(i, SETS[i])
     for i in range(4):

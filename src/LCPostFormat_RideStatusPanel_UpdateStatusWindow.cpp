@@ -157,8 +157,8 @@ void RideStatusPanel::UpdateWhichButtons() {
     }
     mWindow->GetWindow(0x3e34)->Show(1);
     window = mWindow->GetWindow(0x3e2a);
-    // Record slot 36 (+0x9c), the track type word.
-    if (*reinterpret_cast<const int32_t*>(reinterpret_cast<const char*>(info) + 0x9c) == 0) {
+    // Record slot 36 (the Mac's +0x9c), the track type word, by name: the host's record is laid out wider (a vtable and 8-byte slots).
+    if (info->Value(kRideSlot_WhichTrackType).mInteger == 0) {
         window->Show(0);
     } else {
         window->Show(1);

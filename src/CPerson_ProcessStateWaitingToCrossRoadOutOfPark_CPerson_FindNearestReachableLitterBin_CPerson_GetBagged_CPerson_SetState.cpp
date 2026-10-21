@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "ThingReceivers.h"
+#include "RideDB.h"
 #include "World.h"
 #include "Debug.h"
 #include "analyser.h"
@@ -35,7 +36,8 @@ uint8_t* RideOf(uint8_t* s) {
     return Raw(gThingArray[id].mThing);
 }
 
-uint8_t* InfoOf(uint8_t* ride) { return Raw(reinterpret_cast<CObject*>(ride)->GetDBInfo()); }
+// The ride record (its words are read by name, the Mac's +0x100 and +0x15c: the host's record is laid out wider).
+const RideInfo* InfoOf(uint8_t* ride) { return reinterpret_cast<CObject*>(ride)->GetDBInfo(); }
 
 tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> ThingTag(uint16_t v) {
     tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> t;
@@ -111,13 +113,13 @@ void CPerson::SetState(PersonState state) {
                                           static_cast<int32_t>(Word(s, 0x20)));
         Word(s, 0x28) = 0;
         uint8_t* ride = RideOf(s);
-        if (Word(InfoOf(ride), 0x100) != 0) {
+        if (InfoOf(ride)->Value(kRideSlot_RequiresTeleport).mInteger != 0) {
             reinterpret_cast<CPeep*>(this)->UpdatePositionInEngine(0.0f);
             reinterpret_cast<CPeep*>(this)->SpawnParticleEffect(0x13);
         }
         if (Word(s, 0x214) != 0) {
             ride = RideOf(s);
-            if (static_cast<int32_t>(Word(InfoOf(ride), 0x15c)) != 1) {
+            if (InfoOf(ride)->Value(kRideSlot_AppearanceEffect).mInteger != 1) {
                 GAME_ASSERTMSG(Word(s, 0x210) == 0 ? 1 : 0, kBalloonText);
                 uint16_t id = reinterpret_cast<CThing*>(this)->GetThingId().mIndex;
                 gWorld->SeedRand(id);
@@ -131,7 +133,7 @@ void CPerson::SetState(PersonState state) {
     }
     case 13: {
         uint8_t* ride = RideOf(s);
-        if (Word(InfoOf(ride), 0x100) != 0) reinterpret_cast<CPeep*>(this)->SpawnParticleEffect(0x13);
+        if (InfoOf(ride)->Value(kRideSlot_RequiresTeleport).mInteger != 0) reinterpret_cast<CPeep*>(this)->SpawnParticleEffect(0x13);
         ride = RideOf(s);
         if (Half(ride, 0x2e) & 0x20) {
             Word(s, 0x28) = 1;

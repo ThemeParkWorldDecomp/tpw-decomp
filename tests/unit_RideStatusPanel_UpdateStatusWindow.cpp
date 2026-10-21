@@ -15,6 +15,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "ride_layout.h"
 #include "History.h"
 #include "InterfaceWindow.h"
 #include "LLCellSystem.h"

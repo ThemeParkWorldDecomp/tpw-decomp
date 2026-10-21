@@ -10,6 +10,8 @@ fake on both sides that records its arguments (objects as offsets from the case'
 The world of a case: one base block holding the person (fields by Mac offset), a map, a challenge HQ, an analyser, eight rides each with a
 ride record; the thing array rows, the person table, the world words, gWorld and gWorldMap. What is compared: the event log and every
 field the function can write (state word, +0x1c, +0x28, +0x1f1 byte, +0x1f4, +0x1fc, +0x200, +0x208, +0x210, +0xc2, +0x1dc).
+The ride records' words are written at the Mac's offsets on the PPC side and at the host fields of the same names on the host side
+(tests/ridelayout.py); the rides are 0x600 apart so that the host's words stay inside their ride's block.
 
 No fused operations. Not tested: nothing excluded; the state past 0x15 does nothing in both.
 """
@@ -18,6 +20,7 @@ import random
 import struct
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -31,9 +34,9 @@ OWN = set(SIZES)
 ADDR = dict(gThingArray=0x1034CBFC, gWorldMap=0x1037EC08, gWorld=0x1037EC0C, gPersonTable=0x102A0D54, gBlock=0x1029FD48)
 
 WORLD_BYTES = 0x1E0100
-BASE_BYTES = 0x3000
+BASE_BYTES = 0x4000
 MAP_OFF, HQ_OFF, ANA_OFF = 0x400, 0x300, 0x340
-RIDE0, RIDE_STEP = 0x800, 0x400
+RIDE0, RIDE_STEP = 0x800, 0x600
 INFO_DELTA = 0x200
 NRIDES = 8
 HOST_LAYOUT = [1]
@@ -200,6 +203,9 @@ class Ppc(Side):
     def set_thing(self, idx, p):
         self.words(ADDR["gThingArray"] + 0x14 * idx, [p])
 
+    def rec(self, mac):
+        return mac
+
     def call(self, person, state):
         T.call_ppc(self.e, FN, [person & MASK, state & MASK])
 
@@ -241,6 +247,9 @@ class Host(Side):
     def set_thing(self, idx, p):
         self.lib.tpw_ss_setthing(idx, p)
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
     def call(self, person, state):
         self.lib.tpw_ss_setstate(person, state & MASK)
 
@@ -254,6 +263,7 @@ def bind(lib):
     lib.tpw_ss_setup.argtypes = [C.c_uint64, C.c_uint64, C.c_uint64]
     lib.tpw_ss_setthing.argtypes = [C.c_int32, C.c_uint64]
     lib.tpw_ss_setstate.argtypes = [C.c_uint64, C.c_uint32]
+    ridelayout.bind(lib)
     out = (C.c_int64 * 32)()
     n = lib.tpw_ss_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -280,8 +290,8 @@ def build(s, case):
         ride = base + RIDE0 + k * RIDE_STEP
         s.halves(ride + 0xE, [case["ride_type"][k]])
         s.halves(ride + 0x2E, [case["ride_flags"][k]])
-        s.words(ride + INFO_DELTA + 0x100, [case["info100"][k]])
-        s.words(ride + INFO_DELTA + 0x15C, [case["info15c"][k]])
+        s.words(ride + INFO_DELTA + s.rec(0x100), [case["info100"][k]])
+        s.words(ride + INFO_DELTA + s.rec(0x15C), [case["info15c"][k]])
     for i in range(16):
         k = case["things"][i]
         s.set_thing(i, 0 if k is None else base + RIDE0 + k * RIDE_STEP)

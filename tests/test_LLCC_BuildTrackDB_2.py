@@ -21,6 +21,9 @@ thing id whose gThingArray row is NULL on the first thing (the original reads 0x
 (the original reads it), ride anim indices beyond the four sets (the original reads past the table).
 
 Unit v5L39: an image test of gLLCCE0B0 and gLLCCE0B2 as loaded (tests/imagedata.py); the other cases write their own values.
+
+Unit v5L50: GetDBInfo answers a record whose id lands on the object's word at +0x34: the Mac's +0x10 on the PPC side, the host field of
+the same name on the host side (tests/ride_layout.h), so a host read of the record's raw +0x10 meets the word at +0x24 instead.
 """
 import ctypes as C
 import struct

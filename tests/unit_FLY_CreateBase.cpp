@@ -10,6 +10,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "ride_layout.h"
 #include "Debug.h"
 #include "analyser.h"
 #include "HLSprite.h"
@@ -34,7 +35,7 @@ tag_sRideAnimSet* gRideAnimSets[16];
 CRideDatabase gRideDatabase;
 
 namespace {
-uint8_t gRideInfoBlock[0x800];
+alignas(RideInfo) uint8_t gRideInfoBlock[sizeof(RideInfo)];   // the host's ride record (the test writes it by host field)
 }
 
 // ---- the fakes

@@ -9,7 +9,9 @@ the two constructors, the font and string getters, GetSignNameA/B, the virtual S
 arguments; the sign-name fakes write "NameA" / "NameB" into the shared text buffer.
 
 The world of a case: the panel (window at +8, parent window at +0xc whose halfword at +0xdc is the z), the global thing pointer (NULL or
-a block whose byte 2 is the kind), the shared text buffer's first words. What is compared: the event log, the panel's window field
+a block whose byte 2 is the kind), the shared text buffer's first words. The parent's z is written at the Mac's +0xdc on the PPC
+side and at the host window's mZ (from tpw_ses_layout) on the host side: the host window is laid out differently, so a raw +0xdc read
+on the host misses it. What is compared: the event log, the panel's window field
 (as a label), the first words of the text buffer, the thing's bytes. No fused operations. Not tested: nothing is skipped.
 """
 import ctypes as C
@@ -27,7 +29,7 @@ FN = 0x10194208
 OWN = {FN}
 
 ADDR = dict(script=0x102A8530, callback=0x10267960, buf=0x10380C48, bufA=0x10394782, bufB=0x10394764, thing=0x103947A4)
-HOST_LAYOUT = []
+PPC_WINDOW = (0xDC, 0xE0)
 
 TEXT_TITLE = "Edit"
 TEXT_FAKE_CODE = 0x11112222
@@ -105,7 +107,8 @@ class Side:
     def make_world(self, case):
         w = {}
         w["P"] = self.alloc(0x10)
-        w["PW"] = self.alloc(0xE0)
+        z_off, window_size = self.window_layout()
+        w["PW"] = self.alloc(window_size)
         for k in ("W", "T", "A", "B"):
             w[k] = self.alloc(0x130)
             self.hook_window(w[k])
@@ -113,7 +116,7 @@ class Side:
             w[k] = self.alloc(16)
         w["str"] = self.alloc(32)
         w["thing"] = self.alloc(0x10)
-        self.write(w["PW"] + 0xDC, struct.pack(self.fmt[0] + "h", case["z"]))
+        self.write(w["PW"] + z_off, struct.pack(self.fmt[0] + "h", case["z"]))
         self.words(w["P"] + 8, [case["panel8"]])
         self.words(w["P"] + 0xC, [self.p32(w["PW"])])
         self.write(w["thing"], bytes(case["thingbytes"]))
@@ -151,6 +154,9 @@ class Ppc(Side):
 
     def ptr(self, a, v):
         self.words(a, [v])
+
+    def window_layout(self):
+        return PPC_WINDOW
 
     def p32(self, v):
         return v
@@ -198,6 +204,9 @@ class Host(Side):
     def ptr(self, a, v):
         self.words(a, [v & MASK, v >> 32])
 
+    def window_layout(self):
+        return self.lib.window_layout
+
     def p32(self, v):
         return v - self.lib.tpw_ses_addr(b"base")
 
@@ -234,7 +243,7 @@ def bind(lib):
     getattr(lib, p + "show").argtypes = [C.c_uint64]
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
-    assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    lib.window_layout = tuple(out[:n])
     lib.bound = True
 
 

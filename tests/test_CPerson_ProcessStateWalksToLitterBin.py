@@ -13,7 +13,8 @@ the case's queues. CThing::GetThingId answers a number made of the label of the 
 The world of a case: the person block (cell bytes, angle, happiness floats, ride, queue place, patience, admit flag, stamps), the ride
 object block (+0x20 script handle, +0x28, +0x2e), the ride record word +0x9c, gThingArray entries 0 and the ride's, the world turn, the
 map base, gLitterKindCount and the two new halfword globals. What is compared: the event log and the person's words at +0x1c, +0x1b4,
-+0x1f4 and +0x1f8 (the only ones the code writes).
++0x1f4 and +0x1f8 (the only ones the code writes). The ride record word is written at the Mac's +0x9c on the PPC side and at the host
+field of the same name on the host side (tests/ridelayout.py).
 
 No fused operations. fctiwz: the happiness floats stay inside the int range (Unicorn answers 0x80000000 above it) and are never NaN.
 Not tested: a ride index of 0x2800 or more (the host table ends there), a person whose cell id wraps to 0 (the bytes cannot reach it).
@@ -24,6 +25,7 @@ import struct
 from itertools import product
 
 import calllog as CL
+import ridelayout
 import tpwtest as T
 from tpwtest import FnTest
 
@@ -140,7 +142,7 @@ class Side:
     def setup_blocks(self):
         self.person = self.alloc(0x240)
         self.obj = self.alloc(0x60)
-        self.db = self.alloc(0xA0)
+        self.db = self.alloc(self.rec_size())
         self.turnblk = self.alloc(16)
         self.world = (self.turnblk - 0x1DA70C) & 0xFFFFFFFFFFFFFFFF
         self.fixed = {1: self.person, 2: self.obj, 3: self.person + 0x30, 4: self.db, 5: self.world}
@@ -180,6 +182,12 @@ class Ppc(Side):
     def setptrs(self):
         self.words(ADDR["gworld"], [self.world])
         self.words(ADDR["gmap"], [MAP])
+
+    def rec(self, mac):
+        return mac
+
+    def rec_size(self):
+        return 0xA0
 
     def thing(self, index, address):
         self.used.append(index)
@@ -221,6 +229,12 @@ class Host(Side):
     def setptrs(self):
         self.lib.tpw_u5529_set(self.world, MAP, self.db)
 
+    def rec(self, mac):
+        return ridelayout.host_offset(self.lib, mac)
+
+    def rec_size(self):
+        return max(0xA0, ridelayout.host_size(self.lib))
+
     def thing(self, index, address):
         self.used.append(index)
         self.lib.tpw_u5529_thing(index, address)
@@ -237,6 +251,7 @@ def bind(lib):
     getattr(lib, P + "layout").argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_u5529_set.argtypes = [C.c_uint64, C.c_uint64, C.c_uint64]
     lib.tpw_u5529_thing.argtypes = [C.c_uint32, C.c_uint64]
+    ridelayout.bind(lib)
     for op in ("walk", "queue", "script"):
         getattr(lib, P + op).argtypes = [C.c_uint64]
     out = (C.c_int64 * 32)()
@@ -264,7 +279,7 @@ def build(s, case):
         s.put(s.person + off, kind, case[name])
     for name, off, kind in OBJ_FIELDS:
         s.put(s.obj + off, kind, case[name])
-    s.put(s.db + 0x9C, "I", case["db9c"])
+    s.put(s.db + s.rec(0x9C), "I", case["db9c"])
     s.put(s.turnblk, "I", case["turn"])
 
 

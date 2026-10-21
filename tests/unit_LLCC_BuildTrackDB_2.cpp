@@ -9,6 +9,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "ride_layout.h"
 #include "LLCellSystem.h"
 #include "TrackCell.h"
 #include "CellBase.h"
@@ -121,7 +122,8 @@ tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> CMapCell::GetObjectThingId() co
 }
 RideInfo* CObject::GetDBInfo() const {
     ev("GetDBInfo", {I(Word(this, 0x30))});
-    return reinterpret_cast<RideInfo*>(const_cast<char*>(reinterpret_cast<const char*>(this)) + 0x34 - 0x10);
+    // The record's id (the Mac's +0x10, its host field by tpw_ride_hostoffset) lands on the object's word at +0x34.
+    return reinterpret_cast<RideInfo*>(const_cast<char*>(reinterpret_cast<const char*>(this)) + 0x34 - tpw_ride_hostoffset(0x10));
 }
 void GAME_ASSERTMSG(int32_t condition, const char* format, ...) {
     (void)format;

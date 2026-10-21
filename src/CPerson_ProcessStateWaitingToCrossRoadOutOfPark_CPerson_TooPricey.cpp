@@ -6,6 +6,7 @@
 #include "MainBalance.h"
 #include "ObjectControl.h"
 #include "ThingReceivers.h"
+#include "RideDB.h"
 #include "World.h"
 #include "analyser.h"
 #include "ppc_math.h"
@@ -75,22 +76,23 @@ void CPerson::ExtraExcitementEffects(const CObject* object) {
 bool CPerson::TooPricey(CObject* object) const {
     uint32_t price = object->GetPricePerUse();
     if (price == 0) return false;
-    const char* db = reinterpret_cast<const char*>(object->GetDBInfo());
-    int32_t base = Div100(At<int32_t>(static_cast<const void*>(db), 0x140) * 0x73);
+    // The ride record's words by name (the Mac's +0x140 to +0x15c and +0x7a8): the host's record is laid out wider.
+    const RideInfo* db = object->GetDBInfo();
+    int32_t base = Div100(db->Value(kRideSlot_InitCostOfGoods).mInteger * 0x73);
     uint32_t a = Low8(At<float>(this, 0x19c));
     uint32_t b = Low8(At<float>(this, 0x1b0));
     uint32_t c = Low8(At<float>(this, 0x1a4));
     uint32_t d = Low8(At<float>(this, 0x1a8));
-    int32_t termA = Div100(At<int32_t>(static_cast<const void*>(db), 0x150) * static_cast<int32_t>(100 - a));
-    int32_t termB = Div100(At<int32_t>(static_cast<const void*>(db), 0x14c) * static_cast<int32_t>(b));
-    int32_t termC = Div100(At<int32_t>(static_cast<const void*>(db), 0x144) * static_cast<int32_t>(c));
-    int32_t termD = Div100(At<int32_t>(static_cast<const void*>(db), 0x148) * static_cast<int32_t>(d));
+    int32_t termA = Div100(db->Value(kRideSlot_HappinessEffect).mInteger * static_cast<int32_t>(100 - a));
+    int32_t termB = Div100(db->Value(kRideSlot_VomitEffect).mInteger * static_cast<int32_t>(b));
+    int32_t termC = Div100(db->Value(kRideSlot_ThirstEffect).mInteger * static_cast<int32_t>(c));
+    int32_t termD = Div100(db->Value(kRideSlot_HungerEffect).mInteger * static_cast<int32_t>(d));
     int32_t factor = termA + (termC + termD + 100 - termB);
     uint32_t value = UDiv100(static_cast<uint32_t>(base * factor));
     (void)object->GetPricePerUse();
     uint32_t chance = object->GetChanceOfWinning() & 0xff;
     uint32_t prize = 0;
-    if (At<int32_t>(static_cast<const void*>(object->GetDBInfo()), 0x7a8) == 2) prize = object->GetPrizeValue();
+    if (object->GetDBInfo()->mUIType == 2) prize = object->GetPrizeValue();
     ObjectControl* control = object->GetControl();
     int32_t winnings = Div100(static_cast<int32_t>(chance * prize));
     uint32_t controlFactor = static_cast<uint32_t>(control->mRipOffOK + 100);
@@ -100,18 +102,18 @@ bool CPerson::TooPricey(CObject* object) const {
     value = UDiv100(value * happyFactor);
 
     uint32_t opinion = (value - price) * 10 + 0x32;
-    int32_t type = At<int32_t>(static_cast<const void*>(object->GetDBInfo()), 0x7a8);
+    int32_t type = object->GetDBInfo()->mUIType;
     if (type == 2) {
         Offer(9, opinion);
     } else if (type == 1) {
-        switch (At<int32_t>(static_cast<const void*>(db), 0x158)) {
+        switch (db->Value(kRideSlot_SpecialIngredient).mInteger) {
             case 1: Offer(1, opinion); break;
             case 2: Offer(2, opinion); break;
             case 3: Offer(3, opinion); break;
             case 4: Offer(4, opinion); break;
             default: break;
         }
-        switch (At<int32_t>(static_cast<const void*>(db), 0x15c)) {
+        switch (db->Value(kRideSlot_AppearanceEffect).mInteger) {
             case 1: Offer(6, opinion); break;
             case 2: Offer(7, opinion); break;
             default: break;
