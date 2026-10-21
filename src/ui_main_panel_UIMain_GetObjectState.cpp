@@ -21,8 +21,7 @@ int32_t UIMain_GetObjectState(CObject* object, int32_t flag) {
     CWorld* world;
     RideInfo* ride = gRideDatabase.GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{object->mObjectType});
     if (object->IsCondemned()) return 3;
-    const uint8_t* rideBytes = reinterpret_cast<const uint8_t*>(ride);
-    const int32_t kind = *reinterpret_cast<const int32_t*>(rideBytes + 0x9c);
+    const int32_t kind = ride->Value(kRideSlot_WhichTrackType).mInteger;
     if (kind == 3) {
         if (!IsTrackClosed(object)) return 0x19;
         if (!IsTrackValid(object)) return 0x1a;
@@ -51,8 +50,8 @@ int32_t UIMain_GetObjectState(CObject* object, int32_t flag) {
     }
     if (object->IsBrokenDown()) return object->IsBeingWorkedUpon() ? 0x15 : 2;
     if ((object->mFlags & 8) && !object->IsBOQConnected()) return object->IsClosed() ? 0x17 : 0x16;
-    if (*reinterpret_cast<const int32_t*>(rideBytes + 0x7a8) == 0) {
-        if (object->UpgradesWhat().mIndex == gUIMainId7864 && *reinterpret_cast<const int32_t*>(rideBytes + 0x288) != 2 &&
+    if (ride->mUIType == 0) {
+        if (object->UpgradesWhat().mIndex == gUIMainId7864 && ride->Value(kRideSlot_UpgradeType).mInteger != 2 &&
             !object->IsExitCellConnected())
             return 0x18;
     }

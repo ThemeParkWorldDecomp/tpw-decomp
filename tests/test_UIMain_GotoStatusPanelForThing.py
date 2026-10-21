@@ -108,6 +108,7 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
+    at288, at7a8 = 0x288, 0x7A8
 
     def __init__(self, e, case):
         self.e = e
@@ -150,7 +151,8 @@ class Host(Side):
         bind(lib)
         self.thing = lib.tpw_gsp_alloc(0x60)
         self.target = lib.tpw_gsp_alloc(0x60)
-        self.info = lib.tpw_gsp_alloc(0x7C0)
+        self.at288, self.at7a8 = lib.layout[2], lib.layout[3]   # the host's record is laid out wider
+        self.info = lib.tpw_gsp_alloc(max(0x7C0, lib.layout[4]))
         fixed = {i + 1: self.g(n) for i, n in enumerate(PANELS)}
         fixed[20] = self.thing
         fixed[21] = self.target
@@ -193,6 +195,7 @@ def bind(lib):
     n = lib.tpw_gsp_layout(out)
     HOST_LAYOUT = list(out)[:n]
     assert HOST_LAYOUT[1] == 0, HOST_LAYOUT
+    lib.layout = HOST_LAYOUT
     lib.bound = True
 
 
@@ -202,8 +205,8 @@ def build(s, case):
     s.write(s.thing + 0x40, struct.pack(">I", s.info) if isinstance(s, Ppc) else struct.pack("<Q", s.info))
     s.write(s.thing + 2, bytes([case["kind"]]))
     s.half(s.thing + 0x2E, case["flags"])
-    s.words(s.info + 0x288, [case["w288"]])
-    s.words(s.info + 0x7A8, [case["type"]])
+    s.words(s.info + s.at288, [case["w288"]])
+    s.words(s.info + s.at7a8, [case["type"]])
     for i in range(ROWS):
         if i == 0:
             s.row(0, s.info if case["row0"] else 0)

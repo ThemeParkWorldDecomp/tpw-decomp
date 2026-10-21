@@ -144,6 +144,13 @@ void GraphLine(CUIGrapher& grapher, CHistory<int32_t, 144>* history, TbColour& c
     ev("GraphLine", {Addr(&grapher), Addr(history), index, step, mode});
 }
 
+// The table the static initialiser stores (src/ui_StatusPanel_tables.cpp, unit v5L31): a block of the arena made on first use; the test
+// compares only where it is stored.
+uint32_t* FeatureStatusPanelTable() {
+    static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));
+    return table;
+}
+
 extern "C" {
 
 uint64_t tpw_fs_addr(const char* name) {
@@ -178,6 +185,8 @@ uint64_t tpw_fs_mkwin(uint32_t id, uint64_t child1586, uint64_t child1584) {
     window->child1584 = reinterpret_cast<FakeWin*>(static_cast<uintptr_t>(child1584));
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(window));
 }
+
+uint32_t tpw_fs_sinit_table() { return tpw::ArenaOffset(FeatureStatusPanelTable()); }
 
 // The panel's table: slot 0x34 holds the arena offset of a block whose first 8 bytes are FakeSlot34. Answers the table's address.
 uint64_t tpw_fs_mktable() {

@@ -17,9 +17,10 @@
 #include "ui_DrawObject.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
-// 0x102ad4f0 (name invented): the window script of the upgrade panel. Only the first word (initial 0x00000001) is known.
-int16_t gUpgradePanelScript[2] = {0, 1};
+// 0x102ad4f0 (name invented): the window script of the upgrade panel.
+int16_t gUpgradePanelScript[] = {TPW_WINDOW_SCRIPT_102AD4F0};   // 0x102ad4f0: the image's words (generated, devtools/gen_game_tables.py)
 
 namespace {
 
@@ -90,7 +91,7 @@ void RideStatusPanel::UpdateStatusWindow() {
     int32_t state = UIMain_GetObjectState(object, 2);
     if (state != mState) {
         mState = state;
-        mOps->Notify(this);
+        UIStatusPanel_CallSlot(this, 0x2c);
         UpdateWhichButtons();
         UpdateKnobsWindow();
     }

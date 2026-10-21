@@ -13,9 +13,10 @@
 #include "ui_DrawObject.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
-// 0x102ad644 (name invented): the window description; the Mac's first word is 0x00000001. Its real size is unknown.
-int16_t gShopStatusDescription[2] = {0, 1};
+// 0x102ad644 (name invented): the window description.
+int16_t gShopStatusDescription[] = {TPW_WINDOW_SCRIPT_102AD644};   // 0x102ad644: the image's words (generated, devtools/gen_game_tables.py)
 
 // 0x101bd9bc (108 bytes)
 void ShopStatusPanel::ApplyChanges() {

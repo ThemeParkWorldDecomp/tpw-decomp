@@ -41,6 +41,7 @@ public:
         kDynamic = 2,
         kKeepCurrent = 4,   // LoadInfo: do not remember this record as the one to copy from
         kInfoCount = 0x1000,
+        kPoolScale = 1,
     };
 
     CRenderMemory();                             // 0x10026b48

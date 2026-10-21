@@ -91,7 +91,7 @@ int32_t FeatureStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, in
 void __sinit_ui_FeatureStatus_cpp() {
     UIStatusPanelFields* fields = reinterpret_cast<UIStatusPanelFields*>(&gFeatureStatusPanel);
     UIStatusPanel_Construct(reinterpret_cast<UIStatusPanel*>(&gFeatureStatusPanel));
-    fields->mVtable.mOffset = 0x102a9ba0;
+    fields->mVtable.set(FeatureStatusPanelTable());
     fields->mMode = 3;
 }
 

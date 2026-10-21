@@ -168,6 +168,6 @@ void ShopStatusPanel::UpdateStatusWindow() {
     int32_t state = UIMain_GetObjectState(object, 2);
     if (state != mState) {
         mState = state;
-        mOps->Notify(this);
+        UIStatusPanel_CallSlot(this, 0x2c);
     }
 }

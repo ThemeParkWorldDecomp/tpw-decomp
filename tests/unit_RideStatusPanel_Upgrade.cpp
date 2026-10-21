@@ -23,6 +23,7 @@
 #include "ThingReceivers.h"
 #include "World.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 
@@ -38,14 +39,12 @@ CRideDatabase gRideDatabase;
 
 namespace {
 
-void* gPanelForLog = nullptr;   // the panel the wrapper was called on (the Mac passes it to the ops table)
-
-class FakeOps : public UIStatusPanelOps {
-public:
-    void Slot5() override { ev("Slot5", {lab(gPanelForLog)}); }
-    void Slot11(void* panel) override { ev("Slot11", {lab(panel)}); }
-};
-FakeOps gFakeOps;
+// The panel's table (unit v5L31): the slots at +0x1c and +0x34 are logged with the panel, as the Mac's __ptr_glue fakes log them.
+uint64_t Slot(void* panel, uint32_t offset, const void*) {
+    if (offset == 0x1c) ev("Slot5", {lab(panel)});
+    if (offset == 0x34) ev("Slot11", {lab(panel)});
+    return 0;
+}
 
 template <class T>
 T* PointerOf(int64_t value) {
@@ -161,7 +160,7 @@ uint64_t tpw_rsp_addr(const char* name) {
     };
     const Entry entries[] = {
         {"thing", &gStaffRoomPanelThing}, {"world", &gGameWorld}, {"mouse", &gMouse},        {"w1e0", &gMouseWord1E0},
-        {"w1e4", &gMouseWord1E4},         {"show", &gRideStatusShowThing}, {"ops", &gFakeOps},
+        {"w1e4", &gMouseWord1E4},         {"show", &gRideStatusShowThing}, {"ops", FakeStatusPanelTable<Slot>()},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));
@@ -171,11 +170,16 @@ uint64_t tpw_rsp_addr(const char* name) {
 // A zeroed block the module fills with Mac-offset words (32-bit addressable, like every Ptr32 the headers hold).
 uint64_t tpw_rsp_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
 
+// The Ptr32 value of a block (its offset from the arena base; the panel's windows and table are Ptr32, unit v5L31).
+uint32_t tpw_rsp_off(uint64_t address) {
+    return address == 0 ? 0 : tpw::ArenaOffset(reinterpret_cast<void*>(static_cast<uintptr_t>(address)));
+}
+
 // The offsets and sizes the module relies on (HOST_LAYOUT).
 int32_t tpw_rsp_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = offsetof(RideStatusPanel, mWindow);
-    out[n++] = offsetof(RideStatusPanel, mOps);
+    out[n++] = offsetof(RideStatusPanel, mVtable);
     out[n++] = offsetof(RideStatusPanel, mUpgradeWindow);
     out[n++] = offsetof(RideStatusPanel, mF28);
     out[n++] = offsetof(RideStatusPanel, mSpeed);
@@ -200,27 +204,21 @@ int32_t tpw_rsp_layout(int64_t* out) {
 
 // ---- the functions, one wrapper each with C types only
 uint32_t tpw_rsp_upgrade(uint64_t panel, int32_t what, int32_t flag) {
-    gPanelForLog = PointerOf<void>(panel);
     return static_cast<uint32_t>(PointerOf<RideStatusPanel>(panel)->Upgrade(what, flag != 0));
 }
 void tpw_rsp_apply(uint64_t panel) {
-    gPanelForLog = PointerOf<void>(panel);
     PointerOf<RideStatusPanel>(panel)->ApplyChanges();
 }
 void tpw_rsp_dodial(uint64_t panel, int32_t a, int32_t b) {
-    gPanelForLog = PointerOf<void>(panel);
     PointerOf<RideStatusPanel>(panel)->DoDial(a, b);
 }
 void tpw_rsp_edit(uint64_t panel, int32_t on) {
-    gPanelForLog = PointerOf<void>(panel);
     PointerOf<RideStatusPanel>(panel)->Edit(on);
 }
 void tpw_rsp_show(uint64_t panel, uint64_t thing) {
-    gPanelForLog = PointerOf<void>(panel);
     PointerOf<RideStatusPanel>(panel)->Show(PointerOf<CThing>(thing));
 }
 void tpw_rsp_knobs(uint64_t panel) {
-    gPanelForLog = PointerOf<void>(panel);
     PointerOf<RideStatusPanel>(panel)->UpdateKnobsWindow();
 }
 

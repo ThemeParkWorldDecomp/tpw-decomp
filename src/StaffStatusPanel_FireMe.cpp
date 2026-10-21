@@ -11,6 +11,9 @@
 #include "UI_Base.h"
 #include "ui_ErrorDisplay.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
+
+int16_t gStaffStatusScript[] = {TPW_WINDOW_SCRIPT_102AEDD0};   // 0x102aedd0: the image's words (generated, devtools/gen_game_tables.py)
 
 void StaffStatusPanel::FireMe() {
     if (gPlayerSettings.mCurrent.mConfirmDeleteOn) {

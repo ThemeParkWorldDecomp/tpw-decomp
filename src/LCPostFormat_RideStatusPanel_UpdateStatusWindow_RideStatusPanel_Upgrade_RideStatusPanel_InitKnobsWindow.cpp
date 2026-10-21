@@ -38,8 +38,8 @@ void RideStatusPanel::InitWindow() {
 // 0x101baaac: the name, the two ops-table calls (slots at +0x20 and +0x1c, the panel as argument), the knobs, the buttons.
 void RideStatusPanel::UpdateWindow() {
     parkstatus_callee::WindowSetText(mNameWindow, UIMain_GetObjectName(reinterpret_cast<CObject*>(gStaffRoomPanelThing)));
-    mOps->Slot6();
-    mOps->Slot5();
+    UIStatusPanel_CallSlot(this, 0x20);
+    UIStatusPanel_CallSlot(this, 0x1c);
     UpdateKnobsWindow();
     UpdateWhichButtons();
 }

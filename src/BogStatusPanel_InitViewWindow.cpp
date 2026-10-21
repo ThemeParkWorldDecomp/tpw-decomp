@@ -5,12 +5,14 @@
 #include "FillLenderList.h"
 #include "InterfaceWindow.h"
 #include "MainWindowCallback.h"
+#include "RideDB.h"
 #include "ThingReceivers.h"
 #include "UI_Base.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
 CThing* gBogStatusThing = nullptr;                 // 0x103947fc
-int16_t gBogStatusScript[] = {0, 1};               // 0x102a908c (only the first word is known)
+int16_t gBogStatusScript[] = {TPW_WINDOW_SCRIPT_102A908C};   // 0x102a908c: the image's words (generated, devtools/gen_game_tables.py)
 
 namespace {
 
@@ -54,8 +56,8 @@ void BogStatusPanel::UpdateViewWindow() {
         CoolRect rect;
         fields->mF14.get()->GetClientRect(&rect);
         InterfaceWindow* window = fields->mF14.get();
-        UIMain_ShowRidePreview(rect, *reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(info) + 0x78c),
-                               static_cast<int32_t>(window->mZ) + 1);
+        // The record's ride type number (+0x78c) by name: the host's record is laid out wider (unit v5L31).
+        UIMain_ShowRidePreview(rect, info->mRideTypeNumber, static_cast<int32_t>(window->mZ) + 1);
     }
 }
 

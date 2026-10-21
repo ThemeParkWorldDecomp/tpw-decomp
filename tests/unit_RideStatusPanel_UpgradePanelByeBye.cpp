@@ -18,6 +18,7 @@
 #include "ThingReceivers.h"
 #include "World.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 
@@ -44,10 +45,11 @@ int64_t Tag(const void* window) {
 }
 int64_t Raw(const void* p) { return static_cast<int64_t>(reinterpret_cast<intptr_t>(p)); }
 
-class RecOps : public UIStatusPanelOps {
-public:
-    void Slot5() override { ev("Slot5", {1}); }
-};
+// The panel's table (unit v5L31): the slot at +0x1c records an event.
+uint64_t RecSlot(void*, uint32_t offset, const void*) {
+    if (offset == 0x1c) ev("Slot5", {1});
+    return 0;
+}
 
 }  // namespace
 
@@ -133,9 +135,9 @@ uint64_t tpw_RideStatusPanel_UpgradePanelByeBye_p32(uint64_t address) {
     return address == 0 ? 0 : tpw::ArenaOffset(reinterpret_cast<void*>(static_cast<uintptr_t>(address)));
 }
 
-// A table object whose slot 5 records an event.
+// A table whose slot at +0x1c records an event (a block of the arena).
 uint64_t tpw_RideStatusPanel_UpgradePanelByeBye_makeops() {
-    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(new RecOps()));
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(FakeStatusPanelTable<RecSlot>()));
 }
 
 // The panel and the ride record of the call.
@@ -148,7 +150,7 @@ void tpw_RideStatusPanel_UpgradePanelByeBye_begin(uint64_t panel, uint64_t info)
 int32_t tpw_RideStatusPanel_UpgradePanelByeBye_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mWindow));
-    out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mOps));
+    out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mVtable));
     out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mUpgradeWindow));
     out[n++] = static_cast<int64_t>(sizeof(CThingArrayEntry));
     out[n++] = static_cast<int64_t>(offsetof(InterfaceWindow, mZ));

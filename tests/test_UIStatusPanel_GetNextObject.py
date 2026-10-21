@@ -252,6 +252,7 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
+    has_queue = 0x40
 
     def __init__(self, e, case):
         self.e = e
@@ -299,6 +300,7 @@ class Host(Side):
         bind(lib)
         lib.tpw_ui_begin()
         self.base = lib.tpw_ui_base()
+        self.has_queue = lib.has_queue
         self.addr, self.rev, self.newlist, self.lazy = {}, {}, [], {}
         CL.host_begin(lib, {}, case["queues"])
 
@@ -381,7 +383,8 @@ def bind(lib):
     f = getattr(lib, p + "move"); f.restype, f.argtypes = None, [u64]
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
-    assert list(out)[:n] == [0, 4, 0xC, 0x10, 0x14, 0x18, 0x1C, 0x20, 0x24, 0x37, 4, 6], list(out)[:n]
+    assert list(out)[:n - 1] == [0, 4, 0xC, 0x10, 0x14, 0x18, 0x1C, 0x20, 0x24, 0x37, 4, 6], list(out)[:n]
+    lib.has_queue = out[n - 1]   # the ride record's HasQueue slot on the host (the Mac's +0x40; the host's balance slots are wider)
     lib.bound = True
 
 
@@ -405,9 +408,9 @@ def build(s, case):
         s.write(a + 6, bytes([y]))
         s.write(a + 0xE, pack("H", rid))
         s.words(a + 0x10, [rot])
-    ride = s.alloc(0x60)
+    ride = s.alloc(max(0x60, s.has_queue + 8))
     s.register(L_RIDE, ride)
-    s.words(ride + 0x40, [case["rinfo"]])
+    s.words(ride + s.has_queue, [case["rinfo"]])
     mouse = s.alloc(0x10)
     s.register(L_MOUSE, mouse)
     table = s.alloc(0x50)

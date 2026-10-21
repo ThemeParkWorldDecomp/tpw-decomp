@@ -5,9 +5,10 @@
 #include "World.h"
 #include "analyser.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
 CThing* gUpgradeStatusThing = nullptr;       // 0x10395b48
-int16_t gUpgradeStatusScript[2] = {1, 0};    // 0x102af2ac
+int16_t gUpgradeStatusScript[] = {TPW_WINDOW_SCRIPT_102AF2AC};   // 0x102af2ac: the image's words (generated, devtools/gen_game_tables.py)
 
 namespace {
 

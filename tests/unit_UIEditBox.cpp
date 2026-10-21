@@ -16,6 +16,7 @@ static void allocated(std::size_t bytes, bool array, void* p) {
 }
 #define TPW_ALLOCATION_OBSERVER allocated
 #include "calllog.cpp"
+#include "fake_arena_on_heap.h"
 
 InterfaceWindow* gUIFocusWindow;
 InterfaceWindow* gUICaptureDevice;

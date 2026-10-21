@@ -81,6 +81,9 @@ void* FakeMalloc(uint32_t size) {
     uint32_t shown = size;
     if (size == CMapWho::kNodeCount * sizeof(SMapLinkType)) shown = 0x24000;
     if (size == CRenderMemory::kInfoCount * sizeof(SRenderLoadInfo)) shown = 0x38000;
+    // Built with the port fixes on, the pools are kPoolScale times the Mac's (1 when off).
+    if (size == 0x100000 * CRenderMemory::kPoolScale) shown = 0x100000;
+    else if (size == 0x20000 * CRenderMemory::kPoolScale) shown = 0x20000;
     ev("Malloc", {shown});
     if (!ret("Malloc", 1)) return nullptr;
     const uint32_t skew = shown == 0x10000f ? static_cast<uint32_t>(ret("Skew", 0)) : 0;
@@ -187,6 +190,17 @@ int64_t offset_in(const void* pointer, const void* block) {
     return static_cast<const uint8_t*>(pointer) - static_cast<const uint8_t*>(block);
 }
 
+// The Mac's 4096 records. Built with the port fixes on, the table is longer and its static
+// records count down from its own end: the state shows the record numbers the Mac's table has,
+// its first half the dynamic ones from 0, its second half the static ones from its end.
+constexpr int32_t kMacInfoCount = 0x1000;
+int32_t MacRecord(int32_t number) {
+    return number >= CRenderMemory::kInfoCount - kMacInfoCount / 2 ? number - (CRenderMemory::kInfoCount - kMacInfoCount) : number;
+}
+int32_t HostRecord(int32_t number) {
+    return number >= kMacInfoCount / 2 ? number + (CRenderMemory::kInfoCount - kMacInfoCount) : number;
+}
+
 void RenderMemoryState() {
     CRenderMemory* m = gei_RenderMemory;
     put(lab(m));
@@ -196,16 +210,16 @@ void RenderMemoryState() {
     for (const CRenderMemoryType& pool : m->mPools) {
         put(lab(pool.mData));
         put(pool.mUsed);
-        put(pool.mSize);
+        put(pool.mSize / CRenderMemory::kPoolScale);
         put(lab(pool.mIndexData));
         put(pool.mIndexUsed);
-        put(pool.mIndexSize);
+        put(pool.mIndexSize / CRenderMemory::kPoolScale);
     }
     put(lab(m->mInfos));
-    put(m->mInfoCount);
-    put(m->mRemembered);
+    put(m->mInfoCount == CRenderMemory::kInfoCount ? kMacInfoCount : m->mInfoCount);
+    put(MacRecord(m->mRemembered));
     put(m->mNextDynamic);
-    put(m->mNextStatic);
+    put(MacRecord(m->mNextStatic));
     put(lab(m->mScratchBlock));
     const bool live = m->mScratchBlock != nullptr && lab(m->mScratchBlock) > 0;
     put(live ? offset_in(m->mScratch, m->mScratchBlock) : -3);
@@ -217,7 +231,7 @@ void RenderMemoryState() {
     const uintptr_t current = reinterpret_cast<uintptr_t>(m->mCurrent);
     if (records && current >= first && current < first + CRenderMemory::kInfoCount * sizeof(SRenderLoadInfo)) {
         const int32_t index = static_cast<int32_t>(m->mCurrent - m->mInfos);
-        put(index);
+        put(MacRecord(index));
         const SRenderLoadInfo& info = *m->mCurrent;
         int64_t data = -4, indexData = -4;
         for (int p = 0; p < 2; ++p) {
@@ -239,9 +253,9 @@ void RenderMemoryState() {
     // Which records have something in their first word: Reset clears a range of them.
     int64_t marked = 0;
     if (records) {
-        for (int32_t i = 0; i < CRenderMemory::kInfoCount; ++i) {
+        for (int32_t i = 0; i < kMacInfoCount; ++i) {
             uint32_t word;
-            std::memcpy(&word, m->mInfos[i].mF00, 4);
+            std::memcpy(&word, m->mInfos[HostRecord(i)].mF00, 4);
             if (word != 0) marked += i + 1;
         }
     }
@@ -325,6 +339,15 @@ extern "C" {
 
 // The address the test labels 9: what op 20 installs as the map's callback.
 void* tpw_es_marker() { return &gMarker; }
+
+// The render memory's capacity, records times 16 plus the pools' scale (unit v5L47): 0x10001
+// as the Mac has it, 0x100008 built with the port fixes on.
+int32_t tpw_es_capacity() { return CRenderMemory::kInfoCount * 16 + CRenderMemory::kPoolScale; }
+
+// 1 when the unit is built with the port fixes on.
+int32_t tpw_es_portfix() {
+    return 0;
+}
 // The addresses the test labels 20 + k: link bases for ops 44 and 45.
 void* tpw_es_link(int32_t k) { return &gLinks[k]; }
 
@@ -425,12 +448,12 @@ int64_t tpw_es_op(int32_t op, const int32_t* a) {
     case 24: {
         CRenderMemory* m = gei_RenderMemory;
         if (m == nullptr || m->mInfos == nullptr) return -9;
-        return m->LoadInfo(a[0]) - m->mInfos;
+        return MacRecord(static_cast<int32_t>(m->LoadInfo(a[0]) - m->mInfos));
     }
     case 25: {
         CRenderMemory* m = gei_RenderMemory;
         if (m == nullptr || m->mInfos == nullptr) return -9;
-        return m->LoadInfo_CopyVDB(a[0]) - m->mInfos;
+        return MacRecord(static_cast<int32_t>(m->LoadInfo_CopyVDB(a[0]) - m->mInfos));
     }
     case 26: {   // as if geometry had been loaded: pool a[0] grows, its next record moves
         CRenderMemory* m = gei_RenderMemory;
@@ -471,9 +494,9 @@ int64_t tpw_es_op(int32_t op, const int32_t* a) {
     case 40: {   // every record's first word becomes nonzero
         CRenderMemory* m = gei_RenderMemory;
         if (m == nullptr || m->mInfos == nullptr) return -9;
-        for (int32_t i = 0; i < CRenderMemory::kInfoCount; ++i) {
+        for (int32_t i = 0; i < kMacInfoCount; ++i) {
             const uint32_t word = 0x1000 + i;
-            std::memcpy(m->mInfos[i].mF00, &word, 4);
+            std::memcpy(m->mInfos[HostRecord(i)].mF00, &word, 4);
         }
         return 0;
     }

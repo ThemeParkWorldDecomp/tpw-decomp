@@ -152,6 +152,17 @@ InterfaceDrawObject* NewCursorText() {
 void WindowSetText(InterfaceWindow* window, const char16_t* text) { ev("SetText", {lab(window), lab(const_cast<char16_t*>(text))}); }
 }  // namespace staffroom_callee
 
+// The tables the static initialisers store (src/ui_StatusPanel_tables.cpp, unit v5L31): blocks of the arena made on first use; the test
+// compares only where they are stored.
+uint32_t* ShowStatusPanelTable() {
+    static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));
+    return table;
+}
+uint32_t* StaffRoomStatusPanelTable() {
+    static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));
+    return table;
+}
+
 extern "C" {
 
 uint64_t tpw_sr_addr(const char* name) {

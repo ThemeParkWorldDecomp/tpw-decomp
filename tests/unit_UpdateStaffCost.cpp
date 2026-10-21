@@ -15,6 +15,7 @@
 #include "World.h"
 #include "ui_iterators.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 
 using namespace calllog;
 
@@ -32,7 +33,12 @@ struct Obj {
     void* vptr;
     uint8_t pad[0x400];
 };
-Obj gObjs[16];                       // 1 panel, 2 summary, 3 w2df, 4 w2e4, 5 w0xc07f, 6 shop window, 7 thing, 8 callback window, 9 world
+// The objects are a block of the arena: the shop panel keeps its window in a Ptr32 (unit v5L31).
+Obj (&Objs())[16] {
+    static auto* objs = static_cast<Obj(*)[16]>(tpw::ArenaAllocZeroed(sizeof(Obj[16])));
+    return *objs;
+}
+// 1 panel, 2 summary, 3 w2df, 4 w2e4, 5 w0xc07f, 6 shop window, 7 thing, 8 callback window, 9 world
 alignas(16) uint8_t gHq[sizeof(CStaffHQ) + 64];   // 10
 void* gVtable[64];
 
@@ -41,20 +47,20 @@ int32_t FakeSetValue(InterfaceWindow* self, int32_t value) {
     return 0;
 }
 
-class FakeOps : public UIStatusPanelOps {
-public:
-    void Slot5() override { ev("Slot5", {}); }
-};
-FakeOps gOps;
+// The shop panel's table: the slot at +0x1c is logged as the Mac's stub logs it.
+uint64_t Slot(void*, uint32_t offset, const void*) {
+    if (offset == 0x1c) ev("Slot5", {});
+    return 0;
+}
 
 CTrainingCentre& Block() { return reinterpret_cast<CStaffHQ*>(gHq)->mTraining; }
 
-InterfaceWindow* ObjPtr(int idx) { return idx == 0 ? nullptr : reinterpret_cast<InterfaceWindow*>(&gObjs[idx]); }
+InterfaceWindow* ObjPtr(int idx) { return idx == 0 ? nullptr : reinterpret_cast<InterfaceWindow*>(&Objs()[idx]); }
 
 int IdxOf(const void* p) {
     if (p == nullptr) return 0;
     for (int i = 1; i < 10; ++i)
-        if (p == &gObjs[i]) return i;
+        if (p == &Objs()[i]) return i;
     return -1;
 }
 
@@ -151,23 +157,23 @@ int32_t tpw_sm_layout(int64_t* out) {
 uint64_t tpw_sm_obj(int32_t idx) {
     if (idx == 10) return reinterpret_cast<uintptr_t>(gHq);
     if (idx == 11) return reinterpret_cast<uintptr_t>(&gShopStatusPanel);
-    return reinterpret_cast<uintptr_t>(&gObjs[idx]);
+    return reinterpret_cast<uintptr_t>(&Objs()[idx]);
 }
 
 // Resets the fakes' world: the vtables, the world pointer, the pointer globals (idx labels; 0 is NULL), the headquarters block and the panel.
 void tpw_sm_reset(int32_t panel, int32_t shopWindow, int32_t thing) {
     for (void*& slot : gVtable) slot = reinterpret_cast<void*>(&FakeSetValue);
-    for (Obj& o : gObjs) {
+    for (Obj& o : Objs()) {
         std::memset(o.pad, 0, sizeof(o.pad));
         o.vptr = gVtable + 0;
     }
     std::memset(gHq, 0, sizeof(gHq));
-    gGameWorld = reinterpret_cast<CWorld*>(&gObjs[9]);
+    gGameWorld = reinterpret_cast<CWorld*>(&Objs()[9]);
     gStaffCostsPanel = ObjPtr(panel);
     gStaffRoomPanelThing = reinterpret_cast<CThing*>(ObjPtr(thing));
     std::memset(static_cast<void*>(&gShopStatusPanel), 0, sizeof(gShopStatusPanel));
-    gShopStatusPanel.mWindow = ObjPtr(shopWindow);
-    gShopStatusPanel.mOps = &gOps;
+    gShopStatusPanel.mWindow.set(ObjPtr(shopWindow));
+    gShopStatusPanel.mVtable.set(FakeStatusPanelTable<Slot>());
 }
 
 void tpw_sm_hq_set(int32_t i, uint32_t v) {

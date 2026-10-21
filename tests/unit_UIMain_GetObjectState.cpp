@@ -126,6 +126,19 @@ int32_t tpw_gos_layout(int64_t* out) {
     return n;
 }
 
+// The host offsets of the three RideInfo words the function reads (Mac 0x9c, 0x288, 0x7a8) and the record's size.
+int32_t tpw_gos_ridelayout(int64_t* out) {
+    alignas(RideInfo) static unsigned char raw[sizeof(RideInfo)];
+    const RideInfo* ride = reinterpret_cast<const RideInfo*>(raw);
+    const unsigned char* base = raw;
+    int32_t n = 0;
+    out[n++] = reinterpret_cast<const unsigned char*>(&ride->Value(kRideSlot_WhichTrackType).mInteger) - base;
+    out[n++] = reinterpret_cast<const unsigned char*>(&ride->Value(kRideSlot_UpgradeType).mInteger) - base;
+    out[n++] = reinterpret_cast<const unsigned char*>(&ride->mUIType) - base;
+    out[n++] = static_cast<int64_t>(sizeof(RideInfo));
+    return n;
+}
+
 int32_t tpw_gos_state(uint64_t object, int32_t flag) {    return UIMain_GetObjectState(reinterpret_cast<CObject*>(static_cast<uintptr_t>(object)), flag);
 }
 

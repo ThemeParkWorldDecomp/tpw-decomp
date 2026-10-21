@@ -34,6 +34,7 @@ void ObserveAllocation(std::size_t size, bool array, void* block);
 #include "UI_Base.h"
 #include "ui_DrawObject.h"
 #include "ui_controls.h"
+#include "fake_arena_on_heap.h"
 
 using namespace calllog;
 

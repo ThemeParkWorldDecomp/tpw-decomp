@@ -33,7 +33,7 @@ OWN = set(SIZES)
 
 ADDR = dict(font=0x102aed60, g406=0x102aed68, thing=0x103947a4, stafftype=0x10395a98, panel=0x10395a9c, ssp=0x10395b1c)
 MAC_OFF = dict(pwin=0xC, script=0x24, f28=0x28, f2c=0x2C, child=0x58, count=0x150)
-HOST_PANEL_LAYOUT = [0x10, 0x24, 0x28, 0x2C]
+HOST_PANEL_LAYOUT = [0xC, 0x24, 0x28, 0x2C]   # the Mac's (the panel's window is a Ptr32 since unit v5L31)
 
 
 def s32(v):
@@ -245,7 +245,7 @@ def build(s, case):
     s.ptr(o["win"] + s.off["child"], o["child"])
     s.setup_vtable()
     p = s.g("panel")
-    s.ptr(p + s.off["pwin"], o["pwin"])
+    s.words(p + s.off["pwin"], [s.p32(o["pwin"])])
     s.words(p + s.off["script"], [case["script"]])
     s.words(p + s.off["f28"], [case["f28"]])
     s.words(p + s.off["f2c"], [case["f2c"]])

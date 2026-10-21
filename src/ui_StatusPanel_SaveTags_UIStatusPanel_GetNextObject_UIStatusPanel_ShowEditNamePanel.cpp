@@ -8,9 +8,9 @@
 #include "ui_ErrorDisplay.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
-// 0x102a8530: the window description of the panel (not translated: stand-in with the initial word of the Mac's data).
-int16_t gEditNamePanelScript[2] = {0, 1};
+int16_t gEditNamePanelScript[] = {TPW_WINDOW_SCRIPT_102A8530};   // 0x102a8530: the image's words (generated, devtools/gen_game_tables.py)
 
 void UIStatusPanel::ShowEditNamePanel() {
     uint8_t* self = reinterpret_cast<uint8_t*>(this);

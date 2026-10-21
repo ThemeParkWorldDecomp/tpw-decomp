@@ -117,6 +117,13 @@ const char16_t* Slot3c(void* self) {
 }
 }  // namespace
 
+// The table the static initialiser stores (src/ui_StatusPanel_tables.cpp, unit v5L31): a block of the arena made on first use; the test
+// compares only where it is stored.
+uint32_t* UpgradeStatusPanelTable() {
+    static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));
+    return table;
+}
+
 extern "C" {
 
 uint64_t tpw_us_addr(const char* name) {
@@ -166,6 +173,7 @@ int32_t tpw_us_layout(int64_t* out) {
 void tpw_us_updatewindow(uint64_t panel) { reinterpret_cast<ShowStatusPanel*>(static_cast<uintptr_t>(panel))->UpdateWindow(); }
 
 void tpw_us_sinit() { __sinit_ui_upgradeStatus_cpp(); }
+uint32_t tpw_us_sinit_table() { return tpw::ArenaOffset(UpgradeStatusPanelTable()); }
 
 int32_t tpw_us_yearend(uint64_t window, int32_t message, int32_t a, int32_t b) {
     return YearEndPanelMsg(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(window)), message, a, b);

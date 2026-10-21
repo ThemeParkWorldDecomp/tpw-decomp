@@ -23,6 +23,7 @@ bool KeepFreed(void*, bool) { return true; }
 }  // namespace
 #define TPW_RELEASE_OBSERVER(p, array) KeepFreed(p, array)
 #include "calllog.cpp"
+#include "platform/arena.h"
 
 #include "ActionRecorder.h"
 #include "Debug.h"
@@ -35,6 +36,14 @@ bool KeepFreed(void*, bool) { return true; }
 #include "rsse.h"
 
 using namespace calllog;
+
+// The unit makes its things on the game heap (the Mac's operator new), which the host takes from the arena (unit v5L31). Here the arena is
+// the call log's operator new and delete, so a thing's block is made, filled, labelled and freed as the Mac's is.
+namespace tpw {
+void* ArenaAlloc(size_t size) { return ::operator new(size); }
+bool InArena(const void* address) { return address != nullptr; }
+void ArenaFree(void* block) { ::operator delete(block); }
+}  // namespace tpw
 
 namespace {
 

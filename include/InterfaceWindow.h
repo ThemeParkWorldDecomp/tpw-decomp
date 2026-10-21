@@ -12,6 +12,7 @@
 #include <cstdint>
 
 #include "UI_Base.h"
+#include "platform/arena.h"
 
 class InterfaceWindow;
 class InterfaceFont;
@@ -45,6 +46,23 @@ public:
     // for, 2 is "disabled" (Enable). `id` is the Mac's long.
     InterfaceWindow(InterfaceWindow* parent, int32_t attributes, int32_t id, int16_t left, int16_t top, int16_t right,
                     int16_t bottom);
+
+    // The windows (and every control, which derive from this class) come from the arena: the status panels keep theirs in the
+    // Mac's 32-bit fields (UIStatusPanelFields, Ptr32), as the Mac kept every window's address in 32 bits. A window built in
+    // memory from elsewhere (placement new over ::operator new, the list controls' row formats) is given back to where it came from.
+    static void* operator new(size_t size) {
+        void* block = tpw::ArenaAlloc(size);
+        if (block == nullptr) throw std::bad_alloc();
+        return block;
+    }
+    static void* operator new(size_t size, const std::nothrow_t&) noexcept { return tpw::ArenaAlloc(size); }
+    static void* operator new(size_t, void* place) noexcept { return place; }
+    static void operator delete(void* block) {
+        if (tpw::InArena(block)) tpw::ArenaFree(block);
+        else ::operator delete(block);
+    }
+    static void operator delete(void* block, const std::nothrow_t&) noexcept { operator delete(block); }
+    static void operator delete(void*, void*) noexcept {}
 
     // ---- the virtual members, in vtable order
     virtual void DrawFunction();                      // 0x1018a270 (src/InterfaceWindow_virtuals.cpp, unit w54): nothing

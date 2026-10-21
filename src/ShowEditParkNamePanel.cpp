@@ -15,11 +15,12 @@
 #include "ui_ErrorDisplay.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
 // ---- the unit's own globals (the data is the Mac's; the strings the two cheat pointers lead to are not recovered)
 InterfaceWindow* gEditParkNamePanel;      // 0x1039483c
 InterfaceWindow* gParkScreenWindow;       // 0x10394848
-int16_t gEditParkNameScript[2] = {0, 1};  // 0x102a9834
+int16_t gEditParkNameScript[] = {TPW_WINDOW_SCRIPT_102A9834};   // 0x102a9834: the image's words (generated, devtools/gen_game_tables.py)
 char16_t gEditSignBufA[15];               // 0x10394782
 char16_t gEditSignBufB[15];               // 0x10394764
 static const char16_t kCheatTextA[] = u"";

@@ -86,6 +86,13 @@ namespace lender_callee {
 void WindowSetValue(InterfaceWindow* window, int32_t value) { ev("SetValue", {Lb(window), value}); }
 }  // namespace lender_callee
 
+// The table the static initialiser stores (src/ui_StatusPanel_tables.cpp, unit v5L31): a block of the arena made on first use; the test
+// compares only where it is stored.
+uint32_t* StaffStatusPanelTable() {
+    static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));
+    return table;
+}
+
 extern "C" {
 
 uint64_t tpw_us_addr(const char* name) {
@@ -122,5 +129,6 @@ int32_t tpw_us_msg(uint64_t window, int32_t message, int32_t a, int32_t b) {
 }
 
 void tpw_us_sinit() { __sinit_ui_staffStatus_cpp(); }
+uint32_t tpw_us_sinit_table() { return tpw::ArenaOffset(StaffStatusPanelTable()); }
 
 }  // extern "C"

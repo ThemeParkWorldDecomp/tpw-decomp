@@ -10,6 +10,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "RideDB.h"
 #include "ThingReceivers.h"
 #include "World.h"
 #include "ui_main.h"
@@ -92,6 +93,12 @@ int32_t tpw_gsp_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = static_cast<int64_t>(sizeof(CThingArrayEntry));
     out[n++] = static_cast<int64_t>(offsetof(CThingArrayEntry, mThing));
+    // Where the ride record's UpgradeType slot and UI type sit on the host (the Mac's +0x288 and +0x7a8), and its size.
+    alignas(RideInfo) static unsigned char ride[sizeof(RideInfo)];
+    const RideInfo* info = reinterpret_cast<const RideInfo*>(ride);
+    out[n++] = reinterpret_cast<const unsigned char*>(&info->Value(kRideSlot_UpgradeType)) - ride;
+    out[n++] = reinterpret_cast<const unsigned char*>(&info->mUIType) - ride;
+    out[n++] = static_cast<int64_t>(sizeof(RideInfo));
     return n;
 }
 

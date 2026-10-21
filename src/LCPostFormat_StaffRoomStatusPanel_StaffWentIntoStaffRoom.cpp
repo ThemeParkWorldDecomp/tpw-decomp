@@ -9,11 +9,12 @@
 #include "ppc_math.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
 // ---- globals nobody else defines
 tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> gStaffRoomId;   // 0x10395a90
 CThing* gStaffRoomShowThing = nullptr;                           // 0x10395a88
-int16_t gStaffRoomScript[2] = {0, 1};                            // 0x102ae9c8 (initial word 0x00000001)
+int16_t gStaffRoomScript[] = {TPW_WINDOW_SCRIPT_102AE9C8};   // 0x102ae9c8: the image's words (generated, devtools/gen_game_tables.py)
 
 namespace {
 

@@ -42,6 +42,13 @@ void ObserveAllocation(std::size_t size, bool array, void* block);
 #include "tb_resource_system.h"
 #include "ui_DrawObject.h"
 #include "ui_main.h"
+#include "fake_arena_on_heap.h"
+
+// The unit links no arena: the windows' game heap (include/InterfaceWindow.h, unit v5L31) is the observed operator new above, and the one
+// arena read of the real files (InterfaceDrawEngineMesh's constructor, which no case runs) has a null base.
+namespace tpw {
+uint8_t* gArenaBase = nullptr;
+}  // namespace tpw
 
 using namespace calllog;
 using namespace SamsUtilities;

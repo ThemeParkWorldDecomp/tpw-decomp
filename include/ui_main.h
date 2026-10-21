@@ -1,6 +1,7 @@
 // ui_main.cpp (main app). PARTIAL: the text conversion (src/ui_main.cpp) and the start of
 // the interface with its meshes (src/ui_main_meshes.cpp). UI text is 16-bit (the Mac wchar_t).
 #pragma once
+#include <cstddef>
 #include <cstdint>
 
 #include "Ptr32.h"
@@ -350,6 +351,9 @@ public:
     void DeInitWindow();               // 0x101c4cf0 (4 bytes, nothing)
     void ChangeName(char16_t* name);   // 0x101c558c (56 bytes): gStaffRoomPanelThing->SetName when there is one
     const char16_t* GetName();         // 0x101c55f8 (64 bytes): its name, NULL without a thing
+    // the Mac object, read by offset through UIStatusPanelFields (unit v5L31: an empty class made the global one byte, and the static
+    // initialiser's fields ran over its neighbours); the Mac's size is 0x24 (gStaffStatusF40 follows it)
+    uint8_t mFields[0x24];
 };
 // Unit v5364: the staff status panel's edit-name window handler and what it calls (untranslated, faked by the test library).
 int32_t OneEditMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101c56bc (388 bytes)
@@ -375,7 +379,7 @@ public:
     void Show(CThing* thing);          // 0x101433f8 (112 bytes)
     // Unit v5521 (src/WorldSavvy_VisitorStatusPanel_InitStatusWindow.cpp)
     uint8_t mF00[0x10];                // 0x00  (not known)
-    InterfaceWindow* mWindow;          // 0x10  the panel's window (a Ptr32 on the Mac, native here)
+    Ptr32<InterfaceWindow> mWindow;    // 0x10  the panel's status window (UIStatusPanelFields; unit v5L31)
     // 0x10142238 (2092 bytes): gives the panel's child windows (ids 0x3724 to 0x3733) their draw objects, fonts (table entry 6) and texts.
     void InitStatusWindow();
     // Unit v5929 (src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2.cpp). The object has the UIStatusPanelFields layout
@@ -385,7 +389,7 @@ public:
     void Remove();              // 0x1014356c (36 bytes, stand-in)
     void Locate();              // 0x1014350c (44 bytes, stand-in)
     void UpdateStatusWindow();  // 0x10142ae4 (1056 bytes, stand-in)
-    uint8_t mF18[0x40];         // the rest of the Mac object (the Mac's size is 0x28; the host's pointer is wider than the Mac's)
+    uint8_t mF14[0x28 - 0x14];  // 0x14  the rest of the Mac object (UIStatusPanelFields; the Mac's size is 0x28)
     // Unit v51022 (src/ActionRecorder_CActionRecorder_CActionRecorder_VisitorStatusMsg_2_VisitorStatusPanel_UpdateStatusWindow_2.cpp)
     void UpdateViewWindow();    // 0x10142170 (140 bytes): the sprite preview of the thing in the window at Mac +0x14
     // Unit v51037 (untranslated stand-in): a kid left.
@@ -398,7 +402,7 @@ public:
 };
 // Unit v5929: the globals of ui_visitorStatus.cpp (names invented) and its functions.
 extern CThing* gVisitorStatusThing;        // 0x1037ec10: the thing Show was given
-extern int16_t gVisitorStatusScript[2];    // 0x102a4758: the panel's window script (initial word 1)
+extern int16_t gVisitorStatusScript[];    // 0x102a4758: the panel's window script
 extern int32_t gVisitorStatusWordEC3C;     // 0x1037ec3c: 0x10000 after the static initialiser (no reader known)
 extern int32_t gVisitorStatusWordEC40;     // 0x1037ec40: 0 after the static initialiser (no reader known)
 extern uint32_t* gVisitorStatusTable;      // 0x102a4b5c: the panel's table of virtual slots (an arena block, made by the static initialiser)
@@ -687,7 +691,7 @@ int32_t TwoEditsMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t
 void ShowEditParkNamePanel();                  // 0x1019deac
 extern InterfaceWindow* gEditParkNamePanel;    // 0x1039483c: the panel, NULL while it is not up (names invented in this block)
 extern InterfaceWindow* gParkScreenWindow;     // 0x10394848: the window the panel is built under (its z + 7 is the panel's)
-extern int16_t gEditParkNameScript[2];         // 0x102a9834: the panel's window script (initial word 1; the rest of the data is not recovered)
+extern int16_t gEditParkNameScript[];         // 0x102a9834: the panel's window script
 
 // ---- Unit v5885 (src/ShowEditParkNamePanel_CreateEntryPricePanel_2.cpp): the entry price panel (CreateEntryPricePanel is declared above).
 int32_t EntryPricePanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);        // 0x1019d350
@@ -702,7 +706,6 @@ void WindowEnable(InterfaceWindow* window, int16_t on);   // the virtual Enable 
 
 // ---- Unit v5071 (src/ui_main_kbcapture_UIMain_ShowRidePreview_UIMain_GotoStatusPanelForThing.cpp): the status panels of the other kinds
 // (one object each, only Show is used here; untranslated, the unit's test library fakes them).
-class UIStatusPanelOps;
 struct IDXTYPEUniqueNameThingId;
 template<class Tag, class T> struct tag_IDX_TYPE;
 class RideStatusPanel {
@@ -717,17 +720,17 @@ public:
     void UpdateWhichButtons();                  // 0x101b8cc8 (992 bytes)
     void ShowUpgradePanel();                    // 0x101ba6e8 (528 bytes)
     void UpdateKnobsWindow();                   // 0x101bb494 (588 bytes, stand-in)
-    // The fields the three functions use, named from them (the Mac's offsets in the comments; the host's pointers are wider, so its
-    // offsets differ).
+    // The fields the three functions use, named from them: the Mac's layout (UIStatusPanelFields; the windows and the table are
+    // Ptr32, the windows come from the arena; unit v5L31).
     uint8_t mF00[4];                // 0x00
     int32_t mState;                 // 0x04  the object's state the panel last saw (UIMain_GetObjectState(object, 2))
     int32_t mF08;                   // 0x08  not 0: ShowUpgradePanel does nothing
-    InterfaceWindow* mWindow;       // 0x0c  the panel's window
-    InterfaceWindow* mStatusWindow; // 0x10  the window holding the figures (NULL: nothing to update)
-    uint8_t mF14[0x18 - 0x14];      // 0x14 (the Mac's 0x14 to 0x1c; the host's pointer below sits at host 0x18, so mOps stays where it was)
-    InterfaceWindow* mNameWindow;   // 0x1c  the window that shows the object's name (UpdateWindow; unit v51011)
-    UIStatusPanelOps* mOps;         // 0x20  the table whose slot at +0x2c is told the state changed
-    InterfaceWindow* mUpgradeWindow;   // 0x24  the upgrade panel's window (NULL while it is not up)
+    Ptr32<InterfaceWindow> mWindow;       // 0x0c  the panel's window
+    Ptr32<InterfaceWindow> mStatusWindow; // 0x10  the window holding the figures (NULL: nothing to update)
+    uint8_t mF14[0x1c - 0x14];            // 0x14  the view windows (UIStatusPanelFields)
+    Ptr32<InterfaceWindow> mNameWindow;   // 0x1c  the window that shows the object's name (UpdateWindow; unit v51011)
+    Ptr32<uint32_t> mVtable;              // 0x20  the table of virtual slots (UIStatusPanel_CallSlot; +0x2c is told the state changed)
+    Ptr32<InterfaceWindow> mUpgradeWindow;   // 0x24  the upgrade panel's window (NULL while it is not up)
     uint8_t mF28[4];                // 0x28
     int32_t mSpeed;                 // 0x2c  the operating speed asked of the prospective figures (names guessed)
     int32_t mCapacity;              // 0x30
@@ -769,7 +772,7 @@ void UIMain_NotEnoughDough();
 // Unit v5914: RideStatusPanel::Show's two globals (names invented): the thing the panel was opened for (0x1039599c, bss), and the window
 // script it opens (0x102acef0, initial word 1, the rest of the data is not recovered).
 extern CThing* gRideStatusShowThing;
-extern int16_t gRideStatusScript[2];
+extern int16_t gRideStatusScript[];
 // Unit v5191: the variable tag UpdateStatusWindow builds for the age (id 8, the age without its sign, then 1 for a negative age), passed to
 // TbITable::FormatString by address (Mac stack +0x44: magic, vtable of TbIntegerVTag, id, value, flag).
 struct RideAgeTag : TbIntegerVTag {
@@ -777,7 +780,7 @@ struct RideAgeTag : TbIntegerVTag {
     int32_t mNegative;   // Mac +0x10
 };
 // 0x102ad4f0 (name invented): the upgrade panel's window script (initial word 1; the rest of the data is not recovered).
-extern int16_t gUpgradePanelScript[2];
+extern int16_t gUpgradePanelScript[];
 class UpgradeStatusPanel { public: void Show(CThing* thing);   // 0x101c665c (76 bytes)
     void Remove();   // 0x101c66e0 (36 bytes, stand-in; unit v5548)
     // Unit v5905 (src/UpgradeStatusMsg_UpgradeStatusPanel_InitStatusWindow_2.cpp): the panel is a UIStatusPanel; +0xc the parent window
@@ -793,39 +796,21 @@ class UpgradeStatusPanel { public: void Show(CThing* thing);   // 0x101c665c (76
     void UpdateWindow();         // 0x101c6304 (120 bytes): the text from slot 0x3c to the window at +0x1c, then slots 0x20 and 0x1c
     void DeInitWindow();         // 0x101c62c8 (4 bytes, nothing)
     void DeInitStatusWindow();   // 0x101c6090 (4 bytes, nothing)
+    // the Mac object, read by offset through UIStatusPanelFields (unit v5L31: an empty class made the global one byte, and the static
+    // initialiser's fields ran over its neighbours); the Mac's size is 0x24
+    uint8_t mFields[0x24];
 };
 // Unit v5905: 0x10395b48 (name invented): the thing the upgrade panel shows (Show stores it, InitWindow lists it).
 extern CThing* gUpgradeStatusThing;
 // 0x102af2ac (name invented): the upgrade panel's window script (initial word 1; the rest is not kept here).
-extern int16_t gUpgradeStatusScript[2];
+extern int16_t gUpgradeStatusScript[];
 // Unit v5548 (src/UpgradeStatusMsg.cpp): the upgrade panel's window handler, and the static initialiser of ui_staffStatus.cpp.
 int32_t UpgradeStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101c63b4 (620 bytes)
 void __sinit_ui_staffStatus_cpp();   // 0x101c5bec (100 bytes)
 extern int32_t gStaffStatusF40;      // 0x10395b40 (name invented): 0x10000 after the sinit, no reader known
 extern int32_t gStaffStatusF44;      // 0x10395b44 (name invented): 0 after the sinit
-// Unit v5085: the table the status panels keep a pointer to at Mac +0x20. A call through it is `ops->slot(panel)`: the Mac's vtable has
-// 8 bytes of header and 4 a slot, the one the panel calls is at +0x2c (slot 9). The other slots are not named.
-class UIStatusPanelOps {
-public:
-    virtual void Slot0() {}
-    virtual void Slot1() {}
-    virtual void Slot2() {}
-    virtual void Slot3() {}
-    virtual void Slot4() {}
-    virtual void Slot5() {}   // Mac vtable +0x1c (the panel is passed in r3 on the Mac; RideStatusPanel::Condemned calls it)
-    virtual void Slot6() {}
-    virtual void Slot7() {}
-    virtual void Slot8() {}
-    virtual void Notify(void* panel) {}   // Mac vtable +0x2c: told when the state of the object changed
-    // Unit v5534
-    virtual void Slot10() {}
-    virtual void Slot11(void* panel) {}   // Mac vtable +0x34: RideStatusMsg calls it (__ptr_glue) after GoFirstPerson
-    // Unit v5936
-    virtual void Slot12() {}              // Mac vtable +0x38
-    virtual const char16_t* Slot13(void* panel) { return nullptr; }   // Mac vtable +0x3c: ShopStatusPanel::UpdateWindow hands the answer to the window's SetText
-};
 // 0x101bdee0 Show (80 bytes), 0x101bd28c InitWindow (1080 bytes) and 0x101bcea0 UpdateStatusWindow (944 bytes) (unit v5085, src/ShopStatusPanel_InitWindow.cpp).
-// The fields are named from those two; the Mac's offsets are in the comments (the host's pointers are wider, so its offsets differ).
+// The fields are named from those two; the Mac's layout (UIStatusPanelFields; the windows and the table are Ptr32; unit v5L31).
 class ShopStatusPanel {
 public:
     void Show(CThing* thing);
@@ -834,10 +819,10 @@ public:
     uint8_t mF00[4];              // 0x00
     int32_t mState;               // 0x04  the object's state the panel last saw (UIMain_GetObjectState(object, 2))
     uint8_t mF08[4];              // 0x08
-    InterfaceWindow* mWindow;     // 0x0c  the panel's window
-    InterfaceWindow* mStatusWindow;   // 0x10  the window holding the figures (NULL: nothing to update)
-    uint8_t mF14[0x20 - 0x14];    // 0x14
-    UIStatusPanelOps* mOps;       // 0x20  the Mac's vtable pointer of the panel's second table
+    Ptr32<InterfaceWindow> mWindow;   // 0x0c  the panel's window
+    Ptr32<InterfaceWindow> mStatusWindow;   // 0x10  the window holding the figures (NULL: nothing to update)
+    uint8_t mF14[0x20 - 0x14];    // 0x14  the view windows, then the name window (+0x1c, UpdateWindow)
+    Ptr32<uint32_t> mVtable;      // 0x20  the table of virtual slots (UIStatusPanel_CallSlot)
     int32_t mQuality;             // 0x24  times 50 it is the quality asked of GetProspectiveCostOfGoods
     int32_t mIngredient;          // 0x28  the ingredient amount (InitWindow clears it)
     void Remove();                // 0x101bdf64 (36 bytes, stand-in; unit v5152)
@@ -846,7 +831,7 @@ public:
     void ApplyChanges();                      // 0x101bd9bc (108 bytes): the panel's figures onto the shop
     void applytoallcallback(CThing* thing);   // 0x101bdab8 (144 bytes): the same onto a thing of the shop's type
     // Unit v5936 (src/ShopStatusPanel_InitWindow_ShopStatusPanel_ApplyChanges_ShopStatusPanel_InitStatusWindow.cpp)
-    // The Mac's window pointer at 0x1c (UpdateWindow) is read from mF14 + 4 here (the native pointer fits the 12 bytes of mF14).
+    // The Mac's window pointer at 0x1c (UpdateWindow) is the Ptr32 at mF14 + 8.
     void InitStatusWindow();   // 0x101bc6c4 (1892 bytes): the figures window's draw objects, fonts and texts
     void UpdateWindow();       // 0x101bd730 (600 bytes): the panel's figures from the shop (gStaffRoomPanelThing)
     // Unit v51121 (src/LCPostFormat_RideStatusPanel_UpdateStatusWindow_RideStatusPanel_Upgrade_RideStatusPanel_UpgradePanelByeBye.cpp)
@@ -858,7 +843,8 @@ public:
 };
 // 0x1024e580 (unit v5936): "ridestatbar.wct" (16 bytes with the padding), then at +0x10 "happygrad.wct" (the gradients' mesh names)
 extern const char gShopStatusMeshNames[];
-extern int16_t gShopStatusDescription[2];   // 0x102ad644 (name invented, defined in the unit v5734 file): the window description Show hands OpenWindow (first word 1)
+// 0x102ad644 (name invented, defined in the unit v5734 file): the window description Show hands OpenWindow.
+extern int16_t gShopStatusDescription[];
 // 0x19c bytes on the Mac, made by operator new(0x19c) and 0x1018de60 (164 bytes, unit v5L16; unit v5085): the draw object of a money figure.
 extern CObject* gShopStatusObject;   // 0x103959dc (name invented): the shop the panel shows (defined in src/ShopStatusPanel_InitWindow.cpp)
 class ShowStatusPanel { public: void Show(CThing* thing);       // 0x101c2a38 (80 bytes)
@@ -880,6 +866,9 @@ class ShowStatusPanel { public: void Show(CThing* thing);       // 0x101c2a38 (8
     void UpdateViewWindow();                  // 0x101c0ea4 (164 bytes): the ride preview in the view window at +0x14
     void DeInitViewWindow();                  // 0x101c0e48 (36 bytes): UIMain_DestroyRidePreview
     void InitViewWindow();                    // 0x101c0d24 (236 bytes): the view window at +0x18 gets a text sprite and its font
+    // the Mac object, read by offset through UIStatusPanelFields (unit v5L31: an empty class made the global one byte, and the static
+    // initialiser's fields ran over its neighbours); the Mac's size is 0x30 (the ints at +0x24 to +0x2c)
+    uint8_t mFields[0x30];
 };
 
 // Unit v51018: "ridestatbar.wct" at 0x1024e668, "happygrad.wct" 0x10 bytes on.
@@ -906,7 +895,7 @@ struct ShowStatusTag : TbIntegerVTag {
     int32_t mFlag;   // Mac +0x10
 };
 extern CThing* gShowStatusThing;      // 0x10395a54 (name invented): the thing Show was given
-extern int16_t gShowStatusScript[2];  // 0x102ae3e8 (name invented): the panel's window script (initial word 1)
+extern int16_t gShowStatusScript[];  // 0x102ae3e8 (name invented): the panel's window script
 int32_t ShowStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101c2708 (760 bytes)
 
 class BogStatusPanel {
@@ -927,11 +916,14 @@ public:
     void DeInitStatusWindow();  // 0x1019a4c4 (4 bytes): nothing
     void DeInitWindow();        // 0x1019a894 (4 bytes): nothing
     void ApplyChanges();        // 0x1019a978 (4 bytes): nothing
+    // the Mac object, read by offset through UIStatusPanelFields (unit v5L31: an empty class made the global one byte, and the static
+    // initialiser's fields ran over its neighbours); the Mac's size is 0x24
+    uint8_t mFields[0x24];
 };
 int32_t BogStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x1019a9b0 (628 bytes; its TVector is 0x10267aa8)
 void __sinit_ui_bogStatus_cpp();   // 0x1019ad70 (76 bytes, unit v5699): gBogStatusPanel's constructor, table 0x102a9384 at +0x20, mode 0x3ea
 extern CThing* gBogStatusThing;      // 0x103947fc (name invented): the thing Show was given
-extern int16_t gBogStatusScript[];   // 0x102a908c (name invented): the panel's window script (first word 1; the rest not recovered)
+extern int16_t gBogStatusScript[];   // 0x102a908c (name invented): the panel's window script
 class FeatureStatusPanel {
 public:
     void Show(CThing* thing);   // 0x1019edc4 (76 bytes)
@@ -952,16 +944,18 @@ public:
     void DeInitStatusWindow();   // 0x1019e6e4 (4 bytes)
     // Unit v51125 (src/std_exception_what.cpp)
     void DeInitViewWindow();     // 0x1019e314 (36 bytes): UIMain_DestroyRidePreview
+    // the Mac object, read by offset through UIStatusPanelFields (unit v5L31: an empty class made the global one byte, and the static
+    // initialiser's fields ran over its neighbours); the Mac's size is 0x24
+    uint8_t mFields[0x24];
 };
 void __sinit_ui_FeatureStatus_cpp();   // 0x1019eea0 (76 bytes, unit v5904): gFeatureStatusPanel's constructor, table 0x102a9ba0 at +0x20, mode 3
 extern CThing* gFeatureStatusThing;     // 0x1039486c (name invented): the thing Show was given
-extern int16_t gFeatureStatusScript[];  // 0x102a9948 (name invented): the panel's window script (first word 1)
+extern int16_t gFeatureStatusScript[];  // 0x102a9948 (name invented): the panel's window script
 int32_t FeatureStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x10267b40 (TVector; untranslated)
 extern RideStatusPanel gRideStatusPanel;         // 0x103959a4
 extern UpgradeStatusPanel gUpgradeStatusPanel;   // 0x10395b4c
 extern ShopStatusPanel gShopStatusPanel;         // 0x103959e0
-// Unit v5716
-extern UIStatusPanelOps gShopStatusOps;          // 0x102adbd8 (the panel's second table; initial word 0x102adbd0)
+// Unit v5716 (its table 0x102adbd8 is ShopStatusPanelTable, unit v5L31)
 void __sinit_ui_shopStatus_cpp();                // 0x101bdfb8 (76 bytes)
 extern ShowStatusPanel gShowStatusPanel;         // 0x10395a58
 extern BogStatusPanel gBogStatusPanel;           // 0x10394800
@@ -1030,7 +1024,7 @@ public:
     void InitWindow();                   // 0x10193398 (4 bytes)
 };
 // Unit v51114: the table UIStatusPanel::UIStatusPanel stores at +0x20 (Mac 0x102a8644, name invented; the Mac's initial word before it is 0x102a863c).
-// On the host it is a block of the arena (a Ptr32 cannot name a static), made on first use and kept.
+// On the host it is a block of the arena (a Ptr32 cannot name a static), made on first use and kept (src/ui_StatusPanel_tables.cpp, unit v5L31).
 uint32_t* UIStatusPanelTable();
 enum TagId : uint32_t {};
 enum TagButtonAction : int32_t;
@@ -1052,8 +1046,6 @@ int32_t RideStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32
 // Unit v5300: UIStatusPanel::UIStatusPanel() (0x101929e8, 40 bytes, stand-in), a free function so that
 // the globals of other units need no constructor.
 void UIStatusPanel_Construct(UIStatusPanel* self);
-// Unit v5300: the table RideStatusPanel::mOps points at (0x102ad5fc, original name unknown)
-extern UIStatusPanelOps gRideStatusPanelOps;   // 0x102ad5fc
 // Unit v5090: the Mac layout of a UIStatusPanel, which the members above read through raw offsets (the class itself has no members, its
 // derived classes lay their own over them). The windows are Ptr32 (arena offsets). The Mac's table at +0x20 is a table of
 // TVector pointers, called through __ptr_glue; on the host each entry is the arena offset of a block whose first 8 bytes are a
@@ -1069,6 +1061,37 @@ struct UIStatusPanelFields {
     uint32_t mF1C;                  // 0x1c
     Ptr32<uint32_t> mVtable;        // 0x20
 };
+// Unit v5L31: a slot of that table as the host keeps it: the panel (the Mac's r3), the slot's argument (r4: Show's thing, ChangeName's
+// name; the other slots ignore it) and the answer (r3: GetName's text).
+using UIStatusPanelSlot = uint64_t (*)(void* panel, const void* arg);
+// A table: entry offset / 4 is the arena offset of an 8-byte block holding the slot of Mac offset `offset` (the blocks follow the 32
+// words in the same arena block); slots[i] is the slot of Mac offset 4 * i, null for none (the two header words).
+inline uint32_t* UIStatusPanel_MakeTable(const UIStatusPanelSlot* slots, int32_t count) {
+    uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(32 * sizeof(uint32_t) + 32 * sizeof(UIStatusPanelSlot)));
+    UIStatusPanelSlot* blocks = reinterpret_cast<UIStatusPanelSlot*>(table + 32);
+    for (int32_t i = 0; i < count && i < 32; ++i) {
+        if (slots[i] == nullptr) continue;
+        blocks[i] = slots[i];
+        table[i] = tpw::ArenaOffset(&blocks[i]);
+    }
+    return table;
+}
+// The call through the table at +0x20 of a Mac-layout panel (the Mac's __ptr_glue call of the slot at `offset`).
+inline uint64_t UIStatusPanel_CallSlot(void* panel, uint32_t offset, const void* arg = nullptr) {
+    const uint32_t* table = reinterpret_cast<UIStatusPanelFields*>(panel)->mVtable.get();
+    const UIStatusPanelSlot slot = *reinterpret_cast<const UIStatusPanelSlot*>(tpw::gArenaBase + table[offset / 4]);
+    return slot(panel, arg);
+}
+// The tables the static initialisers store at +0x20 (the Mac's vtables; src/ui_StatusPanel_tables.cpp), made on first use and kept.
+uint32_t* RideStatusPanelTable();        // 0x102ad5fc
+uint32_t* ShopStatusPanelTable();        // 0x102adbd8
+uint32_t* ShowStatusPanelTable();        // 0x102ae980
+uint32_t* StaffStatusPanelTable();       // 0x102af264
+uint32_t* StaffRoomStatusPanelTable();   // 0x102aed88
+uint32_t* UpgradeStatusPanelTable();     // 0x102af4dc
+uint32_t* FeatureStatusPanelTable();     // 0x102a9ba0
+uint32_t* BogStatusPanelTable();         // 0x102a9384
+uint32_t* VisitorStatusPanelTable();     // 0x102a4b5c
 class CObject;
 extern int32_t gStatusPanelListCount;       // 0x103947a0 (name invented): what StatusPanelIteratorCallback counts
 extern uint8_t gStatusPanelClickStackDir;   // 0x102e47f0 (name invented)
@@ -1085,8 +1108,8 @@ public:
     void Show(CThing* thing);                               // 0x101c4014 (76 bytes, untranslated; unit v5071)
     void UpdateViewSprite(CStaff* staff);                   // 0x101c2b88
     uint8_t mF00[0xc];       // 0x00  not used by the unit
-    InterfaceWindow* mWindow;   // 0x0c  the panel's window (a 32-bit pointer on the Mac)
-    uint8_t mF18[0x24 - 0x18];  // (Mac 0x10 to 0x23)
+    Ptr32<InterfaceWindow> mWindow;   // 0x0c  the panel's window (StaffRoomPanelFields; unit v5L31)
+    uint8_t mF10[0x24 - 0x10];        // 0x10  the other windows and the table (StaffRoomPanelFields)
     int32_t mScript;         // 0x24  the script handle of the staff view (0 none)
     int32_t mF28;            // 0x28  -1 after the script is killed
     int32_t mF2c;            // 0x2c  -1 after the script is killed
@@ -1105,6 +1128,13 @@ public:
     void DeInitStatusWindow();                    // 0x101c3010 (4 bytes, nothing)
     void DeInitWindow();                          // 0x101c3978 (4 bytes, nothing)
 };
+// Unit v5L31: the panels the base's members (OpenWindow, CloseWindow, the slot calls) reach by the Mac's offsets keep the Mac's layout.
+static_assert(offsetof(RideStatusPanel, mWindow) == 0x0c && offsetof(RideStatusPanel, mVtable) == 0x20 && offsetof(RideStatusPanel, mDuration) == 0x34);
+static_assert(offsetof(ShopStatusPanel, mWindow) == 0x0c && offsetof(ShopStatusPanel, mVtable) == 0x20 && offsetof(ShopStatusPanel, mF2c) == 0x2c);
+static_assert(offsetof(VisitorStatusPanel, mWindow) == 0x10 && sizeof(VisitorStatusPanel) == 0x28);
+static_assert(offsetof(StaffRoomStatusPanel, mWindow) == 0x0c && offsetof(StaffRoomStatusPanel, mScript) == 0x24);
+static_assert(sizeof(StaffStatusPanel) == 0x24 && sizeof(UpgradeStatusPanel) == 0x24 && sizeof(ShowStatusPanel) == 0x30);
+static_assert(sizeof(BogStatusPanel) == 0x24 && sizeof(FeatureStatusPanel) == 0x24 && sizeof(UIStatusPanelFields) == 0x24);
 // Unit v51051: the staff panel's free functions and the two words its static initialiser sets (names invented).
 class CPeep;
 int32_t _applytoall(CThing* thing);       // 0x101c25c0 (48 bytes): gShowStatusPanel.applytoallcallback(thing), answers 1
@@ -1142,7 +1172,7 @@ struct IDXTYPEUniqueNameThingId;
 template<class Tag, class T> struct tag_IDX_TYPE;
 extern tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> gStaffRoomId;   // 0x10395a90 (name invented; a word on the Mac, the id in its high half)
 extern CThing* gStaffRoomShowThing;                                     // 0x10395a88 (name invented): the thing Show was given
-extern int16_t gStaffRoomScript[];                                      // 0x102ae9c8 (name invented): the panel's window script (first word 0, then 1)
+extern int16_t gStaffRoomScript[];                                      // 0x102ae9c8 (name invented): the panel's window script
 extern uint32_t gLCFontIndex;                        // 0x102aed60 (name invented): the font table index LCPostFormat uses (7 at start)
 extern int32_t gStaffRoomMsg406;                     // 0x102aed68 (name invented): the last b of message 0x406 (1 at start)
 extern CThing* gStaffRoomPanelThing;                 // 0x103947a4 (name invented): the thing CreateAllItemsPanel is given
@@ -1175,7 +1205,7 @@ extern int32_t gStaffRoomValueA;         // 0x10395acc (name invented): 0x10000 
 extern int32_t gStaffRoomValueB;         // 0x10395ad0 (name invented): 0 after the static initialiser
 extern uint32_t* gStaffRoomPanelTable;   // 0x102aed88 (name invented): the table the staff room panel's +0x20 holds (made at the first static init)
 extern uint32_t* gShowStatusTable;       // 0x102ae980 (name invented): the table the show status panel's +0x20 holds (the same)
-extern int16_t gStaffEditNameScript[2];  // 0x102af16c (name invented): the staff name panel's window script (first word 1)
+extern int16_t gStaffEditNameScript[];  // 0x102af16c (name invented): the staff name panel's window script
 class InterfaceFont;
 class InterfaceDrawObject;
 // Callees the host cannot call as the Mac does: weak definitions in src/..._sinit_ui_staffRoomStatus_cpp_callees.cpp, faked by the test library.

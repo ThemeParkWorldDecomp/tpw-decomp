@@ -64,15 +64,16 @@ void CRenderMemory::Reset(int32_t pools) {
     mScratchNext = mScratch;
 }
 
-// One pool's two blocks; on failure nothing of the pool stays allocated.
+// One pool's two blocks (1 MB of vertices, 128 KB for indices of which 64 KB count, times kPoolScale: 1 as on
+// the Mac, see tb_rendermemory.h); on failure nothing of the pool stays allocated.
 static bool InitPool(CRenderMemoryType& pool) {
-    pool.mData = static_cast<uint8_t*>(gMalloc(0x100000));
+    pool.mData = static_cast<uint8_t*>(gMalloc(0x100000 * CRenderMemory::kPoolScale));
     if (pool.mData == nullptr) {
         gei_ErrorHandler.Push(3, kErrOutOfMemory);
         return false;
     }
-    pool.mSize = 0x100000;
-    pool.mIndexData = static_cast<uint8_t*>(gMalloc(0x20000));
+    pool.mSize = 0x100000 * CRenderMemory::kPoolScale;
+    pool.mIndexData = static_cast<uint8_t*>(gMalloc(0x20000 * CRenderMemory::kPoolScale));
     if (pool.mIndexData == nullptr) {
         gei_ErrorHandler.Push(3, kErrOutOfMemory);
         if (pool.mIndexData != nullptr) gFree(reinterpret_cast<void*&>(pool.mIndexData));
@@ -81,7 +82,7 @@ static bool InitPool(CRenderMemoryType& pool) {
         pool.mIndexSize = 0;
         return false;
     }
-    pool.mIndexSize = 0x10000;
+    pool.mIndexSize = 0x10000 * CRenderMemory::kPoolScale;
     pool.mUsed = 0;
     pool.mIndexUsed = 0;
     return true;

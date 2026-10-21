@@ -466,4 +466,10 @@ int64_t tpw_ts_run(int32_t op, const int64_t* a, const int64_t* description, int
 // How many numbers the last run wanted to put (more than the capacity it was given if the
 // test's buffer was too small).
 int32_t tpw_ts_count() { return gCount; }
+
+// 1 when the unit is built with the port fixes on (unit v5L47): SortEntries, SortByCriteria and
+// SortByAddress then take a list longer than 4096 entries whole.
+int32_t tpw_ts_portfix() {
+    return 0;
+}
 }

@@ -20,6 +20,7 @@
 #include "ThingReceivers.h"
 #include "WorldThings.h"
 #include "analyser.h"
+#include "platform/arena.h"
 #include "rsse.h"
 
 namespace {
@@ -85,8 +86,9 @@ tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> CWorld::AddThingToThingList(CTh
 }
 
 // 0x1013af58 (192 bytes). Unlinks the entry from the used list and pushes it on the free list, then releases the thing with the plain
-// operator delete (no destructor runs) and clears the pointer. The used head is overwritten whenever the entry's previous link is NULL,
-// even for an entry that is not the head (a double free).
+// operator delete (no destructor runs) and clears the pointer. The Mac's delete gives the block back to the game heap: on the host that is
+// the arena, where the things are made (unit v5L31); a block from anywhere else goes back to the host heap. The used head is overwritten
+// whenever the entry's previous link is NULL, even for an entry that is not the head (a double free).
 void CThingArrayEntry::FreeMe() {
     GAME_ASSERTMSG(mThing != nullptr, kFreeEmptyText);
     if (mNextUsed != nullptr) mNextUsed->mPrevUsed = mPrevUsed;
@@ -96,7 +98,8 @@ void CThingArrayEntry::FreeMe() {
     mPrevUsed = nullptr;
     mNextFree = gFreeThingHead;
     gFreeThingHead = this;
-    ::operator delete(mThing);
+    if (tpw::InArena(mThing)) tpw::ArenaFree(mThing);
+    else ::operator delete(mThing);
     mThing = nullptr;
 }
 

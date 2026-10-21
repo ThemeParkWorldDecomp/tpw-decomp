@@ -22,7 +22,7 @@
 
 using namespace calllog;
 
-extern int16_t gEditNamePanelScript[2];   // defined by the translation
+extern int16_t gEditNamePanelScript[];   // defined by the translation
 
 // ---- globals of other files, defined here
 CThing* gStaffRoomPanelThing;

@@ -12,14 +12,14 @@
 int32_t gStaffStatusF40;   // 0x10395b40
 int32_t gStaffStatusF44;   // 0x10395b44
 
-// The staff panel is built with the UIStatusPanel constructor, then its table pointer (+0x20) gets the Mac's table at 0x102af264 (the table
-// is not recovered, so the word is kept as the Mac address) and its mode word (+0) -1.
+// The staff panel is built with the UIStatusPanel constructor, then its table pointer (+0x20) gets the Mac's table at 0x102af264 (on the host
+// an arena block, src/ui_StatusPanel_tables.cpp) and its mode word (+0) -1.
 void __sinit_ui_staffStatus_cpp() {
     gStaffStatusF44 = 0;
     gStaffStatusF40 = 0x10000;
     UIStatusPanelFields* fields = reinterpret_cast<UIStatusPanelFields*>(&gStaffStatusPanel);
     UIStatusPanel_Construct(reinterpret_cast<UIStatusPanel*>(&gStaffStatusPanel));
-    fields->mVtable.mOffset = 0x102af264;
+    fields->mVtable.set(StaffStatusPanelTable());
     fields->mMode = -1;
 }
 

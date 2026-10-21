@@ -82,7 +82,7 @@ void RideStatusPanel::BreakDown(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t>
     // 0x1024e487
     GAME_ASSERTMSG(gThingArray[0].mThing == nullptr, "Thing has been allocated in ThingArray index 0 - shouldn't happen\n");
     void* thing = gThingArray[id.mIndex].mThing;
-    if (thing != nullptr && thing == static_cast<void*>(gStaffRoomPanelThing)) mOps->Slot5();
+    if (thing != nullptr && thing == static_cast<void*>(gStaffRoomPanelThing)) UIStatusPanel_CallSlot(this, 0x1c);
 }
 
 void ShopStatusPanel::InitViewWindow() { InitView(this); }            // 0x101bc468

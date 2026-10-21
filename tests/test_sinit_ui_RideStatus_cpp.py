@@ -68,15 +68,16 @@ class Host:
 
     def fill(self, c):
         C.memmove(self.a("f00"), struct.pack("<I", c[0]), 4)
-        C.memmove(self.a("mops"), struct.pack("<Q", self.a("ops") + 8 if c[1] & 1 else 0x1000 + c[1]), 8)
+        # the table pointer is a Ptr32 (the arena offset of RideStatusPanelTable(), unit v5L31)
+        C.memmove(self.a("mops"), struct.pack("<I", self.lib.tpw_sinit_off(self.a("ops")) + 8 if c[1] & 1 else (0x1000 + c[1]) & 0xFFFFFFFF), 4)
         C.memmove(self.a("f28"), struct.pack("<I", c[2]), 4)
 
     def call(self):
         self.lib.tpw_sinit_run()
 
     def observe(self):
-        ops = struct.unpack("<Q", C.string_at(self.a("mops"), 8))[0]
-        return {"f00": struct.unpack("<I", C.string_at(self.a("f00"), 4))[0], "ops": ops == self.a("ops"), "rawops": 0,
+        ops = struct.unpack("<I", C.string_at(self.a("mops"), 4))[0]
+        return {"f00": struct.unpack("<I", C.string_at(self.a("f00"), 4))[0], "ops": ops == self.lib.tpw_sinit_off(self.a("ops")), "rawops": 0,
                 "f28": struct.unpack("<I", C.string_at(self.a("f28"), 4))[0], "log": CL.host_end(self.lib)}
 
     def done(self):
@@ -89,6 +90,7 @@ def bind(lib):
     lib.tpw_sinit_addr.restype, lib.tpw_sinit_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_sinit_alloc.restype, lib.tpw_sinit_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_sinit_layout.argtypes = [C.POINTER(C.c_int64)]
+    lib.tpw_sinit_off.restype, lib.tpw_sinit_off.argtypes = C.c_uint32, [C.c_uint64]
     out = (C.c_int64 * 32)()
     n = lib.tpw_sinit_layout(out)
     assert list(out)[:n] == [4, 4], list(out)[:n]

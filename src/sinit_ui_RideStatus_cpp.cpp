@@ -10,7 +10,7 @@ __attribute__((weak)) void UIStatusPanel_Construct(UIStatusPanel*) {}
 void __sinit_ui_RideStatus_cpp() {
     RideStatusPanel* panel = &gRideStatusPanel;
     UIStatusPanel_Construct(reinterpret_cast<UIStatusPanel*>(panel));
-    panel->mOps = &gRideStatusPanelOps;
+    panel->mVtable.set(RideStatusPanelTable());
     panel->mF00[0] = 0; panel->mF00[1] = 0; panel->mF00[2] = 0; panel->mF00[3] = 0;
     panel->mF28[0] = 0; panel->mF28[1] = 0; panel->mF28[2] = 0; panel->mF28[3] = 0;
 }

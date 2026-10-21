@@ -14,14 +14,16 @@
 #include "CVariableTime.h"
 #include "UIInterface.h"
 #include "GameSys.h"
+#include "platform/arena.h"
 
 // The hud and movie toggles (names invented).
 int32_t gKeyHudToggle = 0;      // 0x1037f238
 int32_t gKeyMovieToggle = 0;    // 0x1037f23c
 
 namespace keyaction_callee {
-// The runtime's operator new (0x102384b8); weak so the test library can fake it.
-__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(size); }
+// The runtime's operator new (0x102384b8), the game heap: the arena on the host (the staff it makes are things, whose addresses the
+// lists keep in 32 bits); weak so the test library can fake it.
+__attribute__((weak)) void* OperatorNew(uint32_t size) { return tpw::ArenaAlloc(size); }
 }  // namespace keyaction_callee
 
 namespace {

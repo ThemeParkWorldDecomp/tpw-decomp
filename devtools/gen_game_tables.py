@@ -11,7 +11,7 @@ configure time (TPW_GAME_PROGRAM, see CMakeLists.txt) and compiles what it write
   AdvisorBalance_table.cpp    the description rows of the advisor balance table, 0x3c bytes each at 0x1028318c
   AdvisorScorerSources.cpp    the advisor scorers, 351 pointers to member of 12 bytes at 0x1027df30 (named by include/AdvisorScoring.h)
   SaveLegalText.inc           the seven legal texts of the save file header, UTF-16 at 0x10249f40
-  WindowScripts.inc           the window scripts of the park panels the handheld opens (WINDOW_SCRIPTS: address, words, array)
+  WindowScripts.inc           the window scripts of the park and status panels (WINDOW_SCRIPTS: address, words, array)
 
 The program is the data fork of the "SimTheme Park" application of the 2.04b3 patch, a PowerPC PEF container.
 The addresses are the decompile's: the code section at 0x10000000, the data section right after it on a 16-byte
@@ -350,22 +350,36 @@ def advisor_scorers(p):
     return out
 
 
-# The park panels' window scripts the handheld's buttons build: (address, words, the array that holds them). The word count is the
-# walk's (below), checked so a wrong address stops the configure instead of building a broken panel.
+# The park panels' window scripts the handheld's buttons build, and those of the status panels and their name and upgrade panels
+# (unit v5L31): (address, words, the array that holds them). The word count is the walk's (below), checked so a wrong address stops
+# the configure instead of building a broken panel.
 WINDOW_SCRIPTS = [
+    (0x102A4758, 500, "gVisitorStatusScript"),
+    (0x102A8530, 134, "gEditNamePanelScript"),
     (0x102A868C, 245, "gAllKidsScript"),
     (0x102A8884, 235, "gAllItemsScript"),
     (0x102A8A5A, 116, "gAllRidesScript"),
     (0x102A8C3C, 89, "gAllFeaturesScript"),
     (0x102A8D0E, 441, "gAllStaffScript"),
+    (0x102A908C, 365, "gBogStatusScript"),
     (0x102A96A8, 198, "gEntryPriceScript"),
+    (0x102A9834, 134, "gEditParkNameScript"),
+    (0x102A9948, 286, "gFeatureStatusScript"),
     (0x102A9BEC, 380, "gFinanceScript"),
     (0x102A9EE8, 538, "gHirePanelScript"),
     (0x102AA4A4, 458, "gLoansScript"),
     (0x102AB734, 572, "gParkStatusScript"),
     (0x102AC35A, 924, "gResearchPanelScript"),
     (0x102ACA9C, 541, "gRideListScript"),
+    (0x102ACEF0, 768, "gRideStatusScript"),
+    (0x102AD4F0, 117, "gUpgradePanelScript"),
+    (0x102AD644, 700, "gShopStatusDescription"),
     (0x102ADC20, 674, "gStaffCostsScript"),
+    (0x102AE3E8, 701, "gShowStatusScript"),
+    (0x102AE9C8, 460, "gStaffRoomScript"),
+    (0x102AEDD0, 462, "gStaffStatusScript"),
+    (0x102AF16C, 109, "gStaffEditNameScript"),
+    (0x102AF2AC, 266, "gUpgradeStatusScript"),
     (0x102B2366, 674, "gMapPanelScript"),
     # Unit v5L42: the scripts the launcher had as zero stand-ins (src/ui_window_scripts.cpp) and those its files held as two-word
     # placeholders. Each address is the one its building function loads from the TOC; each walk ends where the next named data begins

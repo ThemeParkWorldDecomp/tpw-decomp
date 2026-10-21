@@ -15,9 +15,10 @@
 #include "analyser.h"
 #include "ui_main.h"
 #include "MainWindowCallback.h"
+#include "WindowScripts.inc"
 
 CThing* gShowStatusThing;                  // 0x10395a54
-int16_t gShowStatusScript[2] = {0, 1};     // 0x102ae3e8
+int16_t gShowStatusScript[] = {TPW_WINDOW_SCRIPT_102AE3E8};   // 0x102ae3e8: the image's words (generated, devtools/gen_game_tables.py)
 
 namespace {
 

@@ -16,9 +16,10 @@
 #include "bfl_FileSystem.h"
 #include "platform/arena.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
 CThing* gVisitorStatusThing = nullptr;               // 0x1037ec10
-int16_t gVisitorStatusScript[2] = {1, 0};            // 0x102a4758
+int16_t gVisitorStatusScript[] = {TPW_WINDOW_SCRIPT_102A4758};   // 0x102a4758: the image's words (generated, devtools/gen_game_tables.py)
 int32_t gVisitorStatusWordEC3C = 0;                  // 0x1037ec3c
 int32_t gVisitorStatusWordEC40 = 0;                  // 0x1037ec40
 uint32_t* gVisitorStatusTable = nullptr;             // 0x102a4b5c
@@ -123,9 +124,8 @@ void __sinit_ui_visitorStatus_cpp() {
     gVisitorStatusWordEC40 = 0;
     gVisitorStatusWordEC3C = 0x10000;
     UIStatusPanel_Construct(reinterpret_cast<UIStatusPanel*>(&gVisitorStatusPanel));
-    // The Mac stores the address of its table of virtual slots (0x102a4b5c); the host's is an arena block, the entries to be filled by whoever
-    // defines the panel's slots.
-    if (gVisitorStatusTable == nullptr) gVisitorStatusTable = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));
+    // The Mac stores the address of its table of virtual slots (0x102a4b5c); the host's is an arena block (src/ui_StatusPanel_tables.cpp).
+    if (gVisitorStatusTable == nullptr) gVisitorStatusTable = VisitorStatusPanelTable();
     UIStatusPanelFields* fields = Fields(&gVisitorStatusPanel);
     fields->mVtable.set(gVisitorStatusTable);
     fields->mMode = -2;

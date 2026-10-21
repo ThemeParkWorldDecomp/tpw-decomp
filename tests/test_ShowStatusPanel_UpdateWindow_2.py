@@ -200,6 +200,9 @@ class Ppc(Side):
     def log(self):
         return self.L.log
 
+    def sinit_table(self, word):
+        return word
+
     def slot_entry(self, kind):
         return MAGIC[kind]
 
@@ -248,6 +251,10 @@ class Host(Side):
     def log(self):
         return CL.host_end(self.lib)
 
+    def sinit_table(self, word):
+        # the static initialiser's table is the arena offset of UpgradeStatusPanelTable() (unit v5L31): the Mac's address when it is that
+        return 0x102AF4DC if word == self.lib.tpw_us_sinit_table() else word
+
     def slot_entry(self, kind):
         b = self.alloc(16)
         self.write(b, struct.pack("<Q", self.lib.tpw_us_fn(kind)))
@@ -285,6 +292,7 @@ def bind(lib):
     lib.tpw_us_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_us_updatewindow.argtypes = [C.c_uint64]
     lib.tpw_us_sinit.argtypes = []
+    lib.tpw_us_sinit_table.restype, lib.tpw_us_sinit_table.argtypes = C.c_uint32, []
     lib.tpw_us_yearend.restype, lib.tpw_us_yearend.argtypes = C.c_int32, [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
     out = (C.c_int64 * 32)()
     n = lib.tpw_us_layout(out)
@@ -322,7 +330,7 @@ def execute(s, case):
 
 def observe(s, case, answer):
     return {"answer": answer, "log": s.log(), "yearend": {0: 0, s.blk[L_YEWIN] & MASK: 1}.get(s.rd_word(s.g("yearend")), 2),
-            "upgrade": s.rd_words(s.g("upgrade"), 9)}
+            "upgrade": s.rd_words(s.g("upgrade"), 8) + [s.sinit_table(s.rd_word(s.g("upgrade") + 0x20))]}
 
 
 def run(s, case):

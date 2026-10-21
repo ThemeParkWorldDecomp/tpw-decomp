@@ -17,6 +17,7 @@
 #include "World.h"
 #include "ui_DrawObject.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 
 using namespace calllog;
 
@@ -26,14 +27,18 @@ CThing* gStaffRoomPanelThing;
 
 namespace {
 
-alignas(16) unsigned char gWindows[15][0x140];
+// The windows are blocks of the arena: the panel keeps them in Ptr32s (unit v5L31).
+unsigned char (*Windows())[0x140] {
+    static auto* windows = static_cast<unsigned char(*)[0x140]>(tpw::ArenaAllocZeroed(15 * 0x140));
+    return windows;
+}
 RideStatusPanel gPanel;
 
-class FakeOps : public UIStatusPanelOps {
-public:
-    void Slot5() override { ev("Slot5", {}); }   // the host call cannot carry the panel (the Mac passes it in r3)
-};
-FakeOps gOps;
+// The panel's table: the slot at +0x1c is logged as the Mac's stub logs it.
+uint64_t Slot(void*, uint32_t offset, const void*) {
+    if (offset == 0x1c) ev("Slot5", {});
+    return 0;
+}
 
 int64_t Ptr(const void* p) { return static_cast<int64_t>(reinterpret_cast<uintptr_t>(p)); }
 
@@ -44,7 +49,7 @@ void GAME_ASSERTMSG(int32_t condition, const char* format, ...) { ev("assert", {
 
 InterfaceWindow* InterfaceWindow::GetWindow(int32_t id) {
     ev("GetWindow", {lab(this), id});
-    return reinterpret_cast<InterfaceWindow*>(gWindows[id - 0x3e16 + 1]);
+    return reinterpret_cast<InterfaceWindow*>(Windows()[id - 0x3e16 + 1]);
 }
 void InterfaceWindow::SetClientDrawObject(InterfaceDrawObject* object) { ev("SetClientDrawObject", {lab(this), lab(object)}); }
 void InterfaceWindow::SetFont(InterfaceFont* font) { ev("SetFont", {lab(this), Ptr(font) & 0xffffffff}); }
@@ -77,7 +82,7 @@ void GradientCtor(void* mem, void* data) { ev("GradientCtor", {newlab(mem)}, {st
 extern "C" {
 
 uint64_t tpw_ride_addr(const char* name) {
-    if (std::strncmp(name, "win", 3) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(gWindows[std::atoi(name + 3)]));
+    if (std::strncmp(name, "win", 3) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(Windows()[std::atoi(name + 3)]));
     if (std::strcmp(name, "panel") == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&gPanel));
     return 0;
 }
@@ -92,9 +97,9 @@ int32_t tpw_ride_layout(int64_t* out) {
 
 // The panel: window (+0x0c), status window (+0x10) and the ops table (+0x20, always there).
 void tpw_ride_panel_set(uint64_t window, uint64_t status) {
-    gPanel.mWindow = reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(window));
-    gPanel.mStatusWindow = reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(status));
-    gPanel.mOps = &gOps;
+    gPanel.mWindow.set(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(window)));
+    gPanel.mStatusWindow.set(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(status)));
+    gPanel.mVtable.set(FakeStatusPanelTable<Slot>());
 }
 void tpw_ride_set_thing(uint32_t index, uint64_t value) { gThingArray[index].mThing = reinterpret_cast<void*>(static_cast<uintptr_t>(value)); }
 void tpw_ride_set_staff(uint64_t value) { gStaffRoomPanelThing = reinterpret_cast<CThing*>(static_cast<uintptr_t>(value)); }

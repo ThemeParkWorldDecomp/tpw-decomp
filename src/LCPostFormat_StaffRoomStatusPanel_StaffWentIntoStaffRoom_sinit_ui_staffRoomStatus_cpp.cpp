@@ -14,6 +14,7 @@
 #include "ui_DrawObject.h"
 #include "ui_ErrorDisplay.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
 int32_t gStaffRoomListFormat;                          // 0x10395a8c
 int32_t gStaffRoomValueA = 0;                          // 0x10395acc
@@ -21,17 +22,16 @@ int32_t gStaffRoomValueB = 0;                          // 0x10395ad0
 uint32_t* gStaffRoomPanelTable;                        // 0x102aed88 (a block made by the static initialiser: a Ptr32 field cannot hold the data address)
 uint32_t* gShowStatusTable;                            // 0x102ae980 (the same)
 
-static uint32_t* MakeTable(uint32_t*& table) {
-    if (table == nullptr) table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(8));
+static uint32_t* MakeTable(uint32_t*& table, uint32_t* (*make)()) {
+    if (table == nullptr) table = make();
     return table;
 }
-int16_t gStaffEditNameScript[2] = {0, 1};              // 0x102af16c
+int16_t gStaffEditNameScript[] = {TPW_WINDOW_SCRIPT_102AF16C};   // 0x102af16c: the image's words (generated, devtools/gen_game_tables.py)
 
 // The callees the host cannot call as the Mac does (new plus constructor, the virtuals through __ptr_glue): weak, faked by the test library.
 namespace staffroom_callee {
 __attribute__((weak)) InterfaceWindow* NewRowWindow(int16_t bottom) {
-    void* memory = ::operator new(sizeof(InterfaceWindow));   // 0x138 bytes on the Mac; the host window is larger
-    return new (memory) InterfaceWindow(nullptr, 0, 0, 0, 0, 100, bottom);
+    return new InterfaceWindow(nullptr, 0, 0, 0, 0, 100, bottom);   // 0x138 bytes of the game heap on the Mac; the host window is larger (arena)
 }
 __attribute__((weak)) int16_t FontHeight(InterfaceFont* font) { return static_cast<int16_t>(font->GetHeight()); }
 __attribute__((weak)) InterfaceDrawObject* NewTitleText() { return new InterfaceTitleTextObject(nullptr); }
@@ -43,7 +43,7 @@ __attribute__((weak)) void WindowSetText(InterfaceWindow* window, const char16_t
 void __sinit_ui_showStatus_cpp() {
     UIStatusPanel_Construct(reinterpret_cast<UIStatusPanel*>(&gShowStatusPanel));
     UIStatusPanelFields* fields = reinterpret_cast<UIStatusPanelFields*>(&gShowStatusPanel);
-    fields->mVtable.set(MakeTable(gShowStatusTable));
+    fields->mVtable.set(MakeTable(gShowStatusTable, ShowStatusPanelTable));
     fields->mMode = 2;
 }
 
@@ -53,7 +53,7 @@ void __sinit_ui_staffRoomStatus_cpp() {
     gStaffRoomValueA = 0x10000;
     UIStatusPanel_Construct(&gStaffRoomStatusPanel);
     StaffRoomPanelFields* fields = reinterpret_cast<StaffRoomPanelFields*>(&gStaffRoomStatusPanel);
-    fields->mTable.set(MakeTable(gStaffRoomPanelTable));
+    fields->mTable.set(MakeTable(gStaffRoomPanelTable, StaffRoomStatusPanelTable));
     fields->mF00 = 0x3eb;
     fields->mScript = 0;
     fields->mF2c = -1;

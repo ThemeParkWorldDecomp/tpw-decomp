@@ -50,7 +50,7 @@ MAC_PANEL = dict(win=0x0C, ops=0x20, upg=0x24, f28=0x28, spd=0x2C, cap=0x30, dur
 MAC_THING = dict(type=0x0E, cond=0x40, lvl=0x4C, spd=0x54, dur=0x58, cap=0x59)
 # panel (window, ops, upgrade window, f28, speed, capacity, duration, size), object (type, condition, level, speed, duration, capacity, size),
 # ride record (size, slot 0's offset, step), control (upgrade cost, size)
-HOST_LAYOUT = [16, 48, 56, 64, 68, 72, 76, 80, 14, 64, 76, 84, 88, 89, 1096, 2824, 24, 8, 4, 32]
+HOST_LAYOUT = [12, 32, 36, 40, 44, 48, 52, 56, 14, 64, 76, 84, 88, 89, 1096, 2824, 24, 8, 4, 32]
 
 # block sizes (Mac, host fills in from the layout)
 MARK_SLOT5, MARK_SLOT11, MARK_SETVALUE = 0x1C, 0x34, 0x24
@@ -186,6 +186,10 @@ class Side:
     def wptr(self, a, v):
         self.wr(a, self.PW, v)
 
+    def wp32(self, a, v):
+        """A 32-bit pointer field of the panel (the Mac's address; the host's arena offset, unit v5L31)."""
+        self.wr(a, 4, v)
+
     def rptr(self, a):
         return self.rd(a, self.PW)
 
@@ -268,6 +272,9 @@ class Host(Side):
     def g(self, name):
         return self.lib.tpw_rsp_addr(name.encode())
 
+    def wp32(self, a, v):
+        self.wr(a, 4, self.lib.tpw_rsp_off(v))
+
     def read(self, a, n):
         return C.string_at(a, n)
 
@@ -295,6 +302,7 @@ def bind(lib):
         return
     lib.tpw_rsp_addr.restype, lib.tpw_rsp_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_rsp_alloc.restype, lib.tpw_rsp_alloc.argtypes = C.c_uint64, [C.c_uint32]
+    lib.tpw_rsp_off.restype, lib.tpw_rsp_off.argtypes = C.c_uint32, [C.c_uint64]
     lib.tpw_rsp_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_rsp_upgrade.restype, lib.tpw_rsp_upgrade.argtypes = C.c_uint32, [C.c_uint64, C.c_int32, C.c_int32]
     lib.tpw_rsp_apply.restype, lib.tpw_rsp_apply.argtypes = None, [C.c_uint64]
@@ -324,9 +332,9 @@ def build(s, case):
     s.wptr(s.g("show"), 0)
     # the panel
     p, pf = B["panel"], s.pf
-    s.wptr(p + pf["win"], B["wpanel"] if case["mwin"] else 0)
-    s.wptr(p + pf["ops"], BLK["ops"] if s.mac else s.g("ops"))
-    s.wptr(p + pf["upg"], case["upg"])
+    s.wp32(p + pf["win"], B["wpanel"] if case["mwin"] else 0)
+    s.wp32(p + pf["ops"], BLK["ops"] if s.mac else s.g("ops"))
+    s.wr(p + pf["upg"], 4, case["upg"])   # only tested for NULL (a Ptr32 on the host)
     s.wr(p + pf["f28"], 4, case["f28"])
     s.wr(p + pf["spd"], 4, case["pspd"])
     s.wr(p + pf["cap"], 4, case["pcap"])
@@ -379,7 +387,7 @@ def observe(s, case, answer):
     mouse = s.rptr(s.g("mouse"))
     return {"answer": answer, "log": s.log(),
             "f28": s.rd(p + pf["f28"], 4), "spd": s.rd(p + pf["spd"], 4), "cap": s.rd(p + pf["cap"], 4), "dur": s.rd(p + pf["dur"], 4),
-            "upg": 1 if s.rptr(p + pf["upg"]) else 0,
+            "upg": 1 if s.rd(p + pf["upg"], 4) else 0,
             "mouse": 0 if mouse == 0 else 1 if mouse == B["mouse0"] else 2,
             "w1e0": s.rd(s.g("w1e0"), 4), "w1e4": s.rd(s.g("w1e4"), 4),
             "show": pmap(s, s.rptr(s.g("show")), case)}

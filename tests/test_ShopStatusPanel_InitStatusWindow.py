@@ -175,6 +175,9 @@ class Ppc(Side):
     def ptr(self, a, v):
         self.words(a, [v])
 
+    def p32(self, a, v):
+        self.words(a, [v])
+
     def log(self):
         return self.L.log
 
@@ -212,7 +215,7 @@ class Host(Side):
         bind(lib)
         lib.tpw_ssiw_reset()
         CL.host_begin(lib, {}, case["queues"])
-        self.off = dict(win=HOST_LAYOUT[0], stat=HOST_LAYOUT[1], w1c=HOST_LAYOUT[2] + 4, ops=HOST_LAYOUT[3])
+        self.off = dict(win=HOST_LAYOUT[0], stat=HOST_LAYOUT[1], w1c=HOST_LAYOUT[2] + 8, ops=HOST_LAYOUT[3])
         self.psize = HOST_LAYOUT[4]
         self.panel = 0
 
@@ -230,6 +233,9 @@ class Host(Side):
 
     def ptr(self, a, v):
         self.write(a, struct.pack("<Q", v))
+
+    def p32(self, a, v):   # the panel's pointer fields are Ptr32 (arena offsets, unit v5L31)
+        self.words(a, [self.lib.tpw_ssiw_off(v)])
 
     def log(self):
         return CL.host_end(self.lib)
@@ -261,6 +267,7 @@ def bind(lib):
         return
     lib.tpw_ssiw_addr.restype, lib.tpw_ssiw_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_ssiw_alloc.restype, lib.tpw_ssiw_alloc.argtypes = C.c_uint64, [C.c_uint32]
+    lib.tpw_ssiw_off.restype, lib.tpw_ssiw_off.argtypes = C.c_uint32, [C.c_uint64]
     lib.tpw_ssiw_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_ssiw_reset.restype, lib.tpw_ssiw_reset.argtypes = None, []
     for n in ("init", "update"):
@@ -269,7 +276,7 @@ def bind(lib):
     out = (C.c_int64 * 32)()
     n = lib.tpw_ssiw_layout(out)
     HOST_LAYOUT = list(out)[:n]
-    assert HOST_LAYOUT[0] == 16 and HOST_LAYOUT[3] - HOST_LAYOUT[2] >= 12, HOST_LAYOUT
+    assert HOST_LAYOUT[:4] == [0xc, 0x10, 0x14, 0x20], HOST_LAYOUT   # the Mac's layout (unit v5L31)
     lib.bound = True
 
 
@@ -280,10 +287,10 @@ def run(s, case):
             if i not in case["missing"]:
                 s.set_window(i, s.win_block(i))
         panel = s.panel = s.alloc(s.psize)
-        s.ptr(panel + s.off["win"], s.win_block(1))
-        s.ptr(panel + s.off["stat"], s.win_block(2) if case["status"] else 0)
-        s.ptr(panel + s.off["w1c"], s.win_block(3))
-        s.ptr(panel + s.off["ops"], s.ops_ptr())
+        s.p32(panel + s.off["win"], s.win_block(1))
+        s.p32(panel + s.off["stat"], s.win_block(2) if case["status"] else 0)
+        s.p32(panel + s.off["w1c"], s.win_block(3))
+        s.p32(panel + s.off["ops"], s.ops_ptr())
         obj = s.alloc(0x140)
         s.words(obj + 0x138, [OBJ_TAG])
         s.ptr(s.global_staff(), obj)

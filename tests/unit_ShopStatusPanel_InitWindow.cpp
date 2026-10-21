@@ -25,6 +25,7 @@
 #include "ui_DrawObject.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 
 using namespace calllog;
 
@@ -44,8 +45,15 @@ alignas(16) uint8_t gPanelBlock[0x80];
 alignas(16) uint8_t gTableBlock[0x40];
 alignas(16) uint8_t gWorldBlock[0x40];
 alignas(16) uint8_t gAnalyserBlock[0x40];
-alignas(16) uint8_t gParentBlock[0x40];
-alignas(16) uint8_t gStatusBlock[0x40];
+// The panel's two windows are blocks of the arena: the panel keeps them in Ptr32s (unit v5L31).
+uint8_t* ParentBlock() {
+    static uint8_t* block = static_cast<uint8_t*>(tpw::ArenaAllocZeroed(0x40));
+    return block;
+}
+uint8_t* StatusBlock() {
+    static uint8_t* block = static_cast<uint8_t*>(tpw::ArenaAllocZeroed(0x40));
+    return block;
+}
 alignas(16) uint8_t gIngredientBlock[0x10];
 alignas(16) uint8_t gFontBlock[0x10];
 alignas(16) uint8_t gOpsBlock[0x10];
@@ -69,9 +77,11 @@ struct FakeWindow : InterfaceWindow {
     }
 };
 
-struct FakeOps : UIStatusPanelOps {
-    void Notify(void* panel) override { ev("PanelNotify", {lab(panel)}); }
-};
+// The panel's table: the slot at +0x2c is told the state changed.
+uint64_t Slot(void* panel, uint32_t offset, const void*) {
+    if (offset == 0x2c) ev("PanelNotify", {lab(panel)});
+    return 0;
+}
 
 FakeWindow** Windows() {
     static FakeWindow* windows[kWindowCount];
@@ -88,11 +98,6 @@ FakeWindow* WindowFor(int32_t id) {
     for (int i = 0; i < kWindowCount; ++i)
         if (kWindowIds[i] == id) return windows[i];
     return nullptr;
-}
-
-FakeOps* Ops() {
-    static FakeOps* ops = new FakeOps();
-    return ops;
 }
 
 int64_t CanonBits(float value) {
@@ -254,7 +259,7 @@ uint64_t tpw_shop_addr(const char* name) {
     const Entry entries[] = {
         {"object", gObjectBlock}, {"object2", gObject2Block}, {"text27", kText27}, {"text28", kText28}, {"converted", gConvertedText},
         {"panel", gPanelBlock}, {"table", gTableBlock}, {"world", gWorldBlock},
-        {"analyser", gAnalyserBlock}, {"parent", gParentBlock}, {"status", gStatusBlock}, {"ingredient", gIngredientBlock},
+        {"analyser", gAnalyserBlock}, {"parent", ParentBlock()}, {"status", StatusBlock()}, {"ingredient", gIngredientBlock},
         {"font", gFontBlock}, {"ops", gOpsBlock}, {"buffer", gUIMainConvertBuffer},
         {"gStaffRoomPanelThing", &gStaffRoomPanelThing}, {"gShopStatusObject", &gShopStatusObject},
         {"gText_table", &reinterpret_cast<CText*>(gTextStorage)->mResourcePointers[6]}, {"gGameWorld", &gGameWorld},
@@ -265,7 +270,8 @@ uint64_t tpw_shop_addr(const char* name) {
         int32_t id = static_cast<int32_t>(std::strtol(name + 3, nullptr, 10));
         return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(WindowFor(id)));
     }
-    if (std::strcmp(name, "opsobject") == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(static_cast<UIStatusPanelOps*>(Ops())));
+    if (std::strcmp(name, "opsobject") == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(FakeStatusPanelTable<Slot>()));
+    if (std::strcmp(name, "arenabase") == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::gArenaBase));
     return 0;
 }
 
@@ -275,7 +281,7 @@ int32_t tpw_shop_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mState));
     out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mWindow));
     out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mStatusWindow));
-    out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mOps));
+    out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mVtable));
     out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mQuality));
     out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mIngredient));
     out[n++] = static_cast<int64_t>(sizeof(ShopStatusPanel));

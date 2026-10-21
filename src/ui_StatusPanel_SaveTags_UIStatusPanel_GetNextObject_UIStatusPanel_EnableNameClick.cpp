@@ -52,11 +52,6 @@ int32_t PreviousIteratorType(int32_t mode) {
 
 }  // namespace
 
-uint32_t* UIStatusPanelTable() {   // 0x102a8644 (name invented)
-    static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(32 * sizeof(uint32_t)));
-    return table;
-}
-
 // 0x101929e8: the table, the thing cleared and the windows cleared.
 void UIStatusPanel_Construct(UIStatusPanel* self) {
     uint8_t* bytes = Bytes(self);

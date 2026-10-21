@@ -32,8 +32,8 @@ SIZES = {FN_INITWINDOW: 164, FN_UPDATEWINDOW: 140, FN_INITKNOBS: 900, FN_TITLES:
 OWN = set(SIZES)
 
 ADDR = dict(sroom=0x103947a4, showthing=0x1039599c, text6=0x1038047c, convbuf=0x10380c48)
-# the host's offsets and sizes: panel mWindow, mNameWindow, mOps, mSpeed, mCapacity, mDuration, sizeof; the ride record's slot 25 and 36, sizeof
-HOST_LAYOUT = [0x10, 0x28, 0x30, 0x44, 0x48, 0x4c, 0x50, 0xE0, 0x138, 0xB08]
+# the host's offsets and sizes: panel mWindow, mNameWindow, mVtable, mSpeed, mCapacity, mDuration, sizeof; the ride record's slot 25 and 36, sizeof
+HOST_LAYOUT = [0x0c, 0x1c, 0x20, 0x2c, 0x30, 0x34, 0x38, 0xE0, 0x138, 0xB08]
 MAC_OFF = dict(window=0x0c, name=0x1c, ops=0x20, speed=0x2c, cap=0x30, dur=0x34)
 MAC_SLOT = {25: 0x70, 36: 0x9c}
 HOST = {}
@@ -197,6 +197,7 @@ class Ppc(Side):
         self.write(a, struct.pack(">I", v & MASK))
 
     ptr = w32
+    p32 = w32
 
     def off(self, name):
         return MAC_OFF[name]
@@ -261,6 +262,9 @@ class Host(Side):
     def ptr(self, a, v):
         self.write(a, struct.pack("<Q", v))
 
+    def p32(self, a, v):   # the panel's pointer fields are Ptr32 (arena offsets, unit v5L31)
+        self.w32(a, self.lib.tpw_rsp_off(v))
+
     def off(self, name):
         return HOST[name]
 
@@ -289,6 +293,7 @@ def bind(lib):
         return
     lib.tpw_rsp_addr.restype, lib.tpw_rsp_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_rsp_alloc.restype, lib.tpw_rsp_alloc.argtypes = C.c_uint64, [C.c_uint32]
+    lib.tpw_rsp_off.restype, lib.tpw_rsp_off.argtypes = C.c_uint32, [C.c_uint64]
     lib.tpw_rsp_set.argtypes = [C.c_int32, C.c_uint64]
     lib.tpw_rsp_layout.argtypes = [C.POINTER(C.c_int64)]
     for n in ("initknobs", "updatewindow", "initwindow"):
@@ -312,9 +317,9 @@ def build(s, case):
     s.ptr(s.g("showthing"), o["showthing"])
     s.ptr(s.g("text6"), o["table"])
     p = o["panel"]
-    s.ptr(p + s.off("window"), o["wpanel"] if case["haswin"] else 0)
-    s.ptr(p + s.off("name"), o["wname"])
-    s.ptr(p + s.off("ops"), s.ops())
+    s.p32(p + s.off("window"), o["wpanel"] if case["haswin"] else 0)
+    s.p32(p + s.off("name"), o["wname"])
+    s.p32(p + s.off("ops"), s.ops())
     s.w32(p + s.off("speed"), case["speed"])
     s.w32(p + s.off("cap"), case["cap"])
     s.w32(p + s.off("dur"), case["dur"])

@@ -136,8 +136,8 @@ public:
 
 // The address book (0x10 bytes on the Mac, a std::list of std::strings first). Its
 // destructor is inline in the original (the list's clear, an MSL instance at 0x1017fc04);
-// here it is declared for email.cpp to define. The constructor's second statement (the word at +0xc takes the word at +8) is the MSL
-// list's own bookkeeping and has no host counterpart.
+// here it is declared for email.cpp to define. The constructor's second statement (the word at +0xc takes the word at +8) puts the
+// cursor at the first node.
 class AddressBook {
 public:
     AddressBook();    // 0x102064cc
@@ -151,9 +151,11 @@ public:
     // did not open, else 1. A failed open or close raises std::ios_base::failure when the stream's state meets its exception mask.
     int32_t Save(const char* path);
     std::list<std::string> mAddresses;
-    // Unit v5012 (untranslated): the cursor functions answer a pointer to the iterator, which holds the entry (AddressBookNode).
+    // Unit v5L45 (src/email.cpp): the cursor functions answer a pointer to the entry's string (AddressBookNode), or to an empty
+    // one at the end. First puts the cursor at the first address, then answers Next; Next answers the cursor's address and moves on.
     struct AddressBookNode** First();   // 0x10206534
     struct AddressBookNode** Next();    // 0x10206594
+    std::list<std::string>::const_iterator mCursor;   // 0x0c  the Mac's word: the node Next answers
     // Unit v5722: Add answers the position of the address after the sort and unique (-1 when not found); Remove answers 1 when erased.
     void Add(const std::string& address);   // 0x102065f8 (the original also answers the position in r3: AddressBookAddIndex)
     int32_t Remove(int32_t position);          // 0x10206728

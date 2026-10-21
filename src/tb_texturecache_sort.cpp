@@ -32,6 +32,7 @@ namespace {
 // Longest list the entry sorts take (the Mac keeps the array on the stack).
 constexpr int32_t kSortLimit = 0x1000;
 
+
 // Cache flags (CTextureCache::mFlags).
 constexpr uint32_t kCacheReshuffle = 0x00000001;   // CACHEFLAG_RESHUFFLE: locked pages and entries are sorted too
 constexpr uint32_t kCacheLimited = 0x00000004;     // SortEntries: the entries' area is held to mF18E4
@@ -199,12 +200,13 @@ void CTextureCache::Entry_QSortInit(CTextureEntry** entries, int32_t low, int32_
 }
 
 void CTextureCache::SortEntries() {
+    constexpr int32_t limit = kSortLimit;
     CTextureEntry* entries[kSortLimit];
     void* scratch;
     int32_t count = 0;
     float highest = 0.0f;
     CTextureEntry* entry = mF18AC;
-    while (entry != nullptr && count < kSortLimit) {
+    while (entry != nullptr && count < limit) {
         entries[count++] = entry;
         if (highest < entry->mPriority) highest = entry->mPriority;
         entry = entry->mNext;
@@ -280,15 +282,16 @@ void CTextureCache::SortEntries() {
 // ---- Lists of entries ----------------------------------------------------------------------
 
 void CTextureCache::SortByCriteria(CTextureEntry** list) {
+    constexpr int32_t limit = kSortLimit;
     CTextureEntry* entries[kSortLimit];
     int32_t count = 0;
     CTextureEntry* entry = *list;
-    while (entry != nullptr && count < kSortLimit) {
+    while (entry != nullptr && count < limit) {
         entries[count++] = entry;
         entry = entry->mNext;
     }
     // What does not fit the array loses its page bits and is not in the list any more.
-    if (count == kSortLimit) {
+    if (count == limit) {
         for (; entry != nullptr; entry = entry->mNext) entry->mFlags &= kEntryPageBits;
     }
     Entry_QSortInit(entries, 0, count - 1);
@@ -301,15 +304,16 @@ void CTextureCache::SortByCriteria(CTextureEntry** list) {
 }
 
 void CTextureCache::SortByAddress(CTextureEntry** list) {
+    constexpr int32_t limit = kSortLimit;
     CTextureEntry* entries[kSortLimit];
     CTextureEntry* scratch;
     int32_t count = 0;
     CTextureEntry* entry = *list;
-    while (entry != nullptr && count < kSortLimit) {
+    while (entry != nullptr && count < limit) {
         entries[count++] = entry;
         entry = entry->mNext;
     }
-    if (count == kSortLimit) {
+    if (count == limit) {
         for (; entry != nullptr; entry = entry->mNext) entry->mFlags &= kEntryPageBits;
     }
     // The records are the pointers themselves, the key their low 32 bits.

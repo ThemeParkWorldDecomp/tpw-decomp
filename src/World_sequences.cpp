@@ -22,6 +22,7 @@
 #include "UIInterface.h"
 #include "WorldThings.h"
 #include "analyser.h"
+#include "platform/arena.h"
 #include "platform/macdoze.h"
 
 // The two globals of World.cpp this unit owns (original names unknown): the id of the thing that plays the winning animation (the "End"
@@ -67,7 +68,7 @@ uint32_t NextRand(uint32_t& state) {
 // A thing of `size` bytes (the Mac's size: the host classes are placeholders), made by its constructor over the block; the result is dropped
 // (the thing enters the thing table itself). The Mac tests the allocation for NULL and skips the constructor then; the host's never fails.
 template <class T, class... Args> void MakeThing(std::size_t size, Args... args) {
-    void* block = ::operator new(size);
+    void* block = tpw::ArenaAlloc(size);   // the Mac's game heap: the arena (a list keeps a thing's address in 32 bits)
     new (block) T(args...);
 }
 
@@ -161,7 +162,7 @@ void CWorld::StartWinningSequence() {
         GAME_ASSERTMSG(0, kNoFeatureText, copy.mData);
         gWinningAnimThing = 0;
     } else {
-        void* block = ::operator new(0x448);
+        void* block = tpw::ArenaAlloc(0x448);
         object = new (block) CObject(MapId{1}, tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{ride->mId}, 0, 0);
         gWinningAnimThing = reinterpret_cast<CThing*>(object)->GetThingId().mIndex;
     }
@@ -267,16 +268,16 @@ void CWorld::PopulatePark() {
 void CWorld::StartingPopulationForOnline() {
     SetParkOpenOrClosed(1, 0);
     for (int32_t i = 0; i < 25; ++i) {
-        void* block = ::operator new(0x22c);
+        void* block = tpw::ArenaAlloc(0x22c);
         const uint32_t r = NextRand(mStartTime);
         new (block) CPerson(GetMap()->GetTicketBoothPos(static_cast<int32_t>(r & 1)));
     }
     const int32_t rides = GetParkAnalyser()->NumberOfObjectTypeInPark(kUIObjRide, 0);
     for (int32_t i = 0; i < rides; ++i) {
-        void* mechanic = ::operator new(0x218);
+        void* mechanic = tpw::ArenaAlloc(0x218);
         uint32_t r = NextRand(mStartTime);
         new (mechanic) CMechanic(GetMap()->GetParkEntrancePos(static_cast<int32_t>(r & 1)));
-        void* entertainer = ::operator new(0x214);
+        void* entertainer = tpw::ArenaAlloc(0x214);
         r = NextRand(mStartTime);
         new (entertainer) CEntertainer(GetMap()->GetParkEntrancePos(static_cast<int32_t>(r & 1)));
     }

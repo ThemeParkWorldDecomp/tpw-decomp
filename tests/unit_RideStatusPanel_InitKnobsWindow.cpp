@@ -22,6 +22,7 @@
 #include "ThingReceivers.h"
 #include "ui_DrawObject.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 
 using namespace calllog;
 
@@ -40,12 +41,12 @@ void* gNameText;
 void* gFont;
 void* gWin[14];
 
-class FakeOps : public UIStatusPanelOps {
-public:
-    void Slot5() override { ev("OpsSlot5", {0}); }
-    void Slot6() override { ev("OpsSlot6", {0}); }
-};
-FakeOps gOps;
+// The panel's table (unit v5L31): the slots at +0x1c and +0x20 are logged.
+uint64_t Slot(void*, uint32_t offset, const void*) {
+    if (offset == 0x1c) ev("OpsSlot5", {0});
+    if (offset == 0x20) ev("OpsSlot6", {0});
+    return 0;
+}
 
 std::string Text(const char16_t* text) { return text ? narrow(text) : std::string("(null)"); }
 
@@ -169,7 +170,7 @@ uint64_t tpw_rsp_addr(const char* name) {
         {"showthing", &gRideStatusShowThing},
         {"text6", &reinterpret_cast<CText*>(gTextStorage)->mResourcePointers[6]},
         {"convbuf", gUIMainConvertBuffer},
-        {"ops", &gOps},
+        {"ops", FakeStatusPanelTable<Slot>()},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));
@@ -177,6 +178,11 @@ uint64_t tpw_rsp_addr(const char* name) {
 }
 
 uint64_t tpw_rsp_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
+
+// The Ptr32 value of a block (the panel's windows and table are Ptr32, unit v5L31).
+uint32_t tpw_rsp_off(uint64_t address) {
+    return address == 0 ? 0 : tpw::ArenaOffset(reinterpret_cast<void*>(static_cast<uintptr_t>(address)));
+}
 
 // The objects the fakes hand out: 0 the ride record, 1 the name text, 2 the font, 10 + k the window of id 0x3e26 + k.
 void tpw_rsp_set(int32_t index, uint64_t value) {
@@ -191,7 +197,7 @@ int32_t tpw_rsp_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mWindow));
     out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mNameWindow));
-    out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mOps));
+    out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mVtable));
     out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mSpeed));
     out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mCapacity));
     out[n++] = static_cast<int64_t>(offsetof(RideStatusPanel, mDuration));

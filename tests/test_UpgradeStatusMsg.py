@@ -174,6 +174,9 @@ class Ppc(Side):
         T.call_ppc(self.e, FN_SINIT, [])
         return 0
 
+    def sinit_table(self, word):
+        return word
+
 
 class Host(Side):
     fmt = "<I"
@@ -217,6 +220,10 @@ class Host(Side):
         self.lib.tpw_us_sinit()
         return 0
 
+    def sinit_table(self, word):
+        # the static initialiser's table is the arena offset of StaffStatusPanelTable() (unit v5L31): the Mac's address when it is that
+        return 0x102AF264 if word == self.lib.tpw_us_sinit_table() else word
+
 
 def bind(lib):
     if getattr(lib, "bound", False):
@@ -228,6 +235,7 @@ def bind(lib):
     getattr(lib, p + "setlab").restype, getattr(lib, p + "setlab").argtypes = None, [C.c_int32, C.c_uint64]
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]
     getattr(lib, p + "msg").restype, getattr(lib, p + "msg").argtypes = C.c_int32, [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
+    getattr(lib, p + "sinit_table").restype, getattr(lib, p + "sinit_table").argtypes = C.c_uint32, []
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -269,6 +277,7 @@ def observe(s, case, answer):
     out = {"answer": answer, "log": s.log()}
     if case["op"] == "sinit":
         out["staff"] = s.rd_words(s.g("staff"), 9)
+        out["staff"][8] = s.sinit_table(out["staff"][8])
         out["f40"] = s.rd_words(s.g("f40"), 1)
         out["f44"] = s.rd_words(s.g("f44"), 1)
     return out

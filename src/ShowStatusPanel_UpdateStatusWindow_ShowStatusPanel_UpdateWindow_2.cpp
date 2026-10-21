@@ -73,7 +73,7 @@ void ShowStatusPanel::UpdateWindow() {
 void __sinit_ui_upgradeStatus_cpp() {
     UIStatusPanelFields* fields = reinterpret_cast<UIStatusPanelFields*>(&gUpgradeStatusPanel);
     UIStatusPanel_Construct(reinterpret_cast<UIStatusPanel*>(&gUpgradeStatusPanel));
-    fields->mVtable.mOffset = 0x102af4dc;
+    fields->mVtable.set(UpgradeStatusPanelTable());
     fields->mMode = 0x3ec;
 }
 

@@ -76,7 +76,7 @@ int32_t ShopStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32
         } else if (a > 0xc06a) {
             if (a == 0xc081) {
                 UI_IterateThingList(kUIIterShops, _applytoall);
-                panel->mOps->Slot5();
+                UIStatusPanel_CallSlot(panel, 0x1c);
                 return 0;
             }
             if (a > 0xc081) {
@@ -108,16 +108,16 @@ int32_t ShopStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32
     } else if (message == 0x800) {
         if (a == 0xc085) {
             panel->mF2c = b;
-            panel->mOps->Slot5();
+            UIStatusPanel_CallSlot(panel, 0x1c);
         } else if (a < 0xc085) {
             if (a == 0xc06b) {
                 panel->mQuality = b;
                 panel->mWindow->GetWindow(0xc07f)->SetValue((b & 0x20) != 0 ? 0 : static_cast<int32_t>(1u << (b & 0x1f)));   // slw: a shift of 32 to 63 gives 0
-                panel->mOps->Slot5();
+                UIStatusPanel_CallSlot(panel, 0x1c);
             }
         } else if (a < 0xc087) {
             panel->mIngredient = b;
-            panel->mOps->Slot5();
+            UIStatusPanel_CallSlot(panel, 0x1c);
         }
     }
     return DefaultStatusPanelMsg(window, message, a, b);

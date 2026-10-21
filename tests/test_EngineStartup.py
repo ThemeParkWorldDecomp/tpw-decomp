@@ -494,6 +494,21 @@ def ppc(e, case):
 # ----------------------------------------------------------------- host side
 
 
+def capacity_ok(lib):
+    """The render memory's capacity: the Mac's 4096 records and pools of 1 MB and 64 KB of
+    indices, or built with the port fixes on (unit v5L47) at least eight times as many records
+    and pools at least eight times as large, which the state shows at the Mac's sizes."""
+    if not hasattr(lib, "es_capacity_ok"):
+        lib.tpw_es_capacity.restype, lib.tpw_es_capacity.argtypes = C.c_int32, []
+        lib.tpw_es_portfix.restype, lib.tpw_es_portfix.argtypes = C.c_int32, []
+        records, scale = lib.tpw_es_capacity() >> 4, lib.tpw_es_capacity() & 15
+        if lib.tpw_es_portfix() == 1:
+            lib.es_capacity_ok = records >= 0x8000 and scale >= 8
+        else:
+            lib.es_capacity_ok = records == 0x1000 and scale == 1
+    return lib.es_capacity_ok
+
+
 def host(lib, case):
     reset = lib["tpw_es_reset"]
     reset.restype, reset.argtypes = None, [C.POINTER(C.c_uint32)]
@@ -529,6 +544,8 @@ def host(lib, case):
             marks.append(C.c_int32.in_dll(lib, "tpw_cl_n").value)
     finally:
         log = CL.host_end(lib)
+    if not capacity_ok(lib):
+        results.append("render memory capacity")
     return dict(results=results, log=log, marks=marks, states=states)
 
 

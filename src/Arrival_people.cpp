@@ -14,6 +14,7 @@
 #include "TimeSig.h"
 #include "World.h"
 #include "analyser.h"
+#include "platform/arena.h"
 
 // __sinit_Arrival_cpp 0x100f29b0 (28 bytes): the Mac stores 0 at 0x1034c1a8, then 0x10000 at 0x1034c1a4: two words of this file's data that nothing in the
 // binary reads (names mine). Constant initialisers need no code on the host.
@@ -157,7 +158,7 @@ int32_t CArrival::CreatePerson() {
     } else {
         cell = gWorldMap->GetBusStopPos(1);
     }
-    void* memory = ::operator new(0x22c);
+    void* memory = tpw::ArenaAlloc(0x22c);
     if (memory != nullptr) new (memory) CPerson(cell);
     return 1;
 }

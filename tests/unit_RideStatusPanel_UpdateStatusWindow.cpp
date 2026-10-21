@@ -27,6 +27,7 @@
 #include "ui_DrawObject.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 
 using namespace calllog;
 
@@ -53,11 +54,11 @@ void* Ptr(int32_t key) {
     return it == gPtr.end() ? nullptr : it->second;
 }
 
-class FakeOps : public UIStatusPanelOps {
-public:
-    void Notify(void* panel) override { ev("Notify", {lab(panel)}); }
-};
-FakeOps gOps;
+// The panel's table (unit v5L31): the slot at +0x2c is told the state changed.
+uint64_t Slot(void* panel, uint32_t offset, const void*) {
+    if (offset == 0x2c) ev("Notify", {lab(panel)});
+    return 0;
+}
 
 int32_t gCaptureNothing;
 
@@ -250,7 +251,7 @@ uint64_t tpw_rsp_addr(const char* name) {
         {"thing", &gStaffRoomPanelThing},
         {"text", &gText},
         {"script", gUpgradePanelScript},
-        {"ops", &gOps},
+        {"ops", FakeStatusPanelTable<Slot>()},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));
@@ -259,6 +260,12 @@ uint64_t tpw_rsp_addr(const char* name) {
 
 // A zeroed block (32-bit addressable, like every Ptr32 the headers hold).
 uint64_t tpw_rsp_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
+
+// The Ptr32 value of a block and back (the panel's windows and table are Ptr32, unit v5L31).
+uint32_t tpw_rsp_off(uint64_t address) {
+    return address == 0 ? 0 : tpw::ArenaOffset(reinterpret_cast<void*>(static_cast<uintptr_t>(address)));
+}
+uint64_t tpw_rsp_at(uint32_t offset) { return offset == 0 ? 0 : static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::gArenaBase + offset)); }
 
 // A window: a real InterfaceWindow (zero bytes, its virtual members recorded above) in the arena.
 uint64_t tpw_rsp_newwindow() {
@@ -281,7 +288,7 @@ int32_t tpw_rsp_layout(int64_t* out) {
     out[n++] = OFFSET_OF(RideStatusPanel, mF08);
     out[n++] = OFFSET_OF(RideStatusPanel, mWindow);
     out[n++] = OFFSET_OF(RideStatusPanel, mStatusWindow);
-    out[n++] = OFFSET_OF(RideStatusPanel, mOps);
+    out[n++] = OFFSET_OF(RideStatusPanel, mVtable);
     out[n++] = OFFSET_OF(RideStatusPanel, mUpgradeWindow);
     out[n++] = OFFSET_OF(RideStatusPanel, mSpeed);
     out[n++] = OFFSET_OF(RideStatusPanel, mCapacity);

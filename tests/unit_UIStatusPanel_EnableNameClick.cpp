@@ -90,6 +90,13 @@ void DrawObjectDtor(void* self, int16_t flag) { ev("DrawObjectDtor", {lab(self),
 void Delete(void* self) { ev("Delete", {lab(self)}); }
 }  // namespace rank_callee
 
+// The tables the static initialisers store (src/ui_StatusPanel_tables.cpp, unit v5L31): blocks of the arena made on first use; the test
+// compares only where they are stored.
+uint32_t* UIStatusPanelTable() {
+    static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));
+    return table;
+}
+
 extern "C" {
 
 uint64_t tpw_us_addr(const char* name) {

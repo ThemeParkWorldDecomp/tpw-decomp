@@ -83,6 +83,7 @@ bool KeepBlock(void* p, bool) {
 }
 #define TPW_RELEASE_OBSERVER KeepBlock
 #include "calllog.cpp"
+#include "fake_arena_on_heap.h"
 
 CGame gGame;
 CGame::CGame() {}

@@ -124,7 +124,7 @@ CGameType::CGameType() { mType = kGameTypeNormal; }
 
 // ---- the nothrow new: the answer is the queue "New" (0 a NULL). The size is recorded as the Mac's; the five staff classes (0x214 or 0x218 on
 // the Mac, the Python module checks which) are one token.
-void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
+void* RecordedNew(std::size_t size) {
     int64_t mac = static_cast<int64_t>(size);
     if (size == sizeof(CMouse)) mac = 1;
     else if (size == sizeof(CMMDefault) || size == sizeof(CMMOnline)) mac = 8;
@@ -141,6 +141,13 @@ void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
     ev("operator_new", {mac, lab(block)});
     return block;
 }
+void* operator new(std::size_t size, const std::nothrow_t&) noexcept { return RecordedNew(size); }
+
+// The staff are made on the game heap (the Mac's operator new), which is the arena on the host since unit v5L31 (src/Mouse_staff.cpp
+// NewStaff); the unit links no arena, and the arena's allocation is the same recording new.
+namespace tpw {
+void* ArenaAlloc(std::size_t size) { return RecordedNew(size); }
+}  // namespace tpw
 
 // ---- the keyboard
 namespace SamsUtilities {

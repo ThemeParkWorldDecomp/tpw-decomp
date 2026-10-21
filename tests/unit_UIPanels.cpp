@@ -34,6 +34,7 @@ void ObserveAllocation(std::size_t size, bool array, void* p);
 }  // namespace
 #define TPW_ALLOCATION_OBSERVER ObserveAllocation
 #include "calllog.cpp"
+#include "fake_arena_on_heap.h"
 using namespace calllog;
 
 // ---- the globals the unit does not define (the staff panel's and the cash panel's are in files that are not linked)

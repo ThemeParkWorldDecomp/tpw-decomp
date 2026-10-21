@@ -25,6 +25,7 @@ void ObserveAllocation(std::size_t size, bool array, void* p);
 }
 #define TPW_ALLOCATION_OBSERVER(size, array, p) ObserveAllocation(size, array, p)
 #include "calllog.cpp"
+#include "fake_arena_on_heap.h"
 
 using namespace calllog;
 

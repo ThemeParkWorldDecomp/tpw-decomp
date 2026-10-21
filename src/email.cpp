@@ -11,8 +11,33 @@
 // at 0x50; then the short at 0x54 is 25 and the words at 0x58 and 0x5c are 0. The words 0x1c..0x27 and 0x4c are not written.
 Outbox::Outbox() : mF00(), mF04(), mF08(), mF0C(), mF18(), mF28(), mF34(), mF40(), mF50(), mF54(25), mF58(0), mEmail(nullptr) {}
 
-// The list's constructor, then the word at +0xc takes the word at +8 (the MSL list's sentinel bookkeeping, nothing on the host).
-AddressBook::AddressBook() : mAddresses() {}
+// The list's constructor, then the word at +0xc (the cursor) takes the word at +8 (the first node).
+AddressBook::AddressBook() : mAddresses(), mCursor(mAddresses.begin()) {}
+
+namespace {
+// What the cursor functions answer a pointer to. The Mac answers the address of the node's string (node + 8), whose representation
+// holds the characters' address at +0xc; at the end, the address of the empty string gEmailBlob (0x10396aa8). The callers read
+// the text at once, before the next call.
+AddressBookNode gAddressEntry;
+AddressBookNode* gAddressEntryRef = &gAddressEntry;
+}  // namespace
+
+// 0x10206534: the cursor to the first node, then Next.
+AddressBookNode** AddressBook::First() {
+    mCursor = mAddresses.begin();
+    return Next();
+}
+
+// 0x10206594: the cursor's address, the cursor moving on; at the end (the sentinel) the empty text, the cursor staying.
+AddressBookNode** AddressBook::Next() {
+    if (mCursor == mAddresses.end()) {
+        gAddressEntry.mText = "";
+        return &gAddressEntryRef;
+    }
+    gAddressEntry.mText = mCursor->c_str();
+    ++mCursor;
+    return &gAddressEntryRef;
+}
 
 // Inline in the original (the list's clear, an MSL instance at 0x1017fc04).
 AddressBook::~AddressBook() {}

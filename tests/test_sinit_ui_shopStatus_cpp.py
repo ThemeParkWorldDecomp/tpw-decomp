@@ -4,7 +4,7 @@
 
 The world: gShopStatusPanel's first word and its table pointer hold garbage before the call. The callee UIStatusPanel::UIStatusPanel
 (0x101929e8) is a fake on both sides recording its object. Compared: the event log, the word at +0, and whether the pointer at +0x20
-is the address of the shop panel's table (0x102adbd8 on the Mac, gShopStatusOps on the host).
+is the address of the shop panel's table (0x102adbd8 on the Mac, the arena offset of ShopStatusPanelTable() on the host).
 
 No fused operations. Not tested: nothing skipped.
 """
@@ -23,7 +23,7 @@ SIZES = {FN: 76}
 OWN = set(SIZES)
 CTOR = 0x101929E8
 ADDR = dict(panel=0x103959E0, ops=0x102ADBD8)
-HOST_LAYOUT = [48, 8]      # the host's offset of mOps (Mac 0x20) and its size
+HOST_LAYOUT = [0x20, 4]    # the host's offset of mVtable (Mac 0x20) and its size (a Ptr32, unit v5L31)
 
 STUBS = CL.Stubs()
 STUBS.real.update(OWN)
@@ -99,7 +99,7 @@ class Host(Side):
         return CL.host_end(self.lib)
 
     def ops_is_set(self):
-        return struct.unpack("<Q", self.read(self.g("panel") + HOST_LAYOUT[0], 8))[0] == self.g("ops")
+        return struct.unpack("<I", self.read(self.g("panel") + HOST_LAYOUT[0], 4))[0] == self.lib.tpw_sinit_off(self.g("ops"))
 
     def word0(self):
         return struct.unpack("<I", self.read(self.g("panel"), 4))[0]
@@ -116,6 +116,7 @@ def bind(lib):
         return
     lib.tpw_sinit_addr.restype, lib.tpw_sinit_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_sinit_layout.argtypes = [C.POINTER(C.c_int64)]
+    lib.tpw_sinit_off.restype, lib.tpw_sinit_off.argtypes = C.c_uint32, [C.c_uint64]
     lib.tpw_sinit_run.restype, lib.tpw_sinit_run.argtypes = None, []
     out = (C.c_int64 * 32)()
     n = lib.tpw_sinit_layout(out)
@@ -127,10 +128,7 @@ def run(s, case):
     try:
         p = s.g("panel")
         s.words(p, [case["w0"]])
-        if s.fmt == "<I":
-            s.write(p + HOST_LAYOUT[0], struct.pack("<Q", case["w20"] | (case["w0"] << 32)))
-        else:
-            s.write(p + 0x20, struct.pack(">I", case["w20"] & MASK))
+        s.write(p + 0x20, struct.pack(s.fmt, case["w20"] & MASK))
         s.call()
         return {"log": s.log(), "word0": s.word0(), "ops": s.ops_is_set()}
     finally:

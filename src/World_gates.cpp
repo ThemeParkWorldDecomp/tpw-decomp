@@ -23,6 +23,7 @@
 #include "TPEngine.h"
 #include "ThingReceivers.h"
 #include "analyser.h"
+#include "platform/arena.h"
 #include "platform/macdoze.h"
 #include "rsse.h"
 
@@ -245,7 +246,7 @@ tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> CWorld::ArrivalVehicle_DoNextLe
             continue;
         }
         // The Mac tests the allocation for NULL and still asks for the id (the host's allocation never fails: not reproduced, as in unit w117).
-        void* block = ::operator new(0x448);
+        void* block = tpw::ArenaAlloc(0x448);
         CObject* object = new (block) CObject(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>{1},
                                               tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{ride->mId}, 0, 0);
         *slot = reinterpret_cast<CThing*>(object)->GetThingId().mIndex;

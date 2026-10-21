@@ -98,6 +98,13 @@ int32_t InterfaceCheckButtons::SetCurrent(int32_t id) {
 }
 void UI_SetGameWindowCursor(int16_t cursor) { ev("UI_SetGameWindowCursor", {cursor}); }
 
+// The table the static initialiser stores (src/ui_StatusPanel_tables.cpp, unit v5L31): a block of the arena made on first use; the test
+// compares only where it is stored.
+uint32_t* BogStatusPanelTable() {
+    static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));
+    return table;
+}
+
 extern "C" {
 
 uint64_t tpw_bog_addr(const char* name) {
@@ -129,6 +136,7 @@ int32_t tpw_bog_msg(uint64_t window, int32_t message, int32_t a, int32_t b) {
     return BogStatusMsg(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(window)), message, a, b);
 }
 void tpw_bog_sinit() { __sinit_ui_bogStatus_cpp(); }
+uint32_t tpw_bog_sinit_table() { return tpw::ArenaOffset(BogStatusPanelTable()); }
 void tpw_bog_place() { CoasterPlaceMouseMode(); }
 void tpw_bog_which(uint32_t mask) { WhichCheckButtonsAreDown(mask); }
 

@@ -27,6 +27,11 @@ extern uint8_t* gArenaBase;               // ArenaBase() once reserved, nullptr 
 // is not in the arena: such a pointer cannot be kept in a 32-bit field.
 uint32_t ArenaOffset(const void* address);
 
+// The bytes asked for in the blocks now live, and the high-water mark (the bytes of the range handed out so far): the checks that
+// what the game makes in the arena is given back (unit v5L31).
+size_t ArenaLiveBytes();
+size_t ArenaHighWater();
+
 // An object the game would keep on the stack whose address still goes into a 32-bit field (the save's memory file, which every
 // bump-map save chunk keeps through a Ptr32): it lives in the arena for as long as the holder does.
 template<class T> class ArenaHeld {

@@ -13,11 +13,12 @@
 #include "World.h"
 #include "analyser.h"
 #include "ui_main.h"
+#include "WindowScripts.inc"
 
 // 0x1039486c (initial 0): the thing Show was given.
 CThing* gFeatureStatusThing = nullptr;
-// 0x102a9948 (initial word 1): the window script; the rest is not recovered.
-int16_t gFeatureStatusScript[] = {0, 1};
+// 0x102a9948: the window script.
+int16_t gFeatureStatusScript[] = {TPW_WINDOW_SCRIPT_102A9948};   // 0x102a9948: the image's words (generated, devtools/gen_game_tables.py)
 
 namespace {
 

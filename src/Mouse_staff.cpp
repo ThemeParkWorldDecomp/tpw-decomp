@@ -25,6 +25,7 @@
 #include "World.h"
 #include "analyser.h"
 #include "intrface.h"
+#include "platform/arena.h"
 
 // The null cell id of CStaffHQ::mF60 (a const halfword of the image at 0x1029d434; its value there is 0). The name is invented.
 extern const uint16_t gStaffHQNullId = 0;
@@ -43,6 +44,13 @@ constexpr const char* kDropping = "Dropping staff where he was before he was pic
 constexpr const char* kRowZero = "Thing has been allocated in ThingArray index 0 - shouldn't happen\n";   // 0x1023dff9
 
 constexpr int32_t kCursorPlace = 9;   // SetGameWindowCursor's argument
+
+// A staff member of class T on the game heap (the Mac's operator new): the arena on the host (unit v5L31), since the lists keep a thing's
+// address in 32 bits. Nothing is made when the arena is used up, as the Mac's new answers NULL.
+template <class T, class... Args>
+void NewStaff(Args... args) {
+    if (void* block = tpw::ArenaAlloc(sizeof(T))) new (block) T(args...);
+}
 
 // The map cell of the pointer (gIntrface.mF24, the 1 based id): plain arithmetic on the world, as the Mac does it.
 CMapCell* PointerCell() {
@@ -183,11 +191,11 @@ void CMMPlaceStaff::OnLeftClick(int32_t, int32_t) {
     }
     const tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cellId{id};
     switch (mModel) {
-        case 5: new (std::nothrow) CHandyman(cellId, mPayGrade, mF11, mF14); break;
-        case 6: new (std::nothrow) CEntertainer(cellId, mPayGrade, mF11, mF14); break;
-        case 7: new (std::nothrow) CGuard(cellId, mPayGrade, mF11, mF14); break;
-        case 4: new (std::nothrow) CMechanic(cellId, mPayGrade, mF11, mF14); break;
-        case 8: new (std::nothrow) CResearcher(cellId, mPayGrade, mF11, mF14); break;
+        case 5: NewStaff<CHandyman>(cellId, mPayGrade, mF11, mF14); break;
+        case 6: NewStaff<CEntertainer>(cellId, mPayGrade, mF11, mF14); break;
+        case 7: NewStaff<CGuard>(cellId, mPayGrade, mF11, mF14); break;
+        case 4: NewStaff<CMechanic>(cellId, mPayGrade, mF11, mF14); break;
+        case 8: NewStaff<CResearcher>(cellId, mPayGrade, mF11, mF14); break;
         default: GAME_ASSERTMSG(0, kUnknownStaffClick); break;
     }
     mPlaced = 1;

@@ -18,6 +18,7 @@
 #include "TPGlobals.h"
 #include "ThingReceivers.h"
 #include "analyser.h"
+#include "platform/arena.h"
 #include "platform/macdoze.h"
 
 // The two names (see World.h). __sinit_World_cpp (0x10141c14) builds the strings on the Mac; until it is translated they are
@@ -31,7 +32,7 @@ namespace {
 // at its start. The Mac tests the allocation for NULL and still asks for the id (the host's allocation never fails, so that path is not
 // reproduced, as in unit w106).
 template <class T> uint16_t MakeThing(uint32_t size) {
-    void* block = ::operator new(size);
+    void* block = tpw::ArenaAlloc(size);   // the Mac's game heap: the arena (a list keeps a thing's address in 32 bits)
     T* thing = new (block) T;
     return reinterpret_cast<CThing*>(thing)->GetThingId().mIndex;
 }
@@ -46,7 +47,7 @@ RideInfo* FindRide(const TbDynamicStringTemplate<char16_t>& name) {
 
 // The "gates" or "lights" object: a CObject (0x448 bytes) on map cell 1 (cell 0, 0) of the ride's object type; its thing id.
 uint16_t MakeFeatureObject(const RideInfo* ride) {
-    void* block = ::operator new(0x448);
+    void* block = tpw::ArenaAlloc(0x448);
     CObject* object = new (block) CObject(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>{1},
                                           tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{ride->mId}, 0, 0);
     return reinterpret_cast<CThing*>(object)->GetThingId().mIndex;

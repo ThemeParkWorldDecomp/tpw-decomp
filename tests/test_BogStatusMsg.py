@@ -123,6 +123,9 @@ class Ppc(Side):
     def log(self):
         return self.L.log
 
+    def sinit_table(self, word):
+        return word
+
     def call(self, op, args):
         entry = {"msg": FN_MSG, "sinit": FN_SINIT, "place": FN_PLACE, "which": FN_WHICH}[op]
         if op == "msg":
@@ -161,6 +164,10 @@ class Host(Side):
     def log(self):
         return CL.host_end(self.lib)
 
+    def sinit_table(self, word):
+        # the static initialiser's table is the arena offset of BogStatusPanelTable() (unit v5L31): the Mac's address when it is that
+        return 0x102A9384 if word == self.lib.tpw_bog_sinit_table() else word
+
     def call(self, op, args):
         if op == "msg":
             return self.lib.tpw_bog_msg(self.win, *[s32(a) for a in args]) & MASK
@@ -186,6 +193,7 @@ def bind(lib):
     lib.tpw_bog_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_bog_msg.restype, lib.tpw_bog_msg.argtypes = C.c_int32, [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
     lib.tpw_bog_sinit.restype, lib.tpw_bog_sinit.argtypes = None, []
+    lib.tpw_bog_sinit_table.restype, lib.tpw_bog_sinit_table.argtypes = C.c_uint32, []
     lib.tpw_bog_place.restype, lib.tpw_bog_place.argtypes = None, []
     lib.tpw_bog_which.restype, lib.tpw_bog_which.argtypes = None, [C.c_uint32]
     out = (C.c_int64 * 32)()
@@ -206,7 +214,9 @@ def build(s, case):
 def observe(s, case, answer):
     m = s.get_ptr(s.g("mouse"))
     kind = 0 if m == 0 else (1 if m == s.mouse else 2)
-    return {"answer": answer, "log": s.log(), "panel": s.rd_words(s.g("panel"), NWORDS), "mouse": kind,
+    panel = s.rd_words(s.g("panel"), NWORDS)
+    panel[8] = s.sinit_table(panel[8])
+    return {"answer": answer, "log": s.log(), "panel": panel, "mouse": kind,
             "w1e0": s.rd_word(s.g("w1e0")), "w1e4": s.rd_word(s.g("w1e4"))}
 
 

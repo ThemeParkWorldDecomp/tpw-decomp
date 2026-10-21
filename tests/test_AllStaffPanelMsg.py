@@ -4,7 +4,7 @@ against libtpw_unit_AllStaffPanelMsg.dylib (tests/unit_AllStaffPanelMsg.cpp), ma
 
 Every callee outside the unit is a fake on both sides that logs its arguments as raw integers (pointers the unit never dereferences are
 random words in both memories). The panel's second table (Mac +0x20) is a block of descriptor words 0x5000 + slot on the PowerPC side and a
-fake UIStatusPanelOps object on the host; the glue stand-in and the host virtual both log the slot reached.
+fake slot table on the host (tests/fake_status_panel_table.h); the glue stand-in and the host slot both log the slot reached.
 
 Compared: the answer, the three message globals and the event log. No fused operations. Not tested: the thing pointer of
 RequestMaintenance is only tested as non-NULL (the original calls through it unconditionally).
@@ -188,6 +188,7 @@ def bind(lib):
     p = "tpw_ash_"
     lib.tpw_ash_addr.restype, lib.tpw_ash_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_ash_alloc.restype, lib.tpw_ash_alloc.argtypes = C.c_uint64, [C.c_uint32]
+    lib.tpw_ash_alloc(16)   # maps the arena before any case: the list's words are offsets from its base (unit v5L31)
     lib.tpw_ash_ops.restype, lib.tpw_ash_ops.argtypes = C.c_uint32, []
     lib.tpw_ash_layout.argtypes = [C.POINTER(C.c_int64)]
     for nm in ("staff", "finance"):

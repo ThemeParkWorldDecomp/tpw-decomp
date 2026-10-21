@@ -5,6 +5,7 @@
 #include "InterfaceWindow.h"
 #include "LLCellSystem.h"
 #include "Mouse.h"
+#include "RideDB.h"
 #include "ThingReceivers.h"
 #include "TPSettings.h"
 #include "ui_ErrorDisplay.h"
@@ -136,7 +137,7 @@ void UIStatusPanel::Move() {
     const uint16_t id = CellId(gStaffRoomPanelThing);
     const uint8_t* bytes = reinterpret_cast<const uint8_t*>(object);
     RideInfo* info = object->GetDBInfo();
-    if (*reinterpret_cast<const int32_t*>(reinterpret_cast<const uint8_t*>(info) + 0x40) != 0) {
+    if (info->Value(kRideSlot_HasQueue).mInteger != 0) {   // the Mac's +0x40 (unit v5L31: the host's balance slots are wider)
         gStatusPanelClickStackDir = static_cast<uint8_t>(LLCC_SystemConstructQueueClickStack(object));
         LLCC_SystemMakeClickStackCopy();
     }

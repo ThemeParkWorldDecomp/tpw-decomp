@@ -334,12 +334,10 @@ def build(s, case):
         w18 = s.window(case["z18"], 0x32) if case["w18"] else 0
         s.words(s.panel + 0x14, [s.p32(w14), s.p32(w18)])
     elif kind == "break":
-        s.ptr(s.panel + s.win_off, s.window(5, 0x33) if case["w0c"] else 0)
-        s.ptr(s.panel + s.ops_off, s.make_ops())
-        if s.ops_off != 0x20:
-            pass
+        s.words(s.panel + s.win_off, [s.p32(s.window(5, 0x33) if case["w0c"] else 0)])   # Ptr32 fields (unit v5L31)
+        s.words(s.panel + s.ops_off, [s.p32(s.make_ops())])
     elif kind == "panel":
-        s.ptr(s.panel + s.upg_off, 0x4321)
+        s.words(s.panel + s.upg_off, [0x4321])
     s.tankwin = s.window(5, 0x44) if kind == "tank" else 0
     s.begin()
 
@@ -369,7 +367,7 @@ def observe(s, case, answer):
         v = s.rptr(s.g(name))
         out[name] = 0 if v == 0 else (1 if v == s.wins[name] else 2)
     if kind == "panel":
-        out["upg"] = s.rptr(s.panel + s.upg_off)
+        out["upg"] = s.rd_words(s.panel + s.upg_off, 1)[0]
     return out
 
 

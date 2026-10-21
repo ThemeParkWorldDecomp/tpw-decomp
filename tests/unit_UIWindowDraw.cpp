@@ -18,6 +18,7 @@
 #include "InterfaceWindow.h"
 #include "UI_Base.h"
 #include "ui_DrawObject.h"
+#include "fake_arena_on_heap.h"
 
 using namespace calllog;
 

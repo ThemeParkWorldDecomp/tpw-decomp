@@ -183,6 +183,14 @@ void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
     return block;
 }
 
+// The unit links no arena. The windows take the game heap (include/InterfaceWindow.h, unit v5L31), which is the arena on the host;
+// here it is the recording nothrow new above, and a block goes back to the global operator delete.
+namespace tpw {
+void* ArenaAlloc(std::size_t size) { return ::operator new(size, std::nothrow); }
+bool InArena(const void*) { return false; }
+void ArenaFree(void* block) { ::operator delete(block); }
+}  // namespace tpw
+
 // Online mode remains a fake. The real default mode's OnAssign calls two recording external leaves.
 CMMOnline::CMMOnline() { ev("Online.ctor", {lab(this)}); }
 CMMOnline::~CMMOnline() { ev("Online.dtor", {lab(this)}); }

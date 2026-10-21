@@ -352,6 +352,10 @@ class Side:
     def setptr(self, a, v):
         self.write(a, struct.pack(self.pfmt, v))
 
+    def setp32(self, a, v):
+        """A 32-bit pointer field of the panel (the Mac's address; the host's arena offset, unit v5L31)."""
+        self.write(a, struct.pack(self.fmt, v - self.base if v else 0))
+
     def rd_int(self, a):
         return struct.unpack(self.fmt, self.read(a, 4))[0]
 
@@ -360,6 +364,7 @@ class Ppc(Side):
     fmt = ">I"
     pfmt = ">I"
     off = MAC_PANEL
+    base = 0
 
     def __init__(self, e, case):
         self.e = e
@@ -429,6 +434,7 @@ class Host(Side):
         self.a = {n: lib.tpw_shop_addr(n.encode()) for n in LABELLED}
         self.a["win"] = {i: self.a["win%d" % i] for i in ALL_IDS}
         self.a["ops"] = lib.tpw_shop_addr(b"opsobject")
+        self.base = lib.tpw_shop_addr(b"arenabase")
         CL.host_begin(lib, {i + 1: self.a[n] for i, n in enumerate(LABELLED)}, case["queues"])
 
     def done(self):
@@ -481,9 +487,9 @@ def build(s, case):
     s.setptr(s.g("world"), a["world"])
     s.setptr(s.g("table"), a["table"])
     s.setint(p + o["state"], case["state"])
-    s.setptr(p + o["window"], a["parent"])
-    s.setptr(p + o["status"], a["status"] if case["has_status"] else 0)
-    s.setptr(p + o["ops"], a["ops"])
+    s.setp32(p + o["window"], a["parent"])
+    s.setp32(p + o["status"], a["status"] if case["has_status"] else 0)
+    s.setp32(p + o["ops"], a["ops"])
     s.setint(p + o["quality"], case["quality"])
     s.setint(p + o["ingr"], case["ingr"])
     s.write(a["object"] + 4, bytes([case["b4"]]))

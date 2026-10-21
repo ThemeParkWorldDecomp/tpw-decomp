@@ -29,7 +29,7 @@ OWN = set(SIZES)
 GETWINDOW, NEW, SPRITE, CASH, NUMBER, TIME, GRADIENT = 0x101dbe40, 0x102384b8, 0x1018d11c, 0x1018de60, 0x1018d930, 0x1018edf4, 0x101898c8
 SETOBJ, GETFONT, SETFONT, GETSTR, SETTEXT, INDENT, PTRGLUE = (0x101db624, 0x10180270, 0x101da118, 0x10180468, 0x101de130, 0x10180940,
                                                               0x1023baa8)
-HOST_LAYOUT = [0x10]
+HOST_LAYOUT = [0x10]   # the panel's window, a Ptr32 (an arena offset) since unit v5L31
 
 STATE = {"wintab": 0, "fonts": 0, "texts": 0, "news": 0}
 
@@ -157,6 +157,9 @@ class Ppc(Side):
     def rd_ptr(self, a):
         return struct.unpack(">I", self.read(a, 4))[0]
 
+    def p32(self, p):
+        return p
+
     def __init__(self, e, case):
         self.e = e
         STATE["news"] = 0
@@ -195,6 +198,9 @@ class Host(Side):
     def rd_ptr(self, a):
         return struct.unpack("<Q", self.read(a, 8))[0]
 
+    def p32(self, p):
+        return p - self.lib.tpw_vsp_arena_base() if p else 0
+
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
@@ -228,6 +234,7 @@ def bind(lib):
         return
     lib.tpw_vsp_addr.restype, lib.tpw_vsp_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_vsp_alloc.restype, lib.tpw_vsp_alloc.argtypes = C.c_uint64, [C.c_uint32]
+    lib.tpw_vsp_arena_base.restype, lib.tpw_vsp_arena_base.argtypes = C.c_uint64, []
     lib.tpw_vsp_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_vsp_reset.argtypes = []
     lib.tpw_vsp_InitStatusWindow.argtypes = [C.c_uint64]
@@ -247,7 +254,7 @@ def build(s, case):
         s.ptr(b + 0x118, s.alloc(0x40))      # the vtable the original reads (+0x118, then slot +0x24) before the SetValue call
         s.ptr(tab + s.psize * i, b)
     panel = s.alloc(0x40)
-    s.ptr(panel + 0x10, 0 if case["nopanel"] else root)
+    s.words(panel + 0x10, [0 if case["nopanel"] else s.p32(root)])
     return panel
 
 
@@ -255,7 +262,7 @@ def run(s, case):
     try:
         panel = build(s, case)
         s.call(panel)
-        return {"log": s.log(), "window": s.rd_ptr(panel + 0x10) != 0}
+        return {"log": s.log(), "window": s.rd_words(panel + 0x10, 1)[0] != 0}
     finally:
         s.done()
 

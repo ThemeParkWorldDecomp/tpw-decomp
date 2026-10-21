@@ -25,10 +25,11 @@
 #include "ObjectControl.h"
 #include "TPEngine.h"
 #include "World.h"
+#include "WindowScripts.inc"
 
-// 0x1039599c (bss) and 0x102acef0 (initial word 1).
+// 0x1039599c (bss) and 0x102acef0 (the window script).
 CThing* gRideStatusShowThing;
-int16_t gRideStatusScript[2] = {0, 1};
+int16_t gRideStatusScript[] = {TPW_WINDOW_SCRIPT_102ACEF0};   // 0x102acef0: the image's words (generated, devtools/gen_game_tables.py)
 
 namespace allitems_post_callee {
 __attribute__((weak)) void WindowSetValue(InterfaceWindow* window, int32_t value) { window->SetValue(value); }
@@ -93,22 +94,22 @@ void RideStatusPanel::ApplyChanges() {
     if (RideValue(object->GetDBInfo(), 25) != 0) object->SetOperatingDuration(static_cast<uint8_t>(mDuration));
 }
 
-// 0x101bb9b8. The Mac's table slot at +0x1c is mOps->Slot5 (its panel argument is not passed here).
+// 0x101bb9b8. The Mac's table slot at +0x1c (UpdateStatusWindow) after each knob.
 void RideStatusPanel::DoDial(int32_t a, int32_t b) {
     reinterpret_cast<CObject*>(gStaffRoomPanelThing)->GetDBInfo();
     if (a == 0x3e2f) {
         mDuration = b;
-        mOps->Slot5();
+        UIStatusPanel_CallSlot(this, 0x1c);
         UpdateKnobsTitles(4);
     } else if (a < 0x3e2f) {
         if (a == 0x3e2d) {
             mCapacity = b;
-            mOps->Slot5();
+            UIStatusPanel_CallSlot(this, 0x1c);
             UpdateKnobsTitles(2);
         }
     } else if (a < 0x3e31) {
         mSpeed = b;
-        mOps->Slot5();
+        UIStatusPanel_CallSlot(this, 0x1c);
         UpdateKnobsTitles(1);
     }
 }
@@ -123,7 +124,7 @@ void RideStatusPanel::Edit(int32_t on) {
         EnsureMouse();
         gMouse->AssignMouseMode(draw);
         LLCM_LeftMouseButtonUp(0, 0, 0, 0);
-        mOps->Slot11(this);
+        UIStatusPanel_CallSlot(this, 0x34);
         return;
     }
     tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> type = {object->mObjectType};
@@ -136,7 +137,7 @@ void RideStatusPanel::Edit(int32_t on) {
         mode = track >= 1 ? 0xe : 0;
     } else if (track < 4) {
         CoasterEditMode(object);
-        mOps->Slot11(this);
+        UIStatusPanel_CallSlot(this, 0x34);
         return;
     } else {
         mode = 0;
@@ -146,7 +147,7 @@ void RideStatusPanel::Edit(int32_t on) {
     EnsureMouse();
     gMouse->AssignMouseMode(draw);
     LLCM_LeftMouseButtonUp(0, 0, 0, 0);
-    mOps->Slot11(this);
+    UIStatusPanel_CallSlot(this, 0x34);
 }
 
 // 0x101bc0bc.

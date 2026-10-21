@@ -11,6 +11,7 @@
 #include "calllog.h"
 #include <cstring>
 #include <new>
+#include "fake_arena_on_heap.h"
 using namespace calllog;
 
 // ---- what the unit's files need and the test does not look at

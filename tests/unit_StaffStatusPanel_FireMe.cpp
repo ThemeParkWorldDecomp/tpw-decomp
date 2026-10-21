@@ -24,7 +24,6 @@ using namespace calllog;
 CPlayerSettings gPlayerSettings;
 CThing* gStaffRoomPanelThing;
 CThing* gStaffStatusThing;
-int16_t gStaffStatusScript[4];
 
 void CPlayerSettings::Init() {}
 CPlayerSettings::~CPlayerSettings() {}

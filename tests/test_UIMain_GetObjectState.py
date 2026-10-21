@@ -100,6 +100,7 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
+    ride = (0x9C, 0x288, 0x7A8, 0x7C0)
 
     def __init__(self, e, case):
         self.e = e
@@ -138,6 +139,7 @@ class Host(Side):
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
+        self.ride = lib.ride
         CL.host_begin(lib, {}, case["queues"])
 
     def done(self):
@@ -173,9 +175,14 @@ def bind(lib):
     lib.tpw_gos_setride.restype, lib.tpw_gos_setride.argtypes = None, [C.c_uint64]
     lib.tpw_gos_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_gos_state.restype, lib.tpw_gos_state.argtypes = C.c_int32, [C.c_uint64, C.c_int32]
+    lib.tpw_gos_ridelayout.argtypes = [C.POINTER(C.c_int64)]
     out = (C.c_int64 * 32)()
     n = lib.tpw_gos_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    # The host RideInfo keeps the Mac's words at its own offsets; the record is written at each side's.
+    n = lib.tpw_gos_ridelayout(out)
+    assert n == 4, n
+    lib.ride = tuple(out)[:n]
     lib.bound = True
 
 
@@ -186,10 +193,11 @@ def build(s, case):
     s.half(obj + 0x0E, case["type"])
     s.words(obj + 0x28, [case["f28"]])
     s.half(obj + 0x2E, case["flags"])
-    ride = s.alloc(0x7C0)
-    s.words(ride + 0x9C, [case["kind"]])
-    s.words(ride + 0x288, [case["r288"]])
-    s.words(ride + 0x7A8, [case["r7a8"]])
+    kind, r288, r7a8, size = s.ride
+    ride = s.alloc(size)
+    s.words(ride + kind, [case["kind"]])
+    s.words(ride + r288, [case["r288"]])
+    s.words(ride + r7a8, [case["r7a8"]])
     s.setride(ride)
     wbase = s.alloc(0x1DA748)
     s.half(wbase + WORLD_OFF, case["w3c"])

@@ -77,7 +77,7 @@ int32_t BogStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_
 void __sinit_ui_bogStatus_cpp() {
     UIStatusPanelFields* fields = reinterpret_cast<UIStatusPanelFields*>(&gBogStatusPanel);
     UIStatusPanel_Construct(reinterpret_cast<UIStatusPanel*>(&gBogStatusPanel));
-    fields->mVtable.mOffset = 0x102a9384;
+    fields->mVtable.set(BogStatusPanelTable());
     fields->mMode = 0x3ea;
 }
 

@@ -249,6 +249,8 @@ int32_t tpw_ui_layout(int64_t* out) {
                                     reinterpret_cast<const uint8_t*>(&gPlayerSettings));
     out[n++] = static_cast<int64_t>(offsetof(CThing, mCellX));
     out[n++] = static_cast<int64_t>(offsetof(CThing, mCellY));
+    alignas(RideInfo) static unsigned char ride[sizeof(RideInfo)];   // where Move reads the HasQueue slot (the Mac's +0x40)
+    out[n++] = reinterpret_cast<const unsigned char*>(&reinterpret_cast<RideInfo*>(ride)->Value(kRideSlot_HasQueue)) - ride;
     return n;
 }
 

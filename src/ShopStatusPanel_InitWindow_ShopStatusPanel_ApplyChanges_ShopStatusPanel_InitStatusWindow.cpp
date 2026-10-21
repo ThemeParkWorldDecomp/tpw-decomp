@@ -77,12 +77,11 @@ void ShopStatusPanel::InitStatusWindow() {
 // 0x101bd730 (600 bytes)
 void ShopStatusPanel::UpdateWindow() {
     CObject* object = reinterpret_cast<CObject*>(gStaffRoomPanelThing);
-    const char16_t* answer = mOps->Slot13(this);
-    InterfaceWindow* window1c;
-    std::memcpy(&window1c, &mF14[4], sizeof(window1c));   // the Mac's pointer at 0x1c
+    const char16_t* answer = reinterpret_cast<const char16_t*>(static_cast<uintptr_t>(UIStatusPanel_CallSlot(this, 0x3c)));
+    InterfaceWindow* window1c = reinterpret_cast<Ptr32<InterfaceWindow>*>(&mF14[8])->get();   // the Mac's pointer at 0x1c
     parkstatus_callee::WindowSetText(window1c, answer);
-    mOps->Slot6();
-    mOps->Slot5();
+    UIStatusPanel_CallSlot(this, 0x20);
+    UIStatusPanel_CallSlot(this, 0x1c);
 
     InterfaceWindow* window = mWindow->GetWindow(0xc082);
     if (window != nullptr) {

@@ -370,7 +370,9 @@ namespace {
 int32_t RunImage(const int64_t* d, int64_t* out) {
     const int32_t flag = static_cast<int32_t>(d[0]);
     tpw_cl_on = 0;
-    InterfaceImage* image = new InterfaceImage(nullptr, 0, 0, 0, 0, 0, 0);
+    // (from the global operator new, which the call log sees free: the class's operator delete hands a block outside the arena to it;
+    // unit v5L31)
+    InterfaceImage* image = new (::operator new(sizeof(InterfaceImage))) InterfaceImage(nullptr, 0, 0, 0, 0, 0, 0);
     tpw_cl_label(kImage, image);
     tpw_cl_on = 1;
     if (static_cast<int16_t>(flag) > 0)

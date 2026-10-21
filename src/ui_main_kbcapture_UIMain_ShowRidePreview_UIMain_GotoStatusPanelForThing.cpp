@@ -2,6 +2,7 @@
 #include <cstdint>
 
 #include "Debug.h"
+#include "RideDB.h"
 #include "ThingReceivers.h"
 #include "World.h"
 #include "ui_main.h"
@@ -21,11 +22,12 @@ void UIMain_GotoStatusPanelForThing(void* thingPtr) {
     uint8_t kind = bytes[2];
     if (kind == 3) {
         CObject* object = static_cast<CObject*>(thingPtr);
-        const uint8_t* info = reinterpret_cast<const uint8_t*>(object->GetDBInfo());
-        int32_t type = *reinterpret_cast<const int32_t*>(info + 0x7a8);
+        // The record's UI type (+0x7a8) and UpgradeType slot (+0x288) by name: the host's record is laid out wider (unit v5L31).
+        const RideInfo* info = object->GetDBInfo();
+        int32_t type = info->mUIType;
         switch (type) {
             case 0:
-                if (*reinterpret_cast<const int32_t*>(info + 0x288) == 2) {
+                if (info->Value(kRideSlot_UpgradeType).mInteger == 2) {
                     gUpgradeStatusPanel.Show(thing);
                 } else {
                     uint16_t parent = object->GetUpgradeParent().mIndex;

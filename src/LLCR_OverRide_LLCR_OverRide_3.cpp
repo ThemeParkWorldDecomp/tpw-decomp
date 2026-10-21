@@ -1,5 +1,6 @@
 // Unit v5932: LLCR_OverRide (the pointer overload, 0x1008905c), LLCM_TrackCellBoundary, LLCR_SetRide, LLCR_AddRideToDB.
 #include <cstdint>
+#include <new>
 #include "LLCellSystem.h"
 #include "MainBalance.h"
 #include "World.h"
@@ -13,6 +14,7 @@
 #include "analyser.h"
 #include "Debug.h"
 #include "ppc_math.h"
+#include "platform/arena.h"
 
 // The words of this unit (initialised data of the Mac, zero at start).
 uint16_t gLLCCE04C = 0;
@@ -124,8 +126,10 @@ CObject* LLCR_AddRideToDB(int32_t rotation) {
     }
     MapDelta delta = reinterpret_cast<MapDelta*>(&ride->mMapOffsetX)->Rotate(rotation);   // the record's 0x7ac
     uint16_t at = static_cast<uint16_t>(delta.mX + static_cast<int32_t>(static_cast<uint32_t>(delta.mY) << 7) + gLLCCE092);
-    CObject* object = new CObject(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>{at},
-                                  tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{gLLCCE09C}, rotation, built);
+    void* block = tpw::ArenaAlloc(sizeof(CObject));   // the Mac's game heap: the arena (unit v5L31; a list keeps a thing's address in 32 bits)
+    CObject* object = block == nullptr ? nullptr
+                                       : new (block) CObject(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>{at},
+                                                             tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t>{gLLCCE09C}, rotation, built);
     if (object != nullptr) {
         if (gLLCCE0DC != 0 && RideValue(ride, kRideSlot_UpgradeType) != 2) {
             CObject* current = LLCM_GetCurrentObject();

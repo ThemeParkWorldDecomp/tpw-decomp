@@ -49,6 +49,7 @@ struct LargeHole {
 // while the program exits.
 std::mutex& gLock = *new std::mutex;
 size_t gTop = 0;                               // first byte never handed out
+size_t gLive = 0;                              // the sizes asked for in the live blocks
 void* gFreeLists[kSmallClasses + kPowerClasses];
 std::vector<LargeHole>* gHoles = nullptr;
 
@@ -138,6 +139,7 @@ void* ArenaAlloc(size_t size) {
     }
     header->size = size;
     header->state = kLive;
+    gLive += size;
     return reinterpret_cast<uint8_t*>(header) + kHeader;
 }
 
@@ -157,6 +159,7 @@ void ArenaFree(void* block) {
     Header* header = HeaderOf(block);
     if (header->state != kLive) Fail(header->state == kFree ? "block freed twice" : "freeing what is not a block", block);
     header->state = kFree;
+    gLive -= header->size;
     if (header->bin == kLargeClass) {
         const size_t bytes = (kHeader + header->size + kLargeStep - 1) / kLargeStep * kLargeStep;
         gHoles->push_back({static_cast<size_t>(reinterpret_cast<uint8_t*>(header) - gArenaBase), bytes});
@@ -180,6 +183,16 @@ bool InArena(const void* address) {
 uint32_t ArenaOffset(const void* address) {
     if (!InArena(address)) Fail("an address outside the arena cannot be kept in a 32-bit pointer field", address);
     return static_cast<uint32_t>(static_cast<const uint8_t*>(address) - gArenaBase);
+}
+
+size_t ArenaLiveBytes() {
+    std::lock_guard<std::mutex> lock(gLock);
+    return gLive;
+}
+
+size_t ArenaHighWater() {
+    std::lock_guard<std::mutex> lock(gLock);
+    return gTop;
 }
 
 }  // namespace tpw

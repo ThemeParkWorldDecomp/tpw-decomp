@@ -71,7 +71,7 @@ int32_t RideStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32
                     panel->UpdateStatusWindow();
                 } else if (a < 0x3e38) {
                     reinterpret_cast<CObject*>(gStaffRoomPanelThing)->GoFirstPerson(0);
-                    panel->mOps->Slot11(panel);
+                    UIStatusPanel_CallSlot(panel, 0x34);
                     return 0;
                 }
             }

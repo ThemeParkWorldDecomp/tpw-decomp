@@ -11,6 +11,7 @@
 #include "platform/arena.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 #include "ThingReceivers.h"
 
 using namespace calllog;
@@ -19,10 +20,11 @@ RideStatusPanel gRideStatusPanel;
 CThing* gStaffRoomPanelThing;
 
 namespace {
-struct FakeOps : UIStatusPanelOps {
-    void Slot11(void* panel) override { ev("PtrGlue", {lab(panel)}); }
-};
-FakeOps gFakeOps;
+// The panel's table (unit v5L31): the slot at +0x34 is logged as the Mac's __ptr_glue fake logs it.
+uint64_t Slot(void* panel, uint32_t offset, const void*) {
+    if (offset == 0x34) ev("PtrGlue", {lab(panel)});
+    return 0;
+}
 }  // namespace
 
 void UIMain_TickRidePreview() { ev("Tick", {}); }
@@ -76,7 +78,7 @@ int32_t tpw_rsm_layout(int64_t* out) {
     return 0;
 }
 
-void tpw_rsm_setops() { gRideStatusPanel.mOps = &gFakeOps; }
+void tpw_rsm_setops() { gRideStatusPanel.mVtable.set(FakeStatusPanelTable<Slot>()); }
 
 int32_t tpw_rsm_msg(uint64_t window, int32_t message, int32_t a, int32_t b) {
     return RideStatusMsg(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(window)), message, a, b);

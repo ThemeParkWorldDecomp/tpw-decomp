@@ -20,6 +20,7 @@ InterfaceHelpText* gUIHelpText;
 struct TbPalette { uint8_t mOpaque[1]; };
 TbPalette _lbGlobalPalette;
 #include "LbDrawText.h"
+#include "fake_arena_on_heap.h"
 const TbTextRender _lbSpriteRender = {}, _lbOneColourSpriteRender = {};
 
 // Window fakes keep the object layout and vtable, and record their arguments.

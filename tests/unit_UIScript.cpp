@@ -23,6 +23,7 @@
 #include "platform/msl.h"
 #include "ui_DrawObject.h"
 #include "ui_controls.h"
+#include "fake_arena_on_heap.h"
 
 using namespace calllog;
 

@@ -16,6 +16,16 @@
 #include "ui_iterators.h"
 #include "ui_main.h"
 
+namespace {
+
+// The list's data word: the staff member's address on the Mac, its arena offset here (FillAllStaffListCallback's PointerData; unit
+// v5L31: the raw word read as an address sent StaffStatusPanel::Show a pointer to nothing).
+CThing* DataThing(int32_t data) {
+    return data != 0 ? reinterpret_cast<CThing*>(tpw::gArenaBase + static_cast<uint32_t>(data)) : nullptr;
+}
+
+}  // namespace
+
 // 0x10198ac4: the all-staff panel's messages. Bug kept: message 0x402 asks the thing id of the list's data pointer.
 int32_t AllStaffPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b) {
     switch (message) {
@@ -46,7 +56,7 @@ int32_t AllStaffPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, in
         if (list != nullptr && b != -1) {
             int32_t data;
             list->GetData(b, &data);
-            gStaffStatusPanel.Show(reinterpret_cast<CThing*>(static_cast<uintptr_t>(static_cast<uint32_t>(data))));
+            gStaffStatusPanel.Show(DataThing(data));
         }
         return 0;
     }
@@ -55,7 +65,7 @@ int32_t AllStaffPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, in
         if (list != nullptr && b != -1) {
             int32_t data;
             list->GetData(b, &data);
-            CThing* thing = reinterpret_cast<CThing*>(static_cast<uintptr_t>(static_cast<uint32_t>(data)));
+            CThing* thing = DataThing(data);
             tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> id = thing->GetThingId();
             UIMain_ZoomToThing(id);
             RemoveAllStaffPanel();
@@ -75,8 +85,7 @@ int32_t AllStaffPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, in
 // 0x101932a0: flags the panel's object for maintenance (on) or takes the flag off, then the panel's table slot at Mac +0x1c.
 void UIStatusPanel::RequestMaintenance(bool on) {
     reinterpret_cast<CObject*>(gStaffRoomPanelThing)->RequestMaintenance(on ? 0 : 1);
-    Ptr32<UIStatusPanelOps>& ops = *reinterpret_cast<Ptr32<UIStatusPanelOps>*>(reinterpret_cast<uint8_t*>(this) + 0x20);
-    ops.get()->Slot5();
+    UIStatusPanel_CallSlot(this, 0x1c);
 }
 
 // 0x1019f434: the finance panel's messages.

@@ -208,6 +208,9 @@ class Ppc(Side):
         self.words(t + 0x34, [MARK_SLOT34])
         return t
 
+    def sinit_table(self, word):
+        return word
+
     def call(self, entry, args):
         r3, _, _ = T.call_ppc(self.e, entry, [a & MASK for a in args])
         return r3 & MASK
@@ -251,6 +254,10 @@ class Host(Side):
     def mktable(self):
         return self.lib.tpw_fs_mktable()
 
+    def sinit_table(self, word):
+        # the host's table is the arena offset of FeatureStatusPanelTable() (unit v5L31)
+        return 0x102A9BA0 if word == self.lib.tpw_fs_sinit_table() else word
+
     def call(self, entry, args):
         lib = self.lib
         if entry == FN_MSG:
@@ -275,6 +282,7 @@ def bind(lib):
     lib.tpw_fs_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_fs_msg.restype, lib.tpw_fs_msg.argtypes = C.c_int32, [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
     lib.tpw_fs_sinit.restype, lib.tpw_fs_sinit.argtypes = None, []
+    lib.tpw_fs_sinit_table.restype, lib.tpw_fs_sinit_table.argtypes = C.c_uint32, []
     lib.tpw_fs_maxy.restype, lib.tpw_fs_maxy.argtypes = C.c_int32, []
     lib.tpw_fs_kiss.restype, lib.tpw_fs_kiss.argtypes = None, [C.c_uint64]
     out = (C.c_int64 * 32)()
@@ -320,6 +328,7 @@ def run(s, case):
         answer = execute(s, case, win)
         w = s.rd_words(s.g("panel"), 12)
         w[4] = 1 if w[4] else 0                                       # the window at +0x10 is a pointer: present or not
+        w[8] = s.sinit_table(w[8])                                    # the static initialiser's table: the Mac's address on both sides
         w[8] = w[8] if w[8] in (0x88, 0x102A9BA0) else 0xFFFFFFFF     # the table at +0x20: a constant of the code, or the case's block
         return {"answer": answer, "log": s.log(), "panel": w}
     finally:

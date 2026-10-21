@@ -128,6 +128,13 @@ int32_t TbITable::FormatString(char16_t* out, uint32_t size, uint32_t id, ...) c
     return 0;
 }
 
+// The tables the static initialisers store (src/ui_StatusPanel_tables.cpp, unit v5L31): blocks of the arena made on first use; the test
+// compares only where they are stored.
+uint32_t* VisitorStatusPanelTable() {
+    static uint32_t* table = static_cast<uint32_t*>(tpw::ArenaAllocZeroed(0x80));
+    return table;
+}
+
 extern "C" {
 
 // The host address of a global by the module's name for it (ADDR's keys).

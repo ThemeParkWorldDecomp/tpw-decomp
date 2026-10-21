@@ -17,6 +17,7 @@
 #include "analyser.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 
 using namespace calllog;
 
@@ -30,6 +31,14 @@ StaffStatusPanel gStaffStatusPanel;
 namespace {
 int64_t P(const void* p) { return static_cast<int32_t>(reinterpret_cast<uintptr_t>(p)); }
 int64_t R(const void* p) { return P(p); }
+// A list's thing as the word the list holds: the Mac's pointer is the host's arena offset (unit v5L31). The whole distance from the
+// base is kept, so an address that is not the arena's (the word itself) cannot pass for one; the base itself, never a block, is -1.
+int64_t O(const void* p) {
+    if (p == nullptr) return 0;
+    const int64_t offset = static_cast<const uint8_t*>(p) - tpw::gArenaBase;
+    if (offset == 0) return -1;
+    return offset > 0 && offset <= 0xffffffffll ? static_cast<int32_t>(static_cast<uint32_t>(offset)) : offset;
+}
 }  // namespace
 
 const char16_t* UIMain_GetString(int32_t id) {
@@ -48,9 +57,9 @@ int32_t InterfaceListControl2::GetData(int32_t position, int32_t* data) {
     *data = static_cast<int32_t>(ret("GetData"));
     return 0;
 }
-void StaffStatusPanel::Show(CThing* thing) { ev("Show", {this == &gStaffStatusPanel ? 1 : 0, P(thing)}); }
+void StaffStatusPanel::Show(CThing* thing) { ev("Show", {this == &gStaffStatusPanel ? 1 : 0, O(thing)}); }
 tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> CThing::GetThingId() const {
-    ev("GetThingId", {P(this)});
+    ev("GetThingId", {O(this)});
     tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> id;
     id.mIndex = static_cast<uint16_t>(ret("GetThingId"));
     return id;
@@ -74,12 +83,11 @@ int32_t CObject::RequestMaintenance(int32_t on) {
 }
 
 namespace {
-class FakeOps : public UIStatusPanelOps {
-public:
-    void Slot4() override { ev("Slot", {4}); }
-    void Slot5() override { ev("Slot", {5}); }
-    void Slot6() override { ev("Slot", {6}); }
-};
+// The panel's table (unit v5L31): every slot logs its number from +0x08, as the Mac's __ptr_glue fake does.
+uint64_t Slot(void*, uint32_t offset, const void*) {
+    ev("Slot", {static_cast<int64_t>((offset - 8) / 4)});
+    return 0;
+}
 }  // namespace
 
 extern "C" {
@@ -103,12 +111,8 @@ uint64_t tpw_ash_addr(const char* name) {
 
 uint64_t tpw_ash_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
 
-// A fake table object in the arena; the answer is its arena offset (what a Ptr32 holds).
-uint32_t tpw_ash_ops() {
-    void* mem = tpw::ArenaAllocZeroed(sizeof(FakeOps));
-    new (mem) FakeOps();
-    return tpw::ArenaOffset(mem);
-}
+// A fake table in the arena; the answer is its arena offset (what a Ptr32 holds).
+uint32_t tpw_ash_ops() { return tpw::ArenaOffset(FakeStatusPanelTable<Slot>()); }
 
 int32_t tpw_ash_layout(int64_t* out) {
     (void)out;

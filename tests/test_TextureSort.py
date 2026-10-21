@@ -25,6 +25,12 @@ original.
 
 The original's fused multiply-adds (SortEntries' three limits) and its fctiwz (the sort keys and
 the area limit) run under HardwareRounding, as in test_TextureFrame.py.
+
+Lists longer than 4096 entries. The original's SortEntries, SortByCriteria and SortByAddress drop
+what does not fit a 4096-pointer array; built with the port fixes on (unit v5L47) the host takes
+the whole list. The cases with such a list are then checked by what the whole list must become
+(check_whole) instead of against the original; the cases of 4095 and 4096 entries are checked both
+ways, which holds check_whole to the original.
 """
 import copy
 import ctypes as C
@@ -1193,11 +1199,12 @@ def edge_big_lists(op):
         order = list(range(1, n + 1))
         r.shuffle(order)
         w["head"] = set_chain(w, order)
-        yield case(op, [], w)
+        yield dict(case(op, [], w), queue=order)
     # Five thousand entries are more than a case holds; the limit is exact at 4096.
     w = big_list_world(r, 4097)
-    w["head"] = set_chain(w, list(range(4097, 0, -1)))
-    yield case(op, [], w)
+    order = list(range(4097, 0, -1))
+    w["head"] = set_chain(w, order)
+    yield dict(case(op, [], w), queue=order)
 
 
 def sort_entries_world(r, n, **kw):
@@ -1327,7 +1334,7 @@ def edge_sort_entries():
         w, order = sort_entries_world(r, n)
         for k, index in enumerate(order[4096:]):
             w["entries"][index - 1]["flags"] = [BLEND, LOCKED | 0xc0, BLEND | LOCKED | ONPAGE, 0x10, DROPPED | 0xf0][k % 5]
-        yield case(SORT_ENTRIES, [], w)
+        yield dict(case(SORT_ENTRIES, [], w), queue=order)
 
 
 def edge_merge():
@@ -1444,8 +1451,71 @@ def edge_create_nw():
     yield case(CREATE_NW, [head, 1], w)
 
 
+def check_whole(case, h):
+    """What the host made of a case's whole list (case["queue"], the entries in list order): every
+    entry of it once, in the sort's order (largest sort key first, or rising addresses for
+    SortByAddress), the flags of those kept as they were. SortEntries leaves out (and resets) only
+    the entries flagged 0x8000 (the cases set no area limit) and sums the area of all of them."""
+    w, queue, op = case["world"], case["queue"], case["op"]
+    st = h["state"]
+    entries = st["entries"]
+    head = st["cache"][0] if op == SORT_ENTRIES else st["head"][0]
+    kept = [n for n in queue if op != SORT_ENTRIES or not w["entries"][n - 1]["flags"] & DROPPED]
+    chain, seen = [], set()
+    n = head
+    while n and n not in seen:
+        seen.add(n)
+        chain.append(n)
+        n = entries[n - 1][1]
+    errors = []
+    if n:
+        errors.append(f"the list loops back to entry {n}")
+    if sorted(chain) != sorted(kept):
+        errors.append(f"the list holds {len(chain)} entries, expected {len(kept)}")
+    changed = [n for n in kept if entries[n - 1][2] != w["entries"][n - 1]["flags"] & MASK]
+    if changed:
+        errors.append(f"{len(changed)} kept entries changed flags, the first {changed[0]}")
+    if op == BY_ADDRESS:
+        ordered = chain == sorted(chain)
+    else:
+        keys = [entries[n - 1][15] & MASK for n in chain]
+        ordered = all(a >= b for a, b in zip(keys, keys[1:]))
+    if not ordered:
+        errors.append("the list is out of order")
+    if op == SORT_ENTRIES:
+        left = [n for n in queue if n not in seen and entries[n - 1][2] & (ONPAGE | QUEUED | LOCKED | DROPPED)]
+        if left:
+            errors.append(f"{len(left)} entries left out were not reset, the first {left[0]}")
+        if st["cache"][7] != area_of(w, queue):
+            errors.append(f"area {st['cache'][7]}, expected {area_of(w, queue)}")
+    return errors
+
+
+def port_fix(lib):
+    if not hasattr(lib, "port_fix"):
+        lib.tpw_ts_portfix.restype, lib.tpw_ts_portfix.argtypes = C.c_int32, []
+        lib.port_fix = lib.tpw_ts_portfix() == 1
+    return lib.port_fix
+
+
+class SortTest(FnTest):
+    """FnTest, with check_whole for the cases that carry their list: in place of the comparison
+    when the host takes a list the original cuts at 4096, as well as the comparison for a list
+    the original takes whole."""
+
+    def run_case(self, runner, case):
+        if "queue" not in case:
+            return FnTest.run_case(self, runner, case)
+        if len(case["queue"]) > 4096:
+            if port_fix(runner.lib):
+                return check_whole(case, self.host(runner.lib, case))
+            return FnTest.run_case(self, runner, case)
+        errors = FnTest.run_case(self, runner, case)
+        return errors + check_whole(case, self.host(runner.lib, case))
+
+
 def test(name, edges, rnd):
-    return FnTest(name, ppc_run, host_run, edge=edges, rnd=rnd)
+    return SortTest(name, ppc_run, host_run, edge=edges, rnd=rnd)
 
 
 TESTS = [test("CTextureCache::Textures_QSort", edge_qsort(False), rnd_qsort(False)),

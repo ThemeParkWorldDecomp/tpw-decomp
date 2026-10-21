@@ -12,6 +12,7 @@
 #include "FillLenderList.h"
 #include "InterfaceWindow.h"
 #include "MainWindowCallback.h"
+#include "RideDB.h"
 #include "ThingReceivers.h"
 #include "UI_Base.h"
 #include "calllog.h"
@@ -175,6 +176,9 @@ int32_t tpw_bog_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(UIStatusPanelFields, mF1C));
     out[n++] = static_cast<int64_t>(offsetof(UIStatusPanelFields, mVtable));
     out[n++] = static_cast<int64_t>(offsetof(InterfaceWindow, mZ));
+    alignas(RideInfo) static unsigned char ride[sizeof(RideInfo)];   // the ride record's type number (the Mac's +0x78c)
+    out[n++] = reinterpret_cast<const unsigned char*>(&reinterpret_cast<const RideInfo*>(ride)->mRideTypeNumber) - ride;
+    out[n++] = static_cast<int64_t>(sizeof(RideInfo));
     return n;
 }
 

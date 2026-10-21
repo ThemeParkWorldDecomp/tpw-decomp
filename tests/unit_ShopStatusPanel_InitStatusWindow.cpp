@@ -17,6 +17,7 @@
 #include "ThingReceivers.h"
 #include "ui_controls.h"
 #include "ui_main.h"
+#include "fake_status_panel_table.h"
 
 using namespace calllog;
 
@@ -39,16 +40,14 @@ int64_t Ident(const void* p) {
 
 int64_t Val(const void* p) { return static_cast<int32_t>(reinterpret_cast<uintptr_t>(p)); }
 
-class FakeOps : public UIStatusPanelOps {
-public:
-    void Slot5() override { ev("Ops5", {1}); }
-    void Slot6() override { ev("Ops6", {1}); }
-    const char16_t* Slot13(void* panel) override {
-        ev("Ops13", {panel != nullptr ? 1 : 0});
-        return reinterpret_cast<const char16_t*>(static_cast<uintptr_t>(ret("Ops13")));
-    }
-};
-FakeOps gOps;
+// The panel's table (unit v5L31): the slots at +0x1c, +0x20 and +0x3c (the name) are logged.
+uint64_t Slot(void* panel, uint32_t offset, const void*) {
+    if (offset == 0x1c) ev("Ops5", {1});
+    if (offset == 0x20) ev("Ops6", {1});
+    if (offset != 0x3c) return 0;
+    ev("Ops13", {panel != nullptr ? 1 : 0});
+    return ret("Ops13");
+}
 
 }  // namespace
 
@@ -138,7 +137,7 @@ uint64_t tpw_ssiw_addr(const char* name) {
         const void* address;
     };
     const Entry entries[] = {
-        {"ops", &gOps},
+        {"ops", FakeStatusPanelTable<Slot>()},
         {"winmap", gWinMap},
         {"staff", &gStaffRoomPanelThing},
     };
@@ -148,6 +147,11 @@ uint64_t tpw_ssiw_addr(const char* name) {
 }
 
 uint64_t tpw_ssiw_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
+
+// The Ptr32 value of a block (the panel's windows and table are Ptr32, unit v5L31).
+uint32_t tpw_ssiw_off(uint64_t address) {
+    return address == 0 ? 0 : tpw::ArenaOffset(reinterpret_cast<void*>(static_cast<uintptr_t>(address)));
+}
 
 void tpw_ssiw_reset() {
     gNew.clear();
@@ -160,7 +164,7 @@ int32_t tpw_ssiw_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mWindow));
     out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mStatusWindow));
     out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mF14));
-    out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mOps));
+    out[n++] = static_cast<int64_t>(offsetof(ShopStatusPanel, mVtable));
     out[n++] = static_cast<int64_t>(sizeof(ShopStatusPanel));
     return n;
 }

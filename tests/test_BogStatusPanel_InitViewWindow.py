@@ -156,7 +156,7 @@ class Side:
     def make(self):
         """The objects every case has (allocated in the same order on both sides)."""
         names = ["panel", "w0c", "w14", "w18", "w1c", "font", "sprite", "chA", "chB", "info", "thing"]
-        self.o = {n: self.alloc(0x800 if n == "info" else 0x400) for n in names}
+        self.o = {n: self.alloc(max(0x800, self.info_size) if n == "info" else 0x400) for n in names}
         self.table = self.alloc(0x80)
 
     def label_of(self, value):
@@ -168,6 +168,7 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
+    ride_type_at, info_size = 0x78C, 0x800
     zoff = 0xDC
 
     def __init__(self, e, case):
@@ -231,6 +232,7 @@ class Host(Side):
         self.lib = lib
         bind(lib)
         self.zoff = lib.mz
+        self.ride_type_at, self.info_size = lib.ride_type_at, lib.info_size
         self.make()
         o = self.o
         fixed = {i: o[n] for i, n in enumerate(["panel", "w0c", "w14", "w18", "w1c", "font", "sprite", "chA", "chB", "info", "thing"], 1)}
@@ -299,6 +301,7 @@ def bind(lib):
     n = lib.tpw_bog_layout(out)
     assert list(out)[:5] == HOST_LAYOUT, list(out)[:n]
     lib.mz = out[5]
+    lib.ride_type_at, lib.info_size = out[6], out[7]   # the ride record's type number and size on the host (laid out wider)
     lib.bound = True
 
 
@@ -314,7 +317,7 @@ def build(s, case):
     s.words(o["panel"] + 0x20, [s.ptr(s.table)])
     for name in ("w14", "w18"):
         s.write16(o[name] + s.zoff, case["z"])
-    s.words(o["info"] + 0x78C, [case["id"]])
+    s.words(o["info"] + s.ride_type_at, [case["id"]])
     s.words(o["thing"] + 0x40, [case["fbits"]])
     s.setptr(s.g("gThing"), o["thing"] if case["gthing"] else 0)
     s.setptr(s.g("gPanelThing"), o["thing"] if case["pthing"] else 0)

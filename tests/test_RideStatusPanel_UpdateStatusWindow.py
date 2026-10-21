@@ -325,11 +325,11 @@ class Host(Side):
     def setptr(self, key, addr):
         self.lib.tpw_rsp_setptr(key, addr)
 
-    def setp(self, panel, name, ptr):
-        self.write(panel + HOST[name], struct.pack("<Q", ptr))
+    def setp(self, panel, name, ptr):   # the panel's pointer fields are Ptr32 (arena offsets, unit v5L31)
+        self.write(panel + HOST[name], struct.pack("<I", self.lib.tpw_rsp_off(ptr)))
 
     def getp(self, panel, name):
-        return struct.unpack("<Q", self.read(panel + HOST[name], 8))[0]
+        return self.lib.tpw_rsp_at(struct.unpack("<I", self.read(panel + HOST[name], 4))[0])
 
     def set_ops(self, panel):
         self.setp(panel, "ops", self.g("ops"))
@@ -356,6 +356,8 @@ def bind(lib):
     p = "tpw_rsp_"
     getattr(lib, p + "addr").restype, getattr(lib, p + "addr").argtypes = C.c_uint64, [C.c_char_p]
     getattr(lib, p + "alloc").restype, getattr(lib, p + "alloc").argtypes = C.c_uint64, [C.c_uint32]
+    getattr(lib, p + "off").restype, getattr(lib, p + "off").argtypes = C.c_uint32, [C.c_uint64]
+    getattr(lib, p + "at").restype, getattr(lib, p + "at").argtypes = C.c_uint64, [C.c_uint32]
     getattr(lib, p + "newwindow").restype, getattr(lib, p + "newwindow").argtypes = C.c_uint64, []
     getattr(lib, p + "setptr").restype, getattr(lib, p + "setptr").argtypes = None, [C.c_int32, C.c_uint64]
     getattr(lib, p + "clearptrs").restype, getattr(lib, p + "clearptrs").argtypes = None, []

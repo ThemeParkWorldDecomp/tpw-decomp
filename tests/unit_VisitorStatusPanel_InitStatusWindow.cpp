@@ -94,6 +94,9 @@ uint64_t tpw_vsp_addr(const char* name) {
 
 uint64_t tpw_vsp_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
 
+// The arena's base: the panel's window is a Ptr32 (an arena offset) since unit v5L31.
+uint64_t tpw_vsp_arena_base() { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::gArenaBase)); }
+
 int32_t tpw_vsp_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = static_cast<int64_t>(offsetof(VisitorStatusPanel, mWindow));

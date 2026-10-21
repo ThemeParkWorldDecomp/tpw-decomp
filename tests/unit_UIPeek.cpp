@@ -15,6 +15,7 @@
 #include "UIInterface.h"
 #include "UI_pump.h"
 #include "TbITable.h"
+#include "fake_arena_on_heap.h"
 using namespace calllog;
 
 EMEffect gEffects[3];

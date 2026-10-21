@@ -6,6 +6,8 @@
 // of the thing table. It starts by resetting the table (InitThingHeap). The used list is rebuilt from the head's index and each entry's next
 // index, and for every used entry the load MAKES the thing of the entry's kind in place (operator new of the kind's size, the part of the
 // class's constructor the Mac inlines here, the kind byte, the entry's index as the thing's id) before the thing's own Serialise reads it.
+// The Mac's operator new is the game heap, so the host takes every thing's block from the arena (unit v5L31): the lists keep a thing's
+// address in a 32-bit word.
 // Every callee answers 0 for success; the first nonzero answer ends Load with 0 at once (nothing is called after it, and a thing that was
 // made is not entered in its row), and a load that read everything relinks the free list, switches the sprite drawing by the world state
 // and answers 1. The strings are at 0x10247498 + the offset in the comment.
@@ -23,6 +25,7 @@
 #include "Serialise.h"
 #include "ThingReceivers.h"
 #include "analyser.h"
+#include "platform/arena.h"
 
 namespace {
 
@@ -246,94 +249,94 @@ int32_t CWorld::Load(void* file) {
         const uint32_t fileVersion = static_cast<uint32_t>(version);
         switch (kind) {
         case 1: {
-            void* block = ::operator new(0x22c);
+            void* block = tpw::ArenaAlloc(0x22c);
             if (block != nullptr) InitPerson(block);
             if (!ReadThing<CPerson>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 3: {
-            void* block = ::operator new(0x448);
+            void* block = tpw::ArenaAlloc(0x448);
             if (block != nullptr) InitObject(block);
             if (!ReadThing<CObject>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 4: {
-            void* block = ::operator new(0x218);
+            void* block = tpw::ArenaAlloc(0x218);
             if (block != nullptr) InitStaff(block);
             if (!ReadThing<CMechanic>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 5: {
-            void* block = ::operator new(0x218);
+            void* block = tpw::ArenaAlloc(0x218);
             if (block != nullptr) InitStaff(block);
             if (!ReadThing<CHandyman>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 6: {
-            void* block = ::operator new(0x214);
+            void* block = tpw::ArenaAlloc(0x214);
             if (block != nullptr) InitStaff(block);
             if (!ReadThing<CEntertainer>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 7: {
-            void* block = ::operator new(0x214);
+            void* block = tpw::ArenaAlloc(0x214);
             if (block != nullptr) InitStaff(block);
             if (!ReadThing<CGuard>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 8: {
-            void* block = ::operator new(0x214);
+            void* block = tpw::ArenaAlloc(0x214);
             if (block != nullptr) InitStaff(block);
             if (!ReadThing<CResearcher>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 9: {
-            void* block = ::operator new(0x68);
+            void* block = tpw::ArenaAlloc(0x68);
             if (block != nullptr) InitStaffHQ(block);
             if (!ReadThing<CStaffHQ>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 10:
-            if (!ReadThing<CMechanicHQ>(entry, ::operator new(0xe), kind, id, file, fileVersion)) return 0;
+            if (!ReadThing<CMechanicHQ>(entry, tpw::ArenaAlloc(0xe), kind, id, file, fileVersion)) return 0;
             break;
         case 11: {
-            void* block = ::operator new(0x16f0);
+            void* block = tpw::ArenaAlloc(0x16f0);
             if (block != nullptr) InitAdvisor(block);
             if (!ReadThing<CAdvisor>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 12:
-            if (!ReadThing<CTagSystem>(entry, ::operator new(0x80e), kind, id, file, fileVersion)) return 0;
+            if (!ReadThing<CTagSystem>(entry, tpw::ArenaAlloc(0x80e), kind, id, file, fileVersion)) return 0;
             break;
         case 13: {
-            void* block = ::operator new(0x21c48);
+            void* block = tpw::ArenaAlloc(0x21c48);
             if (block != nullptr) InitParkAnalyser(block);
             if (!ReadThing<CParkAnalyser>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 14: {
-            void* block = ::operator new(0x146c);
+            void* block = tpw::ArenaAlloc(0x146c);
             if (block != nullptr) InitResearchLab(block);
             if (!ReadThing<CResearchLab>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 15: {
-            void* block = ::operator new(0x68);
+            void* block = tpw::ArenaAlloc(0x68);
             if (block != nullptr) InitWeather(block);
             if (!ReadThing<CWeather>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
         }
         case 16:
-            if (!ReadThing<CBankAccount>(entry, ::operator new(0x128), kind, id, file, fileVersion)) return 0;
+            if (!ReadThing<CBankAccount>(entry, tpw::ArenaAlloc(0x128), kind, id, file, fileVersion)) return 0;
             break;
         case 17:
-            if (!ReadThing<CUIMsgReceiver>(entry, ::operator new(0xc), kind, id, file, fileVersion)) return 0;
+            if (!ReadThing<CUIMsgReceiver>(entry, tpw::ArenaAlloc(0xc), kind, id, file, fileVersion)) return 0;
             break;
         case 18:
             GAME_ASSERTMSG(0, "Should not be able to load online persons\n");   // 0x6ad
             break;
         case 19: {
-            void* block = ::operator new(0x3e4);
+            void* block = tpw::ArenaAlloc(0x3e4);
             if (block != nullptr) InitChallengeHQ(block);
             if (!ReadThing<CChallengeHQ>(entry, block, kind, id, file, fileVersion)) return 0;
             break;
