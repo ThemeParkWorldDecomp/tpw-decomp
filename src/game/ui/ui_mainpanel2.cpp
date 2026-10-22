@@ -24,6 +24,7 @@
 #include "ppc_math.h"
 #include "std_deque_errorthingy.h"
 #include "TbGraphicFile.h"
+#include "TbDynamicStringTemplate.h"
 #include "TbITable.h"
 #include "TbVTag.h"
 #include "Text.h"
@@ -1048,6 +1049,15 @@ void UI_SwitchGameWindow(int32_t first) {
     }
     UIMain_DecideKbCapture();
 }
+
+// 0x10238800: TbDynamicStringTemplate<wchar_t>(const wchar_t*) built in place. The Mac global is 0x14 bytes; the host string is larger,
+// so the storage is sized for it (nothing reads the global but this initialiser).
+namespace mainpanel2_callee {
+__attribute__((weak, noinline)) void WideStringCtor(void* string, const char16_t* text) {
+    new (string) TbDynamicStringTemplate<char16_t>(text);
+}
+}  // namespace mainpanel2_callee
+alignas(8) uint8_t gMainPanel2Text[sizeof(TbDynamicStringTemplate<char16_t>)];   // 0x103949e8 (0x14 bytes on the Mac)
 
 // 0x101a8df4
 const char16_t gMainPanel2Literal[] = u"gms.dat";   // 0x1024e158

@@ -6,4 +6,4 @@ set(TPW_UNIT_CFSOnlinePark_CFSOnlinePark_KEEP
   __ZN13CFSOnlineParkC1EPK10ccParkInfoP23CFSOnlineSystemParkList   # CFSOnlinePark::CFSOnlinePark(ccParkInfo const*, CFSOnlineSystemParkList*)
   __ZN13CFSOnlineParkD1Ev   # CFSOnlinePark::~CFSOnlinePark()
 )
-set_source_files_properties(src/game/online/FS_OnlineList.cpp PROPERTIES COMPILE_OPTIONS "-fno-inline")
+tpw_test_source_flags(src/game/online/FS_OnlineList.cpp OPTIONS -fno-inline)

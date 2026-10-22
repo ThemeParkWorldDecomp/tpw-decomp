@@ -229,9 +229,9 @@ struct _SYSTEMTIME {
     uint16_t wMilliseconds;
 };
 static_assert(sizeof(_SYSTEMTIME) == 16, "SYSTEMTIME is 16 bytes");
-// The local date and time (macdoze 0x10005f08). Not implemented by the platform layer yet (unit w113 declares it).
+// The local date and time (macdoze 0x10005f08, platform/macdoze_misc.cpp; the day of the week is the Mac's, Sunday 1; the milliseconds are 0).
 void GetLocalTime(_SYSTEMTIME* time);
-// Platform import, declared by w216; untranslated (bullfrog glue 0x1006bbec).
+// macdoze 0x10006144 (platform/macdoze_misc.cpp, bullfrog glue 0x1006bbec): the calendar date as a FILETIME, the inverse of FileTimeToSystemTime; always 1.
 int32_t SystemTimeToFileTime(const _SYSTEMTIME* time, tagFILETIME* fileTime);
 // macdoze 0x10005fe4 (240 bytes, platform/macdoze_misc.cpp, unit w125): the FILETIME as a calendar date and time (no time zone; the day
 // of the week is the Mac's, Sunday 1; the milliseconds are 0), always 1.

@@ -171,7 +171,13 @@ void NameWindow(int32_t group) {
 // Unit v5097: the research panel's scroll handling (DoScroll 0x101b42d0), InitAll (0x101b4000) and ResearchPanelMsg (0x101b45e0).
 
 // The Mac's UIMain_UISound answers the sound handle in r3 (the header declares it void): the same symbol, declared with the answer.
+// UIMain_UISound is 14 characters long. The test library defines TPW_DOSCROLL_FAKES (its cmake file): its recording fake in
+// tests/unit_DoScroll.cpp carries the symbol under the length prefix 13.
+#ifdef TPW_DOSCROLL_FAKES
 int32_t UIMain_UISoundHandle(int32_t code) __asm__("__Z13UIMain_UISoundi");
+#else
+int32_t UIMain_UISoundHandle(int32_t code) __asm__("__Z14UIMain_UISoundi");
+#endif
 
 int32_t gResearchScrollSound;   // 0x10395960 (name invented)
 

@@ -4,4 +4,4 @@ set(TPW_UNIT_LCPostFormat_6 src/game/ui/ui_allItemsPanel.cpp platform/arena.cpp)
 set(TPW_UNIT_LCPostFormat_6_KEEP
   __Z24AllItemsListLCPostFormatP15InterfaceWindow   # AllItemsListLCPostFormat(InterfaceWindow*)
 )
-set_source_files_properties(src/game/ui/ui_allItemsPanel.cpp PROPERTIES COMPILE_DEFINITIONS TPW_LCPOST_FAKES)
+tpw_test_source_flags(src/game/ui/ui_allItemsPanel.cpp DEFINITIONS TPW_LCPOST_FAKES)

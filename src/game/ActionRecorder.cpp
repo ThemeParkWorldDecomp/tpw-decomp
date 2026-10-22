@@ -854,6 +854,16 @@ void CActionRecorder::ProcessAction(RecordedAction action, uint8_t* data) {
     if (static_cast<int32_t>(action) != 0xe7) CTRACE(2, "Erroneous stuff going down\n");
 }
 
+// The callers (and the test libraries' fakes) pass the action as an int, the header's first overloads; the Mac has one function per
+// signature, taking a RecordedAction (0x10144bec, 0x101441fc, 0x101445d0, 0x10144704 and, for the replay, 0x10146850). These reach them.
+void CActionRecorder::RecordAction(int32_t action, uint8_t* data) { RecordAction(static_cast<RecordedAction>(action), data); }
+void CActionRecorder::RecordAction(int32_t action, uint16_t value) { RecordAction(static_cast<RecordedAction>(action), value); }
+void CActionRecorder::RecordAction(int32_t action, uint16_t value, uint8_t extra) {
+    RecordAction(static_cast<RecordedAction>(action), value, extra);
+}
+void CActionRecorder::RecordAction(int32_t action, float value, uint16_t id) { RecordAction(static_cast<RecordedAction>(action), value, id); }
+void CActionRecorder::ProcessAction(int32_t action, uint8_t* data) { ProcessAction(static_cast<RecordedAction>(action), data); }
+
 // Unit v51048: eight small functions of the main app (Game.cpp, ActionRecorder.cpp, ui_visitorStatus.cpp's list instance, Peep.cpp's park time,
 // UI_Base.cpp's bar and deferred message).
 

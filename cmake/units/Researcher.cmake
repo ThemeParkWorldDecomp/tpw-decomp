@@ -23,4 +23,4 @@ set(TPW_UNIT_Researcher_KEEP
   _gResearcherSinitLow
 )
 # The test fakes memcmp (operator== is memcmp of ten bytes on the Mac): keep the compiler from expanding the call inline.
-set_source_files_properties(src/game/people/Researcher.cpp PROPERTIES COMPILE_OPTIONS -fno-builtin-memcmp)
+tpw_test_source_flags(src/game/people/Researcher.cpp OPTIONS -fno-builtin-memcmp)

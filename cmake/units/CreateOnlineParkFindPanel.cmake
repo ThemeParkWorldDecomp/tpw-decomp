@@ -7,4 +7,4 @@ set(TPW_UNIT_CreateOnlineParkFindPanel_KEEP
   _gOnlineParkFindScript
   _gOnlineParkFindWide
 )
-set_source_files_properties(src/game/ui/ui_onlineParkFindPanel.cpp PROPERTIES COMPILE_DEFINITIONS TPW_FINDPANEL_UNIT_TEST)
+tpw_test_source_flags(src/game/ui/ui_onlineParkFindPanel.cpp DEFINITIONS TPW_FINDPANEL_UNIT_TEST)

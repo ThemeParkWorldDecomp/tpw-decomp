@@ -99,6 +99,9 @@ TPW_WEAK CFSOnlineSystem* NewOnlineSystem() { return new CFSOnlineSystem(); }
 
 TPW_WEAK CFSUserInfo* NewUserInfo() { return new CFSUserInfo(); }
 
+// 0x10238800: TbDynamicStringTemplate<wchar_t>(const wchar_t*) built in place (the sinit's global is sized for the host string).
+TPW_WEAK void WideStringCtor(void* string, const char16_t* text) { new (string) TbDynamicStringTemplate<char16_t>(text); }
+
 // ReturnUploadFilename, UniStringToUploadPath and WideStringDtor (ui_mainmenu.h) have no definition in the program yet: the launcher makes
 // stand-ins of them. They would be: a TbDynamicStringTemplate<char16_t> built in place from CFSOnlineSystem::ReturnUploadFilename(); a
 // TbDynamicStringTemplate<char> filled by UniStringToString whose text becomes out->mPath; and the string's destructor.
@@ -170,9 +173,9 @@ int32_t MainGameMenuConfirmPublish_OK(void* context) {
 // Unit v51056: CUIGrapher's setters (0x101fd798 .. 0x101fd97c), CFSLoadSave's Save/Hidden wrappers and destructor, the ui_mainmenu.cpp
 // small functions and static initialiser, the TPEmbed.cpp small functions and the bthread / Connection / vector destructors.
 
-alignas(8) uint8_t gMainMenuText[0x14];       // 0x10396a5c
+alignas(8) uint8_t gMainMenuText[sizeof(TbDynamicStringTemplate<char16_t>)];   // 0x10396a5c (0x14 bytes on the Mac)
 alignas(8) uint8_t gMainMenuTextNode[12];     // 0x10396a70
-const char16_t gMainMenuLiteral[2] = {0x0070, 0x0075};   // 0x1024f694 (only the first word is known)
+const char16_t gMainMenuLiteral[] = u"upload";   // 0x1024f694
 
 CFSLoadSave* CFSLoadSave::Destroy(CFSLoadSave* self, int16_t flag) {
     if (self) {

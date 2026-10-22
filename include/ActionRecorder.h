@@ -1,5 +1,4 @@
-// ActionRecorder.cpp (main app): CActionRecorder. PARTIAL: ResetActionRecording and DoTick (unit w133, src/game/ActionRecorder.cpp);
-// ReplayRecording and the rest are untranslated.
+// ActionRecorder.cpp (main app): CActionRecorder, src/game/ActionRecorder.cpp.
 #pragma once
 #include <cstdint>
 
@@ -15,16 +14,18 @@ public:
     // 0x10144f80 (872 bytes, src/game/ActionRecorder.cpp; CWorld::DoGameTurn calls it): while a replay runs, plays the recorded actions.
     void DoTick();
 
-    // Untranslated callees of DoTick and ResetActionRecording (stand-ins in the launcher).
+    // The callees of DoTick and ResetActionRecording.
     void EndReplay();                                       // 0x10144ce4
     void GetNextTimingFileEntry();                          // 0x10145318
     void GetNextCameraFileEntry();                          // 0x10145360
     int32_t ReadAndProcessNextAction();                     // 0x101453a8  0 when the recording has ended
-    void RecordAction(int32_t action, uint8_t* data);       // 0x10144bec
-    void RecordAction(int32_t action, uint16_t value);      // 0x101441fc (untranslated; CoasterTickPreRender records 0x43 and the coaster id)
-    void RecordAction(int32_t action, uint16_t value, uint8_t extra);   // 0x101445d0 (236 bytes, untranslated; unit w185)
-    void RecordAction(int32_t action, uint16_t a, uint16_t b, uint16_t c);   // 0x1014445c (296 bytes, untranslated; unit v5026)
-    void RecordAction(int32_t action, float value, uint16_t id);   // 0x10144704 (284 bytes, untranslated; unit v5054)
+    // The int spellings the callers use (CoasterTickPreRender records 0x43 and the coaster id): the first, second, third and fifth
+    // forward to the RecordedAction overloads below (src/game/ActionRecorder.cpp), which are the translations.
+    void RecordAction(int32_t action, uint8_t* data);       // 0x10144bec (176 bytes)
+    void RecordAction(int32_t action, uint16_t value);      // 0x101441fc (200 bytes)
+    void RecordAction(int32_t action, uint16_t value, uint8_t extra);   // 0x101445d0 (236 bytes)
+    void RecordAction(int32_t action, uint16_t a, uint16_t b, uint16_t c);   // 0x1014445c (296 bytes), translated under this signature
+    void RecordAction(int32_t action, float value, uint16_t id);   // 0x10144704 (284 bytes)
 
     // The Mac's layout is noted per member; the host's three files (bfl::FileSystem::CMemFile, 8 bytes on the Mac at +0x0c, +0x14,
     // +0x1c) are storage here, made in place on first use (the Mac builds them at start-up), because CMemFile has a vtable and a native
@@ -41,7 +42,8 @@ public:
     int32_t mTurnsToNext;                    // 0x30  game turns until the next recorded action
     uint32_t mActionKind[256];               // 0x34  per action byte: how its operands are read (0 to 11; larger traces an error)
 
-    // The twelve overloads ReadAndProcessNextAction calls (stand-ins in the launcher); the action is passed as a word.
+    // The twelve overloads ReadAndProcessNextAction calls (src/game/ActionRecorder.cpp); the action is passed as a word. The last forwards to the
+    // RecordedAction spelling at the end of the class.
     void ProcessAction(int32_t action);                                                       // 0x10145b28
     void ProcessAction(int32_t action, uint8_t a, uint8_t b, uint16_t c);                     // 0x10145d34
     void ProcessAction(int32_t action, uint8_t a, uint8_t b);                                 // 0x10145c24
@@ -62,8 +64,8 @@ public:
     void Destruct();                         // 0x10143880: saves the recording (mode 0), closes and destroys the files
     int32_t Serialise(void* file, int32_t saving, int32_t version, uint32_t unused);   // 0x101439dc: 1 on failure
     void RecordAction(RecordedAction action, uint16_t a, uint16_t b);   // 0x1014430c
-    void ActivateActionRecording(RecordMode mode);   // 0x10143cf0 (stand-in)
-    void SaveRecordingToDisk();                      // 0x10143cac (stand-in)
+    void ActivateActionRecording(RecordMode mode);   // 0x10143cf0
+    void SaveRecordingToDisk();                      // 0x10143cac
     void RecordAction(RecordedAction action, uint8_t a, uint8_t b);                  // 0x10143ff8 (160 bytes)
     void RecordAction(RecordedAction action, uint8_t a, uint8_t b, uint16_t c);      // 0x101440e0 (208 bytes)
     void RecordAction(RecordedAction action, float a, float b, uint16_t id);         // 0x10144868 (336 bytes; unit v5144 declares it)

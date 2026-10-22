@@ -88,16 +88,16 @@ void CallSetText(InterfaceWindow* window, const char16_t* text);   // slot 0x2c
 
 // Unit v51056: __sinit_ui_mainmenu_cpp 0x101fc260 (60): builds a wide string global from a literal and registers its destructor.
 void __sinit_ui_mainmenu_cpp();
-extern uint8_t gMainMenuText[0x14];              // 0x10396a5c (a TbDynamicStringTemplate<wchar_t>; name invented)
+extern uint8_t gMainMenuText[];                  // 0x10396a5c (a TbDynamicStringTemplate<wchar_t>, 0x14 bytes on the Mac, sizeof(...) on the host; name invented)
 extern uint8_t gMainMenuTextNode[12];            // 0x10396a70 (the registration record)
-extern const char16_t gMainMenuLiteral[];        // 0x1024f694 (only the first word 0x00750070 is known)
+extern const char16_t gMainMenuLiteral[];        // 0x1024f694 ("upload")
 namespace mainmenu_callee {
 void WideStringCtor(void* string, const char16_t* text);   // glue 0x10238800 TbDynamicStringTemplate<wchar_t>(const wchar_t*)
 }
 
 // Unit v51122: __sinit_ui_mainpanel2_cpp 0x101a8df4 (64): the same, for the string at 0x103949e8 built from the literal at 0x1024e12e + 0x2a.
 void __sinit_ui_mainpanel2_cpp();
-extern uint8_t gMainPanel2Text[0x14];            // 0x103949e8 (a TbDynamicStringTemplate<wchar_t>; name invented)
+extern uint8_t gMainPanel2Text[];                // 0x103949e8 (a TbDynamicStringTemplate<wchar_t>, 0x14 bytes on the Mac, sizeof(...) on the host; name invented)
 extern uint8_t gMainPanel2TextNode[12];          // 0x103949fc (the registration record)
 extern const char16_t gMainPanel2Literal[];      // 0x1024e158 (string pool 0x1024e12e + 0x2a)
 namespace mainpanel2_callee {

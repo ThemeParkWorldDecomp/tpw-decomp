@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write the six data tables the translation compiles in, from the player's own copy of the game.
+"""Write the seven data tables the translation compiles in, from the player's own copy of the game.
 
 usage: python3 -I devtools/gen_game_tables.py --program "<the 2.04b3 SimTheme Park application>" --out DIR
 
@@ -12,6 +12,7 @@ configure time (TPW_GAME_PROGRAM, see CMakeLists.txt) and compiles what it write
   AdvisorScorerSources.cpp    the advisor scorers, 351 pointers to member of 12 bytes at 0x1027df30 (named by include/AdvisorScoring.h)
   SaveLegalText.inc           the seven legal texts of the save file header, UTF-16 at 0x10249f40
   WindowScripts.inc           the window scripts of the park and status panels (WINDOW_SCRIPTS: address, words, array)
+  RideTemplates.inc           the 14 ride templates of BMP_CreateRide, 0xd0 bytes each at 0x1029be00 (gRideTemplates)
 
 The program is the data fork of the "SimTheme Park" application of the 2.04b3 patch, a PowerPC PEF container.
 The addresses are the decompile's: the code section at 0x10000000, the data section right after it on a 16-byte
@@ -468,15 +469,30 @@ def window_scripts(p):
     return out
 
 
+def ride_templates(p):
+    """The ride templates BMP_CreateRide copies into a new ride: 14 records of 0xd0 bytes (52 words) at 0x1029be00, the kinds -1 to -14.
+    They are plain integers (no word is a program address), so the host table holds the Mac's values."""
+    words = struct.unpack(">%dI" % (14 * 0x34), p.read(0x1029BE00, 14 * 0xD0))
+    out = ["// The 14 ride templates of BMP_CreateRide (kind -1 to -14), 52 words each, as the Mac image holds them at 0x1029be00..0x1029c960.",
+           "// The macro is the initialiser of gRideTemplates in src/game/GameVariables.cpp.",
+           GENERATED, "", "#define TPW_RIDE_TEMPLATES \\"]
+    rows = []
+    for t in range(14):
+        for j in range(0, 0x34, 8):
+            rows.append(", ".join("0x%08x" % w for w in words[t * 0x34 + j:t * 0x34 + min(j + 8, 0x34)]))
+    out += ["    %s%s" % (row, ", \\" if k + 1 < len(rows) else "") for k, row in enumerate(rows)]
+    return out
+
+
 TABLES = {"advisor_lines.cpp": advisor_lines, "AdvisorScoring_table.cpp": advisor_scoring,
           "AdvisorBalance_table.cpp": advisor_balance, "AdvisorScorerSources.cpp": advisor_scorers,
-          "SaveLegalText.inc": save_legal_text, "WindowScripts.inc": window_scripts}
+          "SaveLegalText.inc": save_legal_text, "WindowScripts.inc": window_scripts, "RideTemplates.inc": ride_templates}
 
 
 def main(argv):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--program", required=True, help='the 2.04b3 "SimTheme Park" application (its data fork)')
-    ap.add_argument("--out", required=True, help="the folder to write the six files into")
+    ap.add_argument("--out", required=True, help="the folder to write the seven files into")
     a = ap.parse_args(argv)
     path = pathlib.Path(a.program)
     if not path.is_file():
