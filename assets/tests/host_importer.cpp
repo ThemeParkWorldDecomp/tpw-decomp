@@ -338,6 +338,161 @@ void TestSynthetic(const std::string& scratch) {
     RemoveTree(drop);
 }
 
+// ---- the startup check (assets/verified.tsv): an unchanged install is not rehashed; a file whose size or modification
+// time changed is rehashed and removed when it no longer matches; one that kept both is not seen (by design)
+
+bool LineFor(const std::string& tsv, const std::string& edition, const std::string& dest) {
+    return ("\n" + tsv).find("\n" + edition + "\t" + dest + "\t") != std::string::npos;
+}
+
+void TestStartupCheck(const std::string& scratch) {
+    std::printf("startup check\n");
+    std::string root = scratch + "/startup-data";
+    RemoveTree(root);
+
+    // a US destination with the empty content, and the smallest one with real content named by no other US record
+    std::map<std::string, int> usDests;
+    for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+        const ManifestRecord& r = ManifestRecords()[i];
+        if (r.editions & kEditionUs) usDests[r.dest]++;
+    }
+    const ManifestRecord* emptyRec = nullptr;
+    const ManifestRecord* sizedRec = nullptr;
+    for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+        const ManifestRecord& r = ManifestRecords()[i];
+        if (!(r.editions & kEditionUs) || (r.flags & (kFlagRsrc | kFlagFinfo)) || usDests[r.dest] != 1) continue;
+        if (r.hash_count != 1) continue;
+        uint64_t size = RecordHash(r, 0).size;
+        if (size == 0 && !emptyRec) emptyRec = &r;
+        if (size > 0 && (!sizedRec || size < RecordHash(*sizedRec, 0).size)) sizedRec = &r;
+    }
+    CHECK(emptyRec && sizedRec);
+    if (!emptyRec || !sizedRec) return;
+    const uint64_t size = RecordHash(*sizedRec, 0).size;
+
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    std::string emptyPath, sizedPath, tsvPath;
+    {
+        Importer layout(cfg);
+        emptyPath = layout.DestinationPath(kEditionUs, *emptyRec);
+        sizedPath = layout.DestinationPath(kEditionUs, *sizedRec);
+        tsvPath = layout.VerifiedPath();
+    }
+    // the empty file is the right content; the other is junk of an accepted size, which the stat sweep counts as present
+    WriteFile(emptyPath, "");
+    WriteFile(sizedPath, std::string(static_cast<size_t>(size), 'j'));
+    std::string err;
+    size_t present = 0;
+
+    // (4) no verified.tsv: nothing is rehashed or removed, the record is written from the stat sweep
+    {
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        OpenCheck c = imp.LastOpenCheck();
+        CHECK(!c.hadRecord);
+        CHECK_EQ(c.rehashed, 0);
+        CHECK_EQ(c.Removed(), 0);
+        CHECK(c.Notice().empty());
+        CHECK(Exists(sizedPath));
+        present = imp.Status(kEditionUs).present;
+        CHECK(present >= 2);
+        CHECK(Exists(tsvPath));
+        std::string tsv = ReadText(tsvPath);
+        CHECK(LineFor(tsv, "us", emptyRec->dest));
+        CHECK(LineFor(tsv, "us", sizedRec->dest));
+        CHECK(!Exists(tsvPath + ".tmp"));
+    }
+
+    // (1) an unchanged install: every present file compared, none rehashed
+    {
+        Importer imp(cfg);
+        auto t0 = std::chrono::steady_clock::now();
+        CHECK(imp.Open(err));
+        double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+        OpenCheck c = imp.LastOpenCheck();
+        CHECK(c.hadRecord);
+        CHECK_EQ(c.checked, present);
+        CHECK_EQ(c.rehashed, 0);
+        CHECK_EQ(c.Removed(), 0);
+        CHECK_EQ(imp.Status(kEditionUs).present, present);
+        std::printf("  unchanged: %llu files compared, none rehashed, Open %.1f ms\n",
+                    static_cast<unsigned long long>(c.checked), ms);
+    }
+
+    // (3) other content of the same size with the same modification time: not seen (by design), the file stays
+    {
+        std::error_code ec;
+        fs::file_time_type when = fs::last_write_time(sizedPath, ec);
+        CHECK(!ec);
+        WriteFile(sizedPath, std::string(static_cast<size_t>(size), 'k'));
+        fs::last_write_time(sizedPath, when, ec);
+        CHECK(!ec);
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        OpenCheck c = imp.LastOpenCheck();
+        CHECK_EQ(c.rehashed, 0);
+        CHECK_EQ(c.Removed(), 0);
+        CHECK(Exists(sizedPath));
+        CHECK_EQ(imp.Status(kEditionUs).present, present);
+    }
+
+    // a changed modification time on a file that still matches: rehashed and kept
+    {
+        std::error_code ec;
+        fs::last_write_time(emptyPath, fs::last_write_time(emptyPath, ec) + std::chrono::seconds(7), ec);
+        CHECK(!ec);
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        OpenCheck c = imp.LastOpenCheck();
+        CHECK_EQ(c.rehashed, 1);
+        CHECK_EQ(c.Removed(), 0);
+        CHECK(Exists(emptyPath));
+        CHECK_EQ(imp.Status(kEditionUs).present, present);
+    }
+
+    // (2) the same size, another modification time and wrong content: rehashed at Open, removed, and the notice says so
+    {
+        std::error_code ec;
+        fs::last_write_time(sizedPath, fs::last_write_time(sizedPath, ec) + std::chrono::seconds(5), ec);
+        CHECK(!ec);
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        OpenCheck c = imp.LastOpenCheck();
+        CHECK_EQ(c.rehashed, 1);
+        CHECK_EQ(c.removed[0], 1);
+        CHECK_EQ(c.Removed(), 1);
+        CHECK(!Exists(sizedPath));
+        CHECK(Exists(emptyPath));
+        CHECK_EQ(imp.Status(kEditionUs).present, present - 1);
+        CHECK(c.Notice() == "1 file of the US edition had changed and was removed; drop its disc to restore it.");
+        std::printf("  notice: %s\n", c.Notice().c_str());
+        std::string tsv = ReadText(tsvPath);
+        CHECK(!LineFor(tsv, "us", sizedRec->dest));
+        CHECK(LineFor(tsv, "us", emptyRec->dest));
+        LauncherIni ini;
+        CHECK(LoadLauncherIni(root + "/launcher.ini", ini, err));
+        CHECK(ini.editions["us"] != "unlocked");
+    }
+    // and the next start finds nothing new
+    {
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        CHECK_EQ(imp.LastOpenCheck().rehashed, 0);
+        CHECK_EQ(imp.LastOpenCheck().Removed(), 0);
+    }
+
+    // the notice for more files and more editions
+    OpenCheck several;
+    several.removed[1] = 3;
+    CHECK(several.Notice() == "3 files of the European edition had changed and were removed; drop its disc to restore them.");
+    several.removed[0] = 1;
+    CHECK(several.Notice() == "1 file of the US edition and 3 files of the European edition had changed and were removed; "
+                              "drop their discs to restore them.");
+
+    RemoveTree(root);
+}
+
 // ---- damaged containers: an error naming the file and the reason, never a drop that quietly holds nothing
 
 void Put16(std::string& v, uint32_t x) {
@@ -776,6 +931,7 @@ int main() {
     fs::create_directories(scratch);
 
     TestSynthetic(scratch);
+    TestStartupCheck(scratch);
     TestDamagedContainers(scratch);
 
     std::string transfer = Env("TPW_TEST_TRANSFER"), expect = Env("TPW_TEST_EXPECT"), gdi = Env("TPW_GDI_ROOT");

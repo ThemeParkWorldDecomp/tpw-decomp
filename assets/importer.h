@@ -10,6 +10,7 @@
 //   assets/eur/Theme Park Data/<dest>   the European edition's game folder
 //   assets/gold/<name>                  the Gold rides (manifest destinations "gold/<name>")
 //   assets/.staging/                    files being written and big images being unpacked; emptied on every start
+//   assets/verified.tsv                 size and modification time of every verified file (the startup check)
 //   launcher.ini                        data folder, edition states, last choice (LauncherIni)
 //
 // Rules the matcher keeps:
@@ -23,6 +24,13 @@
 //   reported by destination, unless the same drop also held the right file for it (a disc's other languages). Every
 //   other file is unknown: counted, never listed. A file whose bytes match is used whatever its name on the disc.
 // - A repeated drop changes nothing: destinations that already hold a verified file are left alone and counted.
+//
+// Startup check: Open() finds the installed files by a stat sweep (size only). assets/verified.tsv holds one line per
+// verified file ("edition<tab>dest<tab>size<tab>mtime", mtime in nanoseconds), written at the end of an import, of
+// VerifyEdition, of RemoveEdition and of Open, each time to a temporary file renamed over it. Open compares each present
+// file's size and modification time with its line: a file with no line, or another size or time, is rehashed (as
+// VerifyEdition does) and removed when it no longer matches; an unchanged install costs only the stat sweep. A change
+// that keeps both the size and the modification time is not seen, by design: VerifyEdition ("Check again") rehashes all.
 //
 // Threading: Import() runs on the caller's thread; Start() runs it on a worker thread. Progress goes through a
 // thread-safe queue the UI drains (ProgressQueue); Status(), Ini() and the other const calls may be made from any thread.
@@ -137,6 +145,18 @@ struct ImportReport {
 
 // ---- the importer
 
+// What Open()'s startup check did (assets/verified.tsv).
+struct OpenCheck {
+    bool hadRecord = false;      // verified.tsv was there; without it nothing is rehashed, it is only written
+    uint64_t checked = 0;        // present files compared with their line
+    uint64_t rehashed = 0;       // files with no line or another size or time, hashed again
+    uint64_t removed[3] = {0, 0, 0};  // us, eur, gold: rehashed files that no longer matched, removed
+    uint64_t Removed() const { return removed[0] + removed[1] + removed[2]; }
+    // The home screen's notice when files were removed, e.g. "3 files of the European edition had changed and were
+    // removed; drop its disc to restore them." Empty when nothing was.
+    std::string Notice() const;
+};
+
 struct ImporterConfig {
     std::string dataRoot;           // the data folder (assets/ is created in it)
     std::string iniPath;            // empty: dataRoot/launcher.ini
@@ -152,8 +172,13 @@ public:
     Importer& operator=(const Importer&) = delete;
 
     // Creates assets/, empties assets/.staging, finds which destinations already hold a file of an accepted size,
-    // loads launcher.ini and writes it back with the current edition states. Call once before anything else.
+    // rehashes the ones whose size or modification time changed since verified.tsv was written (the startup check
+    // above), loads launcher.ini and writes it back with the current edition states. Call once before anything else.
     bool Open(std::string& err);
+    // The last Open()'s startup check.
+    OpenCheck LastOpenCheck() const;
+    // Where the startup check's record is kept (assets/verified.tsv).
+    std::string VerifiedPath() const { return assetsDir_ + "/verified.tsv"; }
 
     // One drop: every path is a folder or a file (an archive, an image, a .cue, an installer or a game file).
     // Runs on the calling thread.
@@ -187,7 +212,10 @@ public:
 private:
     struct Work;
     struct Run;
-    bool ScanInstalled();
+    struct Stamp;
+    bool ScanInstalled(std::vector<Stamp>* found);
+    void CheckChanged(std::vector<Stamp>& found);
+    bool RecordStamps(const std::vector<Stamp>* found);
     ImportReport DoImport(const std::vector<std::string>& paths);
     void Enumerate(Run& run, const std::shared_ptr<Source>& source, const std::string& display,
                    const std::string& folderRoot, int depth);
@@ -218,6 +246,8 @@ private:
     std::thread worker_;
     ImportReport workerReport_;
     bool opened_ = false;
+    std::mutex stampMutex_;                 // one writer of verified.tsv at a time
+    OpenCheck openCheck_;                   // guarded by mutex_
 };
 
 }  // namespace tpw::assets

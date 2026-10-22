@@ -5,6 +5,7 @@
 #include "importer.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
@@ -12,12 +13,16 @@
 #include <set>
 #include <sstream>
 #include <system_error>
+#include <unordered_map>
 
 #include "sha256.h"
 #include "sniff.h"
 
 #ifdef __APPLE__
 #include <sys/xattr.h>
+#endif
+#if defined(__APPLE__) || defined(__unix__)
+#include <sys/stat.h>
 #endif
 
 namespace tpw::assets {
@@ -89,6 +94,54 @@ bool SizeAccepted(const ManifestRecord& r, uint64_t size) {
 bool Trivial(const ManifestRecord& r, uint64_t size) { return size == 0 || (r.flags & kFlagFinfo) != 0; }
 
 bool SideFile(const ManifestRecord& r) { return (r.flags & (kFlagRsrc | kFlagFinfo)) != 0; }
+
+// One stat of a path: false unless it is a regular file. `mtime` is the modification time in nanoseconds (the startup
+// check compares it only with what this same call returned earlier, so the epoch does not matter).
+bool StatFile(const std::string& path, uint64_t& size, int64_t& mtime) {
+#if defined(__APPLE__) || defined(__unix__)
+    struct stat st;
+    if (::stat(path.c_str(), &st) != 0 || !S_ISREG(st.st_mode)) return false;
+    size = static_cast<uint64_t>(st.st_size);
+#if defined(__APPLE__)
+    mtime = static_cast<int64_t>(st.st_mtimespec.tv_sec) * 1000000000 + st.st_mtimespec.tv_nsec;
+#else
+    mtime = static_cast<int64_t>(st.st_mtim.tv_sec) * 1000000000 + st.st_mtim.tv_nsec;
+#endif
+    return true;
+#else
+    std::error_code ec;
+    if (!fs::is_regular_file(path, ec)) return false;
+    size = fs::file_size(path, ec);
+    if (ec) return false;
+    fs::file_time_type t = fs::last_write_time(path, ec);
+    if (ec) return false;
+    mtime = std::chrono::duration_cast<std::chrono::nanoseconds>(t.time_since_epoch()).count();
+    return true;
+#endif
+}
+
+// assets/verified.tsv's key for a file: "<edition>\t<dest>".
+std::string StampKey(Edition edition, const ManifestRecord& r) { return std::string(EditionName(edition)) + "\t" + r.dest; }
+
+// Writes `text` to a temporary file beside `path`, then renames it over `path`.
+bool ReplaceFile(const std::string& path, const std::string& text, std::string& err) {
+    std::string tmp = path + ".tmp";
+    FILE* f = std::fopen(tmp.c_str(), "wb");
+    if (!f) {
+        err = "cannot write " + tmp;
+        return false;
+    }
+    bool ok = std::fwrite(text.data(), 1, text.size(), f) == text.size();
+    ok = std::fclose(f) == 0 && ok;
+    std::error_code ec;
+    if (ok) fs::rename(tmp, path, ec);
+    if (!ok || ec) {
+        std::remove(tmp.c_str());
+        err = "cannot write " + path;
+        return false;
+    }
+    return true;
+}
 
 uint32_t RecordIndex(const ManifestRecord* r) { return static_cast<uint32_t>(r - ManifestRecords()); }
 
@@ -376,6 +429,13 @@ struct Importer::Run {
     bool stop = false;
 };
 
+struct Importer::Stamp {
+    Edition edition;
+    uint32_t record;
+    uint64_t size;
+    int64_t mtime;
+};
+
 Importer::Importer(ImporterConfig config) : config_(std::move(config)) {
     std::string root = config_.dataRoot;
     while (root.size() > 1 && root.back() == '/') root.pop_back();
@@ -436,10 +496,13 @@ bool Importer::Open(std::string& err) {
             std::lock_guard<std::mutex> lock(mutex_);
             ini_ = ini;
         }
-        if (!ScanInstalled()) {
+        std::vector<Stamp> found;
+        if (!ScanInstalled(&found)) {
             err = "out of memory";
             return false;
         }
+        CheckChanged(found);
+        RecordStamps(&found);  // a record that cannot be written only means the next start rehashes nothing
         opened_ = true;
         std::lock_guard<std::mutex> lock(mutex_);
         return SaveIniLocked(err);
@@ -449,7 +512,7 @@ bool Importer::Open(std::string& err) {
     }
 }
 
-bool Importer::ScanInstalled() {
+bool Importer::ScanInstalled(std::vector<Stamp>* found) {
     try {
         const ManifestRecord* records = ManifestRecords();
         size_t n = ManifestRecordCount();
@@ -468,11 +531,11 @@ bool Importer::ScanInstalled() {
             }
             for (Edition e : kAllEditions) {
                 if (!(r.editions & e)) continue;
-                std::error_code ec;
-                fs::path p(DestinationPath(e, r));
-                if (!fs::is_regular_file(p, ec)) continue;
-                uint64_t size = fs::file_size(p, ec);
-                if (!ec && SizeAccepted(r, size)) present[i] |= e;
+                uint64_t size = 0;
+                int64_t mtime = 0;
+                if (!StatFile(DestinationPath(e, r), size, mtime) || !SizeAccepted(r, size)) continue;
+                present[i] |= e;
+                if (found) found->push_back(Stamp{e, idx, size, mtime});
             }
         }
         std::lock_guard<std::mutex> lock(mutex_);
@@ -480,6 +543,146 @@ bool Importer::ScanInstalled() {
         bySize_ = std::move(bySize);
         byPath_ = std::move(byPath);
         return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+// The startup check (importer.h). With no verified.tsv (the first start of a launcher that has the check, or a data
+// folder from before it) nothing is rehashed: the files were verified when they were written, and Open only writes the
+// record from this stat sweep. A file whose size and modification time both stay the same is never rehashed here.
+void Importer::CheckChanged(std::vector<Stamp>& found) {
+    OpenCheck check;
+    std::unordered_map<std::string, std::pair<uint64_t, int64_t>> recorded;
+    {
+        std::ifstream in(VerifiedPath(), std::ios::binary);
+        check.hadRecord = static_cast<bool>(in);
+        std::string line;
+        while (check.hadRecord && std::getline(in, line)) {
+            if (line.empty() || line[0] == '#') continue;
+            size_t t3 = line.rfind('\t');
+            size_t t2 = t3 == std::string::npos || t3 == 0 ? std::string::npos : line.rfind('\t', t3 - 1);
+            if (t2 == std::string::npos) continue;
+            char* end = nullptr;
+            uint64_t size = std::strtoull(line.c_str() + t2 + 1, &end, 10);
+            if (end != line.c_str() + t3) continue;
+            int64_t mtime = std::strtoll(line.c_str() + t3 + 1, &end, 10);
+            if (*end != '\0') continue;
+            recorded[line.substr(0, t2)] = {size, mtime};
+        }
+    }
+    if (check.hadRecord) {
+        const ManifestRecord* records = ManifestRecords();
+        // Several records can name one file (other accepted contents): each changed file is hashed once.
+        std::map<std::string, std::pair<bool, Sha256Digest>> hashed;
+        std::vector<Stamp> kept;
+        kept.reserve(found.size());
+        for (const Stamp& st : found) {
+            const ManifestRecord& r = records[st.record];
+            ++check.checked;
+            auto it = recorded.find(StampKey(st.edition, r));
+            if (it != recorded.end() && it->second.first == st.size && it->second.second == st.mtime) {
+                kept.push_back(st);
+                continue;
+            }
+            std::string path = DestinationPath(st.edition, r);
+            auto h = hashed.find(path);
+            if (h == hashed.end()) {
+                ++check.rehashed;
+                std::pair<bool, Sha256Digest> result{false, Sha256Digest{}};
+                FILE* f = std::fopen(path.c_str(), "rb");
+                if (f) {
+                    PlainFileStream s(f, st.size);
+                    std::string readErr;
+                    result.first = HashStream(s, result.second, readErr);
+                }
+                h = hashed.emplace(path, result).first;
+            }
+            if (h->second.first && Accepts(r, st.size, h->second.second)) {
+                kept.push_back(st);
+                continue;
+            }
+            MarkPresent(st.edition, st.record, false);
+            ++check.removed[EditionIndex(st.edition)];
+        }
+        // a file goes only when no record of it still accepts it
+        std::set<std::string> used;
+        if (!hashed.empty()) {
+            for (const Stamp& st : kept) {
+                std::string path = DestinationPath(st.edition, records[st.record]);
+                if (hashed.count(path)) used.insert(path);
+            }
+        }
+        for (const auto& kv : hashed) {
+            if (!used.count(kv.first)) std::remove(kv.first.c_str());
+        }
+        found = std::move(kept);
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    openCheck_ = check;
+}
+
+std::string OpenCheck::Notice() const {
+    static const char* const kNames[3] = {"the US edition", "the European edition", "the Gold bonus rides"};
+    std::vector<std::string> parts;
+    for (int i = 0; i < 3; ++i) {
+        if (removed[i] == 0) continue;
+        parts.push_back(std::to_string(removed[i]) + (removed[i] == 1 ? " file of " : " files of ") + kNames[i]);
+    }
+    if (parts.empty()) return "";
+    std::string text;
+    for (size_t i = 0; i < parts.size(); ++i) {
+        if (i > 0) text += i + 1 == parts.size() ? " and " : ", ";
+        text += parts[i];
+    }
+    bool one = Removed() == 1;
+    text += one ? " had changed and was removed; " : " had changed and were removed; ";
+    text += parts.size() == 1 ? "drop its disc to restore " : "drop their discs to restore ";
+    text += one ? "it." : "them.";
+    return text;
+}
+
+OpenCheck Importer::LastOpenCheck() const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return openCheck_;
+}
+
+// Writes assets/verified.tsv: from `found` (Open's sweep), else from a stat of every present file.
+bool Importer::RecordStamps(const std::vector<Stamp>* found) {
+    try {
+        std::lock_guard<std::mutex> writer(stampMutex_);
+        const ManifestRecord* records = ManifestRecords();
+        std::vector<Stamp> swept;
+        if (!found) {
+            std::vector<uint8_t> present;
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                present = present_;
+            }
+            for (size_t i = 0; i < present.size(); ++i) {
+                for (Edition e : kAllEditions) {
+                    if (!(present[i] & e)) continue;
+                    uint64_t size = 0;
+                    int64_t mtime = 0;
+                    if (StatFile(DestinationPath(e, records[i]), size, mtime)) {
+                        swept.push_back(Stamp{e, static_cast<uint32_t>(i), size, mtime});
+                    }
+                }
+            }
+            found = &swept;
+        }
+        // nothing verified and no record yet (a new data folder): no file is made; an existing record is rewritten even
+        // when it empties, so a file put there by hand later is rehashed
+        std::error_code ec;
+        if (found->empty() && !fs::exists(VerifiedPath(), ec)) return true;
+        std::string text = "# verified files: edition, destination, size, modification time in ns (the launcher's startup check)\n";
+        text.reserve(found->size() * 64);
+        for (const Stamp& st : *found) {
+            text += StampKey(st.edition, records[st.record]);
+            text += "\t" + std::to_string(st.size) + "\t" + std::to_string(st.mtime) + "\n";
+        }
+        std::string err;
+        return ReplaceFile(VerifiedPath(), text, err);
     } catch (...) {
         return false;
     }
@@ -654,6 +857,7 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
         std::string err;
         if (opened_ && !SaveIniLocked(err)) run.report.errors.push_back(err);
     }
+    if (opened_) RecordStamps(nullptr);
     ImportProgress done;
     done.kind = ImportProgress::Kind::Finished;
     done.n = done.total = run.report.hashed;
@@ -1083,6 +1287,7 @@ long Importer::VerifyEdition(Edition edition, std::string& err) {
                 ++removed;
             }
         }
+        RecordStamps(nullptr);
         std::lock_guard<std::mutex> lock(mutex_);
         if (!SaveIniLocked(err)) return -1;
     } catch (...) {
@@ -1104,8 +1309,12 @@ bool Importer::RemoveEdition(Edition edition, std::string& err) {
         err = "cannot remove " + dir + ": " + ec.message();
         return false;
     }
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        for (uint8_t& p : present_) p &= static_cast<uint8_t>(~edition);
+    }
+    RecordStamps(nullptr);
     std::lock_guard<std::mutex> lock(mutex_);
-    for (uint8_t& p : present_) p &= static_cast<uint8_t>(~edition);
     return SaveIniLocked(err);
 }
 
