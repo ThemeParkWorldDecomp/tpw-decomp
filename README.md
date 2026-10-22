@@ -1,6 +1,6 @@
 # tpw-decomp
 
-A decompilation of Theme Park World (Sim Theme Park) as released for the Mac in 1999 (the 2.04b3 patch, PowerPC), into C++.
+A decompilation of Sim Theme Park (AKA Theme Park World) as released for the Mac in 1999 (the 2.04b3 patch, PowerPC), into C++.
 
 Only the game's own functions are here, each translated to behave exactly as the Mac build does, bugs included. The aim is a
 complete, tested decompilation that is behaviour-equivalent to the original, not byte-matching: the C++ is not meant to
