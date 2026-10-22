@@ -290,7 +290,7 @@ def advisor_balance(p):
            GENERATED,
            '#include "AdvisorScoring.h"',
            "",
-           "const BalanceDescription gAdvisorBalanceDescriptions[%d] = {" % len(desc)]
+           "BalanceDescription gAdvisorBalanceDescriptions[%d] = {" % len(desc)]
     for t, name, mi, ma, ac, fl in desc:
         out.append('    {%d, "%s", %d, %d, 0.0f, 0.0f, %d, %du},' % (t, name, mi, ma, ac, fl))
     out.append("};")
@@ -501,7 +501,7 @@ TABLES = {"advisor_lines.cpp": advisor_lines, "AdvisorScoring_table.cpp": adviso
 # 2.1.4). A change of include/AdvisorScoring.h that renames a scorer changes AdvisorScorerSources.cpp: update its entry then.
 KNOWN_OUTPUT_SHA1 = {
     "advisor_lines.cpp": "49b974cb42f7d1eff627a24b630e0799b7723339",
-    "AdvisorBalance_table.cpp": "c10a0baf67255f2671ea1fd49bb7cb2b50208904",
+    "AdvisorBalance_table.cpp": "975c982b9a89432b2d9a23167fca2535c3195f83",
     "AdvisorScorerSources.cpp": "da5b2c3df9bac53f4040a90c1baab0b3c377a3ba",
     "AdvisorScoring_table.cpp": "1cbc72c3e2d4d8bd2303e1fb415e4dd55f7ba3f2",
     "SaveLegalText.inc": "c29bf03a884224a571e4b9f7b1ba862e58ee1441",

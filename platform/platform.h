@@ -157,6 +157,9 @@ bool FitActive();
 // The largest width or height this machine's OpenGL renders a frame at (platform/offscreen.cpp's LargestSize), asked of a
 // hidden 1 x 1 window before the game's own exists; 0 when it cannot be asked. The launcher picks a preset that fits.
 int LargestGameSize();
+// The SDL display --display names (Config::display), or 0 when none was asked for or none matches; SDL's video must be
+// started. The launcher's own window (launcher/ui/window.h) opens there too.
+uint32_t ChosenDisplay();
 // A mouse position in window points as a game pixel: through the letterbox and clamped to the game's pixels with the
 // fit, unchanged without it.
 void MouseToGame(double x, double y, double& gameX, double& gameY);

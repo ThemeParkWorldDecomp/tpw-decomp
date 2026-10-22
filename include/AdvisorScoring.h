@@ -58,7 +58,7 @@ constexpr int32_t kAdvisorBalanceSlots = 393;
 constexpr int32_t kAdvisorGroupSlot = 4;       // the first MessageGroups slot
 constexpr int32_t kAdvisorBalanceMinScore = 3;   // unit w124: the lowest score that gets a message queued (Mac +0x20 in the scoring object)
 constexpr int32_t kAdvisorGroupStride = 3;
-extern const BalanceDescription gAdvisorBalanceDescriptions[775];
+extern BalanceDescription gAdvisorBalanceDescriptions[775];
 
 class CAdvisorBalance : public CBalanceTable {
 public:
