@@ -191,7 +191,12 @@ void UIStatusPanel::CloseObject(int32_t flag) {
 // ShowVersionNumberTag 0x101928dc and delme 0x10193084 (ui_StatusPanel.cpp).
 
 // The confirm handler of the dialog: selects the object, then clicks on its cell.
-int32_t delme(void* thing) {
+// The Mac's argument is the thing's address; here EraseObject keeps the thing's arena offset in the dialog's word (DialogBoxCallback
+// hands it over unchanged, as a 32-bit word widened to a pointer), so the offset is turned back into the thing's host address first
+// (0 stays null). A word that is already an address in the arena is taken as it is.
+int32_t delme(void* word) {
+    void* thing = word;
+    if (word != nullptr && !tpw::InArena(word)) thing = tpw::gArenaBase + static_cast<uint32_t>(reinterpret_cast<uintptr_t>(word));
     const uint8_t* bytes = static_cast<const uint8_t*>(thing);
     uint16_t cell = static_cast<uint16_t>(bytes[4] + (static_cast<uint32_t>(bytes[6]) << 7) + 1);
     UI_SetSelectedObject(thing);

@@ -322,7 +322,12 @@ int32_t StaffStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int3
 }
 
 void StaffStatusPanel::SetSelected() { UI_SetSelectedPeep(reinterpret_cast<CPeep*>(gStaffRoomPanelThing)); }   // 0x101c5358
-int32_t fireme(void* context) {   // 0x101c53b8
+// The Mac's argument is the staff member's address; here FireMe keeps the thing's arena offset in the dialog's word (DialogBoxCallback
+// hands it over unchanged, as a 32-bit word widened to a pointer), so the offset is turned back into the thing's host address first
+// (0 stays null). A word that is already an address in the arena is taken as it is.
+int32_t fireme(void* word) {   // 0x101c53b8
+    void* context = word;
+    if (word != nullptr && !tpw::InArena(word)) context = tpw::gArenaBase + static_cast<uint32_t>(reinterpret_cast<uintptr_t>(word));
     reinterpret_cast<CStaff*>(context)->SackMe();
     return 1;
 }
@@ -335,7 +340,11 @@ void StaffStatusPanel::FireMe() {
         params.mGreen = 0xff;
         params.mBlue = 0xff;
         params.mValue8 = 4;
-        params.mValueC = static_cast<int32_t>(reinterpret_cast<uintptr_t>(gStaffRoomPanelThing));
+        // the Mac stores the thing's address in the word; the host stores its arena offset (0 for null). An address outside the arena
+        // (the game's things are all inside it) keeps its low 32 bits, as the Mac's word was.
+        params.mValueC = gStaffRoomPanelThing == nullptr ? 0
+                         : tpw::InArena(gStaffRoomPanelThing) ? static_cast<int32_t>(tpw::ArenaOffset(gStaffRoomPanelThing))
+                                                              : static_cast<int32_t>(reinterpret_cast<uintptr_t>(gStaffRoomPanelThing));
         UI_DialogBox(params, static_cast<dlgbutton>(2), nullptr, static_cast<dlgbutton>(1), fireme, static_cast<dlgbutton>(0),
                      nullptr, false);
     } else {
