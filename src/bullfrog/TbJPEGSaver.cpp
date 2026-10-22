@@ -139,6 +139,9 @@ bool TbJPEGLoader::ValidImage(CFile& file) {
 
 // bullfrog TbSystemInfo.cpp, LbDraw.cpp, WinScrn.cpp, LbMaths.cpp, TbJPEGSaver.cpp, Draw.cpp, LbSCBack.cpp small functions (unit v51071).
 
+// 0x100747dc: the pixel format masks of the loader's rows (red, green, blue, alpha, bit count, 0); zero until __sinit_TbJPEGSaver_cpp runs.
+uint32_t gTbJPEGSaverMasks[6];
+
 void __sinit_TbJPEGSaver_cpp() {   // 0x100249c0
     gTbJPEGSaverMasks[0] = 0xff;
     gTbJPEGSaverMasks[1] = 0xff00;
