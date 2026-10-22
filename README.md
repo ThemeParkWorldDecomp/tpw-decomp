@@ -14,7 +14,7 @@ Progress: 9184 functions translated and tested (100.00% of the five programs' fu
 
 This is a reference: there is no launcher, no platform layer and no fix of the game's bugs here. The playable port, which
 builds this repository as a submodule and lists every deliberate change it makes, is
-[tpw-port](https://gitlab.com/tpw-decomp/tpw-port).
+[tpw-port](https://gitlab.com/tpw-decomp/tpw-port). To play, clone it and run `make` in it (Apple Silicon Macs; its README's Quick start).
 
 ## Nothing from the game
 
