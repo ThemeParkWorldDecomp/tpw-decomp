@@ -113,6 +113,10 @@ IDirectDraw* LbScreen_GetDirectDraw(int32_t addRef) {
 
 // Unit v5056, bullfrog WinScrn.cpp: LbScreen_Initialise 0x10068c60, ReleaseMode 0x100689ac, WindowProc 0x10068820.
 
+// BSS words at 0x10075228..0x10075238 (zero at start): the surface in use, the palette and the window.
+TbSurface* gWinScrnSurface;                  // 0x10075228
+IDirectDrawPalette* gWinScrnPalette;         // 0x10075230
+void* gWinScrnHWnd;                          // 0x10075238
 int32_t gWinScrnInitialised;
 NS_MacDoze::_GUID* gWinScrnGuid;
 int32_t gWinScrnF120;

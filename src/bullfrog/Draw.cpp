@@ -1199,6 +1199,17 @@ void CDraw::SetSpritePalette(const TbPalette& palette, const TbPixFormat* format
 
 // bullfrog TbSystemInfo.cpp, LbDraw.cpp, WinScrn.cpp, LbMaths.cpp, TbJPEGSaver.cpp, Draw.cpp, LbSCBack.cpp small functions (unit v51071).
 
+// The four vtables of the draw contexts (initialised data, 0x4c bytes each, 0x100738c0..0x100739f0). The Mac's hold a
+// header pointer, then twelve TVector pointers (CircleOutline, CircleFilled, HorizontalLine, VerticalLine, Line, Pixel,
+// PropText, RectangleOutline, RectangleFilled, Triangle, OneColourSprite, Sprite of CRenderClass32/24/16/8, which the
+// RenderContext8 translations stand for) and more code pointers. Nothing on the host dispatches through them (CDraw
+// takes the address of the contexts and ui_2dmap only compares them), and a 32-bit TVector pointer cannot be stored as a
+// host function pointer, so the arrays keep their size and stay zero.
+alignas(8) uint8_t kDrawContextVtable8[0x4c];    // 0x100739a4
+alignas(8) uint8_t kDrawContextVtable16[0x4c];   // 0x10073958
+alignas(8) uint8_t kDrawContextVtable24[0x4c];   // 0x1007390c
+alignas(8) uint8_t kDrawContextVtable32[0x4c];   // 0x100738c0
+
 void __sinit_Draw_cpp() {   // 0x100661a8
     bfl::draw::gDrawContext8.mVtable = kDrawContextVtable8;
     bfl::draw::gDrawContext16.mVtable = kDrawContextVtable16;

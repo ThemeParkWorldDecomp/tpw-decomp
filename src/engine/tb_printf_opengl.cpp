@@ -27,6 +27,10 @@
 
 extern "C" void glDeleteLists(GLuint list, GLsizei range);
 
+// Engine BSS 0x102b364c (0x1c bytes) and 0x102b3668 (16 bytes): zero until __sinit_tb_printf_opengl_cpp (0x10046d30) builds the object.
+COpenGLPrintf gOpenGLPrintf;
+uint8_t gOpenGLPrintfNode[16];
+
 bool COpenGLPrintf::Close() {
     int32_t* list = reinterpret_cast<int32_t*>(this);   // the display list base is the first word
     if (*list != 0) {

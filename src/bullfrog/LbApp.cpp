@@ -60,6 +60,7 @@ template <> LbSEList::~TbTList();
 template <> void LbSEList::RemoveAll();
 template <> _LbSEFunction* LbSEList::RemoveHead();
 // The application globals (TOC offsets 0x505c..0x5068 from the data base; the icon is gLbWindowIcon, defined elsewhere).
+int16_t gLbWindowIcon;       // 0x10073dfa, the icon id LbApp_Init stores (BSS, zero until then)
 void* gLbAppUserWndProc;     // 0x10073dfc
 void* gLbAppHWnd;            // 0x10073e00
 void* gLbAppHInstance;       // 0x10073e04
