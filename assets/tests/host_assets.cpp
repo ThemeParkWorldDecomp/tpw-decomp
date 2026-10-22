@@ -747,6 +747,9 @@ void TestCabInMemory() {
     CHECK(FindCabinet(*MakeMemoryBlob(std::vector<uint8_t>(5000, 'x')), 1 << 20, err) == -1);
     std::vector<uint8_t> noCab(exe.begin(), exe.begin() + stub.size());
     CHECK(OpenSniffed(MakeMemoryBlob(noCab), opts, 0, err) == nullptr);
+    // An exe without a cabinet is a plain file.
+    SniffStatus status = SniffStatus::Opened;
+    CHECK(OpenSniffed(MakeMemoryBlob(noCab), opts, 0, status, err) == nullptr && status == SniffStatus::NotContainer);
 }
 
 // An HFS volume: 512-byte allocation blocks from byte 2048; the extents file in blocks 0-1, the catalog in 2-4, files at
@@ -929,10 +932,10 @@ void TestHfsInMemory() {
 void TestSniffDepth() {
     std::string err;
     SniffOptions opts;
-    // Five zips inside each other: the fifth is the fifth open container and is refused.
+    // kMaxNesting + 1 zips inside each other (7): the last is the 7th open container and is refused.
     std::vector<uint8_t> inner = BuildMacBinary("leaf", "payload", "", true);
     std::vector<uint8_t> level = inner;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < kMaxNesting + 1; i++) {
         std::string s(level.begin(), level.end());
         level = BuildZip({{"inner.bin", s, false, false, false}}, false);
     }
@@ -947,9 +950,19 @@ void TestSniffDepth() {
     }
     CHECK(opened == kMaxNesting);
     CHECK(!src && err.find("nested too deeply") != std::string::npos);
+    // The same chain with the status: too deep is Failed, not a plain file.
+    {
+        SniffStatus status = SniffStatus::Opened;
+        std::shared_ptr<Source> chain = OpenSniffed(MakeMemoryBlob(level), opts, 0, status, err);
+        for (int depth = 1; chain && depth < 8; depth++) {
+            chain = OpenEntrySniffed(chain, chain->Entries()[0], opts, depth, status, err);
+        }
+        CHECK(!chain && status == SniffStatus::Failed);
+    }
+    CHECK(kMaxNesting == 6);
     // The same chain one level shorter opens down to the MacBinary leaf.
     level = inner;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < kMaxNesting - 1; i++) {
         std::string s(level.begin(), level.end());
         level = BuildZip({{"inner.bin", s, false, false, false}}, false);
     }

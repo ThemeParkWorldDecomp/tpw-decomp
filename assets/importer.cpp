@@ -715,11 +715,16 @@ void Importer::EnumeratePath(Run& run, const std::string& path) {
         return;
     }
     std::string sniffErr;
-    std::shared_ptr<Source> source = OpenSniffed(blob, run.sniff, 0, sniffErr);
+    SniffStatus sniffStatus = SniffStatus::NotContainer;
+    std::shared_ptr<Source> source = OpenSniffed(blob, run.sniff, 0, sniffStatus, sniffErr);
     blob.reset();
     if (source) {
         ++run.report.containers;
         Enumerate(run, source, BaseName(key), std::string(), 1);
+        return;
+    }
+    if (sniffStatus == SniffStatus::Failed) {   // a damaged container is an error, never a file with nothing in it
+        fail(BaseName(key) + ": " + sniffErr);
         return;
     }
     auto single = std::make_shared<SingleFileSource>();
@@ -746,6 +751,7 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
         if (e.kind == EntryKind::Data && !known && e.size >= 2048 && ContainerExtension(Extension(e.path))) {
             std::string err;
             std::shared_ptr<Source> child;
+            SniffStatus childStatus = SniffStatus::NotContainer;
             bool seen = false;
             if (!folderRoot.empty()) {
                 // a file of a folder: read in place, with random access
@@ -756,10 +762,11 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
                 seen = !run.opened.insert(key).second;
                 if (!seen) {
                     std::shared_ptr<Blob> blob = OpenFileBlob(key, err);
-                    if (blob) child = OpenSniffed(blob, run.sniff, depth, err);
+                    if (blob) child = OpenSniffed(blob, run.sniff, depth, childStatus, err);
+                    else childStatus = SniffStatus::Failed;   // the folder file cannot be read: OpenFileBlob said why
                 }
             } else {
-                child = OpenEntrySniffed(source, e, run.sniff, depth, err);
+                child = OpenEntrySniffed(source, e, run.sniff, depth, childStatus, err);
             }
             if (seen) continue;
             if (child) {
@@ -772,8 +779,9 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
                 Enumerate(run, child, name, std::string(), depth + 1);
                 continue;
             }
-            if (err.find("free space") != std::string::npos || err.find("nested too deeply") != std::string::npos ||
-                err.find("cannot write") != std::string::npos) {
+            // A plain file with a container's name stays silent (it is counted among the other files below); every
+            // container that failed to open is an error with its path and the reader's message.
+            if (childStatus == SniffStatus::Failed) {
                 run.report.errors.push_back(name + ": " + err);
                 ImportProgress ev;
                 ev.kind = ImportProgress::Kind::Error;

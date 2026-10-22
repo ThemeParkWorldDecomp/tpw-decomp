@@ -16,9 +16,11 @@
 #include <set>
 #include <sstream>
 #include <thread>
+#include <zlib.h>
 
 #include "../importer.h"
 #include "../sha256.h"
+#include "../sniff.h"
 
 #ifndef TPW_DEVTOOLS_DIR
 #define TPW_DEVTOOLS_DIR "devtools"
@@ -336,6 +338,191 @@ void TestSynthetic(const std::string& scratch) {
     RemoveTree(drop);
 }
 
+// ---- damaged containers: an error naming the file and the reason, never a drop that quietly holds nothing
+
+void Put16(std::string& v, uint32_t x) {
+    v += char(x & 255);
+    v += char((x >> 8) & 255);
+}
+void Put32(std::string& v, uint32_t x) {
+    Put16(v, x & 0xffff);
+    Put16(v, x >> 16);
+}
+
+// A zip of one member, built here from bytes. `crcXor` is XORed into the CRC both headers carry (0: a good zip);
+// `packed` stores the member deflated; `cutEnd` drops that many bytes from the end (the central directory).
+std::string ZipOf(const std::string& name, const std::string& data, bool packed, uint32_t crcXor, size_t cutEnd = 0) {
+    std::string body = data;
+    if (packed) {
+        z_stream z{};
+        deflateInit2(&z, 6, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY);
+        body.assign(deflateBound(&z, uLong(data.size())) + 16, '\0');
+        z.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(data.data()));
+        z.avail_in = uInt(data.size());
+        z.next_out = reinterpret_cast<Bytef*>(&body[0]);
+        z.avail_out = uInt(body.size());
+        deflate(&z, Z_FINISH);
+        body.resize(z.total_out);
+        deflateEnd(&z);
+    }
+    uint32_t crc = uint32_t(crc32(crc32(0, nullptr, 0), reinterpret_cast<const Bytef*>(data.data()), uInt(data.size()))) ^ crcXor;
+    uint16_t method = packed ? 8 : 0;
+    std::string out;
+    Put32(out, 0x04034b50);
+    Put16(out, 20);
+    Put16(out, 0);
+    Put16(out, method);
+    Put32(out, 0);
+    Put32(out, crc);
+    Put32(out, uint32_t(body.size()));
+    Put32(out, uint32_t(data.size()));
+    Put16(out, uint32_t(name.size()));
+    Put16(out, 0);
+    out += name;
+    out += body;
+    uint32_t cdStart = uint32_t(out.size());
+    Put32(out, 0x02014b50);
+    Put16(out, 20);
+    Put16(out, 20);
+    Put16(out, 0);
+    Put16(out, method);
+    Put32(out, 0);
+    Put32(out, crc);
+    Put32(out, uint32_t(body.size()));
+    Put32(out, uint32_t(data.size()));
+    Put16(out, uint32_t(name.size()));
+    Put16(out, 0);
+    Put16(out, 0);
+    Put16(out, 0);
+    Put16(out, 0);
+    Put32(out, 0);
+    Put32(out, 0);
+    out += name;
+    uint32_t cdSize = uint32_t(out.size()) - cdStart;
+    Put32(out, 0x06054b50);
+    Put16(out, 0);
+    Put16(out, 0);
+    Put16(out, 1);
+    Put16(out, 1);
+    Put32(out, cdSize);
+    Put32(out, cdStart);
+    Put16(out, 0);
+    if (cutEnd) out.resize(out.size() - cutEnd);
+    return out;
+}
+
+bool AnyContains(const std::vector<std::string>& lines, const std::string& text) {
+    for (const std::string& l : lines) {
+        if (l.find(text) != std::string::npos) return true;
+    }
+    return false;
+}
+
+size_t FileCount(const std::string& dir) {
+    size_t n = 0;
+    for (const auto& kv : Tree(dir, false)) n += kv.first.find("/.staging/") == std::string::npos && kv.first != "launcher.ini";
+    return n;
+}
+
+void TestDamagedContainers(const std::string& scratch) {
+    std::printf("damaged containers\n");
+    std::string root = scratch + "/damaged-data", drop = scratch + "/damaged-drop";
+    RemoveTree(root);
+    RemoveTree(drop);
+    // a member the manifest knows by size, so that the importer reads it
+    uint64_t size = 0;
+    for (size_t i = 0; i < ManifestHashCount(); ++i) {
+        uint64_t s = ManifestHashes()[i].size;
+        if (s > 0 && (size == 0 || s < size)) size = s;
+    }
+    CHECK(size > 0);
+    const std::string member(static_cast<size_t>(size), 'j');
+
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    Importer imp(cfg);
+    std::string err;
+    CHECK(imp.Open(err));
+
+    // a deflated member whose CRC is wrong: one error naming the zip and the member, and nothing written
+    WriteFile(drop + "/bad-crc.zip", ZipOf("damaged.dat", member, true, 0x5a5a5a5a));
+    ImportReport crc = imp.Import({drop + "/bad-crc.zip"});
+    CHECK_EQ(crc.errors.size(), 1);
+    CHECK(AnyContains(crc.errors, "bad-crc.zip") && AnyContains(crc.errors, "damaged.dat") &&
+          AnyContains(crc.errors, "checksum mismatch"));
+    CHECK_EQ(crc.written, 0);
+    CHECK_EQ(FileCount(root), 0);
+    CHECK(Tree(root + "/assets/.staging", false).empty());
+    std::vector<ImportProgress> ev = Events(imp);
+    CHECK_EQ(CountKind(ev, ImportProgress::Kind::Error), 1);
+    CHECK(crc.Summary().find("1 errors") != std::string::npos);
+
+    // the same zip, good, writes nothing here either (the member is no game file by content) and has no error
+    WriteFile(drop + "/good.zip", ZipOf("damaged.dat", member, true, 0));
+    ImportReport good = imp.Import({drop + "/good.zip"});
+    CHECK(good.errors.empty());
+    CHECK_EQ(good.containers, 1);
+    Events(imp);
+
+    // a deflated member with a flipped bit in its compressed data
+    {
+        std::string z = ZipOf("flipped.dat", member, true, 0);
+        z[30 + 11 + 1] = char(z[30 + 11 + 1] ^ 0x55);
+        WriteFile(drop + "/flipped.zip", z);
+        ImportReport r = imp.Import({drop + "/flipped.zip"});
+        CHECK_EQ(r.errors.size(), 1);
+        CHECK(AnyContains(r.errors, "flipped.zip") && AnyContains(r.errors, "flipped.dat"));
+        CHECK_EQ(r.written, 0);
+        Events(imp);
+    }
+
+    // a truncated zip dropped on its own: an error with its name, not a lone file of unknown content
+    WriteFile(drop + "/cut.zip", ZipOf("damaged.dat", member, true, 0, 30));
+    ImportReport cut = imp.Import({drop + "/cut.zip"});
+    CHECK_EQ(cut.errors.size(), 1);
+    CHECK(AnyContains(cut.errors, "cut.zip"));
+    CHECK_EQ(cut.written, 0);
+    CHECK_EQ(cut.unknownFiles, 0);
+    Events(imp);
+
+    // a truncated zip inside a folder, and a plain file that only has a container's name (stays silent)
+    WriteFile(drop + "/folder/inner-cut.zip", ZipOf("damaged.dat", Junk(3000), false, 0, 30));
+    WriteFile(drop + "/folder/plain.zip", Junk(5000));
+    ImportReport folder = imp.Import({drop + "/folder"});
+    CHECK_EQ(folder.errors.size(), 1);
+    CHECK(AnyContains(folder.errors, "folder/inner-cut.zip"));
+    CHECK(!AnyContains(folder.errors, "plain.zip"));
+    CHECK_EQ(folder.written, 0);
+    ev = Events(imp);
+    CHECK_EQ(CountKind(ev, ImportProgress::Kind::Error), 1);
+    ImportReport plain = imp.Import({drop + "/folder/plain.zip"});
+    CHECK(plain.errors.empty());
+    CHECK_EQ(plain.unknownFiles, 1);
+    Events(imp);
+
+    // nesting: the limit (6 zips inside each other) opens, one more is an error that says so
+    for (int zips : {kMaxNesting, kMaxNesting + 1}) {
+        std::string level = Junk(3000);
+        for (int i = 0; i < zips; i++) level = ZipOf(i == 0 ? "leaf.dat" : "n.zip", level, false, 0);
+        std::string path = drop + "/chain" + std::to_string(zips) + ".zip";
+        WriteFile(path, level);
+        ImportReport r = imp.Import({path});
+        if (zips <= kMaxNesting) {
+            CHECK(r.errors.empty());
+            CHECK_EQ(r.containers, zips);
+            CHECK_EQ(r.unknownFiles, 1);
+        } else {
+            CHECK_EQ(r.errors.size(), 1);
+            CHECK(AnyContains(r.errors, "nested too deeply") && AnyContains(r.errors, "chain7.zip/n.zip"));
+            CHECK_EQ(r.containers, kMaxNesting);
+        }
+        Events(imp);
+    }
+    CHECK_EQ(FileCount(root), 0);
+    RemoveTree(root);
+    RemoveTree(drop);
+}
+
 // ---- the discs
 
 struct Discs {
@@ -589,6 +776,7 @@ int main() {
     fs::create_directories(scratch);
 
     TestSynthetic(scratch);
+    TestDamagedContainers(scratch);
 
     std::string transfer = Env("TPW_TEST_TRANSFER"), expect = Env("TPW_TEST_EXPECT"), gdi = Env("TPW_GDI_ROOT");
     Discs d;
