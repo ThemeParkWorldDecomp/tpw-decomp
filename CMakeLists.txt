@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(tpw LANGUAGES CXX)
+project(tpw LANGUAGES C CXX)   # C for the vendored libraries (third_party/)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -10,29 +10,31 @@ endif()
 
 add_compile_options(-Wall -Wextra -Wno-unused-parameter -ffp-contract=off -fwrapv)
 
-# The bullfrog library's zlib unpacker (src/bullfrog/LbZLib.cpp) inflates with the host's zlib, always present on macOS.
-find_package(ZLIB REQUIRED)
+# The bullfrog library's zlib unpacker (src/bullfrog/LbZLib.cpp) inflates with zlib, built from source here
+# (third_party/zlib, static); no copy on the host is ever looked for.
+add_subdirectory(third_party/zlib)
 
 # Four data tables of the original program (the advisor's response, message and balance description tables and the save
 # file header's legal texts) are not in this repository: devtools/gen_game_tables.py reads them at configure time from the
-# player's own "SimTheme Park" application of the 2.04b3 patch (its data fork, a PEF file) into the build folder.
-# -DTPW_GAME_PROGRAM=<path> or the TPW_GAME_PROGRAM environment variable names it; the default is the extracted patch
-# next to this repository.
+# player's own "SimTheme Park" application (its data fork, a PEF file) into the build folder. Any full Mac build will do:
+# the CD's own 2.0.1, the 2.04b3 patch's, or one of the 2.1 releases (the tables are the same in all of them).
+# -DTPW_GAME_PROGRAM=<path> or the TPW_GAME_PROGRAM environment variable names it; the default is the CD's program as
+# devtools/import_originals.py writes it, next to this repository.
 if(NOT TPW_GAME_PROGRAM)
   if(DEFINED ENV{TPW_GAME_PROGRAM})
     set(TPW_GAME_PROGRAM "$ENV{TPW_GAME_PROGRAM}")
   else()
-    set(TPW_GAME_PROGRAM "${CMAKE_CURRENT_SOURCE_DIR}/../extracted/SimTPPatch_204b3/Sim Theme Park Patch/patch 2.04b3/SimTheme Park")
+    set(TPW_GAME_PROGRAM "${CMAKE_CURRENT_SOURCE_DIR}/../extracted/disc-hfs/Theme Park Data/SimTheme Park")
   endif()
 endif()
-set(TPW_GAME_PROGRAM "${TPW_GAME_PROGRAM}" CACHE FILEPATH "The 2.04b3 SimTheme Park application the data tables are read from")
+set(TPW_GAME_PROGRAM "${TPW_GAME_PROGRAM}" CACHE FILEPATH "A full Mac SimTheme Park application (its data fork) the data tables are read from")
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 set(TPW_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
 execute_process(COMMAND ${Python3_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR}/devtools/gen_game_tables.py
                         --program ${TPW_GAME_PROGRAM} --out ${TPW_GENERATED_DIR}
                 RESULT_VARIABLE TPW_GENERATED_RESULT)
 if(NOT TPW_GENERATED_RESULT EQUAL 0)
-  message(FATAL_ERROR "The game's data tables could not be generated: set TPW_GAME_PROGRAM to the 2.04b3 \"SimTheme Park\" application")
+  message(FATAL_ERROR "The game's data tables could not be generated: set TPW_GAME_PROGRAM to a full Mac \"SimTheme Park\" application (the CD's own one is fine)")
 endif()
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
              ${CMAKE_CURRENT_SOURCE_DIR}/devtools/gen_game_tables.py ${TPW_GAME_PROGRAM}

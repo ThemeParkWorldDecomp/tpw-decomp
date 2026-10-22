@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Write the seven data tables the translation compiles in, from the player's own copy of the game.
 
-usage: python3 -I devtools/gen_game_tables.py --program "<the 2.04b3 SimTheme Park application>" --out DIR
+usage: python3 -I devtools/gen_game_tables.py --program "<a full Mac SimTheme Park / Theme Park World application>" --out DIR
 
 The tables are the original program's data, so they are not in this repository: CMake runs this script at
 configure time (TPW_GAME_PROGRAM, see CMakeLists.txt) and compiles what it writes into DIR:
@@ -14,10 +14,17 @@ configure time (TPW_GAME_PROGRAM, see CMakeLists.txt) and compiles what it write
   WindowScripts.inc           the window scripts of the park and status panels (WINDOW_SCRIPTS: address, words, array)
   RideTemplates.inc           the 14 ride templates of BMP_CreateRide, 0xd0 bytes each at 0x1029be00 (gRideTemplates)
 
-The program is the data fork of the "SimTheme Park" application of the 2.04b3 patch, a PowerPC PEF container.
-The addresses are the decompile's: the code section at 0x10000000, the data section right after it on a 16-byte
-boundary (0x1025fcc0), unpacked and relocated as the Code Fragment Manager does, imports from 0x103bc8b0 in
-order. Only that build has these tables at these addresses, so the file's SHA-1 is checked first.
+The program is the data fork of a "SimTheme Park" or "Theme Park World" application, a PowerPC PEF container. Any full Mac
+build will do (the CD's own 2.0.1, the 2.04b3 patch's, and the 2.1, 2.1.1, 2.1.2 and 2.1.4 releases): the tables are
+byte for byte the same in all of them, only at other addresses. The addresses in the code below are the decompile's (the
+2.04b3 build's: the code section at 0x10000000, the data section right after it on a 16-byte boundary, unpacked and
+relocated as the Code Fragment Manager does, imports from 0x103bc8b0 in order). Each table is found in the program by its
+content: a table of the 2.04b3 build is a block of bytes whose SHA-1 is listed below (PARTS, WINDOW_HASHES), found by the SHA-1
+of its first 32 bytes and then checked whole. The scorers' pointers differ by build, so they are followed instead: the
+scorer table sits with the message table, its TVectors are 241 consecutive 8-byte records, and each scorer function is named
+by its rank among the 241 (they lie in the same order in every build; include/AdvisorScoring.h declares them with their
+2.04b3 addresses). The seven files written must then have the SHA-1s in KNOWN_OUTPUT_SHA1, or nothing is written and the
+script stops: a program that is not one of those builds cannot pass quietly.
 """
 import argparse
 import re
@@ -26,7 +33,6 @@ import pathlib
 import struct
 import sys
 
-PROGRAM_SHA1 = "ce184baca37824def7faa1fb033840a2ce273ef9"
 CODE_BASE = 0x10000000
 IMPORTS_BASE = 0x103BC8B0
 
@@ -489,25 +495,216 @@ TABLES = {"advisor_lines.cpp": advisor_lines, "AdvisorScoring_table.cpp": adviso
           "SaveLegalText.inc": save_legal_text, "WindowScripts.inc": window_scripts, "RideTemplates.inc": ride_templates}
 
 
+# ---- finding the tables in any build
+
+# The SHA-1 of each of the seven files this script writes; the same for every full Mac build (2.0.1, 2.04b3, 2.1, 2.1.1, 2.1.2,
+# 2.1.4). A change of include/AdvisorScoring.h that renames a scorer changes AdvisorScorerSources.cpp: update its entry then.
+KNOWN_OUTPUT_SHA1 = {
+    "advisor_lines.cpp": "49b974cb42f7d1eff627a24b630e0799b7723339",
+    "AdvisorBalance_table.cpp": "c10a0baf67255f2671ea1fd49bb7cb2b50208904",
+    "AdvisorScorerSources.cpp": "da5b2c3df9bac53f4040a90c1baab0b3c377a3ba",
+    "AdvisorScoring_table.cpp": "1cbc72c3e2d4d8bd2303e1fb415e4dd55f7ba3f2",
+    "SaveLegalText.inc": "c29bf03a884224a571e4b9f7b1ba862e58ee1441",
+    "WindowScripts.inc": "3c06b6192bc76bac990e70910da4f26ce4fb69e4",
+    "RideTemplates.inc": "dffca3874e4ccb2414a33d104a703e489ade663e",
+}
+
+ANCHOR = 32                     # bytes hashed to find a block; the whole block's SHA-1 then confirms it
+SCORERS, SCORER_COUNT = 0x1027DF30, 351
+MESSAGES = 0x1027EFA4
+TVECTORS_FIRST, TVECTORS_END = 0x10265800, 0x10265F8C     # the scorers' TVectors in the 2.04b3 build (241 of 8 bytes)
+
+# (name, 2.04b3 address, length, SHA-1 of the first ANCHOR bytes, SHA-1 of all of it) of the blocks without pointers
+PARTS = [
+    ("legal texts", 0x10249F40, 6518, "1861c0241c6ece2fa2ce93280baef0f027492229", "668f087e18b1a207cb4af5b09030f4e440449b41"),
+    ("advisor lines", 0x10278CE4, 19552, "30b116a942e5bdd1264390ffefa7135b5451bc6f", "2c6160aade733840aaf39984bee905a36ebc8a96"),
+    ("message table", 0x1027EFA4, 16848, "37c1f7292dc7ffa6e939d8057152e2697aa70538", "376addbbbfe47d7d1b4a727779c3648a1140d998"),
+    ("balance rows", 0x1028318C, 46500, "de8a847bff8c343d69b853a215e6ee775ef2ef96", "6b7b5c4e0e479129d1dd44bdb45f9ea486ecd8c9"),
+    ("ride templates", 0x1029BE00, 2912, "015033c1bf6951e5e0fab1bc402e6a43a68ddaff", "c70b59faf6ccfcb5d9bbd1d4000846471300a5a6"),
+]
+
+# window script address: (SHA-1 of the first ANCHOR bytes, SHA-1 of the whole script, its place among the identical copies by
+# address, the number of identical copies in the 2.04b3 build). The length is WINDOW_SCRIPTS'.
+WINDOW_HASHES = {
+    0x102A4758: ("69051fed3bedfa47d0ab7dbc48fb01a1f6f7e5cf", "151ee73970154e19e3c49fe11f43cca7a76826ae", 0, 1),
+    0x102A8530: ("483299a14aaa6d36056363cbba2941c1f5d3c463", "df855f92ac20f4670c3c04f2f45e5039d54f7ddf", 0, 2),
+    0x102A868C: ("deb614b0b6e070fa0cddbd501524e368054a82b4", "fdb30562b2c1fb419a2c80dc94eda8f1586cf789", 0, 1),
+    0x102A8884: ("9bf6071a9cb11e36605c5fd71b3270b3edc6f691", "dceb22a07c1b0081e3a94a0811005ac50b302d5f", 0, 1),
+    0x102A8A5A: ("f919cf9d3564eab5af385464a394529784165295", "057beb472c16ecbc57a56b47cf5382f8b0c073a1", 0, 1),
+    0x102A8C3C: ("f919cf9d3564eab5af385464a394529784165295", "b1d9fac38d56f125828f3b73e3a6ee320676888f", 0, 1),
+    0x102A8D0E: ("4278167f4f959cf5e8748cca562d87064614a6ac", "21ef6f71cd52f81dfb93193b033544269feb9046", 0, 1),
+    0x102A908C: ("ddb95898cb254742996b4e8b26a8d60054ff0823", "78dc57135a2800d279964fd42d6e0ece8f17e871", 0, 1),
+    0x102A96A8: ("6534a23c1aaf703816baebc7db9e0072153a4ef0", "71ed6b1bd7e30566ac07cb92db64a78080eee9bf", 0, 1),
+    0x102A9834: ("483299a14aaa6d36056363cbba2941c1f5d3c463", "df855f92ac20f4670c3c04f2f45e5039d54f7ddf", 1, 2),
+    0x102A9948: ("7ea6a67c59e94483d7ea33c2be739d41686b1600", "b87d1a90bf6aa7f9def347bf236d2b44d62af97b", 0, 1),
+    0x102A9BEC: ("81a0aa9a9d7ca52414e392d3bd51ade5c9b64e15", "ef1078d00b2c1d0f72fae76a292bf5e67e437ceb", 0, 1),
+    0x102A9EE8: ("ad32c1fb40876faca314cc207723e3d9357f2277", "3dd77aa63c1b51dc43d87f95ed1cc7ffd60756f2", 0, 1),
+    0x102AA4A4: ("e1df70867301ed61736648f3d9d12e9178935f0a", "935b9135b9d4cd26ea40b29826e5a52b74b59ac4", 0, 1),
+    0x102AB734: ("72f25798d9eb46848b7eac289f4084390e8f7bd7", "86cdd6aa8b4a9cbd67f2a3ebe0fc9d31f3b51f55", 0, 1),
+    0x102AC35A: ("768f544e451894636c3c2a8fdd7c98a561b81917", "57b841ca2416d0ef75f25bcf965051d9fb95c588", 0, 1),
+    0x102ACA9C: ("d2279c61ca1928eeffdc2743aec4930c4c53bcfa", "fb930ddb2c0663399dc7c26af331e922af5f8cef", 0, 1),
+    0x102ACEF0: ("ee0a244daa4a2b90aef146f3ffb10d8818758464", "fd1ccff032a286a3a1a009a203978f2b1e88acf8", 0, 1),
+    0x102AD4F0: ("82ec1b79af93aebc9ac527a1546afdcd31c30f8c", "d617f154f3b93566bf148af9f35308ad6de58ad7", 0, 1),
+    0x102AD644: ("53e0a956aa8d8916b35fafb4e7cc6fa561b8d762", "8010a6e4b014044ed646e2a5986dc7015d1c5faf", 0, 1),
+    0x102ADC20: ("07cbec8d5ce12a7f5011e3ef3a5f327cb16a33a7", "43610c6de00a9cb517d3c8b686269fc61dd5b6e1", 0, 1),
+    0x102AE3E8: ("ac3dd320af908b54a9ef1e7eb003798cae967dfc", "8c39e6229e71d9b0a1b5a3b53fad3af56187b01d", 0, 1),
+    0x102AE9C8: ("0e166b138ef196370a89af63603900b484de9716", "9a54678ffd31f632a4309f97384041ba132617ec", 0, 1),
+    0x102AEDD0: ("3b390b069e930f420fcc93d40e046f5c55372db9", "63b023993e44e8922217568e2ca19dc30e50b4ae", 0, 1),
+    0x102AF16C: ("8fb0011dd9a048d74840e9026b5e2a5939303304", "4dbd386df49ed5157c5cb4b3f8259945274972e2", 0, 1),
+    0x102AF2AC: ("edef7cd78ed5c7e6fd504422f3566794ad7bf728", "e637f9b8b97cf820ee0dd9454c57f05ac427490d", 0, 1),
+    0x102B2366: ("164b2204a48e944a7c099e9e424db8372cebd37c", "86d6ca9ec7cbc350882235e3224bd77cba6f162a", 0, 1),
+    0x102A772C: ("5e3cb750cd9b3ecbb86935721925bc2285e474b6", "c6f2ba6540f2664e66838f5102f48c4780530b13", 0, 1),
+    0x102A7756: ("c06076e3574b4ed1f9e03a630f13d3e423a75b46", "c9e6730fde886e0d9e209ffd3372f65c1884920c", 0, 1),
+    0x102A8B42: ("17ca7a6c014b503e0482e4e6c6585b8c1b84a7e0", "d815b6d6fcdbe35381a9e56fa0b68543b0b4f152", 0, 1),
+    0x102AA330: ("da2679968f8fe8461702629f723dc909ccca40da", "c38887c499b4c8407661bf13eec1a50688cb68ee", 0, 1),
+    0x102AADE4: ("ded62b31441252282e2938702780ea6c3b244869", "81f38de09dc394945e3f18fb57f1eb786c47891f", 0, 1),
+    0x102AC1E6: ("e8dcf800b891c06a40bbe86d04fd08f091f323d2", "c8e6358b1b56bdb9199f27ffb19c793af9ffa059", 0, 1),
+    0x102AF524: ("3808cf796c44b5cc14460ebcfea9757fe127b41b", "76a5c86db2f19babf5a991ff13f25ba8893ddec3", 0, 1),
+    0x102AFE24: ("52deb8e049f5cfbad246c1ec65768e80e8c6ee12", "3a7842f1f36d2a377e5d5f11e9f7987daf427b13", 0, 1),
+    0x102B0288: ("ece7a8e9e0e672aaa7c21e285a461079e713ef63", "79752d8168099563bdd8df4dc42e2ff70f2d3fef", 0, 1),
+    0x102B05C4: ("0f45abc16873a6c95dc075183ea587fc119d88a7", "1d07465b5f17acede29b656f706a680e0c29a488", 0, 1),
+    0x102B0E58: ("622bef38bd3a77b7c382136369804c705d0eb1c8", "9e1dbba2c65303a335631e255332282ed51a53c9", 0, 1),
+}
+
+
+def _sha1(b):
+    return hashlib.sha1(b).hexdigest()
+
+
+def _sections(p):
+    return ((CODE_BASE, bytes(p.code)), (p.data_base, bytes(p.data)))
+
+
+def find_blocks(p, wanted):
+    """{key: [addresses in p, ascending]} of the blocks in WANTED, a list of (key, length, anchor SHA-1, whole SHA-1). The
+    program's two sections are scanned once, on even addresses (the window scripts are halfword aligned)."""
+    by_anchor = {}
+    for want in wanted:
+        by_anchor.setdefault(want[2], []).append(want)
+    found = {want[0]: [] for want in wanted}
+    sha1 = hashlib.sha1
+    for base, buf in _sections(p):
+        for i in range(0, len(buf) - ANCHOR + 1, 2):
+            group = by_anchor.get(sha1(buf[i:i + ANCHOR]).digest().hex())
+            if group:
+                for key, length, _, whole in group:
+                    if i + length <= len(buf) and sha1(buf[i:i + length]).hexdigest() == whole:
+                        found[key].append(base + i)
+    return {k: sorted(v) for k, v in found.items()}
+
+
+class BuildView:
+    """The program of another build, answering reads at the 2.04b3 build's addresses: each block the tables read is found by
+    its content and shifted by its own delta; the scorer table and its TVectors are followed (see the docstring)."""
+
+    def __init__(self, p, header):
+        self.p = p
+        self.regions = []                 # (low, high, delta in the 2.04b3 address space)
+        self.patch = {}                   # 2.04b3 word address -> the word the tables must see there
+        wanted = [(("part", i), length, anchor, whole) for i, (_, _, length, anchor, whole) in enumerate(PARTS)]
+        for addr, (anchor, whole, _, _) in WINDOW_HASHES.items():
+            wanted.append((("script", addr), 2 * next(n for a, n, _ in WINDOW_SCRIPTS if a == addr), anchor, whole))
+        hits = find_blocks(p, wanted)
+        for i, (name, addr, length, _, _) in enumerate(PARTS):
+            h = hits[("part", i)]
+            if len(h) != 1:
+                raise ValueError("the %s (%d bytes) are found %d times in the program, not once" % (name, length, len(h)))
+            self.regions.append((addr, addr + length, h[0] - addr))
+        for (kind, addr), h in hits.items():
+            if kind != "script":
+                continue
+            _, _, ordinal, copies = WINDOW_HASHES[addr]
+            if len(h) == 1 and copies == 1:
+                at = h[0]
+            elif len(h) == copies and copies > 1:
+                at = h[ordinal]            # identical copies: the one in the same place among them
+            else:
+                raise ValueError("the window script at 0x%08x is found %d times in the program, not %d" % (addr, len(h), copies))
+            self.regions.append((addr, addr + 2 * next(n for a, n, _ in WINDOW_SCRIPTS if a == addr), at - addr))
+        self.regions.sort(key=lambda r: r[1] - r[0])        # the smallest block first, so a script wins over a wider block
+        message_delta = next(d for lo, hi, d in self.regions if lo == MESSAGES)
+        self.regions.append((SCORERS, MESSAGES, message_delta))          # record -1 is its last 0x30 bytes
+        # the scorer table: 351 pointers to member {0, -1, TVector}; the TVectors are consecutive in the 241-scorer region
+        entries = []
+        for k in range(SCORER_COUNT):
+            delta, vindex, tv = struct.unpack(">3I", self._raw(SCORERS + 12 * k, 12))
+            if delta != 0 or vindex != 0xFFFFFFFF:
+                raise ValueError("scorer %d is not a plain pointer to member" % k)
+            entries.append(tv)
+        distinct = sorted(set(entries))
+        names = sorted(set(self._declared_scorers(header)))
+        if len(distinct) != len(names) or any(b - a != 8 for a, b in zip(distinct, distinct[1:])):
+            raise ValueError("the scorer table names %d TVectors, not %d consecutive ones" % (len(distinct), len(names)))
+        tv_delta = distinct[0] - TVECTORS_FIRST
+        if distinct[-1] - tv_delta + 8 > TVECTORS_END + 4:
+            raise ValueError("the scorers' TVectors end at an unexpected address")
+        self.regions.append((TVECTORS_FIRST, TVECTORS_END, tv_delta))
+        codes = sorted({struct.unpack(">I", p.read(tv, 4))[0] for tv in entries})
+        if len(codes) != len(names):
+            raise ValueError("%d scorer functions in the program, %d declared" % (len(codes), len(names)))
+        rank = dict(zip(codes, names))
+        for k, tv in enumerate(entries):
+            self.patch[SCORERS + 12 * k + 8] = tv - tv_delta
+            self.patch[tv - tv_delta] = rank[struct.unpack(">I", p.read(tv, 4))[0]]
+
+    @staticmethod
+    def _declared_scorers(header):
+        for line in header.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"\s*u?int32_t\s+(_ADVISOR_\w+)\(\);\s*//\s*(0x[0-9a-fA-F]{8})", line)
+            if m:
+                yield int(m.group(2), 16)
+
+    def _raw(self, a, n):
+        for lo, hi, d in self.regions:
+            if lo <= a and a + n <= hi:
+                return self.p.read(a + d, n)
+        raise ValueError("0x%08x+%d is outside the blocks found in the program" % (a, n))
+
+    def read(self, a, n):
+        b = bytearray(self._raw(a, n))
+        for w in range(a - a % 4, a + n, 4):
+            if w in self.patch:
+                v = struct.pack(">I", self.patch[w])
+                for i in range(4):
+                    if a <= w + i < a + n:
+                        b[w + i - a] = v[i]
+        return bytes(b)
+
+
+def generate(program_path, header=None):
+    """{file name: text} of the seven tables from the program at program_path; ValueError when it is not a build whose tables
+    are the known ones."""
+    header = header or pathlib.Path(__file__).resolve().parent.parent / "include" / "AdvisorScoring.h"
+    view = BuildView(Program(program_path), header)
+    texts = {}
+    for name, make in TABLES.items():
+        texts[name] = "\n".join(make(view)) + "\n"
+        got = _sha1(texts[name].encode("utf-8"))
+        if got != KNOWN_OUTPUT_SHA1[name]:
+            raise ValueError("%s has SHA-1 %s, not the known %s" % (name, got, KNOWN_OUTPUT_SHA1[name]))
+    return texts
+
+
 def main(argv):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--program", required=True, help='the 2.04b3 "SimTheme Park" application (its data fork)')
+    ap.add_argument("--program", required=True, help='a full Mac "SimTheme Park" or "Theme Park World" application (its data fork)')
     ap.add_argument("--out", required=True, help="the folder to write the seven files into")
     a = ap.parse_args(argv)
     path = pathlib.Path(a.program)
     if not path.is_file():
-        sys.exit("gen_game_tables.py: %s does not exist (set TPW_GAME_PROGRAM to the 2.04b3 \"SimTheme Park\" application)" % path)
-    sha1 = hashlib.sha1(path.read_bytes()).hexdigest()
-    if sha1 != PROGRAM_SHA1:
-        sys.exit("gen_game_tables.py: %s has SHA-1 %s, not the 2.04b3 build's %s" % (path, sha1, PROGRAM_SHA1))
-    p = Program(path)
+        sys.exit("gen_game_tables.py: %s does not exist (set TPW_GAME_PROGRAM to the data fork of a full Mac SimTheme Park or "
+                 "Theme Park World application: the CD's own program, import_originals.py writes it)" % path)
+    try:
+        texts = generate(path)
+    except ValueError as e:
+        sys.exit("gen_game_tables.py: %s is not a full Mac build whose tables are known: %s" % (path, e))
     out = pathlib.Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
-    for name, make in TABLES.items():
-        text = "\n".join(make(p)) + "\n"
+    for name, text in texts.items():
         f = out / name
-        if not f.exists() or f.read_text(encoding="utf-8") != text:
-            f.write_text(text, encoding="utf-8")
+        if not f.exists() or f.read_bytes() != text.encode("utf-8"):
+            with open(f, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(text)
 
 
 if __name__ == "__main__":

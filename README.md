@@ -22,8 +22,8 @@ This repository holds no part of the game: no program, no data files, no memory 
 from the game. You need your own copy of the game, and the build and the tests read what they need from it:
 
 - the build reads six data tables (the advisor's lines and messages, the balance descriptions, the save file's legal text,
-  the handheld's window scripts) from the "SimTheme Park" application of the 2.04b3 patch at configure time
-  (devtools/gen_game_tables.py; it checks the file's SHA-1);
+  the handheld's window scripts) from any full Mac SimTheme Park program (the CD's own is fine) at configure time
+  (devtools/gen_game_tables.py; it finds each table by its content and checks the SHA-1 of every file it writes);
 - the tests run the original code out of memory dumps of the programs and read some of the game's files.
 
 ## The working folder
@@ -33,8 +33,8 @@ The tests look for the game's files beside this repository:
     WORK/
       tpw-decomp/                      this repository
       extracted/
-        SimTPPatch_204b3/Sim Theme Park Patch/patch 2.04b3/SimTheme Park   the patched application (data fork)
-        disc-hfs/Theme Park Data/      the CD's data folder (devtools/hfsdump.py unpacks the CD's HFS partition)
+        disc-hfs/Theme Park Data/      the CD's data folder and its "SimTheme Park" program, the full Mac program the
+                                       build reads the tables from (devtools/hfsdump.py unpacks the CD's HFS partition)
         wads/                          the game's .wad archives unpacked, one NAME.wad.d folder each (devtools/wad.py)
       ghidra/
         dumps/<program>/               memory dumps of each program ("SimTheme Park", "engine symbols shared", ...)
@@ -47,9 +47,10 @@ made with Ghidra from the game's own programs; the scripts that make them are no
 
 ## Building and testing
 
-Needs CMake 3.20, a C++17 compiler, zlib, Python 3 and, for the tests, the Python package unicorn.
+Needs CMake 3.20, a C++17 compiler, Python 3 and, for the tests, the Python package unicorn (zlib is built from
+third_party/zlib).
 
-    cmake -S tpw-decomp -B build -DTPW_GAME_PROGRAM="<the 2.04b3 SimTheme Park application>"
+    cmake -S tpw-decomp -B build
     cmake --build build -j8
     cd tpw-decomp && TPW_SHIM=../build/libtpw_testshim.dylib python3 -I tests/difftest.py            # every module
     cd tpw-decomp && TPW_SHIM=../build/libtpw_testshim.dylib python3 -I tests/difftest.py test_Clock  # one module
