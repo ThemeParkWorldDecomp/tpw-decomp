@@ -131,6 +131,7 @@ UKeyboard::UKeyboard() {
 }
 uint8_t UKeyboard::IsOptionDown() { return 0; }
 uint8_t UKeyboard::IsCommandDown() { return 0; }
+uint32_t UKeyboard::GetModifiers() { return 0; }   // the import 0x10001b00, which the tests never reach on this class
 }  // namespace SamsUtilities
 
 // ---- the mouse

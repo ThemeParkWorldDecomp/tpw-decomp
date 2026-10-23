@@ -277,7 +277,8 @@ TbError CreateAudioObject(const char* name, TbAudioSystem** audio, const CAudioC
 
 // The sams utilities the sound start-up asks about the keyboard (imports of main). The listing's vtable slots of the real
 // UKeyboard: +0x08 destructor, +0x0c IsShiftDown, +0x10 IsOptionDown, +0x14 IsControlDown, +0x18 IsCommandDown, +0x1c
-// GetModifiers, +0x20 IsKeyDown, +0x24 and +0x28 Translate; SOUND_Init asks the two named here and nothing else.
+// GetModifiers, +0x20 IsKeyDown, +0x24 and +0x28 Translate; SOUND_Init asks IsOptionDown and IsCommandDown, and the park's
+// pointer code (UIMain_GetShiftKeyState, ContextMouse) asks GetModifiers.
 namespace SamsUtilities {
 class UKeyboard {
 public:
@@ -285,7 +286,7 @@ public:
     virtual ~UKeyboard() {}   // +0x08 0x1000188c
     virtual uint8_t IsOptionDown();    // +0x10 0x10001a08
     virtual uint8_t IsCommandDown();   // +0x18 0x10001910
-    virtual uint32_t GetModifiers() { return 0; }   // +0x1c (unit w142; the host stand-in answers 0)
+    virtual uint32_t GetModifiers();   // +0x1c 0x10001b00: control 0x1000, command 0x100, shift 0x200, option 0x800
 };
 extern UKeyboard* gKeyboard;   // the import variable (TOC word 0x103bcef4): the keyboard object, or NULL until the first use
 

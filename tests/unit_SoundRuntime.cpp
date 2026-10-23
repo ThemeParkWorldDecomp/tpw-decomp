@@ -198,6 +198,8 @@ uint8_t UKeyboard::IsCommandDown() {
     return static_cast<uint8_t>(ret("Command", 0));
 }
 
+uint32_t UKeyboard::GetModifiers() { return 0; }   // the import 0x10001b00; SOUND_Init never asks it
+
 void USoundChannel::SetSafeMode(uint8_t on) { ev("SetSafeMode", {on}); }
 }  // namespace SamsUtilities
 
