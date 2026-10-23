@@ -203,7 +203,7 @@ void RemoveSlideoutPanel(int16_t which) { ev("RemoveSlideoutPanel", {I(which)});
 
 void FillLenderList(InterfaceListControl2* list) { ev("FillLenderList", {P(list)}); }
 
-char16_t* UIMain_ConvertMulti(const unsigned char* text) {
+char16_t* UIMain_ConvertMulti(unsigned char* text) {   // 0x10180334, the overload the Mac calls (the PPC side's fake)
     const char16_t* chars = reinterpret_cast<const char16_t*>(text);
     ev("ConvertMulti", {I(static_cast<uint32_t>(chars[0])), I(static_cast<uint32_t>(chars[1]))});
     gConvBuffer[0] = static_cast<char16_t>(ret("conv"));
@@ -211,7 +211,10 @@ char16_t* UIMain_ConvertMulti(const unsigned char* text) {
     return gConvBuffer;
 }
 
-int32_t TbITable::FormatString(char16_t* out, uint32_t size, uint32_t id, ...) const {
+// The unsigned char overload, the one UI_MainPanelDateChange calls (as the Mac's glue 0x10239f70 does); the two values are written as
+// two halfwords, as the PPC side's fake writes them and the ConvertMulti fake above reads them.
+int32_t TbITable::FormatString(unsigned char* buffer, uint32_t size, uint32_t id, ...) const {
+    char16_t* out = reinterpret_cast<char16_t*>(buffer);
     va_list args;
     va_start(args, id);
     ShowStatusTag* tags[3];

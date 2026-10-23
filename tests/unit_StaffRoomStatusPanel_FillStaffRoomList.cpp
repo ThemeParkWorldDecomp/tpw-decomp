@@ -26,6 +26,7 @@
 
 using namespace calllog;
 
+
 // ---- globals of other files the unit reads or writes, defined here
 tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> gStaffRoomId;
 CThing* gStaffRoomShowThing = nullptr;

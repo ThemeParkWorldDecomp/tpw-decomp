@@ -9,6 +9,7 @@
 #include "TPEngine.h"
 #include <cstdio>
 
+
 // TPAdvisor.cpp (main app of SimTheme Park 2.04b3): the advisor's model, 0x10031bc0..0x1003228c, and the slots'
 // constructor 0x10032454. (The file's text reader is in src/TPAdvisor.cpp, which two other unit libraries link, so the
 // model is kept apart.)

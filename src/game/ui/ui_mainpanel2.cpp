@@ -262,9 +262,10 @@ void UI_MainPanelDateChange(int32_t day, int32_t month, int32_t year) {
     ShowStatusTag dayTag(0x10, day);
     ShowStatusTag monthTag(0x11, month);
     ShowStatusTag yearTag(0x12, year + 0x76c);
-    char16_t text[0x20];
+    // corrected 2026-10-22: byte buffer as on the Mac (found by samueleagle91, tpw-port PR #3)
+    unsigned char text[0x24];   // r1+0x7c, the 36 bytes below the saved registers; FormatString's unsigned char overload (glue 0x10239f70)
     static_cast<TbITable*>(gText.mResourcePointers[6])->FormatString(text, 0x1f, 0x1c0, &dayTag, &monthTag, &yearTag);
-    title->SetClientDrawText(UIMain_ConvertMulti(reinterpret_cast<const unsigned char*>(text)));
+    title->SetClientDrawText(UIMain_ConvertMulti(text));
     InterfaceWindow* cash = gGameWindow->GetWindow(0x2f);
     InterfaceWindow* gauge = cash->GetWindow(0x31);
     uint8_t* analyser = reinterpret_cast<uint8_t*>(gGameWorldRef->GetParkAnalyser());
