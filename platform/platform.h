@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include "log_file.h"
 #include "platform/interfacelib.h"
 #include "platform/samsutils.h"
 
@@ -88,7 +89,7 @@ bool ScriptedPointer(float& gameX, float& gameY, bool& buttonDown);
 // The pass of the run loop being run (from 1; counted only with --frames, else 0).
 int32_t CurrentPass();
 
-// One line in the platform log ("platform: ..." on stderr). The game's own log lines
+// One line in the platform log ("platform: ..." on stderr, and the log file of log_file.h). The game's own log lines
 // (ULogManager) and the stubs' "unimplemented" lines go through LogLine as well.
 void Log(const char* format, ...) __attribute__((format(printf, 1, 2)));
 void LogLine(const char* prefix, const char* text);

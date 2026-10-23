@@ -8,9 +8,10 @@
 #include <cstring>
 
 #include "platform/msl.h"
+#include "log_file.h"   // the failure reports go to the log file too
 
 void msl_assertion_failed(const char* condition, const char* file, int32_t line) {
-    std::fprintf(stderr, "Assertion (%s) failed in \"%s\", line %d\n", condition, file, line);
+    ::tpw::LogRawF("Assertion (%s) failed in \"%s\", line %d\n", condition, file, line);
     std::abort();
 }
 

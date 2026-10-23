@@ -18,6 +18,7 @@
 #include <cstring>
 #include <mutex>
 #include <vector>
+#include "log_file.h"   // the failure reports go to the log file too
 
 namespace tpw {
 
@@ -54,7 +55,7 @@ void* gFreeLists[kSmallClasses + kPowerClasses];
 std::vector<LargeHole>* gHoles = nullptr;
 
 [[noreturn]] void Fail(const char* what, const void* address) {
-    std::fprintf(stderr, "arena: %s (%p)\n", what, address);
+    ::tpw::LogRawF("arena: %s (%p)\n", what, address);
     std::abort();
 }
 
