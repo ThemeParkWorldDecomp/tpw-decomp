@@ -12,6 +12,10 @@ The test for where a change goes: does a park play the same with it on and with 
 tpw-port. If it changes the rules, the money, the visitors, the staff, the rides, the advisor, the game's content, what a
 control does or the save files, it belongs in tpw-mods, even as a setting that is off by default.
 
+One exception: an option the original game already had in its .sam data files belongs in tpw-port, even when it
+changes how a park plays, as long as it offers only the values the original accepts and its default is the original's.
+Players set it in the launcher or a game menu, never by editing a .sam file.
+
 This repository takes no pull requests and no changes of any kind. A function here changes only when the differential
 tests show that its translation differs from the Mac, and the maintainers make that change in the private working tree
 both tpw-decomp and tpw-port are exported from. If you find such a function, open an issue on
