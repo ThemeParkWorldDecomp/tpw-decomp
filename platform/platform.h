@@ -80,12 +80,37 @@ struct Config {
         int32_t steps;
     };
     std::vector<ScriptedDrag> drags;
+    // A scripted pointer move with no button (--move X,Y@N): the pointer goes to the game pixel (X, Y) on pass N and stays.
+    struct ScriptedMove {
+        int32_t pass;
+        int32_t x;
+        int32_t y;
+    };
+    std::vector<ScriptedMove> moves;
+    // A scripted right click (--rclick X,Y@N): as --click, with the right button.
+    std::vector<ScriptedClick> rightClicks;
+    // A scripted key (--key NAME@N: down on pass N, up on pass N + 1) or a held key (--hold NAME@N-M: down on pass N, up on
+    // pass M), sent as a real key of that SDL scancode is (HandleTyping, the key state and the events' modifiers). NAME is
+    // esc, return, space, tab, cmd, ctrl, shift, option or an SDL key name (a letter, a digit, "Delete", "F1").
+    struct ScriptedKey {
+        int32_t scancode;
+        int32_t down;
+        int32_t up;
+    };
+    std::vector<ScriptedKey> keys;
 };
 Config& config();
 
 // The scripted pointer (Config::clicks) while one is in effect: its game pixel and whether its button is held. In effect
 // from a click's pass until the next real mouse motion; false when none is, and the real mouse counts.
 bool ScriptedPointer(float& gameX, float& gameY, bool& buttonDown);
+// Whether a scripted right click (Config::rightClicks) holds the right button now.
+bool ScriptedRightButton();
+// Whether a scripted key (Config::keys) holds the key of this SDL scancode now, and the SDL modifier bits those keys make.
+bool ScriptedKeyDown(int32_t sdlScancode);
+uint16_t ScriptedSDLModifiers();
+// The SDL scancode of a --key or --hold name (0: none).
+int32_t ScancodeFromKeyName(const char* name);
 // The pass of the run loop being run (from 1; counted only with --frames, else 0).
 int32_t CurrentPass();
 
