@@ -20,7 +20,11 @@
 #include <filesystem>
 #include <string>
 
+#ifdef _WIN32
+#include <io.h>   // Windows: _write; there is no <sys/uio.h> or writev
+#else
 #include <sys/uio.h>
+#endif
 
 namespace tpw {
 
@@ -70,12 +74,31 @@ void LogDisplayOnce();
 inline void LogToFile(const char* a, const char* b) {
     const int fd = gLogFileFd.load(std::memory_order_relaxed);
     if (fd < 0) return;
+#ifdef _WIN32
+    // Windows: no writev. The parts are joined in a buffer on the stack (nothing allocated, as a signal handler needs)
+    // and go out in one _write; the C runtime holds the descriptor's lock for each _write, so lines from two threads do
+    // not interleave. A line longer than the buffer goes in three writes, which another thread's line can come between.
+    // A short write (a full disk) is left as it is. Windows has no EINTR.
+    const size_t lengthA = std::strlen(a), lengthB = std::strlen(b);
+    char line[4096];
+    if (lengthA + lengthB < sizeof line) {
+        std::memcpy(line, a, lengthA);
+        std::memcpy(line + lengthA, b, lengthB);
+        line[lengthA + lengthB] = '\n';
+        (void)_write(fd, line, static_cast<unsigned>(lengthA + lengthB + 1));
+    } else {
+        (void)_write(fd, a, static_cast<unsigned>(lengthA));
+        (void)_write(fd, b, static_cast<unsigned>(lengthB));
+        (void)_write(fd, "\n", 1);
+    }
+#else
     char newline = '\n';
     iovec parts[3] = {{const_cast<char*>(a), std::strlen(a)}, {const_cast<char*>(b), std::strlen(b)}, {&newline, 1}};
     // One writev on a descriptor opened for appending: lines from two threads do not interleave. A short write (a full
     // disk) is left as it is.
     while (writev(fd, parts, 3) < 0 && errno == EINTR) {
     }
+#endif
 }
 
 inline void LogRaw(const char* line) {
