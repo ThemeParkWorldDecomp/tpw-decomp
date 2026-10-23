@@ -171,16 +171,20 @@ void RemoveEntryPricePanel() { UI_SendMessage(gParkScreenWindow, 4, 0, 0); }
 // ShowEditParkNamePanel 0x1019deac (904 bytes) and TwoEditsMsg 0x1019da6c (1,032 bytes), unit v5057 (ui_entryPricePanel.cpp on the Mac):
 // the panel with two edit boxes for the two sign names of the "gates" thing (the park's name), and its message function.
 
-// ---- the unit's own globals (the data is the Mac's; the strings the two cheat pointers lead to are not recovered)
+// ---- the unit's own globals (the data is the Mac's; the strings the two cheat pointers lead to are recovered, see kCheatPool)
 InterfaceWindow* gEditParkNamePanel;      // 0x1039483c
 InterfaceWindow* gParkScreenWindow;       // 0x10394848
 int16_t gEditParkNameScript[] = {TPW_WINDOW_SCRIPT_102A9834};   // 0x102a9834: the image's words (generated, devtools/gen_game_tables.py)
 char16_t gEditSignBufA[15];               // 0x10394782
 char16_t gEditSignBufB[15];               // 0x10394764
-static const char16_t kCheatTextA[] = u"";
-static const char16_t kCheatTextB[] = u"";
-const char16_t* gCheatSignA = kCheatTextA;   // 0x102a9940
-const char16_t* gCheatSignB = kCheatTextB;   // 0x102a9944
+// The Mac's string pool at 0x1024e068 (UTF-16, plain ASCII), recovered from the 2.04b3 program image: the two cheat texts and,
+// 0x2a bytes past the first, the string __sinit_ui_entryPricePanel_cpp copies. TwoEditsMsg XORs each typed character with its
+// position before it compares, so the texts are kept in that scrambled form. Offsets in char16_t: text A at +0 (9 characters
+// and the terminator, 0x14 bytes), text B at +0xa (0x14 bytes on), the third string at +0x15 (0x2a bytes).
+static const char16_t kCheatPool[] = u"Kdtjj%rom\0Cnqnmf&Dg~\0gms.dat";
+static_assert(sizeof(kCheatPool) / sizeof(char16_t) == 0x15 + 8, "text B at +0xa, the third string at +0x15 (0x2a bytes), 7 characters and the terminator");
+const char16_t* gCheatSignA = kCheatPool;         // 0x102a9940 (initial 0x1024e068)
+const char16_t* gCheatSignB = kCheatPool + 0xa;   // 0x102a9944 (initial 0x1024e07c)
 
 // The Mac's string pool at 0x1024e01c: the assert text, and 0x43 bytes on the name of the draw object of the cursor.
 static char kPoolStrings[] = "Thing has been allocated in ThingArray index 0 - shouldn't happen\n\0hilight";
@@ -288,7 +292,7 @@ void ShowEditParkNamePanel() {
     panel->GetWindow(0x3943c)->CaptureKb(0);
 }
 
-// 0x1019e260 (64 bytes): builds the global string from the text 0x2a bytes into the cheat text.
+// 0x1019e260 (64 bytes): builds the global string from the text 0x2a bytes into the cheat text (the third string of kCheatPool).
 void __sinit_ui_entryPricePanel_cpp() {
     TbDynamicStringTemplate<char16_t>* string = reinterpret_cast<TbDynamicStringTemplate<char16_t>*>(gEntryPriceStringStorage);
     new (string) TbDynamicStringTemplate<char16_t>(
