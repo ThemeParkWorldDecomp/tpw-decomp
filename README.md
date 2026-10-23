@@ -14,18 +14,24 @@ Progress: 9184 functions translated and tested (100.00% of the five programs' fu
 
 This is a reference: there is no launcher, no platform layer and no fix of the game's bugs here. The playable port, which
 builds this repository as a submodule and lists every deliberate change it makes, is
-[tpw-port](https://github.com/ThemeParkWorldDecomp/tpw-port). To play, clone it and run `make` in it (Apple Silicon Macs; its README's Quick start).
+[tpw-port](https://github.com/ThemeParkWorldDecomp/tpw-port). To play, follow its README's Quick start (Macs and Windows PCs).
 
 ## Contributing
 
-This repository takes no pull requests and no changes of any kind. It is a pure translation of the Mac program and it stays
-that way. A function here changes only when the differential tests show that its translation differs from the Mac, and the
-maintainers make that change from their private working tree, from which both public repositories are exported.
+The project is three repositories, and every change belongs in exactly one of them:
 
-Contributions of every kind (port work, bug fixes, other systems such as Windows or Linux, build changes, tools) go to
-[tpw-port](https://github.com/ThemeParkWorldDecomp/tpw-port). A changed game source file is a whole-file copy under its overrides/ at the same path, with a
-row in its FIXES.md saying what the Mac does, what the port does and why. A pull request opened here is closed with a
-pointer to tpw-port.
+| Repository | What it holds | Pull requests |
+| --- | --- | --- |
+| [tpw-decomp](https://github.com/ThemeParkWorldDecomp/tpw-decomp) | The translation: the Mac program's own functions in C++, each behaving exactly as the Mac build does, bugs included, with the differential tests that check it. | None. A function that behaves differently from the Mac is reported as an issue on tpw-port. |
+| [tpw-port](https://github.com/ThemeParkWorldDecomp/tpw-port) | The original game on today's Macs and Windows PCs: the launcher, the platform layer, the builds, and the fixes that make it run as it did on the Mac. | Welcome, by its CONTRIBUTING.md. |
+| [tpw-mods](https://github.com/ThemeParkWorldDecomp/tpw-mods) | Optional changes to how the game plays, each one off until the player turns it on. tpw-port carries it as a submodule at mods/. | Welcome, by its CONTRIBUTING.md. |
+
+The test for where a change goes: does a park play the same with it on and with it off? If it does, the change belongs in
+tpw-port. If it changes the rules, the money, the visitors, the staff, the rides, the advisor, the game's content, what a
+control does or the save files, it belongs in tpw-mods, even as a setting that is off by default.
+
+This repository takes no pull requests and no changes of any kind; its CONTRIBUTING.md says where each kind of change
+goes.
 
 ## Nothing from the game
 
@@ -106,7 +112,7 @@ what the game computes:
 
 ## See also
 
-- [tpw-port](https://github.com/ThemeParkWorldDecomp/tpw-port): the playable port (launcher, platform layer, the port's fixes in its FIXES.md), and the
-  place for every contribution.
+- [tpw-port](https://github.com/ThemeParkWorldDecomp/tpw-port): the playable port (launcher, platform layer, the port's fixes in its FIXES.md).
+- [tpw-mods](https://github.com/ThemeParkWorldDecomp/tpw-mods): optional changes to how the game plays.
 
 No license has been chosen yet.
