@@ -13,4 +13,6 @@ set(TPW_UNIT_UIMenu_AddItem_KEEP
   __ZN11menu_callee8RectDtorEPv   # menu_callee::RectDtor(void*)
   __ZN6UIMenu4InitEPFiP15InterfaceWindowiiiES3_   # UIMenu::Init(int (*)(InterfaceWindow*, int, int, int), int (*)(InterfaceWindow*, int, int, int))
   __ZN6UIMenu7AddItemEiPKDsiiiii   # UIMenu::AddItem(int, char16_t const*, int, int, int, int, int)
+  _gUIUnitHeight
+  __Z13UI_CentreDownPK15InterfaceWindow   # UI_CentreDown(InterfaceWindow const*)
 )

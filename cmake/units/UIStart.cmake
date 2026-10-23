@@ -100,6 +100,10 @@ set(TPW_UNIT_UIStart_KEEP
   _gUISliderName
   _gUIUnitWidth
   _gUIWideAspect
+  __Z16UI_InterfaceSizev   # UI_InterfaceSize()
+  _gUIInterfaceSizeOn
+  _gUIScale
+  _gUIUnitHeight
 )
 # The unit file includes calllog.cpp itself.
 set(TPW_UNIT_UIStart_OWN_CALLLOG ON)

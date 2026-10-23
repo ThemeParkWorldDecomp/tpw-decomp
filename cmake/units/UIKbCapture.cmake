@@ -68,4 +68,11 @@ set(TPW_UNIT_UIKbCapture_KEEP
   _gUIScriptPosition
   _gUIUnitWidth
   _gUIWideAspect
+  __Z16UI_InterfaceSizev   # UI_InterfaceSize()
+  _gUIInterfaceSizeOn
+  _gUIScale
+  _gUIUnitHeight
+  __Z12UI_TallShiftPK15InterfaceWindow   # UI_TallShift(InterfaceWindow const*)
+  __Z15UI_TallShiftForPK15InterfaceWindowb   # UI_TallShiftFor(InterfaceWindow const*, bool)
+  __Z15UI_IsWideWindowPK15InterfaceWindow   # UI_IsWideWindow(InterfaceWindow const*)
 )

@@ -153,6 +153,13 @@ set(TPW_UNIT_UIInit_KEEP
   _gUIWideAspect
   __ZN12_GLOBAL__N_111gWideShiftsE   # gWideShifts (static object)
   __ZN12_GLOBAL__N_113sUILightSetupE   # sUILightSetup (static object)
+  __Z16UI_InterfaceSizev   # UI_InterfaceSize()
+  _gUIInterfaceSizeOn
+  _gUIScale
+  _gUIUnitHeight
+  __Z12UI_TallShiftPK15InterfaceWindow   # UI_TallShift(InterfaceWindow const*)
+  __Z15UI_TallShiftForPK15InterfaceWindowb   # UI_TallShiftFor(InterfaceWindow const*, bool)
+  __Z19UI_UseInterfaceSizeb   # UI_UseInterfaceSize(bool)
 )
 # The unit file includes calllog.cpp itself.
 set(TPW_UNIT_UIInit_OWN_CALLLOG ON)

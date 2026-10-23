@@ -45,4 +45,8 @@ set(TPW_UNIT_LobbyLeaves_KEEP
   _gUIRealScreenWidth
   _gUIUnitWidth
   _gUIWideAspect
+  __Z16UI_InterfaceSizev   # UI_InterfaceSize()
+  _gUIInterfaceSizeOn
+  _gUIScale
+  _gUIUnitHeight
 )

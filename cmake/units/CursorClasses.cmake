@@ -128,4 +128,10 @@ set(TPW_UNIT_CursorClasses_KEEP
   _gUIUnitWidth
   _gUIWideAspect
   __ZN12_GLOBAL__N_113sUILightSetupE   # sUILightSetup (static object)
+  __Z16UI_InterfaceSizev   # UI_InterfaceSize()
+  _gUIInterfaceSizeOn
+  _gUIScale
+  _gUIUnitHeight
+  __Z19UI_UseInterfaceSizeb   # UI_UseInterfaceSize(bool)
+  _gUIRootWindow
 )

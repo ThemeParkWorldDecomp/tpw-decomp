@@ -119,4 +119,8 @@ set(TPW_UNIT_LobbyLeaves2_KEEP
   _gUISliderName
   _gUIUnitWidth
   _gUIWideAspect
+  __Z16UI_InterfaceSizev   # UI_InterfaceSize()
+  _gUIInterfaceSizeOn
+  _gUIScale
+  _gUIUnitHeight
 )

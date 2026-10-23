@@ -79,5 +79,10 @@ set(TPW_UNIT_GameUIInit_KEEP
   _gUISelectedThing
   _gUIUnitWidth
   _gUIWideAspect
+  __Z16UI_InterfaceSizev   # UI_InterfaceSize()
+  _gUIInterfaceSizeOn
+  _gUIScale
+  _gUIUnitHeight
+  __Z19UI_UseInterfaceSizeb   # UI_UseInterfaceSize(bool)
 )
 set(TPW_UNIT_GameUIInit_OWN_CALLLOG ON)
