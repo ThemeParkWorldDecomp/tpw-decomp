@@ -9,6 +9,11 @@ which answers from the queue "GetMode".
 The world of a case: gMouse (NULL or a persistent pre-existing mouse), gMouseMode (NULL or a persistent object with a vtable), the two
 mouse words with random values. Compared: the event log, the two words, and gMouse as NULL / the pre-existing one / a new object.
 
+With the port fixes on (unit coaster64; the port fix in CoasterPanelEndTrack, src/game/ui/ui_coasterPanel.cpp), the translation allocates the
+mouse, the default mode and the coaster mode with sizeof each where the Mac asks for 1, 8 and 8. That one difference is mapped back: a host
+allocation of exactly the sizeof the unit reports for the object it is made for (the constructor event after it names the object, none the
+mouse) is logged as the Mac's size. Everything else is compared as with the fixes off.
+
 No fused operations. Not tested: nothing skipped.
 """
 import ctypes as C
@@ -132,7 +137,8 @@ class Host(Side):
         C.memmove(a, data, len(data))
 
     def log(self):
-        return CL.host_end(self.lib)
+        log = CL.host_end(self.lib)
+        return mac_sizes(self.lib, log) if self.lib.port_fix else log
 
     def set_ptrs(self, mouse, mode):
         self.lib.tpw_cpet_set(mouse, mode)
@@ -153,10 +159,30 @@ def bind(lib):
     lib.tpw_cpet_get_gmouse.restype, lib.tpw_cpet_get_gmouse.argtypes = C.c_uint64, []
     lib.tpw_cpet_run.restype, lib.tpw_cpet_run.argtypes = None, []
     lib.tpw_cpet_layout.argtypes = [C.POINTER(C.c_int64)]
+    lib.tpw_cpet_portfix.restype, lib.tpw_cpet_portfix.argtypes = C.c_int32, []
+    lib.tpw_cpet_new_sizes.argtypes = [C.POINTER(C.c_int64)]
     out = (C.c_int64 * 32)()
     n = lib.tpw_cpet_layout(out)
     assert list(out)[:n] == HOST_LAYOUT
+    lib.port_fix = lib.tpw_cpet_portfix() == 1
+    n = lib.tpw_cpet_new_sizes(out)
+    mouse, default, coaster = list(out)[:n]
+    # the object an allocation is for (the name of the constructor event after it, None the mouse): (the host's sizeof, the Mac's size)
+    lib.new_sizes = {None: (mouse, 1), "CMMDefault": (default, 8), "CMMCoaster": (coaster, 8)}
     lib.bound = True
+
+
+def mac_sizes(lib, log):
+    """The host log with the port fixes' allocation sizes (sizeof the object) turned back into the Mac's."""
+    out = list(log)
+    for i, (name, ints, texts) in enumerate(out):
+        if name != "new":
+            continue
+        after = out[i + 1][0] if i + 1 < len(out) and out[i + 1][0] in lib.new_sizes else None
+        host_size, mac_size = lib.new_sizes[after]
+        if ints == (host_size,):
+            out[i] = (name, (mac_size,), texts)
+    return out
 
 
 def run(s, case):

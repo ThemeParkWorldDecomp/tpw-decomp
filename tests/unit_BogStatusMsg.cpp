@@ -140,4 +140,17 @@ uint32_t tpw_bog_sinit_table() { return tpw::ArenaOffset(BogStatusPanelTable());
 void tpw_bog_place() { CoasterPlaceMouseMode(); }
 void tpw_bog_which(uint32_t mask) { WhichCheckButtonsAreDown(mask); }
 
+// 1 when the unit is built with the port fixes on (unit coaster64): CoasterPlaceMouseMode then allocates the path drawing mode, the
+// mouse and the default mode with these sizes instead of the Mac's 0x14, 1 and 8.
+int32_t tpw_bog_portfix() {
+    return 0;
+}
+int32_t tpw_bog_new_sizes(int64_t* out) {
+    int32_t n = 0;
+    out[n++] = static_cast<int64_t>(sizeof(CMMPathDraw));
+    out[n++] = static_cast<int64_t>(sizeof(CMouse));
+    out[n++] = static_cast<int64_t>(sizeof(CMMDefault));
+    return n;
+}
+
 }  // extern "C"

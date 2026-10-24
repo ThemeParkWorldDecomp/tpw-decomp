@@ -18,7 +18,9 @@ Download. A case is one call on a page (bytes per pixel and pitch), an entry (fl
 length), its image (16-bit pixels, up to 300 x 300) and the shared upload buffer (256 x 256 pixels, filled
 with a pattern so that clearing shows), at a place (x, y) of the page. The upload buffer, the entry's flags
 and the log are compared. The original writes each pixel as one big-endian word and the translation as four
-bytes, so the buffer holds the same bytes.
+bytes, so the buffer holds the same bytes. Built with the port fixes (unit texnibble), the translation fills both
+halves of each byte it writes with the channel's nibble: each byte the original wrote (its low nibble 0) is then
+expected as b | b >> 4, and each byte it left alone as it was (DownloadTest).
 
 The destructor. The original destructor restores the vtable pointers, runs the base destructor when its flag
 is not zero and frees the block when the flag is positive. The host compiler does the same for a plain
@@ -405,6 +407,39 @@ def random_download(r):
         x, y, bpp, pitch = 0, 0, 4, 1024
         cw, ch = min(cw, 64), min(ch, 64)
     return download_case(r, w, h, cw, ch, flags, flip=r.randrange(2), stride=stride, x=x, y=y, page=page, bpp=bpp, pitch=pitch)
+
+
+def port_fix(lib):
+    if not hasattr(lib, "port_fix"):
+        lib.tpw_fs_portfix.restype, lib.tpw_fs_portfix.argtypes = C.c_int32, []
+        lib.port_fix = lib.tpw_fs_portfix() == 1
+    return lib.port_fix
+
+
+# A buffer byte whose low nibble is 0 (0 aside) with its low bit set, so that no byte the original leaves alone looks
+# like one it wrote; and a written byte as the port's StorePixel writes it, the nibble in both halves.
+SET_LOW = bytes(b | 1 if b & 0x0F == 0 and b else b for b in range(256))
+NIBBLE_BOTH = bytes(b | b >> 4 for b in range(256))
+
+
+class DownloadTest(FnTest):
+    """FnTest, with the port's StorePixel when the unit is built with the port fixes (unit texnibble): the case's
+    buffer has no byte with a low nibble of 0 but 0 (SET_LOW, on both sides), so a byte the original changed is one it
+    wrote, expected as NIBBLE_BOTH has it, and a byte it did not change is expected as it was (a 0 it wrote is 0 on
+    both counts). The comparison stays exact."""
+
+    def run_case(self, runner, case):
+        if not port_fix(runner.lib):
+            return FnTest.run_case(self, runner, case)
+        before = case["buffer"].translate(SET_LOW)
+        case = dict(case, buffer=before)
+        runner.emu.reset_scratch()
+        try:
+            p = self.ppc(runner.emu, case)
+        except ppcemu.ImportCalled as ex:
+            return [f"PPC side called unstubbed import {ex}"]
+        p["buffer"] = bytes(b if b == old else NIBBLE_BOTH[b] for b, old in zip(p["buffer"], before))
+        return T.same_values(p, self.host(runner.lib, case), "", self.exact_nan)
 
 
 # ================================================================= the destructor
@@ -1460,7 +1495,7 @@ def random_lightning(r):
 
 
 TESTS = [
-    FnTest("COpenGLTexture::Download", download_ppc, download_host, edge=edge_download, rnd=random_download),
+    DownloadTest("COpenGLTexture::Download", download_ppc, download_host, edge=edge_download, rnd=random_download),
     FnTest("COpenGLDrawPrimitive::~COpenGLDrawPrimitive", destroy_ppc, destroy_host, edge=edge_destroy, rnd=random_destroy),
     FnTest("CTextureCache::Entry_Specific_Compress", cache_ppc, cache_host, edge=edge_esc, rnd=random_esc),
     FnTest("CTextureCache::BalanceCache_ClearTexture", cache_ppc, cache_host, edge=edge_clear, rnd=random_clear),

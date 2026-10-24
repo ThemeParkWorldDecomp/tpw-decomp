@@ -12,6 +12,10 @@ for the other brace's height table. What is compared: the answer, the out float 
 
 Fused operations: fmadds in both functions; HardwareRounding is aimed at them. Not tested: GetNewBraceLoftInterval with the other brace NULL
 in the branch that reads it (the original then uses its caller's f31, a register the test cannot fix).
+
+With the port fixes on (unit coaster64), GetNewBraceLoftInterval reads the ride set's embedded records through sEmbeddedSet (the port fix
+in GetNewBraceLoftInterval, src/game/rides/CoasterPylon.cpp): the host world writes the records' table, the record and its block where
+sEmbeddedSet and sEmbeddedRecord keep them, and the other brace's loft at mL50, from the library's layout.
 """
 import ctypes as C
 import random
@@ -42,10 +46,12 @@ TEXTS = {0x1023CF10: 0, 0x1023CF4D: 1, 0x1023CF8E: 2, 0x1023CFE5: 3, 0x1023D019:
 
 LAYOUT_NAMES = ["pyl_control", "pyl_x", "pyl_y", "pyl_z", "pyl_other", "pyl_count", "pyl_braces", "ctl_id", "ctl_f2c", "ctl_f68",
                 "ctl_f6c", "ctl_fc4", "br_flags", "br_data", "br_w70", "br_size", "dat_flags", "dat_control", "dat_size", "set_heads",
-                "mesh_f28", "inst_f118", "ctl_size", "set_size", "mesh_size", "inst_size"]
+                "mesh_f28", "inst_f118", "ctl_size", "set_size", "mesh_size", "inst_size", "br_l50", "emb_records", "rec_size",
+                "rec_block"]
 MAC = dict(pyl_control=0x18, pyl_x=0x1C, pyl_y=0x20, pyl_z=0x24, pyl_other=0x2C, pyl_count=0x30, pyl_braces=0x34, ctl_id=0x0C,
            ctl_f2c=0x2C, ctl_f68=0x68, ctl_f6c=0x6C, ctl_fc4=0xC4, br_flags=8, br_data=0x100, br_w70=0x70, br_size=0, dat_flags=4,
-           dat_control=0x18, dat_size=0, set_heads=8, mesh_f28=0x28, inst_f118=0x118, ctl_size=0, set_size=0, mesh_size=0, inst_size=0)
+           dat_control=0x18, dat_size=0, set_heads=8, mesh_f28=0x28, inst_f118=0x118, ctl_size=0, set_size=0, mesh_size=0, inst_size=0, br_l50=0x50,
+           emb_records=4, rec_size=0x14, rec_block=4)
 
 
 def fb(x):
@@ -287,14 +293,14 @@ def build_g(s, case):
     if ot is not None:
         ctrl_o = build_control(s, {"id": 9, "f2c": ot["f2c"]})
         other = build_brace(s, 0x33, 0x44, 0, build_data(s, ot["dflags"], ctrl_o), ot["w70"])
-        s.words(other + 0x50, [ot["f50"]])
+        s.words(other + o["br_l50"], [ot["f50"]])
         entry = s.blk()
         s.words(entry + 0x34, [ot["f34"]])
         table = s.blk()
         if not ot["slot_null"]:
-            s.ptr(table + ot["f2c"] * 0x14 + 4, entry)
+            s.ptr(table + ot["f2c"] * o["rec_size"] + o["rec_block"], entry)
         holder = s.blk()
-        s.ptr(holder + 4, table)
+        s.ptr(holder + o["emb_records"], table)
         mesh = s.blk("mesh_size")
         s.ptr(mesh + o["mesh_f28"], holder)
         rset = s.blk("set_size")

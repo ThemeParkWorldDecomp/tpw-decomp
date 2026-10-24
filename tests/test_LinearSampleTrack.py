@@ -18,13 +18,23 @@ every control's place, every brace's sample, and the event log.
 Fused operations (fmadd, fmadds) and fctiwz: HardwareRounding on the function. Not tested: a first control with no second brace (the
 original then runs on registers nothing sets); a negative track length (the sampling may never end); the Decrement branch is reached only
 when the t falls below 0, which needs such a length.
+
+With the port fixes on (unit coaster64), the translation keeps no previous control (the Mac's word 0x14 of a control): Link14 works it
+out from the control's brace (mBrace) and its place, as SetupBraceBezierCtrlParams links them (the port fixes in
+SetupBraceBezierCtrlParams and Link14, src/game/rides/CoasterTrack.cpp). A case's world then gives every control the previous control
+SetupBraceBezierCtrlParams links (the one before it in its array, or for the first the last of the same array of the next brace, none for
+the last brace) and every brace its next, on both sides (linked); and a control whose previous control the original reads (a sample's t
+below 0) has its own brace, found by running the original first (LinearSampleTest). The other controls keep the case's brace, and the
+comparison stays exact. The fake Increment walks a brace's controls past its spline's count (the real one moves to the next brace), and
+Link14 takes a control past the count in the first array for one of the second: the host world holds a brace's two arrays in one block,
+the second first, so that Link14 answers the control before it there too, as the linked case has it.
 """
 import ctypes as C
 import math
 import random
 import struct
 
-from unicorn import UC_HOOK_CODE
+from unicorn import UC_HOOK_CODE, UC_HOOK_MEM_READ
 
 import calllog as CL
 import tpwtest as T
@@ -46,7 +56,8 @@ ADDR = dict(data=0x102B68A4)
 MAC = dict([
     ("inst.blk", 0x3C), ("inst.last", 0x54), ("inst.cap", 0x98), ("inst.samples", 0x9C), ("inst.a0", 0xA0), ("inst.count", 0xA4),
     ("inst.len", 0xA8), ("inst.fac", 0xAC), ("inst.size", 0x150),
-    ("brace.flags", 0x08), ("brace.prev", 0x64), ("brace.f90", 0x90), ("brace.f74", 0x74), ("brace.sample", 0xFC), ("brace.size", 0x108),
+    ("brace.flags", 0x08), ("brace.prev", 0x64), ("brace.f90", 0x90), ("brace.f74", 0x74), ("brace.sample", 0xFC), ("brace.next", 0x68),
+    ("brace.size", 0x108),
     ("spl.count", 0), ("spl.A", 4), ("spl.B", 8), ("spl.size", 0xC),
     ("ctl.f08", 0x08), ("ctl.brace", 0x10), ("ctl.p14", 0x14), ("ctl.next", 0x18), ("ctl.size", 0x58), ("ctl.f40", 0x40),
     ("smp.pos", 4), ("smp.yaw", 0x10), ("smp.pitch", 0x14), ("smp.bank", 0x18), ("smp.ca", 0x2C), ("smp.cb", 0x30), ("smp.t", 0x34),
@@ -239,10 +250,11 @@ class Ppc(Side):
     fmt, pfmt, pw = ">I", ">I", 4
     O = MAC
 
-    def __init__(self, e, case):
+    def __init__(self, e, case, watch=None):
         self.e = e
         self.case = case
         self.saved = None
+        self.watch = watch
 
     def start(self, labels):
         self.L = self.e.cl = CL.PpcLog({a: l for l, a in labels.items()}, self.case["queues"])
@@ -268,8 +280,25 @@ class Ppc(Side):
         return self.L.log
 
     def call(self, inst):
-        with ROUNDING(self.e):
-            T.call_ppc(self.e, FN, [inst & MASK])
+        hooks = []
+        if self.watch is not None:
+            for i, arrays in enumerate(self.ctls):
+                for arr, base in enumerate(arrays):
+                    end = base + NCTL * 0x58 - 1
+                    hooks.append(self.e.uc.hook_add(UC_HOOK_MEM_READ, self.read_link, (i, arr, base), begin=base, end=end))
+        try:
+            with ROUNDING(self.e):
+                T.call_ppc(self.e, FN, [inst & MASK])
+        finally:
+            for h in hooks:
+                self.e.uc.hook_del(h)
+
+    def read_link(self, uc, access, addr, size, value, where):
+        """Notes (brace, array, control) when the original reads a control's previous control (its word 0x14)."""
+        i, arr, base = where
+        j, offset = divmod(addr - base, 0x58)
+        if 0x14 <= offset < 0x18:
+            self.watch.add((i, arr, j))
 
 
 class Host(Side):
@@ -314,6 +343,8 @@ def bind(lib):
     lib.tpw_lst_alloc.restype, lib.tpw_lst_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_lst_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_lst_run.restype, lib.tpw_lst_run.argtypes = None, [C.c_uint64]
+    lib.tpw_lst_portfix.restype, lib.tpw_lst_portfix.argtypes = C.c_int32, []
+    lib.port_fix = lib.tpw_lst_portfix() == 1
     out = (C.c_int64 * 64)()
     n = lib.tpw_lst_layout(out)
     assert n == len(KEYS), n
@@ -341,7 +372,12 @@ def build(s, case):
     for i in range(nb):
         braces.append(s.alloc(O["brace.size"]))
         labels[10 + i] = braces[i]
-        ctls.append([s.alloc(NCTL * 0x58), s.alloc(NCTL * 0x58)])
+        if O["ctl.p14"] < 0:
+            # The port fixes: the two arrays in one block, the second first (the module's docstring).
+            both = s.alloc(2 * NCTL * 0x58)
+            ctls.append([both + NCTL * 0x58, both])
+        else:
+            ctls.append([s.alloc(NCTL * 0x58), s.alloc(NCTL * 0x58)])
         for arr in range(2):
             for j in range(NCTL):
                 labels[100 + i * 20 + arr * 8 + j] = ctls[i][arr] + j * 0x58
@@ -354,6 +390,8 @@ def build(s, case):
         s.wptr(sp + O["spl.B"], ctls[i][1])
         s.wptr(b + O["brace.f90"], sp)
         s.wptr(b + O["brace.prev"], braces[i - 1] if i else 0)
+        if "links" in case:
+            s.wptr(b + O["brace.next"], braces[i + 1] if i + 1 < nb else 0)
         s.w32(b + O["brace.flags"], case["flags"][i])
         s.w32(b + O["brace.sample"], case["sample0"][i])
         if case["f74"][i] is not None:
@@ -366,7 +404,13 @@ def build(s, case):
                 f08, brn, p14, f40 = case["ctl"][i][arr][j]
                 s.w32(c + O["ctl.f08"], f08)
                 s.wptr(c + O["ctl.brace"], braces[brn])
-                s.wptr(c + O["ctl.p14"], ctls[i][arr] + p14 * 0x58 if p14 >= 0 else 0)
+                if "links" in case:
+                    # The port fixes keep no previous control on the host (ctl.p14 is -1 there; the module's docstring).
+                    link = case["links"][i][arr][j]
+                    if O["ctl.p14"] >= 0:
+                        s.wptr(c + O["ctl.p14"], ctls[link[0]][arr] + link[1] * 0x58 if link else 0)
+                else:
+                    s.wptr(c + O["ctl.p14"], ctls[i][arr] + p14 * 0x58 if p14 >= 0 else 0)
                 s.wptr(c + O["ctl.next"], c + 0x58 if j + 1 < NCTL else 0)
                 for k in range(3):
                     s.w32(c + O["ctl.f40"] + 4 * k, f40[k])
@@ -515,6 +559,45 @@ def rnd(r):
     return make_case(r)
 
 
+def linked(case):
+    """The case with every control's previous control as SetupBraceBezierCtrlParams links it (brace, index; None for none) and every
+    brace's next (port fixes on; the module's docstring)."""
+    nb, counts = case["nb"], case["counts"]
+    links = [[[(i, j - 1) if j else ((i + 1, counts[i + 1] - 1) if i + 1 < nb else None) for j in range(NCTL)] for arr in range(2)]
+             for i in range(nb)]
+    return dict(case, links=links)
+
+
+def read_links(e, case):
+    """The controls (brace, array, index) whose previous control the original reads in the case."""
+    e.reset_scratch()
+    s = Ppc(e, case, set())
+    run(s, case)
+    return s.watch
+
+
+class LinearSampleTest(FnTest):
+    """FnTest, with the case linked when the unit is built with the port fixes (unit coaster64): the original runs first to find the
+    controls whose previous control it reads, and those get their own brace, until no other is read. The comparison stays exact."""
+
+    def run_case(self, runner, case):
+        bind(runner.lib)
+        if not runner.lib.port_fix:
+            return FnTest.run_case(self, runner, case)
+        case = linked(case)
+        for _ in range(8):
+            read = read_links(runner.emu, case)
+            foreign = sorted(x for x in read if case["ctl"][x[0]][x[1]][x[2]][1] != x[0])
+            if not foreign:
+                return FnTest.run_case(self, runner, case)
+            ctl = [[list(row) for row in per] for per in case["ctl"]]
+            for i, arr, j in foreign:
+                f08, _, p14, f40 = ctl[i][arr][j]
+                ctl[i][arr][j] = (f08, i, p14, f40)
+            case = dict(case, ctl=ctl)
+        return ["the controls whose previous control the original reads did not settle"]
+
+
 TESTS = [
-    FnTest("LinearSampleTrack", ppc, host, edge=edges, rnd=rnd),
+    LinearSampleTest("LinearSampleTrack", ppc, host, edge=edges, rnd=rnd),
 ]

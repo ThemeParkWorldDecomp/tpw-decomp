@@ -13,6 +13,11 @@ What is compared: every word of the brace the function may write (flags, +0x0c t
 
 Fused operations: fmadds, fmsubs and fmadd are hooked with HardwareRounding. Not tested: a NULL pylon data pointer on the brace (the original
 reads it unconditionally), a NULL neighbour pylon data when it is reached.
+
+With the port fixes on (unit coaster64), the translation reads the params' word 0x18 as mLastBrace and the type's words 0, 8 and 0x0c as
+tag_sCoasterType's mFlags, mF08 and mF0C (the port fix in GetRequiredBraceTangents), and the brace keeps its position at the Mac's
+0x4c (the port fix in tag_sTrackBrace): the host world writes them where the library's layout puts them (the type's word 4, which
+neither side reads, has no place there).
 """
 import ctypes as C
 import math
@@ -37,7 +42,7 @@ NORMALISE = 0x10045A38
 FPCLASSIFY = 0x10239268
 
 MAC = dict(flags=8, f0c=0x0c, x4c=0x4c, l50=0x50, z54=0x54, prev=0x64, next=0x68, data=0x100, f94=0x94, bsize=0x120,
-           dsize=0x40, f18=0x18, head=0x18, psize=0x40, tsize=0x20, psz=4)
+           dsize=0x40, f18=0x18, head=0x18, psize=0x40, tsize=0x20, t00=0, t04=4, t08=8, t0c=0x0c, psz=4)
 
 
 def fb(x):
@@ -185,7 +190,9 @@ def bind(lib):
     out = (C.c_int64 * 32)()
     n = lib.tpw_gbt_layout(out)
     v = list(out)[:n]
-    names = ["bsize", "flags", "f0c", "x4c", "l50", "z54", "prev", "next", "data", "f94", "dsize", "f18", "head", "psize", "tsize"]
+    names = ["bsize", "flags", "f0c", "x4c", "l50", "z54", "prev", "next", "data", "f94", "dsize", "f18", "head", "psize", "tsize", "t00",
+             "t04", "t08", "t0c"]
+    assert n == len(names), v
     O = dict(zip(names, v))
     assert O["flags"] == 8 and O["f0c"] == 0x0c, O
     O["psz"] = 8
@@ -221,7 +228,9 @@ def build_and_run(s, case):
     main = build_brace(s, case["main"])
     head = build_brace(s, case["head"])
     typ = s.alloc(s.O["tsize"] if s.O["tsize"] >= 0x20 else 0x20)
-    s.words(typ, case["type"])
+    for k, w in zip(("t00", "t04", "t08", "t0c"), case["type"]):
+        if s.O[k] >= 0:
+            s.words(typ + s.O[k], [w])
     params = s.alloc(s.O["psize"])
     s.ptr(params + s.O["head"], head)
     s.call(main, typ, params)

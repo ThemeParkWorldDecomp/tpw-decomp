@@ -111,9 +111,11 @@ int32_t CStaff::IsRestingInStaffRoom(tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint
     return static_cast<int32_t>(ret("IsResting"));
 }
 int32_t InterfaceListControl2::AddItem(UI_LCAdd* item, int32_t data, int32_t position, int32_t update) {
-    // the data word is the thing's address cut to 32 bits (a Mac long): match it against the case's thing
+    // the data word is the thing's address cut to 32 bits (a Mac long), or with the port's fixes its arena offset: match
+    // it against the case's thing
     void* thing = P(gObj[kThing]);
-    void* dataThing = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(thing)) == static_cast<uint32_t>(data) ? thing : P(static_cast<uint32_t>(data));
+    const uint32_t word = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(thing));
+    void* dataThing = word == static_cast<uint32_t>(data) ? thing : P(static_cast<uint32_t>(data));
     ev("AddItem", {lab(this), lab(const_cast<char16_t*>(item[0].mText)), item[1].mInt, lab(dataThing), position, update});
     return 0;
 }

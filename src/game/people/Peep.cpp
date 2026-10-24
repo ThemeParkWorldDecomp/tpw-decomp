@@ -137,6 +137,7 @@ uint8_t* PeepBytes(CPeep* peep) { return reinterpret_cast<uint8_t*>(peep); }
 // The Mac's int -> single conversion of the magic-number trick: the exact int, rounded to single.
 float IntToSingle(int32_t value) { return static_cast<float>(static_cast<double>(value)); }
 
+
 }  // namespace
 
 // Declared before its first use: the definition is further down.

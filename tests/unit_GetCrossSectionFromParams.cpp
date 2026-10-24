@@ -1,6 +1,6 @@
 // Test library for GetCrossSectionFromParams (unit v5208; libtpw_unit_GetCrossSectionFromParams.dylib), main app:
 //   src/game/rides/CoasterExtrude.cpp
-// No callees and no globals.
+// No callees and no globals. With the port fixes on, tpw_gcs_a hands the function the case's table as the fix reads it (below).
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

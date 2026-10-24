@@ -193,6 +193,9 @@ int32_t tpw_LC_layout(int64_t* out) {
     O(tag_sRideAnimSet, mHeads);
     O(tag_sMesh, mHeader);
     O(tag_sM3D2Header, mF78);
+    // the brace's two brace infos (Mac 0x78 and 0x84), where LoadCoasters points the brace's mF90
+    out[n++] = static_cast<int64_t>(offsetof(tag_sTrackBrace, mF70) + (0x78 - 0x70));   // counted from mF70, as the Mac's from 0x70
+    out[n++] = static_cast<int64_t>(offsetof(tag_sTrackBrace, mF70) + (0x84 - 0x70));
 #undef O
     return n;
 }

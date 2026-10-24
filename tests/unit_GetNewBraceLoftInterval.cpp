@@ -134,6 +134,10 @@ int32_t tpw_lay_layout(int64_t* out) {
     out[n++] = sizeof(tag_sRideAnimSet);
     out[n++] = sizeof(tag_sMesh);
     out[n++] = sizeof(tag_sCoasterInstance);
+    out[n++] = offsetof(tag_sTrackBrace, mF0C) + 0x50 - 0x0c;
+    out[n++] = 4;
+    out[n++] = 0x14;
+    out[n++] = 4;
     return n;
 }
 

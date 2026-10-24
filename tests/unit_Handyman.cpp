@@ -377,4 +377,8 @@ void tpw_hm_totoilet(uint64_t block) { H(block)->ProcessWalkingToCleanToilet(); 
 void tpw_hm_cleantoilet(uint64_t block) { H(block)->ProcessCleaningToilet(); }
 uint32_t tpw_hm_find(uint64_t block) { return H(block)->FindNearestDirtyToilet().mIndex; }
 
+int32_t tpw_hm_walkfix() {
+    return 0;
+}
+
 }  // extern "C"

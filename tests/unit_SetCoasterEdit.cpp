@@ -87,6 +87,12 @@ int32_t tpw_sce_layout(int64_t* out) {
     return n;
 }
 
+// 1 when the unit is built with the port fixes on (unit coaster64): the brace mesh views then keep the host brace's and pylon record's places,
+// and an entry's mesh is the brace's 32-bit mWord70, which GetNthBraceMesh answers widened.
+int32_t tpw_sce_portfix() {
+    return 0;
+}
+
 void tpw_sce_set(uint64_t coaster, int32_t flag) { SetCoasterEdit(reinterpret_cast<void*>(static_cast<uintptr_t>(coaster)), flag); }
 
 uint64_t tpw_sce_pylon(uint32_t id, uint64_t out) {

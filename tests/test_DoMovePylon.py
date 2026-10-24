@@ -15,6 +15,12 @@ the marked braces and their chain, the recorder's recording word. What is compar
 the coaster's flags and the event log. Structure fields sit at the Mac's offsets on the PowerPC side and at the host's (taken from
 the library's layout export) on the host side; pointers are 4 bytes there and 8 here.
 
+With the port fixes on (unit coaster64), the pylon record has the host's layout (the port fix to sTrackBraceData in
+include/TPCoaster.h), and DoMovePylon compares the pylons' whole control pointers and their mInstance where the Mac compares the words 0x18
+and 0x14 (the port fix in DoMovePylon, src/game/rides/CoasterEdit.cpp). The host world then writes the case's two words, which
+stand for those two pointers, zero-extended into the pointers: two pylons are the same coaster's and control's on the host exactly when
+their words are equal on the Mac.
+
 No fused operations. Not tested: a marked second brace with no first one, and a chain of marked braces that does not reach the other
 mark (the original dereferences NULL there).
 """
@@ -52,11 +58,12 @@ REC_LABEL = 14
 LAB2NAME = {v[0]: k for k, v in BLK.items()}
 
 MAC = dict(b_flags=8, b_prev=0x64, b_next=0x68, b_w70=0x70, b_data=0x100, d_flags=4, d_x=0xC, d_z=0x10, d_f14=0x14, d_f18=0x18,
-           d_f30=0x30, d_owner=0x34, o_f70=0x70, i_b3c=0x3C, r_rec=0x24)
+           d_f30=0x30, d_owner=0x34, o_f70=0x70, i_b3c=0x3C, r_rec=0x24, portfix=0)
 LAYOUT_NAMES = ["b_flags", "b_prev", "b_next", "b_w70", "b_data", "d_flags", "d_x", "d_z", "d_f14", "d_f18", "d_f30", "d_owner", "o_f70",
-                "i_b3c", "r_rec"]
+                "i_b3c", "r_rec", "portfix"]
 HOST = {}
 HB = {}          # host blocks: name -> address
+HSIZE = {}       # host blocks: name -> size (the owner, a brace, holds its word further on with the port fixes)
 PB = {}          # PowerPC blocks: name -> address
 
 
@@ -208,6 +215,10 @@ class Side:
     def rd_word(self, a):
         return self.rd_words(a, 1)[0]
 
+    def wide(self, a, w):
+        """A word that stands for a pointer: a whole host pointer, zero-extended, when the pylon record holds one (the port fixes)."""
+        self.write(a, struct.pack(self.pfmt if self.O["portfix"] else self.fmt, w & MASK))
+
     def setptr(self, a, name):
         v = self.blocks[name] if name else 0
         self.write(a, struct.pack(self.pfmt, v))
@@ -231,6 +242,7 @@ class Ppc(Side):
     def __init__(self, e, case):
         self.e = e
         self.blocks = PB
+        self.sizes = {n: size for n, (lab, size) in BLK.items()}
         fixed = {a: BLK[n][0] for n, a in PB.items()}
         fixed[ADDR["rec"]] = REC_LABEL
         self.L = e.cl = CL.PpcLog(fixed, case["queues"])
@@ -270,6 +282,7 @@ class Host(Side):
         bind(lib)
         self.O = HOST
         self.blocks = HB
+        self.sizes = HSIZE
         fixed = {BLK[n][0]: a for n, a in HB.items()}
         fixed[REC_LABEL] = self.g("rec")
         CL.host_begin(lib, fixed, case["queues"])
@@ -310,9 +323,15 @@ def bind(lib):
     assert n == len(LAYOUT_NAMES), n
     HOST.update(dict(zip(LAYOUT_NAMES, list(out)[:n])))
     # what the Mac-offset-free parts of the layout must satisfy
-    assert HOST["b_flags"] == 8 and HOST["d_flags"] == 4 and HOST["d_x"] == 0xC and HOST["d_f30"] == 0x30 and HOST["i_b3c"] > 0x3C - 1
+    assert HOST["b_flags"] == 8 and HOST["d_flags"] == 4 and HOST["d_x"] == 0xC and HOST["i_b3c"] > 0x3C - 1
+    if HOST["portfix"]:
+        # the record's control and coaster are whole pointers, the brace count after them (the port fix to sTrackBraceData)
+        assert HOST["d_f18"] % 8 == 0 and HOST["d_f14"] % 8 == 0 and HOST["d_f30"] > HOST["d_f18"] + 8, list(out)[:n]
+    else:
+        assert HOST["d_f30"] == 0x30, list(out)[:n]
     for name, (lab, size) in BLK.items():
-        HB[name] = lib.tpw_dmp_alloc(size)
+        HSIZE[name] = max(size, HOST["o_f70"] + 4) if name == "owner" else size
+        HB[name] = lib.tpw_dmp_alloc(HSIZE[name])
         lib.tpw_dmp_setblock(lab, HB[name])
     lib.bound = True
 
@@ -326,8 +345,8 @@ def wr_pylon(s, name, d):
     s.words(a + O["d_flags"], [d["flags"]])
     s.words(a + O["d_x"], [d["x"]])
     s.words(a + O["d_z"], [d["z"]])
-    s.words(a + O["d_f14"], [d["f14"]])
-    s.words(a + O["d_f18"], [d["f18"]])
+    s.wide(a + O["d_f14"], d["f14"])
+    s.wide(a + O["d_f18"], d["f18"])
     s.words(a + O["d_f30"], [d["f30"]])
     s.setptr(a + O["d_owner"], "owner")
 
@@ -342,7 +361,7 @@ def wr_node(s, name, num, flags, prev):
 def build(s, case):
     B = s.blocks
     O = s.O
-    for name, (lab, size) in BLK.items():
+    for name, size in s.sizes.items():
         s.write(B[name], bytes(size))
     g = case["g"]
     for n in WORDS + FLOATS:

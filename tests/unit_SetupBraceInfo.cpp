@@ -56,7 +56,8 @@ uint64_t tpw_sbi_addr(const char* name) {
 
 uint64_t tpw_sbi_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
 
-// The host offsets of the fields the module writes by Mac offset, in the order of the module's FIELDS.
+// The host offsets of the fields the module writes by Mac offset, in the order of the module's FIELDS, then where the parameter block
+// sits in the object the module allocates for it and that object's size.
 int32_t tpw_sbi_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = offsetof(tag_sTrackBrace, mFlags);
@@ -86,6 +87,8 @@ int32_t tpw_sbi_layout(int64_t* out) {
     out[n++] = offsetof(sBraceControl, mCount);
     out[n++] = offsetof(sBraceControl, mBase);
     out[n++] = offsetof(sPylonControl, mRideType);
+    out[n++] = 0;
+    out[n++] = 0x400;
     return n;
 }
 

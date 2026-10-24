@@ -12,6 +12,10 @@ The world of a case: the input flags, a chain of braces (numbers rising along th
 table, the marks, the dragged brace, the costs, the recorder flag. What is compared: the log, the cost word, the marks and the flags of
 every brace.
 
+With the port fixes on (unit coaster64), the port fix in HandleMultiBracePreviewChange compares the pylon records' coaster at mInstance,
+and the ones in sTrackBraceData and sCoasterPylon put their other words where sPylonRecord keeps them: the host world writes the Mac's word
+0x14 as the low half of mInstance (the layout's data.mF14), the rest at the fix's offsets.
+
 No fused operations (the two fctiwz read values far below 2^31). Not tested: a NULL the original reads unconditionally (a held brace that
 is NULL while a brace was found, a missing next brace under flag 0x40).
 """

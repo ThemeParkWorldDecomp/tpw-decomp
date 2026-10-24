@@ -153,6 +153,7 @@ int32_t tpw_lst_layout(int64_t* out) {
     put(offsetof(tag_sTrackBrace, mF90));
     put(offsetof(tag_sTrackBrace, mF74));
     put(offsetof(tag_sTrackBrace, mSample));
+    put(offsetof(tag_sTrackBrace, mNext));
     put(sizeof(tag_sTrackBrace));
     put(offsetof(sBraceSpline, mCount));
     put(offsetof(sBraceSpline, mControlsA));
@@ -173,6 +174,11 @@ int32_t tpw_lst_layout(int64_t* out) {
     put(offsetof(sTrackSample, mF34));
     put(sizeof(sTrackSample));
     return n;
+}
+
+// 1 when the unit is built with the port fixes on (unit coaster64): Link14 then works a control's previous control out from its brace.
+int32_t tpw_lst_portfix() {
+    return 0;
 }
 
 void tpw_lst_run(uint64_t instance) { LinearSampleTrack(reinterpret_cast<tag_sCoasterInstance*>(static_cast<uintptr_t>(instance))); }

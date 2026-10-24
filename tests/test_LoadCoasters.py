@@ -13,7 +13,11 @@ SetTrainCapacity, ClearCoasterButtons and FlashEndPylons. The swaps run as the o
 The world of a case: the file bytes (cut short for the read failures), 1 to 3 coaster instances (list, type, brace chain, pylon list with braces
 and tables), a pool of braces PlacePylon answers, the ride sets' heights, the object table's counters, the action recorder's flag. What is compared:
 the answer, the event log, the counters, the globals, every instance word the function writes, every brace (flags, count, words, the pointers it
-writes as offsets inside their object).
+writes as offsets inside their object; the brace's spline pointer as the brace info it points at, the Mac's 0x78 or 0x84).
+
+With the port fixes on (unit coaster64), the brace infos are tag_sTrackBrace's mInfo78 and mInfo84 (the port fix in LoadCoasters):
+the layout export gives their host places, and the pylon node and pylon data offsets are those of the fix's sCoasterPylon and
+sTrackBraceData.
 
 No fused operations. Not tested: a record whose entrance matches no instance (the original reads address 0), brace word counts above 10 (the host
 brace array holds 11 words).
@@ -47,11 +51,11 @@ NAMES = ["i_flags", "i_type", "i_state", "i_entrance", "i_objid", "i_next", "i_f
          "i_prev60", "i_b64", "i_ff0", "i_trains", "i_f140", "i_size",
          "b_number", "b_flags", "b_prev", "b_fb0", "b_fb4", "b_f70", "b_f90", "b_f74", "b_data", "b_size",
          "y_flags", "y_control", "y_next", "y_count", "y_braces", "y_size",
-         "d_table", "d_size", "t_f2f4", "t_size", "rs_heads", "mesh_hdr", "hdr_f78"]
+         "d_table", "d_size", "t_f2f4", "t_size", "rs_heads", "mesh_hdr", "hdr_f78", "b_info78", "b_info84"]
 MAC = dict(zip(NAMES, [0, 4, 8, 0x10, 0x14, 0x18, 0x2C, 0x3C, 0x4C, 0x54, 0x58, 0x60, 0x64, 0xF0, 0xF4, 0x140, 0x14C,
                        0, 8, 0x64, 0xB0, 0xB4, 0x70, 0x90, 0x74, 0x100, 0x120,
                        4, 0x18, 0x28, 0x30, 0x34, 0x48,
-                       0x18, 0x40, 0x2F4, 0x360, 8, 4, 0x78]))
+                       0x18, 0x40, 0x2F4, 0x360, 8, 4, 0x78, 0x78, 0x84]))
 BIG = 0x400
 
 
@@ -442,7 +446,8 @@ def observe(s, case, answer):
         d["fb4"] = s.rd_slots(b + o["b_fb4"], 11)
         d["prev"] = lab_of(W, s.rd_ptr(b + o["b_prev"]))
         v = s.rd_ptr(b + o["b_f90"])
-        d["f90"] = 0 if v == 0 else v - b - o["b_f70"]
+        info = {o["b_info78"]: "info78", o["b_info84"]: "info84"}
+        d["f90"] = 0 if v == 0 else info.get(v - b, v - b - o["b_f70"])
         v = s.rd_ptr(b + o["b_f74"])
         d["f74"] = 0 if v == 0 else (v - table if table else ("raw", v))
         out["brace%d" % label] = d

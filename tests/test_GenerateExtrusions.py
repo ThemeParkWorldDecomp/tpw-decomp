@@ -12,6 +12,10 @@ transitions, the two section words), the transition records (each a length float
 steps, the orientation the spline gives, the cross section each step has). What is compared: the first 60 records of the table, the two
 static records, the orientation and the event log. The records and words that hold addresses are compared as record numbers.
 
+With the port fixes on (unit coaster64), the translation reads the type as tag_sCoasterType: the host world then holds the flags, the table
+(0x38-byte entries with record pointers), its count and the two section words where that type keeps them, and the GetCrossSectionFromParams
+fake answers the record pointer.
+
 One fused operation (fnmsubs) and fctiwz: the function's range runs under HardwareRounding. Not tested: NaN positions (fctiwz of NaN).
 """
 import ctypes as C
@@ -38,7 +42,8 @@ SIP, IEOS, ICS, GCS = 0x100509BC, 0x1004B050, 0x1004B0B0, 0x1004FD94
 ADDR = dict(cur=0x102B68A8, curdata=0x102B68A4, g0=0x1029CE70, g1=0x1029CE74, static=0x102B7650, buf=0x102B7674)
 
 MAC = dict(P=4, itype=4, f78=0x78, samples=0x9C, block=0x3C, isize=0x200, ssize=0x38, spiece=0x2C, cf08=8, cnext=0x18, csize=0x58,
-           rf14=0x14, rsize=0x20, esize=0x10, esec=0xC, ttable=0x78, tcount=0x7C, tsize=0x120, secB=0x80, secA=0x84)
+           rf14=0x14, rsize=0x20, esize=0x10, esec=0xC, ttable=0x78, tcount=0x7C, tsize=0x120, secB=0x80, secA=0x84, tflags=0x74,
+           tentry=0x2C, portfix=0)
 HOST = {}          # filled by bind from tpw_ge_layout
 NSAMPLES = 24
 FIRST = 8          # the sample number of the array's first element is -8
@@ -245,12 +250,15 @@ def bind(lib):
     n = getattr(lib, p + "layout")(out)
     v = list(out)[:n]
     names = ["itype", "f78", "samples", "block", "isize", "ssize", "spiece", "cf08", "cnext", "csize", "rf14", "rsize", "esize", "esec",
-             "ttable", "tcount", "tsize", "secB", "secA"]
+             "ttable", "tcount", "tsize", "secB", "secA", "tflags", "tentry", "portfix"]
     assert len(v) == len(names), v
     HOST.update(zip(names, v))
     HOST["P"] = 8
-    assert HOST["csize"] == 0x58 and HOST["esize"] == 24 and HOST["ttable"] == 0x78 and HOST["tcount"] == 0x80, v
-    assert HOST["secB"] == 0x88 and HOST["secA"] == 0x90, v
+    assert HOST["csize"] == 0x58 and HOST["esize"] == 24, v
+    if HOST["portfix"]:
+        assert HOST["tentry"] == 0x38, v
+    else:
+        assert HOST["ttable"] == 0x78 and HOST["tcount"] == 0x80 and HOST["secB"] == 0x88 and HOST["secA"] == 0x90, v
     assert HOST["isize"] >= HOST["samples"] + 8 and HOST["tsize"] >= 0x98, v
     HOST["tsize"] = max(HOST["tsize"], 0x120)
     lib.bound = True
@@ -279,11 +287,15 @@ def build(s, case):
     s.ptr(inst + O["itype"], typ)
     s.ptr(inst + O["samples"], arr + FIRST * O["ssize"])
     s.words(inst + O["f78"], case["orient"])
-    s.words(typ + 0x74, [case["flags"]])
+    s.words(typ + O["tflags"], [case["flags"]])
     entries = case["entries"]
-    table = s.alloc(0x2C * len(entries))
+    table = s.alloc(O["tentry"] * len(entries))
     for k, (w20, fr, to) in enumerate(entries):
-        s.words(table + 0x2C * k + 0x20, [s.word(recs[w20]), s.word(recs[fr]), s.word(recs[to])])
+        if O["portfix"]:
+            for i, x in enumerate((w20, fr, to)):
+                s.ptr(table + O["tentry"] * k + 0x20 + 8 * i, recs[x])
+        else:
+            s.words(table + O["tentry"] * k + 0x20, [s.word(recs[w20]), s.word(recs[fr]), s.word(recs[to])])
     s.ptr(typ + O["ttable"], table)
     s.words(typ + O["tcount"], [len(entries)])
     s.ptr(typ + O["secB"], recs[case["secB"]])

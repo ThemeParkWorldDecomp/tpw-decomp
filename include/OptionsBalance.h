@@ -12,3 +12,4 @@ public:
 };
 extern const BalanceDescription gOptionsBalanceDescriptions[32]; // 0x102990a8
 extern COptionsBalance gOptionsBalance; // 0x102b4da8, original symbol name not recovered
+

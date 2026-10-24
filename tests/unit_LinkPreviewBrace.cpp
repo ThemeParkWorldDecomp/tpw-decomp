@@ -158,6 +158,9 @@ int32_t tpw_lpb_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(sPylonRecord, mNext));
     out[n++] = static_cast<int64_t>(sizeof(sPylonRecord));
     out[n++] = static_cast<int64_t>(offsetof(sBraceSpline, mControlsA));
+    out[n++] = 0xa8;    // the type's pylon controls, taken by their offsets
+    out[n++] = 0x1c8;
+    out[n++] = 0x400;
     return n;
 }
 

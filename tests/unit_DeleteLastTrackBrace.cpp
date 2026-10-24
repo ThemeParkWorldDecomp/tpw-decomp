@@ -121,6 +121,10 @@ int32_t tpw_dltb_layout(int64_t* out) {
     o(offsetof(tag_sMesh, mF28));
     o(sizeof(tag_sMesh));
     o(reinterpret_cast<const char*>(&gActionRecorder.mRecording) - reinterpret_cast<const char*>(&gActionRecorder));
+    o(0xa4);   // the type's word, read by its offset
+    o(0xc0);
+    o(0x70);   // the owner's word, read by its offset
+    o(0x90);
     return n;
 }
 

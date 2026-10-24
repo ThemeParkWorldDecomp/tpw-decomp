@@ -11,6 +11,12 @@ The world of a case: the two button masks, the action recorder's recording word,
 in blocks the loaded files own; the set's flags and word 0xd4 at the host's offsets). What is compared: the answer, the globals, the out word and the
 event log. No fused operations. Not tested: an id past the slots table, an index past the entries of a list without flag 0x20 (kept inside the 8 entries
 the test fills).
+
+With the port fixes on (unit coaster64), the brace mesh views keep the places of the host brace (its pylon record mData, its word mWord70) and
+of the host pylon record (the count and the braces); the layout export gives them. One deliberate difference is mapped (the port fix
+in GetNthBraceMesh): the entry's mesh is the brace's 32-bit mWord70, answered widened to the pointer, where the Mac keeps a 32-bit
+pointer. The host world then writes each mesh as a 32-bit word (the low half of its block's address, a different one for each block) and
+the answer is matched against those words.
 """
 import ctypes as C
 import random
@@ -102,6 +108,11 @@ class Ppc(Side):
     def ptr(self, a, p):
         self.words(a, [p])
 
+    def mesh(self, a, p):
+        """Stores an entry's mesh; answers the value GetNthBraceMesh gives back for it."""
+        self.ptr(a, p)
+        return p
+
     def __init__(self, e, case):
         self.e = e
         self.L = e.cl = CL.PpcLog({ADDR["dummy"]: 1, ADDR["ui"]: 2}, case["queues"])
@@ -144,6 +155,13 @@ class Host(Side):
     def ptr(self, a, p):
         self.write(a, p.to_bytes(8, "little"))
 
+    def mesh(self, a, p):
+        if not HL["portfix"]:
+            self.ptr(a, p)
+            return p
+        self.words(a, [p & MASK])
+        return p & MASK
+
     def done(self):
         pass
 
@@ -177,12 +195,17 @@ def bind(lib):
     lib.tpw_sce_pylon.restype, lib.tpw_sce_pylon.argtypes = C.c_uint64, [C.c_uint32, C.c_uint64]
     lib.tpw_sce_nth.restype, lib.tpw_sce_nth.argtypes = C.c_uint64, [C.c_uint64, C.c_uint32]
     lib.tpw_sce_click.restype, lib.tpw_sce_click.argtypes = None, [C.c_uint32, C.c_uint32]
+    lib.tpw_sce_portfix.restype, lib.tpw_sce_portfix.argtypes = C.c_int32, []
     out = (C.c_int64 * 32)()
     n = lib.tpw_sce_layout(out)
     v = list(out)[:n]
     HL.update(flags=v[0], fd4=v[1], size=v[2], slot=v[3], bl=v[4], blksize=v[5], lflags=v[6], lcount=v[7], lentries=v[8],
               listsize=v[9], eflags=v[10], emesh=v[11], entsize=v[12])
-    assert v[6] == 4 and v[10] == 8 and v[4] == 0x100 and v[7] == 0x30, v
+    HL["portfix"] = lib.tpw_sce_portfix() == 1
+    if HL["portfix"]:
+        assert v[6] == 4 and v[10] == 8 and v[11] + 4 <= v[12], v
+    else:
+        assert v[6] == 4 and v[10] == 8 and v[4] == 0x100 and v[7] == 0x30, v
     lib.bound = True
 
 
@@ -220,9 +243,9 @@ def build(s, case):
             ent = s.alloc(P["entsize"])
             s.words(ent + P["eflags"], [case["entflags"][k]])
             mesh = s.alloc(4) if case["vals"][k] else 0
+            mesh = s.mesh(ent + P["emesh"], mesh)
             if mesh:
                 case["_meshes"][mesh] = k + 1
-            s.ptr(ent + P["emesh"], mesh)
             s.ptr(y + P["lentries"] + s.PS * k, ent)
         case["_y"] = y
 

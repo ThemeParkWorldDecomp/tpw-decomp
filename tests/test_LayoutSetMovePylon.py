@@ -13,6 +13,10 @@ The world: the edit instance (flags), braces with an index word at +4 and a pylo
 the object table, random starting values of the globals the functions write. Compared: the log, gCoasterDragBrace, gCoasterWord16E0,
 gCoasterCurrent, gCoasterCurrentData and gCoasterEditInstance.
 
+With the port fixes on (unit coaster64), the record's table entry the Mac reads at 0x30 + 4 * i is the host record's mBraces[i - 1] (the
+port fix in PylonTableEntry, src/game/rides/CoasterEdit.cpp): entry 0, the Mac's brace count, is the 8 bytes before mBraces. The host world
+then writes the table there, its start taken from tpw_lmp_layout.
+
 No fused operations. Not tested: nothing skipped (ids stay inside the 0x100 object table).
 """
 import ctypes as C
@@ -35,9 +39,9 @@ C_DISABLE, C_GETBRACE, C_START, C_DODEL = 0x10053B58, 0x1004DE40, 0x10057738, 0x
 C_GEN, C_EXCH, C_FIND, C_SETEDIT = 0x10050FCC, 0x10053594, 0x10043380, 0x100585F4
 
 ADDR = dict(edit=0x102B68B0, drag=0x102C178C, w16e0=0x102C16E0, current=0x102B68A8, currentdata=0x102B68A4, table=0x102B6F04)
-# the host's offsets: brace +0x100 pointer, brace size, instance size, flags offset, pointer size
+# the host's offsets: brace +0x100 pointer, brace size, instance size, flags offset, pointer size (the table's start comes from the unit)
 HOST_LAYOUT = [0x108, 0x1f0, 0x1f0, 0, 8]
-PPC_LAYOUT = dict(data=0x100, brace=0x110, inst=0x200, psz=4)
+PPC_LAYOUT = dict(data=0x100, brace=0x110, inst=0x200, psz=4, tab=0x30)
 
 CUR = None
 
@@ -160,7 +164,7 @@ class Host(Side):
         global CUR
         self.lib = lib
         bind(lib)
-        self.L = dict(data=HOST_LAYOUT[0], brace=HOST_LAYOUT[1], inst=HOST_LAYOUT[2], psz=8)
+        self.L = dict(data=HOST_LAYOUT[0], brace=HOST_LAYOUT[1], inst=HOST_LAYOUT[2], psz=8, tab=lib.tab)
         CL.host_begin(lib, {}, case["queues"])
         CUR = self
 
@@ -213,7 +217,9 @@ def bind(lib):
         f.restype, f.argtypes = None, [C.c_uint32] * k
     out = (C.c_int64 * 32)()
     n = lib.tpw_lmp_layout(out)
-    assert list(out)[:n] == HOST_LAYOUT, [hex(x) for x in list(out)[:n]]
+    assert n == len(HOST_LAYOUT) + 1 and list(out)[:n - 1] == HOST_LAYOUT, [hex(x) for x in list(out)[:n]]
+    lib.tab = out[n - 1]
+    assert lib.tab >= 0x30 and lib.tab % 8 == 0 and lib.tab + 16 * 8 <= 0x100, lib.tab
     lib.bound = True
 
 
@@ -234,7 +240,7 @@ def build(s, case):
         s.words(b + 4, [case["bidx"][i]])
         s.ptr(b + L["data"], datas[i])
         for k, t in enumerate(case["tab"][i]):
-            s.ptr(datas[i] + 0x30 + k * L["psz"], s.obj(t) if t >= 0 else 0)
+            s.ptr(datas[i] + L["tab"] + k * L["psz"], s.obj(t) if t >= 0 else 0)
     for k, t in enumerate(case["otab"]):
         s.ptr(s.g("table") + k * L["psz"], s.obj(t) if t >= 0 else 0)
     s.ptr(s.g("drag"), s.obj(case["drag0"]) if case["drag0"] >= 0 else 0)

@@ -14,6 +14,10 @@ The world of a case: a coaster instance (type flags and the float at 0x48; the p
 word and the list node are one object; on the host they are two (the node and the data view), written alike. What is compared: the event
 log and every field of every brace the function writes.
 
+With the port fixes on (unit coaster64), the port fix in RecalcBraceTangents reads the type's word 0x48 as tag_sCoasterType's mF48, and
+the ones in sTrackBraceData and sCoasterPylon put the data record's x y z, braces and control where sPylonRecord keeps them: the host world
+writes them at those offsets (tpw_rbt_layout), and the type block is a whole tag_sCoasterType.
+
 No fused operations. Not tested: a brace index of 2 (the host's data record overlays that slot with mF18Table), a brace index past its pylon's braces (a NULL read), NaN or infinite orientation answers (the doubles in
 the CTRACE words), the first brace's stale animation set (r23 is zeroed before the call, the translation starts with NULL).
 """
@@ -49,6 +53,7 @@ FIELDS = [
     ("dflags", 4), ("f18", 0x18), ("xyz", 0x1c), ("dbraces", 0x34),
     ("f2c", 0x2c), ("fc4", 0xc4),
     ("type", 4), ("pylons", 0x4c), ("last", 0x54),
+    ("tf48", 0x48), ("tsize", 0x100), ("portfix", 0),
 ]
 MAC_OFF = dict(FIELDS)
 HOST_OFF = {}
@@ -264,9 +269,10 @@ def bind(lib):
     assert n == len(FIELDS), n
     for (name, _), v in zip(FIELDS, out):
         HOST_OFF[name] = v
-    # the fields the function copies as bytes sit at the Mac offsets on the host too
-    for name in ("flags", "point", "idx", "number", "dflags", "xyz", "f2c", "fc4"):
+    # the fields the function copies as bytes sit at the Mac offsets on the host too (the port fix reads x y z at the record's mX)
+    for name in ("flags", "point", "idx", "number", "dflags", "f2c", "fc4") + (() if HOST_OFF["portfix"] else ("xyz",)):
         assert HOST_OFF[name] == MAC_OFF[name], (name, HOST_OFF[name])
+    assert HOST_OFF["tsize"] >= MAC_OFF["tsize"], HOST_OFF["tsize"]
     lib.bound = True
 
 
@@ -279,10 +285,10 @@ def build(s, case):
     inst = s.alloc(0x800)
     s.lab[inst] = 1
     s.lab[inst + 0x3c] = 3
-    typ = s.alloc(0x100)
+    typ = s.alloc(o("tsize"))
     s.lab[typ] = 2
     s.words(typ, [case["tflags"]])
-    s.words(typ + 0x48, [case["tf48"]])
+    s.words(typ + o("tf48"), [case["tf48"]])
     s.ptr(inst + o("type"), typ)
 
     nodes, datas, ctrls = [], [], []

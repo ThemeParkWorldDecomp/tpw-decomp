@@ -59,6 +59,10 @@ int32_t tpw_dct_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(tag_sRideAnimSet, mFC4));
     out[n++] = static_cast<int64_t>(sizeof(tag_sRideAnimSet));
     out[n++] = static_cast<int64_t>(sizeof(tag_sMesh));
+    out[n++] = 0x24;   // the type's words, read at the Mac offsets
+    out[n++] = 0x28;
+    out[n++] = 0x2c;
+    out[n++] = 0x100;
     return n;
 }
 

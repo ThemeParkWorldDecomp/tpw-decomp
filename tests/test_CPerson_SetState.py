@@ -155,6 +155,8 @@ def setup(runner):
 
 # ---------------------------------------------------------------------------------------------------------------- the two sides
 class Side:
+    walk = False
+
     def words(self, a, ws):
         self.write(a, b"".join(struct.pack(self.fmt, w & MASK) for w in ws))
 
@@ -216,6 +218,7 @@ class Host(Side):
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
+        self.walk = lib.tpw_ss_walkfix() == 1
         CL.host_begin(lib, {}, case["queues"])
 
     def done(self):
@@ -286,6 +289,9 @@ def build(s, case):
         s.halves(p + o, [case["ph"][o]])
     for o in PB:
         s.write(p + o, bytes([case["pb"][o]]))
+    if s.walk:
+        pb = case["pb"]
+        s.halves(p + 0x18, [pb[0x18] << 8 | pb[0x19], pb[0x1A] << 8 | pb[0x1B]])
     for k in range(NRIDES):
         ride = base + RIDE0 + k * RIDE_STEP
         s.halves(ride + 0xE, [case["ride_type"][k]])
@@ -310,6 +316,10 @@ def observe(s, case):
         out["h%x" % o] = s.rd(p + o, "H")
     for o in PB:
         out["b%x" % o] = s.rd(p + o, "B")
+    if s.walk:
+        for o in (0x18, 0x1A):
+            h = s.rd(p + o, "H")
+            out["b%x" % o], out["b%x" % (o + 1)] = h >> 8, h & 0xFF
     return out
 
 

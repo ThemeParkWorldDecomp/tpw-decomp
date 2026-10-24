@@ -131,6 +131,9 @@ int32_t tpw_ge_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(sizeof(sCoasterType));
     out[n++] = static_cast<int64_t>(kCoasterTypeSectionB);
     out[n++] = static_cast<int64_t>(kCoasterTypeSectionA);
+    out[n++] = 0x74;   // the flags word
+    out[n++] = 0x2c;   // a table entry
+    out[n++] = 0;
     return n;
 }
 

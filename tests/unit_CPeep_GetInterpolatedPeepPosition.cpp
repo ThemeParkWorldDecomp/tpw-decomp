@@ -115,4 +115,8 @@ void tpw_peep_interp(uint64_t peep, float t, int32_t ranged, uint64_t out) {
     reinterpret_cast<CPeep*>(gBase)->GetInterpolatedPeepPosition(t, ranged, o[0], o[1], o[2], *reinterpret_cast<uint32_t*>(o + 3));
 }
 
+int32_t tpw_peep_walkfix() {
+    return 0;
+}
+
 }  // extern "C"

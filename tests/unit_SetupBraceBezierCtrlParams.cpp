@@ -142,6 +142,12 @@ int32_t tpw_sbbc_layout(int64_t* out) {
     return n;
 }
 
+// 1 when the unit is built with the port fixes on (unit coaster64): SetupBraceBezierCtrlParams then leaves each control's mBrace (the
+// Mac's previous control word) holding its brace.
+int32_t tpw_sbbc_portfix() {
+    return 0;
+}
+
 void tpw_sbbc_setup(uint64_t instance) { SetupBraceBezierCtrlParams(reinterpret_cast<tag_sCoasterInstance*>(instance)); }
 void tpw_sbbc_gen(uint64_t instance) { GenerateTrack(reinterpret_cast<tag_sCoasterInstance*>(instance)); }
 

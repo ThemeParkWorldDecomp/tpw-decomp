@@ -14,6 +14,12 @@ from the case's queues. GenerateTrack runs SetupBraceBezierCtrlParams as the ori
 The world of a case: an instance (type with a texture set, brace chain with splines of controls, mesh set chain, the junk the call
 overwrites) and the globals of the call. What is compared: the call log, every control's number, neighbours and weight, the instance's
 words, the cache, the texture flag store and the extrusion globals. No fused operations. Not tested: a NULL spline (read at once).
+
+With the port fixes on (unit coaster64), the translation does not store a control's previous control (the Mac's word 0x14): the host
+control's mBrace covers that word and keeps the control's brace, and Link14 works the previous control out from it (the port fixes in
+SetupBraceBezierCtrlParams and Link14, src/game/rides/CoasterTrack.cpp). The host world then gives every control its brace in mBrace (as
+SetupBraceInfo does), and the previous control read back is the one Link14 answers from the host's words after the call: the control
+before it in its array, or the last of the same array of its brace's mNext (none without one), once mBrace still holds the brace.
 """
 import ctypes as C
 import random
@@ -172,6 +178,9 @@ class Ppc(Side):
     def o(self, name):
         return MAC[name]
 
+    def port_fix(self):
+        return False
+
     def g(self, name):
         return ADDR[name]
 
@@ -209,6 +218,9 @@ class Host(Side):
     def o(self, name):
         return self.lib.offs[name]
 
+    def port_fix(self):
+        return self.lib.port_fix
+
     def g(self, name):
         return self.lib.tpw_sbbc_addr(name.encode())
 
@@ -240,6 +252,8 @@ def bind(lib):
     n = lib.tpw_sbbc_layout(out)
     assert n == len(NAMES), n
     lib.offs = {name: out[i] for i, (name, _) in enumerate(NAMES)}
+    lib.tpw_sbbc_portfix.restype, lib.tpw_sbbc_portfix.argtypes = C.c_int32, []
+    lib.port_fix = lib.tpw_sbbc_portfix() == 1
     lib.bound = True
 
 
@@ -316,7 +330,8 @@ def build(s, case):
                 s.words(ca + o("C_F08"), [c["f08"]])
                 s.words(ca + o("C_F0C"), [c["junk"]])
                 s.words(ca + o("C_F40"), c["pt"])
-                s.wp(ca + o("C_PREV"), 0x7777)
+                # With the port fixes the host control's mBrace (the Mac's words 0x10 and 0x14) holds its brace (the module's docstring).
+                s.wp(ca + o("C_PREV"), a if s.port_fix() else 0x7777)
                 s.wp(ca + o("C_NEXT"), 0x7777)
     if case["op"] == "gen":
         s.wp(s.g("gCoasterCurrentData"), inst + o("I_B3C"))
@@ -348,6 +363,26 @@ def norm_ctl(s, W, p, csz):
     return -1
 
 
+def link14(s, W, br, ca, csz):
+    """The previous control Link14 answers for the host control at ca of the brace br (port fixes on; the module's docstring)."""
+    o = s.o
+    if s.rp(ca + o("C_PREV")) != br["addr"]:
+        return "mBrace %#x" % s.rp(ca + o("C_PREV"))
+    spl = s.rp(br["addr"] + o("B_F90"))
+    n = s.rd_word(spl + o("S_COUNT"))
+    a = s.rp(spl + o("S_A"))
+    base = a if a <= ca < a + n * csz else s.rp(spl + o("S_B"))
+    index = (ca - base) // csz
+    if index > 0:
+        return norm_ctl(s, W, base + (index - 1) * csz, csz)
+    other = s.rp(br["addr"] + o("B_NEXT"))
+    if other == 0:
+        return 0
+    ospl = s.rp(other + o("B_F90"))
+    obase = s.rp(ospl + (o("S_A") if base == a else o("S_B")))
+    return norm_ctl(s, W, obase + (s.rd_word(ospl + o("S_COUNT")) - 1) * csz, csz)
+
+
 def observe(s, case):
     o, W = s.o, s.W
     csz = o("C_SIZE")
@@ -358,7 +393,8 @@ def observe(s, case):
         for key in ("A", "B"):
             for k in range(b["count"]):
                 ca = br[key] + k * csz
-                ctl.append([s.rd_word(ca + o("C_F00")), norm_ctl(s, W, s.rp(ca + o("C_PREV")), csz),
+                prev = link14(s, W, br, ca, csz) if s.port_fix() else norm_ctl(s, W, s.rp(ca + o("C_PREV")), csz)
+                ctl.append([s.rd_word(ca + o("C_F00")), prev,
                             norm_ctl(s, W, s.rp(ca + o("C_NEXT")), csz), canon_f(s.rd_word(ca + o("C_F0C"))),
                             canon_f(s.rd_word(ca + o("C_F08"))), [canon_f(w) for w in s.rd_words(ca + o("C_F40"), 3)]])
     res["ctl"] = ctl

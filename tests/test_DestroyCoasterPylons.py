@@ -10,6 +10,10 @@ MReleaseFreeF, BezierPosition) are fakes on both sides; objects are named in the
 BezierPosition's fake writes the two controls' ids and t's bits into the point, so the compare sees which controls were passed.
 
 What is compared: the event log, the lists' head and links as ids, the control's four words (braces as ids), the point.
+
+With the port fixes on (unit coaster64), DestroyCoasterPylons passes the brace's mInfo78 where the Mac passes the brace + 0x78 (the port
+fix in DestroyCoasterPylons, src/game/rides/CoasterTrack.cpp): the host brace keeps its two sBraceInfo further on. The unit's
+DestroyBraceInfo fake then logs mInfo78 and mInfo84 as the Mac's 0x78 and 0x84, and any other info at its host offset.
 No fused operations. Not tested: NULL links the original dereferences (a brace list without next or prev).
 """
 import ctypes as C

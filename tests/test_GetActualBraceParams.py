@@ -11,6 +11,10 @@ float +0x6c, record list +0x90 with count and the 0x58-byte records). UpdatePylo
 pylon pointers, each pylon with flags and a chain +0x100 -> +0x18 -> word. Compared: the log, the node flags, the pylon flags and the two
 stored pointers (as which area of the target they name). Fused operations: none (fadds only). Not tested: NULL pointers the original
 dereferences.
+
+With the port fixes on (unit coaster64), the stack is the host pylon record and each stack pylon a host brace (the port fixes to
+sPylonStackHead and sStackPylon in include/TPCoaster.h): the count, the pylon pointers, the pylon's control, its two stored pointers and
+their areas are where the host keeps them, and the host world takes all of them from tpw_gabp_layout.
 """
 import ctypes as C
 import random
@@ -27,8 +31,8 @@ FN_GET, FN_UPD = 0x1003D4CC, 0x1003D844
 CALLEE = 0x1004E230
 ADDR = dict(skip=0x102B68A0, data=0x102B68A4)
 KEYS = ["n_flags", "n_next", "n_f", "n_list", "l_recs", "l_end", "d_head", "s_pyl", "p_f74", "p_a78", "p_a84", "p_f90", "p_ctl", "c_q",
-        "q_a30", "q_a44", "r_size", "r_pt", "r_f", "dup"]
-MAC = dict(zip(KEYS, [8, 0x64, 0x6C, 0x90, 4, 8, 0x18, 0x34, 0x74, 0x78, 0x84, 0x90, 0x100, 0x18, 0x30, 0x44, 0x58, 0x28, 0xC, 8]))
+        "q_a30", "q_a44", "r_size", "r_pt", "r_f", "dup", "s_cnt"]
+MAC = dict(zip(KEYS, [8, 0x64, 0x6C, 0x90, 4, 8, 0x18, 0x34, 0x74, 0x78, 0x84, 0x90, 0x100, 0x18, 0x30, 0x44, 0x58, 0x28, 0xC, 8, 0x30]))
 HOST_LAYOUT = []
 
 
@@ -192,7 +196,7 @@ def build(s, case):
     else:
         s.words(s.g("skip"), [case["skip"]])
         stack = s.alloc(o["s_pyl"] + 8 * max(1, len(case["pylons"])) + 8)
-        s.words(stack + 0x30, [case["count"]])
+        s.words(stack + o["s_cnt"], [case["count"]])
         pyl = []
         for i, p in enumerate(case["pylons"]):
             a = s.alloc(0x200)

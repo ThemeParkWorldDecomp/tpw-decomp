@@ -12,6 +12,11 @@ The world of a case: the panel block (0x24 bytes) filled with random words, the 
 global (NULL or an object) and its two words, the coaster panel global. What is compared: the answer, the log, the panel words, the
 mouse words and what the mouse global holds (nothing, the old object, a new one).
 
+With the port fixes on (unit coaster64; the port fix in CoasterPlaceMouseMode, src/game/ui/ui_coasterPanel.cpp), the translation allocates the
+path drawing mode, the mouse and the default mode with sizeof each where the Mac asks for 0x14, 1 and 8. That one difference is mapped back:
+a host allocation of exactly the sizeof the unit reports for the object it is made for (the constructor event after it names the object,
+none the mouse) is logged as the Mac's size. Everything else is compared as with the fixes off.
+
 No fused operations. Not tested: nothing is left out; a NULL buttons window is a case (the fakes ignore it, as the original passes it on).
 """
 import ctypes as C
@@ -141,6 +146,7 @@ class Host(Side):
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
+        self.fix_sizes = lib.port_fix and case["op"] == "place"
         self.objects()
         lib.tpw_bog_set_buttons(self.buttons)
         CL.host_begin(lib, {1: self.g("panel"), 2: self.win, 3: self.thing, 4: self.cpanel, 5: self.buttons, 6: self.mouse},
@@ -162,7 +168,8 @@ class Host(Side):
         C.memmove(a, data, len(data))
 
     def log(self):
-        return CL.host_end(self.lib)
+        log = CL.host_end(self.lib)
+        return mac_sizes(self.lib, log) if self.fix_sizes else log
 
     def sinit_table(self, word):
         # the static initialiser's table is the arena offset of BogStatusPanelTable() (unit v5L31): the Mac's address when it is that
@@ -196,10 +203,30 @@ def bind(lib):
     lib.tpw_bog_sinit_table.restype, lib.tpw_bog_sinit_table.argtypes = C.c_uint32, []
     lib.tpw_bog_place.restype, lib.tpw_bog_place.argtypes = None, []
     lib.tpw_bog_which.restype, lib.tpw_bog_which.argtypes = None, [C.c_uint32]
+    lib.tpw_bog_portfix.restype, lib.tpw_bog_portfix.argtypes = C.c_int32, []
+    lib.tpw_bog_new_sizes.argtypes = [C.POINTER(C.c_int64)]
     out = (C.c_int64 * 32)()
     n = lib.tpw_bog_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    lib.port_fix = lib.tpw_bog_portfix() == 1
+    n = lib.tpw_bog_new_sizes(out)
+    path, mouse, default = list(out)[:n]
+    # the object an allocation is for (the name of the constructor event after it, None the mouse): (the host's sizeof, the Mac's size)
+    lib.new_sizes = {"CMMPathDraw": (path, 0x14), None: (mouse, 1), "CMMDefault": (default, 8)}
     lib.bound = True
+
+
+def mac_sizes(lib, log):
+    """The host log with the port fixes' allocation sizes (sizeof the object) turned back into the Mac's."""
+    out = list(log)
+    for i, (name, ints, texts) in enumerate(out):
+        if name != "new":
+            continue
+        after = out[i + 1][0] if i + 1 < len(out) and out[i + 1][0] in lib.new_sizes else None
+        host_size, mac_size = lib.new_sizes[after]
+        if ints == (host_size,):
+            out[i] = (name, (mac_size,), texts)
+    return out
 
 
 def build(s, case):

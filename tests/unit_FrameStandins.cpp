@@ -428,6 +428,12 @@ int64_t tpw_fs_download(const int64_t* a, const uint16_t* image, int32_t imageCo
     return result;
 }
 
+// 1 when the unit is built with the port fixes on (unit texnibble): Download's StorePixel then fills
+// both halves of each byte with the channel's nibble.
+int32_t tpw_fs_portfix() {
+    return 0;
+}
+
 // ---- The draw primitive's destructor --------------------------------------------------------------
 // mode 1: a heap object, deleted (the original's flag above 0); 2: an object in place, destroyed (a
 // flag below 0); 0: nothing (a flag of 0 is the destructor of a base object, which C++ never calls

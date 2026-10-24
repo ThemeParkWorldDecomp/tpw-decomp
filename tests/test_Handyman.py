@@ -267,6 +267,8 @@ def setup(runner):
 
 
 class Side:
+    walk = False
+
     def put(self, a, size, v):
         self.write(a, struct.pack(put_fmt(self.order, size), v & ((1 << (8 * size)) - 1)))
 
@@ -360,6 +362,7 @@ class Host(Side):
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
+        self.walk = lib.tpw_hm_walkfix() == 1
         CL.host_begin(lib, {}, case["queues"])
 
     def done(self):
@@ -489,7 +492,7 @@ def build(s, c):
     s.put(tail + HEAD_AT, 2, OIDS[c["chain"][0]] if c["chain"] else 0)
     s.tail = tail
     for off, size, key in CASE_FIELDS:
-        if key in ("posx", "posy"):         # a MapPos (two bytes), not a number: the same BYTES on both sides
+        if key in ("posx", "posy") and not s.walk:         # a MapPos (two bytes), not a number: the same BYTES on both sides
             s.write(eb + off, struct.pack(">H", c[key]))
         else:
             s.put(eb + off, size, c[key])
@@ -574,6 +577,12 @@ def execute(s, c):
 def observe(s, c, answer):
     out = {"answer": answer, "log": s.log(), "centre": s.centre(), "globals": s.globals()}
     out["obj"] = snapshot(s, s.eb - GUARD, OBJ_BLOCK, OBJ_FIELDS)
+    if s.walk:                          # the host keeps posx/posy as halfwords: show them as the Mac bytes
+        values, data = out["obj"]
+        data = bytearray(data)
+        for o in (0x18, 0x1A):
+            data[GUARD + o:GUARD + o + 2] = data[GUARD + o:GUARD + o + 2][::-1]
+        out["obj"] = (values, bytes(data))
     out["tail"] = snapshot(s, s.tail, TAIL, [(0, 4), (HEAD_AT, 2)], 0)
     out["map"] = snapshot(s, s.mapblock, MAP_BLOCK, [(CELL * k + o, n) for k in range(NCELL) for o, n in ((0x2C, 4), (0x30, 2))], 0)
     out["toilets"] = [snapshot(s, t, TOILET, [(4, 1), (6, 1), (0xC, 2), (0x2E, 2), (0x32, 2)], 0) for t in s.toilets]

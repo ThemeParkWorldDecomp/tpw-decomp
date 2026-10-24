@@ -14,6 +14,9 @@ The world of a case: the globals and blocks (panel, parent window, thing, window
 compared: the answer, the globals and blocks read back after the call, the event log. The parent window's z is written at the Mac's
 +0xdc on the PPC side and at the host window's mZ (from tpw_sr_layout) on the host side: the host window is laid out differently.
 
+With the port fixes on (unit staffrows; the port fix in StaffRoomListFiller), a row's word is the staff member's offset in the
+arena, not its address cut to 32 bits; the fake AddItem matches either against the case's thing, so the comparison is unchanged.
+
 No fused operations (fctiwz only on values below 2^31). Not tested: a zero screen height (divw by zero is undefined on the hardware), a
 NULL parent window with the edit window clear (the original reads through it).
 """

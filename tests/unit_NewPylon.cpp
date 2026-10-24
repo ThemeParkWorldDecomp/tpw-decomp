@@ -145,6 +145,12 @@ int32_t tpw_np_layout(int64_t* out) {
     return n;
 }
 
+// 1 when the unit is built with the port fixes on (unit coaster64): the brace's pylon data (sTrackBraceData) then has the host record's
+// layout, so the word UpdatePylonStackMeshes reads at its Mac 0x20 is the record's mY.
+int32_t tpw_np_portfix() {
+    return 0;
+}
+
 uint64_t tpw_np_new(uint32_t x, uint32_t z, uint32_t flags, int32_t unused, uint64_t control, uint64_t point) {
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(
         NewPylon(x, z, flags, unused, reinterpret_cast<sPylonControl*>(static_cast<uintptr_t>(control)),

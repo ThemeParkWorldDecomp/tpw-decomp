@@ -16,6 +16,8 @@ change, a deleted brace loses its next) to show which words the original reads a
 What is compared: the answer, the log, every object's fields, the globals the functions write (the edit coaster, the list head, the count,
 the four pylon words) and the new instance's fields. Fused operations: the single-precision fmadds are corrected by ROUNDING (GetHeightForInterval,
 XZAngleBetweenPylons); the double fmadd and sqrt/acos are the C library's on both sides.
+With the port fixes on (unit coaster64), the pylon data (sTrackBraceData) is the view of the host pylon record: only its size in the layout
+check differs, and the world is laid out from the layout export as without them.
 Not tested: InstanceCoaster with a ride type number no coaster type has (the original reads a NULL type: a crash) and its answer when the flag is
 set (the Mac answers its register 25, the host 0); DestroyEndPylons with no plain brace after the end pylons (a NULL read); a train count above
 4 (the blocks hold four records).
@@ -82,6 +84,8 @@ ORDER = ["inst", "brace", "bdata", "type", "set", "mesh", "hdr", "node", "pylon"
 # ---- the host's offsets and sizes the module relies on, checked once against tpw_ci_layout (catches a header that moved); the last is
 # sizeof(CCoasterBalance)
 HOST_LAYOUT = [0, 8, 16, 20, 24, 28, 32, 40, 44, 48, 56, 64, 88, 120, 212, 300, 336, 340, 360, 392, 496, 8, 112, 264, 496, 4, 72, 0, 916, 40, 180, 828, 832, 848, 944, 8, 16, 392, 8, 112, 120, 184, 68, 160, 188, 192, 296, 0, 144, 30464]
+# With the port fixes on (unit coaster64; the port fix in sTrackBraceData) the pylon data is the host pylon record's view: only its size differs.
+HOST_LAYOUT_PORT_FIX = {26: 120}
 HOST = {}
 HOSTSIZE = {}
 BALANCE_MAC = 0x3B80
@@ -442,12 +446,17 @@ def bind(lib):
         f = getattr(lib, p + name)
         f.restype, f.argtypes = res, args
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]
+    getattr(lib, p + "portfix").restype, getattr(lib, p + "portfix").argtypes = C.c_int32, []
     lib.tpw_cl_lab.restype, lib.tpw_cl_lab.argtypes = C.c_int32, [C.c_void_p]
     out = (C.c_int64 * 80)()
     n = getattr(lib, p + "layout")(out)
     layout = list(out)[:n]
     if HOST_LAYOUT is not None:
-        assert layout == HOST_LAYOUT, layout
+        expected = list(HOST_LAYOUT)
+        if getattr(lib, p + "portfix")() == 1:
+            for k, v in HOST_LAYOUT_PORT_FIX.items():
+                expected[k] = v
+        assert layout == expected, layout
     i = 0
     for st in ORDER:
         fields = MAC[st][0]

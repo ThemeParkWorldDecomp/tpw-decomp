@@ -75,6 +75,7 @@ int32_t tpw_gabp_layout(int64_t* out) {
     out[n++] = offsetof(sBraceWalkRecord, mPoint);
     out[n++] = offsetof(sBraceWalkRecord, mF0C);
     out[n++] = offsetof(sBraceWalkNode, mFlags);
+    out[n++] = offsetof(sPylonStackHead, mCount);
     return n;
 }
 

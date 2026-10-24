@@ -14,6 +14,10 @@ pointer, the call log. The world of UpdatePylonStackMeshes: the pylon with up to
 node arrays, root node, head table), the pylon control's flags and node indices. What is compared: every node and mini node word of every
 set, the written node words, the root words, the call log.
 
+With the port fixes on (unit coaster64, the port fix to sTrackBraceData in include/TPCoaster.h), the brace's pylon data is the host
+pylon record: the skirt height UpdatePylonStackMeshes reads at the Mac's data word 0x20 is then the record's mY (host 0x24), and the host world
+puts it there.
+
 No fused operations. Not tested: a NULL set, mesh or header (read unconditionally), a brace index past 2, a node index past the arrays (the
 tests keep the index below 8 = the arrays' size), a NULL coaster (read unconditionally).
 """
@@ -262,11 +266,17 @@ def bind(lib):
     getattr(lib, p + "new").argtypes = [C.c_uint32, C.c_uint32, C.c_uint32, C.c_int32, C.c_uint64, C.c_uint64]
     getattr(lib, p + "upd").restype = None
     getattr(lib, p + "upd").argtypes = [C.c_uint64, C.c_uint64, C.c_int32, C.c_int32]
+    getattr(lib, p + "portfix").restype, getattr(lib, p + "portfix").argtypes = C.c_int32, []
     out = (C.c_int64 * 64)()
     n = getattr(lib, p + "layout")(out)
     assert n == len(NAMES), n
     HOST.update(dict(zip(NAMES, list(out)[:n])))
+    port_fix = getattr(lib, p + "portfix")() == 1
     for k in SAME:
+        if port_fix and k == "data_f20":
+            # the brace's pylon data has the host record's layout: the Mac's word 0x20 is the record's y
+            assert HOST[k] == HOST["pr_y"], (k, HOST[k], HOST["pr_y"])
+            continue
         assert HOST[k] == MAC[k], (k, HOST[k], MAC[k])
     lib.bound = True
 

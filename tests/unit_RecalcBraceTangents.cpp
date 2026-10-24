@@ -116,7 +116,7 @@ uint64_t tpw_rbt_addr(const char* name) {
 
 uint64_t tpw_rbt_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
 
-// The host offsets, in the order of the module's field lists (brace, node, data, control, instance).
+// The host offsets, in the order of the module's field lists (brace, node, data, control, instance, type), then whether the port fixes are on.
 int32_t tpw_rbt_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = OFF(tag_sTrackBrace, mFlags);
@@ -150,6 +150,9 @@ int32_t tpw_rbt_layout(int64_t* out) {
     out[n++] = OFF(tag_sCoasterInstance, mType);
     out[n++] = OFF(tag_sCoasterInstance, mPylons);
     out[n++] = OFF(tag_sCoasterInstance, mLastBrace);
+    out[n++] = 0x48;   // the type's word, read by its offset
+    out[n++] = 0x100;
+    out[n++] = 0;
     return n;
 }
 

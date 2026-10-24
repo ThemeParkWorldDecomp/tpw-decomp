@@ -167,4 +167,8 @@ void tpw_ss_setstate(uint64_t person, uint32_t state) {
     reinterpret_cast<CPerson*>(static_cast<uintptr_t>(person))->SetState(static_cast<CPerson::PersonState>(state));
 }
 
+int32_t tpw_ss_walkfix() {
+    return 0;
+}
+
 }  // extern "C"

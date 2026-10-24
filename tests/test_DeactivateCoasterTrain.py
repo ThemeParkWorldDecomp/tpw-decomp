@@ -9,6 +9,9 @@ is identified by the word at its start) and StopTrainSounds are recording fakes 
 The world: a train with up to 8 cars, a coaster instance's scale, car types, up to 7 ride anim sets in gRideAnimSets. Compared: the log,
 the train's flags and samples, every car's flags, the speed answer. Fused operations: fmadds in GetCarWantedSpeedAtHeight (HardwareRounding).
 Not tested: a car count that walks past the 8 allocated cars.
+
+GetCarWantedSpeedAtHeight's coaster type: with the port fixes on (unit coaster64) the translation reads its three floats as
+tag_sCoasterType's mF24, mF28 and mF2C, so the host world puts the case's words there (the layout export says where).
 """
 import ctypes as C
 import random
@@ -38,11 +41,12 @@ NRIDES = 8
 MAC = dict(car_size=0x60, car_type=4, car_ride=0x0C, car_f38=0x38,
            train_size=0x80, train_f08=8, train_n=0x0C, train_front=0x20, train_rear=0x24, train_cars=0x28, train_pos=0x74,
            coaster_fac=0xAC, coaster_size=0x200, ct_f24=0x24, ct_f28=0x28, ct_size=0x40,
-           rs_flags=4, rs_mesh=8, rs_fc0=0xC0, rs_fc4=0xC4, rs_size=0x100, mesh_size=0x20, psz=4)
+           rs_flags=4, rs_mesh=8, rs_fc0=0xC0, rs_fc4=0xC4, rs_size=0x100, mesh_size=0x20, type_f24=0x24, type_f28=0x28, type_f2c=0x2C,
+           type_size=0x100, psz=4)
 HOST = {}
 HOST_KEYS = ["car_size", "car_type", "car_ride", "car_f38", "train_size", "train_f08", "train_n", "train_front", "train_rear", "train_cars",
              "train_pos", "coaster_fac", "coaster_size", "ct_f24", "ct_f28", "ct_size", "rs_flags", "rs_mesh", "rs_fc0", "rs_fc4", "rs_size",
-             "mesh_size"]
+             "mesh_size", "type_f24", "type_f28", "type_f2c", "type_size"]
 
 
 def fb(x):
@@ -261,10 +265,11 @@ def observe(s, case):
 def run(s, case):
     try:
         if case["op"] == "speed":
-            tb = s.alloc(0x100)
-            s.words(tb + 0x24, [case["t24"]])
-            s.words(tb + 0x28, [case["t28"]])
-            s.words(tb + 0x2C, [case["t2c"]])
+            o = s.o
+            tb = s.alloc(o["type_size"])
+            s.words(tb + o["type_f24"], [case["t24"]])
+            s.words(tb + o["type_f28"], [case["t28"]])
+            s.words(tb + o["type_f2c"], [case["t2c"]])
             return {"speed": s.speed(tb, *case["args"])}
         build(s, case)
         s.call2(FN_DEACT if case["op"] == "deact" else FN_SAMPLES)

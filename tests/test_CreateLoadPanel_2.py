@@ -10,6 +10,8 @@ swprintf, operator new and the constructors) is a fake on both sides that record
 The world of a case: gGame's word 0x3c, the panels' two words, the convert buffer, the time format, the string table pointer in gText, the
 save file entries (name, two stamp words), and the queues (Dialog and list answers, the calendar fields per entry, the formatted text).
 What is compared: the event log, gGame's word, the two panel words (as labels of the fake windows) and the convert buffer's start.
+A panel word is the window's address on the Mac and its low half on the host; built with the port fixes (unit panelword, the port fix in
+WindowWord) the host's is the window's offset in the arena, as tpw_cl_word gives it.
 
 No fused operations. Not tested: nothing is left out; GetWindow(-1) and GetWindow(0x23bce2) always answer a window (the original does not
 test them), the list answer may be NULL.
@@ -293,9 +295,12 @@ class Side:
     def label_of(self, value):
         if value == 0:
             return 0
+        words = self.panel_words()
+        return words.index(value) + 1 if value in words else -1
+
+    def panel_words(self):
         # the words are 32 bits: the host's pointers are compared by their low halves
-        low = [o & 0xFFFFFFFF for o in self.objs]
-        return low.index(value) + 1 if value in low else -1
+        return [o & 0xFFFFFFFF for o in self.objs]
 
 
 class Ppc(Side):
@@ -373,6 +378,9 @@ class Host(Side):
     def done(self):
         pass
 
+    def panel_words(self):
+        return [self.lib.tpw_cl_word(o) for o in self.objs]
+
     def g(self, name):
         return self.lib.tpw_cl_addr(name.encode())
 
@@ -421,7 +429,8 @@ def bind(lib):
     for name, res, args in (("addr", C.c_uint64, [C.c_char_p]), ("alloc", C.c_uint64, [C.c_uint32]), ("obj", C.c_uint64, [C.c_int32]),
                             ("entry", C.c_uint64, [C.c_int32, C.c_uint32, C.c_uint32]), ("count", None, [C.c_int32]),
                             ("set_table", None, [C.c_uint64]), ("load", None, [C.c_int32]), ("save", None, [C.c_int32]),
-                            ("fillload", None, [C.c_uint64]), ("fillsave", None, [C.c_uint64]), ("post", None, [C.c_uint64])):
+                            ("fillload", None, [C.c_uint64]), ("fillsave", None, [C.c_uint64]), ("post", None, [C.c_uint64]),
+                            ("word", C.c_uint32, [C.c_uint64])):
         f = getattr(lib, p + name)
         f.restype, f.argtypes = res, args
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]

@@ -32,6 +32,7 @@ uint32_t NowMs() {
     return static_cast<uint32_t>(SamsUtilities::UTimer::GetAbsolute() / 1000);
 }
 
+
 // The full-screen image draw (inline twice in the original): window coordinates (-1, -1),
 // scaled to the display.
 void DrawImage(const void* pixels, int32_t width, int32_t height) {

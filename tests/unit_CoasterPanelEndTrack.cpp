@@ -1,7 +1,7 @@
 // Test library for CoasterPanelEndTrack (unit v5333; libtpw_unit_CoasterPanelEndTrack.dylib, tests/test_CoasterPanelEndTrack.py), main app:
 //   src/game/ui/ui_coasterPanel.cpp   CoasterPanelEndTrack
 //
-// Fakes (same events as the PowerPC stubs): operator new (size 1 or 8), CMMDefault::CMMDefault, CMMCoaster::CMMCoaster,
+// Fakes (same events as the PowerPC stubs): operator new (size 1 or 8; sizeof each object with the port fixes on), CMMDefault::CMMDefault, CMMCoaster::CMMCoaster,
 // CMouse::AssignMouseMode, and the mode's GetMode virtual. The globals of Mouse.cpp are defined here.
 #include <cstddef>
 #include <cstdint>
@@ -91,5 +91,18 @@ uint64_t tpw_cpet_get_gmouse() { return static_cast<uint64_t>(reinterpret_cast<u
 int32_t tpw_cpet_layout(int64_t*) { return 0; }
 
 void tpw_cpet_run() { CoasterPanelEndTrack(); }
+
+// 1 when the unit is built with the port fixes on (unit coaster64): CoasterPanelEndTrack then allocates the mouse, the default mode and the
+// coaster mode with these sizes instead of the Mac's 1, 8 and 8.
+int32_t tpw_cpet_portfix() {
+    return 0;
+}
+int32_t tpw_cpet_new_sizes(int64_t* out) {
+    int32_t n = 0;
+    out[n++] = static_cast<int64_t>(sizeof(CMouse));
+    out[n++] = static_cast<int64_t>(sizeof(CMMDefault));
+    out[n++] = static_cast<int64_t>(sizeof(CMMCoaster));
+    return n;
+}
 
 }  // extern "C"

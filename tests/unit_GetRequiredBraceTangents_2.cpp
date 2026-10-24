@@ -59,6 +59,10 @@ int32_t tpw_gbt_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(sCoasterTrackParams, mBraceHead));
     out[n++] = static_cast<int64_t>(sizeof(sCoasterTrackParams));
     out[n++] = static_cast<int64_t>(sizeof(sCoasterType));
+    out[n++] = 0;   // the type's words by their Mac offsets
+    out[n++] = 4;
+    out[n++] = 8;
+    out[n++] = 0x0c;
     return n;
 }
 

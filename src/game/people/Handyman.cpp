@@ -14,6 +14,7 @@
 #include "World.h"
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <new>
 
 // CHandyman (main app, SimTheme Park 2.04b3, Handyman.cpp; unit w184): both constructors 0x100fefd0 and 0x100ff0a4, Init 0x100ff1b8,
@@ -90,6 +91,7 @@ int32_t BalanceAt(int32_t slot) { return gMainBalance.mValues[slot].mInteger; }
 // The word "x" and "y" a cell id has on the map (cell ids start at 1).
 int32_t CellX(MapId id) { return static_cast<int32_t>((static_cast<uint32_t>(id.mIndex) - 1u) & 0x7fu); }
 int32_t CellY(MapId id) { return static_cast<int32_t>((static_cast<uint32_t>(id.mIndex) - 1u) >> 7); }
+
 
 }  // namespace
 

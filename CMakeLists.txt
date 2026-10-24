@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
+# The oldest macOS the launcher runs on: 11, the first with Apple Silicon. Without it a build runs only on the macOS it
+# was built on and newer, so a release built on GitHub's macOS 15 would refuse every older Mac. Set before project().
+set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "The oldest macOS the launcher runs on")
 project(tpw LANGUAGES C CXX)   # C for the vendored libraries (third_party/)
 
 set(CMAKE_CXX_STANDARD 17)

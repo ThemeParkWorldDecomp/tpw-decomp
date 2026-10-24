@@ -34,7 +34,8 @@ void Destroy3DObjectFromAIWorld(uint32_t a, uint32_t b) {
 }
 
 void DestroyBraceInfo(tag_sTrackBrace* brace, sBraceInfo* info) {
-    ev("DestroyBraceInfo", {static_cast<int64_t>(Word(brace, 0)), static_cast<int64_t>(reinterpret_cast<const char*>(info) - reinterpret_cast<const char*>(brace))});
+    int64_t offset = reinterpret_cast<const char*>(info) - reinterpret_cast<const char*>(brace);
+    ev("DestroyBraceInfo", {static_cast<int64_t>(Word(brace, 0)), offset});
 }
 
 void DestroyDynamicMeshSetInstance(tag_sDMeshSet* set, sHeapInfo* heap, uint32_t flags) {

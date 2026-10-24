@@ -108,6 +108,8 @@ int32_t tpw_lmp_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(sizeof(tag_sCoasterInstance));
     out[n++] = static_cast<int64_t>(offsetof(tag_sCoasterInstance, mFlags));
     out[n++] = static_cast<int64_t>(sizeof(void*));
+    // where the pylon record's pointer table starts (its entry 0, the Mac's word 0x30)
+    out[n++] = 0x30;
     return n;
 }
 

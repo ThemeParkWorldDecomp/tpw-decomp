@@ -10,6 +10,12 @@ MReleaseFreeF, FindDataNodeIndexByID, GetRideRequiredYOffset, CorrectBraceNumber
 What is compared: every field of every object after the call, the allocated entry blocks of SetupBraceInfo, and the event log.
 No fused operations. Not tested: UnLinkBrace on a linked brace with no next brace when the head and tail differ (the original dereferences
 it), a NULL pylon tail in LinkPylon and a NULL tail in LinkBrace (read unconditionally).
+
+With the port fixes on (unit coaster64), the parameter block is the instance's words from mBlock3C, and LinkPylon, LinkBrace and
+UnLinkBrace keep the Mac block's words 0x08 (the brace count), 0x14 (the last pylon) and 0x24 (the editor's brace) in the instance's
+mBraceCount, mPylonTail and mPreviewBrace (the port fixes in sCoasterTrackParams, LinkPylon, LinkBrace and UnLinkBrace,
+src/game/rides/CoasterPylon.cpp): the host world allocates the block as an instance and writes and reads those words there
+(tpw_sbi_layout).
 """
 import ctypes as C
 import random
@@ -44,6 +50,7 @@ FIELDS = [
 ]
 MACOFF = {(k, f): o for k, f, o, p in FIELDS}
 HOSTOFF = {}
+PARAMS = {}        # where the host's parameter block sits in the object allocated for it, and that object's size (tpw_sbi_layout)
 ISPTR = {(k, f): p for k, f, o, p in FIELDS}
 FLOATS = {("pylon", "x"), ("pylon", "y"), ("pylon", "z")}
 
@@ -216,9 +223,10 @@ def bind(lib):
     lib.tpw_sbi_unlink.argtypes = [P, P]
     out = (C.c_int64 * 64)()
     n = lib.tpw_sbi_layout(out)
-    assert n == len(FIELDS), n
+    assert n == len(FIELDS) + 2, n
     for (k, f, o, p), v in zip(FIELDS, list(out)[:n]):
         HOSTOFF[(k, f)] = v
+    PARAMS.update(base=out[n - 2], size=out[n - 1])
     lib.bound = True
 
 
@@ -230,7 +238,10 @@ def build(s, case):
     s.obj = {}
     s.names = {}
     for n in sorted(objs):
-        a = s.alloc(0x400)
+        if s.psz == 8 and objs[n][0] == "params":
+            a = s.alloc(max(0x400, PARAMS["size"])) + PARAMS["base"]
+        else:
+            a = s.alloc(0x400)
         s.obj[n] = a
         s.names[a] = n
     for n, (kind, vals) in objs.items():

@@ -51,6 +51,7 @@ uint8_t gLLCC4818;
 uint8_t gLLCCE0CC;
 int32_t gLLCC4800, gLLCC4804, gLLCC480C, gLLCCDB6C, gLLCCE288, gLLCCE28C, gLLCCFirstBlockX, gLLCCFirstBlockY, gLLCCClickStackCount;
 LLCCClick gLLCCClickStack[0x400];
+CObject* gLLCMCurrentObject;   // HeldRide's whole pointer (LLCellMouse.cpp); never the held ride here
 
 const MapDelta gMapDeltaPlusX = {1, 0, 0};
 const MapDelta gMapDeltaPlusXPlusY = {1, 1, 0};

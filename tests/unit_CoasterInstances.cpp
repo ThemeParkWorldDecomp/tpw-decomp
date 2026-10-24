@@ -215,6 +215,12 @@ int32_t tpw_ci_layout(int64_t* out) {
     return n;
 }
 
+// 1 when the unit is built with the port fixes on (unit coaster64): sTrackBraceData is then the host pylon record's view, so its size is
+// that record's.
+int32_t tpw_ci_portfix() {
+    return 0;
+}
+
 // ---- the functions, one wrapper each with C types only (floats as bits out, pointers as uint64_t)
 void tpw_ci_SetCurrentEditCoaster(uint64_t instance) { SetCurrentEditCoaster(reinterpret_cast<tag_sCoasterInstance*>(instance)); }
 uint32_t tpw_ci_Interval(int32_t which, float value, uint64_t pylon) {

@@ -16,6 +16,10 @@ pylon and brace of the pool, the found pylon, the saved copies of the pylon, its
 
 Fused operations and fctiwz run under HardwareRounding on the original's code. Not tested: a pylon with more than five braces (the saved
 arrays hold five), a NULL brace where the original reads one.
+
+With the port fixes on (unit coaster64), the port fix in LinkPreviewBraceToPylon takes the type's pylon controls as
+tag_sCoasterType's mPylonsB and mPylonsA instead of the words at 0x1c8 and 0xa8, so the type is laid out and its two controls labelled
+at the offsets the unit reports for those fields.
 """
 import ctypes as C
 import random
@@ -44,10 +48,11 @@ ADDR = dict(instances=0x102B68B4, word1790=0x102C1790, input=0x102C1794, header=
 
 LAYOUT_NAMES = ["i_type", "i_blk", "i_next", "i_pylons", "i_last", "i_braces", "i_b5c", "i_prev", "i_b64", "i_ppylon", "i_b6c", "i_f118",
                 "i_size", "b_flags", "b_next", "b_loft", "b_data", "b_spline", "b_w74", "b_size", "p_flags", "p_index", "p_cx", "p_cz",
-                "p_control", "p_x", "p_z", "p_count", "p_braces", "p_next", "p_size", "s_ctrl"]
+                "p_control", "p_x", "p_z", "p_count", "p_braces", "p_next", "p_size", "s_ctrl", "t_pa", "t_pb",
+                "t_size"]
 MAC_LAYOUT = [0x04, 0x3C, 0x18, 0x4C, 0x54, 0x58, 0x5C, 0x60, 0x64, 0x68, 0x6C, 0x118, 0x150,
               0x08, 0x68, 0xE8, 0x100, 0x90, 0x74, 0x110,
-              0x04, 0x08, 0x0C, 0x10, 0x18, 0x1C, 0x24, 0x30, 0x34, 0x28, 0x48, 0x04]
+              0x04, 0x08, 0x0C, 0x10, 0x18, 0x1C, 0x24, 0x30, 0x34, 0x28, 0x48, 0x04, 0xA8, 0x1C8, 0x400]
 MAC_O = dict(zip(LAYOUT_NAMES, MAC_LAYOUT))
 
 
@@ -312,9 +317,9 @@ def build(s, case):
     s.zero(s.g("saved_flag"), 4)
     s.zero(s.g("found"), s.psz)
 
-    typ = s.obj(0x400)
-    s.lab(typ + 0xA8)
-    s.lab(typ + 0x1C8)
+    typ = s.obj(max(O["t_size"], 0x400))
+    s.lab(typ + O["t_pa"])
+    s.lab(typ + O["t_pb"])
     ctrls = []
     for cd in c["ctrls"]:
         a = s.obj(0x100)

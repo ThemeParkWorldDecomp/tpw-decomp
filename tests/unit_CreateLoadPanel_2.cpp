@@ -268,6 +268,11 @@ uint64_t tpw_cl_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_
 
 uint64_t tpw_cl_obj(int32_t i) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(Obj(i))); }
 
+// The word a panel keeps for a window: its address's low half, or with the port fixes its offset in the arena (unit panelword).
+uint32_t tpw_cl_word(uint64_t window) {
+    return static_cast<uint32_t>(window);
+}
+
 // Entry i: its stamp words (Mac 0x14 and 0x18) and the address of its 34-character name.
 uint64_t tpw_cl_entry(int32_t i, uint32_t w0, uint32_t w1) {
     TFSLoadSaveSaveFileDetails* d = Entry(i);

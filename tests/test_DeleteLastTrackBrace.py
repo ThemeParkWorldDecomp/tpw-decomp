@@ -12,6 +12,10 @@ The world of a case: an instance with a type block, a list of 1 to 6 braces each
 chain of three records) and owner block; the globals (edit instance, drag brace, input flags, button masks, the recorder's flag). What is
 compared: the instance's and the braces' fields (pointers as labels), the globals and the event log.
 
+With the port fixes on (unit coaster64), the port fix in DeleteTrackBrace reads the type's word 0xa4 as tag_sCoasterType's mFA4 and the
+pylon owner's word 0x70 as sPylonOwner's mF70, and the one in sTrackBraceData puts the pylon record's words where sPylonRecord keeps them:
+the host world writes them at those offsets (tpw_dltb_layout) and allocates the type and the owner at their host sizes.
+
 No fused operations. Not tested: a list whose first remaining brace chain ends flagged 0x40 (the original reads a NULL brace there), a NULL
 first brace read by the button tests.
 """
@@ -37,11 +41,11 @@ ADDR = dict(edit=0x102B68B0, enabled=0x102C16D4, down=0x102C16D8, drag=0x102C178
 NAMES = ["i_flags", "i_type", "i_blk", "i_count", "i_last", "i_braces", "i_b5c", "i_prev", "i_b64", "i_f118", "i_flash", "i_size",
          "b_num", "b_flags", "b_prev", "b_next", "b_f6c", "b_w70", "b_data", "b_size",
          "p_flags", "p_cx", "p_cz", "p_ctrl", "p_f30", "p_owner", "p_size",
-         "c_f2c", "c_size", "s_flags", "s_heads", "s_size", "m_f28", "m_size", "r_rec"]
+         "c_f2c", "c_size", "s_flags", "s_heads", "s_size", "m_f28", "m_size", "r_rec", "t_fa4", "t_size", "o_f70", "o_size"]
 MAC = dict(zip(NAMES, [0, 4, 0x3C, 0x44, 0x54, 0x58, 0x5C, 0x60, 0x64, 0x118, 0x144, 0x150,
                        0, 8, 0x64, 0x68, 0x6C, 0x70, 0x100, 0x120,
                        4, 0xC, 0x10, 0x18, 0x30, 0x34, 0x40,
-                       0x2C, 0x100, 4, 8, 0x20, 0x28, 0x40, 0x24]))
+                       0x2C, 0x100, 4, 8, 0x20, 0x28, 0x40, 0x24, 0xA4, 0xC0, 0x70, 0x90]))
 
 
 def s32(v):
@@ -210,9 +214,9 @@ def build(s, case):
 
     def mkinst(label, tflags, tf118):
         inst = s.alloc(max(O["i_size"], 0x200) + 16)
-        typ = s.alloc(0xC0)
+        typ = s.alloc(max(O["t_size"], 0xC0))
         s.words(typ, [tflags])
-        s.words(typ + 0xA4, [tf118])
+        s.words(typ + O["t_fa4"], [tf118])
         s.ptr(inst + O["i_type"], typ)
         labels[label] = inst
         return inst
@@ -229,7 +233,7 @@ def build(s, case):
         b = s.alloc(max(O["b_size"], 0x120) + 16)
         py = s.alloc(max(O["p_size"], 0x40) + 16)
         ctrl = s.alloc(max(O["c_size"], 0x100) + 16)
-        owner = s.alloc(0x90)
+        owner = s.alloc(max(O["o_size"], 0x90))
         labels[10 + i], labels[30 + i], labels[50 + i], labels[70 + i] = b, py, ctrl, owner
         braces.append(b)
         bc = case["braces"][i]
@@ -244,7 +248,7 @@ def build(s, case):
         s.words(py + O["p_f30"], [bc["f30"]])
         s.ptr(py + O["p_ctrl"], ctrl)
         s.ptr(py + O["p_owner"], owner)
-        s.words(owner + 0x70, [bc["owner"]])
+        s.words(owner + O["o_f70"], [bc["owner"]])
         s.words(ctrl + O["c_f2c"], [bc["f2c"]])
     for i in range(n):
         if i > 0:

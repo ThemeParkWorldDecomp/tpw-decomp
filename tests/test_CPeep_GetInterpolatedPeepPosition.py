@@ -129,6 +129,8 @@ def setup(runner):
 
 
 class Side:
+    walk = False
+
     def words(self, a, ws):
         self.write(a, b"".join(struct.pack(self.fmt, w & MASK) for w in ws))
 
@@ -178,6 +180,7 @@ class Host(Side):
         self.C = C
         self.lib = lib
         bind(lib)
+        self.walk = lib.tpw_peep_walkfix() == 1
         self.peep = lib.tpw_peep_alloc(0x1C0)
         self.file = lib.tpw_peep_alloc(16)
         self.out = lib.tpw_peep_alloc(16)
@@ -222,12 +225,18 @@ def bind(lib):
 def build(s, case):
     s.words(s.peep, case["peep"])
     s.write(s.peep + 0x18, bytes(case["dest"]))     # the two MapPos are bytes: the same byte string in either order
+    if s.walk:
+        d = case["dest"]
+        s.write(s.peep + 0x18, struct.pack("<HH", d[0] << 8 | d[1], d[2] << 8 | d[3]))
     s.words(s.out, [0xDEADBEEF] * 4)
 
 
 def observe(s, case, answer):
     peep = s.rd_words(s.peep, PEEP_WORDS)
     peep[6] = list(s.read(s.peep + 0x18, 4))
+    if s.walk:
+        a, b = struct.unpack("<HH", s.read(s.peep + 0x18, 4))
+        peep[6] = [a >> 8, a & 0xFF, b >> 8, b & 0xFF]
     return {"answer": answer, "log": s.log(), "peep": peep, "out": s.rd_words(s.out, 4)}
 
 

@@ -159,6 +159,7 @@ int32_t tpw_dmp_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(sPylonOwner, mF70));
     out[n++] = static_cast<int64_t>(offsetof(tag_sCoasterInstance, mBlock3C));
     out[n++] = static_cast<int64_t>(offsetof(CActionRecorder, mRecording));
+    out[n++] = 0;
     return n;
 }
 
