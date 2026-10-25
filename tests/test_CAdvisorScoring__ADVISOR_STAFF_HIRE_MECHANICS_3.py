@@ -30,7 +30,7 @@ NAMES = {
     "hand2": "CAdvisorScoring::_ADVISOR_STAFF_HIRE_HANDYMEN_2", "hand3": "CAdvisorScoring::_ADVISOR_STAFF_HIRE_HANDYMEN_3",
 }
 SLOT_CELL = 0x102a460c        # holds the address of gGameWorld
-SLOT_BASE = 0x18              # the Mac offset of balance slot 0 in the scoring object
+SLOT_BASE = 0x14              # the Mac offset of balance slot 0 in the scoring object
 SLOTS = [(off - SLOT_BASE) // 4 for off in range(0xac, 0xf0, 4)] + [(0x630 - SLOT_BASE) // 4]
 
 STUBS = CL.Stubs()

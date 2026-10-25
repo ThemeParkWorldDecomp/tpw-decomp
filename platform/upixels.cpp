@@ -15,7 +15,8 @@
 // Translated so far: the base class and the five formats the image loader uses (sources
 // 16BGRA, 24BGR, 32BGRA; destinations 16RGBA, 32RGBA). The other seven formats select no
 // implementation yet, and the per-format Convert(const Implementation&) (the path without
-// `dither`, which the game never takes) is not translated.
+// `dither`, which the game never takes) is not translated. The port adds format 7, the
+// postcard's (UPixels24RGB below).
 #include "platform/upixels.h"
 
 #include <cstdlib>
@@ -158,6 +159,7 @@ public:
         SetWord16(p, ((pixel << 8) & 0xf000) | ((pixel >> 4) & 0xf00) | (high >> 12) | (high & 0xf0));
     }
 };
+
 
 // Format 8: three bytes blue, green, red (TGA order); the alpha is the default, or zero
 // for the transparent colour when one is set. SetPixel writes red, green, blue: the

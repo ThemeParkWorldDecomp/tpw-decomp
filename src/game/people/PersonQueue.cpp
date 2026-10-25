@@ -36,8 +36,10 @@ uint16_t gNoFireworks = 0;       // 0x102a0ff2
 uint16_t gNoBalloonThing = 0;    // 0x102a0ff4
 uint16_t gNoDecision = 0;        // 0x102a0ff6
 
-// Placeholder: the real type of the message (vtable 0x102a10dc) is not recovered.
-int32_t CMsgPersonIdle::GetType() const { return 0; }
+// The message is the original's CMsgPrankery (include/ThingReceivers.h), whose GetType (0x10120b90) answers 14, a prank:
+// CStaffHQ::ReceiveMessage sends the nearest free guard after the prankster for that type. Found by samueleagle91
+// (tpw-port issue #51).
+int32_t CMsgPersonIdle::GetType() const { return 0xe; }
 
 namespace {
 

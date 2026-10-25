@@ -168,7 +168,7 @@ class Host(Side):
         return self.lib.tpw_adv_alloc(self.lib.size)
 
     def bal_addr(self, obj, off):
-        return obj + self.lib.base + ((off - 0x18) // 4) * self.lib.stride
+        return obj + self.lib.base + ((off - 0x14) // 4) * self.lib.stride
 
     def write(self, a, d):
         C.memmove(a, d, len(d))

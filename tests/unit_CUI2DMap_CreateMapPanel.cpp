@@ -214,6 +214,12 @@ int32_t tpw_cmp_layout(int64_t* out) {
     return n;
 }
 
+// The word the map keeps at +4 for the panel window at this address: its low 32 bits on the Mac, its arena offset with the port fixes on
+// (unit mapword).
+uint32_t tpw_cmp_panel_word(uint64_t pointer) {
+    return static_cast<uint32_t>(pointer);
+}
+
 // ---- the function
 void tpw_cmp_create() { gUI2DMap.CreateMapPanel(); }
 

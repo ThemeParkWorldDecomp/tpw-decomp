@@ -6,7 +6,7 @@ libtpw_unit_CAdvisorScoring__ADVISOR_CONGRAT_PRICING_DRINKS_.dylib (tests/unit_C
 
 A case is a scoring object (limit and multiplier balance values, halfword 4 and word 8), the function's "none" id global and the answers of the
 analyser fake (id, figure). The world getter and the analyser calls are fakes on both sides that record their arguments (the shop type too).
-The PowerPC object is built at the Mac's offsets; the host's balance slots are passed to the wrapper (slot = (offset - 0x18) / 4).
+The PowerPC object is built at the Mac's offsets; the host's balance slots are passed to the wrapper (slot = (offset - 0x14) / 4).
 Compared: the answer, halfword 4, word 8 and the event log. No fused operations. Not tested: nothing skipped.
 """
 import struct
@@ -112,7 +112,7 @@ def host(lib, case):
     g = lib.tpw_cps_addr(b"g%d" % idx)
     C.memmove(g, struct.pack("<H", case["none"]), 2)
     w4, w8 = C.c_uint32(case["w4"]), C.c_uint32(case["w8"])
-    slot = (off - 0x18) // 4
+    slot = (off - 0x14) // 4
     r = lib.tpw_cps_call(idx, slot, T.s32(case["limit"]), T.s32(case["mult"]), C.byref(w4), C.byref(w8))
     return {"answer": r & MASK, "w4": w4.value & 0xFFFF, "w8": w8.value & MASK, "log": CL.host_end(lib)}
 

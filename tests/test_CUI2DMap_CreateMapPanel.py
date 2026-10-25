@@ -189,6 +189,10 @@ class Side:
     def rd_half(self, a):
         return struct.unpack(self.fmt[0] + "H", self.read(a, 2))[0]
 
+    def panel_word(self):
+        """The word the map keeps at +4 for the panel window (the PPC's: the window's address)."""
+        return self.objs["panel"] & MASK
+
 
 class Ppc(Side):
     fmt = ">I"
@@ -254,6 +258,10 @@ class Host(Side):
     def done(self):
         pass
 
+    def panel_word(self):
+        """The host's: the window's arena offset with the port fixes on (unit mapword), else its low 32 bits."""
+        return self.lib.tpw_cmp_panel_word(self.objs["panel"])
+
     def g(self, name):
         return self.lib.tpw_cmp_addr(name.encode())
 
@@ -279,6 +287,7 @@ def bind(lib):
     lib.tpw_cmp_set.restype, lib.tpw_cmp_set.argtypes = None, [C.c_int32, C.c_uint64]
     lib.tpw_cmp_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_cmp_create.restype, lib.tpw_cmp_create.argtypes = None, []
+    lib.tpw_cmp_panel_word.restype, lib.tpw_cmp_panel_word.argtypes = C.c_uint32, [C.c_uint64]
     out = (C.c_int64 * 32)()
     n = lib.tpw_cmp_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -324,7 +333,7 @@ def build(s, case):
 
 def observe(s, case, answer):
     m = s.g("map")
-    panel = s.objs["panel"] & MASK
+    panel = s.panel_word()
     words = []
     for off in MAPW:
         w = s.rd_word(m + off)

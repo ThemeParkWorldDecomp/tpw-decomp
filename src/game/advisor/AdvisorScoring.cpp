@@ -377,13 +377,13 @@ int32_t CAdvisorScoring::_ADVISOR_CLOSE_PARK() {
 //   _ADVISOR_VISITORS_THIRSTY 0x10011640, _ADVISOR_VISITORS_HUNGRY 0x100116d8, _ADVISOR_STAFF_HIRE_MECHANICS_1 0x1001176c,
 //   _ADVISOR_STAFF_HIRE_MECHANICS_2 0x10011838, _ADVISOR_STAFF_HIRE_MECHANICS_3 0x10011900, _ADVISOR_STAFF_HIRE_HANDYMEN_1 0x10011a08,
 //   _ADVISOR_STAFF_HIRE_HANDYMEN_2 0x10011b0c, _ADVISOR_STAFF_HIRE_HANDYMEN_3 0x10011c0c.
-// The balance values are read at Mac offsets of the scoring object: the table's values start at 0x18 (slot 0), four bytes a slot.
+// The balance values are read at Mac offsets of the scoring object: the table's values start at 0x14 (slot 0), four bytes a slot.
 
 namespace {
 
 // The balance value the Mac reads at `macOffset` of the scoring object.
 inline int32_t Bal_2(CAdvisorScoring* self, int32_t macOffset) {
-    return self->mBalance.mValues[(macOffset - 0x18) / 4].mInteger;
+    return self->mBalance.mValues[(macOffset - 0x14) / 4].mInteger;
 }
 
 inline CParkAnalyser* Analyser() { return gGameWorld->GetParkAnalyser(); }
@@ -1485,8 +1485,8 @@ uint16_t gAdvisorNoneRestaurantSat = 0;     // 0x1027df28
 
 namespace {
 
-// The balance value at a Mac offset of the scoring object (the values start at 0x18 there, four bytes each).
-int32_t Slot_4(const CAdvisorScoring* self, int32_t macOffset) { return self->mBalance.mValues[(macOffset - 0x18) / 4].mInteger; }
+// The balance value at a Mac offset of the scoring object (the values start at 0x14 there, four bytes each).
+int32_t Slot_4(const CAdvisorScoring* self, int32_t macOffset) { return self->mBalance.mValues[(macOffset - 0x14) / 4].mInteger; }
 
 }  // namespace
 
