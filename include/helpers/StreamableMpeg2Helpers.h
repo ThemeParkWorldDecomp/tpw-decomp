@@ -4,6 +4,7 @@
 // copy.
 #pragma once
 
+#include <cstdint>
 #include <new>
 
 // A size of 0 counts as 1; a block of the class's size comes from the list of idle objects when there is one, anything else

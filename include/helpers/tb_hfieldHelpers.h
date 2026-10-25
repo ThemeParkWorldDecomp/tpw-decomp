@@ -3,6 +3,7 @@
 // here, static inline, so each file that includes this header keeps its own internal copy.
 #pragma once
 
+#include <cstdint>
 #include <utility>
 
 // The middle of a range as the sorts take it: the 32-bit sum shifted right arithmetically.

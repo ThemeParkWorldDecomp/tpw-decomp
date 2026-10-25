@@ -113,10 +113,10 @@ void UIMain_CancelAdvisorMessage(AdvisorMessage message) { ev("CancelAdvisorMess
 
 void CreateAllItemsPanel(UIObjType type, CThing* thing) { ev("CreateAllItemsPanel", {static_cast<int64_t>(type), lab(thing)}); }
 
-int32_t _applytoall(CThing*) { return 0; }
+int32_t _applytoall_shop(CThing*) { return 0; }
 
 int32_t UI_IterateThingList(UIIteratorTypes mask, int (*fn)(CThing*)) {
-    ev("UI_IterateThingList", {static_cast<int64_t>(mask), fn == reinterpret_cast<int (*)(CThing*)>(&_applytoall) ? 0x10267e20 : 0});
+    ev("UI_IterateThingList", {static_cast<int64_t>(mask), fn == reinterpret_cast<int (*)(CThing*)>(&_applytoall_shop) ? 0x10267e20 : 0});
     return 0;
 }
 

@@ -1420,7 +1420,7 @@ int32_t ShopStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32
 void UIMain_TickRidePreview();     // 0x10181570 (src/game/ui/ui_main.cpp, unit v5L06): TickRidePreview(gRidePreview) when there is one
 void RemoveStaffCostsPanel();      // 0x101bf278 (stand-in)
 // Unit v51121: the static initialisers of ui_ridepanel.cpp and ui_StaffCostsPanel.cpp, the two words of the latter (names invented) and the
-// shop's _applytoall (0x101bda5c; the staff room's 0x101c25c0 owns the name _applytoall).
+// shop's _applytoall (0x101bda5c; the sideshow panel's 0x101c25c0 owns the name _applytoall).
 void __sinit_ui_ridepanel_cpp();          // 0x101b8c8c
 void __sinit_ui_StaffCostsPanel_cpp();    // 0x101bf2dc
 extern int32_t gStaffCostsF24;            // 0x10395a24: 0x10000 after the sinit
@@ -1428,7 +1428,6 @@ extern int32_t gStaffCostsF28;            // 0x10395a28: 0 after the sinit
 int32_t _applytoall_shop(CThing* thing);  // 0x101bda5c: gShopStatusPanel.applytoallcallback(thing), answers 1
 void CreateFinancePanel();         // 0x101a001c (stand-in)
 extern int16_t gFinanceScript[];   // 0x102a9bec: the finance panel's window script (unit v51026, src/game/ui/ui_FinancePanel.cpp)
-int32_t _applytoall(CThing* thing);   // 0x101bda5c (not translated; ShopStatusMsg hands its TVector 0x10267e20 to UI_IterateThingList)
 
 // ---- Unit v5363 (src/game/ui/ui_ridepanel.cpp): FillRideList (declared above) and the ride list panel's view window.
 // 0x101b5f1c (1420 bytes): the picture (0x1eb) and the label (0x1ec) of the panel's view window (0x1ea) for the ride id (the Mac passes the

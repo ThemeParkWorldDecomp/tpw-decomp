@@ -3,6 +3,7 @@
 // here, static inline, so each file that includes this header keeps its own internal copy.
 #pragma once
 
+#include <cstdint>
 #include <cstring>
 
 template <class T>

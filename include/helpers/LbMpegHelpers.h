@@ -3,6 +3,7 @@
 // here, static inline, so each file that includes this header keeps its own internal copy.
 #pragma once
 
+#include <cstdint>
 #include <new>
 
 // divw: the quotient truncated towards zero; the dividend where the processor leaves it undefined (a zero divisor, the

@@ -341,7 +341,10 @@ int32_t ShopStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int32
             base->GetNextObject();
         } else if (a > 0xc06a) {
             if (a == 0xc081) {
-                UI_IterateThingList(kUIIterShops, _applytoall);
+                // The shop's own callback (0x101bda5c, the tvector at 0x10267e20); the sideshow panel's _applytoall copied
+                // that panel's values instead, so the shops' price became 0 and their quality and ingredient stayed. Found by
+                // Piro (Discord).
+                UI_IterateThingList(kUIIterShops, _applytoall_shop);
                 UIStatusPanel_CallSlot(panel, 0x1c);
                 return 0;
             }
@@ -398,7 +401,7 @@ void ShopStatusPanel::Show(CThing* thing) {
 
 void ShopStatusPanel::Remove() { reinterpret_cast<UIStatusPanel*>(this)->CloseWindow(); }   // 0x101bdf64
 
-// 0x101bda5c (the name is shared with the staff room's 0x101c25c0, so the host name differs).
+// 0x101bda5c (the name is shared with the sideshow panel's 0x101c25c0, so the host name differs).
 int32_t _applytoall_shop(CThing* thing) {
     gShopStatusPanel.applytoallcallback(thing);
     return 1;

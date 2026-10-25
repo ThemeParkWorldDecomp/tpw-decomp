@@ -3,6 +3,7 @@
 // each; that copy now lives here, static inline, so each file that includes this header keeps its own internal copy.
 #pragma once
 
+#include <cstdint>
 #include <new>
 
 static inline uint32_t* MakeTable(uint32_t*& table, uint32_t* (*make)()) {

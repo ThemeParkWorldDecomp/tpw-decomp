@@ -5,6 +5,9 @@
 // the file as it comes (no buffer), so a crash or an abort loses nothing written before it. The ten most recent files
 // are kept. A player sends the latest one with a bug report.
 //
+// Nothing that names the player or the computer reaches the file: every byte goes through log_scrub.h on its way (the
+// home folder is ~, the account name <user>, the computer name <computer>), so the file is safe to send as it is.
+//
 // No game headers here: the platform files that report a failure on their own (msl.cpp's assertion, arena.cpp,
 // jpeg_native.cpp) include this file only. The line writers (LogToFile, LogRaw, LogRawF, LogFileF) are defined here,
 // inline, with the open file's descriptor: the differential tests' units link one of those platform files without
@@ -21,10 +24,12 @@
 #include <string>
 
 #ifdef _WIN32
-#include <io.h>   // Windows: _write; there is no <sys/uio.h> or writev
+#include <io.h>   // Windows: _write
 #else
-#include <sys/uio.h>
+#include <unistd.h>
 #endif
+
+#include "log_scrub.h"
 
 namespace tpw {
 
@@ -59,7 +64,10 @@ std::string LogFileName(std::time_t when);
 // The header's lines after the first, each ending in a newline: date, os, hardware, args and log (`path`).
 std::string LogHeaderLines(int argc, const char* const* argv, const std::string& path);
 
-// `a`, then `b`, then a newline, to the log file only (nothing when none is open), in one write. Safe in a signal
+// `length` bytes of `text` to the descriptor, scrubbed (log_scrub.h): the way every byte reaches the log file. Safe in a
+// signal handler: it takes no lock and allocates nothing.
+void WriteScrubbed(int fd, const char* text, size_t length);
+// `a`, then `b`, then a newline, to the log file only (nothing when none is open), scrubbed, in one write. Safe in a signal
 // handler: it takes no lock and allocates nothing.
 void LogToFile(const char* a, const char* b);
 // A whole line to both: stderr exactly as given (with a newline after it, whatever Config::logToStderr says, as the
@@ -75,34 +83,43 @@ void LogFileF(const char* format, ...) __attribute__((format(printf, 1, 2)));
 // in points, pixel scale and refresh rate, the primary one marked). Said once per run; nothing before video starts.
 void LogDisplayOnce();
 
+inline void WriteScrubbed(int fd, const char* text, size_t length) {
+    const ScrubIdentity* identity = gScrubIdentity.load(std::memory_order_relaxed);
+    char out[4096];
+    size_t at = 0;
+    while (at < length) {
+        size_t written = 0;
+        at = ScrubChunk(identity, text, length, at, out, sizeof out, &written);
+#ifdef _WIN32
+        // Windows: _write takes an int count; the C runtime holds the descriptor's lock for each call, so lines from two
+        // threads do not interleave. A short write (a full disk) is left as it is. Windows has no EINTR.
+        (void)_write(fd, out, static_cast<unsigned>(written));
+#else
+        // One write on a descriptor opened for appending: lines from two threads do not interleave. A short write (a full
+        // disk) is left as it is.
+        while (write(fd, out, written) < 0 && errno == EINTR) {
+        }
+#endif
+    }
+}
+
 inline void LogToFile(const char* a, const char* b) {
     const int fd = gLogFileFd.load(std::memory_order_relaxed);
     if (fd < 0) return;
-#ifdef _WIN32
-    // Windows: no writev. The parts are joined in a buffer on the stack (nothing allocated, as a signal handler needs)
-    // and go out in one _write; the C runtime holds the descriptor's lock for each _write, so lines from two threads do
-    // not interleave. A line longer than the buffer goes in three writes, which another thread's line can come between.
-    // A short write (a full disk) is left as it is. Windows has no EINTR.
+    // The two parts are joined in a buffer on the stack (nothing allocated, as a signal handler needs), scrubbed (log_scrub.h)
+    // and written in one call. A line longer than the buffer goes in three, which another thread's line can come between.
     const size_t lengthA = std::strlen(a), lengthB = std::strlen(b);
-    char line[4096];
+    char line[2048];
     if (lengthA + lengthB < sizeof line) {
         std::memcpy(line, a, lengthA);
         std::memcpy(line + lengthA, b, lengthB);
         line[lengthA + lengthB] = '\n';
-        (void)_write(fd, line, static_cast<unsigned>(lengthA + lengthB + 1));
+        WriteScrubbed(fd, line, lengthA + lengthB + 1);
     } else {
-        (void)_write(fd, a, static_cast<unsigned>(lengthA));
-        (void)_write(fd, b, static_cast<unsigned>(lengthB));
-        (void)_write(fd, "\n", 1);
+        WriteScrubbed(fd, a, lengthA);
+        WriteScrubbed(fd, b, lengthB);
+        WriteScrubbed(fd, "\n", 1);
     }
-#else
-    char newline = '\n';
-    iovec parts[3] = {{const_cast<char*>(a), std::strlen(a)}, {const_cast<char*>(b), std::strlen(b)}, {&newline, 1}};
-    // One writev on a descriptor opened for appending: lines from two threads do not interleave. A short write (a full
-    // disk) is left as it is.
-    while (writev(fd, parts, 3) < 0 && errno == EINTR) {
-    }
-#endif
 }
 
 inline void LogRaw(const char* line) {

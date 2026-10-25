@@ -3,6 +3,7 @@
 // static inline, so each file that includes this header keeps its own internal copy.
 #pragma once
 
+#include <cstdint>
 #include <new>
 
 static inline uint32_t Be16(const uint8_t* p) { return (uint32_t(p[0]) << 8) | p[1]; }
