@@ -484,7 +484,10 @@ void UIStatusPanel::ShowEditNamePanel() {
 
     InterfaceWindow* parent = parentField.get();
     int16_t z = parent->mZ;   // the Mac's +0xdc, by name: the host window is laid out differently
-    InterfaceWindow* window = parent->Build(gEditNamePanelScript, TwoEditsMsg);
+    // The panel's handler is the edit-name one (0x10193fac, TwoEditsMsgStatus here), the tvector at 0x10267960; the park gate's
+    // TwoEditsMsg renamed the gates object and wrote through gParkScreenWindow, so the tick crashed. Found by samueleagle91
+    // (tpw-port issue #34).
+    InterfaceWindow* window = parent->Build(gEditNamePanelScript, TwoEditsMsgStatus);
     windowField.set(window);
     window->setZ(static_cast<int16_t>(z + 0x11));
     window->setExtraParam(0, thing);

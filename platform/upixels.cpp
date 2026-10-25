@@ -264,7 +264,7 @@ UPixelsImplementation* MakeImplementation(intptr_t format, uint8_t* bytes, uint3
     case kPixels32ARGB: return new UPixels32ARGB(bytes, w, h, pitch, 4);
     case kPixels32RGBA: return new UPixels32RGBA(bytes, w, h, pitch, 4);
     case kPixels32BGRA: return new UPixels32BGRA(bytes, w, h, pitch, 4);
-    default: return nullptr;   // above 11: none in the original either; 0, 2, 3, 6, 7: not translated yet
+    default: return nullptr;   // above 11: none in the original either; 0, 2, 3, 6: not translated yet (7 too, without the port fixes)
     }
 }
 }  // namespace

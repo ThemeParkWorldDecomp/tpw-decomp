@@ -28,7 +28,8 @@ MASK = 0xFFFFFFFF
 FN = 0x10194208
 OWN = {FN}
 
-ADDR = dict(script=0x102A8530, callback=0x10267960, buf=0x10380C48, bufA=0x10394782, bufB=0x10394764, thing=0x103947A4)
+ADDR = dict(script=0x102A8530, callback=0x10267960,   # callback: the tvector of 0x10193fac, TwoEditsMsgStatus on the host
+            buf=0x10380C48, bufA=0x10394782, bufB=0x10394764, thing=0x103947A4)
 PPC_WINDOW = (0xDC, 0xE0)
 
 TEXT_TITLE = "Edit"

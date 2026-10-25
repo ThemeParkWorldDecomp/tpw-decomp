@@ -30,7 +30,7 @@ char16_t gEditSignBufA[15];
 char16_t gEditSignBufB[15];
 char16_t gUIMainConvertBuffer[0x4000];
 
-int32_t TwoEditsMsg(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
+int32_t TwoEditsMsgStatus(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
 
 namespace {
 
@@ -147,7 +147,7 @@ uint64_t tpw_ses_addr(const char* name) {
     };
     const Entry entries[] = {
         {"script", gEditNamePanelScript},
-        {"callback", reinterpret_cast<const void*>(&TwoEditsMsg)},
+        {"callback", reinterpret_cast<const void*>(&TwoEditsMsgStatus)},
         {"buf", gUIMainConvertBuffer},
         {"bufA", gEditSignBufA},
         {"bufB", gEditSignBufB},
