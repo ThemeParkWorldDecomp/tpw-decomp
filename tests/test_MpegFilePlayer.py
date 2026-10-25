@@ -343,8 +343,13 @@ def build_stubs(real_udebug=False):
     return S
 
 
+PORT_FIX = False
+
+
 def setup(runner):
-    global STUBS, STUBS_REAL_UDEBUG, FAKE_VTABLE, FILE_VTABLE
+    global STUBS, STUBS_REAL_UDEBUG, FAKE_VTABLE, FILE_VTABLE, PORT_FIX
+    runner.lib.tpw_mf_portfix.restype, runner.lib.tpw_mf_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_mf_portfix() == 1
     T.install_std_stubs(runner.emu)
     FAKE_VTABLE, FILE_VTABLE = make_fake_vtables(runner.emu)
     STUBS = build_stubs()
@@ -426,6 +431,11 @@ def ppc_op(e, L, ctx, op):
         return 0
     if kind == OP_NEW:
         block = call(A_UPNEW, [b & MASK])
+        if block == 0 and PORT_FIX and b & MASK == OBJ:
+            # The port's fixes (tpw-port issue #50): with no idle player, a new element (the Mac's own MakeNewPoolElement), its
+            # player handed out off the queue.
+            made = call(A_MAKE, [])
+            block = made + ELEM if made else 0
         ctx["blocks"][a] = block
         return plab(L, block)
     if kind == OP_NEW_RAW:

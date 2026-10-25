@@ -104,7 +104,7 @@ template <>
 Pool::UPooled() {}
 
 // 0x10007ffc: for the player's size, the first element of the queue whose player has no read in flight, taken off the queue;
-// NULL when there is none (no heap fallback). Any other size goes to the heap.
+// NULL when there is none (no heap fallback; the port's fixes make one, below). Any other size goes to the heap.
 // (The game tests the answer: NULL is a pool with no idle player, not an allocation failure.)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnew-returns-null"

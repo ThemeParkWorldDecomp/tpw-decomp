@@ -10,6 +10,7 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include <mutex>
 
 #include "TbMpegBase.h"
 #include "bfl_FileSystem.h"
@@ -98,9 +99,10 @@ public:
     int32_t mCount;                        // +0x0c
 };
 
-// The pool of file players (StreamableMpeg2.cpp, CSprocketsModule.cpp): operator new takes an idle player from the queue and
-// answers NULL when none is idle (there is no heap fallback: the game keeps the pool full, MaintainPoolLevel, from the sound
-// module's Tick), operator delete puts the player back. Level 10 is the target the pool is kept at. The members are defined
+// The pool of file players (StreamableMpeg2.cpp, CSprocketsModule.cpp): operator new takes an idle player from the queue; on
+// the Mac it answers NULL when none is idle (there is no heap fallback: the game keeps the pool full, MaintainPoolLevel, from
+// the sound module's Tick); the port's fixes make a new player then (operator new, src/sound/StreamableMpeg2.cpp). Operator
+// delete puts the player back. Level 10 is the target the pool is kept at. The members are defined
 // for the one instance the game has, <CMpegMacFilePlayerUnpooled, 10> (src/sound/StreamableMpeg2.cpp), as explicit specializations.
 template <class T, int Level>
 class UPooled : public T {
@@ -132,6 +134,7 @@ public:
 };
 
 using MpegFilePlayerPool = UPooled<CMpegMacFilePlayerUnpooled, 10>;
+
 
 }  // namespace SamsUtilities
 

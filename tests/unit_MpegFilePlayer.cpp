@@ -31,6 +31,7 @@ using namespace calllog;
 
 #pragma clang diagnostic ignored "-Winvalid-offsetof"
 
+
 using Pool = SamsUtilities::MpegFilePlayerPool;
 using PoolQueue = Pool::Queue;
 using Element = PoolQueue::Element;
@@ -571,6 +572,11 @@ void tpw_mf_pool_state(int64_t* out) {
 int32_t tpw_mf_get_mmx() { return using_MMX; }
 uint32_t tpw_mf_initial_target() { return gInitialTarget; }
 uint32_t tpw_mf_initial_keepfull() { return gInitialKeepFull; }
+// 1 when the unit is built with the port fixes on (tpw-port issue #50): operator new then makes a new element when no player is idle,
+// where the Mac answered NULL.
+int32_t tpw_mf_portfix() {
+    return 0;
+}
 void tpw_mf_set_pool(int keepFull, uint32_t target) {
     Pool::gPoolKeepFull = static_cast<uint8_t>(keepFull);
     Pool::gPoolTarget = target;

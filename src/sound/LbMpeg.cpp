@@ -570,6 +570,7 @@ typename UInterruptSafeQueue<Data>::Element* UInterruptSafeQueue<Data>::Element:
     return reinterpret_cast<Element*>(static_cast<uint8_t*>(data) - sizeof(Element));
 }
 
+
 template <class Data>
 UInterruptSafeQueue<Data>::UInterruptSafeQueue() : mFlags(0), mHead(nullptr), mTail(nullptr), mCount(0) {}
 
