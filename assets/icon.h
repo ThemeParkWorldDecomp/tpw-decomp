@@ -45,4 +45,13 @@ bool DecodeIconPng(const uint8_t* data, size_t size, IconImage& out, std::string
 bool ReadIconPng(const std::string& path, IconImage& out, std::string* source);
 bool WriteIconPng(const std::string& path, const IconImage& icon, const std::string& source, std::string& err);
 
+// A .ico of the icon at the sizes Windows asks for: 16, 24, 32, 48, 64, 128 and 256 pixels, each no bigger than the
+// picture (its own size is always among them; a 64 x 64 TP.ico gives five). The smaller pictures are scaled down from it
+// (the area average of the source pixels, with the alpha taken into account), each stored as a 32-bit bitmap with its
+// mask, and a picture of more than 128 pixels as a PNG, which Windows reads since Vista and asks for at 256. Made at
+// build time into the launcher's icon resource (launcher/win/make_ico.cpp) and by --write-icon on Windows, for the
+// Start menu shortcut (install.ps1). Empty for an empty picture.
+std::vector<uint8_t> EncodeIco(const IconImage& icon);
+bool WriteIconIco(const std::string& path, const IconImage& icon, std::string& err);
+
 }  // namespace tpw::assets

@@ -607,9 +607,11 @@ bool ReadIconPng(const std::string& path, IconImage& out, std::string* source) {
     return DecodeIconPng(bytes.data(), bytes.size(), out, source);
 }
 
-bool WriteIconPng(const std::string& path, const IconImage& icon, const std::string& source, std::string& err) {
-    const std::vector<uint8_t> png = EncodeIconPng(icon, source);
-    if (png.empty()) {
+namespace {
+
+// `bytes` as the file `path`, through `path`.part and a rename, so that no reader sees half a file.
+bool WriteWhole(const std::string& path, const std::vector<uint8_t>& bytes, std::string& err) {
+    if (bytes.empty()) {
         err = "no picture to write";
         return false;
     }
@@ -619,7 +621,7 @@ bool WriteIconPng(const std::string& path, const IconImage& icon, const std::str
         err = "cannot write " + part;
         return false;
     }
-    const bool ok = std::fwrite(png.data(), 1, png.size(), f) == png.size();
+    const bool ok = std::fwrite(bytes.data(), 1, bytes.size(), f) == bytes.size();
     if (std::fclose(f) != 0 || !ok) {
         std::remove(part.c_str());
         err = "cannot write " + part;
@@ -631,6 +633,111 @@ bool WriteIconPng(const std::string& path, const IconImage& icon, const std::str
         return false;
     }
     return true;
+}
+
+}  // namespace
+
+bool WriteIconPng(const std::string& path, const IconImage& icon, const std::string& source, std::string& err) {
+    return WriteWhole(path, EncodeIconPng(icon, source), err);
+}
+
+// ---- .ico
+
+namespace {
+
+void PutLe16(std::vector<uint8_t>& out, unsigned v) { out.push_back(uint8_t(v)), out.push_back(uint8_t(v >> 8)); }
+void PutLe32(std::vector<uint8_t>& out, uint32_t v) { PutLe16(out, v & 0xffff), PutLe16(out, v >> 16); }
+
+// `src` scaled to `n` x `n`: each pixel the area average of the source pixels under it (a box filter, exact for any
+// ratio), the colours weighted by their alpha so that see-through pixels lend no colour to the edge.
+IconImage Downscale(const IconImage& src, int n) {
+    IconImage out;
+    out.width = out.height = n;
+    out.bitDepth = 32;
+    out.rgba.assign(size_t(n) * n * 4, 0);
+    const double sx = double(src.width) / n, sy = double(src.height) / n;
+    for (int dy = 0; dy < n; ++dy) {
+        const double y0 = dy * sy, y1 = (dy + 1) * sy;
+        for (int dx = 0; dx < n; ++dx) {
+            const double x0 = dx * sx, x1 = (dx + 1) * sx;
+            double r = 0, g = 0, b = 0, a = 0, area = 0;
+            for (int y = int(y0); y < src.height && y < y1; ++y) {
+                const double wy = std::min(y1, double(y + 1)) - std::max(y0, double(y));
+                if (wy <= 0) continue;
+                for (int x = int(x0); x < src.width && x < x1; ++x) {
+                    const double wx = std::min(x1, double(x + 1)) - std::max(x0, double(x));
+                    if (wx <= 0) continue;
+                    const double w = wx * wy;
+                    const uint8_t* p = &src.rgba[(size_t(y) * src.width + x) * 4];
+                    const double wa = w * p[3];
+                    r += wa * p[0], g += wa * p[1], b += wa * p[2], a += wa, area += w;
+                }
+            }
+            uint8_t* o = &out.rgba[(size_t(dy) * n + dx) * 4];
+            if (a > 0) {
+                o[0] = uint8_t(r / a + 0.5), o[1] = uint8_t(g / a + 0.5), o[2] = uint8_t(b / a + 0.5);
+                o[3] = uint8_t(std::min(255.0, a / area + 0.5));
+            }
+        }
+    }
+    return out;
+}
+
+// One picture of a .ico as a 32-bit device-independent bitmap: BITMAPINFOHEADER with the height doubled, bottom-up BGRA
+// rows, then the 1-bit AND mask (1 where the pixel is see-through), as DecodeDib reads it.
+std::vector<uint8_t> IcoDib(const IconImage& img) {
+    std::vector<uint8_t> out;
+    const size_t andStride = ((size_t(img.width) + 31) / 32) * 4;
+    PutLe32(out, 40), PutLe32(out, uint32_t(img.width)), PutLe32(out, uint32_t(img.height) * 2);
+    PutLe16(out, 1), PutLe16(out, 32), PutLe32(out, 0);
+    PutLe32(out, uint32_t(size_t(img.width) * img.height * 4 + andStride * img.height));
+    PutLe32(out, 0), PutLe32(out, 0), PutLe32(out, 0), PutLe32(out, 0);
+    for (int y = img.height - 1; y >= 0; --y) {
+        const uint8_t* row = &img.rgba[size_t(y) * img.width * 4];
+        for (int x = 0; x < img.width; ++x) {
+            const uint8_t* p = row + x * 4;
+            out.push_back(p[2]), out.push_back(p[1]), out.push_back(p[0]), out.push_back(p[3]);
+        }
+    }
+    for (int y = img.height - 1; y >= 0; --y) {
+        const uint8_t* row = &img.rgba[size_t(y) * img.width * 4];
+        std::vector<uint8_t> mask(andStride, 0);
+        for (int x = 0; x < img.width; ++x)
+            if (row[x * 4 + 3] == 0) mask[x / 8] |= uint8_t(0x80 >> (x % 8));
+        out.insert(out.end(), mask.begin(), mask.end());
+    }
+    return out;
+}
+
+}  // namespace
+
+std::vector<uint8_t> EncodeIco(const IconImage& icon) {
+    std::vector<uint8_t> out;
+    if (icon.Empty() || icon.rgba.size() < size_t(icon.width) * icon.height * 4 || icon.width > 256 || icon.height > 256) return out;
+    const int own = std::max(icon.width, icon.height);
+    std::vector<int> sizes;
+    for (int n : {16, 24, 32, 48, 64, 128, 256})
+        if (n < own) sizes.push_back(n);
+    sizes.push_back(own);
+    std::vector<std::vector<uint8_t>> pictures;
+    for (int n : sizes) {
+        const IconImage img = n == own && icon.width == icon.height ? icon : Downscale(icon, n);
+        pictures.push_back(n > 128 ? EncodeIconPng(img, "") : IcoDib(img));
+    }
+    PutLe16(out, 0), PutLe16(out, 1), PutLe16(out, unsigned(sizes.size()));
+    size_t offset = 6 + 16 * sizes.size();
+    for (size_t i = 0; i < sizes.size(); ++i) {
+        const unsigned n = unsigned(sizes[i]);
+        out.push_back(uint8_t(n == 256 ? 0 : n)), out.push_back(uint8_t(n == 256 ? 0 : n)), out.push_back(0), out.push_back(0);
+        PutLe16(out, 1), PutLe16(out, 32), PutLe32(out, uint32_t(pictures[i].size())), PutLe32(out, uint32_t(offset));
+        offset += pictures[i].size();
+    }
+    for (const std::vector<uint8_t>& p : pictures) out.insert(out.end(), p.begin(), p.end());
+    return out;
+}
+
+bool WriteIconIco(const std::string& path, const IconImage& icon, std::string& err) {
+    return WriteWhole(path, EncodeIco(icon), err);
 }
 
 }  // namespace tpw::assets

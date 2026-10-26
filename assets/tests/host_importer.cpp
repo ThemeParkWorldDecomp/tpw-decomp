@@ -1019,6 +1019,51 @@ void TestIcon(const std::string& scratch) {
     CHECK_EQ(back.bitDepth, 4);
     CHECK(back.rgba == icon.rgba);
 
+    // the .ico the launcher writes (EncodeIco): a 64 x 64 picture gives the five sizes up to its own, 32-bit bitmaps,
+    // and reads back as itself (the biggest wins); a 256 x 256 one gives all seven, the biggest as a PNG
+    auto ramp = [](int n) {
+        IconImage img;
+        img.width = img.height = n;
+        img.bitDepth = 32;
+        img.rgba.resize(size_t(n) * n * 4);
+        for (int y = 0; y < n; ++y)
+            for (int x = 0; x < n; ++x) {
+                uint8_t* p = &img.rgba[(size_t(y) * n + x) * 4];
+                p[0] = uint8_t(x * 255 / (n - 1)), p[1] = uint8_t(y * 255 / (n - 1)), p[2] = 77, p[3] = x < n / 2 ? 255 : 0;
+            }
+        return img;
+    };
+    const IconImage sixtyFour = ramp(64);
+    const std::vector<uint8_t> ico64 = EncodeIco(sixtyFour);
+    CHECK(ico64.size() > 6 && ico64[0] == 0 && ico64[1] == 0 && ico64[2] == 1 && ico64[3] == 0);
+    CHECK_EQ(ico64[4], 5);
+    CHECK_EQ(ico64[6 + 4 * 16], 64);   // the fifth entry: 64 x 64
+    CHECK_EQ(ico64[6 + 16], 24);       // the second: 24 x 24
+    IconImage again;
+    CHECK(DecodeIcon(IconFile::Ico, ico64.data(), ico64.size(), again));
+    CHECK_EQ(again.width, 64);
+    CHECK_EQ(again.bitDepth, 32);
+    CHECK(again.rgba == sixtyFour.rgba);
+    const std::vector<uint8_t> ico256 = EncodeIco(ramp(256));
+    CHECK_EQ(ico256[4], 7);
+    CHECK_EQ(ico256[6 + 6 * 16], 0);   // the seventh: 256, written as 0
+    CHECK(DecodeIcon(IconFile::Ico, ico256.data(), ico256.size(), again));
+    CHECK_EQ(again.width, 128);        // the PNG picture is skipped, the 128 one is scaled down: the left half opaque
+    CHECK_EQ(again.rgba[3], 255);
+    CHECK_EQ(again.rgba[(64 * 128 + 127) * 4 + 3], 0);
+    CHECK_EQ(again.rgba[(127 * 128 + 63) * 4 + 1], 255);   // bottom row: green 254 and 255 averaged, rounded up
+    const size_t pngAt = size_t(ico256[6 + 6 * 16 + 12]) | size_t(ico256[6 + 6 * 16 + 13]) << 8 | size_t(ico256[6 + 6 * 16 + 14]) << 16;
+    const size_t pngSize = size_t(ico256[6 + 6 * 16 + 8]) | size_t(ico256[6 + 6 * 16 + 9]) << 8 | size_t(ico256[6 + 6 * 16 + 10]) << 16;
+    CHECK(pngAt + pngSize == ico256.size());
+    CHECK(DecodeIconPng(ico256.data() + pngAt, pngSize, again, nullptr));
+    CHECK_EQ(again.width, 256);
+    CHECK(again.rgba == ramp(256).rgba);
+    CHECK(EncodeIco(IconImage{}).empty());
+    std::string icoErr;
+    CHECK(WriteIconIco(scratch + "/icon-test.ico", sixtyFour, icoErr));
+    CHECK(DecodeIcon(IconFile::Ico, ico64.data(), ico64.size(), again));
+    std::remove((scratch + "/icon-test.ico").c_str());
+
     // a drop with TP.ico in it writes icon.png beside launcher.ini; a lesser icon later does not replace it
     std::string root = scratch + "/icon-data", drop = scratch + "/icon-drop";
     RemoveTree(root);
