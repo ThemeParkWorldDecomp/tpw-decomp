@@ -57,14 +57,14 @@
 namespace rails_callee {
 void RectCtor(void* rect);                                   // 0x101c7448 CoolRect::CoolRect()
 void RectDtor(void* rect);                                   // 0x101c74e0 CoolRect::~CoolRect() (flag -1)
-void WindowSetValue(InterfaceWindow* window, int32_t value);   // the virtual SetValue (slot 0x1c of the table at +0x118)
+void WindowEnable(InterfaceWindow* window, int16_t on);            // the virtual Enable (slot 0x1c of the table at +0x118)
 InterfaceWindow* WindowFromWord(int32_t word);               // a 32-bit window word as a pointer (the test maps it to its window)
 __attribute__((weak)) InterfaceWindow* WindowFromWord(int32_t word) {
     return SlideoutWordWindow(word);   // the panel LinkSlideoutPanel noted (include/ui_main.h)
 }
 __attribute__((weak)) void RectCtor(void* rect) { new (rect) CoolRect(); }
 __attribute__((weak)) void RectDtor(void* rect) { static_cast<CoolRect*>(rect)->~CoolRect(); }
-__attribute__((weak)) void WindowSetValue(InterfaceWindow* window, int32_t value) { window->SetValue(value); }
+__attribute__((weak)) void WindowEnable(InterfaceWindow* window, int16_t on) { window->Enable(on); }
 }  // namespace rails_callee
 
 namespace {
@@ -427,7 +427,7 @@ int32_t RailsCallback(InterfaceWindow* window, int32_t message, int32_t a, int32
                     window->mF134 = 3;
                 }
                 InterfaceWindow* tab = window->GetWindow(0x24);
-                if (tab != nullptr) WindowSetValue(tab, 0);
+                if (tab != nullptr) WindowEnable(tab, 0);   // the close button answers clicks only while a panel is in
                 SOUND_SendEvent(0, gSoundBanks[3], 0x1c, 0, 0, 0);
                 RectDtor(slotB.bytes);
                 RectDtor(slotA.bytes);
@@ -473,7 +473,7 @@ int32_t RailsCallback(InterfaceWindow* window, int32_t message, int32_t a, int32
                         window->startAnimTimer(0x80080);
                         window->mF134 = 2;
                         InterfaceWindow* tab = window->GetWindow(0x24);
-                        if (tab != nullptr) WindowSetValue(tab, 1);
+                        if (tab != nullptr) WindowEnable(tab, 1);
                         SOUND_SendEvent(0, gSoundBanks[3], 0x1c, 0, 0, 0);
                         UI_SendMessage(arrival, 0x1001d9, 0, 0);
                     }

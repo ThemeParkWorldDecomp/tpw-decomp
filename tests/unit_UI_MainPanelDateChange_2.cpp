@@ -268,7 +268,7 @@ InterfaceWindow* WindowFromWord(int32_t word) {
             return static_cast<InterfaceWindow*>(gWinTable[i]);
     return reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(static_cast<uint32_t>(word)));
 }
-void WindowSetValue(InterfaceWindow* window, int32_t value) { ev("SetValue", {P(window), I(value)}); }
+void WindowEnable(InterfaceWindow* window, int16_t on) { ev("Enable", {P(window), I(on)}); }
 }  // namespace rails_callee
 
 extern "C" {

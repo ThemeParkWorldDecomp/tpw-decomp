@@ -6,7 +6,8 @@ src/game/ui/ui_loansPanel.cpp, src/game/ui/ui_mainpanel2.cpp:
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian) for the translation; the same code reads both back. Every callee outside
 the unit (the window methods, the rectangle constructor, destructor and GetDims, FormatString, the text converter, the park analyser, the
-history, the sound, message and panel calls, the virtual SetValue) is a fake on both sides that records its arguments and answers from the case.
+history, the sound, message and panel calls, the virtual Enable of the slide-out tab) is a fake on both sides that records its arguments and
+answers from the case. The fake window table holds 0x5000 + offset in every slot, so the log names the virtual that was called.
 
 The world of a case: twelve window blocks (labels 1 to 12; label 1 is the panel RailsCallback runs on, 2 the window it is given), the
 globals (main panel, game window, slide-out tab, loans panel and mode, the three last-panel words, the sound bank, the text table word, the
@@ -282,7 +283,14 @@ def st_fill_lender(e):
 
 @stub(0x1023BAA8)
 def st_ptr_glue(e):
-    e.cl.rec("SetValue", (e.cl.lab(e.r(3)), s32(e.r(4))))
+    # a virtual call: r12 holds the word of the fake table, 0x5000 + the slot's offset, so the log tells Enable (0x1c) from SetValue (0x24)
+    slot = (e.r(12) - 0x5000) & MASK
+    if slot == 0x1C:
+        e.cl.rec("Enable", (e.cl.lab(e.r(3)), s16(e.r(4))))
+    elif slot == 0x24:
+        e.cl.rec("SetValue", (e.cl.lab(e.r(3)), s32(e.r(4))))
+    else:
+        e.cl.rec("Virtual", (slot, e.cl.lab(e.r(3))))
 
 
 @stub(0x10180334)
@@ -353,7 +361,7 @@ class Ppc(Side):
     def __init__(self, e, case):
         self.e = e
         self.win = [0] + [e.alloc(WIN_SIZE) for _ in range(NWIN)]
-        vt = e.alloc(0x40)
+        vt = e.alloc(0x40, b"".join(struct.pack(">I", 0x5000 + 4 * k) for k in range(16)))   # slot k holds 0x5000 + its offset
         for a in self.win[1:]:
             e.write(a + 0x118, struct.pack(">I", vt))
         e.write(0x102A460C, struct.pack(">I", ADDR["gGameWorld"]))
