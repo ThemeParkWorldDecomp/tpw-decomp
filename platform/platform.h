@@ -180,9 +180,14 @@ void GameSize(int& wide, int& high);
 // The game sets its resolution (SetDisplayMode, MoveWindow); with the fit the window is fitted to it again.
 void SetGameSize(int wide, int high);
 bool FitActive();
-// Alt+Enter (Windows, Linux): the window goes between a real full-screen window and the fitted window, at run time
-// (platform/window.cpp). False when it cannot (no window, no fit, --background) or the system refused.
+// Alt+Enter (Windows, Linux) and the game's Esc menu button (every system): the window goes between a real full-screen
+// window and the fitted window, at run time (platform/window.cpp). False when it cannot (no window, no fit, --background)
+// or the system refused.
 bool ToggleFullScreen();
+// Whether ToggleFullScreen can act now (a window, the fit, not --background), and whether the window is full screen now
+// (as the window reports it, so the system's own switch counts). The Esc menu's button shows and reads them.
+bool CanToggleFullScreen();
+bool IsFullScreen();
 // The largest width or height this machine's OpenGL renders a frame at (platform/offscreen.cpp's LargestSize), asked of a
 // hidden 1 x 1 window before the game's own exists; 0 when it cannot be asked. The launcher picks a preset that fits.
 int LargestGameSize();

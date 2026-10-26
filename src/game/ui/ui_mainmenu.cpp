@@ -148,6 +148,7 @@ const uint8_t kGameActions[26] = {kGHide, kGLoad0, kGSave0, kGRestart, kGPublish
                                   kGDefault, kGDefault, kGDefault, kGDefault, kGDefault, kGDefault, kGDefault, kGHide, kGDefault,
                                   kGDefault, kGLeaveNoBye, kGQuitNoBye, kGHide, kGLoad1, kGBankruptRestart, kGLeave, kGQuit};
 
+
 }  // namespace
 
 // 0x101fabd8 (316)

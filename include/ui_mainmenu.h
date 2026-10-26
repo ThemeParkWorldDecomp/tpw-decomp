@@ -5,6 +5,7 @@
 int32_t MainLobbyMenuConfirmQuit_OK(void* context);   // 0x101fb1f4
 int32_t MainGameMenuConfirmQuit_OK(void* context);    // 0x101fab10
 
+
 // Unit v5522 (src/game/ui/ui_mainmenu.cpp).
 class InterfaceWindow;
 class CFSOnlineSystem;
