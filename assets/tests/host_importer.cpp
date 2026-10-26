@@ -18,6 +18,7 @@
 #include <thread>
 #include <zlib.h>
 
+#include "../icon.h"
 #include "../importer.h"
 #include "../sha256.h"
 #include "../sniff.h"
@@ -921,6 +922,132 @@ void TestGold(const Discs& d, const std::string& scratch) {
     }
 }
 
+// ---- the game's icon (icon.h): a .ico made here, its PNG, and a drop that carries one
+
+// A .ico picture: `bpp` 4 (a 16-colour palette, entry i = blue i*16, green i*8, red i*4; pixel (x, y) is entry (x + y) % 16)
+// or 24 (pixel (x, y) is blue x, green y, red 200); the AND mask clears the top-left pixel.
+std::string IcoPicture(int w, int h, int bpp) {
+    std::string out;
+    auto le16 = [&out](unsigned v) { out += static_cast<char>(v & 255); out += static_cast<char>((v >> 8) & 255); };
+    auto le32 = [&le16](unsigned v) { le16(v & 0xffff); le16(v >> 16); };
+    const unsigned colours = bpp == 4 ? 16 : 0;
+    le32(40); le32(static_cast<unsigned>(w)); le32(static_cast<unsigned>(2 * h)); le16(1); le16(static_cast<unsigned>(bpp));
+    le32(0); le32(0); le32(0); le32(0); le32(colours); le32(0);
+    for (unsigned i = 0; i < colours; ++i) { out += static_cast<char>(i * 16); out += static_cast<char>(i * 8); out += static_cast<char>(i * 4); out += '\0'; }
+    const size_t xorStride = ((size_t(w) * bpp + 31) / 32) * 4, andStride = ((size_t(w) + 31) / 32) * 4;
+    for (int y = h - 1; y >= 0; --y) {   // bottom-up
+        std::string row(xorStride, '\0');
+        for (int x = 0; x < w; ++x) {
+            if (bpp == 4) row[x / 2] |= static_cast<char>(((x + y) % 16) << (x % 2 == 0 ? 4 : 0));
+            else { row[x * 3] = static_cast<char>(x); row[x * 3 + 1] = static_cast<char>(y); row[x * 3 + 2] = static_cast<char>(200); }
+        }
+        out += row;
+    }
+    for (int y = h - 1; y >= 0; --y) {
+        std::string row(andStride, '\0');
+        if (y == 0) row[0] = static_cast<char>(0x80);
+        out += row;
+    }
+    return out;
+}
+
+std::string IcoFile(const std::vector<std::string>& pictures, const std::vector<int>& widths, const std::vector<int>& depths) {
+    std::string out;
+    auto le16 = [&out](unsigned v) { out += static_cast<char>(v & 255); out += static_cast<char>((v >> 8) & 255); };
+    auto le32 = [&le16](unsigned v) { le16(v & 0xffff); le16(v >> 16); };
+    le16(0); le16(1); le16(static_cast<unsigned>(pictures.size()));
+    size_t offset = 6 + 16 * pictures.size();
+    for (size_t i = 0; i < pictures.size(); ++i) {
+        out += static_cast<char>(widths[i]); out += static_cast<char>(widths[i]); out += static_cast<char>(depths[i] == 4 ? 16 : 0); out += '\0';
+        le16(1); le16(static_cast<unsigned>(depths[i])); le32(static_cast<unsigned>(pictures[i].size())); le32(static_cast<unsigned>(offset));
+        offset += pictures[i].size();
+    }
+    for (const std::string& p : pictures) out += p;
+    return out;
+}
+
+void TestIcon(const std::string& scratch) {
+    std::printf("the game's icon\n");
+    CHECK(IconFileKind("Theme Park Data/SimTheme Park", true) == IconFile::ResourceFork);
+    CHECK(IconFileKind("Theme Park World 2.1.4", true) == IconFile::ResourceFork);
+    CHECK(IconFileKind("Theme Park Data/SimTheme Park", false) == IconFile::None);
+    CHECK(IconFileKind("TP.ico", false) == IconFile::Ico);
+    CHECK(IconFileKind("disc/tp.ICO", false) == IconFile::Ico);
+    CHECK(IconFileKind("TP.EXE", false) == IconFile::Exe);
+    CHECK(IconFileKind("ThemeParkWorld.exe", false) == IconFile::Exe);
+    CHECK(IconFileKind("Setup.exe", false) == IconFile::None);
+    CHECK(IconFileKind("data/levels/level.sam", false) == IconFile::None);
+
+    // the .ico: the 8 x 8 16-colour picture beats the 4 x 4 true-colour one (more pixels first)
+    const std::string ico = IcoFile({IcoPicture(4, 4, 24), IcoPicture(8, 8, 4)}, {4, 8}, {24, 4});
+    IconImage icon;
+    CHECK(DecodeIcon(IconFile::Ico, reinterpret_cast<const uint8_t*>(ico.data()), ico.size(), icon));
+    CHECK_EQ(icon.width, 8);
+    CHECK_EQ(icon.height, 8);
+    CHECK_EQ(icon.bitDepth, 4);
+    CHECK_EQ(icon.rgba.size(), 8u * 8 * 4);
+    CHECK_EQ(icon.rgba[3], 0);                      // top left: masked out
+    CHECK_EQ(icon.rgba[4], 4);                      // (1, 0): entry 1, red 4
+    CHECK_EQ(icon.rgba[5], 8);
+    CHECK_EQ(icon.rgba[6], 16);
+    CHECK_EQ(icon.rgba[7], 255);
+    CHECK_EQ(icon.rgba[(7 * 8 + 7) * 4 + 2], 14 * 16);   // (7, 7): entry 14, blue 224
+    IconImage small;
+    const std::string one = IcoFile({IcoPicture(4, 4, 24)}, {4}, {24});
+    CHECK(DecodeIcon(IconFile::Ico, reinterpret_cast<const uint8_t*>(one.data()), one.size(), small));
+    CHECK_EQ(small.width, 4);
+    CHECK_EQ(small.bitDepth, 24);
+    CHECK_EQ(small.rgba[(1 * 4 + 2) * 4 + 0], 200);   // (2, 1): red 200, green 1, blue 2
+    CHECK_EQ(small.rgba[(1 * 4 + 2) * 4 + 1], 1);
+    CHECK_EQ(small.rgba[(1 * 4 + 2) * 4 + 2], 2);
+    CHECK(BetterIcon(icon, small));
+    CHECK(!BetterIcon(small, icon));
+    CHECK(BetterIcon(small, IconImage{}));
+    CHECK(!BetterIcon(icon, icon));   // the same again is no better
+    IconImage none;
+    CHECK(!DecodeIcon(IconFile::Ico, reinterpret_cast<const uint8_t*>("\0\0\1\0"), 4, none));
+    CHECK(!DecodeIcon(IconFile::Exe, reinterpret_cast<const uint8_t*>(ico.data()), ico.size(), none));
+
+    // the PNG keeps the pixels and says where they came from
+    const std::vector<uint8_t> png = EncodeIconPng(icon, "TP.ico");
+    CHECK(png.size() > 8 && png[1] == 'P' && png[2] == 'N' && png[3] == 'G');
+    IconImage back;
+    std::string source;
+    CHECK(DecodeIconPng(png.data(), png.size(), back, &source));
+    CHECK(source == "TP.ico, 8x8, 4-bit");
+    CHECK_EQ(back.width, 8);
+    CHECK_EQ(back.bitDepth, 4);
+    CHECK(back.rgba == icon.rgba);
+
+    // a drop with TP.ico in it writes icon.png beside launcher.ini; a lesser icon later does not replace it
+    std::string root = scratch + "/icon-data", drop = scratch + "/icon-drop";
+    RemoveTree(root);
+    RemoveTree(drop);
+    WriteFile(drop + "/TP.ico", ico);
+    WriteFile(drop + "/README.txt", "a disc");
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    Importer imp(cfg);
+    std::string err;
+    CHECK(imp.Open(err));
+    ImportReport r = imp.Import({drop});
+    CHECK(r.errors.empty());
+    CHECK(r.icon == "TP.ico, 8x8, 4-bit");
+    IconImage kept;
+    CHECK(ReadIconPng(root + "/icon.png", kept, &source));
+    CHECK(source == "TP.ico, 8x8, 4-bit");
+    CHECK(kept.rgba == icon.rgba);
+    WriteFile(drop + "/TP.ico", one);
+    r = imp.Import({drop});
+    CHECK(r.errors.empty());
+    CHECK(r.icon.empty());
+    CHECK(ReadIconPng(root + "/icon.png", kept, &source));
+    CHECK(source == "TP.ico, 8x8, 4-bit");
+    RemoveTree(root);
+    RemoveTree(drop);
+}
+
+
 }  // namespace
 
 int main() {
@@ -931,6 +1058,7 @@ int main() {
     fs::create_directories(scratch);
 
     TestSynthetic(scratch);
+    TestIcon(scratch);
     TestStartupCheck(scratch);
     TestDamagedContainers(scratch);
 

@@ -137,6 +137,9 @@ struct ImportReport {
     std::vector<std::string> differentVersions;  // destinations ("data/..."), sorted, whose file in the drop has other content
     uint64_t unknownFiles = 0, unknownBytes = 0; // counted, never listed
     std::vector<std::string> errors;
+    // The game's icon (icon.h) when this drop wrote <data folder>/icon.png: where it came from ("TP.ico, 64x64, 8-bit");
+    // empty when the drop held none, or none better than the one already there.
+    std::string icon;
     EditionStatus status[3];           // us, eur, gold after the drop
     bool ChangedNothing() const { return written == 0; }
     // One plain line for the log and the Finished event, e.g. "Nothing new: 1683 files were already in place."

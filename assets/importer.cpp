@@ -15,6 +15,7 @@
 #include <system_error>
 #include <unordered_map>
 
+#include "icon.h"
 #include "sha256.h"
 #include "sniff.h"
 
@@ -426,6 +427,8 @@ struct Importer::Run {
     std::set<std::string> matchedDests;          // destinations a file of the drop matched
     std::set<std::pair<int, uint32_t>> counted;  // (edition index, record) written or counted as already there
     std::set<std::string> opened;                // canonical paths of files and folders already read in this drop
+    IconImage icon;                              // the best game icon seen so far (icon.h), and the file it came from
+    std::string iconSource;
     bool stop = false;
 };
 
@@ -842,6 +845,25 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
         run.report.aborted = true;
     }
     run.work.clear();
+    // The drop's best game icon becomes <data folder>/icon.png when there is none yet or it beats the one there (icon.h).
+    if (!run.icon.Empty() && opened_ && !cancel_ && !run.report.aborted) {
+        const std::string iconPath = config_.dataRoot + "/icon.png";
+        IconImage have;
+        std::string err;
+        if (!ReadIconPng(iconPath, have, nullptr) || BetterIcon(run.icon, have)) {
+            if (WriteIconPng(iconPath, run.icon, run.iconSource, err)) {
+                char text[64];
+                std::snprintf(text, sizeof text, ", %dx%d, %d-bit", run.icon.width, run.icon.height, run.icon.bitDepth);
+                run.report.icon = run.iconSource + text;
+                ImportProgress ev;
+                ev.kind = ImportProgress::Kind::Written;
+                ev.path = "icon.png (the game's icon, from " + run.iconSource + ")";
+                progress_.Push(ev);
+            } else {
+                run.report.errors.push_back("icon.png: " + err);
+            }
+        }
+    }
     // a destination the drop also holds the right file for is not news (a disc's other languages, say)
     for (const std::string& dest : run.different) {
         if (run.matchedDests.count(dest)) continue;
@@ -952,6 +974,24 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
         if (!skip.empty() && Under(e.path, skip)) continue;
         std::string name = display.empty() ? e.path : display + "/" + e.path;
         bool known = bySize_.count(e.size) != 0;
+        // The game's icon (icon.h): the Mac program's resource fork, TP.ico or the PC program, read whole and decoded; the
+        // best picture of the drop is written as icon.png at the end. Never an error: a file that will not read is skipped.
+        if (e.size > 0 && e.size <= kIconFileLimit) {
+            const IconFile kind = IconFileKind(e.path, e.kind == EntryKind::Rsrc);
+            if (kind != IconFile::None) {
+                std::string err;
+                std::vector<uint8_t> bytes;
+                std::unique_ptr<Stream> in = source->Open(e, err);
+                IconImage found;
+                if (in && ReadAll(*in, kIconFileLimit, bytes, err) && DecodeIcon(kind, bytes.data(), bytes.size(), found) &&
+                    BetterIcon(found, run.icon)) {
+                    run.icon = std::move(found);
+                    const size_t slash = e.path.find_last_of('/');
+                    run.iconSource = (slash == std::string::npos ? e.path : e.path.substr(slash + 1)) +
+                                     (e.kind == EntryKind::Rsrc ? " (resource fork)" : "");
+                }
+            }
+        }
         if (e.kind == EntryKind::Data && !known && e.size >= 2048 && ContainerExtension(Extension(e.path))) {
             std::string err;
             std::shared_ptr<Source> child;
