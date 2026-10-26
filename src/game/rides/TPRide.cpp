@@ -1065,21 +1065,25 @@ void PutFloat(uint8_t* where, float value) {
     Store(where, value);
 }
 
+
 }  // namespace
 
 int32_t SaveRides(void* file) {
+    uint32_t countB = gRideCountB;
+    uint32_t countA = gRideCountA;
+    uint32_t firstFree = gRideFirstFree;
     uint32_t total = 0xc;
     uint8_t* block = nullptr;
     uint8_t* p = nullptr;
     for (uint32_t pass = 0; pass < 2; ++pass) {
         if (pass == 1) {
             block = static_cast<uint8_t*>(MReleaseAllocF(total, 1));
-            PutWord(block, gRideCountB);
-            PutWord(block + 4, gRideCountA);
-            PutWord(block + 8, gRideFirstFree);
+            PutWord(block, countB);
+            PutWord(block + 4, countA);
+            PutWord(block + 8, firstFree);
             p = block + 12;
         }
-        for (uint32_t slot = 0; slot < gRideCountB + gRideCountA; ++slot) {
+        for (uint32_t slot = 0; slot < countB + countA; ++slot) {
             tag_sRideAnimSet* set = gRideAnimSets[slot + 1];
             if (pass == 0) {
                 total += 1;
@@ -1277,6 +1281,7 @@ uint16_t Half_2(const uint8_t* p) {
     std::memcpy(&v, p, 2);
     return v;
 }
+
 
 }  // namespace
 

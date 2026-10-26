@@ -8,7 +8,8 @@
   src/game/park/TPHField.cpp    LoadProceduralTextureSet 0x1005b8fc
   src/game/MeshLoad.cpp      CorrectOrientationFlagsForDiffProceduralMode 0x100b7fa0
 
-The nine functions run as the original on the PowerPC side and as src/ on the host; where one calls another (the walk under DoIHaveTheseRides,
+The nine functions run as the original on the PowerPC side and as src/ on the host (DoIHaveTheseRides with the port fix on tests every
+required bit, so the host's answer is checked against that model and the Mac's model is compared with the original, fixed_result); where one calls another (the walk under DoIHaveTheseRides,
 DisableRideHead and SCR_KillScript under FLY_RemoveBase, the corrector under LoadProceduralTextureSet) the callee is real on both sides.
 Everything else they call is a fake that records the same event on both sides: FindDataNodeIndexByID (the ride set's label, the mask and
 the id; the queue answers, 0xffffffff when empty), DestroyRideInstance, PAR_KillEmitter, SOUND_StopSoundEffect, LbMem_Free and MReleaseFreeF
@@ -130,6 +131,8 @@ def lib_setup(lib):
     lib.tpw_pe_do_i_have.restype = I32
     lib.tpw_pe_do_i_have.argtypes = [VP, I32, VP, VP]
     lib.tpw_pe_required_after.argtypes = [VP]
+    lib.tpw_pe_portfix.restype, lib.tpw_pe_portfix.argtypes = I32, []
+    lib.port_fix = lib.tpw_pe_portfix() == 1
     lib.tpw_pe_walk.restype = I32
     lib.tpw_pe_walk.argtypes = [I32, VP]
     lib.tpw_pe_scene.argtypes = [I32, I32, VP, VP]
@@ -319,7 +322,22 @@ def host_do_i_have(lib, c):
     result = lib.tpw_pe_do_i_have(required, c["previews"], owned, C.byref(cursor))
     required_mask = C.create_string_buffer(32)
     lib.tpw_pe_required_after(required_mask)
+    if lib.port_fix:
+        result = fixed_result(c["required"], owned.raw[:32], result)
     return dict(result=result, owned=owned.raw[:32], required_mask=required_mask.raw[:32], cursor=cursor.value, log=CL.host_end(lib))
+
+
+def fixed_result(required, owned, result):
+    """The host's answer with the port fix on (fix gold, World.cpp), as a value to compare with the Mac's.
+
+    The fix tests every bit: the park is refused (0) when any required bit is not in the owned mask the function has just rebuilt, else
+    1. The Mac tests (mask & byte) == 1, so only bit 0 of each byte counts. When the host's answer is the fixed one, the Mac's model of
+    the same masks is returned, so the comparison still checks the Mac's answer against the original; otherwise a tuple that names the
+    host's answer and the fixed one, which no PowerPC result matches."""
+    expected = 0 if any(required[i] & ~owned[i] & 0xFF for i in range(32)) else 1
+    if result != expected:
+        return ("fixed", result, expected)
+    return 0 if any(required[i] & 1 and not owned[i] & 1 for i in range(32)) else 1
 
 
 def walk_visit(c):

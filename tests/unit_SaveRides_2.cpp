@@ -28,6 +28,9 @@ tag_sRideAnimSet* gRideAnimSets[kMaxRideInstances + 4];
 uint32_t gRideCountA;
 uint32_t gRideCountB;
 uint32_t gRideFirstFree;
+// The type table: the port fix ridepreviewsave looks the instances' type numbers up in it (the Mac's SaveRides never reads it).
+tag_sRideAnimSet* gRideTypes[kMaxRideTypes + 2];
+uint32_t gRideTypeCount;
 
 namespace {
 std::vector<std::vector<uint8_t>> gWrites;
@@ -93,6 +96,8 @@ uint64_t tpw_sr_addr(const char* name) {
         {"B", &gRideCountB},
         {"ff", &gRideFirstFree},
         {"zero", &gSaveRidesTbErrorZero},
+        {"types", &gRideTypes[0]},
+        {"typeCount", &gRideTypeCount},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));
@@ -149,6 +154,13 @@ int32_t tpw_sr_layout(int64_t* out) {
 void tpw_sr_reset() {
     gWrites.clear();
     gLastBlock = nullptr;
+    std::memset(gRideTypes, 0, sizeof(gRideTypes));
+    gRideTypeCount = 0;
+}
+
+// 1 when the library was built with the port fixes (ridepreviewsave: an instance of no loaded type is written as an empty slot).
+int32_t tpw_sr_portfix() {
+    return 0;
 }
 int32_t tpw_sr_nwrites() { return static_cast<int32_t>(gWrites.size()); }
 int32_t tpw_sr_wlen(int32_t i) { return static_cast<int32_t>(gWrites[i].size()); }

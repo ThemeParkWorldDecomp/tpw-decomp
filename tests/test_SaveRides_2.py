@@ -12,6 +12,12 @@ What is compared: the answer, the event log and every byte written to the file. 
 time control's +0x14 word) is stored in the machine's own order, so the PowerPC bytes of that word are reversed before the compare
 (the host is little-endian: the file's order). Fused operations: none. Not tested: a set with more nodes in the "nodes" part than
 the header's all-node count (the original never reads them), a NULL mesh or header (read unconditionally).
+
+The port fix ridepreviewsave (src/game/rides/TPRide.cpp) writes an instance whose type number no loaded ride type carries (the status
+panels' ride preview) as an empty slot, with the counts and the first free slot as DestroyRideInstance would leave them. The host's
+type table (gRideTypes, which the Mac's SaveRides never reads) is given every slot's set as a type, except the slots a case names in
+"unknown". The SaveRides_portfix test runs the host on such a case and the original on the case with those slots emptied and the counts
+adjusted the same way (derived); with the fixes off both sides run the derived case.
 """
 import ctypes as C
 import random
@@ -181,6 +187,9 @@ class Ppc(Side):
     def log(self):
         return self.e.cl.log
 
+    def types(self, addrs):
+        pass        # the Mac's SaveRides never reads the type table
+
     def writes(self, case):
         out = [bytearray(b) for b in self.e.sr_writes]
         if len(out) > 1:
@@ -227,6 +236,12 @@ class Host(Side):
     def log(self):
         return CL.host_end(self.lib)
 
+    def types(self, addrs):
+        table = self.g("types")
+        for i, addr in enumerate(addrs):
+            self.ptr(table + self.psize * (i + 1), addr)
+        self.words(self.g("typeCount"), [len(addrs)])
+
     def writes(self, case):
         out = []
         for i in range(self.lib.tpw_sr_nwrites()):
@@ -251,6 +266,8 @@ def bind(lib):
     lib.tpw_sr_wlen.restype, lib.tpw_sr_wlen.argtypes = C.c_int32, [C.c_int32]
     lib.tpw_sr_wdata.argtypes = [C.c_int32, C.c_void_p]
     lib.tpw_sr_save.restype, lib.tpw_sr_save.argtypes = C.c_int32, [C.c_uint64]
+    lib.tpw_sr_portfix.restype, lib.tpw_sr_portfix.argtypes = C.c_int32, []
+    lib.port_fix = lib.tpw_sr_portfix() == 1
     lib.bound = True
 
 
@@ -322,9 +339,14 @@ def build(s, case):
     s.words(s.g("ff"), [case["ff"]])
     s.words(s.g("zero"), [case["zero"]])
     table = s.g("sets")
+    types = []
+    unknown = set(case.get("unknown", []))
     for i, d in enumerate(case["slots"]):
         addr = make_set(s, d) if d is not None else 0
         s.ptr(table + s.psize * (i + 1), addr)
+        if d is not None and i not in unknown:
+            types.append(addr)
+    s.types(types)
 
 
 def run(s, case):
@@ -342,6 +364,32 @@ def ppc(e, case):
 
 def host(lib, case):
     return run(Host(lib, case), case)
+
+
+def derived(case):
+    """The case as the port fix writes it: the unknown slots empty, the counts and the first free slot as DestroyRideInstance keeps
+    them (the empty slots at the end go, the first free slot is the lowest empty one)."""
+    unknown = set(case.get("unknown", []))
+    if not unknown:
+        return case
+    slots = [None if i in unknown else d for i, d in enumerate(case["slots"])]
+    total = (case["B"] + case["A"]) & MASK
+    b = case["B"] - len(unknown) if len(unknown) < case["B"] else 0
+    a = (total - b) & MASK
+    while a != 0 and slots[(b + a - 1) & MASK] is None:
+        a -= 1
+    n = (b + a) & MASK
+    ff = next((i for i in range(n) if slots[i] is None), n)
+    return dict(case, slots=slots[:n], A=a, B=b, ff=ff, unknown=[])
+
+
+def fix_ppc(e, case):
+    return ppc(e, derived(case))
+
+
+def fix_host(lib, case):
+    bind(lib)
+    return host(lib, case if lib.port_fix else derived(case))
 
 
 SPECIAL = [0, 0x80000000, 0x7F800000, 0xFF800000, 0x00000001, 0x3F800000, 0xBF800000, 0x7F7FFFFF, 0x00800000, 0xFFFFFFFF]
@@ -432,6 +480,46 @@ def edges():
                 yield base(r, [make_setdesc(r)], err=err, zero=zero, wn=wn)
 
 
+def with_unknown(r, case, unknown):
+    """The case with the given slots as instances no loaded type carries the number of (type number 0, the preview's; the others' never 0)."""
+    for i, d in enumerate(case["slots"]):
+        if d is None:
+            continue
+        if i in unknown:
+            d["mFF8"] = 0
+        elif d["mFF8"] == 0:
+            d["mFF8"] = r.randrange(1, 1 << 32)
+    case["unknown"] = [i for i in unknown if case["slots"][i] is not None]
+    return case
+
+
+def fix_edges():
+    r = random.Random(11)
+
+    def slots(pattern):
+        return [make_setdesc(r) if ch == "r" else None for ch in pattern]
+
+    # the preview at the end, in the middle, at the start, next to holes, with holes after it, alone, two of them, every slot
+    for pattern, unknown in (("rrr", [2]), ("rrr", [1]), ("rrr", [0]), ("r.r.r", [2]), ("rr..", [1]), ("r", [0]), ("rrrr", [1, 3]),
+                             ("rr", [0, 1]), ("r.r", [2]), (".r", [1]), ("rrr.r", [4]), ("rrr.r", [3]), ("", [])):
+        yield with_unknown(r, base(r, slots(pattern)), unknown)
+    # the counts of the file are not tied to the holes in a test: a used count that is 0 and a used count that is all the slots
+    c = with_unknown(r, base(r, slots("rr.")), [0])
+    c["A"], c["B"] = 3, 0
+    yield c
+    c = with_unknown(r, base(r, slots("rr.")), [0])
+    c["A"], c["B"] = 0, 3
+    yield c
+
+
+def fix_random_case(r):
+    case = random_case(r)
+    present = [i for i, d in enumerate(case["slots"]) if d is not None]
+    unknown = [i for i in present if r.random() < 0.4]
+    return with_unknown(r, case, unknown)
+
+
 TESTS = [
     FnTest("SaveRides", ppc, host, edge=edges, rnd=random_case),
+    FnTest("SaveRides_portfix", fix_ppc, fix_host, edge=fix_edges, rnd=fix_random_case),
 ]

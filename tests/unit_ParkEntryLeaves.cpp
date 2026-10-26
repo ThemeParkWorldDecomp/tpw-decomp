@@ -170,6 +170,12 @@ int32_t tpw_pe_do_i_have(const char* required, int32_t previews, uint8_t* owned,
 // The required mask as DoIHaveTheseRides left it (it is primed with 0xc3 bytes by tpw_pe_do_i_have).
 void tpw_pe_required_after(uint8_t* out) { std::memcpy(out, gParkRequiredRides, 0x20); }
 
+// 1 when the unit is built with the port fixes on (fix gold): DoIHaveTheseRides then tests every bit of the required mask, not
+// only bit 0 of each byte, and a park that needs a ride the database has not got is refused.
+int32_t tpw_pe_portfix() {
+    return 0;
+}
+
 // GetFirstRide (next == 0) or GetNextRide: the answer's pool index (-1 NULL, -2 other) and the position after.
 int32_t tpw_pe_walk(int32_t next, int32_t* cursor) {
     RideInfo* answer = next == 0 ? gRideDatabase.GetFirstRide() : gRideDatabase.GetNextRide();
