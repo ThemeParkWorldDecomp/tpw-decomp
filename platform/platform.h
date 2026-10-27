@@ -168,7 +168,9 @@ struct Window : GrafPort {
 };
 Window* MainWindow();             // NULL before NewCWindow
 // The window's title for the game's Pascal-string title: the game calls its window "Theme Park World" in both editions,
-// which is the UK edition's name; the US edition's window is "SimTheme Park", the name on its box, splash and menus.
+// which is the UK edition's name; the US edition's window is "Sim Theme Park" (its box and splash write it SimTheme
+// Park; the launcher's menus and the window write the name as the game is known). The title bar shows it out of full
+// screen.
 std::string WindowTitle(const std::string& edition, const unsigned char* title);
 // The window's content origin in screen coordinates (the Mac's "global" coordinates).
 void WindowOrigin(int32_t& x, int32_t& y);

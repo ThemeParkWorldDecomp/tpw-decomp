@@ -18,6 +18,14 @@ a stream of records. What is compared: the answer, the globals, the sine table, 
 Fused operations: FLY_Load's sine table (fmadd, fctiwz) runs under HardwareRounding. Not tested: a table of bases longer than 100 words
 (the PowerPC would overrun into the next global, the host's table is twice as wide); a table length that is not a multiple of 4 (the
 Mac's words are big-endian, the host's are not); a base smaller than 0x60 bytes; a thing id past the thing table.
+
+With the port fixes on (unit flysave; the port fixes in FLY_Load, src/game/rides/FlyingRide.cpp) FLY_Load also reads a fly file written by
+a port build before the save fix: a 400-byte table of 64-bit pointer pairs (base 0 two zero words, every other pair zero or a low word and a
+high word in 1..0x7fff) followed by bases whose thing id and 20 fly records are byte-reversed. Such a case carries that file and the Mac's
+form of the same park: the host reads the port file and the PowerPC side the Mac's, and the two must agree, which shows the repair (the
+pairs become the marks of bases 1 to 49, every base is swapped back, including an idle one whose thing id the bytes alone could not tell).
+A Mac-format park with 0, 1 or several rides, marked as the Mac and the fixed port mark them, is left alone. With the fixes off both sides
+read the port file as it is, and the comparison is the original's.
 """
 import ctypes as C
 import random
@@ -173,8 +181,14 @@ STUBS.internal(0x10154868, st_ride_info)
 STUBS.internal(0x1006A140, st_restore)
 
 
+PORT_FIX = False      # the host library was built with the port fixes on (setup; the PowerPC side then reads the Mac's form of a port file)
+
+
 def setup(runner):
+    global PORT_FIX
     T.install_std_stubs(runner.emu)
+    bind(runner.lib)
+    PORT_FIX = runner.lib.port_fix
 
 
 # ---------------------------------------------------------------------------------------------------------------- the two sides
@@ -210,6 +224,7 @@ class Ppc(Side):
     fmt = ">I"
     pfmt = ">I"
     psz = 4
+    port_file = property(lambda self: not PORT_FIX)      # reads a port file as it is only when the host does too
     thing_stride = 0x14
     sub_off = 0x7B8
 
@@ -258,6 +273,7 @@ class Host(Side):
     fmt = "<I"
     pfmt = "<Q"
     psz = 8
+    port_file = True
     thing_stride = 48
     sub_off = 2728
 
@@ -310,9 +326,11 @@ def bind(lib):
     lib.tpw_fly_load.restype, lib.tpw_fly_load.argtypes = C.c_int32, [C.c_uint64]
     lib.tpw_fly_restore.restype, lib.tpw_fly_restore.argtypes = None, []
     lib.tpw_fly_object.restype, lib.tpw_fly_object.argtypes = None, [C.c_uint64]
+    lib.tpw_fly_portfix.restype, lib.tpw_fly_portfix.argtypes = C.c_int32, []
     out = (C.c_int64 * 32)()
     n = lib.tpw_fly_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    lib.port_fix = lib.tpw_fly_portfix() == 1
     lib.bound = True
 
 
@@ -333,7 +351,7 @@ def loaded(case):
 
 def build(s, case):
     op = case["op"]
-    s.set_file(case.get("file", b""))
+    s.set_file(case["portfile"] if case.get("portfile") is not None and s.port_file else case.get("file", b""))
     if op == "load":
         s.words(s.g("gFlyActive"), [case["active"]])
         s.words(s.g("gFlyInitialised"), [1 if case["init"] else 0])
@@ -393,9 +411,10 @@ def observe(s, case, answer):
         else:
             d["tablePtr"] = tab & MASK
         bs = case["bs"]
+        alloc = case["portalloc"] if "portalloc" in case and not PORT_FIX else case["alloc"]
         for i in range(100):
             p = s.rptr(s.bases(i))
-            if loaded(case) and i in case["alloc"]:
+            if loaded(case) and i in alloc:
                 d["base%d" % i] = (s.rd_words(p, 22), s.r16(p + 0x58), s.read(p + 0x5A, bs - 0x5A))
             else:
                 d["base%d" % i] = p & MASK
@@ -427,9 +446,10 @@ def host(lib, case):
 # ---------------------------------------------------------------------------------------------------------------- case generators
 
 MARKS = [0, 0x01010101, 0x7E7E7E7E, 0x02020202]
+MAC_MARKS = [0xFFFFFFFF, 0x0A3F5C20, 0x10400000, 0x00FF8000]     # the fixed port's mark and Mac heap pointers: never a pair's high word
 
 
-def fly_case(r, good=None, version=None, init=None, nw=None, density=None, bs=None):
+def fly_case(r, good=None, version=None, init=None, nw=None, density=None, bs=None, marks=None, count=None):
     good = r.random() < 0.85 if good is None else good
     magic = 0x5F594C46 if good else r.choice([0, 0x464C595F, r.getrandbits(32)])
     version = r.choice([1, 2, r.getrandbits(32) | 1, 1, 1, 0]) if version is None else version
@@ -441,7 +461,12 @@ def fly_case(r, good=None, version=None, init=None, nw=None, density=None, bs=No
         if density >= 0.5:
             bs = min(bs, 0x100)
     preset = [r.choice(MARKS) if r.random() < 0.5 else 0 for _ in range(100)]
-    filemarks = [r.choice(MARKS[1:]) if r.random() < density else 0 for _ in range(nw)]
+    marks = MARKS[1:] if marks is None else marks
+    filemarks = [r.choice(marks) if r.random() < density else 0 for _ in range(nw)]
+    if count is not None:       # exactly `count` set bases, among 1..nw-1
+        filemarks = [0] * nw
+        for i in r.sample(range(1, nw), count):
+            filemarks[i] = r.choice(marks)
     final = (list(preset) if init else [0] * 100)
     final[:nw] = filemarks
     alloc = [i for i in range(1, 100) if final[i]]
@@ -461,6 +486,49 @@ def fly_case(r, good=None, version=None, init=None, nw=None, density=None, bs=No
             "zones": zones, "file": file, "bs": bs, "alloc": alloc, "queues": {}}
 
 
+def swap16(v):
+    return ((v & 0xFF) << 8) | (v >> 8)
+
+
+def port_case(r, density=None, init=None, idle=None):
+    """A fly file written by a port build before the save fix (the port fixes, unit flysave), with the Mac's form of the same park.
+    "portfile": the table holds the host's first 50 pointers as 64-bit pairs (base 0 two zero words; a set base a low word, zero or
+    not, and a high word in 1..0x7fff), and each base's thing id and 20 fly records are byte-reversed. "file": the same park as the Mac
+    writes it (marks of 1, bases as they are). "portalloc" and "alloc": the bases a side allocates when it reads the port file as it is
+    (each nonzero word a mark) and when it reads either file as the Mac's. An idle base (all 20 states 0) with a thing id whose low byte
+    is below 0x28 is one the bytes alone could not tell."""
+    density = r.choice([0.03, 0.1, 0.3, 1.0]) if density is None else density
+    init = r.random() < 0.4 if init is None else init
+    idle = r.random() < 0.5 if idle is None else idle
+    pairs = [(0, 0)] + [(r.choice([0, r.getrandbits(32), r.getrandbits(16)]), r.randrange(1, 0x8000)) if r.random() < density else (0, 0)
+                        for _ in range(1, 50)]
+    if not any(high for _, high in pairs):
+        pairs[r.randrange(1, 50)] = (r.getrandbits(32), r.randrange(1, 0x8000))
+    raw = [w for pair in pairs for w in pair]
+    marks = [1 if pair != (0, 0) else 0 for pair in pairs] + [0] * 50
+    preset = [r.choice(MARKS) if r.random() < 0.5 else 0 for _ in range(100)]
+    alloc = [i for i in range(1, 100) if marks[i]]
+    portalloc = [i for i in range(1, 100) if raw[i]]
+    zones = [r.getrandbits(32) for _ in range(4)]
+    zone_bytes = le(*[r.getrandbits(32) for _ in range(4)])
+    version = r.choice([1, 2, r.getrandbits(32) | 1])
+    head = le(0x5F594C46, version, 400)
+    tail = zone_bytes + le(*[r.getrandbits(32) for _ in range(5)], BASE_SIZE)
+    file, portfile = head + le(*marks) + tail, head + le(*raw) + tail
+    idle_at = r.choice(alloc) if idle else None
+    for i in alloc:
+        ws = [r.getrandbits(32) for _ in range(BASE_SIZE // 4)]
+        tid, rest = r.getrandbits(16), r.getrandbits(16)
+        if i == idle_at:
+            tid = (r.getrandbits(8) << 8) | r.randrange(0x28)
+            for j in range(20):
+                ws[(0xDC + j * 0xE4) // 4] = 0
+        file += le(*ws[:22]) + struct.pack("<HH", tid, rest) + le(*ws[23:])
+        portfile += le(*ws[:22]) + struct.pack("<HH", swap16(tid), rest) + be(*ws[23:])
+    return {"op": "load", "magic": 0x5F594C46, "version": version, "init": init, "active": r.choice([0, 1, 7]), "preset": preset,
+            "zones": zones, "file": file, "portfile": portfile, "bs": BASE_SIZE, "alloc": alloc, "portalloc": portalloc, "queues": {}}
+
+
 def fly_edges():
     r = random.Random(5201)
     yield fly_case(r, good=False)
@@ -471,10 +539,19 @@ def fly_edges():
         for nw in (0, 1, 2, 100):
             for dens in (0.0, 0.1, 1.0):
                 yield fly_case(r, good=True, version=1, init=init, nw=nw, density=dens, bs=BASE_SIZE if dens < 1 else 0x60)
+    # the port fixes: Mac-format parks with 0, 1 and several rides, marked as the Mac and the fixed port mark them, left alone
+    for count in (0, 1, 2, 3, 7):
+        for init in (False, True):
+            yield fly_case(r, good=True, version=1, init=init, nw=100, density=0.0, bs=BASE_SIZE, marks=MAC_MARKS, count=count)
+    # the port fixes: files written by a port build before the save fix
+    for density in (0.03, 0.1, 0.3, 1.0):
+        for init in (False, True):
+            yield port_case(r, density=density, init=init, idle=True)
+            yield port_case(r, density=density, init=init, idle=False)
 
 
 def fly_random(r):
-    return fly_case(r)
+    return port_case(r) if r.random() < 0.05 else fly_case(r)
 
 
 def rest_case(r, empty=False):

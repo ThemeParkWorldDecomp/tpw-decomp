@@ -12,6 +12,13 @@ The world of a case: the initialised flag, the four zone limits and the 100 fly 
 What is compared: the answer and the event log (which holds the bytes written). No fused operations. Not tested: nothing excluded; the raw
 table written by the second LbFile_Write is 400 bytes of the table in memory (Mac 32-bit pointers, host 64-bit): only its label and length
 are compared.
+
+With the port fixes on (unit flysave; the port fix in FLY_Save, src/game/rides/FlyingRide.cpp) the table write is a local buffer of 100
+words, 0xFFFFFFFF where a base is set and 0 elsewhere (the Mac only tests a word for nonzero): the host's event carries its checksum, which
+is checked against the case's bases and the event then stands in for the Mac's write of the table itself. The thing id Byteswap and
+USwapBlockStruct<FLYBOY> of a base are left out on a little-endian host (the Mac's put the words in the file's order; the port's swapped them
+the wrong way), so the host's log gets the Mac's two events back, with the values the Mac's fakes see, before each base's write; the bytes
+written are the same. With the fixes off the comparison is the original's.
 """
 import ctypes as C
 import random
@@ -177,7 +184,8 @@ class Host(Side):
         self.write(a, b"".join(struct.pack("<Q", p) for p in ps))
 
     def log(self):
-        return CL.host_end(self.lib)
+        log = CL.host_end(self.lib)
+        return mac_events(self, log) if self.lib.port_fix else log
 
     def save(self):
         return self.lib.tpw_flysave_save(FILE) & MASK
@@ -191,10 +199,32 @@ def bind(lib):
     getattr(lib, p + "alloc").restype, getattr(lib, p + "alloc").argtypes = C.c_uint64, [C.c_uint32]
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]
     getattr(lib, p + "save").restype, getattr(lib, p + "save").argtypes = C.c_uint32, [C.c_uint64]
+    getattr(lib, p + "portfix").restype, getattr(lib, p + "portfix").argtypes = C.c_int32, []
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    lib.port_fix = getattr(lib, p + "portfix")() == 1
     lib.bound = True
+
+
+def mac_events(s, log):
+    """The host's log with the port fixes on, in the Mac's form: the table write (the only unlabelled 400-byte write) checked against the
+    case's marks and replaced by the Mac's write of gFlyBases; the Mac's Byteswap16 and USwapBlockStruct events put back before each base's
+    write, in the order of the bases."""
+    out = []
+    swaps = list(s.swaps)
+    for ev in log:
+        name, ints = ev[0], ev[1]
+        if name == "LbFile_Write" and ints[1] == -1 and ints[2] == 0x190:
+            assert ints[4] == csum(s.marks), (ints[4], csum(s.marks))
+            ev = (name, (ints[0], LABELS["gFlyBases"], ints[2], ints[3], 0)) + tuple(ev[2:])
+        elif name == "LbFile_Write" and ints[1] == -1 and ints[2] == BASE:
+            v, w0, c = swaps.pop(0)
+            out.append(("Byteswap16", (v,)) + tuple(ev[2:]))
+            out.append(("USwapBlockStruct", (0x14, w0, c)) + tuple(ev[2:]))
+        out.append(ev)
+    assert not swaps, swaps
+    return out
 
 
 # ---------------------------------------------------------------------------------------------------------------- the world
@@ -207,7 +237,8 @@ def build(s, case):
     s.words(s.g("gFlyZoneA"), [case["zones"][2]])
     s.words(s.g("gFlyZoneC"), [case["zones"][3]])
     ps = []
-    for seed in case["bases"]:
+    s.swaps = []       # what the Mac's Byteswap16 and USwapBlockStruct fakes see for bases 1 to 99, in order (the port fixes, mac_events)
+    for i, seed in enumerate(case["bases"]):
         if seed is None:
             ps.append(0)
             continue
@@ -217,7 +248,13 @@ def build(s, case):
         ws[0x58 // 4] = (ws[0x58 // 4] & 0xFF) * 0x01010101     # the halfword at +0x58 reads the same big- or little-endian
         s.words(a, ws)
         ps.append(a)
+        if i >= 1 and case["init"] != 0:      # nothing is written when the flag is clear
+            c = 0
+            for w in ws[0x5C // 4:]:
+                c = (c * 31 + w) & MASK
+            s.swaps.append(((ws[0x58 // 4] & 0xFF) * 0x101, ws[0x5C // 4], c))
     s.ptrs(s.g("gFlyBases"), ps)
+    s.marks = b"".join(struct.pack("<I", MASK if p else 0) for p in ps)     # the fixed port's table of marks
 
 
 def observe(s, case, answer):

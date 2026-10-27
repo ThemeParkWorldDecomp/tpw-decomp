@@ -47,6 +47,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <new>
@@ -1477,6 +1478,7 @@ void ReadWord(void* file, void* word) {
     uint32_t transferred;
     LbFile_Read(file, word, 4, &transferred);
 }
+
 
 }  // namespace
 

@@ -98,4 +98,10 @@ int32_t tpw_flysave_layout(int64_t* out) {
 
 uint32_t tpw_flysave_save(uint64_t file) { return static_cast<uint32_t>(FLY_Save(reinterpret_cast<void*>(static_cast<uintptr_t>(file)))); }
 
+// 1 when the unit is built with the port fixes on (unit flysave): FLY_Save then writes a table of 0xFFFFFFFF marks instead of the
+// pointers and leaves the thing id and the fly records of a base unswapped on a little-endian host.
+int32_t tpw_flysave_portfix() {
+    return 0;
+}
+
 }  // extern "C"

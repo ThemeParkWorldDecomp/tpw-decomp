@@ -93,6 +93,28 @@ void* LbMem_Alloc(uint32_t size) {
     return tpw::ArenaAllocZeroed(size);
 }
 
+// The two swaps FLY_Load applies to a base of a fly file written by a port build before the save fix (the port fixes, unit flysave): the
+// originals' bodies (FlyingRide.cpp, HLSprite.cpp; the slice keeps only the unit's functions), which really swap, so that such a base can
+// be compared with the Mac's form of it. Neither logs: the Mac's Byteswap runs as it is and its USwapBlockStruct is faked as doing nothing.
+template<> void tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t>::Byteswap() { mIndex = __builtin_bswap16(mIndex); }
+
+namespace SamsUtilities {
+
+void USwapBlockStruct(FLYBOY* records, int32_t count) {
+    uint8_t* record = reinterpret_cast<uint8_t*>(records);
+    while (count-- != 0) {
+        for (int32_t offset = 0; offset < 0xe4; offset += 4) {
+            uint32_t word;
+            std::memcpy(&word, record + offset, 4);
+            word = __builtin_bswap32(word);
+            std::memcpy(record + offset, &word, 4);
+        }
+        record += 0xe4;
+    }
+}
+
+}  // namespace SamsUtilities
+
 uint32_t PAR_InitEmitter(int32_t type, int32_t a, int32_t b, int32_t c) {
     ev("PAR_InitEmitter", {S(type), S(a), S(b), S(c)});
     return static_cast<uint32_t>(ret("PAR_InitEmitter"));
@@ -165,6 +187,12 @@ int32_t tpw_fly_layout(int64_t* out) {
 }
 
 int32_t tpw_fly_load(uint64_t file) { return FLY_Load(reinterpret_cast<void*>(static_cast<uintptr_t>(file))); }
+
+// 1 when the unit is built with the port fixes on (unit flysave): FLY_Load then reads a fly file written by a port build before the
+// save fix (a table of 64-bit pointer pairs, reversed bases) as the Mac's format.
+int32_t tpw_fly_portfix() {
+    return 0;
+}
 void tpw_fly_restore() { FLY_RestoreMeshes(); }
 void tpw_fly_object(uint64_t path) { OBJECT_Load(reinterpret_cast<char*>(static_cast<uintptr_t>(path))); }
 
