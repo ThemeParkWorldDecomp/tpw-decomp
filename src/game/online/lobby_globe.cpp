@@ -390,11 +390,11 @@ uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
 // 0x100ad6dc PostGetCityListCallbackFunction (the online globe's city list callback)
 
 void PostGetCityListCallbackFunction(int error, const void* context, TbPtrList<CFSOnlineCity>* cities) {
-    CLBCityListScreen* screen = static_cast<CLBCityListScreen*>(const_cast<void*>(context));
+    CLBScreenComponentOnlineGlobe* globe = static_cast<CLBScreenComponentOnlineGlobe*>(const_cast<void*>(context));
     if (error == 0)
-        screen->CityListReceived(cities);
+        globe->CreateCities(cities);
     else
-        screen->CityListFailed();
+        globe->HandleOnlineBacktrack();
 }
 
 // The online globe's window: Show, Hide, zoom, city flags (0x100ad788 .. 0x100ae228).
@@ -594,7 +594,7 @@ uint32_t CLBScreenComponentDownloadGlobe::ProcessCancel() {
     if (gOnlineSystem->mF384 != 0) {
         if (gOnlineSystem == nullptr) gOnlineSystem = mainmenu_callee::NewOnlineSystem();
         gOnlineSystem->StopProcessing();
-        HandleOnlineBacktrack();   // virtual slot 0x4c of the globe (0x100ae9c0 here)
+        ShowPanels();   // virtual slot 0x4c of the globe (0x100ae7b0 here: the download globe's vtable 0x1029e7dc)
         answer = 1;
     }
     return answer;

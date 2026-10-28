@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <iterator>
 #include <map>
 #include <set>
 #include <sstream>
@@ -97,11 +98,12 @@ static void TestStructure() {
         // a plain relative ASCII path
         CHECK(!dest.empty() && dest[0] != '/' && dest.find("..") == std::string::npos && dest.find('\\') == std::string::npos);
         for (unsigned char c : dest) CHECK(c >= 0x20 && c < 0x7f);
-        CHECK(r.editions != 0 && (r.editions & ~(kEditionUs | kEditionEur | kEditionGold)) == 0);
+        CHECK(r.editions != 0 && (r.editions & ~(kEditionUs | kEditionEur | kEditionGold | kEditionLanguages)) == 0);
         CHECK(r.group < kGroupCount);
-        CHECK(r.source == kSourceMacCd || r.source == kSourcePcCd || r.source == kSourceGoldCd);
+        CHECK(r.source == kSourceMacCd || r.source == kSourcePcCd || r.source == kSourceGoldCd ||
+              r.source == kSourceLanguageDisc);
         // no duplicate (dest, edition)
-        for (int e : {kEditionUs, kEditionEur, kEditionGold}) {
+        for (int e : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages}) {
             if (r.editions & e) CHECK(seen.insert({dest, e}).second);
         }
         // the flags say what the name says
@@ -113,6 +115,18 @@ static void TestStructure() {
         CHECK(r.group != kGroupLanguageAmerican || r.editions == kEditionUs);
         CHECK(r.group != kGroupLanguageEnglish || r.editions == kEditionEur);
         CHECK(r.group != kGroupProgram || (r.hash_count == 2 && r.editions == kEditionUs));
+        // a language pack's file: lang/<Name>/<game path>, that edition alone, a known language
+        const bool lang = (r.editions & kEditionLanguages) != 0;
+        CHECK(lang == StartsWith(dest, "lang/"));
+        CHECK(lang == (r.group == kGroupLanguagePack));
+        CHECK(lang == (r.source == kSourceLanguageDisc));
+        CHECK(!lang || r.editions == kEditionLanguages);
+        if (lang) {
+            size_t slash = dest.find('/', 5);
+            CHECK(slash != std::string::npos && FindLanguage(dest.substr(5, slash - 5).c_str()) != nullptr);
+            CHECK(StartsWith(dest.substr(slash + 1), "data/"));
+            CHECK((r.flags & (kFlagRsrc | kFlagFinfo | kFlagTuning)) == 0);
+        }
         // hashes: consecutive, point back
         CHECK(r.hash_count >= 1);
         CHECK_EQ(r.first_hash, next_hash);
@@ -130,7 +144,7 @@ static void TestStructure() {
     // lookups: every record by destination and edition, every content by size and hash
     for (size_t i = 0; i < n; ++i) {
         const ManifestRecord& r = records[i];
-        for (int e : {kEditionUs, kEditionEur, kEditionGold}) {
+        for (int e : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages}) {
             if (r.editions & e) CHECK(FindByDest(static_cast<Edition>(e), r.dest) == &r);
             else CHECK(FindByDest(static_cast<Edition>(e), r.dest) != &r);
         }
@@ -166,8 +180,8 @@ static void TestStructure() {
 // ---- counts (the generator prints the same figures)
 
 static void TestCounts() {
-    CHECK_EQ(ManifestRecordCount(), 1657);
-    CHECK_EQ(ManifestHashCount(), 1658);
+    CHECK_EQ(ManifestRecordCount(), 2925);
+    CHECK_EQ(ManifestHashCount(), 2934);
     CHECK_EQ(CountRecords(kEditionUs), 770);
     CHECK_EQ(CountRecords(kEditionEur), 913);
     CHECK_EQ(CountRecords(kEditionGold), 36);
@@ -228,6 +242,9 @@ static void TestCounts() {
     CHECK(std::strcmp(GroupName(kGroupFontsRsrc), "fonts-rsrc") == 0);
     CHECK(std::strcmp(EditionName(kEditionEur), "eur") == 0);
     CHECK(std::strcmp(SourceName(kSourcePcCd), "pc") == 0);
+    CHECK(std::strcmp(GroupName(kGroupLanguagePack), "language-pack") == 0);
+    CHECK(std::strcmp(EditionName(kEditionLanguages), "lang") == 0);
+    CHECK(std::strcmp(SourceName(kSourceLanguageDisc), "lang") == 0);
 }
 
 // ---- the Python lists, read as text
@@ -363,9 +380,87 @@ static void TestPythonLists() {
     }
 }
 
+// ---- the language packs (LANGUAGES.md: what each disc gave; the generator prints the same figures)
+
+static void TestLanguages() {
+    CHECK_EQ(CountRecords(kEditionLanguages), 1268);
+    CHECK_EQ(CountRecords(kEditionLanguages, true), 1154);
+    struct Expected {
+        const char* name;
+        size_t records, required;
+        unsigned flags;
+    };
+    const Expected expected[] = {
+        {"English", 96, 85, 0},
+        {"American", 84, 80, 0},
+        {"French", 96, 85, 0},
+        {"German", 96, 85, 0},
+        {"Danish", 96, 85, 0},
+        {"Swedish", 96, 85, 0},
+        {"Spanish", 92, 81, kLanguageOldTables | kLanguageBaseDateFonts},
+        {"Italian", 92, 81, kLanguageOldTables | kLanguageBaseDateFonts},
+        {"Dutch", 92, 81, kLanguageOldTables | kLanguageBaseDateFonts},
+        {"Polish", 92, 81, kLanguageOldTables | kLanguageBaseDateFonts},
+        {"Japanese", 93, 85, 0},
+        {"Korean", 81, 80, 0},
+        {"TraditionalChinese", 81, 80, kLanguageOldTables},
+        {"SimplifiedChinese", 81, 80, kLanguageOldTables},
+    };
+    CHECK_EQ(ManifestLanguageCount(), std::size(expected));
+    if (ManifestLanguageCount() != std::size(expected)) return;
+    for (size_t l = 0; l < std::size(expected); ++l) {
+        const ManifestLanguage& language = ManifestLanguages()[l];
+        const Expected& e = expected[l];
+        CHECK(std::strcmp(language.name, e.name) == 0);
+        CHECK_EQ(language.flags, e.flags);
+        CHECK(FindLanguage(e.name) == &language);
+        const std::string prefix = std::string("lang/") + e.name + "/";
+        const std::string text = prefix + "data/Language/" + e.name + "/";
+        size_t records = 0, required = 0, meshes = 0, speech = 0, dates = 0;
+        for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+            const ManifestRecord& r = ManifestRecords()[i];
+            const std::string dest = r.dest;
+            if (!StartsWith(dest, prefix.c_str())) continue;
+            ++records;
+            if (!(r.flags & kFlagRequired)) continue;
+            ++required;
+            meshes += EndsWith(dest, ".MD2");
+            speech += !StartsWith(dest, text.c_str());
+            dates += StartsWith(dest, (text + "DATE").c_str());
+        }
+        CHECK_EQ(records, e.records);
+        CHECK_EQ(required, e.required);
+        CHECK_EQ(meshes, 3);
+        CHECK_EQ(speech, 20);
+        // the four DATE fonts: in the pack, or (kLanguageBaseDateFonts) the base edition's
+        CHECK_EQ(dates, (e.flags & kLanguageBaseDateFonts) ? 0u : 4u);
+        for (const char* file : {"UITEXT.str", "residx.dat", "swears.txt"}) {
+            const ManifestRecord* r = FindByDest(kEditionLanguages, (text + file).c_str());
+            CHECK(r != nullptr && (r->flags & kFlagRequired));
+        }
+        // the old tables' residx.dat is the short one; a new residx with old tables is the Chinese discs'
+        const ManifestRecord* residx = FindByDest(kEditionLanguages, (text + "residx.dat").c_str());
+        if (residx) CHECK(((RecordHash(*residx, 0).size == 1343)) == ((e.flags & kLanguageBaseDateFonts) != 0));
+    }
+    CHECK(FindLanguage("Klingon") == nullptr);
+    CHECK(FindLanguage("french") == nullptr);
+    // the English and American packs are the European and US editions' own files
+    const std::pair<Edition, const char*> editions[] = {{kEditionEur, "English"}, {kEditionUs, "American"}};
+    for (const auto& [edition, name] : editions) {
+        for (const char* file : {"UITEXT.str", "residx.dat", "DATEBIG.bf4"}) {
+            const std::string path = std::string("data/Language/") + name + "/" + file;
+            const ManifestRecord* base = FindByDest(edition, path.c_str());
+            const ManifestRecord* pack = FindByDest(kEditionLanguages, (std::string("lang/") + name + "/" + path).c_str());
+            CHECK(base != nullptr && pack != nullptr);
+            if (base && pack) CHECK(HasHash(*base, RecordHash(*pack, 0).sha256, &RecordHash(*pack, 0).size));
+        }
+    }
+}
+
 int main() {
     TestStructure();
     TestCounts();
+    TestLanguages();
     TestPythonLists();
     std::printf("manifest: %d checks passed\n", gChecks);
     return 0;

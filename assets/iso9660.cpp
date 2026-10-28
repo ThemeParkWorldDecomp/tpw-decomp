@@ -1,8 +1,9 @@
 // An ISO 9660 image as a Source (ECMA-119; Joliet names when there is a Joliet supplementary volume). Cooked images have
 // 2048-byte sectors; raw images (ECMA-130) have 2352-byte sectors that start with the 12-byte sync, and the mode byte at
-// offset 15 says where the 2048 bytes of user data start: offset 16 for MODE1, offset 24 for MODE2 form 1. Files are
-// read straight from the Blob in chunks of a few sectors; no image is ever loaded whole. Version suffixes (";1") are
-// removed from file names. Multi-extent files are joined.
+// offset 15 says where the 2048 bytes of user data start: offset 16 for MODE1, offset 24 for MODE2 form 1. Raw images
+// saved with the sub-channel (some .mdf files) have 2448-byte sectors: the same 2352 bytes, then 96 sub-channel bytes,
+// which are skipped. Files are read straight from the Blob in chunks of a few sectors; no image is ever loaded whole.
+// Version suffixes (";1") are removed from file names. Multi-extent files are joined.
 #include <algorithm>
 #include <cstring>
 #include <mutex>
@@ -16,6 +17,7 @@ namespace {
 
 constexpr uint32_t kUser = 2048;
 constexpr uint32_t kRaw = 2352;
+constexpr uint32_t kRawSub = 2448;  // a raw sector followed by 96 bytes of sub-channel data
 constexpr uint32_t kChunkSectors = 64;
 const uint8_t kSync[12] = {0, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0};
 
@@ -36,11 +38,18 @@ class Sectors {
 public:
     bool Init(std::shared_ptr<Blob> blob, std::string& err) {
         blob_ = std::move(blob);
-        // Volume descriptors start at sector 16.
+        // Volume descriptors start at sector 16; a raw image has the sync there, at its own stride.
         uint8_t head[32];
-        int64_t got = blob_->ReadAt(uint64_t(16) * kRaw, head, sizeof head, err);
-        if (got < 0) return false;
-        if (got == int64_t(sizeof head) && std::memcmp(head, kSync, 12) == 0) {
+        uint32_t rawStride = 0;
+        for (uint32_t stride : {kRaw, kRawSub}) {
+            int64_t got = blob_->ReadAt(uint64_t(16) * stride, head, sizeof head, err);
+            if (got < 0) return false;
+            if (got == int64_t(sizeof head) && std::memcmp(head, kSync, 12) == 0) {
+                rawStride = stride;
+                break;
+            }
+        }
+        if (rawStride != 0) {
             uint8_t mode = head[15];
             if (mode != 1 && mode != 2) {
                 err = "iso: raw sectors of mode " + std::to_string(mode) + " are not supported";
@@ -48,7 +57,7 @@ public:
             }
             raw_ = true;
             offset_ = mode == 1 ? 16 : 24;
-            stride_ = kRaw;
+            stride_ = rawStride;
         } else {
             raw_ = false;
             offset_ = 0;
@@ -81,15 +90,15 @@ public:
             }
             return true;
         }
-        tmp_.resize(size_t(count) * kRaw);
-        int64_t got = blob_->ReadAt(first * kRaw, tmp_.data(), tmp_.size(), err);
+        tmp_.resize(size_t(count) * stride_);
+        int64_t got = blob_->ReadAt(first * stride_, tmp_.data(), tmp_.size(), err);
         if (got < 0) return false;
         if (size_t(got) != tmp_.size()) {
             err = "iso: the image is cut off";
             return false;
         }
         for (uint32_t i = 0; i < count && size_t(i) * kUser < limit; i++) {
-            const uint8_t* s = &tmp_[size_t(i) * kRaw];
+            const uint8_t* s = &tmp_[size_t(i) * stride_];
             if (std::memcmp(s, kSync, 12) != 0) {
                 err = "iso: sector " + std::to_string(first + i) + " has no sync";
                 return false;

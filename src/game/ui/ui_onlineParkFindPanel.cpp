@@ -31,6 +31,7 @@
 #include "ui_Postcard.h"
 #include "ui_publishParkPanel.h"
 #include "ui_tooltip.h"
+#include "WindowScripts.inc"
 #include <cstdint>
 #include <new>
 #include <string>
@@ -259,7 +260,7 @@ void FillOnlineParkFindList(TbPtrList<CFSOnlinePark>* parks) {
     button->SetState(0, 1);
 }
 
-int16_t gOnlineParkFindScript[2] = {0, 1};   // 0x102b0c8c (the rest of the script is not kept here)
+int16_t gOnlineParkFindScript[] = {TPW_WINDOW_SCRIPT_102B0C8C};   // 0x102b0c8c: the words are the image's, generated at configure time (devtools/gen_game_tables.py, WindowScripts.inc)
 // 0x1024f01e: empty wide strings, the cells of the find list point at +0 and +2 (bytes).
 const char16_t gOnlineParkFindWide[4] = {0, 0, 0, 0};
 

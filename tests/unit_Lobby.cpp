@@ -169,6 +169,11 @@ uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
 // The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
+void CLBScreenComponentOnlineGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
+void CLBScreenComponentDownloadGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
+void CLBScreenComponentDownloadGlobe::HandleOnlineBacktrack() {}
+void CLBScreenComponentPublishGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
+void CLBScreenComponentPublishGlobe::HandleOnlineBacktrack() {}
 uint32_t CLBScreenComponentThemeIslands::ProcessCancel() { return 0; }
 uint32_t CLBScreenComponentOnlineIslands::ProcessCancel() { return 0; }
 uint32_t CLBScreenComponentDownloadGlobe::ProcessCancel() { return 0; }

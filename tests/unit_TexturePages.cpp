@@ -356,6 +356,11 @@ void tpw_tp_bulk(int32_t bulk) { gBulk = bulk; }
 void* tpw_tp_upload_buffer() { return &gUploadBuffer; }
 void* tpw_tp_gl_instance() { return &gGLInstance; }
 
+// 1 when COpenGLTexture::SetState has the port fix (clamp to edge in place of GL_CLAMP).
+int32_t tpw_tp_portfix() {
+    return 0;
+}
+
 // Recording must be off. Frees what the last script left and puts the globals back.
 void tpw_tp_reset() {
     Quiet quiet;

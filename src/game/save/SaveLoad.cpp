@@ -31,6 +31,7 @@
 #include "platform/msl.h"
 #include "platform/samsutils.h"
 #include "ppc_math.h"
+#include "Ptr32.h"
 #include "RideDB.h"
 #include "rsse.h"
 #include "SaveLegalText.inc"
@@ -57,7 +58,9 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <iterator>
 #include <new>
+#include <vector>
 
 // RideDB.cpp range of the main app (SimTheme Park 2.04b3): the ride types' names. The name database (CRideNameDB, which the
 // inventory files under SaveLoad.cpp) builds a ride type's name from two strings of the object names string table; the ride
@@ -526,6 +529,8 @@ void CSaveLoad::PreLoadOperations() {
     ADV_Kill(0);
     gUIInterface.PreLevelLoad();
 }
+
+
 
 // Rebuilds what the engine holds after a park is read. The particle system is low spec when the current detail is 0.
 void CSaveLoad::PostLoadOperations() {

@@ -41,6 +41,7 @@ enum : GLenum {
     GL_TEXTURE_WRAP_T = 0x2803,
     GL_CLAMP = 0x2900,
     GL_REPEAT = 0x2901,
+    GL_CLAMP_TO_EDGE = 0x812f,          // OpenGL 1.2; the port's wrap (COpenGLTexture::SetState)
     GL_RGBA4 = 0x8056,
     GL_UNSIGNED_BYTE = 0x1401,
     GL_RGBA = 0x1908,

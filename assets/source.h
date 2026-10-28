@@ -80,7 +80,7 @@ std::unique_ptr<Source> OpenFolder(const std::string& path, std::string& err);
 // A zip archive (stored and deflate entries, zip64, data descriptors).
 std::unique_ptr<Source> OpenZip(std::shared_ptr<Blob> blob, std::string& err);
 // An ISO 9660 image (Joliet names when there is a Joliet volume): cooked 2048-byte sectors or raw 2352-byte sectors,
-// MODE1 or MODE2 form 1.
+// MODE1 or MODE2 form 1, also with 96 sub-channel bytes after each raw sector (2448 bytes, as some .mdf files have).
 std::unique_ptr<Source> OpenIso9660(std::shared_ptr<Blob> blob, std::string& err);
 // A classic Macintosh HFS volume (apm_hfs.cpp): the first Apple_HFS partition of an Apple partition map (a .toast or
 // .iso Mac disc image), or a bare HFS volume. Kind() is "hfs". Both forks are listed: the data fork as a Data entry

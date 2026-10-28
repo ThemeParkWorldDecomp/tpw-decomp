@@ -1454,9 +1454,9 @@ int32_t ButtonsUnderlayMsg(InterfaceWindow* window, int32_t message, int32_t a, 
 void FindParksPostGetPlayerParksCallbackFn(int32_t result, const void* context, TbPtrList<CFSOnlinePark>* list);   // 0x101e9324
 void RemoveOnlineParkFindPanel();                            // 0x101ea468 (stand-in)
 void ShowFindListSearching();                                // 0x101e9f28 (stand-in)
-extern int16_t gOnlinePanelScript[2];        // 0x102b0834 (initial word 1; the rest is not kept here)
-extern int16_t gOnlineUnderlayScriptA[2];    // 0x102b0a22 (initial word 1)
-extern int16_t gOnlineUnderlayScriptB[2];    // 0x102b0b5e (initial word 1)
+extern int16_t gOnlinePanelScript[];          // 0x102b0834
+extern int16_t gOnlineUnderlayScriptA[];      // 0x102b0a22
+extern int16_t gOnlineUnderlayScriptB[];      // 0x102b0b5e
 extern uint32_t gOnlineEditFontIndex;        // 0x102b0c50: the font table index of the panel's edit box (7 at start)
 extern uint8_t gOnlineByte78;                // 0x10395e78: CreateOnlinePanel clears it
 extern int32_t gOnlineWord88;                // 0x10395e88: CreateOnlinePanel clears it

@@ -93,7 +93,8 @@ tpw_slice(TARGET tpw NAME tpw SOURCES sound/CSprocketsModule.cpp DROP
 # (devtools/make_manifest.py writes assets/manifest_data.inc by hand; no Python runs at build time).
 # It also holds the container readers (folders, zip archives, ISO 9660 and HFS images, MacBinary, cabinets, SHA-256); they need
 # only zlib, so the library builds without SDL3. Their host tests read the player's own discs when TPW_GDI_ROOT,
-# TPW_TEST_TRANSFER and TPW_TEST_EXPECT name them (TPW_TEST_SCRATCH for the Mac toast) and skip with a message otherwise.
+# TPW_TEST_TRANSFER and TPW_TEST_EXPECT name them (TPW_TEST_SOURCES, or sources.txt in TPW_TEST_TRANSFER, says which file is
+# which disc; TPW_TEST_SCRATCH for the Mac toast) and skip with a message otherwise.
 # The importer (assets/importer.cpp) runs a drop on a worker thread.
 find_package(Threads REQUIRED)
 file(GLOB TPW_ASSETS_SOURCES CONFIGURE_DEPENDS assets/*.cpp)
@@ -199,5 +200,10 @@ add_executable(tpw_manifest_tests tests/host_manifest.cpp)
 target_link_libraries(tpw_manifest_tests PRIVATE tpw_assets)
 target_compile_definitions(tpw_manifest_tests PRIVATE TPW_DEVTOOLS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/devtools")
 add_test(NAME manifest COMMAND tpw_manifest_tests)
+# The generator reads the compiled-in manifest back and writes it again: the same bytes, or it fails
+# (devtools/make_manifest.py --base). It needs no disc and no hash list.
+add_test(NAME manifest_generator
+         COMMAND ${Python3_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR}/devtools/make_manifest.py
+                 --base ${CMAKE_CURRENT_SOURCE_DIR}/assets/manifest_data.inc --keep-languages --check)
 endif()   # TPW_BUILD_TESTS
 

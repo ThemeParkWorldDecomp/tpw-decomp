@@ -3,7 +3,7 @@
 // the game are one process after Play, so the file holds both. It starts with a header (the launcher's version, the
 // date, the system and the hardware, the command line and the file's own path) and every line is written straight to
 // the file as it comes (no buffer), so a crash or an abort loses nothing written before it. The ten most recent files
-// are kept. A player sends the latest one with a bug report.
+// are kept. A player sends the About box's Export logs file (log_export.h), which holds the newest of them.
 //
 // Nothing that names the player or the computer reaches the file: every byte goes through log_scrub.h on its way (the
 // home folder is ~, the account name <user>, the computer name <computer>), so the file is safe to send as it is.
@@ -55,7 +55,7 @@ void CloseLogFile();
 // Removes all but the `keep` newest launcher-*.log files of `folder` (newest by name: the names hold the time), and
 // nothing else. The number removed.
 size_t RemoveOldLogs(const std::filesystem::path& folder, size_t keep);
-// The newest launcher-*.log file of `folder`, the one Show logs selects and Export logs copies: the latest modification
+// The newest launcher-*.log file of `folder`, the one Show logs selects: the latest modification
 // time wins, and files with the same time (or none that can be read) go by name, the later name first. Files that are not
 // launcher-*.log files, and folders, are ignored. Its full path, or an empty path when the folder has none or cannot be read.
 std::filesystem::path NewestLog(const std::filesystem::path& folder);

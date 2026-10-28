@@ -1062,7 +1062,8 @@ namespace {
 void CallListCallbackDefault(int32_t callback, int32_t error, int32_t context, void* list) {
     typedef void (*Fn)(int32_t, const void*, void*);
     Fn fn = reinterpret_cast<Fn>(static_cast<uintptr_t>(static_cast<uint32_t>(callback)));
-    fn(error, reinterpret_cast<const void*>(static_cast<uintptr_t>(static_cast<uint32_t>(context))), list);
+    const void* data = reinterpret_cast<const void*>(static_cast<uintptr_t>(static_cast<uint32_t>(context)));
+    fn(error, data, list);
 }
 
 void DeleteCityRecordDefault(CFSOnlineCity* city) { delete city; }

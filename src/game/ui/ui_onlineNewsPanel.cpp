@@ -25,6 +25,7 @@
 #include "ui_main.h"
 #include "ui_Postcard.h"
 #include "ui_publishParkPanel.h"
+#include "WindowScripts.inc"
 #include <cstdint>
 
 // Unit v5225: the online news panel's text window (src/ui_onlineNewsPanel.cpp in the original).
@@ -34,7 +35,7 @@
 
 // The panel's globals (original names unknown).
 uint32_t gOnlineNewsFont = 8;                  // 0x102b05c0  the font index of the text window
-int16_t gOnlineNewsScript[2] = {0, 1};         // 0x102b0440  the dialog script (the word 1)
+int16_t gOnlineNewsScript[] = {TPW_WINDOW_SCRIPT_102B0440};   // 0x102b0440  the dialog script (the words are the image's, generated at configure time (devtools/gen_game_tables.py, WindowScripts.inc))
 uint8_t gOnlineNewsShowInbox = 0;              // 0x10395dd4  1: the first text of the online system, 0: the second
 InterfaceWindow* gOnlineNewsPanel = nullptr;   // 0x10395dd8  the panel, NULL until made
 
