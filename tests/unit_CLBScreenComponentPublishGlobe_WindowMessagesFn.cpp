@@ -52,6 +52,7 @@ uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
 // The globe's vtable (emitted here) names Tick and WindowMessagesFn, unit v5571's (src/game/online/lobby_globe.cpp).
 void CLBScreenComponentOnlineGlobe::Tick() {}
 void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
+void CLBScreenComponentOnlineGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
 void CLBScreenComponentOnlineGlobe_WindowMessagesFn(CLBScreenComponentOnlineGlobe* globe, int32_t message, int32_t a, int32_t b) {
     ev("OnlineGlobeWindowMessagesFn", {lab(globe), message, a, b});
 }

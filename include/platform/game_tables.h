@@ -9,7 +9,7 @@
 //   gAdvisorBalanceDescriptions  the description rows of the advisor balance table, 775 of 0x3c bytes (AdvisorScoring.h)
 //   gAdvisorScorerSources        the 351 scorers, pointers to member of CAdvisorScoring (241 distinct)
 //   gSaveLegalText               the save file header's seven legal texts (SaveLoad.h; GameTableLegalText below)
-//   the 38 window scripts        the park and status panels' scripts, the int16_t arrays src/game/ui defines
+//   the 48 window scripts        the park, status and online panels' scripts, the int16_t arrays src/game/ui defines
 //   gRideTemplates               BMP_CreateRide's 14 ride templates, 52 words each (BMP_InsideArea.h)
 //
 // A program is known by the SHA-1 of its data fork (the CD's 2.0.1, the 2.04b3 patch's, 2.1.1 and 2.1.4, with the
@@ -49,7 +49,7 @@ constexpr int kGameTableMessageRecords = 351;          // gAdvisorMessageBlock h
 constexpr int kGameTableBalanceRows = 775;
 constexpr int kGameTableScorers = 241;                 // distinct functions among the 351 scorer sources
 constexpr int kGameTableLegalTexts = 7;
-constexpr int kGameTableWindowScripts = 38;
+constexpr int kGameTableWindowScripts = 48;
 constexpr int kGameTableRideTemplateWords = 14 * 0x34;
 
 // Where ReadGameTables puts each table: arrays of the sizes above (messageBlock kGameTableMessageRecords + 2, scorers

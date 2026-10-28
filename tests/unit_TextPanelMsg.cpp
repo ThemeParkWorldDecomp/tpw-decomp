@@ -31,7 +31,7 @@ int16_t gUIRealScreenWidth = 0;
 
 // ---- the unit's own globals and functions
 extern uint32_t gOnlineNewsFont;
-extern int16_t gOnlineNewsScript[2];
+extern int16_t gOnlineNewsScript[];
 extern uint8_t gOnlineNewsShowInbox;
 extern InterfaceWindow* gOnlineNewsPanel;
 int32_t NewsPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);

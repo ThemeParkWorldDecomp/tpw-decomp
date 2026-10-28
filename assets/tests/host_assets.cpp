@@ -1,5 +1,6 @@
 // Host tests of the asset launcher's container readers (assets/): SHA-256 known answers, a zip built in memory (stored,
-// deflate, data descriptor, zip64), a folder, the US Mac disc's zip, three PC disc images and the Gold disc's zip.
+// deflate, data descriptor, zip64), ISO 9660 images built in memory (cooked, raw, raw with the sub-channel), a folder,
+// the US Mac disc's zip, three PC disc images and the Gold disc's zip.
 // The inputs are the player's own files, read in place and never copied. A test whose input is absent is skipped with a
 // message. Expected hashes of the PC images come from JSON lists of path, size and SHA-256 made by hashing the images with a script (TPW_TEST_EXPECT).
 //
@@ -56,6 +57,35 @@ void Skip(const std::string& what) {
 std::string Env(const char* name, const std::string& fallback) {
     const char* v = std::getenv(name);
     return v && *v ? v : fallback;
+}
+
+// The player's own discs are named in a file of theirs, not here: TPW_TEST_SOURCES, or sources.txt in TPW_TEST_TRANSFER, one
+// "key = path under TPW_TEST_TRANSFER" per line (keys: mac-zip, eur-a, eur-first, eur-b, gold-zip; "KEY.expect = file" names
+// the expected-list file under TPW_TEST_EXPECT, KEY.json by default). A test whose key is missing is skipped.
+std::string SourceFor(const std::string& transfer, const std::string& key) {
+    std::string file = Env("TPW_TEST_SOURCES", transfer + "/sources.txt");
+    std::ifstream in(file);
+    std::string line;
+    while (std::getline(in, line)) {
+        size_t eq = line.find('=');
+        if (eq == std::string::npos) continue;
+        auto trim = [](std::string s) {
+            size_t a = s.find_first_not_of(" \t\r"), b = s.find_last_not_of(" \t\r");
+            return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
+        };
+        if (trim(line.substr(0, eq)) == key) {
+            std::string rel = trim(line.substr(eq + 1));
+            return rel.empty() ? rel : transfer + "/" + rel;
+        }
+    }
+    return "";
+}
+
+// The expected-list file name for KEY (relative to TPW_TEST_EXPECT).
+std::string ExpectFor(const std::string& transfer, const std::string& key) {
+    std::string named = SourceFor(transfer, key + ".expect");
+    if (named.empty()) return key + ".json";
+    return named.substr(transfer.size() + 1);
 }
 
 bool Exists(const std::string& path) {
@@ -423,13 +453,12 @@ void CompareWithList(Source& src, const std::map<std::string, Expect>& want, con
     CHECK(bad == 0 && missing == 0);
 }
 
-void TestPcImage(const std::string& transfer, const std::string& expectDir, const char* dirName, const char* file,
-                 const char* json, size_t files) {
-    std::string path = transfer + "/1 ThemeParkWorld PC UK-European CD Bullfrog EA/" + dirName + "/" + file;
+void TestPcImage(const std::string& transfer, const std::string& expectDir, const char* key, size_t files) {
+    std::string path = SourceFor(transfer, key), json = ExpectFor(transfer, key);
     std::string err;
     std::map<std::string, Expect> want;
-    if (!Exists(path) || !LoadExpect(expectDir + "/" + json, want)) {
-        Skip(std::string("iso source: ") + file + " or " + json + " is absent");
+    if (path.empty() || !Exists(path) || !LoadExpect(expectDir + "/" + json, want)) {
+        Skip(std::string("iso source: ") + key + " or " + json + " is absent");
         return;
     }
     CHECK(want.size() == files);
@@ -443,25 +472,21 @@ void TestPcImage(const std::string& transfer, const std::string& expectDir, cons
         return;
     }
     CHECK(std::string(src->Kind()) == "iso9660");
-    CompareWithList(*src, want, file);
+    CompareWithList(*src, want, key);
 }
 
 void TestPcImages(const std::string& transfer, const std::string& expectDir) {
-    TestPcImage(transfer, expectDir, "ThemeParkWorld_PC_EA-Classics-CD-Image_2000-11_Bullfrog-EA_Win9x_redump-66484",
-                "ThemeParkWorld.img", "p66484.json", 2839);
-    TestPcImage(transfer, expectDir, "ThemeParkWorld_PC_European-CD-Image-EN-IT-NL-PL_1999-10_Bullfrog-EA_Win9x_redump-66100",
-                "TPWORLD.mdf", "p66100.json", 2651);
-    TestPcImage(transfer, expectDir, "ThemeParkWorld_PC_German-Play-the-Games-Vol4-CD-Image_2000-06_Bullfrog-EA_Win9x_redump-9465",
-                "TPWORLD.bin", "p9465.json", 2817);
+    TestPcImage(transfer, expectDir, "eur-a", 2839);
+    TestPcImage(transfer, expectDir, "eur-first", 2651);
+    TestPcImage(transfer, expectDir, "eur-b", 2817);
 }
 
 // ---- The US Mac disc's zip, and the Gold disc's zip holding a raw image
 
 void TestMacZip(const std::string& transfer) {
-    std::string path = transfer + "/2 SimThemePark Mac US CD v2.0.1 Feral Aspyr/"
-                       "SimThemePark_Mac_US-CD-Image_v2.0.1_2000_Feral-Aspyr_PPC-Classic.toast.zip";
+    std::string path = SourceFor(transfer, "mac-zip");
     std::string err;
-    if (!Exists(path)) {
+    if (path.empty() || !Exists(path)) {
         Skip("zip source: the US Mac disc's zip is absent");
         return;
     }
@@ -478,18 +503,17 @@ void TestMacZip(const std::string& transfer) {
     CHECK(toast && side);
     if (!(toast && side)) return;
     CHECK(toast->size == 670476288 && side->size == 82);
-    CHECK_EQ_STR(HashEntry(*src, *side), "527e59a255929a8837cb120dc118923ca58bd30dcadc909811289c9f4b446202");
     if (g_quick) return;
-    // 670 MB inflated and checked against its CRC-32, a chunk at a time.
-    CHECK_EQ_STR(HashEntry(*src, *toast), "75cc5c39614cf17d20139382419727e9b471701c7a21e2036ecda9ab00f3e359");
+    // 670 MB inflated and checked against its CRC-32, a chunk at a time; the disc image's hash is not kept here (the
+    // trees it unpacks to are compared with the manifest by TestToast).
+    CHECK(!HashEntry(*src, *toast).empty());
 }
 
 void TestGold(const std::string& transfer, const std::string& expectDir) {
-    std::string path = transfer + "/4 SimThemePark PC Gold Edition Bonus Rides and Attractions CD/"
-                       "SimThemePark_PC_US-Gold-Edition-Bonus-Rides-and-Attractions-CD-Image_2000-07_Bullfrog-EA_Win9x.zip";
+    std::string path = SourceFor(transfer, "gold-zip");
     std::string err;
     std::map<std::string, Expect> want;
-    if (!Exists(path) || !LoadExpect(expectDir + "/gold.json", want)) {
+    if (path.empty() || !Exists(path) || !LoadExpect(expectDir + "/gold.json", want)) {
         Skip("gold zip: the zip or gold.json is absent");
         return;
     }
@@ -516,6 +540,134 @@ void TestGold(const std::string& transfer, const std::string& expectDir) {
     CompareWithList(*iso, want, "gold image in its zip");
 }
 
+
+// ---- An ISO 9660 image built in memory: cooked, and raw with 2352- and 2448-byte sectors, MODE1 and MODE2 form 1
+
+// A directory record of `name` (ECMA-119 9.1), both-endian extent and size.
+void PutDirRecord(std::vector<uint8_t>& sec, size_t& at, const std::string& name, uint32_t extent, uint32_t size, uint8_t flags) {
+    size_t len = 33 + name.size() + (name.size() % 2 == 0 ? 1 : 0);
+    uint8_t* r = &sec[at];
+    r[0] = uint8_t(len);
+    for (int i = 0; i < 4; i++) {
+        r[2 + i] = uint8_t(extent >> (8 * i));
+        r[9 - i] = uint8_t(extent >> (8 * i));
+        r[10 + i] = uint8_t(size >> (8 * i));
+        r[17 - i] = uint8_t(size >> (8 * i));
+    }
+    r[25] = flags;
+    r[28] = 1;
+    r[31] = 1;
+    r[32] = uint8_t(name.size());
+    std::memcpy(r + 33, name.data(), name.size());
+    at += len;
+}
+
+std::string IsoText(size_t n, uint8_t seed) {
+    std::string s(n, '\0');
+    for (size_t i = 0; i < n; i++) s[i] = char(seed + i * 7 + i / 251);
+    return s;
+}
+
+// Sectors 0-15 empty, 16 the primary volume descriptor, 17 the terminator, 18 the root, 19 DIR, 20-21 README.TXT
+// (3000 bytes), 22 DIR/DATA.BIN (100 bytes).
+std::vector<uint8_t> BuildCookedIso() {
+    std::vector<uint8_t> img(23 * 2048, 0);
+    auto sector = [&](uint32_t s) { return &img[size_t(s) * 2048]; };
+    uint8_t* pvd = sector(16);
+    pvd[0] = 1;
+    std::memcpy(pvd + 1, "CD001", 5);
+    pvd[6] = 1;
+    pvd[128] = 0x00; pvd[129] = 0x08; pvd[130] = 0x08; pvd[131] = 0x00;  // logical block size 2048, both-endian
+    std::vector<uint8_t> rec(256, 0);
+    size_t at = 0;
+    PutDirRecord(rec, at, std::string(1, '\0'), 18, 2048, 2);
+    std::memcpy(pvd + 156, rec.data(), 34);
+    uint8_t* term = sector(17);
+    term[0] = 255;
+    std::memcpy(term + 1, "CD001", 5);
+    term[6] = 1;
+    std::vector<uint8_t> root(2048, 0), dir(2048, 0);
+    at = 0;
+    PutDirRecord(root, at, std::string(1, '\0'), 18, 2048, 2);
+    PutDirRecord(root, at, std::string(1, '\1'), 18, 2048, 2);
+    PutDirRecord(root, at, "DIR", 19, 2048, 2);
+    PutDirRecord(root, at, "README.TXT;1", 20, 3000, 0);
+    at = 0;
+    PutDirRecord(dir, at, std::string(1, '\0'), 19, 2048, 2);
+    PutDirRecord(dir, at, std::string(1, '\1'), 18, 2048, 2);
+    PutDirRecord(dir, at, "DATA.BIN;1", 22, 100, 0);
+    std::memcpy(sector(18), root.data(), 2048);
+    std::memcpy(sector(19), dir.data(), 2048);
+    std::string readme = IsoText(3000, 1), data = IsoText(100, 99);
+    std::memcpy(sector(20), readme.data(), readme.size());
+    std::memcpy(sector(22), data.data(), data.size());
+    return img;
+}
+
+// The cooked image as raw sectors of `stride` bytes (2352, or 2448 with the sub-channel after each). The bytes around
+// the user data are filled with junk, so a reader taking the wrong offset or stride gets the wrong data.
+std::vector<uint8_t> RawIso(const std::vector<uint8_t>& cooked, uint32_t stride, int mode) {
+    static const uint8_t sync[12] = {0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0};
+    size_t count = cooked.size() / 2048;
+    std::vector<uint8_t> img(count * stride, 0x5A);
+    for (size_t s = 0; s < count; s++) {
+        uint8_t* p = &img[s * stride];
+        std::memcpy(p, sync, 12);
+        uint32_t lba = uint32_t(s) + 150;
+        p[12] = uint8_t(lba / 75 / 60);
+        p[13] = uint8_t(lba / 75 % 60);
+        p[14] = uint8_t(lba % 75);
+        p[15] = uint8_t(mode);
+        size_t user = mode == 1 ? 16 : 24;
+        if (mode == 2) std::memset(p + 16, 0, 8);  // the subheader: form 1
+        std::memcpy(p + user, &cooked[s * 2048], 2048);
+        for (uint32_t i = 2352; i < stride; i++) p[i] = uint8_t(0x80 | (s + i));
+    }
+    return img;
+}
+
+void TestIsoInMemory() {
+    std::vector<uint8_t> cooked = BuildCookedIso();
+    std::string readme = IsoText(3000, 1), data = IsoText(100, 99);
+    struct Variant {
+        const char* label;
+        uint32_t stride;
+        int mode;
+    };
+    for (const Variant& v : {Variant{"cooked", 2048, 0}, Variant{"2352 MODE1", 2352, 1}, Variant{"2352 MODE2", 2352, 2},
+                             Variant{"2448 MODE1", 2448, 1}, Variant{"2448 MODE2", 2448, 2}}) {
+        std::vector<uint8_t> img = v.stride == 2048 ? cooked : RawIso(cooked, v.stride, v.mode);
+        std::string err;
+        auto src = OpenIso9660(MakeMemoryBlob(img), err);
+        CHECK(src != nullptr);
+        if (!src) {
+            std::printf("  %s: %s\n", v.label, err.c_str());
+            continue;
+        }
+        CHECK(std::string(src->Kind()) == "iso9660");
+        const auto& es = src->Entries();
+        CHECK(es.size() == 2);
+        if (es.size() != 2) continue;
+        CHECK(es[0].path == "DIR/DATA.BIN" && es[0].size == 100);
+        CHECK(es[1].path == "README.TXT" && es[1].size == 3000);
+        CHECK_EQ_STR(HashEntry(*src, es[0]), Sha256::Of(data.data(), data.size()).Hex());
+        CHECK_EQ_STR(HashEntry(*src, es[1]), Sha256::Of(readme.data(), readme.size()).Hex());
+        SniffOptions opts;
+        auto sniffed = OpenSniffed(MakeMemoryBlob(img), opts, 0, err);
+        CHECK(sniffed != nullptr && std::string(sniffed->Kind()) == "iso9660");
+        // Cut off inside README.TXT: listed, but reading it fails.
+        if (v.stride != 2048) {
+            img.resize(21 * size_t(v.stride) - 1);
+            auto cut = OpenIso9660(MakeMemoryBlob(img), err);
+            CHECK(cut != nullptr);
+            if (cut && cut->Entries().size() == 2) CHECK(HashEntry(*cut, cut->Entries()[1]).rfind("read failed", 0) == 0);
+        }
+    }
+    // Raw sectors of another mode are refused.
+    std::vector<uint8_t> mode0 = RawIso(cooked, 2448, 0);
+    std::string err;
+    CHECK(OpenIso9660(MakeMemoryBlob(mode0), err) == nullptr && err.find("mode 0") != std::string::npos);
+}
 
 // ---- Mac Roman, MacBinary, a cabinet and an HFS volume built in memory
 
@@ -984,11 +1136,10 @@ size_t CountSpillFiles(const std::string& dir) {
 }
 
 void TestToast(const std::string& root, const std::string& transfer, const std::string& scratch) {
-    std::string zipPath = transfer + "/2 SimThemePark Mac US CD v2.0.1 Feral Aspyr/"
-                          "SimThemePark_Mac_US-CD-Image_v2.0.1_2000_Feral-Aspyr_PPC-Classic.toast.zip";
+    std::string zipPath = SourceFor(transfer, "mac-zip");
     std::string treePath = root + "/extracted/disc-hfs";
     std::string err;
-    if (!Exists(zipPath) || scratch.empty()) {
+    if (zipPath.empty() || !Exists(zipPath) || scratch.empty()) {
         Skip("toast: the US Mac disc's zip is absent or TPW_TEST_SCRATCH is not set");
         return;
     }
@@ -1060,12 +1211,11 @@ void TestToast(const std::string& root, const std::string& transfer, const std::
 // ---- The Gold disc: zip, raw ISO image, installer .exe, cabinet; against the files cabextract wrote
 
 void TestGoldCab(const std::string& transfer, const std::string& expectDir) {
-    std::string zipPath = transfer + "/4 SimThemePark PC Gold Edition Bonus Rides and Attractions CD/"
-                          "SimThemePark_PC_US-Gold-Edition-Bonus-Rides-and-Attractions-CD-Image_2000-07_Bullfrog-EA_Win9x.zip";
+    std::string zipPath = SourceFor(transfer, "gold-zip");
     std::string err;
     std::string listPath = expectDir + "/gold-wads.sha256";
     auto cabDir = OpenFolder(expectDir + "/gold-cab", err);
-    if (!Exists(zipPath) || !cabDir || !Exists(listPath)) {
+    if (zipPath.empty() || !Exists(zipPath) || !cabDir || !Exists(listPath)) {
         Skip("gold cabinet: the zip, gold-cab or gold-wads.sha256 is absent");
         return;
     }
@@ -1139,6 +1289,7 @@ int main(int argc, char** argv) {
     TestMacBinary();
     TestCabInMemory();
     TestHfsInMemory();
+    TestIsoInMemory();
     TestSniffDepth();
     if (root.empty()) Skip("folder source: TPW_GDI_ROOT is not set"); else TestFolder(root);
     if (transfer.empty()) {

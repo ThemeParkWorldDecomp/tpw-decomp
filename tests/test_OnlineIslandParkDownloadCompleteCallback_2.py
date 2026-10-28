@@ -38,7 +38,7 @@ LABELED = ["wide", "wideNode", "folder", "folderNode", "file", "fileNode", "wdto
            "arrNode", "espList", "espNode", "fileInfo", "fiDtor", "fiNode", "printf"]
 OBJS = ["o%d" % i for i in range(8)]
 
-ISVIS_CODE, GLOBE_BT_CODE, ISLANDS_4C_CODE = 0x100a0010, 0x100ae9c0, 0x100b45d0
+ISVIS_CODE, SHOW_PANELS_CODE, ISLANDS_4C_CODE = 0x100a0010, 0x100ae7b0, 0x100b45d0
 
 HOST_LAYOUT = []
 PERSIST = {}
@@ -107,7 +107,7 @@ fake(0x102382d8, "NString", "Ls")
 fake(0x10238758, "construct_array", "LLLii")
 fake(0x10239940, "register", "LLL")
 fake(ISVIS_CODE, "IsVisible", "L", "i")
-fake(GLOBE_BT_CODE, "GlobeBacktrack", "L")
+fake(SHOW_PANELS_CODE, "ShowPanels", "L")
 fake(ISLANDS_4C_CODE, "Slot4c", "L")
 fake(0x102384b8, "operator_new", "i", lambda e, log: e.alloc(0x410))
 STUBS.internal(0x1016f7d0, stub_ctor)
@@ -408,7 +408,7 @@ def execute(s, case):
         ans = s.c_islc(o[0])
         ex["state"] = s.isl_state(o[0])
     elif op == "gcancel":
-        s.mk_vobj(o[0], {0x4c: GLOBE_BT_CODE})
+        s.mk_vobj(o[0], {0x4c: SHOW_PANELS_CODE})
         if case["have"]:
             s.set_gonline(o[4])
             s.set_f384(o[4], case["f384"])

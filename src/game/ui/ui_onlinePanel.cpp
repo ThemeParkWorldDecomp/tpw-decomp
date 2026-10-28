@@ -42,6 +42,7 @@
 #include "ui_tooltip.h"
 #include "UIInterface.h"
 #include "World.h"
+#include "WindowScripts.inc"
 #include <cstddef>
 #include <cstdint>
 #include <new>
@@ -997,9 +998,10 @@ void ContactMenu(int32_t position) {
 
 // OnlineParkFindPanelMsg 0x101e93b0 (700 bytes) and CreateOnlinePanel 0x101e8f08 (916 bytes), Mac file ui_onlineParkFindPanel.cpp.
 
-int16_t gOnlinePanelScript[2] = {0, 1};         // 0x102b0834
-int16_t gOnlineUnderlayScriptA[2] = {0, 1};     // 0x102b0a22
-int16_t gOnlineUnderlayScriptB[2] = {0, 1};     // 0x102b0b5e
+// The three window scripts: the words are the image's, generated at configure time (devtools/gen_game_tables.py, WindowScripts.inc).
+int16_t gOnlinePanelScript[] = {TPW_WINDOW_SCRIPT_102B0834};       // 0x102b0834
+int16_t gOnlineUnderlayScriptA[] = {TPW_WINDOW_SCRIPT_102B0A22};   // 0x102b0a22
+int16_t gOnlineUnderlayScriptB[] = {TPW_WINDOW_SCRIPT_102B0B5E};   // 0x102b0b5e
 uint32_t gOnlineEditFontIndex = 7;              // 0x102b0c50
 uint8_t gOnlineByte78;                          // 0x10395e78
 int32_t gOnlineWord88;                          // 0x10395e88

@@ -27,6 +27,7 @@
 #include "ui_mainmenu.h"
 #include "ui_publishParkPanel.h"
 #include "UI_pump.h"
+#include "WindowScripts.inc"
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
@@ -245,7 +246,7 @@ int32_t WorldLobbyControllerMsg(InterfaceWindow* window, int32_t message, int32_
 // Unit v5948: the world lobby window's creation and the satellite number windows' message function (main app).
 //   CreateWorldLobbyController 0x1022b038 (1600), SatelliteMsg 0x1022ae30 (464)
 
-int16_t gWorldLobbyScript[2] = {1, 0};   // 0x102b20f8
+int16_t gWorldLobbyScript[] = {TPW_WINDOW_SCRIPT_102B20F8};   // 0x102b20f8: the words are the image's, generated at configure time (devtools/gen_game_tables.py, WindowScripts.inc)
 
 // Weak; the test library fakes it (the constructor is another file's).
 namespace worldlobby_callee {

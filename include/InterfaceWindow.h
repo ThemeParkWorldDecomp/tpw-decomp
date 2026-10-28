@@ -361,7 +361,7 @@ void CreateOnlineParkFindPanel(void (*onCancel)());   // 0x101e9ff8 (src/game/ui
 // Unit v5661: what CreateOnlineParkFindPanel and ShowFindListSearching need.
 class InterfaceDrawObject;
 class CFSOnlineSystem;
-extern int16_t gOnlineParkFindScript[2];       // 0x102b0c8c: the find panel's window script (initial word 1; the rest is not kept here)
+extern int16_t gOnlineParkFindScript[];       // 0x102b0c8c: the find panel's window script
 extern const char16_t gOnlineParkFindWide[];   // 0x1024f01e: wide strings of the pool; the list cells use +0 and +2 (bytes)
 InterfaceWindow* OnlineParkFindLCFormat();             // 0x101e96b0 (the find list's row maker; weak stand-in in the callees file)
 void OnlineParkFindLCPostFormat(InterfaceWindow*);     // 0x101e9874 (the find list's attach function; weak stand-in)
@@ -404,8 +404,8 @@ void CStrDtor(void* mem);                       // 0x102382f0
 }  // namespace onlineparkfind_callee
 
 // Unit v5948 (src/game/ui/ui_worldLobbyController.cpp): the world lobby window and its satellite panel.
-// The world lobby window's script (the word at 0x102b20f8, initial value 1; the rest is not kept here).
-extern int16_t gWorldLobbyScript[2];
+// The world lobby window's script (0x102b20f8).
+extern int16_t gWorldLobbyScript[];
 // 0x1022b038 (1600): builds the world lobby window on the lobby's window (once; the parent word 0x10396fec says it exists), sets its
 // extra parameter 0 to `publish`, and either hides the panel 0x16007 (publish) or shows it with five number windows 0x16008..0x1600c
 // (callback SatelliteMsg, extra parameter 1..5); then the four arrow buttons 0x16002, 0x16004, 0x16005, 0x16001 get auto repeat (0, 10).

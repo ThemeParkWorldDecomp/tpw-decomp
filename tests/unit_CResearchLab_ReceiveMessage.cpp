@@ -80,7 +80,7 @@ CMsgResearchCategoryUpdated::CMsgResearchCategoryUpdated(ResearchCat category) {
 }
 
 int32_t CMessageCentre::PostMessage(const CMsg& message) {
-    ev("PostMessage", {Kind(this), static_cast<int64_t>(static_cast<const CMsgResearchCategoryUpdated&>(message).mCategory)});
+    ev("PostMessage", {Kind(this), static_cast<int64_t>(static_cast<const CMsgResearchCategoryUpdated&>(message).mCategory), message.GetType()});
     return 1;
 }
 

@@ -3,9 +3,15 @@
 // With the player's own discs they import for real and compare the trees with devtools/import_originals.py's CHECKSUMS
 // (US), import_eur.py's EXPECTED (European) and the European folder under TPW_GDI_ROOT/game-eur; the discs are read in
 // place and the output trees are deleted at the end. A test whose input is absent is skipped with a message.
+// The language packs: synthetic drops always (an empty file matched by its language folder, the status lines); with a
+// language disc (TPW_TEST_LANGUAGE_DISC and TPW_TEST_LANGUAGE) a real import that must make that language available.
 //
 // environment: TPW_GDI_ROOT (the ROOT folder), TPW_TEST_TRANSFER (the disc archive folder), TPW_TEST_EXPECT (the folder
-// with allitems.exe), TPW_TEST_SCRATCH (where the output trees go; the disc tests need about 3 GB there)
+// with allitems.exe), TPW_TEST_SOURCES (the file naming the discs under TPW_TEST_TRANSFER; sources.txt there by default),
+// TPW_TEST_SCRATCH (where the output trees go; the disc tests need about 3 GB there),
+// TPW_TEST_LANGUAGE_DISC (a disc, image or folder with a language on it) and TPW_TEST_LANGUAGE (that language, as
+// ManifestLanguages() spells it; several separated by commas)
+#include <cctype>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -63,6 +69,26 @@ void Skip(const std::string& what) {
 std::string Env(const char* name) {
     const char* v = std::getenv(name);
     return v && *v ? v : "";
+}
+
+// The player's own discs are named in a file of theirs, not here: TPW_TEST_SOURCES, or sources.txt in TPW_TEST_TRANSFER, one
+// "key = path under TPW_TEST_TRANSFER" per line (keys: mac-zip, eur-a, eur-first, gold-zip). A missing key skips its test.
+std::string SourceFor(const std::string& transfer, const std::string& key) {
+    std::string file = Env("TPW_TEST_SOURCES");
+    if (file.empty()) file = transfer + "/sources.txt";
+    std::ifstream in(file);
+    std::string line;
+    auto trim = [](std::string s) {
+        size_t a = s.find_first_not_of(" \t\r"), b = s.find_last_not_of(" \t\r");
+        return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
+    };
+    while (std::getline(in, line)) {
+        size_t eq = line.find('=');
+        if (eq == std::string::npos || trim(line.substr(0, eq)) != key) continue;
+        std::string rel = trim(line.substr(eq + 1));
+        return rel.empty() ? rel : transfer + "/" + rel;
+    }
+    return "";
 }
 
 bool Exists(const std::string& path) {
@@ -337,6 +363,175 @@ void TestSynthetic(const std::string& scratch) {
 
     RemoveTree(root);
     RemoveTree(drop);
+}
+
+// ---- the language packs
+
+const LanguageStatus* FindStatus(const std::vector<LanguageStatus>& all, const std::string& name) {
+    for (const LanguageStatus& l : all)
+        if (l.name == name) return &l;
+    return nullptr;
+}
+
+// The lines --verify prints, from plain data.
+void TestLanguageLines() {
+    std::printf("language lines\n");
+    LanguageStatus l;
+    l.name = "French";
+    l.text = 60, l.filter = 1, l.meshes = 3, l.speech = 20;
+    CHECK(l.Line() == "French: absent");
+    l.state = LanguageStatus::State::Available;
+    CHECK(l.Line() == "French: available");
+    l.oldTables = l.baseDateFonts = l.baseDateFontsPresent = true;
+    l.name = "Spanish";
+    CHECK(l.Line() == "Spanish: available, older text tables, date fonts from the base edition");
+    l = LanguageStatus();
+    l.name = "German";
+    l.state = LanguageStatus::State::Partial;
+    l.text = l.textPresent = 61, l.filter = l.filterPresent = 1, l.meshes = l.meshesPresent = 3, l.speech = 20;
+    l.speechPresent = 17;
+    CHECK(l.Line() == "German: partial, 3 of 20 speech files missing");
+    l.textPresent = 51, l.meshesPresent = 0;
+    CHECK(l.Line() == "German: partial, 10 of 61 text files, 3 of 3 meshes and 3 of 20 speech files missing");
+    l.filterPresent = 0, l.textPresent = 61, l.meshesPresent = 3, l.speechPresent = 20;
+    CHECK(l.Line() == "German: partial, 1 of 1 filter files missing");
+    l = LanguageStatus();
+    l.name = "Dutch";
+    l.state = LanguageStatus::State::Partial;
+    l.baseDateFonts = true;
+    l.text = l.textPresent = 56;
+    CHECK(l.Line() == "Dutch: partial, text and speech present, needs the US or European edition (its date fonts)");
+    l.textPresent = 55;
+    CHECK(l.Line() == "Dutch: partial, 1 of 56 text files missing; needs the US or European edition (its date fonts)");
+    CHECK(std::strcmp(l.StateWord(), "partial") == 0);
+}
+
+// An empty language file is matched by its name and a folder named after its language (the overlay discs keep each
+// language in a folder of its own); without such a folder it is an unknown file. Nothing else of a language makes it
+// available or partial.
+void TestLanguageSynthetic(const std::string& scratch) {
+    std::printf("language drops\n");
+    std::string root = scratch + "/language-data", drop = scratch + "/language-drop";
+    RemoveTree(root);
+    RemoveTree(drop);
+
+    // the languages whose alloweds.txt is the empty file
+    std::vector<std::string> emptyLanguages;
+    for (size_t l = 0; l < ManifestLanguageCount(); ++l) {
+        const std::string name = ManifestLanguages()[l].name;
+        const ManifestRecord* r =
+            FindByDest(kEditionLanguages, ("lang/" + name + "/data/Language/" + name + "/alloweds.txt").c_str());
+        if (r && r->hash_count == 1 && RecordHash(*r, 0).size == 0) emptyLanguages.push_back(name);
+    }
+    CHECK(emptyLanguages.size() >= 2);
+    if (emptyLanguages.size() < 2) return;
+    const std::string first = emptyLanguages[0], second = emptyLanguages[1];
+    std::string lower = second;
+    for (char& c : lower) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+
+    WriteFile(drop + "/" + first + "/Filter/" + first + "/alloweds.txt", "");  // an overlay disc's layout
+    WriteFile(drop + "/disc2/" + lower + "/alloweds.txt", "");                  // any case
+    WriteFile(drop + "/Filter/alloweds.txt", "");                               // no language folder: unknown
+
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    Importer imp(cfg);
+    std::string err;
+    CHECK(imp.Open(err));
+    std::vector<LanguageStatus> before = imp.Languages();
+    CHECK_EQ(before.size(), ManifestLanguageCount());
+    for (const LanguageStatus& l : before) CHECK(l.state == LanguageStatus::State::Absent);
+
+    ImportReport r = imp.Import({drop});
+    CHECK(r.errors.empty());
+    CHECK_EQ(r.written, 2);
+    CHECK_EQ(r.unknownFiles, 1);
+    const std::string lang = imp.GameFolder(kEditionLanguages);
+    CHECK(lang == root + "/assets/lang");
+    CHECK(Exists(lang + "/" + first + "/data/Language/" + first + "/alloweds.txt"));
+    CHECK(Exists(lang + "/" + second + "/data/Language/" + second + "/alloweds.txt"));
+    CHECK(Tree(root + "/assets/us", false).empty() && Tree(root + "/assets/eur", false).empty());
+    CHECK_EQ(r.languages.size(), ManifestLanguageCount());
+    for (size_t l = 0; l < r.languages.size() && l < ManifestLanguageCount(); ++l)
+        CHECK(r.languages[l].name == ManifestLanguages()[l].name);
+    // an optional file alone is no part of a language
+    const LanguageStatus* got = FindStatus(r.languages, first);
+    CHECK(got != nullptr && got->state == LanguageStatus::State::Absent && got->optionalPresent == 1);
+    CHECK(got != nullptr && got->Line() == first + ": absent");
+    CHECK(got != nullptr && got->speech == 20 && got->meshes == 3 && got->filter == 1 && got->speechPresent == 0);
+    // the flags come from the manifest's language table
+    const LanguageStatus* spanish = FindStatus(r.languages, "Spanish");
+    CHECK(spanish != nullptr && spanish->oldTables && spanish->baseDateFonts && !spanish->baseDateFontsPresent);
+    const LanguageStatus* korean = FindStatus(r.languages, "Korean");
+    CHECK(korean != nullptr && !korean->oldTables && !korean->baseDateFonts);
+
+    // found again by Open, checked again, removed
+    {
+        Importer again(cfg);
+        CHECK(again.Open(err));
+        const LanguageStatus* back = FindStatus(again.Languages(), first);
+        CHECK(back != nullptr && back->optionalPresent == 1);
+    }
+    CHECK_EQ(imp.VerifyEdition(kEditionLanguages, err), 0);
+    WriteFile(lang + "/" + second + "/data/Language/" + second + "/alloweds.txt", "changed");
+    CHECK_EQ(imp.VerifyEdition(kEditionLanguages, err), 1);
+    CHECK(!Exists(lang + "/" + second + "/data/Language/" + second + "/alloweds.txt"));
+    CHECK(imp.RemoveEdition(kEditionLanguages, err));
+    CHECK(!Exists(lang));
+    const LanguageStatus* gone = FindStatus(imp.Languages(), first);
+    CHECK(gone != nullptr && gone->optionalPresent == 0);
+
+    // a drop that may not write the language packs leaves them alone
+    ImporterConfig noLang = cfg;
+    noLang.editions = kEditionUs | kEditionEur | kEditionGold;
+    Importer without(noLang);
+    CHECK(without.Open(err));
+    ImportReport r2 = without.Import({drop});
+    CHECK_EQ(r2.written, 0);
+    CHECK(!Exists(lang));
+
+    RemoveTree(root);
+    RemoveTree(drop);
+}
+
+// A real language disc: every language it names becomes available, and each file written under assets/lang/<Name>/
+// is its record's content.
+void TestLanguageDisc(const std::string& disc, const std::string& names, const std::string& scratch) {
+    std::printf("language disc\n");
+    std::string root = scratch + "/language-disc";
+    RemoveTree(root);
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    Importer imp(cfg);
+    std::string err;
+    CHECK(imp.Open(err));
+    ImportReport r = imp.Import({disc});
+    CHECK(r.errors.empty());
+    for (const std::string& e : r.errors) std::printf("  error: %s\n", e.c_str());
+    for (const LanguageStatus& l : r.languages) std::printf("  %s\n", l.Line().c_str());
+    std::stringstream list(names);
+    std::string name;
+    while (std::getline(list, name, ',')) {
+        const LanguageStatus* l = FindStatus(r.languages, name);
+        CHECK(l != nullptr && l->state == LanguageStatus::State::Available);
+        size_t checked = 0;
+        for (const auto& [rel, info] : Tree(imp.GameFolder(kEditionLanguages) + "/" + name, true)) {
+            const ManifestRecord* rec = FindByDest(kEditionLanguages, ("lang/" + name + "/" + rel).c_str());
+            CHECK(rec != nullptr);
+            bool accepts = false;
+            for (unsigned k = 0; rec && k < rec->hash_count; ++k) {
+                const ManifestHash& h = RecordHash(*rec, k);
+                Sha256Digest d;
+                std::memcpy(d.bytes, h.sha256, sizeof d.bytes);
+                accepts = accepts || (h.size == info.size && d.Hex() == info.sha);
+            }
+            CHECK(accepts);
+            ++checked;
+        }
+        CHECK(l != nullptr && checked >= l->text + l->filter + l->meshes + l->speech);
+    }
+    CHECK_EQ(imp.VerifyEdition(kEditionLanguages, err), 0);
+    RemoveTree(root);
 }
 
 // ---- the startup check (assets/verified.tsv): an unchanged install is not rehashed; a file whose size or modification
@@ -682,7 +877,7 @@ void TestDamagedContainers(const std::string& scratch) {
 // ---- the discs
 
 struct Discs {
-    std::string toast, img66484, mdf66100, goldZip, allitems, gameEur;
+    std::string toast, eurImg, eurFirst, goldZip, allitems, gameEur;
 };
 
 bool CompareUs(const std::string& folder) {
@@ -784,11 +979,11 @@ ImportReport RunAsync(Importer& imp, const std::vector<std::string>& paths, bool
 }
 
 void TestUsAndEur(const Discs& d, const std::string& scratch) {
-    if (d.toast.empty() || d.img66484.empty()) {
-        Skip("US and European import: the US toast zip or the 66484 image is not under TPW_TEST_TRANSFER");
+    if (d.toast.empty() || d.eurImg.empty()) {
+        Skip("US and European import: the US toast zip or the European image is not under TPW_TEST_TRANSFER");
         return;
     }
-    std::printf("US toast, then 66484\n");
+    std::printf("US toast, then the European image\n");
     std::string root = scratch + "/us-eur";
     RemoveTree(root);
     ImporterConfig cfg;
@@ -828,9 +1023,9 @@ void TestUsAndEur(const Discs& d, const std::string& scratch) {
     CompareUs(imp.GameFolder(kEditionUs));
 
     // (b) add the PC disc: the European tree
-    ImportReport eur = imp.Import({d.img66484});
+    ImportReport eur = imp.Import({d.eurImg});
     Events(imp);
-    PrintStatus("66484", eur);
+    PrintStatus("european", eur);
     for (const std::string& v : eur.differentVersions) std::printf("    different version (not used): %s\n", v.c_str());
     CHECK(eur.errors.empty());
     CHECK(eur.status[1].unlocked);
@@ -841,7 +1036,7 @@ void TestUsAndEur(const Discs& d, const std::string& scratch) {
 
     // (c) both again: nothing changes
     std::map<std::string, FileInfo> before = Tree(root + "/assets", false);
-    ImportReport again = imp.Import({d.toast, d.img66484});
+    ImportReport again = imp.Import({d.toast, d.eurImg});
     Events(imp);
     PrintStatus("both again", again);
     CHECK(again.ChangedNothing());
@@ -860,22 +1055,22 @@ void TestUsAndEur(const Discs& d, const std::string& scratch) {
     RemoveTree(root);
 }
 
-void Test66100(const Discs& d, const std::string& scratch) {
-    if (d.mdf66100.empty()) {
-        Skip("66100 import: the image is not under TPW_TEST_TRANSFER");
+void TestFirstPressing(const Discs& d, const std::string& scratch) {
+    if (d.eurFirst.empty()) {
+        Skip("first pressing import: the image is not under TPW_TEST_TRANSFER");
         return;
     }
-    std::printf("66100 alone\n");
-    std::string root = scratch + "/eur-66100";
+    std::printf("first pressing alone\n");
+    std::string root = scratch + "/eur-first";
     RemoveTree(root);
     ImporterConfig cfg;
     cfg.dataRoot = root;
     Importer imp(cfg);
     std::string err;
     CHECK(imp.Open(err));
-    ImportReport r = imp.Import({d.mdf66100});
+    ImportReport r = imp.Import({d.eurFirst});
     Events(imp);
-    PrintStatus("66100", r);
+    PrintStatus("first pressing", r);
     const EditionStatus& s = r.status[1];
     CHECK(r.errors.empty());
     CHECK(!s.unlocked);
@@ -1062,7 +1257,19 @@ void TestIcon(const std::string& scratch) {
     std::string icoErr;
     CHECK(WriteIconIco(scratch + "/icon-test.ico", sixtyFour, icoErr));
     CHECK(DecodeIcon(IconFile::Ico, ico64.data(), ico64.size(), again));
+    // a second write of the same path replaces the file, and leaves no .part (std::rename refused that on Windows:
+    // tpw-port issue #62, PR #63); so does a second icon.png
+    CHECK(WriteIconIco(scratch + "/icon-test.ico", ramp(256), icoErr));
+    CHECK(icoErr.empty());
+    CHECK(ReadText(scratch + "/icon-test.ico") == std::string(ico256.begin(), ico256.end()));
+    CHECK(!Exists(scratch + "/icon-test.ico.part"));
+    CHECK(WriteIconPng(scratch + "/icon-test.png", icon, "TP.ico", icoErr));
+    CHECK(WriteIconPng(scratch + "/icon-test.png", sixtyFour, "TP.EXE", icoErr));
+    CHECK(ReadIconPng(scratch + "/icon-test.png", again, &source));
+    CHECK(again.width == 64 && source == "TP.EXE, 64x64, 32-bit");
+    CHECK(!Exists(scratch + "/icon-test.png.part"));
     std::remove((scratch + "/icon-test.ico").c_str());
+    std::remove((scratch + "/icon-test.png").c_str());
 
     // a drop with TP.ico in it writes icon.png beside launcher.ini; a lesser icon later does not replace it
     std::string root = scratch + "/icon-data", drop = scratch + "/icon-drop";
@@ -1106,18 +1313,24 @@ int main() {
     TestIcon(scratch);
     TestStartupCheck(scratch);
     TestDamagedContainers(scratch);
+    TestLanguageLines();
+    TestLanguageSynthetic(scratch);
+    const std::string languageDisc = Env("TPW_TEST_LANGUAGE_DISC"), languages = Env("TPW_TEST_LANGUAGE");
+    if (languageDisc.empty() || languages.empty()) Skip("the language disc: TPW_TEST_LANGUAGE_DISC or TPW_TEST_LANGUAGE is not set");
+    else TestLanguageDisc(languageDisc, languages, scratch);
 
     std::string transfer = Env("TPW_TEST_TRANSFER"), expect = Env("TPW_TEST_EXPECT"), gdi = Env("TPW_GDI_ROOT");
     Discs d;
     auto pick = [](const std::string& path) { return Exists(path) ? path : std::string(); };
     if (!transfer.empty()) {
-        d.toast = pick(transfer + "/2 SimThemePark Mac US CD v2.0.1 Feral Aspyr/"
-                                  "SimThemePark_Mac_US-CD-Image_v2.0.1_2000_Feral-Aspyr_PPC-Classic.toast.zip");
-        const std::string eu = transfer + "/1 ThemeParkWorld PC UK-European CD Bullfrog EA/";
-        d.img66484 = pick(eu + "ThemeParkWorld_PC_EA-Classics-CD-Image_2000-11_Bullfrog-EA_Win9x_redump-66484/ThemeParkWorld.img");
-        d.mdf66100 = pick(eu + "ThemeParkWorld_PC_European-CD-Image-EN-IT-NL-PL_1999-10_Bullfrog-EA_Win9x_redump-66100/TPWORLD.mdf");
-        d.goldZip = pick(transfer + "/4 SimThemePark PC Gold Edition Bonus Rides and Attractions CD/"
-                                    "SimThemePark_PC_US-Gold-Edition-Bonus-Rides-and-Attractions-CD-Image_2000-07_Bullfrog-EA_Win9x.zip");
+        auto source = [&](const char* key) {
+            std::string path = SourceFor(transfer, key);
+            return path.empty() ? path : pick(path);
+        };
+        d.toast = source("mac-zip");
+        d.eurImg = source("eur-a");
+        d.eurFirst = source("eur-first");
+        d.goldZip = source("gold-zip");
     }
     if (!expect.empty()) d.allitems = pick(expect + "/allitems.exe");
     if (!gdi.empty()) d.gameEur = pick(gdi + "/game-eur/tpw-eur/Theme Park Data");
@@ -1128,7 +1341,7 @@ int main() {
         Skip("the disc imports: TPW_TEST_TRANSFER is not set");
     } else {
         TestUsAndEur(d, scratch);
-        Test66100(d, scratch);
+        TestFirstPressing(d, scratch);
         TestGold(d, scratch);
     }
     RemoveTree(scratch);

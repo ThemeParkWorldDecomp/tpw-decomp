@@ -78,6 +78,11 @@ RECORD(CLBScreenComponentOnlineGlobe, "Globe", Close)
 RECORD_CANCEL(CLBScreenComponentOnlineGlobe, "Globe")
 RECORD(CLBScreenComponentOnlineGlobe, "Globe", Tick)  // the globe's own, unit v5571's; its vtable is emitted here
 RECORD_INPUT(CLBScreenComponentOnlineGlobe, "Globe")
+void CLBScreenComponentOnlineGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
+void CLBScreenComponentDownloadGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
+void CLBScreenComponentDownloadGlobe::HandleOnlineBacktrack() {}
+void CLBScreenComponentPublishGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
+void CLBScreenComponentPublishGlobe::HandleOnlineBacktrack() {}
 RECORD_DTOR(CLBScreenComponentDownloadGlobe, "DownloadGlobe")
 RECORD(CLBScreenComponentDownloadGlobe, "DownloadGlobe", Init)
 RECORD(CLBScreenComponentDownloadGlobe, "DownloadGlobe", Tick)

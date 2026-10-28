@@ -11,8 +11,9 @@ namespace tpw::assets {
 
 namespace {
 
-// Sector 16 of a raw 2352-byte image is at 37632 and its "CD001" at +16+1 (MODE1) or +24+1 (MODE2 form 1).
-const size_t kHead = 16 * 2352 + 32;
+// Sector 16 of a raw 2352-byte image is at 37632 and its "CD001" at +16+1 (MODE1) or +24+1 (MODE2 form 1); with 96
+// sub-channel bytes after each sector (2448 bytes, some .mdf files) it is at 39168.
+const size_t kHead = 16 * 2448 + 32;
 
 // A temporary copy of an entry; the file goes away with the Blob.
 class SpillBlob : public Blob {
@@ -119,7 +120,9 @@ std::vector<Container> Classify(Blob& blob, const SniffOptions& options, uint64_
     bool hfs = Has(head.data(), n, 0, "ER") || Has(head.data(), n, 1024, "BD");
     bool iso = Has(head.data(), n, 16 * 2048 + 1, "CD001") ||
                (RawSync(head.data(), n) && (Has(head.data(), n, 16 * 2352 + 17, "CD001") ||
-                                            Has(head.data(), n, 16 * 2352 + 25, "CD001")));
+                                            Has(head.data(), n, 16 * 2352 + 25, "CD001") ||
+                                            Has(head.data(), n, 16 * 2448 + 17, "CD001") ||
+                                            Has(head.data(), n, 16 * 2448 + 25, "CD001")));
     if (hfs) out.push_back(Container::Hfs);
     if (iso) out.push_back(Container::Iso9660);
     // MacBinary has no signature; its header is validated when it is opened, and it is the last resort.

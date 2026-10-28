@@ -27,8 +27,7 @@ AdvisorMessageRecord gAdvisorMessageBlock[kAdvisorMessageCount + 2];
 CWorld* gGameWorld = nullptr;
 CWorld*& gGameWorldRef = gGameWorld;
 
-// The guard byte of TheGameType()'s function-local static (the test sets it to try both first-use paths).
-extern uint64_t gTheGameTypeGuard asm("__ZGVZ11TheGameTypevE9sGameType");
+// The guard byte of TheGameType()'s object (gLoansGameTypeGuard, FS_Online.h; the test sets it to try both first-use paths).
 
 namespace {
 CParkAnalyser* sAnalyser = nullptr;
@@ -200,16 +199,16 @@ void tpw_fx_settable(const int32_t* d) {
 
 // The game type object and its guard.
 void tpw_fx_setgame(int32_t type, int32_t guard) {
-    gTheGameTypeGuard = 1;
+    gLoansGameTypeGuard = 1;
     TheGameType().mType = static_cast<GameType>(type);
-    gTheGameTypeGuard = guard ? 1 : 0;
+    gLoansGameTypeGuard = guard ? 1 : 0;
 }
 void tpw_fx_getgame(int64_t* out) {
-    uint64_t g = gTheGameTypeGuard;
-    gTheGameTypeGuard = 1;
+    int8_t g = gLoansGameTypeGuard;
+    gLoansGameTypeGuard = 1;
     out[0] = static_cast<int32_t>(TheGameType().mType);
-    out[1] = static_cast<int64_t>(g & 0xff);
-    gTheGameTypeGuard = g;
+    out[1] = static_cast<int64_t>(static_cast<uint8_t>(g));
+    gLoansGameTypeGuard = g;
 }
 
 uint32_t tpw_fx_call(int32_t which, uint64_t scoring, int32_t count) {

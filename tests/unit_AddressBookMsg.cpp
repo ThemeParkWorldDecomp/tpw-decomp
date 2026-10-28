@@ -29,9 +29,8 @@ CFSOnlineSystem* gOnlineSystem;
 InterfaceWindow* gAddressBookPanel;
 char16_t gAddressRemoveName[0x40];
 
-// The program's one game type object and its guard: function-local statics of the inline TheGameType() in the translation's file.
-extern CGameType gTheGameTypeObject asm("__ZZ11TheGameTypevE9sGameType");
-extern char gTheGameTypeGuard asm("__ZGVZ11TheGameTypevE9sGameType");
+// The program's one game type object and its guard byte are TheGameType()'s storage (gLoansGameTypeStorage and
+// gLoansGameTypeGuard, inline variables of FS_Online.h).
 
 namespace {
 
@@ -202,7 +201,7 @@ uint64_t tpw_ab_addr(const char* name) {
     const Entry entries[] = {
         {"gUserInfo", &gUserInfo},          {"gOnlineSystem", &gOnlineSystem},
         {"gPanelPtr", &gAddressBookPanel},  {"removeName", gAddressRemoveName},
-        {"gtype", &gTheGameTypeObject},     {"gguard", &gTheGameTypeGuard},
+        {"gtype", gLoansGameTypeStorage},   {"gguard", &gLoansGameTypeGuard},
         {"head", &gBookHead},               {"cursor", &gCursor},
         {"list", gListWindow},              {"edit", &gEditWindow},
         {"parent", gParent},                {"panel", gPanel},

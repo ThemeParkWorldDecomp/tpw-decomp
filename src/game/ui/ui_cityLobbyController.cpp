@@ -49,7 +49,7 @@ void ListParkOnlineParkInfoPanelCancelCallback() { parkinfo_callee::OnlineIsland
 // screen of the lobby and forgets the window when it dies.
 
 InterfaceWindow* gCityLobbyWindow;                  // 0x10395c70 (name invented)
-int16_t gCityLobbyScript[2] = {0, 1};               // 0x102afe7a (name invented): stand-in; the real description is Mac data
+int16_t gCityLobbyScript[] = {TPW_WINDOW_SCRIPT_102AFE7A};   // 0x102afe7a (name invented): the words are the image's, generated at configure time (devtools/gen_game_tables.py, WindowScripts.inc)
 
 // ListParkOnlineParkInfoPanelCancelCallback (0x101e0388) is translated in src/PublishPanelMsg_OnlineParkListPostGetAllParksInCityCallbackFn.cpp.
 

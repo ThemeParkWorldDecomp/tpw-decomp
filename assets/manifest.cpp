@@ -17,6 +17,16 @@ size_t ManifestHashCount() { return std::size(kManifestHashes); }
 
 const ManifestHash& RecordHash(const ManifestRecord& record, unsigned i) { return kManifestHashes[record.first_hash + i]; }
 
+const ManifestLanguage* ManifestLanguages() { return kManifestLanguages; }
+size_t ManifestLanguageCount() { return std::size(kManifestLanguages); }
+
+const ManifestLanguage* FindLanguage(const char* name) {
+    for (const ManifestLanguage& l : kManifestLanguages) {
+        if (std::strcmp(l.name, name) == 0) return &l;
+    }
+    return nullptr;
+}
+
 namespace {
 
 // Order of the by-hash index: SHA-256 bytes, then size (the generator sorts by record too, which the lookup ignores).
@@ -59,7 +69,8 @@ size_t CountRecords(unsigned editions, bool required_only) {
 }
 
 const char* GroupName(Group group) {
-    static const char* const names[kGroupCount] = {"core", "fonts-rsrc", "movies", "language:american", "language:english", "program", "gold"};
+    static const char* const names[kGroupCount] = {"core", "fonts-rsrc", "movies", "language:american", "language:english", "program", "gold",
+                                                    "language-pack"};
     return group < kGroupCount ? names[group] : "?";
 }
 
@@ -68,6 +79,7 @@ const char* EditionName(Edition edition) {
         case kEditionUs: return "us";
         case kEditionEur: return "eur";
         case kEditionGold: return "gold";
+        case kEditionLanguages: return "lang";
     }
     return "?";
 }
@@ -77,6 +89,7 @@ const char* SourceName(DiscSource source) {
         case kSourceMacCd: return "mac";
         case kSourcePcCd: return "pc";
         case kSourceGoldCd: return "gold";
+        case kSourceLanguageDisc: return "lang";
     }
     return "?";
 }

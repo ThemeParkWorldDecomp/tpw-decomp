@@ -1,6 +1,8 @@
 """Unit v5L42, the window scripts of src/game/ui/ui_allStaffPanel.cpp, src/game/ui/ui_cityLobbyController.cpp, src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineOutbox.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_parkStatus.cpp, against libtpw_unit_WindowScripts.dylib (tests/unit_WindowScripts.cpp), main app
 ("SimTheme Park"): the arrays the launcher had as all-zero stand-ins until devtools/gen_game_tables.py generated them (WINDOW_SCRIPTS). Also
 the scripts that were two-word placeholders until then, which their panels' files define: each is read from that unit's library (ELSEWHERE).
+And the online world's ten scripts (the city lobby, the online login, news, panel, underlays, park finder, park list, publish panel and
+world lobby), two-word placeholders until the island lobby's globe was given back its online world.
 
 No code runs. One test, "the window scripts": the host's array against the words of the program image, read from the data section's dump (so
 from another reading of the program than the generator's). A case is one script and one block of 16 words (the last block is shorter); the edge
@@ -26,6 +28,16 @@ SCRIPTS = [
     ("gCityInfoOverlayScript", 0x102B0288, 58),
     ("gOutboxPanelData", 0x102B05C4, 311),
     ("gOnlineParkInfoScript", 0x102B0E58, 279),
+    ("gCityLobbyScript", 0x102AFE7A, 233),
+    ("gOnlineLoginPanelScript", 0x102B02FC, 162),
+    ("gOnlineNewsScript", 0x102B0440, 192),
+    ("gOnlinePanelScript", 0x102B0834, 247),
+    ("gOnlineUnderlayScriptA", 0x102B0A22, 158),
+    ("gOnlineUnderlayScriptB", 0x102B0B5E, 118),
+    ("gOnlineParkFindScript", 0x102B0C8C, 230),
+    ("gOnlineParkListScript", 0x102B1086, 176),
+    ("gPublishParkPanelScript", 0x102B11E6, 128),
+    ("gWorldLobbyScript", 0x102B20F8, 311),
 ]
 BLOCK = 16
 # the arrays another unit's library holds: (library, its address function, the name it takes)

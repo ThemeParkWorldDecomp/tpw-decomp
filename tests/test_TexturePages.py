@@ -508,6 +508,22 @@ def ppc(e, case):
 
 # ----------------------------------------------------------------- host side
 
+GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_CLAMP, GL_CLAMP_TO_EDGE = 0xde1, 0x2802, 0x2803, 0x2900, 0x812f
+
+
+def mac_wrap(log):
+    """The port fix in COpenGLTexture::SetState (tpw-port PR #61) sets clamp to edge where the Mac sets GL_CLAMP:
+    puts the Mac's value back in those calls, and marks a GL_CLAMP the fixed build still sets, so the rest is
+    compared with the original."""
+    out = []
+    for name, ints, texts in log:
+        if name == "glTexParameteri" and ints[:2] in ((GL_TEXTURE_2D, GL_TEXTURE_WRAP_S),
+                                                      (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T)):
+            wrap = {GL_CLAMP_TO_EDGE: GL_CLAMP, GL_CLAMP: -1}.get(ints[2], ints[2])
+            ints = ints[:2] + (wrap,) + ints[3:]
+        out.append((name, ints, texts))
+    return out
+
 
 def host(lib, case):
     reset = lib["tpw_tp_reset"]
@@ -541,6 +557,10 @@ def host(lib, case):
     finally:
         log = CL.host_end(lib)
         bulk(0)
+    portfix = lib["tpw_tp_portfix"]
+    portfix.restype, portfix.argtypes = C.c_int32, []
+    if portfix() == 1:
+        log = mac_wrap(log)
     return dict(results=results, log=log, marks=marks, states=states)
 
 

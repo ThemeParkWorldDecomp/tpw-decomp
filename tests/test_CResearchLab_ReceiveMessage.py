@@ -10,7 +10,8 @@ arguments (labels for the lab and its parts) and answer from the case's queues. 
 
 The world of a case: the lab block (project count, work load, best project, active flag), gWorld, gMessageCentre and gMasterSave (null or
 an existing block), the game type word (the guard byte is set on the PowerPC side only). What is compared: the answer, the lab's four
-words, where the three globals point afterwards (null, the new object, another) and the event log.
+words, where the three globals point afterwards (null, the new object, another) and the event log. The posted message's log entry holds
+its type (GetType on the host, 0x12 on the PowerPC side), so a type the UI does not subscribe to fails.
 
 No fused operations. Not tested: the game type's guard byte on the host (a function-local static there; the constructor fake does nothing,
 so the type word is the case's).
@@ -109,7 +110,9 @@ STUBS.internal(0x10151D94, stub_msgctor)
 
 
 def stub_post(e):
-    e.cl.rec("PostMessage", (kind(e, e.r(3)), e.u32(e.r(4) + 8)))
+    # the message's type: 0x12, what its GetType (0x10124510, compared in test_CStaffHQ_PickUpStaff) answers on the Mac; the
+    # constructor is a fake here, so the PowerPC message has no vtable to ask
+    e.cl.rec("PostMessage", (kind(e, e.r(3)), e.u32(e.r(4) + 8), 0x12))
 
 
 STUBS.internal(0x1015256C, stub_post)

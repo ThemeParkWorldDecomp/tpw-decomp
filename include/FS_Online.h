@@ -2,6 +2,7 @@
 // untranslated (the OnlineConfig constructor is in src/game/online/FS_Online.cpp).
 #pragma once
 #include <cstdint>
+#include <new>
 #include <string>
 
 #include "FS_OnlineList.h"
@@ -551,10 +552,22 @@ public:
 
 // The one game type object: a function-local static of an inline accessor in the
 // original (0x102b3aa0, guard byte 0x102b3aa4), so every user inlines the guard test and
-// constructs it on first use. The accessor's name is not known.
+// constructs it on first use. The accessor's name is not known. The object and its guard
+// byte are raw storage, so that no constructor runs at start-up, and the four functions
+// that spell the guard test out (UIInterface::EnableResearchButton, CreateLoansPanel and
+// the entry price and finance panels) test and construct the same object as the accessor.
+// Their names are the loans panel's, where they were found first. (A static of the
+// accessor's own was a second object: a login set it, and those four kept the type they
+// were first made with; from tpw-port PR #71 by samueleagle91.)
+alignas(4) inline unsigned char gLoansGameTypeStorage[4];   // 0x102b3aa0 (a CGameType)
+inline int8_t gLoansGameTypeGuard;                           // 0x102b3aa4
+static_assert(sizeof(CGameType) == sizeof(gLoansGameTypeStorage));
 inline CGameType& TheGameType() {
-    static CGameType sGameType;
-    return sGameType;
+    if (gLoansGameTypeGuard == 0) {
+        new (gLoansGameTypeStorage) CGameType();
+        gLoansGameTypeGuard = 1;
+    }
+    return *reinterpret_cast<CGameType*>(gLoansGameTypeStorage);
 }
 
 // The online servers and ports, copied from COnlineBalance by SetInitialOnlineValues

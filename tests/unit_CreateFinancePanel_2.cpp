@@ -24,8 +24,6 @@ uint32_t gFinanceGraphFlags;
 int32_t gFinanceGraphMode;
 InterfaceWindow* gFinanceGraphPanel;
 InterfaceWindow* gGameWindow;
-unsigned char gLoansGameTypeStorage[4];
-int8_t gLoansGameTypeGuard;
 
 // ---- the test's tables
 static uint64_t gWinTable[28];   // 14 pairs: id, address (0 for a window that does not exist)
