@@ -30,7 +30,7 @@ float gCameraPosition[3];
 float gCameraF5BF4;
 uint16_t gThingListEnd;
 
-// The collision world is bigger than tabCOLLIST (the unit reads +0x2c); one block under the symbol the header declares.
+// The collision world (the unit reads +0x2c), with room after it; one block under the symbol the header declares.
 struct ColBlock {
     tabCOLLIST list;
     uint32_t tail[16];

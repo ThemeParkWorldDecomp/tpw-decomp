@@ -19,8 +19,9 @@ CFSOnlineSystem* gOnlineSystem;
 
 typedef CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList> CityBase;
 
-// The base destructor is out of line in the program (other files).
-template<class L, class R> CFSOnlineSystemList<L, R>::~CFSOnlineSystemList() {}
+// The base destructor is out of line in the program (other files). The city instance's is a specialization of its own
+// (FS_Online.cpp), which the port's build of the header declares, so it is defined here as one.
+template<> CityBase::~CFSOnlineSystemList() {}
 
 namespace {
 

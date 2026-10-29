@@ -59,8 +59,8 @@ uint32_t gContactsFontIndex;
 int16_t gUIRealScreenHeight;
 int32_t gMailStatusA;
 int32_t gMailStatusB;
-alignas(16) const char16_t kOnlineCityNoText[1] = {0};
-alignas(16) char16_t gOnlineLoginEmptyText[2] = {0, 0};
+alignas(16) const char16_t kOnlineCityNoText[8] = {0};
+alignas(16) char16_t gOnlineLoginEmptyText[8] = {0};
 extern const char16_t gOnlineNewsText[];
 
 namespace {

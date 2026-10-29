@@ -569,7 +569,7 @@ int64_t tpw_fs_particles(int32_t op, const int64_t* description, int64_t* out, i
     for (int32_t i = 0; i < kParticleSlots; ++i) {
         const int32_t entry = in.i32();
         gParticleSlots[i].mEntry = entry > 0 ? &gParticleEntries[entry - 1] : nullptr;
-        gParticleSlots[i].mF04 = 0x5a5a5a5a;
+        gParticleSlots[i].mF04 = reinterpret_cast<void*>(static_cast<uintptr_t>(0x5a5a5a5a));
         gParticleSlots[i].mAspect = in.f32();
     }
     for (int32_t i = 0; i < CParticle::kEmitters; ++i) {

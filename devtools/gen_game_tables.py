@@ -402,6 +402,20 @@ WINDOW_SCRIPTS = [
     (0x102B0288, 58, "gCityInfoOverlayScript"),
     (0x102B05C4, 311, "gOutboxPanelData"),
     (0x102B0E58, 279, "gOnlineParkInfoScript"),
+    # The online world's windows, which its files held as two-word placeholders (the world lobby's failed the lpNew assertion when
+    # the island lobby's globe was pressed): the city lobby, the online login, news, panel, underlays, park finder, park list,
+    # publish panel and world lobby. Each address is the one its building function loads from the TOC; each walk ends where the next
+    # named data begins (the second underlay's 66 bytes before the park finder are not script).
+    (0x102AFE7A, 233, "gCityLobbyScript"),
+    (0x102B02FC, 162, "gOnlineLoginPanelScript"),
+    (0x102B0440, 192, "gOnlineNewsScript"),
+    (0x102B0834, 247, "gOnlinePanelScript"),
+    (0x102B0A22, 158, "gOnlineUnderlayScriptA"),
+    (0x102B0B5E, 118, "gOnlineUnderlayScriptB"),
+    (0x102B0C8C, 230, "gOnlineParkFindScript"),
+    (0x102B1086, 176, "gOnlineParkListScript"),
+    (0x102B11E6, 128, "gPublishParkPanelScript"),
+    (0x102B20F8, 311, "gWorldLobbyScript"),
 ]
 
 
@@ -505,7 +519,7 @@ KNOWN_OUTPUT_SHA1 = {
     "AdvisorScorerSources.cpp": "da5b2c3df9bac53f4040a90c1baab0b3c377a3ba",
     "AdvisorScoring_table.cpp": "1cbc72c3e2d4d8bd2303e1fb415e4dd55f7ba3f2",
     "SaveLegalText.inc": "c29bf03a884224a571e4b9f7b1ba862e58ee1441",
-    "WindowScripts.inc": "3c06b6192bc76bac990e70910da4f26ce4fb69e4",
+    "WindowScripts.inc": "d4448fa18a67c2eaa0a6568d8ea0994675627cc5",
     "RideTemplates.inc": "dffca3874e4ccb2414a33d104a703e489ade663e",
 }
 
@@ -564,6 +578,16 @@ WINDOW_HASHES = {
     0x102B0288: ("ece7a8e9e0e672aaa7c21e285a461079e713ef63", "79752d8168099563bdd8df4dc42e2ff70f2d3fef", 0, 1),
     0x102B05C4: ("0f45abc16873a6c95dc075183ea587fc119d88a7", "1d07465b5f17acede29b656f706a680e0c29a488", 0, 1),
     0x102B0E58: ("622bef38bd3a77b7c382136369804c705d0eb1c8", "9e1dbba2c65303a335631e255332282ed51a53c9", 0, 1),
+    0x102AFE7A: ("754a68b352233376dcf0ba872a5f1bcbcacdf674", "ca4a63ef32c248372fd4709177e5edff61f8b687", 0, 1),
+    0x102B02FC: ("4490123ea5f36bf5ac081ac8b8382fd508bf63b8", "9796b790712f214bd2ee24ced486a2d8547410f4", 0, 1),
+    0x102B0440: ("d52f5c3f2a0e03d1372f0ead9df14a3793766c43", "8857e57761d92a53b9eb8996214d63beaaf57278", 0, 1),
+    0x102B0834: ("0f965b831135d5c8aec1e62da2c74277316e0f69", "5004be48f58541e51550c53db16e945955f9a79e", 0, 1),
+    0x102B0A22: ("917456f7b13827a54ac68c87cc4c56190aa35c30", "50ac46fe354bf13e19869eb7a29ab4a0a538ae00", 0, 1),
+    0x102B0B5E: ("7332ba9b12234642ec17d14cfd38cf4f50e07ff5", "d8d2067ebc8077ddb8ea7ca5d2c91de15223b4bb", 0, 1),
+    0x102B0C8C: ("b96e69191af291a24a9322c3db937cb660b6186d", "d0dfd4afe9cb6305340ae198649ad19786fbade5", 0, 1),
+    0x102B1086: ("4543af4167258caecb6be1afbd68fdd65d303905", "7c711fc2bc2809b145e3231ef1f6ee6c2465fed5", 0, 1),
+    0x102B11E6: ("fd118b561648a5b5202411427c1efa4f6ba0b70d", "0e928504c8916501695f66a6c02392cf00c5a7da", 0, 1),
+    0x102B20F8: ("52f7e81f74ffee6220d4a747378a805bc45b677f", "d5451b6b4fa3f62b887e16a0cdafd4695e06d14c", 0, 1),
 }
 
 

@@ -30,6 +30,7 @@
 #include "ui_tooltip.h"
 #include "UIInterface.h"
 #include "World.h"
+#include "WindowScripts.inc"
 #include <cstdint>
 #include <cstring>
 #include <new>
@@ -230,7 +231,7 @@ void OnlineParkListPostGetAllParksInCityCallbackFn(int32_t error, const void* co
 
 extern OnlineParkSelection* gOnlineParkSelection;
 
-int16_t gOnlineParkListScript[2] = {1, 0};             // 0x102b1086
+int16_t gOnlineParkListScript[] = {TPW_WINDOW_SCRIPT_102B1086};   // 0x102b1086: the words are the image's, generated at configure time (devtools/gen_game_tables.py, WindowScripts.inc)
 InterfaceWindow* gOnlineParkListPanel = nullptr;       // 0x10396234
 void (*gOnlineParkListClose)() = nullptr;              // 0x10396230
 

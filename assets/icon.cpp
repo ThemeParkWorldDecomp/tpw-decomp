@@ -7,6 +7,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
+#include <system_error>
 #include <zlib.h>
 
 namespace tpw::assets {
@@ -609,7 +611,11 @@ bool ReadIconPng(const std::string& path, IconImage& out, std::string* source) {
 
 namespace {
 
-// `bytes` as the file `path`, through `path`.part and a rename, so that no reader sees half a file.
+// `bytes` as the file `path`, through `path`.part and a rename, so that no reader sees half a file. The rename is
+// std::filesystem's, which replaces a file already there on Windows too (MoveFileExW with MOVEFILE_REPLACE_EXISTING),
+// as importer.cpp's writes do; std::rename refuses one there, so a second write of an icon failed ("cannot replace"):
+// tpw_launcher.ico in a build folder that had one, icon.png when a better icon came (found and fixed by samueleagle91,
+// tpw-port issue #62, PR #63).
 bool WriteWhole(const std::string& path, const std::vector<uint8_t>& bytes, std::string& err) {
     if (bytes.empty()) {
         err = "no picture to write";
@@ -627,9 +633,11 @@ bool WriteWhole(const std::string& path, const std::vector<uint8_t>& bytes, std:
         err = "cannot write " + part;
         return false;
     }
-    if (std::rename(part.c_str(), path.c_str()) != 0) {
+    std::error_code ec;
+    std::filesystem::rename(part, path, ec);
+    if (ec) {
         std::remove(part.c_str());
-        err = "cannot replace " + path;
+        err = "cannot replace " + path + ": " + ec.message();
         return false;
     }
     return true;

@@ -6,6 +6,11 @@
 // program has two builds, each with its own size) and where its content comes from. A file the US and European folders
 // both hold with the same content is one record with both edition bits; the same destination with different content
 // is two records.
+//
+// The language packs (kEditionLanguages) are records too: dests "lang/<Name>/<game path>" (data/Language/<Name>/...,
+// the speech under data/global/Speech and data/levels/<world>/Speech, the pictures under data/Init/<res>), one pack per
+// name of ManifestLanguages(). English and American are copies of the eur and us records, so a pack never needs
+// another one. The date fonts of a kLanguageBaseDateFonts pack are not records: they come from the base edition.
 #pragma once
 #include <cstddef>
 #include <cstdint>
@@ -17,6 +22,7 @@ enum Edition : uint8_t {
     kEditionUs = 1,    // the US Mac release
     kEditionEur = 2,   // the UK/European release (PC disc, plus Mac files the PC disc cannot supply)
     kEditionGold = 4,  // the Gold ride pack (destinations are under "gold/"; where the rides go is the Gold join's job)
+    kEditionLanguages = 8,  // the language packs (destinations are under "lang/<Name>/"; read by the language layer)
 };
 
 enum Group : uint8_t {
@@ -27,6 +33,7 @@ enum Group : uint8_t {
     kGroupLanguageEnglish,   // data/Language/English/ (European)
     kGroupProgram,           // the Mac program's data fork (the run-time tables are read from it)
     kGroupGold,              // the Gold ride wads and ride configuration text
+    kGroupLanguagePack,      // a language pack's text, filter, meshes, speech and pictures (kEditionLanguages)
     kGroupCount,
 };
 
@@ -35,6 +42,7 @@ enum DiscSource : uint8_t {
     kSourceMacCd,   // the US Mac CD (or, for the program, the 2.04b3 patch)
     kSourcePcCd,    // the European PC CD
     kSourceGoldCd,  // the Gold disc
+    kSourceLanguageDisc,  // any disc with that language (a European multi-language disc or a single-language one)
 };
 
 enum Flag : uint8_t {
@@ -60,6 +68,18 @@ struct ManifestRecord {
     uint8_t flags;        // Flag bits
 };
 
+// A language pack: the name the original spells it with (the folder data/Language/<name>) and what it needs besides
+// its records.
+enum LanguageFlag : uint8_t {
+    kLanguageOldTables = 1,      // its text tables are the older build (the run-time layer adapts them)
+    kLanguageBaseDateFonts = 2,  // it has no DATE*.bf4 fonts: the base edition's are used (they draw only digits)
+};
+
+struct ManifestLanguage {
+    const char* name;
+    uint8_t flags;  // LanguageFlag bits
+};
+
 // All records, sorted by destination (byte order), then edition bits.
 const ManifestRecord* ManifestRecords();
 size_t ManifestRecordCount();
@@ -74,6 +94,12 @@ const ManifestHash& RecordHash(const ManifestRecord& record, unsigned i);
 // empty when none does. Cost: a binary search.
 std::vector<const ManifestRecord*> FindByContent(uint64_t size, const uint8_t sha256[32]);
 
+// The 14 language packs, in the original's order (English, American, French, ...).
+const ManifestLanguage* ManifestLanguages();
+size_t ManifestLanguageCount();
+// The pack with this name (exact spelling), or nullptr.
+const ManifestLanguage* FindLanguage(const char* name);
+
 // The record with this destination for this edition bit, or nullptr.
 const ManifestRecord* FindByDest(Edition edition, const char* dest);
 
@@ -81,7 +107,7 @@ const ManifestRecord* FindByDest(Edition edition, const char* dest);
 size_t CountRecords(unsigned editions, bool required_only = false);
 
 const char* GroupName(Group group);       // "core", "fonts-rsrc", "movies", "language:american", ...
-const char* EditionName(Edition edition); // "us", "eur", "gold"
-const char* SourceName(DiscSource source);    // "mac", "pc", "gold"
+const char* EditionName(Edition edition); // "us", "eur", "gold", "lang"
+const char* SourceName(DiscSource source);    // "mac", "pc", "gold", "lang"
 
 }  // namespace tpw::assets

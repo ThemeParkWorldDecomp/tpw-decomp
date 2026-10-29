@@ -28,8 +28,8 @@ InterfaceWindow* gOnlineWindow = nullptr;
 InterfaceWindow* gOnlinePanel = nullptr;
 uint8_t gOnlineBlockToggle = 0;
 uint8_t gOnlinePanelShown = 0;
-uint32_t gOutboxPreview[9] = {};
-extern const char16_t gEmailSeparators[3] = {0, u'\n', 0};
+alignas(8) uint32_t gOutboxPreview[12] = {};
+extern const char16_t gEmailSeparators[10] = {0, u'\n', 0};
 
 namespace {
 int64_t Raw(const void* p) { return static_cast<int64_t>(reinterpret_cast<uintptr_t>(p) & 0xffffffffu); }

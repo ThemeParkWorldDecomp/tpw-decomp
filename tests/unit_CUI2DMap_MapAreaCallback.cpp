@@ -188,6 +188,9 @@ uint64_t tpw_map_addr(const char* name) {
 // A zeroed block the module fills with Mac-offset words (32-bit addressable).
 uint64_t tpw_map_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
 
+// A block's offset in the arena: what a Ptr32 word holds for it (the map panel window at map + 4).
+uint32_t tpw_map_offset(uint64_t address) { return tpw::ArenaOffset(reinterpret_cast<const void*>(static_cast<uintptr_t>(address))); }
+
 // The offsets and sizes the module relies on (HOST_LAYOUT).
 int32_t tpw_map_layout(int64_t* out) {
     typedef TbTList<CUI2DMapSprite*, CUI2DMapSprite*> List;

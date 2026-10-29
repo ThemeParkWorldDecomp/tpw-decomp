@@ -19,8 +19,7 @@
 using namespace calllog;
 
 // ---- globals of other files the unit reads or writes, defined here
-tabCOLLIST gColList;            // 0x102b56c0: the Mac's list is larger; the words past it follow
-uint32_t gColListTail[16];
+tabCOLLIST gColList;            // 0x102b56c0
 int32_t gHostSineTable[512];    // 0x102b4ec0
 tag_sRideAnimSet* gRideAnimSets[8];   // 0x102c79a4
 CWorld* gGameWorld;             // 0x1037ebfc
@@ -104,7 +103,6 @@ void tpw_mc2_setanim(uint64_t set, uint32_t flags, uint64_t mesh, uint32_t fc0, 
 
 int32_t tpw_mc2_layout(int64_t* out) {
     int32_t n = 0;
-    out[n++] = static_cast<int64_t>(reinterpret_cast<const char*>(gColListTail) - reinterpret_cast<const char*>(&gColList));
     out[n++] = static_cast<int64_t>(sizeof(tabCOLLIST));
     return n;
 }

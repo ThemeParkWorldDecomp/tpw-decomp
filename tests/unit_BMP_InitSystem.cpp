@@ -23,7 +23,7 @@ using namespace calllog;
 // ---- globals of other files, defined here
 int32_t gHostSineTable[512];
 
-// The world is 0x3c bytes, gColList is declared 0x20: the same symbol, a larger object.
+// The world (0x3c bytes) with room after it: the same symbol, a larger object.
 struct BigColList {
     tabCOLLIST list;
     uint32_t extra[8];

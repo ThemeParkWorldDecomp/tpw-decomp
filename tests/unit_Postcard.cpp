@@ -486,4 +486,10 @@ int32_t tpw_pc_run(const uint8_t* blob, int64_t* out) {
     return static_cast<int32_t>(put - out);
 }
 
+// 1 when the unit is built with the port fixes on (unit previewcolours): resize_into_buffer then stores format 2's halfwords in
+// host order instead of high byte first.
+int32_t tpw_pc_portfix() {
+    return 0;
+}
+
 }  // extern "C"

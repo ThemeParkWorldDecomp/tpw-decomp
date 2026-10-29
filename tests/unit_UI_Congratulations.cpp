@@ -61,10 +61,8 @@ alignas(16) uint8_t gUISliderNameRaw[sizeof(TbDynamicStringTemplate<char>)] asm(
 alignas(16) uint8_t gUIPlainFrameNameRaw[sizeof(TbDynamicStringTemplate<char>)] asm("_gUIPlainFrameName");
 alignas(16) uint8_t gUIButtonNameRaw[sizeof(TbDynamicStringTemplate<char>)] asm("_gUIButtonName");
 
-// The game type object and its guard: the function-local static of the inline accessor TheGameType() (FS_Online.h), reached through
-// its symbol names, so the test sets the Mac's two cells (0x102b3aa0, guard byte 0x102b3aa4).
-extern uint8_t gTheGameTypeObject[4] asm("__ZZ11TheGameTypevE9sGameType");
-extern uint8_t gTheGameTypeGuard[8] asm("__ZGVZ11TheGameTypevE9sGameType");
+// The game type object and its guard byte: the inline accessor TheGameType()'s storage (gLoansGameTypeStorage and gLoansGameTypeGuard,
+// FS_Online.h), so the test sets the Mac's two cells (0x102b3aa0, guard byte 0x102b3aa4).
 
 // What the fakes of the windows answer with (the test writes the low words).
 static InterfaceWindow* gHostCreated;
@@ -267,8 +265,8 @@ uint64_t tpw_u5022_addr(const char* name) {
         {"root", reinterpret_cast<uintptr_t>(&gUIRootWindow)},
         {"world", reinterpret_cast<uintptr_t>(&gGameWorld)},
         {"ticks", reinterpret_cast<uintptr_t>(&gCongratsTicks)},
-        {"gtype", reinterpret_cast<uintptr_t>(gTheGameTypeObject)},
-        {"guard", reinterpret_cast<uintptr_t>(gTheGameTypeGuard)},
+        {"gtype", reinterpret_cast<uintptr_t>(gLoansGameTypeStorage)},
+        {"guard", reinterpret_cast<uintptr_t>(&gLoansGameTypeGuard)},
         {"rmb", reinterpret_cast<uintptr_t>(&reinterpret_cast<CPlayerSettings*>(gPlayerSettingsRaw)->mCurrent.mRMBCancelOn)},
         {"res", reinterpret_cast<uintptr_t>(&reinterpret_cast<CText*>(gTextRaw)->mResourcePointers[0])},
         {"w8", reinterpret_cast<uintptr_t>(&gUIMainWordCCF8)},

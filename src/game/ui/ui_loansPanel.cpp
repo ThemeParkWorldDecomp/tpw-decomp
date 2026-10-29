@@ -340,8 +340,6 @@ int32_t LendersItemsCallback(InterfaceWindow* window, int32_t message, int32_t a
 
 int16_t gLoansScript[] = {TPW_WINDOW_SCRIPT_102AA4A4};   // 0x102aa4a4: the image's words (generated, devtools/gen_game_tables.py)
 int32_t gLenderColumnColour = 8;      // 0x102aa83c
-alignas(4) unsigned char gLoansGameTypeStorage[4];   // 0x102b3aa0
-int8_t gLoansGameTypeGuard;                           // 0x102b3aa4
 
 namespace {
 

@@ -108,9 +108,10 @@ template<> void CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList>::Compl
 template<> void CFSOnlineSystemList<TbPtrList<CFSOnlinePark>, ccParkList>::CompleteGetList(int32_t error) {
     Ev("CompleteGetList", {L(this), error});
 }
-// The empty base destructors of the instances the unit does not translate (the unit's derived destructors do the base's work).
-template<class LIST, class RECEIVED> CFSOnlineSystemList<LIST, RECEIVED>::~CFSOnlineSystemList() {}
-template CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList>::~CFSOnlineSystemList();
+// The empty base destructors of the instances the unit does not translate (the unit's derived destructors do the base's work),
+// as the specializations they are in the program (FS_Online.cpp), which the port's build of the header declares.
+template<> CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList>::~CFSOnlineSystemList() {}
+template<> CFSOnlineSystemList<TbPtrList<CFSOnlinePark>, ccParkList>::~CFSOnlineSystemList() {}
 
 CFSOnlineSystemParkList::~CFSOnlineSystemParkList() {}
 CFSOnlineSystemParkList_InCity::~CFSOnlineSystemParkList_InCity() {}

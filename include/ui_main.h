@@ -477,7 +477,7 @@ public:
     // Unit v5L47b: 0x30 more bytes for the host render area below.
     alignas(16) uint8_t mBytes[0x20130];
     // Host only: the six sprite images InitSprites loads, as native pointers at 0x200b8 .. 0x200e7 (the Mac's Ptr32 words at
-    // 0x20068 .. 0x2007c cannot hold a host heap pointer; 0x200a0 .. 0x200b7 are MapAreaCallback's host-only places). Image k is
+    // 0x20068 .. 0x2007c cannot hold a host heap pointer; 0x200a0 .. 0x200af are MapAreaCallback's host-only places). Image k is
     // the one of the Mac word at 0x20068 + 4 * k.
     static constexpr size_t kHostImagesOffset = 0x200b8;
     void*& HostImage(int32_t k) { return reinterpret_cast<void**>(mBytes + kHostImagesOffset)[k]; }
@@ -1454,9 +1454,9 @@ int32_t ButtonsUnderlayMsg(InterfaceWindow* window, int32_t message, int32_t a, 
 void FindParksPostGetPlayerParksCallbackFn(int32_t result, const void* context, TbPtrList<CFSOnlinePark>* list);   // 0x101e9324
 void RemoveOnlineParkFindPanel();                            // 0x101ea468 (stand-in)
 void ShowFindListSearching();                                // 0x101e9f28 (stand-in)
-extern int16_t gOnlinePanelScript[2];        // 0x102b0834 (initial word 1; the rest is not kept here)
-extern int16_t gOnlineUnderlayScriptA[2];    // 0x102b0a22 (initial word 1)
-extern int16_t gOnlineUnderlayScriptB[2];    // 0x102b0b5e (initial word 1)
+extern int16_t gOnlinePanelScript[];          // 0x102b0834
+extern int16_t gOnlineUnderlayScriptA[];      // 0x102b0a22
+extern int16_t gOnlineUnderlayScriptB[];      // 0x102b0b5e
 extern uint32_t gOnlineEditFontIndex;        // 0x102b0c50: the font table index of the panel's edit box (7 at start)
 extern uint8_t gOnlineByte78;                // 0x10395e78: CreateOnlinePanel clears it
 extern int32_t gOnlineWord88;                // 0x10395e88: CreateOnlinePanel clears it

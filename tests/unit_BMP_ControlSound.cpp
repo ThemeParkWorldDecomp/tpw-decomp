@@ -17,7 +17,7 @@
 
 using namespace calllog;
 
-// ---- globals of other files, defined here. The world is bigger than tabCOLLIST: the symbol is the same.
+// ---- globals of other files, defined here. The world, with room after it: the symbol is the same.
 struct BigWorld {
     uint32_t words[16];
 };

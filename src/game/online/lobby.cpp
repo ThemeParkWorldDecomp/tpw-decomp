@@ -305,6 +305,7 @@ void __sinit_lobby_cpp() {
     __register_global_object(wide1, reinterpret_cast<void*>(&UIMain_DestroyWString), gLobbyNode48C0);
     void* wide2 = new (static_cast<void*>(gLobbyWString488C)) W(kLobbyW2);
     __register_global_object(wide2, reinterpret_cast<void*>(&UIMain_DestroyWString), gLobbyNode48A0);
+    static_assert(sizeof(TbDynamicStringTemplate<char>) <= sizeof(OnlineUploadFile), "the global holds the narrow string");
     void* narrow = new (static_cast<void*>(&gOnlineUploadFile)) TbDynamicStringTemplate<char>("");
     __register_global_object(narrow, reinterpret_cast<void*>(&UIMain_DestroyString), gLobbyNode487C);
 }

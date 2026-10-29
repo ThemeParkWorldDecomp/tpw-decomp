@@ -94,6 +94,8 @@ int32_t Lower(int32_t c) { return (c >= 'A' && c <= 'Z') ? c + 32 : c; }
 }  // namespace
 
 void CText::SetLanguageId(uint32_t id) { ev("CText::SetLanguageId", {lab(this), id}); }
+// The port picks its code page for the language here (a port fix): platform code, nothing the Mac called.
+void tpw::UseCodePageOfLanguage(uint32_t) {}
 const char* LbFile_GetProjectDir() {
     ev("LbFile_GetProjectDir");
     return gProjectDir.c_str();
