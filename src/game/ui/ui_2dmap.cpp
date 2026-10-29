@@ -65,11 +65,13 @@
 #include "ui_tooltip.h"
 #include "WindowScripts.inc"
 #include "World.h"
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <new>
+
 
 // Unit v5193: UpdateSatellite 0x1022b8d0 and UI2DMReturnScaleColour 0x1022bb44 (ui_worldLobbyController.cpp, ui_2dmap.cpp).
 

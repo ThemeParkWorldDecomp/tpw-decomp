@@ -9,6 +9,7 @@
 #pragma once
 #include <cstdarg>
 #include <cstdint>
+#include <cstdio>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -132,8 +133,37 @@ extern const char kProjectDirMac[];   // "TPW:Theme Park Data:"
 extern const char kRemoteDirMac[];    // "Theme Park:Theme Park Data:"
 
 // Splits a game path into its components below the game folder. Accepts ':', '\\' and '/'
-// as separators, a leading project or CD prefix, and a leading separator.
+// as separators, a leading project or CD prefix, and a leading separator. In a double-byte
+// code page (below) a lead byte's trail byte is never a separator, as on the PC.
 std::vector<std::string> SplitGamePath(const std::string& gamePath);
+
+// The code page of the game's narrow text (code_page.cpp): 0, the shim's Latin-1, unless the
+// game runs in Hebrew (1255), Japanese (932), Korean (949), TraditionalChinese (950) or
+// SimplifiedChinese (936), set once at start from the game's language (UseCodePageOfLanguage
+// in platform/macdoze.h). The shim's WideCharToMultiByte, MultiByteToWideChar and
+// IsDBCSLeadByte follow it.
+uint32_t CodePageOfLanguage(uint32_t languageId);
+void SetGameCodePage(uint32_t codePage);
+uint32_t GameCodePage();
+bool IsLeadByte(uint32_t codePage, uint8_t byte);
+bool IsGameLeadByte(uint8_t byte);
+// `bytes` in `codePage` as UTF-16 and back, both strict: false when a byte or a character has
+// no counterpart, or would not come back the same. Code page 0 is Latin-1.
+bool DecodeCodePage(uint32_t codePage, const std::string& bytes, std::u16string& text);
+bool EncodeCodePage(uint32_t codePage, const std::u16string& text, std::string& bytes);
+// The shim's conversions in the game's code page: a character it lacks becomes `defaultChar`
+// (and sets usedDefault), a byte it has no character for becomes '?'.
+std::string NarrowGameText(const char16_t* text, size_t length, char defaultChar, bool& usedDefault);
+std::u16string WidenGameText(const char* text, size_t length);
+// One component of a game path as the host names it, and back. With code page 0, or a name
+// of ASCII alone, the bytes are the name (as before); otherwise the name is the code page's
+// text, which the host stores as UTF-8 (Mac) or UTF-16 (Windows), so a Hebrew or Japanese
+// player's folder is named in its own letters. A name the code page cannot express keeps its
+// bytes.
+std::filesystem::path HostNameOf(const std::string& gameName);
+std::string GameNameOf(const std::filesystem::path& hostName);
+// A host file opened with the C runtime (its UTF-16 name on Windows, so no letter is lost).
+std::FILE* OpenHostFile(const std::filesystem::path& path, const char* mode);
 
 // The host file or folder a game path names: the user folder's copy if there is one, else
 // the game folder's. Names are matched ignoring case, as on the Mac. Empty if neither

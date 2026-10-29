@@ -35,8 +35,6 @@ int32_t gMouseWord1E0 = 0;
 int32_t gMouseWord1E4 = 0;
 CThingArrayEntry gThingArray[kThingArraySize];
 StaffRoomStatusPanel gStaffRoomStatusPanel;
-unsigned char gLoansGameTypeStorage[4];
-int8_t gLoansGameTypeGuard = 0;
 std::deque<errorthingy> gUIErrorQueue;
 bthread_mutex gUIErrorMutex;
 InterfaceWindow* gUIErrorDialog = nullptr;

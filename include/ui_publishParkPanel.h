@@ -29,8 +29,8 @@ extern OnlineUploadFile gOnlineUploadFile;          // 0x102e4868
 extern InterfaceWindow* gPublishParkPanel;          // 0x10396278: the panel's window, 0 when none
 extern char16_t gPublishParkDescription[0x80];      // 0x1039627c: the description's text (0x7e characters shown)
 extern char16_t gPublishParkName[0x10];             // 0x1039637c: the park's name (0xf characters)
-extern int16_t gPublishParkPanelScript[2];          // 0x102b11e6: the panel's window script (only its address is used here)
-extern int16_t gOnlineParkListScript[2];            // 0x102b1086: the list panel's window script
+extern int16_t gPublishParkPanelScript[];          // 0x102b11e6: the panel's window script (only its address is used here)
+extern int16_t gOnlineParkListScript[];            // 0x102b1086: the list panel's window script
 extern InterfaceWindow* gOnlineParkListPanel;       // 0x10396234
 extern void (*gOnlineParkListClose)();              // 0x10396230: the function the list panel's caller gave
 

@@ -194,8 +194,13 @@ def run_host(lib, case):
     return dict(steps=steps)
 
 
+PORTFIX = [False]   # the library is built with the port's fixes (ProcessLine then leaves a line's hidden end alone)
+
+
 def setup(runner):
     T.install_std_stubs(runner.emu)
+    runner.lib.tpw_tv_portfix.restype = C.c_int32
+    PORTFIX[0] = runner.lib.tpw_tv_portfix() != 0
 
 
 # ======================================================================= cases
@@ -322,7 +327,46 @@ def line_case(chars, first=None, last=None, op=0, r=None):
     return dict(records=records, first=0 if first is None else first, last=len(chars) if last is None else last, op=op)
 
 
+def is_hebrew(char):
+    return 0x5B0 < char < 0x5EB
+
+
+def hidden_end(c):
+    """Where ProcessLine's line ends with the port's fix: the hidden records (type 0x40) at its end are left out, as tp.exe's Hebrew
+    edition does (0x6ae4c9..0x6ae4dd). Returns (end, walk): walk is set when only the left-out records have Hebrew, so the Mac's
+    ProcessLine would not touch the shortened line and its reversal and walk are done here instead."""
+    first, last, records = c["first"], c["last"], c["records"]
+    if c["op"] != 0 or not PORTFIX[0] or first > last or not any(is_hebrew(r[0]) for r in records[first:last]):
+        return last, False
+    end = last
+    while end != first and records[end - 1][2] & 0x40:
+        end -= 1
+    return end, end != first and not any(is_hebrew(r[0]) for r in records[first:end])
+
+
+def reverse_records(out, first, last):
+    """InvertLine on the dumped words (record i is at out[8 * (i + 1)])."""
+    cells = [out[8 * (i + 1):8 * (i + 2)] for i in range(first, last)]
+    for k, cell in enumerate(reversed(cells)):
+        out[8 * (first + k + 1):8 * (first + k + 2)] = cell
+
+
+def walk_plain(out, first, last):
+    """ProcessLine on a line with no Hebrew left: reverse it, then turn each word back the right way round."""
+    reverse_records(out, first, last)
+    delimiter = lambda i: out[8 * (i + 1)] in (0x20, 0x2C)
+    cursor = first
+    while cursor <= last - 2:
+        start = next((i for i in range(cursor, last) if not delimiter(i)), None)
+        if start is None:
+            return
+        end = next((i for i in range(start, last) if delimiter(i)), last)
+        reverse_records(out, start, end)
+        cursor = end
+
+
 def ppc_line(e, c):
+    end, walk = hidden_end(c)
     st = CL.Stubs()
     st.real = {PROCESS_LINE, FIX_PARENTHESIS}
     old = st.activate(e)
@@ -340,13 +384,16 @@ def ppc_line(e, c):
             b[14:16] = struct.pack(">H", w[7] & 0xFFFF)
             block[16 * (i + 1):16 * (i + 2)] = b
         base = e.alloc(len(block), bytes(block), alignment=16) + 16
-        T.call_ppc(e, PROCESS_LINE if c["op"] == 0 else FIX_PARENTHESIS, [base + 16 * c["first"], base + 16 * c["last"]])
+        last = c["first"] if walk else end
+        T.call_ppc(e, PROCESS_LINE if c["op"] == 0 else FIX_PARENTHESIS, [base + 16 * c["first"], base + 16 * last])
         d = bytes(e.read(base - 16, len(block)))
         out = []
         for i in range(n + 2):
             x = d[16 * i:16 * i + 16]
             out += [struct.unpack(">H", x[0:2])[0], struct.unpack(">H", x[2:4])[0], x[4], x[5], struct.unpack(">H", x[6:8])[0],
                     struct.unpack(">I", x[8:12])[0], struct.unpack(">H", x[12:14])[0], struct.unpack(">H", x[14:16])[0]]
+        if walk:
+            walk_plain(out, c["first"], end)
         return dict(records=out)
     finally:
         CL.Stubs.deactivate(e, old)
@@ -384,6 +431,17 @@ def line_edges(op):
                         yield line_case(chars, first, last, op)
             if n >= 2:
                 yield line_case(chars, n, 0, op)
+        # lines that end in hidden records (type 0x40), as a wrapped line ends on its space; with the port's fix ProcessLine leaves them out
+        tails = [
+            ([H, 0x20, 0x41, 0x42, 0x20], 1), ([H, 0x5D1, 0x20], 1), ([0x41, 0x42, 0x20], 1), ([0x41, 0x20, H], 1), ([H, 0x20], 2),
+            ([H, 0x20, 0x20], 2), ([0x41, 0x20, 0x42, H, 0x20], 2), ([0x28, H, 0x29, 0x20], 1), ([H, 0x41, 0x20], 0), ([H], 1),
+        ]
+        for chars, hidden in tails:
+            for first, last in ((0, len(chars)), (1, len(chars)), (0, len(chars) - 1)):
+                c = line_case(chars, first, last, op)
+                for rec in c["records"][len(chars) - hidden:]:
+                    rec[2] |= 0x40
+                yield c
     return gen
 
 

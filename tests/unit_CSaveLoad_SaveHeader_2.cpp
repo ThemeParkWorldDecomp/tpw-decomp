@@ -145,6 +145,7 @@ void PAR_SetLowSpec(int32_t on) { ev("PAR_SetLowSpec", {on}); }
 void ESP_FixSpriteIDsFromDetail() { ev("ESP_FixSpriteIDsFromDetail"); }
 void SOUND_SetPauseOn3DSoundsOnly(int32_t on) { ev("SOUND_SetPauseOn3DSoundsOnly", {on}); }
 
+
 extern "C" {
 
 uint64_t tpw_sh_addr(const char* name) {

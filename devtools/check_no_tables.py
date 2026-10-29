@@ -10,7 +10,7 @@ usage: python3 -I devtools/check_no_tables.py --program FILE BUILT_FILE...
   BUILT_FILE       a library or program of the build (libtpw.a and tpw_launcher, say)
 
 The tables are cut into their records: the seven legal texts, the 611 response rows, the 351 message records, the 775
-balance description rows, the 14 ride templates and the 38 window scripts. Each record is a key in the program's own
+balance description rows, the 14 ride templates and the 48 window scripts. Each record is a key in the program's own
 byte order and as the host holds it (little-endian words, the message records and balance rows in their host
 structures, the texts as UTF-16). Two kinds of record are left out, since finding them says nothing about these tables:
 those with fewer than five distinct byte values, and those the program also holds outside the seven tables (balance

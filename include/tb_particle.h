@@ -49,9 +49,14 @@ struct PARPOINT3D {
 class CTextureEntry;
 // The texture a particle is drawn with: the entry (null while it is not loaded) and the ratio
 // of its width to its height (a Mac word at +8).
+// corrected 2026-10-28: the record is a sprite of the particle sprite file (SSpriteEngineData, include/tb_starfield.h; ESP_GetParticleSprite
+// hands out a pointer into the file's array), whose second word is the pixel pointer, a native pointer on the host. It was an int32_t, so
+// a 64-bit host read mAspect at +0x0c, the upper half of that null pointer, where the sprite's is at +0x10: every textured particle was
+// drawn 0 wide (94 of the 102 effects of Tp2.plb have a sprite), among them the gold star over a sideshow when a guest wins (reported
+// by a pretty cool guy, Pixus and pulpmetal on Discord)
 struct PTCLTexture {
     CTextureEntry* mEntry;   // 0x00
-    int32_t mF04;            // 0x04  not read by the frame members
+    void* mF04;              // 0x04  the sprite's pixel block (SSpriteEngineData::mData); not read by the frame members
     float mAspect;           // 0x08  scales the sprite's half width
 };
 // One particle of a drawing list (0x1c bytes on the Mac).

@@ -14,7 +14,9 @@ compared: the instance's and the braces' fields (pointers as labels), the global
 
 With the port fixes on (unit coaster64), the port fix in DeleteTrackBrace reads the type's word 0xa4 as tag_sCoasterType's mFA4 and the
 pylon owner's word 0x70 as sPylonOwner's mF70, and the one in sTrackBraceData puts the pylon record's words where sPylonRecord keeps them:
-the host world writes them at those offsets (tpw_dltb_layout) and allocates the type and the owner at their host sizes.
+the host world writes them at those offsets (tpw_dltb_layout) and allocates the type and the owner at their host sizes. With the port fix
+of unit coasterundo, DeleteTrackBrace reads the pylon's height through the host's sEmbeddedSet records (mRecords[index].mBlock): the host
+world builds the mesh's set at sEmbeddedSet's and sEmbeddedRecord's offsets and size.
 
 No fused operations. Not tested: a list whose first remaining brace chain ends flagged 0x40 (the original reads a NULL brace there), a NULL
 first brace read by the button tests.
@@ -41,11 +43,13 @@ ADDR = dict(edit=0x102B68B0, enabled=0x102C16D4, down=0x102C16D8, drag=0x102C178
 NAMES = ["i_flags", "i_type", "i_blk", "i_count", "i_last", "i_braces", "i_b5c", "i_prev", "i_b64", "i_f118", "i_flash", "i_size",
          "b_num", "b_flags", "b_prev", "b_next", "b_f6c", "b_w70", "b_data", "b_size",
          "p_flags", "p_cx", "p_cz", "p_ctrl", "p_f30", "p_owner", "p_size",
-         "c_f2c", "c_size", "s_flags", "s_heads", "s_size", "m_f28", "m_size", "r_rec", "t_fa4", "t_size", "o_f70", "o_size"]
+         "c_f2c", "c_size", "s_flags", "s_heads", "s_size", "m_f28", "m_size", "r_rec", "t_fa4", "t_size", "o_f70", "o_size",
+         "e_recs", "e_size", "e_block"]
 MAC = dict(zip(NAMES, [0, 4, 0x3C, 0x44, 0x54, 0x58, 0x5C, 0x60, 0x64, 0x118, 0x144, 0x150,
                        0, 8, 0x64, 0x68, 0x6C, 0x70, 0x100, 0x120,
                        4, 0xC, 0x10, 0x18, 0x30, 0x34, 0x40,
-                       0x2C, 0x100, 4, 8, 0x20, 0x28, 0x40, 0x24, 0xA4, 0xC0, 0x70, 0x90]))
+                       0x2C, 0x100, 4, 8, 0x20, 0x28, 0x40, 0x24, 0xA4, 0xC0, 0x70, 0x90,
+                       4, 0x14, 4]))
 
 
 def s32(v):
@@ -270,18 +274,18 @@ def build(s, case):
         st = s.alloc(max(O["s_size"], 0x40) + 16)
         mesh = s.alloc(max(O["m_size"], 0x40) + 16)
         a = s.alloc(0x20)
-        bb = s.alloc(0x40)
+        bb = s.alloc(max(3 * O["e_size"], 0x40))
         labels[80 + k] = st
         s.words(st + O["s_flags"], [sc["flags"]])
         s.ptr(st + O["s_heads"], mesh)
         s.ptr(mesh + O["m_f28"], a)
-        s.ptr(a + 4, bb)
+        s.ptr(a + O["e_recs"], bb)
         for j in range(3):
             c = sc["chain"][j]
             if c is not None:
                 cb = s.alloc(0x50)
                 s.words(cb + 0x34, [c])
-                s.ptr(bb + j * 0x14 + 4, cb)
+                s.ptr(bb + j * O["e_size"] + O["e_block"], cb)
         s.ptr(s.sets_at(k), st)
     # globals
     edit = [inst, inst2, 0][case["edit"]]

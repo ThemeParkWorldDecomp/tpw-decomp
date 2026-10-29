@@ -46,7 +46,7 @@ InterfaceWindow* Dialog(int16_t* script, int32_t (*handler)(InterfaceWindow*, in
     return static_cast<InterfaceWindow*>(gWin[0]);
 }
 
-int32_t OnlineLoginPanelDlgMsg(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
+int32_t LobbyOnlineLoginPanelDlgMsg(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
 
 InterfaceFont* GetFontTableEntry(uint32_t index) {
     ev("GetFontTableEntry", {index});
@@ -113,7 +113,7 @@ uint64_t tpw_cr_addr(const char* name) {
     const Entry entries[] = {
         {"script", gOnlineLoginPanelScript}, {"empty", gOnlineLoginEmptyText},     {"callback", &gOnlineLoginFailureFn},
         {"flag", &gOnlineLoginPanelFlag},    {"pass", gOnlineLoginPassword},       {"name", gOnlineLoginName},
-        {"handler", reinterpret_cast<const void*>(&OnlineLoginPanelDlgMsg)},
+        {"handler", reinterpret_cast<const void*>(&LobbyOnlineLoginPanelDlgMsg)},
         {"win0", gWin[0]},                   {"win1", gWin[1]},                    {"win2", gWin[2]},
         {"win3", gWin[3]},                   {"win4", gWin[4]},                    {"win5", gWin[5]},
     };
