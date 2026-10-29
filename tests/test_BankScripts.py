@@ -36,6 +36,7 @@ PROGRAM = "SimTheme Park"
 MASK = 0xFFFFFFFF
 M64 = 0xFFFFFFFFFFFFFFFF
 INT_MIN, INT_MAX = -0x80000000, 0x7FFFFFFF
+SCRIPTS = 26   # the words of the table at 0x102a08fc (CDelayedScript's ScriptIdx values; 13 to 16 are custom data block numbers)
 POISON = b"\xa5"
 
 A = dict(FinalDestroy=0x100F2CB8, MakeDeposit=0x100F32EC, BeenInTheRedFor=0x100F3490, ReceiveMessage=0x100F3564, PayAdmission=0x100F3AC8,
@@ -784,11 +785,11 @@ def bal_bind(lib):
 # ---- CDelayedScript
 def mk_script(r, **kw):
     c = base_case(r)
-    c["arg"] = r.randrange(13)
+    c["arg"] = r.randrange(SCRIPTS)
     c["arg2"] = r.choice([4, 5, 6, 7, 8, 0, 1, 100, -1, r.getrandbits(32)])
     c["arg3"] = r.choice([0, 1, -1, 7, r.getrandbits(32)])
     put(c, 0, r.choice([0, 0, 1, -1, 5, 99, r.getrandbits(32)]))
-    put(c, 4, r.choice([0, 0, 1, 2, 12, 13, -1, r.getrandbits(32)]) if False else r.choice([0, 0, 1, 2, 5, 12, r.randrange(13)]))
+    put(c, 4, r.choice([0, 0, 1, 2, 12, 13, -1, r.getrandbits(32)]) if False else r.choice([0, 0, 1, 2, 5, 12, 14, 25, r.randrange(SCRIPTS)]))
     put(c, 8, r.choice([0, 0, 1, 250, 251, -1, r.getrandbits(32), r.randrange(0, 300)]))
     c["queues"] = {"running": [r.choice([0, 0, 1, -1, 0x100, 0x80000000])], "spawn": [r.choice([0, 1, -1, 7, r.getrandbits(31)])]}
     c.update(kw)
@@ -798,8 +799,8 @@ def mk_script(r, **kw):
 def script_idx_edges(extra=None):
     def edges():
         r = random.Random(1780)
-        for idx in range(13):
-            for na in (0, idx, idx + 1, 12):
+        for idx in range(SCRIPTS):
+            for na in (0, idx, min(idx + 1, SCRIPTS - 1), 12, 25):
                 for sprite in (0, 1, 3):
                     c = mk_script(r)
                     c["arg"] = idx
@@ -811,7 +812,7 @@ def script_idx_edges(extra=None):
 
 def process_edges():
     r = random.Random(1781)
-    for idx in range(13):
+    for idx in range(SCRIPTS):
         for iv in (0, 1, 250, 0xFFFFFFFF):
             for handle in (0, -1, 5):
                 c = mk_script(r)

@@ -25,6 +25,7 @@
 #include "ui_main.h"
 #include "ui_Postcard.h"
 #include "ui_publishParkPanel.h"
+#include "WindowScripts.inc"
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -91,14 +92,15 @@ int32_t LobbyOnlineLoginPanelDlgMsg(InterfaceWindow* window, int32_t message, in
     return DefaultDialogCallback(window, message, a, b);
 }
 
-// CreateOnlineLoginPanel (0x101e27bc): makes the login dialog and fits its name and password edit boxes and the labels and title.
+// CreateOnlineLoginPanel (0x101e27bc): makes the login dialog and fits its name and password edit boxes and the labels and title. The
+// dialog's handler is LobbyOnlineLoginPanelDlgMsg (the TVector 0x102684b8), so the default dialog handler sees what the panel's own leaves.
 
-int16_t gOnlineLoginPanelScript[2] = {0, 1};     // 0x102b02fc
-char16_t gOnlineLoginEmptyText[2] = {0, 0x75};   // 0x1024ee76
+int16_t gOnlineLoginPanelScript[] = {TPW_WINDOW_SCRIPT_102B02FC};   // 0x102b02fc: the words are the image's, generated at configure time (devtools/gen_game_tables.py, WindowScripts.inc)
+char16_t gOnlineLoginEmptyText[8] = u"\0upload";   // 0x1024ee76, the image's words: the sinit's text at +1 is u"upload"
 void (*gOnlineLoginFailureFn)() = nullptr;       // 0x10395d28
 
 void CreateOnlineLoginPanel(void (*onFailure)()) {
-    InterfaceWindow* dialog = Dialog(gOnlineLoginPanelScript, OnlineLoginPanelDlgMsg, 0);
+    InterfaceWindow* dialog = Dialog(gOnlineLoginPanelScript, LobbyOnlineLoginPanelDlgMsg, 0);
     gOnlineLoginPanelFlag = static_cast<int32_t>(reinterpret_cast<uintptr_t>(dialog));
     gOnlineLoginFailureFn = onFailure;
     // The Mac reloads the dialog from the flag (0x10395d2c) for the three direct children; nothing changes the flag in between, and a host
@@ -164,13 +166,12 @@ void CreateOnlineLoginPanel(void (*onFailure)()) {
 
 // NewsPanelMsg (0x101e2f84) and RemoveOnlineLoginPanel (0x101e2be4).
 
-// 0x10395d28: a pointer to a function descriptor (called through __ptr_glue), NULL until set; original name unknown.
-void (*gOnlineLoginPanelHook)() = nullptr;
-
 void RemoveOnlineLoginPanel(int32_t arg) {
-    UI_SendMessage(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(static_cast<uint32_t>(gOnlineLoginPanelFlag))), 4, 0, 0);
+    InterfaceWindow* panel = reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(static_cast<uint32_t>(gOnlineLoginPanelFlag)));
+    UI_SendMessage(panel, 4, 0, 0);
     if (arg != 0) {
-        if (gOnlineLoginPanelHook != nullptr) gOnlineLoginPanelHook();
+        // 0x10395d28 (called through __ptr_glue): the failure function CreateOnlineLoginPanel was given.
+        if (gOnlineLoginFailureFn != nullptr) gOnlineLoginFailureFn();
     }
 }
 

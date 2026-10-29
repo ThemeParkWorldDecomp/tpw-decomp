@@ -27,6 +27,7 @@
 #include "ui_mainmenu.h"
 #include "ui_publishParkPanel.h"
 #include "UI_pump.h"
+#include "WindowScripts.inc"
 #include <cstdint>
 #include <cstring>
 #include <new>
@@ -56,7 +57,7 @@ OnlineUploadFile gOnlineUploadFile = {};               // 0x102e4868
 InterfaceWindow* gPublishParkPanel = nullptr;          // 0x10396278
 char16_t gPublishParkDescription[0x80] = {};           // 0x1039627c
 char16_t gPublishParkName[0x10] = {};                  // 0x1039637c
-int16_t gPublishParkPanelScript[2] = {1, 0};           // 0x102b11e6
+int16_t gPublishParkPanelScript[] = {TPW_WINDOW_SCRIPT_102B11E6};   // 0x102b11e6: the words are the image's, generated at configure time (devtools/gen_game_tables.py, WindowScripts.inc)
 // 0x101eca2c, 608 bytes. The message function of the publish panel: 0x15 and 0x14 (the panel's show and hide, with the key tables and the
 // lobby window's message 6), 0x100 (a button: -1 uploads the park, -2 closes), the edit boxes' 0x802 to 0x804 (a key in one box moves the
 // keyboard to the other), everything else (and all of them but the two buttons) to the dialog's default handler. The game type object is

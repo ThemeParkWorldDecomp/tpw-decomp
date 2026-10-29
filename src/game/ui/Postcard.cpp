@@ -203,8 +203,9 @@ void PostcardBitmap::alphablt(PostcardBitmap& dest, uint32_t x, uint32_t y) {
 // or more wraps). Every output row averages its rows' runs across into a row buffer, then the buffer's rows down. The
 // averages are (sum & 0xffff) / count per channel. The formats: 1 writes the bytes channel 1, 2, 3 and 0xff (the first
 // channel is dropped), 2 a 4444 halfword of channels 1, 2 and 3 with 0xf, 3 the bytes 0xff and channels 0, 1 and 2 (the last
-// channel is dropped); both words are written the way the Mac's stores lay them (high byte first). Any other format writes
-// nothing and `out` does not move. A buffer that cannot be had answers 0 and keeps the ones already made.
+// channel is dropped); both words are written the way the Mac's stores lay them (high byte first; the port's fixes write
+// format 2's halfword as a host word, below). Any other format writes nothing and `out` does not move. A buffer that
+// cannot be had answers 0 and keeps the ones already made.
 int32_t PostcardBitmap::resize_into_buffer(uint8_t* out, int32_t width, int32_t height, int32_t format) {
     const int32_t sourceWidth = static_cast<int32_t>(mWidth);
     const uint8_t* source = mPixels;

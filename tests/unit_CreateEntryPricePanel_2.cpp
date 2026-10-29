@@ -25,8 +25,6 @@ InterfaceWindow* gParkScreenWindow;
 InterfaceWindow* gGameWindow;
 CWorld* gGameWorld;
 CThingArrayEntry gThingArray[kThingArraySize];
-unsigned char gLoansGameTypeStorage[4];
-int8_t gLoansGameTypeGuard;
 
 namespace {
 enum Blk { GAME, PANEL, T4AF, T4B0, T4AE, T4B1, T4AC, SELF, OBJ, NAME, STR, FONT, NEW1, NEW2, BANK, VT, NBLK };

@@ -15,6 +15,7 @@
 #include "analyser.h"
 #include "MainBalance.h"
 
+
 using namespace calllog;
 
 alignas(16) char gMainBalanceStorage[32768] __asm__("_gMainBalance");

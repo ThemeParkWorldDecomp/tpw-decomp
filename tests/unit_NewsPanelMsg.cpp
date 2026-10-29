@@ -17,7 +17,7 @@ using namespace calllog;
 CLBLobby* gLobby = nullptr;
 InterfaceWindow* gOnlineNewsPanel = nullptr;
 int32_t gOnlineLoginPanelFlag = 0;
-extern void (*gOnlineLoginPanelHook)();
+extern void (*gOnlineLoginFailureFn)();
 int32_t NewsPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
 
 static int64_t Raw(const void* p) { return static_cast<int64_t>(reinterpret_cast<uintptr_t>(p)); }
@@ -59,7 +59,7 @@ int32_t tpw_nm_layout(int64_t* out) {
     return n;
 }
 
-void tpw_nm_sethook(int32_t on) { gOnlineLoginPanelHook = on ? HookFake : nullptr; }
+void tpw_nm_sethook(int32_t on) { gOnlineLoginFailureFn = on ? HookFake : nullptr; }
 // the pointers in the globals are 64-bit on the host: the test hands over 32-bit values
 void tpw_nm_setptrs(uint32_t window, uint32_t news) {
     alignas(16) static char lobbyBlock[512];

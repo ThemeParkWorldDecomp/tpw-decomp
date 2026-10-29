@@ -243,4 +243,9 @@ int32_t tpw_tv_dump_records(uint32_t* out) {
     return static_cast<int32_t>(cursor - out);
 }
 
+// 1 when the library is built with the port's fixes: ProcessLine then leaves the hidden records at a line's end where they are
+int32_t tpw_tv_portfix() {
+    return 0;
+}
+
 }  // extern "C"

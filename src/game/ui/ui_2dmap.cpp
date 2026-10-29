@@ -65,11 +65,13 @@
 #include "ui_tooltip.h"
 #include "WindowScripts.inc"
 #include "World.h"
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <new>
+
 
 // Unit v5193: UpdateSatellite 0x1022b8d0 and UI2DMReturnScaleColour 0x1022bb44 (ui_worldLobbyController.cpp, ui_2dmap.cpp).
 
@@ -427,11 +429,11 @@ const char16_t kEmptyText[] = u"";                                              
 
 template <class T> T& Field(CUI2DMap* map, size_t offset) { return *reinterpret_cast<T*>(reinterpret_cast<uint8_t*>(map) + offset); }
 
-// Host-only places (the Mac keeps 32-bit words at 4, 0x20060 and the flag at 0x20084, which a native pointer cannot share with the
-// list pointer at 0x20080): the hovered sprite, the drag flag and the map panel window.
+// Host-only places (the Mac keeps a 32-bit word at 0x20060 and the flag at 0x20084, which a native pointer cannot share with the
+// list pointer at 0x20080): the hovered sprite and the drag flag. The map panel window stays the Mac's word at 4, a Ptr32 (an arena
+// offset) as CreateMapPanel stores it.
 constexpr size_t kHoverOffset = 0x200a0;
 constexpr size_t kDragOffset = 0x200a8;
-constexpr size_t kPanelOffset = 0x200b0;
 CUI2DMapSprite*& HoverOf(CUI2DMap* map) { return Field<CUI2DMapSprite*>(map, kHoverOffset); }
 CUI2DMapSprite* SpriteOf(CUI2DMapSprite* p) { return p; }
 CUI2DMapSprite* WordOf(CUI2DMapSprite* p) { return p; }
@@ -589,7 +591,8 @@ int32_t CUI2DMap::MapAreaCallbackResult(InterfaceWindow* window, int32_t message
             float poiX = static_cast<float>(ix * 10);
             float poiY = static_cast<float>(iy * 10);
             SetCameraPOI(&poiX, &poiY, nullptr, nullptr, nullptr);
-            UI_SendMessage(Field<InterfaceWindow*>(map, kPanelOffset), 4, 0, 0);
+            // the panel window is a Ptr32 word (an arena offset) at 4, as in MapCallback
+            UI_SendMessage(reinterpret_cast<Ptr32<InterfaceWindow>*>(map->mBytes + 4)->get(), 4, 0, 0);
             if (target != nullptr) UIMain_GotoStatusPanelForThing(target);
             return 0;
         }

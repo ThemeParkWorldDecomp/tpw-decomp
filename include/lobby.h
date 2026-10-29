@@ -373,7 +373,10 @@ public:
     void Hide() override { CLBScreenComponent::Hide(); }   // 0x100ada68
 #endif
     void SortOutZoomConstants();           // 0x100addb4
-    void CreateCities(TbPtrList<CFSOnlineCity>* cities);   // 0x100ade44
+    // Slots 0x30 and 0x34, which PostGetCityListCallbackFunction calls on the globe that asked for the city list: the list
+    // arrived, or it could not be had (the Mac's base slot 0x34 is pure; the download and publish globes go back to the islands).
+    virtual void CreateCities(TbPtrList<CFSOnlineCity>* cities);   // slot 0x30 (0x100ade44)
+    virtual void HandleOnlineBacktrack() {}                        // slot 0x34
     void UnRegister(CLBGlobeCityFlag* flag);               // 0x100ae228
     // Slots 0x38 and 0x48 (the download and publish globes override them; inline defaults keep those classes buildable).
     virtual void RegisterGlobe(CLBGlobe* globe) {}         // slot 0x38
@@ -420,8 +423,8 @@ public:
     void Hide() override;                    // 0x100ae63c
     virtual void Slot50() {}                 // slot 0x50 (unit v5130: EnterChatSatellite calls it on the lobby's download globe; body unknown)
     // Unit v5957 (src/game/online/lobby_globe.cpp).
-    void HandleOnlineBacktrack();            // 0x100ae9c0: this->Hide(), then the theme islands' Show
-    void CreateCities(TbPtrList<CFSOnlineCity>* cities);   // 0x100ae8a0: a flag per wanted city, then the advisor says line 0x256
+    void HandleOnlineBacktrack() override;   // slot 0x34 (0x100ae9c0): this->Hide(), then the theme islands' Show
+    void CreateCities(TbPtrList<CFSOnlineCity>* cities) override;   // slot 0x30 (0x100ae8a0): a flag per wanted city, then the advisor says line 0x256
     // Unit v51106 (plain members; the Mac has them in vtable slots).
     int32_t IsCityValid(const CFSOnlineCity* city);   // 0x100aea58: the city's value is above 0
     void HidePanels();                       // 0x100ae828
@@ -436,8 +439,8 @@ public:
     void Show() override;                    // 0x100aec3c
     void Hide() override;                    // 0x100aece8
     // Unit v5957 (src/game/online/lobby_globe.cpp).
-    void CreateCities(TbPtrList<CFSOnlineCity>* cities);   // 0x100aef90
-    void HandleOnlineBacktrack();            // 0x100af094: this->Hide(), then the theme islands' Show and EnterCurrentIsland
+    void CreateCities(TbPtrList<CFSOnlineCity>* cities) override;   // slot 0x30 (0x100aef90)
+    void HandleOnlineBacktrack() override;   // slot 0x34 (0x100af094): this->Hide(), then the theme islands' Show and EnterCurrentIsland
     // Unit v51106 (plain members; the Mac has them in vtable slots).
     int32_t IsCityValid(const CFSOnlineCity* city);   // 0x100af148
     void HidePanels();                       // 0x100aef20
@@ -713,8 +716,8 @@ void UpdateOutboxMailIcon();                   // 0x101e3698 (src/game/ui/ui_onl
 // Unit v5017 (src/game/ui/ui_onlineOutbox.cpp): the online outbox panel's helpers.
 extern InterfaceWindow* gOutboxWindow;         // 0x10395e3c: the outbox panel's window
 extern uint8_t* gOutboxCursor;                 // 0x10395e38: the outbox's cursor part (the outbox + 4); read by Mac offsets
-extern uint32_t gOutboxPreview[9];             // 0x10395e10: the preview's size: width at +0x1c (word 7), height at +0x20 (word 8)
-extern const char16_t gEmailSeparators[3];     // 0x1024eeca: an empty string, then (at +2) "\n"
+extern uint32_t gOutboxPreview[12];            // 0x10395e10: the preview's area; the Mac's size: width at +0x1c (word 7), height at +0x20 (word 8)
+extern const char16_t gEmailSeparators[10];    // 0x1024eeca: an empty string, then (at +2) "\n", then (at +6) "upload"
 void FillOutboxList();                         // 0x101e378c
 // Unit v5096 (src/game/ui/ui_onlineOutbox.cpp): the outbox panel's row functions (LCFormat and LCPostFormat of ui_onlineOutbox.cpp) and its
 // untranslated message functions and window description.
@@ -862,13 +865,8 @@ bool NewNameOK(void* slot);
 
 // Unit v5128 (src/game/online/lobby_globe.cpp)
 class CFSOnlineCity;
-// The screen that asked for the city list (class unknown): two virtual slots after IsVisible, called by the callback.
-class CLBCityListScreen : public CLBScreenComponent {
-public:
-    virtual void CityListReceived(TbPtrList<CFSOnlineCity>* cities) = 0;   // slot 0x30: the list arrived (error 0)
-    virtual void CityListFailed() = 0;                                     // slot 0x34: any error
-};
-// 0x100ad6dc: error 0 calls the context's slot 0x30 with the list, otherwise its slot 0x34.
+// 0x100ad6dc: the context is the online globe that asked (CLBScreenComponentOnlineGlobe::Show); error 0 calls its slot 0x30
+// (CreateCities) with the list, otherwise its slot 0x34 (HandleOnlineBacktrack).
 void PostGetCityListCallbackFunction(int error, const void* context, TbPtrList<CFSOnlineCity>* cities);
 
 // Unit v5189 (src/game/ui/ui_cityLobbyController.cpp)

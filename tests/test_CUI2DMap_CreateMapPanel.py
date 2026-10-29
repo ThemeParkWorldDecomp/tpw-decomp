@@ -13,6 +13,10 @@ words, the windows (the depth of window 0x990) and the answers of the fakes. Wha
 function reads or writes, the game's word at +0x3c and the display's fog colour.
 
 No fused operations (fmuls only; fctiwz is given values far below 2^31). Not tested: a NULL window from GetWindow (the original reads it).
+
+With the port fixes on (unit mapedge; the port fix in CreateMapPanel) the host map's pointer words +0x10 and +0x14 are set to the pointer's
+last place (gUIPointerX, gUIPointerY, a random case value) once the panel is built: the host's two words are checked against it and then
+read as the Mac leaves them, the case's words. With the fixes off the comparison is the original's.
 """
 import ctypes as C
 import random
@@ -251,6 +255,7 @@ class Host(Side):
             for i, wid in enumerate(WIN_IDS):
                 lib.tpw_cmp_set(2 + i, lib.objs["w%x" % wid])
         self.objs = lib.objs
+        self.pointer = case["pointer"]
         fixed = {LABELS[n]: lib.objs[n] for n in OBJ_NAMES}
         fixed.update({l: self.g(n) for n, l in GLOBAL_LABELS.items()})
         CL.host_begin(lib, fixed, case["queues"])
@@ -275,8 +280,20 @@ class Host(Side):
         return CL.host_end(self.lib)
 
     def create(self):
+        self.lib.tpw_cmp_pointer(*self.pointer)
         self.lib.tpw_cmp_create()
         return 0
+
+    def mac_words(self, case, words):
+        """The map's words in the Mac's form: with the port fixes on, a built panel's pointer words (+0x10, +0x14) are checked against the
+        pointer's place and read as the case's, which the Mac leaves alone."""
+        if not self.lib.port_fix or words[1] != -1:
+            return words
+        for off, v in zip((0x10, 0x14), self.pointer):
+            k = MAPW.index(off)
+            assert words[k] == v & MASK, (hex(off), hex(words[k]), v)
+            words[k] = case["mapw"][k]
+        return words
 
 
 def bind(lib):
@@ -288,9 +305,12 @@ def bind(lib):
     lib.tpw_cmp_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_cmp_create.restype, lib.tpw_cmp_create.argtypes = None, []
     lib.tpw_cmp_panel_word.restype, lib.tpw_cmp_panel_word.argtypes = C.c_uint32, [C.c_uint64]
+    lib.tpw_cmp_portfix.restype, lib.tpw_cmp_portfix.argtypes = C.c_int32, []
+    lib.tpw_cmp_pointer.restype, lib.tpw_cmp_pointer.argtypes = None, [C.c_int32, C.c_int32]
     out = (C.c_int64 * 32)()
     n = lib.tpw_cmp_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
+    lib.port_fix = lib.tpw_cmp_portfix() == 1
     lib.bound = True
 
 
@@ -338,6 +358,8 @@ def observe(s, case, answer):
     for off in MAPW:
         w = s.rd_word(m + off)
         words.append(-1 if off == 4 and w == panel else w)
+    if hasattr(s, "mac_words"):
+        words = s.mac_words(case, words)
     return {
         "log": s.log(),
         "words": words,
@@ -393,6 +415,7 @@ def base(r):
         "f3c": r.choice([0, 1, r.getrandbits(32)]), "fog": r.getrandbits(32),
         "z": {wid: r.choice([0, 1, 5, 0x100, 0x7fff, 0x8000 - 3, 0xfffe, r.getrandbits(16)]) for wid in WIN_IDS},
         "mapw": mapw,
+        "pointer": [r.choice([0, 1, 1023, 2047, -1, r.randrange(-0x8000, 0x8000)]) for _ in range(2)],
         "p0": r.getrandbits(32), "h0": r.getrandbits(16), "h1": r.getrandbits(16), "p1": [r.getrandbits(32) for _ in range(7)],
         "p2": r.getrandbits(32), "p3": r.getrandbits(32),
     }

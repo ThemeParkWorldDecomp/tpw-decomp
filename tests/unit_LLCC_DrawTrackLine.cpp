@@ -21,8 +21,7 @@ using namespace calllog;
 int32_t gTrackNbrOn485C;
 int32_t gLLCC4858;
 CWorld* gGameWorld;
-// gOnlineUploadFile (0x102e4868) is a bigger object on the Mac (the sinit builds a string in it); the host struct is 16 bytes, so the
-// definition is padded under the same symbol.
+// gOnlineUploadFile (0x102e4868) holds the string the sinit builds in it; this definition is padded further under the same symbol.
 struct PaddedUpload {
     OnlineUploadFile file;
     uint8_t pad[240];

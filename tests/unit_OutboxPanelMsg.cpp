@@ -29,7 +29,7 @@ CFSOnlineSystem* gOnlineSystem;           // 0x10380ab0
 CLBLobby* gLobby;                         // 0x102e4888
 OnlineConfig gOnlineConfig;               // 0x102b2b70
 InterfaceWindow* gOutboxWindow;           // 0x10395e3c
-uint32_t gOutboxPreview[9];               // 0x10395e10
+alignas(8) uint32_t gOutboxPreview[12];   // 0x10395e10
 InterfaceWindow* gOutboxSendingWindow;    // 0x10395e0c
 int32_t gMailStatusShownB;                // 0x10395e00
 int32_t gMailStatusShownA;                // 0x10395e08

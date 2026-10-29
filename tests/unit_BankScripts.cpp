@@ -61,12 +61,14 @@ char gFileHandle;
 CWorld* WorldPtr(int32_t k) { return reinterpret_cast<CWorld*>(reinterpret_cast<uintptr_t>(gTail[k]) - kTail); }
 CParkAnalyser* AnalyserPtr(int32_t k) { return reinterpret_cast<CParkAnalyser*>(gAnalyser[k] + kGuard); }
 
-// The Mac code address of a host pointer into the code array (0 for nullptr or any other pointer): the arithmetic of SCR_CodeAddress.
+// The Mac code address of a host pointer into the code array, a custom data block number 0 to 3 as itself (the Mac's word), -1 for
+// any other pointer: the arithmetic of SCR_CodeAddress.
 int64_t MacCode(const void* code) {
     const uint8_t* byte = static_cast<const uint8_t*>(code);
     const uint8_t* first = reinterpret_cast<const uint8_t*>(gCodeStore);
     if (byte >= first && byte < first + sizeof gCodeStore) return kScriptCodeAddress + static_cast<int64_t>(byte - first);
-    return code == nullptr ? 0 : -1;
+    if (reinterpret_cast<uintptr_t>(code) < 4) return static_cast<int64_t>(reinterpret_cast<uintptr_t>(code));
+    return -1;
 }
 
 std::string Hex(const void* data, uint32_t size) {

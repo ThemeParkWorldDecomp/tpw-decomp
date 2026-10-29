@@ -9,6 +9,7 @@
 #pragma once
 #include <cstdarg>
 #include <cstdint>
+#include <cstdio>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -132,8 +133,37 @@ extern const char kProjectDirMac[];   // "TPW:Theme Park Data:"
 extern const char kRemoteDirMac[];    // "Theme Park:Theme Park Data:"
 
 // Splits a game path into its components below the game folder. Accepts ':', '\\' and '/'
-// as separators, a leading project or CD prefix, and a leading separator.
+// as separators, a leading project or CD prefix, and a leading separator. In a double-byte
+// code page (below) a lead byte's trail byte is never a separator, as on the PC.
 std::vector<std::string> SplitGamePath(const std::string& gamePath);
+
+// The code page of the game's narrow text (code_page.cpp): 0, the shim's Latin-1, unless the
+// game runs in Hebrew (1255), Japanese (932), Korean (949), TraditionalChinese (950) or
+// SimplifiedChinese (936), set once at start from the game's language (UseCodePageOfLanguage
+// in platform/macdoze.h). The shim's WideCharToMultiByte, MultiByteToWideChar and
+// IsDBCSLeadByte follow it.
+uint32_t CodePageOfLanguage(uint32_t languageId);
+void SetGameCodePage(uint32_t codePage);
+uint32_t GameCodePage();
+bool IsLeadByte(uint32_t codePage, uint8_t byte);
+bool IsGameLeadByte(uint8_t byte);
+// `bytes` in `codePage` as UTF-16 and back, both strict: false when a byte or a character has
+// no counterpart, or would not come back the same. Code page 0 is Latin-1.
+bool DecodeCodePage(uint32_t codePage, const std::string& bytes, std::u16string& text);
+bool EncodeCodePage(uint32_t codePage, const std::u16string& text, std::string& bytes);
+// The shim's conversions in the game's code page: a character it lacks becomes `defaultChar`
+// (and sets usedDefault), a byte it has no character for becomes '?'.
+std::string NarrowGameText(const char16_t* text, size_t length, char defaultChar, bool& usedDefault);
+std::u16string WidenGameText(const char* text, size_t length);
+// One component of a game path as the host names it, and back. With code page 0, or a name
+// of ASCII alone, the bytes are the name (as before); otherwise the name is the code page's
+// text, which the host stores as UTF-8 (Mac) or UTF-16 (Windows), so a Hebrew or Japanese
+// player's folder is named in its own letters. A name the code page cannot express keeps its
+// bytes.
+std::filesystem::path HostNameOf(const std::string& gameName);
+std::string GameNameOf(const std::filesystem::path& hostName);
+// A host file opened with the C runtime (its UTF-16 name on Windows, so no letter is lost).
+std::FILE* OpenHostFile(const std::filesystem::path& path, const char* mode);
 
 // The host file or folder a game path names: the user folder's copy if there is one, else
 // the game folder's. Names are matched ignoring case, as on the Mac. Empty if neither
@@ -213,6 +243,11 @@ struct CursorPlace {
 bool CursorPlacement(CursorPlace& place);
 void SwapBuffers();
 void DrawCursorOverlay();   // platform/cursor.cpp: the game's cursor over the frame about to be presented
+// platform/ddraw.cpp: what a lock of the back buffer reads the game's picture with, as RGBA bytes, the bottom row first,
+// wide x high; false when there is nothing to read. By default the game's OpenGL target (glReadPixels); tests set their
+// own, and nullptr puts the default back.
+using PictureReader = bool (*)(uint8_t* rgba, int wide, int high);
+void SetPictureReader(PictureReader reader);
 
 // ---- Events -------------------------------------------------------------------------
 // A UEvent as the platform makes it: the fields of the Mac EventRecord the game reads.
@@ -226,6 +261,16 @@ struct Event : SamsUtilities::UEvent {
 uint8_t MacKeyCodeFromScancode(int32_t sdlScancode);        // 0xff: no Mac key
 int32_t ScancodeFromWindowsKey(int32_t virtualKey);         // 0: none
 uint16_t MacModifiersFromSDL(uint16_t sdlModifiers);
+char PlainKeyCharacter(uint8_t macKeyCode);                 // 0: no character, or AltGr held
+
+// How soon and how often a held key repeats (key_repeat.cpp): the run loop's autoKeys, as the Mac's Event Manager
+// sent them. The defaults are the fallback where the system has no setting the platform reads.
+struct KeyRepeatTiming {
+    uint32_t delayMs = 500;      // from the key going down to its first autoKey
+    uint32_t intervalMs = 33;    // between autoKeys
+};
+KeyRepeatTiming SystemKeyRepeat();                                                    // the host's keyboard settings
+KeyRepeatTiming WindowsKeyRepeat(uint32_t delaySetting, uint32_t speedSetting);       // SPI_GETKEYBOARDDELAY, SPEED
 
 // The number of GDI handles (DCs, fonts, bitmaps) alive in gdi.cpp; the platform test checks that none leak.
 size_t GdiLiveHandles();

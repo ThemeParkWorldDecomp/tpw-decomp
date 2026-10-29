@@ -39,6 +39,7 @@
 #include "std_basic_filebuf.h"
 #include "std_basic_ifstream.h"
 #include "tb_hfield.h"
+#include "tb_particle.h"
 #include "tb_printf_opengl.h"
 #include "tb_rain.h"
 #include "tb_resource_display.h"
@@ -1047,6 +1048,12 @@ void ESP_AddHLSpriteFromScript(tagSCRIPT* script) {
         gESPCellCounts[cellX][cellZ] = gESPCellCounts[cellX][cellZ] + 1;
     }
 }
+
+// The particle frame members read the answer as a PTCLTexture (include/tb_particle.h): its words are the sprite's first three.
+static_assert(offsetof(PTCLTexture, mEntry) == offsetof(SSpriteEngineData, mTexture) &&
+                  offsetof(PTCLTexture, mF04) == offsetof(SSpriteEngineData, mData) &&
+                  offsetof(PTCLTexture, mAspect) == offsetof(SSpriteEngineData, mAspect),
+              "a particle texture is the start of a sprite of the particle sprite file");
 
 PTCLTexture* ESP_GetParticleSprite(int32_t sprite, int32_t frame, int32_t variant) {
     // Division and remainder round towards zero, as the compiled shift and adjust do.

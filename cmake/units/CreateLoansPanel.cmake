@@ -4,7 +4,5 @@ set(TPW_UNIT_CreateLoansPanel src/game/ui/ui_loansPanel.cpp platform/arena.cpp)
 set(TPW_UNIT_CreateLoansPanel_KEEP
   __Z16CreateLoansPanelv   # CreateLoansPanel()
   _gLenderColumnColour
-  _gLoansGameTypeGuard
-  _gLoansGameTypeStorage
   _gLoansScript
 )

@@ -43,12 +43,16 @@ struct tagBUMP {
 };
 static_assert(sizeof(tagBUMP) == 0xa8, "tagBUMP");
 
-// The list of collision objects, main app data 0x102b56c0 (not exported; name invented).
+// The list of collision objects, main app data 0x102b56c0 (not exported; name invented). The global is the bump world's
+// 0x3c bytes (gAdvisorStore follows at 0x102b56fc); its other words are the views of src/game/rides/BumperRide.cpp
+// (tagBUMPWORLD, tagBUMPSAVEWORLD, BumpWorld), which BMP_InitSystem and BMP_CloseSystem clear whole.
 struct tabCOLLIST {
     uint32_t pad00[6];  // 0x00
     Ptr32<tabCOLOBJECT> first;   // 0x18
     int32_t count;      // 0x1c live objects
+    uint32_t pad20[7];  // 0x20
 };
+static_assert(sizeof(tabCOLLIST) == 0x3c, "tabCOLLIST");
 extern tabCOLLIST gColList;   // main app data 0x102b56c0
 
 int32_t PointInColObject(int32_t x, int32_t y, tabCOLOBJECT* object);   // 0x1002bc34 (outside the unit)

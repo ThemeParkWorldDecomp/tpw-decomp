@@ -1,6 +1,6 @@
 // log_scrub.h: takes what identifies the player or the computer out of a log's text, so that two computers doing the same
 // thing write the same log and a log is safe to send. Every line is scrubbed as it is written to the log file (log_file.h),
-// the Windows launcher.log is scrubbed the same way (host_win.cpp), and Export logs scrubs once more (log_export.h).
+// what Windows' processes print into it the same way (host_win.cpp), and Export logs scrubs once more (log_export.h).
 //
 // What changes, in this order of preference (a path rule first, since a path says plainly what the text is):
 //   the home folder          ~  (Windows: %USERPROFILE%); the system's spellings of it, and /Users/NAME, /home/NAME and

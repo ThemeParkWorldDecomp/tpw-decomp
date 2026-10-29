@@ -43,7 +43,7 @@ int32_t CityInfoOverlayMsg(InterfaceWindow* window, int32_t message, int32_t a, 
 
 InterfaceWindow* gOnlineCityOverlay = nullptr;            // 0x10395d04
 const CFSOnlineCity* gOnlineCityOverlayShown = nullptr;   // 0x10395d00
-extern const char16_t kOnlineCityNoText[1] = {0};         // 0x1024ee5e
+extern const char16_t kOnlineCityNoText[8] = u"\0upload";   // 0x1024ee5e, the image's words: the sinit's text at +1 is u"upload"
 
 // 0x101e1f64: shows the city's name and its formatted number in the overlay's two text windows (0x16c11, 0x16c12); no city empties both.
 // Does nothing without an overlay or when the city is the one shown already.

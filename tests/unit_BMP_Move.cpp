@@ -5,8 +5,8 @@
 // PossitionSound1, TrackRideIdToThingId, GAME_ASSERTMSG, RSSE_GetSoundEventCode, SOUND_SetParamValue, GetRideFromID,
 // GetDataNodeWorldMatrix, NormaliseVector, PAR_InitEmitterLaunch, PAR_SetEmitterPos, FlushDeferredAnim, SetCurRideAnim, BMP_MaskCar,
 // GetCurrentAnim, GetDeferredAnim). The globals of other files the unit reads are defined here, zero at start like the Mac's bss.
-// The list at 0x102b56c0 is longer on the Mac than tabCOLLIST (BMP_Move reads its word 0x38), so the header's declaration is renamed
-// while it is read and gColList is defined here as 0x40 words.
+// The list at 0x102b56c0 is read here as words (BMP_Move reads its word 0x38), so the header's declaration is renamed while it is
+// read and gColList is defined here as 0x40 words.
 #define gColList gColList_header_declaration
 #include <cstddef>
 #include <cstdint>

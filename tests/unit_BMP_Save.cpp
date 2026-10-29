@@ -16,7 +16,7 @@
 
 using namespace calllog;
 
-// ---- globals of other files the unit reads, defined here: gColList by its symbol, larger than tabCOLLIST (the Mac's global is)
+// ---- globals of other files the unit reads, defined here: gColList by its symbol, with room after the Mac's 0x3c bytes
 alignas(8) uint32_t gBumpSaveWorldStorage[16] __asm__("_gColList");
 
 namespace {
