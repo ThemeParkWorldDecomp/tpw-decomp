@@ -10,6 +10,6 @@ public:
     explicit InterfacePasswordTextObject(void* data);   // 0x1018dc38
 };
 
-extern int16_t gOnlineLoginPanelScript[2];     // 0x102b02fc: the Dialog script (only its first word, 1, is known)
-extern char16_t gOnlineLoginEmptyText[2];      // 0x1024ee76: the text given to the two edit boxes (empty)
+extern int16_t gOnlineLoginPanelScript[];       // 0x102b02fc: the Dialog script
+extern char16_t gOnlineLoginEmptyText[8];      // 0x1024ee76: the text given to the two edit boxes (empty), then u"upload" at +1
 extern void (*gOnlineLoginFailureFn)();        // 0x10395d28: the failure function CreateOnlineLoginPanel was given

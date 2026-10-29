@@ -1,7 +1,7 @@
 // Test library for PostGetCityListCallbackFunction (unit v5128), main app:
 //   src/game/online/lobby_globe.cpp
 //
-// The context is a screen whose two virtual slots (0x30, 0x34) are recording fakes.
+// The context is an online globe whose two virtual slots (0x30 CreateCities, 0x34 HandleOnlineBacktrack) are recording fakes.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -18,10 +18,18 @@ CLBScreenComponent::~CLBScreenComponent() {}
 void CLBScreenComponent::Show() {}
 void CLBScreenComponent::Hide() {}
 int32_t CLBScreenComponent::IsVisible() { return 0; }
+CLBScreenComponentOnlineGlobe::CLBScreenComponentOnlineGlobe() {}
+CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
+void CLBScreenComponentOnlineGlobe::Render() {}
+void CLBScreenComponentOnlineGlobe::Close() {}
+uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }
+void CLBScreenComponentOnlineGlobe::Tick() {}
+void CLBScreenComponentOnlineGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
+void CLBScreenComponentOnlineGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
 
 namespace {
 
-class FakeScreen : public CLBCityListScreen {
+class FakeScreen : public CLBScreenComponentOnlineGlobe {
 public:
     void Init() override {}
     void Tick() override {}
@@ -32,8 +40,8 @@ public:
     void Show() override {}
     void Hide() override {}
     int32_t IsVisible() override { return 0; }
-    void CityListReceived(TbPtrList<CFSOnlineCity>* cities) override { ev("Received", {lab(this), lab(cities)}); }
-    void CityListFailed() override { ev("Failed", {lab(this)}); }
+    void CreateCities(TbPtrList<CFSOnlineCity>* cities) override { ev("Received", {lab(this), lab(cities)}); }
+    void HandleOnlineBacktrack() override { ev("Failed", {lab(this)}); }
 };
 
 FakeScreen gScreen;

@@ -303,7 +303,7 @@ def bind(lib):
     out = (C.c_int64 * 32)()
     n = lib.tpw_bmp_layout(out)
     v = list(out)[:n]
-    assert v[4] == 0x78 and v[8] == 0x20, v        # the header's mF78 at the Mac's offset, the list block's size
+    assert v[4] == 0x78 and v[8] == 0x3C, v        # the header's mF78 at the Mac's offset, the list block's size
     LAY.update(heads=v[0], set=v[1], header=v[2], mesh=v[3], f78=v[4], hdr=v[5], mthing=v[6], row=v[7])
     assert LAY["mthing"] == 0, v
     lib.bound = True

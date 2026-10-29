@@ -16,9 +16,8 @@ three resource pointers, the settings byte, the tick word, the game type cell an
 word the static initialiser sets. What is compared: the answer, the event log, and every one of those cells read back.
 
 No fused operations (the only floats are the constants 0.0 and 1.0 the initialiser hands to the light). Not tested: a NULL table or
-NULL converter (the original calls through them and the fakes only log), a guard byte other than 0 or 1 (the host's guard test looks
-at bit 0, the Mac's at the whole byte), a game type outside 0..3 (the host holds it in an enum), the contents of the scripts and the
-animations (only their addresses are used).
+NULL converter (the original calls through them and the fakes only log), a guard byte other than 0 or 1, a game type outside 0..3
+(the host holds it in an enum), the contents of the scripts and the animations (only their addresses are used).
 
 A last test (unit v5L39), "the window animations": the host's congratulations and bankrupt animations as the library was loaded against
 the program image's frames (tests/imagedata.py), one case per frame. Before v5L39 the host had one frame of each, and the animation ran on
@@ -369,8 +368,6 @@ def build(s, case):
     s.words(s.g("ticks"), [case["tick"]])
     s.words(s.g("gtype"), [case["gtype"]])
     s.setbyte(s.g("guard"), case["guard"])
-    if isinstance(s, Host):
-        s.write(s.g("guard") + 1, bytes(7))        # the host's guard is 8 bytes; the runtime leaves flags in the others
     s.setbyte(s.g("rmb"), case["rmb"])
     s.ptr(s.res(0), o["conv"])
     s.ptr(s.res(1), o["conv1"] if case["res1"] else 0)

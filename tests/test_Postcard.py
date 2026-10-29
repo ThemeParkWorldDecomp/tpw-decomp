@@ -18,6 +18,7 @@ reversed when it was flipped) xor 0x5a, so a wrong flip or a wrong size changes 
 import ctypes as C
 import random
 import struct
+import sys
 import zlib
 
 import calllog as CL
@@ -363,13 +364,19 @@ def build_stubs(e):
 
 
 STUBS = None
+# With the port fixes on (unit previewcolours) resize_into_buffer stores format 2's halfwords in host order: on a little-endian
+# host the original's output is compared with each halfword's two bytes swapped.
+SWAP_FORMAT2 = False
 
 
 def setup(runner):
-    global STUBS
+    global STUBS, SWAP_FORMAT2
     e = runner.emu
     T.install_std_stubs(e)
     STUBS = build_stubs(e)
+    lib = runner.lib
+    lib.tpw_pc_portfix.restype, lib.tpw_pc_portfix.argtypes = C.c_int32, []
+    SWAP_FORMAT2 = lib.tpw_pc_portfix() == 1 and sys.byteorder == "little"
 
 
 def ppc(e, case):
@@ -423,7 +430,12 @@ def ppc(e, case):
             size = us.blocks.get(pointer, (0, 0))[0]
             data = e.read(pointer, size)
             state += [1, size, zlib.crc32(data), signed64(int.from_bytes(data[:8], "big"))]
-        state.append(zlib.crc32(e.read(out, out_size + OUT_GUARD)))
+        data = bytes(e.read(out, out_size + OUT_GUARD))
+        if SWAP_FORMAT2 and fn in (RESIZE, PREVIEW) and a[2] == 2:
+            words = bytearray(data[:out_size])
+            words[0::2], words[1::2] = data[1:out_size:2], data[0:out_size:2]
+            data = bytes(words) + data[out_size:]
+        state.append(zlib.crc32(data))
         state.append(int(u32(e, cell) != 0))
         return dict(state=state, log=e.cl.log)
     finally:

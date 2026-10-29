@@ -26,18 +26,25 @@ const char kSpriteScriptName[] = "mSpriteScript";               // +0x00
 const char kNextAnimName[] = "mNextAnim";                       // +0x0e
 const char kNextServiceIntervalName[] = "mNextServiceInterval"; // +0x18
 
-constexpr int32_t kScriptTableSize = 13;
-// The table at 0x102a08fc (TOC word -0x4e60): the Mac code address of each script's start in the script code array (gScriptCodeWords), 0 for the first.
-// The ESP_ calls read a code argument of 0 to 3 as a custom data block number, so the 0 entry goes through as a null pointer, as on the Mac.
+// corrected 2026-10-28: the table has all of the Mac's 26 words; the translation stopped at the zero of script 13, so the staff's
+// scripts (13 to 25) were read past its end and a staff member froze while he cleaned, repaired, entertained or caught someone
+// (found by samueleagle91, tpw-port PR #60)
+constexpr int32_t kScriptTableSize = 26;
+// The table at 0x102a08fc (TOC word -0x4e60): the Mac code address of each script's start in the script code array (gScriptCodeWords), or a custom
+// data block number 0 to 3, which the ESP_ calls read as such (the 0 entries go through as a null pointer, as on the Mac). Scripts 13 to 16 are
+// the custom blocks (an entertainer's acts), 17 the handyman's cleaning, 18 the mechanic's repairing, 19 and 20 the staff's states 5 and 6, 22 the
+// guard's catch, 24 the guard's walk with a lost kid; 21, 23 and 25 are the blocks at 0x1029f768, 0x1029f948 and 0x1029fd48.
 const uint32_t kScriptStarts[kScriptTableSize] = {
     0x00000000, 0x1029f2ac, 0x1029f308, 0x1029f364, 0x1029f388, 0x1029f424, 0x1029f460,
     0x1029f4d8, 0x1029f49c, 0x1029f210, 0x1029f514, 0x1029f570, 0x1029f68c,
+    0x00000000, 0x00000001, 0x00000002, 0x00000003,
+    0x1029f7a4, 0x1029f800, 0x1029f880, 0x1029f85c, 0x1029f768, 0x1029f8ec, 0x1029f948, 0x1029f9a4, 0x1029fd48,
 };
 
 // The code pointer the ESP_ calls take for a script index (no bound test, as on the Mac: the index times four into the table).
 void* ScriptCode(CDelayedScript::ScriptIdx script) {
     const uint32_t address = kScriptStarts[static_cast<int32_t>(script)];
-    if (address == 0) return nullptr;
+    if (address < 4) return reinterpret_cast<void*>(static_cast<uintptr_t>(address));   // a custom data block number, as the Mac's word
     return const_cast<uint32_t*>(gScriptCodeWords) + (address - kScriptCodeAddress) / 4;
 }
 

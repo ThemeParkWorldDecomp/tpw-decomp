@@ -170,6 +170,7 @@ void CLBScreenComponentOnlineIslands::DownloadFailFunction() { ev("DownloadFail"
 void CLBScreenComponentOnlineIslands::HandleOnlineBacktrack() { ev("OnlineBacktrack", {lab(this)}); }
 void CLBScreenComponentOnlineIslands::CreateParks(TbPtrList<CFSOnlinePark>* parks) { ev("CreateParks", {lab(this), lab(parks)}); }
 void CLBScreenComponentDownloadGlobe::HandleOnlineBacktrack() { ev("GlobeBacktrack", {lab(this)}); }
+void CLBScreenComponentDownloadGlobe::ShowPanels() { ev("ShowPanels", {lab(this)}); }
 void OnlineIslandsSlot4c(CLBScreenComponentOnlineIslands* screen) { ev("Slot4c", {lab(screen)}); }
 void CreateWorldLobbyController(bool publish) { ev("CreateWorldLobbyController", {publish ? 1 : 0}); }
 void CreateOnlineCityInfoOverlay() { ev("CreateOnlineCityInfoOverlay"); }

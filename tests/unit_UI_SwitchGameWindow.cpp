@@ -18,11 +18,7 @@ InterfaceWindow* gGameWindow;
 InterfaceWindow* gFirstPersonWindow;
 CWorld* gGameWorld;
 
-// The function-local static of TheGameType and its guard, reached by their mangled names.
-extern "C" {
-extern CGameType gTheGameTypeObject __asm__("__ZZ11TheGameTypevE9sGameType");
-extern uint8_t gTheGameTypeGuard[8] __asm__("__ZGVZ11TheGameTypevE9sGameType");
-}
+// TheGameType's object and its guard byte are gLoansGameTypeStorage and gLoansGameTypeGuard (FS_Online.h).
 
 // ---- the fakes
 bool CWorld::IsPlayingWinningAnim() {
@@ -55,8 +51,8 @@ uint64_t tpw_usw_addr(const char* name) {
         {"gFirstPersonWindow", &gFirstPersonWindow},
         {"gGameWorld", &gGameWorld},
         {"gGameWindowCursor", &gGameWindowCursor},
-        {"gameType", &gTheGameTypeObject},
-        {"gameTypeGuard", &gTheGameTypeGuard[0]},
+        {"gameType", gLoansGameTypeStorage},
+        {"gameTypeGuard", &gLoansGameTypeGuard},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));

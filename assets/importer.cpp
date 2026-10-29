@@ -32,12 +32,13 @@ namespace {
 
 namespace fs = std::filesystem;
 
-const Edition kAllEditions[3] = {kEditionUs, kEditionEur, kEditionGold};
+const Edition kAllEditions[3] = {kEditionUs, kEditionEur, kEditionGold};      // the editions launcher.ini and the report list
+const Edition kFileEditions[4] = {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages};  // everything a file can be
 const uint64_t kSmall = 1ull << 20;          // read whole and written from memory
 const uint64_t kProgressStep = 16ull << 20;  // a Hashing event every this many bytes of a big file
 const size_t kChunk = 1 << 20;
 
-int EditionIndex(Edition e) { return e == kEditionUs ? 0 : (e == kEditionEur ? 1 : 2); }
+int EditionIndex(Edition e) { return e == kEditionUs ? 0 : (e == kEditionEur ? 1 : (e == kEditionGold ? 2 : 3)); }
 
 std::string Lower(std::string s) {
     for (char& c : s) {
@@ -93,6 +94,25 @@ bool SizeAccepted(const ManifestRecord& r, uint64_t size) {
 
 // Content that proves nothing by itself: an empty file, or a Finder info side file (ten bytes many files share).
 bool Trivial(const ManifestRecord& r, uint64_t size) { return size == 0 || (r.flags & kFlagFinfo) != 0; }
+
+// The language a "lang/<Name>/..." destination belongs to, or "".
+std::string LanguageOf(const ManifestRecord& r) {
+    if (!(r.editions & kEditionLanguages) || std::strncmp(r.dest, "lang/", 5) != 0) return "";
+    const char* end = std::strchr(r.dest + 5, '/');
+    return end ? std::string(r.dest + 5, end) : "";
+}
+
+// The evidence for a language pack's trivial file (its empty alloweds.txt): the (lower-case) path has the destination's
+// file name and a folder named after the language, as every disc lays a language out ("German/Filter/German/...").
+bool LanguageEvidence(const std::string& path, const ManifestRecord& r) {
+    std::string name = Lower(LanguageOf(r));
+    if (name.empty() || BaseName(path) != Lower(BaseName(r.dest))) return false;
+    size_t start = 0;
+    for (size_t slash; (slash = path.find('/', start)) != std::string::npos; start = slash + 1) {
+        if (path.compare(start, slash - start, name) == 0 && slash - start == name.size()) return true;
+    }
+    return false;
+}
 
 bool SideFile(const ManifestRecord& r) { return (r.flags & (kFlagRsrc | kFlagFinfo)) != 0; }
 
@@ -356,8 +376,47 @@ const char* SourceDiscName(DiscSource source) {
         case kSourceMacCd: return "the US Mac CD";
         case kSourcePcCd: return "the European PC CD";
         case kSourceGoldCd: return "the Gold CD";
+        case kSourceLanguageDisc: return "a disc with that language";
     }
     return "?";
+}
+
+const char* LanguageStatus::StateWord() const {
+    switch (state) {
+        case State::Available: return "available";
+        case State::Partial: return "partial";
+        case State::Absent: return "absent";
+    }
+    return "?";
+}
+
+std::string LanguageStatus::Line() const {
+    std::string line = name + ": " + StateWord();
+    if (state == State::Absent) return line;
+    if (state == State::Available) {
+        if (oldTables) line += ", older text tables";
+        if (baseDateFonts) line += ", date fonts from the base edition";
+        return line;
+    }
+    std::vector<std::string> missing;
+    auto count = [&](size_t total, size_t present, const char* what) {
+        if (present < total)
+            missing.push_back(std::to_string(total - present) + " of " + std::to_string(total) + " " + what);
+    };
+    count(text, textPresent, "text files");
+    count(filter, filterPresent, "filter files");
+    count(meshes, meshesPresent, "meshes");
+    count(speech, speechPresent, "speech files");
+    for (size_t i = 0; i < missing.size(); ++i) {
+        line += i == 0 ? ", " : (i + 1 == missing.size() ? " and " : ", ");
+        line += missing[i];
+    }
+    if (!missing.empty()) line += " missing";
+    if (baseDateFonts && !baseDateFontsPresent) {
+        line += missing.empty() ? ", text and speech present, needs" : "; needs";
+        line += " the US or European edition (its date fonts)";
+    }
+    return line;
 }
 
 void ProgressQueue::Push(const ImportProgress& p) {
@@ -458,6 +517,7 @@ std::string Importer::GameFolder(Edition edition) const {
         case kEditionUs: return assetsDir_ + "/us/Theme Park Data";
         case kEditionEur: return assetsDir_ + "/eur/Theme Park Data";
         case kEditionGold: return assetsDir_ + "/gold";
+        case kEditionLanguages: return assetsDir_ + "/lang";
     }
     return assetsDir_;
 }
@@ -465,6 +525,7 @@ std::string Importer::GameFolder(Edition edition) const {
 std::string Importer::DestinationPath(Edition edition, const ManifestRecord& record) const {
     std::string dest = record.dest;
     if (edition == kEditionGold && dest.compare(0, 5, "gold/") == 0) dest = dest.substr(5);
+    if (edition == kEditionLanguages && dest.compare(0, 5, "lang/") == 0) dest = dest.substr(5);
     return GameFolder(edition) + "/" + dest;
 }
 
@@ -532,7 +593,7 @@ bool Importer::ScanInstalled(std::vector<Stamp>* found) {
                 }
                 byPath.emplace(Lower(r.dest), idx);
             }
-            for (Edition e : kAllEditions) {
+            for (Edition e : kFileEditions) {
                 if (!(r.editions & e)) continue;
                 uint64_t size = 0;
                 int64_t mtime = 0;
@@ -626,9 +687,10 @@ void Importer::CheckChanged(std::vector<Stamp>& found) {
 }
 
 std::string OpenCheck::Notice() const {
-    static const char* const kNames[3] = {"the US edition", "the European edition", "the Gold bonus rides"};
+    static const char* const kNames[4] = {"the US edition", "the European edition", "the Gold bonus rides",
+                                          "the language packs"};
     std::vector<std::string> parts;
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
         if (removed[i] == 0) continue;
         parts.push_back(std::to_string(removed[i]) + (removed[i] == 1 ? " file of " : " files of ") + kNames[i]);
     }
@@ -663,7 +725,7 @@ bool Importer::RecordStamps(const std::vector<Stamp>* found) {
                 present = present_;
             }
             for (size_t i = 0; i < present.size(); ++i) {
-                for (Edition e : kAllEditions) {
+                for (Edition e : kFileEditions) {
                     if (!(present[i] & e)) continue;
                     uint64_t size = 0;
                     int64_t mtime = 0;
@@ -733,6 +795,78 @@ EditionStatus Importer::StatusLocked(Edition edition) const {
     }
     s.unlocked = s.required > 0 && s.requiredPresent == s.required;
     return s;
+}
+
+std::vector<LanguageStatus> Importer::Languages() const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return LanguagesLocked();
+}
+
+std::vector<LanguageStatus> Importer::LanguagesLocked() const {
+    const ManifestRecord* records = ManifestRecords();
+    size_t n = ManifestRecordCount();
+    auto have = [&](Edition e, size_t i) { return i < present_.size() && (present_[i] & e) != 0; };
+    // the date fonts of an installed edition, for the packs that use the base edition's
+    bool dateFonts = false;
+    const std::pair<Edition, const char*> bases[] = {{kEditionEur, "data/Language/English/"},
+                                                     {kEditionUs, "data/Language/American/"}};
+    for (const auto& base : bases) {
+        bool all = true;
+        for (const char* font : {"DATEBIG.bf4", "DATEMED.bf4", "DATESMALL.bf4", "DATETINY.bf4"}) {
+            const ManifestRecord* r = FindByDest(base.first, (std::string(base.second) + font).c_str());
+            all = all && r && have(base.first, RecordIndex(r));
+        }
+        dateFonts = dateFonts || all;
+    }
+    std::vector<LanguageStatus> out;
+    for (size_t l = 0; l < ManifestLanguageCount(); ++l) {
+        const ManifestLanguage& lang = ManifestLanguages()[l];
+        LanguageStatus s;
+        s.name = lang.name;
+        s.oldTables = (lang.flags & kLanguageOldTables) != 0;
+        s.baseDateFonts = (lang.flags & kLanguageBaseDateFonts) != 0;
+        s.baseDateFontsPresent = dateFonts;
+        const std::string prefix = "lang/" + s.name + "/", text = prefix + "data/Language/" + s.name + "/";
+        bool own = false;  // one of its own files (a content no other language has) is present
+        const ManifestRecord* begin = std::partition_point(records, records + n, [&](const ManifestRecord& r) {
+            return std::strcmp(r.dest, prefix.c_str()) < 0;
+        });
+        for (const ManifestRecord* r = begin; r != records + n && std::strncmp(r->dest, prefix.c_str(), prefix.size()) == 0; ++r) {
+            if (!(r->editions & kEditionLanguages)) continue;
+            bool p = have(kEditionLanguages, RecordIndex(r));
+            std::string dest = r->dest;
+            if (!(r->flags & kFlagRequired)) {
+                ++s.optional;
+                s.optionalPresent += p;
+                continue;
+            }
+            std::string file = BaseName(dest);
+            std::string ext = Extension(file);
+            size_t* total = &s.text;
+            size_t* present = &s.textPresent;
+            if (dest.compare(0, text.size(), text) != 0) total = &s.speech, present = &s.speechPresent;
+            else if (Lower(file) == "swears.txt") total = &s.filter, present = &s.filterPresent;
+            else if (ext == "md2") total = &s.meshes, present = &s.meshesPresent;
+            ++*total;
+            *present += p;
+            if (!p || own) continue;
+            bool shared = false;
+            for (unsigned k = 0; k < r->hash_count && !shared; ++k) {
+                const ManifestHash& h = RecordHash(*r, k);
+                for (const ManifestRecord* o : FindByContent(h.size, h.sha256)) {
+                    std::string other = LanguageOf(*o);
+                    shared = shared || (!other.empty() && other != s.name);
+                }
+            }
+            own = !shared;
+        }
+        bool complete = s.textPresent == s.text && s.filterPresent == s.filter && s.meshesPresent == s.meshes &&
+                        s.speechPresent == s.speech && (!s.baseDateFonts || s.baseDateFontsPresent);
+        s.state = complete ? LanguageStatus::State::Available
+                           : (own ? LanguageStatus::State::Partial : LanguageStatus::State::Absent);
+        out.push_back(std::move(s));
+    }
+    return out;
 }
 
 std::vector<uint32_t> Importer::RecordsByPath(const std::string& lowerPath) const {
@@ -876,6 +1010,7 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
     {
         std::lock_guard<std::mutex> lock(mutex_);
         for (Edition e : kAllEditions) run.report.status[EditionIndex(e)] = StatusLocked(e);
+        run.report.languages = LanguagesLocked();
         std::string err;
         if (opened_ && !SaveIniLocked(err)) run.report.errors.push_back(err);
     }
@@ -1073,7 +1208,8 @@ void Importer::Process(Run& run, Work& work) {
     const ManifestRecord* records = ManifestRecords();
     std::string evidence = EvidencePath(e);
     auto allowed = [&](const ManifestRecord& r) {
-        return (r.editions & config_.editions) != 0 && (!Trivial(r, e.size) || EndsWithDest(evidence, Lower(r.dest)));
+        return (r.editions & config_.editions) != 0 &&
+               (!Trivial(r, e.size) || EndsWithDest(evidence, Lower(r.dest)) || LanguageEvidence(evidence, r));
     };
     auto error = [&](const std::string& message) {
         run.report.errors.push_back(work.display + ": " + message);
@@ -1089,7 +1225,7 @@ void Importer::Process(Run& run, Work& work) {
     if (bySize != bySize_.end()) {
         for (uint32_t r : bySize->second) {
             if (!allowed(records[r])) continue;
-            for (Edition ed : kAllEditions) {
+            for (Edition ed : kFileEditions) {
                 if ((records[r].editions & config_.editions & ed) && !IsPresent(ed, r)) need = true;
             }
         }
@@ -1199,7 +1335,7 @@ void Importer::Process(Run& run, Work& work) {
     std::vector<std::pair<Edition, uint32_t>> targets;
     for (const ManifestRecord* r : hits) {
         uint32_t idx = RecordIndex(r);
-        for (Edition ed : kAllEditions) {
+        for (Edition ed : kFileEditions) {
             if (!(r->editions & config_.editions & ed)) continue;
             if (IsPresent(ed, idx)) Count(run, ed, idx, false);
             else targets.emplace_back(ed, idx);
@@ -1232,7 +1368,7 @@ void Importer::Process(Run& run, Work& work) {
     for (const ManifestRecord* r : hits) {
         if (SideFile(*r)) continue;
         std::string side = std::string(r->dest) + ".finfo";
-        for (Edition ed : kAllEditions) {
+        for (Edition ed : kFileEditions) {
             if (!(r->editions & config_.editions & ed)) continue;
             const ManifestRecord* fr = FindByDest(ed, side.c_str());
             if (!fr || !Accepts(*fr, finfo.size(), fd)) continue;

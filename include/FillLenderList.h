@@ -45,7 +45,5 @@ extern int16_t gLoansScript[];          // 0x102aa4a4: the loans panel's window 
 extern int32_t gLenderColumnColour;      // 0x102aa83c: the lender list's column button colour (8 at start)
 // 0x101a4bec (untranslated; its TVector is 0x10267bf8): the message function of the lender list.
 int32_t LenderListCallback(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);
-// The game type object (0x102b3aa0) and its guard byte (0x102b3aa4) as CreateLoansPanel inlines them: constructed on first use.
-// Raw storage so that no constructor runs at start-up.
-extern unsigned char gLoansGameTypeStorage[4];   // 0x102b3aa0 (a CGameType)
-extern int8_t gLoansGameTypeGuard;               // 0x102b3aa4
+// The game type object (0x102b3aa0) and its guard byte (0x102b3aa4), which CreateLoansPanel tests inline and constructs on
+// first use, are TheGameType()'s: gLoansGameTypeStorage and gLoansGameTypeGuard in FS_Online.h.

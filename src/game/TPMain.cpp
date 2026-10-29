@@ -217,8 +217,9 @@ void ThemeParkWorld::HandleTyping(char character, char keyCode, uint32_t modifie
     }
     const signed char ch = static_cast<signed char>(character);
     auto upper = [ch]() -> int16_t { return ch == -1 ? -1 : msl_upper_map[static_cast<uint8_t>(ch)]; };
+    auto tableKey = upper;
     if (down) {
-        if (key == 0) key = upper();
+        if (key == 0) key = tableKey();
         UI_Keydown(key, mods << 16);
         gKeyTable->KeyDown(key, static_cast<int16_t>(mods));
     } else if (key != 0) {
@@ -226,8 +227,8 @@ void ThemeParkWorld::HandleTyping(char character, char keyCode, uint32_t modifie
         gKeyTable->KeyUp(key, static_cast<int16_t>(mods));
     } else {
         UI_KeyChar(ch, 0x1000000);
-        UI_Keyup(upper(), (mods << 16) | 0x1000000);
-        gKeyTable->KeyUp(upper(), static_cast<int16_t>(mods));
+        UI_Keyup(tableKey(), (mods << 16) | 0x1000000);
+        gKeyTable->KeyUp(tableKey(), static_cast<int16_t>(mods));
     }
 }
 

@@ -109,7 +109,7 @@ TPW_WEAK void WideStringCtor(void* string, const char16_t* text) { new (string) 
 TPW_WEAK void ScreenShow(void* screen) { static_cast<CLBScreenComponent*>(screen)->Show(); }
 TPW_WEAK void ScreenHide(void* screen) { static_cast<CLBScreenComponent*>(screen)->Hide(); }
 TPW_WEAK int32_t ScreenIsVisible(void* screen) { return static_cast<CLBScreenComponent*>(screen)->IsVisible(); }
-// Slot 0x34 of the publish globe's vtable: not declared on the host classes yet (stand-in, nothing happens).
+// Slot 0x34 of the publish globe's vtable (HandleOnlineBacktrack): the launcher's is in platform/online_dispatch.cpp; nothing here.
 TPW_WEAK void PublishGlobeSlot34(void*) {}
 
 }  // namespace mainmenu_callee

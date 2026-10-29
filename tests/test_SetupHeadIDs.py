@@ -269,7 +269,7 @@ def bind(lib):
     out = (C.c_int64 * 32)()
     n = lib.tpw_sh_layout(out)
     lay = list(out)[:n]
-    assert n == 8 and lay[2] + 0x20 <= 0xF00 and lay[6] == 0x20 and lay[3] <= 0x400 and lay[4] <= 0x100 and lay[5] <= 0x100 and lay[7] in (4, 8), lay
+    assert n == 8 and lay[2] + 0x20 <= 0xF00 and lay[6] == 0x3C and lay[3] <= 0x400 and lay[4] <= 0x100 and lay[5] <= 0x100 and lay[7] in (4, 8), lay
     lib.layout = lay
     lib.bound = True
 

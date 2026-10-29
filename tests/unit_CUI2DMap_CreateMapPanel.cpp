@@ -220,6 +220,17 @@ uint32_t tpw_cmp_panel_word(uint64_t pointer) {
     return static_cast<uint32_t>(pointer);
 }
 
+// 1 when the port fix of unit mapedge is built in: CreateMapPanel then seeds the map's pointer (+0x10, +0x14) from gUIPointerX/Y.
+int32_t tpw_cmp_portfix() {
+    return 0;
+}
+
+// The pointer's last place (gUIPointerX, gUIPointerY), with the port fix on; nothing without it.
+void tpw_cmp_pointer(int32_t x, int32_t y) {
+    (void)x;
+    (void)y;
+}
+
 // ---- the function
 void tpw_cmp_create() { gUI2DMap.CreateMapPanel(); }
 

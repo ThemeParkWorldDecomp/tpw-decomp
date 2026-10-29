@@ -18,19 +18,21 @@ struct OnlineParkSelection {
     int32_t mF10;                // 0x10
     const char16_t* mName;       // 0x14  a pointer on the Mac (the host's is at 0x18)
 };
-// 0x102e4868: a global whose word at 0x08 is the path of the park file to upload (a pointer on the Mac).
+// 0x102e4868: a global whose word at 0x08 is the path of the park file to upload (a pointer on the Mac). __sinit_lobby_cpp builds a
+// narrow string in it (0x14 bytes on the Mac, gLobbyNode487C follows); the host's string is 0x20 bytes, so the tail makes room for it.
 struct OnlineUploadFile {
     int32_t mF00;                // 0x00
     int32_t mF04;                // 0x04
     const char* mPath;           // 0x08
+    uint8_t mHostTail[0x10];     // host only: the rest of the host's string
 };
 extern OnlineParkSelection* gOnlineParkSelection;   // 0x102e4864
 extern OnlineUploadFile gOnlineUploadFile;          // 0x102e4868
 extern InterfaceWindow* gPublishParkPanel;          // 0x10396278: the panel's window, 0 when none
 extern char16_t gPublishParkDescription[0x80];      // 0x1039627c: the description's text (0x7e characters shown)
 extern char16_t gPublishParkName[0x10];             // 0x1039637c: the park's name (0xf characters)
-extern int16_t gPublishParkPanelScript[2];          // 0x102b11e6: the panel's window script (only its address is used here)
-extern int16_t gOnlineParkListScript[2];            // 0x102b1086: the list panel's window script
+extern int16_t gPublishParkPanelScript[];          // 0x102b11e6: the panel's window script (only its address is used here)
+extern int16_t gOnlineParkListScript[];            // 0x102b1086: the list panel's window script
 extern InterfaceWindow* gOnlineParkListPanel;       // 0x10396234
 extern void (*gOnlineParkListClose)();              // 0x10396230: the function the list panel's caller gave
 

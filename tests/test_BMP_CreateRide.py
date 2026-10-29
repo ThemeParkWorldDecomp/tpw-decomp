@@ -33,7 +33,7 @@ COL_OBJ, BUOY, FOR_RIDE, TRACE = 0x1002EDFC, 0x1002EBD0, 0x1002ED74, 0x1006FCFC
 
 ADDR = dict(world=0x102B56C0, templ=0x1029BE00, pmax=0x1029CA24, pmin=0x1029CA28, sine=0x102B4EC0)
 NT = 14     # the templates: kinds -1 to -14, template (-kind - 1)
-HOST_LAYOUT = [0x20, 0xD0, NT * 0xD0]
+HOST_LAYOUT = [0x3C, 0xD0, NT * 0xD0]
 MAGIC = 0x4A454647
 NREC = 256
 CUR = {}

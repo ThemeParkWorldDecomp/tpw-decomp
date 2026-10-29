@@ -51,8 +51,8 @@ ADDR = dict(w=0x102B2B54, h=0x102B2B50, set=0x1038071C, text=0x1037FF18, buf=0x1
 NT = 6          # thing slots
 NS = 5          # sprites in the pool
 MAC = dict(PW=4, head=4, nxt=4, prv=8, vis=0x2C, thing=0x18, stride=0x14, athing=0, slot=0x564,
-           hov=0x20060, drag=0x20084, panel=4)
-HOST_ONLY = dict(hov=0x200A0, drag=0x200A8, panel=0x200B0)   # the translation keeps these three outside the Mac offsets
+           hov=0x20060, drag=0x20084)
+HOST_ONLY = dict(hov=0x200A0, drag=0x200A8)   # the translation keeps these two outside the Mac offsets
 
 
 def fb(x):
@@ -217,6 +217,9 @@ class Ppc(Side):
     def rd_ptr(self, a):
         return self.rd_word(a)
 
+    def word_ptr(self, a, v):
+        self.words(a, [v])
+
     def log(self):
         return self.L.log
 
@@ -258,6 +261,9 @@ class Host(Side):
     def rd_ptr(self, a):
         return struct.unpack("<Q", self.read(a, 8))[0]
 
+    def word_ptr(self, a, v):
+        self.words(a, [self.lib.tpw_map_offset(v)])
+
     def log(self):
         return CL.host_end(self.lib)
 
@@ -272,6 +278,8 @@ def bind(lib):
     f.restype, f.argtypes = C.c_uint64, [C.c_char_p]
     f = lib.tpw_map_alloc
     f.restype, f.argtypes = C.c_uint64, [C.c_uint32]
+    f = lib.tpw_map_offset
+    f.restype, f.argtypes = C.c_uint32, [C.c_uint64]
     lib.tpw_map_layout.argtypes = [C.POINTER(C.c_int64)]
     f = lib.tpw_map_call
     f.restype, f.argtypes = C.c_int32, [C.c_uint64, C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
@@ -316,7 +324,8 @@ def build(s, c):
     s.ptr(lst + s.head, nodes[0] if nodes else 0)
     # the map object
     m = s.map
-    s.ptr(m + s.panel, s.m5)
+    # the panel window: a 32-bit word at 4 on both sides (on the host a Ptr32, the window's offset in the arena)
+    s.word_ptr(m + 4, s.m5)
     s.words(m + 0x10, [c["mx"], c["my"]])
     s.words(m + 0x24, [c["mw"], c["mh"]])
     s.words(m + 0x54, [fb(c["cx"]), fb(c["cy"]), fb(c["zoom"])])

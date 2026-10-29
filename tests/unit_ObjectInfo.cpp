@@ -84,11 +84,8 @@ int32_t TbITable::FormatString(char16_t*, uint32_t, uint32_t, ...) const { retur
 extern char16_t gObjectSignNameBuffer[0x21];
 extern char16_t gObjectUINameBuffer[0x21];
 
-// TheGameType()'s function-local static and its guard (the Mac's data at 0x102b3aa0 and the byte at 0x102b3aa4): the wrappers set both, so a case can start with
-// the game type "not yet constructed" or already constructed, as the original's callers find it. They are read by name, so tpw_oin_game_keep below must
-// make this library hold the inline function's static even while the stubs do not call it.
-extern CGameType gGameStorage __asm__("__ZZ11TheGameTypevE9sGameType");
-extern uint64_t gGameTypeGuard __asm__("__ZGVZ11TheGameTypevE9sGameType");
+// TheGameType()'s object and its guard byte (gLoansGameTypeStorage and gLoansGameTypeGuard, FS_Online.h; the Mac's data at 0x102b3aa0 and the byte at
+// 0x102b3aa4): the wrappers set both, so a case can start with the game type "not yet constructed" or already constructed, as the original's callers find it.
 
 static_assert(offsetof(CObject, mObjectType) == 0x0e && offsetof(CObject, mRotation) == 0x10 && offsetof(CObject, mF20) == 0x20 &&
               offsetof(CObject, mF24) == 0x24 && offsetof(CObject, mFlags) == 0x2e && offsetof(CObject, mF32) == 0x32 &&
@@ -386,13 +383,13 @@ uint64_t tpw_oin_master() { return AddressOf(gMasterSave); }
 // The game type: guard set (already constructed, of the type) or not (the call constructs it, with ctortype). The type is read from the static itself, so a
 // translation that skips the guard and the constructor is seen as a value, not constructed by the reader.
 void tpw_oin_game(int32_t constructed, int32_t type, int32_t ctortype) {
-    gGameStorage.mType = static_cast<GameType>(type);
-    gGameTypeGuard = constructed ? 1 : 0;
+    reinterpret_cast<CGameType*>(gLoansGameTypeStorage)->mType = static_cast<GameType>(type);
+    gLoansGameTypeGuard = constructed ? 1 : 0;
     gCtorType = ctortype;
 }
 
-int32_t tpw_oin_game_type() { return static_cast<int32_t>(gGameStorage.mType); }
-int32_t tpw_oin_game_guard() { return (gGameTypeGuard & 0xff) != 0; }
+int32_t tpw_oin_game_type() { return static_cast<int32_t>(reinterpret_cast<CGameType*>(gLoansGameTypeStorage)->mType); }
+int32_t tpw_oin_game_guard() { return gLoansGameTypeGuard != 0; }
 
 // Never called: it makes this library emit TheGameType()'s static and guard whatever the stubs do.
 void tpw_oin_game_keep() { (void)TheGameType(); }

@@ -125,6 +125,9 @@ int32_t tpw_dltb_layout(int64_t* out) {
     o(0xc0);
     o(0x70);   // the owner's word, read by its offset
     o(0x90);
+    o(4);      // the set's word 4, the records
+    o(0x14);   // a record's size
+    o(4);      // a record's word 4, the block
     return n;
 }
 

@@ -110,7 +110,7 @@ class Ppc(Side):
 class Host(Side):
     fmt = "<I"
     pfmt = "<Q"
-    guard_pad = 7       # the host's guard variable is 8 bytes (Itanium ABI: byte 0 is the flag)
+    guard_pad = 0
 
     def __init__(self, lib, case):
         self.lib = lib

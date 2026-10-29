@@ -42,6 +42,8 @@ struct Probe {
     virtual void Show() { ev("virt", {lab(this), 0x24, 0}); }
     virtual void Hide() { ev("virt", {lab(this), 0x28, 0}); }
     virtual int32_t IsVisible() { ev("unexpected", {7}); return 0; }
+    virtual void CreateCities(TbPtrList<CFSOnlineCity>*) { ev("unexpected", {10}); }
+    virtual void HandleOnlineBacktrack() { ev("unexpected", {11}); }
     virtual void RegisterGlobe(CLBGlobe*) { ev("unexpected", {8}); }
     virtual int32_t IsCityWanted(CFSOnlineCity*) { ev("unexpected", {9}); return 0; }
     virtual void Slot3C(CLBGlobe* globe) { ev("virt", {lab(this), 0x3c, lab(globe)}); }

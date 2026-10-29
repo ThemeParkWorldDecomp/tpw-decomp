@@ -281,4 +281,8 @@ std::string GamePathForWriting(const char* gamePath);
 // finds it). A path neither folder has is given back as it is, so a host path still opens and a missing file still fails. For the
 // game's reads through fopen and the MSL input streams (unit v5L48: the outbox's mails and their pictures).
 std::string GamePathForReading(const char* gamePath);
+// The game's language (CText's id, FS_ReadLanguageRegistry) picks the code page of its narrow text, as the PC editions' Windows
+// did: Hebrew 1255, Japanese 932, Korean 949, TraditionalChinese 950, SimplifiedChinese 936; any other language keeps the
+// shim's Latin-1 (platform/code_page.cpp).
+void UseCodePageOfLanguage(uint32_t languageId);
 }  // namespace tpw

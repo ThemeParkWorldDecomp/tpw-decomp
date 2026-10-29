@@ -26,7 +26,7 @@ struct IDXTYPEUniqueNameObjectId;
 template<class Tag, class T> struct tag_IDX_TYPE;
 
 // Unit w149: the index type of CPeep::DrawMySpriteAt (the values used are 2 and 3). Unit w177 (src/game/DelayedScript.cpp): the rest of the class, a handle to a
-// sprite script and the one waiting to be switched to. ScriptIdx stays opaque: its values are the thirteen indices of the table at 0x102a08fc.
+// sprite script and the one waiting to be switched to. ScriptIdx stays opaque: its values are the 26 indices of the table at 0x102a08fc.
 class CDelayedScript {
 public:
     enum ScriptIdx : int32_t;
@@ -1215,7 +1215,10 @@ public:
 class CMsgResearchCategoryUpdated : public CMsg {
 public:
     explicit CMsgResearchCategoryUpdated(ResearchCat category);   // 0x10151d94
-    int32_t GetType() const override { return 0; }                // the real message type is not recovered
+    // corrected 2026-10-28: 0x12, the type CUIMsgReceiver subscribes to (src/game/ui/vector2d.cpp, case 18 ResearchCategoryComplete) and
+    // the class's GetType answers on the Mac (0x10124510, CMsgResearchCategoryUpdated_GetType in src/game/buildings/ResearchLab.cpp); the
+    // placeholder 0 reached no one, so a category never moved on from a finished project (found by samueleagle91, tpw-port PR #57)
+    int32_t GetType() const override { return 0x12; }
     ResearchCat mCategory;  // Mac +0x08
 };
 // Unit w124: types the weather turn uses.

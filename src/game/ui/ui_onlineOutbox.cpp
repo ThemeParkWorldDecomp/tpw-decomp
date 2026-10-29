@@ -71,8 +71,8 @@ void UpdateOutboxMailIcon() {
 
 InterfaceWindow* gOutboxWindow;      // 0x10395e3c
 uint8_t* gOutboxCursor;              // 0x10395e38
-uint32_t gOutboxPreview[9];          // 0x10395e10
-const char16_t gEmailSeparators[3] = {0, 0x000a, 0};   // 0x1024eeca
+alignas(8) uint32_t gOutboxPreview[12];   // 0x10395e10, the sinit's TbRenderArea (0x28 bytes on the Mac, 0x30 on the host)
+const char16_t gEmailSeparators[10] = u"\0\n\0upload";   // 0x1024eeca, the image's words: the sinit's text at +6 is u"upload"
 
 namespace {
 
@@ -623,6 +623,7 @@ void __sinit_ui_onlineOutbox_cpp() {
     __register_global_object(string, reinterpret_cast<void*>(&UIMain_DestroyWString), gOutboxStringNode);
     TbSize size{0x280, 0xf0};
     TbPixFormat format(0xff0000, 0xff00, 0xff, 0xff000000u, 0x20, 0);
+    static_assert(sizeof(TbRenderArea) <= sizeof(gOutboxPreview), "the global holds the preview's area");
     new (gOutboxPreview) TbRenderArea(size, format, nullptr, 0);
 }
 

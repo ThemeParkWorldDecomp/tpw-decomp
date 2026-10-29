@@ -285,7 +285,7 @@ class Ppc(Side):
 
 class Host(Side):
     fmt = "<I"
-    guard_pad = bytes(7)
+    guard_pad = b""
 
     def __init__(self, lib, case):
         self.lib = lib
@@ -366,7 +366,7 @@ def build(s, case):
         s.ptr(s.g("parkinfo") + 0x9C, a)
     s.u16s(s.g("str121"), OTHER + [0])
     s.words(s.g("gtype"), [case["mtype"]])
-    s.write(s.g("gguard"), bytes([case["guard"]]) + s.guard_pad)   # the host's guard word also has a state byte after the flag
+    s.write(s.g("gguard"), bytes([case["guard"]]) + s.guard_pad)
     s.u16s(s.g("removeName"), case["name"])
     s.ptr(s.g("gPanelPtr"), s.g("panel"))
 
