@@ -33,6 +33,10 @@ struct Desc {
 };
 
 void* Alloc(uint32_t size) {
+    // The arena starts on a 4 GB boundary, so its first 64 KB have the low words of the raw table words the test writes: skip them,
+    // so that Describe never takes such a word for a region offset.
+    static void* const gap = tpw::ArenaAlloc(0x10000);
+    (void)gap;
     void* p = tpw::ArenaAllocZeroed(size);
     gMslMacAddressHigh = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(p)) >> 32;
     if (gRegionCount < 512) gRegions[gRegionCount++] = {static_cast<uint32_t>(reinterpret_cast<uintptr_t>(p)), size};
@@ -54,11 +58,14 @@ uint32_t* Native(uint32_t w) {
 
 }  // namespace
 
-namespace online_callee {
+namespace argdeque_callee {
 void* OperatorNew(uint32_t size) {
     ev("new", {static_cast<int64_t>(size)});
     return Alloc(size);
 }
+}  // namespace argdeque_callee
+
+namespace online_callee {
 void OperatorDelete(void* p) {
     Desc d = D(p);
     ev("delete", {d.id, d.off});

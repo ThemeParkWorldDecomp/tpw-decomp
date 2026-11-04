@@ -4,7 +4,9 @@
 //
 // The callees are fakes that record what they read. Strings the original keeps as one word are opaque buffers: a fake that builds one
 // stores the 32-bit address of a std::u16string it allocates (a "pseudo" string, registered in gPseudo); a source that is not registered is
-// a real std::u16string (the name argument, a contact node's value). Text is logged as a hash of its UTF-16 units.
+// a real std::u16string (the name argument). The keys the translation keeps as host strings go through the std::u16string overloads,
+// which read and assign the string itself. A contact node is built on the Mac's words (its key a rep at +0xc). Text is logged as a hash
+// of its UTF-16 units.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -17,8 +19,6 @@
 #include "platform/arena.h"
 #include "online.h"
 #include "UIInterface.h"
-#include "MslSubscriptionTree.h"
-#include "MslWStringTree.h"
 
 using namespace calllog;
 
@@ -77,9 +77,16 @@ uint32_t Word(const void* p) {
     return v;
 }
 
-void SubCopy(void* self, const void* other, uint32_t pos, uint32_t count) {
-    const std::u16string& source = Txt(other);
-    MakePseudo(self, source.substr(pos, count == 0xffffffffu ? std::u16string::npos : count));
+std::u16string Part(const std::u16string& source, uint32_t pos, uint32_t count) {
+    return source.substr(pos, count == 0xffffffffu ? std::u16string::npos : count);
+}
+
+void SubCopy(void* self, const void* other, uint32_t pos, uint32_t count) { MakePseudo(self, Part(Txt(other), pos, count)); }
+
+// A host string the translation builds (a stack slot that once held a pseudo string is a host string now).
+void Assign(std::u16string* self, const std::u16string& value) {
+    gPseudo.erase(self);
+    *self = value;
 }
 
 }  // namespace
@@ -96,25 +103,39 @@ void WStringCtor(void* self) {
     MakePseudo(self, std::u16string());
     ev("WStringCtor", {});
 }
+void WStringCtorFrom(void* self, const char16_t* text) {
+    ev("WStringCtorFrom", {HashC(text)});
+    MakePseudo(self, std::u16string(text));
+}
 void WStringDtor(void* self, int16_t flag) { ev("WStringDtor", {flag, HashS(Txt(self))}); }
 void WStringCopy(void* self, const void* other, uint32_t pos, uint32_t count) {
     ev("WStringCopy", {pos, count, HashS(Txt(other))});
     SubCopy(self, other, pos, count);
+}
+// The copy from the host's string (SendNameCommand's name) is the same fake.
+void WStringCopy(void* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    WStringCopy(self, static_cast<const void*>(other), pos, count);
 }
 void NocaseWStringCopy(void* self, const void* other, uint32_t pos, uint32_t count) {
     ev("NocaseCopy", {pos, count, HashS(Txt(other))});
     SubCopy(self, other, pos, count);
 }
 void NocaseWStringDtor(void* self, int16_t flag) { ev("NocaseDtor", {flag, HashS(Txt(self))}); }
-void* NocaseSetFind(void* tree, const void* key) {
-    ev("NocaseSetFind", {Off(tree), HashS(Txt(key))});
+void NocaseWStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    ev("NocaseCopy", {pos, count, HashS(*other)});
+    Assign(self, Part(*other, pos, count));
+}
+void NocaseWStringDtor(std::u16string* self, int16_t flag) { ev("NocaseDtor", {flag, HashS(*self)}); }
+void* NocaseSetFind(void* tree, const std::u16string* key) {
+    ev("NocaseSetFind", {Off(tree), HashS(*key)});
     return static_cast<uint8_t*>(tree) + (ret("find") ? 0x40 : 4);
 }
-void* BuddyTreeFind(void* tree, const void* key) {
-    ev("BuddyFind", {Off(tree), HashS(Txt(key))});
+void* BuddyTreeFind(void* tree, const std::u16string* key) {
+    ev("BuddyFind", {Off(tree), HashS(*key)});
     return static_cast<uint8_t*>(tree) + (ret("bfind") ? 0x40 : 4);
 }
-void BuddyTreeEraseOne(void* tree, const void* key) { ev("BuddyErase", {Off(tree), HashS(Txt(key))}); }
+void BuddyTreeEraseOne(void* tree, const std::u16string* key) { ev("BuddyErase", {Off(tree), HashS(*key)}); }
+void WStringSetEraseOne(void* tree, const std::u16string* key) { ev("ContactErase", {Off(tree), HashS(*key)}); }
 void ArgumentCtor(void* self, const void* text) {
     ev("ArgumentCtor", {HashS(Txt(text))});
     std::memset(self, 0, 12);
@@ -135,8 +156,8 @@ void UIOnlineRemoveBuddy(void* ui, const char16_t* text) { ev("UIRemoveBuddy", {
 void COnlineControl::DoCommand(void* arguments) {
     ev("DoCommand", {Off(this), Word(static_cast<uint8_t*>(arguments) + 4)});
 }
-uint32_t COnlineControl::GetDataForUser(const nocase_string& key) const {
-    ev("GetDataForUser", {Off(this), HashS(Txt(&key))});
+uint32_t COnlineControl::GetDataForUser(const std::u16string& key) const {
+    ev("GetDataForUser", {Off(this), HashS(key)});
     return static_cast<uint32_t>(ret("gdfu"));
 }
 
@@ -160,16 +181,12 @@ void ParserDtor(void* parser, int16_t flag) {
 }
 }  // namespace online_parser_callee
 
-bool WStringTree::erase_one(const MslWideString& key) {
-    ev("ContactErase", {Off(this), HashS(*reinterpret_cast<const std::u16string*>(&key))});
-    return false;
-}
-
-void MslRedBlackTree::increment(node_base*& iterator) {
+// The tree increment on the Mac's words: the iterator is a node's arena offset; the fake walks the case's chain, then the end node.
+void ignore_callee::TreeIncrement(uint32_t* node) {
     ev("Increment", {});
     size_t i = 0;
-    while (i < gNodes.size() && gNodes[i] != iterator) i++;
-    iterator = (i + 1 < gNodes.size()) ? static_cast<node_base*>(gNodes[i + 1]) : reinterpret_cast<node_base*>(gSelf + 0xe2c);
+    while (i < gNodes.size() && tpw::ArenaOffset(gNodes[i]) != *node) i++;
+    *node = tpw::ArenaOffset(i + 1 < gNodes.size() ? gNodes[i + 1] : static_cast<void*>(gSelf + 0xe2c));
 }
 
 extern "C" {
@@ -187,11 +204,15 @@ uint64_t tpw_cocig_u16(const uint16_t* data, uint32_t n) {
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(made));
 }
 
-// A contact node (host layout: node base, then the std::u16string) at `node`.
+// A contact node's key at `node` + 0xc, on the Mac's words: the word of a rep with the length at +0 and the characters' word at +0xc.
 void tpw_cocig_node(uint64_t node, const uint16_t* data, uint32_t n) {
-    auto* made = new (reinterpret_cast<void*>(static_cast<uintptr_t>(node) + sizeof(MslRedBlackTree::node_base)))
-        std::u16string(reinterpret_cast<const char16_t*>(data), n);
-    (void)made;
+    uint8_t* chars = static_cast<uint8_t*>(tpw::ArenaAllocZeroed(2 * n + 2));
+    std::memcpy(chars, data, 2 * n);
+    uint8_t* rep = static_cast<uint8_t*>(tpw::ArenaAllocZeroed(0x10));
+    const uint32_t words[3] = {n, tpw::ArenaOffset(chars), tpw::ArenaOffset(rep)};
+    std::memcpy(rep, &words[0], 4);
+    std::memcpy(rep + 0xc, &words[1], 4);
+    std::memcpy(reinterpret_cast<uint8_t*>(static_cast<uintptr_t>(node)) + 0xc, &words[2], 4);
 }
 uint32_t tpw_cocig_offset(uint64_t address) { return address == 0 ? 0 : tpw::ArenaOffset(reinterpret_cast<void*>(static_cast<uintptr_t>(address))); }
 void tpw_cocig_clear_nodes(){ gNodes.clear(); }
@@ -200,7 +221,6 @@ void tpw_cocig_push_node(uint64_t node) { gNodes.push_back(reinterpret_cast<void
 int32_t tpw_cocig_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = static_cast<int64_t>(sizeof(COnlineControl));
-    out[n++] = static_cast<int64_t>(sizeof(MslRedBlackTree::node_base));
     return n;
 }
 
@@ -220,6 +240,12 @@ void tpw_cocig_SendText(uint64_t self, uint64_t name) {
     Begin(reinterpret_cast<void*>(static_cast<uintptr_t>(self)));
     reinterpret_cast<COnlineControl*>(static_cast<uintptr_t>(self))
         ->SendText(*reinterpret_cast<std::u16string*>(static_cast<uintptr_t>(name)));
+}
+
+// 1 when the library was built with the port fixes (the module then compares every line that is not empty, '/' or not, against the command
+// the fix builds without the parser).
+int32_t tpw_cocig_portfix() {
+    return 0;
 }
 
 void tpw_cocig_UpdateUserList(uint64_t self) {

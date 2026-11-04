@@ -181,6 +181,7 @@ uint32_t CLBScreenComponentAdvisor::ProcessCancel() { return 0; }
 FAKE_SCREEN(CLBScreenComponentThemeIslands, 1)
 void CLBScreenComponentThemeIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/game/online/lobby_island.cpp)
 FAKE_SCREEN(CLBScreenComponentOnlineIslands, 2)
+void CLBScreenComponentOnlineIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/game/online/lobby_island.cpp)
 FAKE_SCREEN(CLBScreenComponentDownloadGlobe, 3)
 void CLBScreenComponentDownloadGlobe::Init() {}
 FAKE_SCREEN(CLBScreenComponentPublishGlobe, 4)

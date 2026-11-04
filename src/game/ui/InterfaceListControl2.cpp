@@ -886,9 +886,10 @@ namespace {
 // labs of the C library: the most negative number stays as it is (wrapping negation).
 int32_t MacLabs(int32_t value) { return value < 0 ? -value : value; }
 
-// The data word of the entry at `index`: the word after the entry's own (the original reads storage + 4 * index + 4).
+// The data word of the entry at `index`: the word after the entry's own, kLCData (the original reads storage + 4 * index + 4,
+// its words being 4 bytes; the host's are LCWord, so the word is read as GetData reads it).
 int32_t EntryData(const uint8_t* storage, int32_t index) {
-    return *reinterpret_cast<const int32_t*>(storage + index * 4 + 4);
+    return reinterpret_cast<const LCWord*>(storage)[index + kLCData].mInt;
 }
 
 }  // namespace

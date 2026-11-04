@@ -9,6 +9,8 @@
 #include "RenderContextDepthCircles.h"
 #include "TpwPropFont.h"
 
+#include <cstring>
+
 // Units w234-w238: indexed and true-colour drawing primitives from TbSystemInfo.cpp and Draw.cpp.
 
 namespace {
@@ -21,6 +23,10 @@ uint32_t ShiftLeft(uint32_t value, int16_t shift) {
     const uint32_t amount = uint16_t(shift) & 63;
     return amount < 32 ? value << amount : 0;
 }
+
+// A 16-bit pixel as the engine keeps it: a host-order word, as TbRaConvert.cpp's Store16 and the font writers store it
+// and COpenGLTexture::Download reads it (the Mac's sth stored it in its own big-endian order).
+void Store16(uint8_t* destination, uint16_t value) { std::memcpy(destination, &value, sizeof(value)); }
 
 uint16_t Pack16(uint32_t colour) {
     const auto channel = [colour](const TbMaskInfo& caps) {
@@ -346,7 +352,7 @@ void RenderContext32::LbDraw_OneColourSprite(int32_t x,int32_t y,const TbSprite*
 }
 void RenderContext16::LbDraw_Pixel(int32_t x, int32_t y, TbColour colour) {
     const uint16_t value = Pack16(ColourWord(colour));
-    Pixel<2>(x, y, [value](uint8_t* d) { d[0] = uint8_t(value >> 8); d[1] = uint8_t(value); });
+    Pixel<2>(x, y, [value](uint8_t* d) { Store16(d, value); });
 }
 
 void RenderContext16::LbDraw_Rectangle(const TbRect& rect, TbColour colour) {
@@ -354,21 +360,21 @@ void RenderContext16::LbDraw_Rectangle(const TbRect& rect, TbColour colour) {
     else LbDraw_RectangleOutline(rect, colour);
 }
 void RenderContext16::LbDraw_RectangleOutline(const TbRect& rect, TbColour colour) {
-    const uint16_t v=Pack16(ColourWord(colour)); RectangleOutline<2>(rect,[v](uint8_t*d){d[0]=uint8_t(v>>8);d[1]=uint8_t(v);});
+    const uint16_t v=Pack16(ColourWord(colour)); RectangleOutline<2>(rect,[v](uint8_t*d){Store16(d,v);});
 }
 void RenderContext16::LbDraw_Line(int32_t x0, int32_t y0, int32_t x1, int32_t y1, TbColour colour) {
     const uint16_t value = Pack16(ColourWord(colour));
-    Line<2>(x0, y0, x1, y1, [value](uint8_t* d) { d[0] = uint8_t(value >> 8); d[1] = uint8_t(value); });
+    Line<2>(x0, y0, x1, y1, [value](uint8_t* d) { Store16(d, value); });
 }
 
 void RenderContext16::LbDraw_HorizontalLine(int32_t x, int32_t y, int32_t length, TbColour colour) {
     const uint16_t value = Pack16(ColourWord(colour));
-    HorizontalLine<2>(x, y, length, [value](uint8_t* d) { d[0] = uint8_t(value >> 8); d[1] = uint8_t(value); });
+    HorizontalLine<2>(x, y, length, [value](uint8_t* d) { Store16(d, value); });
 }
 
 void RenderContext16::LbDraw_VerticalLine(int32_t x, int32_t y, int32_t length, TbColour colour) {
     const uint16_t value = Pack16(ColourWord(colour));
-    VerticalLine<2>(x, y, length, [value](uint8_t* d) { d[0] = uint8_t(value >> 8); d[1] = uint8_t(value); });
+    VerticalLine<2>(x, y, length, [value](uint8_t* d) { Store16(d, value); });
 }
 
 void RenderContext16::LbDraw_Circle(int32_t x, int32_t y, uint32_t radius, TbColour colour) {
@@ -379,53 +385,50 @@ void RenderContext16::LbDraw_Circle(int32_t x, int32_t y, uint32_t radius, TbCol
 void RenderContext16::LbDraw_CircleOutline(int32_t x, int32_t y, uint32_t radius, TbColour colour) {
     const uint16_t value = Pack16(ColourWord(colour));
     CircleOutline<2>(x, y, radius, [value](uint8_t* destination) {
-        destination[0] = static_cast<uint8_t>(value >> 8);
-        destination[1] = static_cast<uint8_t>(value);
+        Store16(destination, value);
     });
 }
 
 void RenderContext16::LbDraw_CircleFilled(int32_t x, int32_t y, uint32_t radius, TbColour colour) {
     const uint16_t value = Pack16(ColourWord(colour));
     CircleFilled<2>(x, y, radius, [value](uint8_t* destination) {
-        destination[0] = static_cast<uint8_t>(value >> 8);
-        destination[1] = static_cast<uint8_t>(value);
+        Store16(destination, value);
     });
 }
 
 void RenderContext16::LbDraw_Triangle(int32_t x0,int32_t y0,int32_t x1,int32_t y1,int32_t x2,int32_t y2,TbColour colour) {
-    const uint16_t v=Pack16(ColourWord(colour)); Triangle<2>(x0,y0,x1,y1,x2,y2,[v](uint8_t*d){d[0]=uint8_t(v>>8);d[1]=uint8_t(v);});
+    const uint16_t v=Pack16(ColourWord(colour)); Triangle<2>(x0,y0,x1,y1,x2,y2,[v](uint8_t*d){Store16(d,v);});
 }
 void RenderContext16::LbDraw_ClearClipWindow(TbColour colour) {
     const uint16_t value = Pack16(uint32_t(colour.mAlpha) << 24 | uint32_t(colour.mRed) << 16 |
                                   uint32_t(colour.mGreen) << 8 | colour.mBlue);
     ClearClipWindow<2>([value](uint8_t* destination) {
-        destination[0] = static_cast<uint8_t>(value >> 8);
-        destination[1] = static_cast<uint8_t>(value);
+        Store16(destination, value);
     });
 }
 
 void RenderContext16::LbDraw_RectangleFilled(const TbRect& rect, TbColour colour) {
     const uint16_t value = Pack16(ColourWord(colour));
-    RectangleFilled<2>(rect, [value](uint8_t* d) { d[0] = uint8_t(value >> 8); d[1] = uint8_t(value); });
+    RectangleFilled<2>(rect, [value](uint8_t* d) { Store16(d, value); });
 }
 
 void RenderContext16::LbDraw_PropText(int32_t x,int32_t y,const char* text,TbColour colour) {
     const uint32_t w=uint32_t(colour.mAlpha)<<24|uint32_t(colour.mRed)<<16|uint32_t(colour.mGreen)<<8|colour.mBlue;
-    const uint16_t v=Pack16(w); PropText<2>(x,y,text,[v](uint8_t*d){d[0]=uint8_t(v>>8);d[1]=uint8_t(v);});
+    const uint16_t v=Pack16(w); PropText<2>(x,y,text,[v](uint8_t*d){Store16(d,v);});
 }
 void RenderContext16::LbDraw_UnicodePropText(int32_t x,int32_t y,const char16_t* text,TbColour colour) {
     const uint32_t w=uint32_t(colour.mAlpha)<<24|uint32_t(colour.mRed)<<16|uint32_t(colour.mGreen)<<8|colour.mBlue;
-    const uint16_t v=Pack16(w); PropText<2>(x,y,text,[v](uint8_t*d){d[0]=uint8_t(v>>8);d[1]=uint8_t(v);});
+    const uint16_t v=Pack16(w); PropText<2>(x,y,text,[v](uint8_t*d){Store16(d,v);});
 }
 
 void RenderContext16::LbDraw_Sprite(int32_t x,int32_t y,const TbSprite* sprite) {
     SpritePixels<2>(x,y,*sprite,[](uint8_t*d,uint8_t index){
         const uint8_t*p=reinterpret_cast<const uint8_t*>(&_lbGlobalPalette)+uint32_t(index)*4;
         const uint16_t v=Pack16(0xff000000u|uint32_t(p[0])<<16|uint32_t(p[1])<<8|p[2]);
-        d[0]=uint8_t(v>>8);d[1]=uint8_t(v);
+        Store16(d,v);
     });
 }
 void RenderContext16::LbDraw_OneColourSprite(int32_t x,int32_t y,const TbSprite* sprite,TbColour colour) {
     const uint32_t w=uint32_t(colour.mAlpha)<<24|uint32_t(colour.mRed)<<16|uint32_t(colour.mGreen)<<8|colour.mBlue;
-    const uint16_t v=Pack16(w); OneColourSpritePixels<2>(x,y,*sprite,[v](uint8_t*d){d[0]=uint8_t(v>>8);d[1]=uint8_t(v);});
+    const uint16_t v=Pack16(w); OneColourSpritePixels<2>(x,y,*sprite,[v](uint8_t*d){Store16(d,v);});
 }

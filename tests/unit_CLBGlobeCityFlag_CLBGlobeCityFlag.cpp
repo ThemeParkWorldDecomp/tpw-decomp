@@ -45,17 +45,20 @@ alignas(16) uint8_t gFlagBuf[64];
 alignas(16) uint8_t gCityBuf[0x68];
 char16_t gNameBuf[40];
 
-class FakeGlobe : public CLBGlobeFlagOwner {
-public:
-    void AddFlag(CLBGlobeCityFlag* flag) override { ev("vcall", {lab(this), lab(flag), 0x40}); }
-    void RemoveFlag(CLBGlobeCityFlag* flag) override { ev("vcall", {lab(this), lab(flag), 0x44}); }
-};
-FakeGlobe gGlobe;
+alignas(16) uint8_t gGlobe[16];
 
 }  // namespace
 
+// The globe's slots 0x40 and 0x44 (the Mac's virtual calls through the globe's vtable).
+void GlobeRegisterFlag(const CLBScreenComponentOnlineGlobe* globe, CLBGlobeCityFlag* flag) {
+    ev("vcall", {lab(globe), lab(flag), 0x40});
+}
+void GlobeUnRegisterFlag(const CLBScreenComponentOnlineGlobe* globe, CLBGlobeCityFlag* flag) {
+    ev("vcall", {lab(globe), lab(flag), 0x44});
+}
+
 int32_t NS_MacDoze::_wcsicmp(const char16_t* a, const char16_t* b) {
-    ev("wcsicmp", {HashW(a), b != nullptr ? 1 : 0});
+    ev("wcsicmp", {HashW(a), HashW(b)});
     return static_cast<int32_t>(ret("wcsicmp"));
 }
 
@@ -90,7 +93,7 @@ uint64_t tpw_cf_addr(const char* name) {
     };
     const Entry entries[] = {
         {"meshes", gMeshesBuf}, {"mesh", gMeshBuf}, {"flag", gFlagBuf}, {"city", gCityBuf},
-        {"globe", &gGlobe},     {"name", gNameBuf}, {"gLobbyMeshes", &gLobbyMeshes},
+        {"globe", gGlobe},      {"name", gNameBuf}, {"gLobbyMeshes", &gLobbyMeshes},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));
@@ -114,7 +117,7 @@ int32_t tpw_cf_layout(int64_t* out) {
 
 // The constructor on the static flag buffer; answers the object.
 uint64_t tpw_cf_ctor() {
-    auto* globe = reinterpret_cast<const CLBScreenComponentOnlineGlobe*>(static_cast<CLBGlobeFlagOwner*>(&gGlobe));
+    auto* globe = reinterpret_cast<const CLBScreenComponentOnlineGlobe*>(gGlobe);
     auto* city = reinterpret_cast<const CFSOnlineCity*>(gCityBuf);
     CLBGlobeCityFlag* flag = new (gFlagBuf) CLBGlobeCityFlag(globe, city);
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(flag));
@@ -130,7 +133,7 @@ void tpw_cf_prep() {
     std::memset(city, 0, sizeof(city));
     reinterpret_cast<CFSOnlineCity*>(city)->mName = gNameBuf;
     CLBGlobeCityFlag* f = new (scratch) CLBGlobeCityFlag(
-        reinterpret_cast<const CLBScreenComponentOnlineGlobe*>(static_cast<CLBGlobeFlagOwner*>(&gGlobe)),
+        reinterpret_cast<const CLBScreenComponentOnlineGlobe*>(gGlobe),
         reinterpret_cast<const CFSOnlineCity*>(city));
     std::memcpy(&gSavedVptr, f, 8);
 }
@@ -143,6 +146,12 @@ uint64_t tpw_cf_dtor(int32_t isNull, int16_t flag) {
     p->~CLBGlobeCityFlag();
     if (flag > 0) ev("delete", {lab(p)});
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(p));
+}
+
+// 1 when the library was built with the port fixes (the module then expects the flag's height to start at 0.05, port_fix tag
+// globeflag).
+int32_t tpw_cf_portfix() {
+    return 0;
 }
 
 }  // extern "C"

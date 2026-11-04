@@ -6,6 +6,6 @@ set(TPW_UNIT_CLBScreenComponentOnlineIslands_GotoNextIsland_KEEP
   __ZN31CLBScreenComponentOnlineIslands19SelectCurrentIslandEv   # CLBScreenComponentOnlineIslands::SelectCurrentIsland()
   __ZN31CLBScreenComponentOnlineIslands20DownloadFailFunctionEv   # CLBScreenComponentOnlineIslands::DownloadFailFunction()
   __ZN31CLBScreenComponentOnlineIslands21HandleOnlineBacktrackEv   # CLBScreenComponentOnlineIslands::HandleOnlineBacktrack()
-  __ZN31CLBScreenComponentOnlineIslands24EnterCurrentIslandOnlineEv   # CLBScreenComponentOnlineIslands::EnterCurrentIslandOnline()
+  __ZN31CLBScreenComponentOnlineIslands18EnterCurrentIslandEv   # CLBScreenComponentOnlineIslands::EnterCurrentIsland()
   __ZN31CLBScreenComponentOnlineIslands4TickEv   # CLBScreenComponentOnlineIslands::Tick()
 )

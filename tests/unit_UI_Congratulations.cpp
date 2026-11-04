@@ -334,6 +334,14 @@ void tpw_u5022_cong(uint64_t object) {
 }
 void tpw_u5022_bank(uint64_t object) { UI_Bankrupt(reinterpret_cast<CObject*>(object)); }
 void tpw_u5022_sinit() { __sinit_ui_main_cpp(); }
+
+// The unit space (the port's widescreen and interface size); 0 when the library is built without the port fixes.
+int32_t tpw_u5022_units(int32_t width, int32_t height) {
+    (void)width;
+    (void)height;
+    return 0;
+}
+
 int32_t tpw_u5022_msg(uint64_t window, int32_t message, int32_t a, int32_t b) {
     return CongratsWindowMsg(reinterpret_cast<InterfaceWindow*>(window), message, a, b);
 }

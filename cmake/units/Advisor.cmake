@@ -1,6 +1,6 @@
 set(TPW_UNIT_Advisor src/game/advisor/Advisor.cpp src/game/TPCamera.cpp src/game/advisor/TPAdvisor.cpp
     src/game/TPEmbed.cpp src/game/TPMesh.cpp src/game/rides/RideAnim.cpp src/game/LMatrix.cpp src/game/Sound.cpp
-    src/game/park/ParkSound.cpp src/game/Light.cpp ${TPW_GENERATED_DIR}/advisor_lines.cpp platform/arena.cpp)
+    src/game/park/ParkSound.cpp src/game/Light.cpp tables/advisor_lines.cpp platform/arena.cpp)
 set(TPW_UNIT_Advisor_KEEP
   __Z10ADV_GetTag15AdvisorResponse   # ADV_GetTag(AdvisorResponse)
   __Z11ADV_UnPausev   # ADV_UnPause()

@@ -566,7 +566,7 @@ CellTag CurrentCell() {
 template <class T>
 void MakeStaff(uint32_t size) {
     CellTag cell = CurrentCell();
-    void* memory = online_callee::OperatorNew(size);
+    void* memory = keyaction_callee::OperatorNew(size);
     if (memory) new (memory) T(cell);
 }
 }  // namespace
@@ -574,7 +574,7 @@ void MakeStaff(uint32_t size) {
 // 0x1014dbf4 (136 bytes)
 int32_t spawn_person() {
     if (gGameWorld->ParkGates_GetStatus() == 1) {
-        void* memory = online_callee::OperatorNew(0x22c);
+        void* memory = keyaction_callee::OperatorNew(0x22c);
         if (memory) {
             CellTag cell = CurrentCell();
             new (memory) CPerson(cell);
@@ -589,7 +589,7 @@ int32_t spawn_person() {
 int32_t spawn_five_persons() {
     if (gGameWorld->ParkGates_GetStatus() == 1) {
         for (int32_t i = 0; i < 5; i++) {
-            void* memory = online_callee::OperatorNew(0x22c);
+            void* memory = keyaction_callee::OperatorNew(0x22c);
             if (memory) {
                 CellTag cell = CurrentCell();
                 new (memory) CPerson(cell);
@@ -655,15 +655,15 @@ int32_t spawn_guard() {
 // 0x1014e138 (232 bytes): the cell is read once, before the first allocation
 int32_t spawn_bag_o_staff() {
     CellTag cell = CurrentCell();
-    void* memory = online_callee::OperatorNew(0x214);
+    void* memory = keyaction_callee::OperatorNew(0x214);
     if (memory) new (memory) CGuard(cell);
-    memory = online_callee::OperatorNew(0x214);
+    memory = keyaction_callee::OperatorNew(0x214);
     if (memory) new (memory) CResearcher(cell);
-    memory = online_callee::OperatorNew(0x218);
+    memory = keyaction_callee::OperatorNew(0x218);
     if (memory) new (memory) CMechanic(cell);
-    memory = online_callee::OperatorNew(0x218);
+    memory = keyaction_callee::OperatorNew(0x218);
     if (memory) new (memory) CHandyman(cell);
-    memory = online_callee::OperatorNew(0x214);
+    memory = keyaction_callee::OperatorNew(0x214);
     if (memory) new (memory) CEntertainer(cell);
     return 1;
 }

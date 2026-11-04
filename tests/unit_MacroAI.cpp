@@ -25,6 +25,7 @@
 #include "ObjectParts.h"
 #include "ParkTime.h"
 #include "StaffDB.h"
+#include "ThingReceivers.h"
 #include "UIInterface.h"
 #include "World.h"
 #include "WorldSavvy.h"

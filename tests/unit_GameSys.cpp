@@ -646,6 +646,10 @@ COnlineControl::COnlineControl() {
     ev("COnlineControl", {newlab(this)});
     mClientReady = 0;
 }
+// The class's own allocator (the arena in the game) is the global one here.
+void* COnlineControl::operator new(std::size_t size) { return ::operator new(size); }
+void* COnlineControl::operator new(std::size_t size, const std::nothrow_t& tag) noexcept { return ::operator new(size, tag); }
+void COnlineControl::operator delete(void* block) noexcept { ::operator delete(block); }
 COnlineControl::~COnlineControl() { ev("~COnlineControl", {lab(this)}); }
 void COnlineControl::InitClient() { ev("COnlineControl::InitClient", {lab(this)}); }
 void COnlineControl::InitGameWorld() { ev("COnlineControl::InitGameWorld", {lab(this)}); }

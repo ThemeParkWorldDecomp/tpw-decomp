@@ -27,7 +27,7 @@ OSTREAM = 0x10226C94
 FILEBUF = 0x10226EF4
 
 ADDR = dict(gOfsWVtbl=0x102B1F50, gIfsWVtblE=0x102B1F20, gIosBaseVt=0x103BD034)
-HOST_LAYOUT = [8, 0x48]
+HOST_LAYOUT = [8, 0x44, 0x60, 0xB8]
 
 STUBS = CL.Stubs()
 STUBS.real.update(OWN)
@@ -96,15 +96,15 @@ class Host(Side):
     fmt = "<I"
     pfmt = "<Q"
     psize = 8
-    slot_off, ios_off, base_off = 8, 0x38, 0x48
-    fb_off = 0x10
+    slot_off, ios_off, base_off = 8, 0xB8, 0x44
+    fb_off = 0x60
 
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
         self.obj = lib.tpw_ofs_alloc(0x200)
         self.other = lib.tpw_ofs_alloc(0x100)
-        CL.host_begin(lib, {1: self.obj, 2: self.obj + 0x10}, case["queues"])
+        CL.host_begin(lib, {1: self.obj, 2: self.obj + self.fb_off}, case["queues"])
 
     def done(self):
         pass
@@ -161,9 +161,9 @@ def observe(s, case):
         "mios_is_ios": mios == ios,
         "mios_is_other": mios == s.other,
         "slot": rd_ptr(s, s.obj + s.slot_off) - vt,
-        "ios_vt": rd_ptr(s, mios) - vt,
+        "ios_vt": T.s32((s.rd_word(mios) - vt) & MASK),
         "base": T.s32(s.rd_word(mios + s.base_off)) - (ios - mios),
-        "ios_part": rd_ptr(s, ios) if not (case["flag"] & 0xFFFF) else 0,
+        "ios_part": s.rd_word(ios) if not (case["flag"] & 0xFFFF) else 0,
     }
 
 

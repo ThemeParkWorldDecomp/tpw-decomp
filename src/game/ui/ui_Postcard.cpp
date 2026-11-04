@@ -184,7 +184,7 @@ InterfaceWindow* gAddressBookPanel;        // 0x103956f8, original name unknown
 char16_t gAddressEditText[0x40];           // 0x10394ba6, original name unknown: the edit box's text (capacity 0x3f)
 char16_t gAddressRemoveName[0x40];         // 0x10394b24, original name unknown: the address the removal dialog names
 
-// 0x102ac1e6: the panel's script, the image's 184 words (generated at configure time, unit v5L42).
+// 0x102ac1e6: the panel's script, the image's 184 words (include/WindowScripts.inc, unit v5L42).
 int16_t gAddressBookDescription[] = {TPW_WINDOW_SCRIPT_102AC1E6};
 
 // 0x1024e1e1: "%ls" and, 4 bytes on, "hilight" (the selection and cursor draw object's name).

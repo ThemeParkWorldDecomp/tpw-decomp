@@ -121,6 +121,11 @@ int32_t BthreadCreate(void* (*fn)(void*), FTPClient* arg) {
     ev("bthread_create", {I(fn == &FTPClient::_threadfn), lab(arg)});
     return static_cast<int32_t>(ret("bthread_create"));
 }
+// No online server is set: the client does its own work, as on the Mac.
+bool PortFTPConnect(FTPClient*, const char*, const char*) { return false; }
+bool PortFTPDownload(FTPClient*, const char*, const char*) { return false; }
+bool PortFTPDisconnect(FTPClient*) { return false; }
+void PortFTPEnd(FTPClient*) {}
 }  // namespace ftp_callee
 
 extern "C" {

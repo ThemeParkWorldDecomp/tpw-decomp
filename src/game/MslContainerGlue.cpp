@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstring>
 #include <new>
+#include <string>
 
 #include "FS_MasterSave.h"
 #include "FS_Online.h"
@@ -20,7 +21,10 @@
 #include "online.h"
 #include "platform/arena.h"
 #include "platform/msl.h"
+#include "platform/online_slots.h"
 #include "std_basic_filebuf.h"
+#include "std_basic_ifstream.h"
+#include "std_basic_istream.h"
 #include "std_cdeque.h"
 #include "std_deque_errorthingy.h"
 #include "ui_ime.h"
@@ -97,6 +101,10 @@ void errdeque_callee::CdequeResize(void* cdeque, uint32_t n, const void* fill) {
 
 // 0x101f492c std::__cdeque<const void*>::max_size.
 uint32_t cdeque_callee::MaxSize(const Cdeque* self) { return self->max_size(); }
+
+// 0x102384b8 for the block table of reserve (a 32-bit word holds its address) and for grow_buf_back's blocks of the argument deque.
+void* cdeque_callee::TableNew(uint32_t size) { return ArenaNew(size); }
+void* argdeque_callee::OperatorNew(uint32_t size) { return ArenaNew(size); }
 
 // 0x101f5d6c: the iterator copy, three words; answers the destination.
 MslErrorDequeCursor* errdeque_callee::CursorCopy(MslErrorDequeCursor* dst, const MslErrorDequeCursor* src) {
@@ -184,12 +192,22 @@ void ignore_callee::TreeIncrement(uint32_t* node) {
     *node = current;
 }
 
-// char strings (MslCharString, host layout) 0x101b2440 and 0x1020100c.
-void ignore_callee::CharStringAssign(void* self, const char* text, uint32_t count) {
-    msl_char_string::assignChars(static_cast<MslCharString*>(self), text, count);
+// char strings 0x101b2440 assign and 0x1020100c append, on the string slot their callers made with online_callee::StringCtor
+// (include/platform/online_slots.h). Read as a host MslCharString before, the slot's arena offset was taken for a pointer.
+namespace {
+void ReplaceCharSlot(void* self, const std::string& text) {
+    const uint32_t made = tpw::slots::MakeNarrow(text.data(), text.size());
+    tpw::slots::Release(self);
+    std::memcpy(self, &made, sizeof(made));
 }
+}  // namespace
+void ignore_callee::CharStringAssign(void* self, const char* text, uint32_t count) { ReplaceCharSlot(self, std::string(text, count)); }
 void ignore_callee::CharStringAppend(void* self, const char* text, uint32_t count) {
-    msl_char_string::appendChars(static_cast<MslCharString*>(self), text, count);
+    uint32_t word;
+    std::memcpy(&word, self, sizeof(word));
+    std::string joined(tpw::slots::NarrowText(word), tpw::slots::Length(word));
+    joined.append(text, count);
+    ReplaceCharSlot(self, joined);
 }
 
 // operator new[] 0x10238668, strcpy 0x10238410 and the reference counted character pointer constructor 0x100026ac.
@@ -274,4 +292,40 @@ uint32_t ignore_callee::FilebufClose(IgnoreFilebuf* filebuf) {
 }
 void ignore_callee::FilebufDtor(IgnoreFilebuf* filebuf, int16_t flag) {
     reinterpret_cast<BasicFilebufWchar*>(filebuf)->destroy(flag);
+}
+
+extern char gIosBaseVt[];   // 0x103bd034 data import __vt__Q23std8ios_base
+
+// basic_ifstream<wchar_t>() 0x10221e20 (BasicIfstreamWchar::construct, the Mac's words of one object) on the stream part of an
+// IgnoreFstream: the ios part's stream buffer word is the filebuf's arena offset, so the stream reads through the filebuf the
+// caller opens. A stand-in left the stream without a buffer before, so every read failed at once.
+void ignore_callee::IfstreamCtor(IgnoreStream* stream, int32_t flag) {
+    IgnoreFstream* object = FstreamOf(stream);
+    if (static_cast<int16_t>(flag) != 0) {
+        stream->mIos = &object->mIos;
+        object->mIos.mVtable = VtableWord(gIosBaseVt);
+        object->mIos.mVtable = VtableWord(gIfsWVtblE);
+    }
+    ifstream_callee::IstreamCtor(stream, 0, &object->mFilebuf);   // basic_istream(streambuf* = this + 0xc), flag 0
+    reinterpret_cast<WideIstream*>(stream)->mVtable = gIfsWVtblB;
+    stream->mIos->mVtable = VtableWord(gIfsWVtblB) + 0xc;
+    stream->mIos->mBaseOffset =
+        static_cast<int32_t>(reinterpret_cast<intptr_t>(&object->mIos) - reinterpret_cast<intptr_t>(stream->mIos));
+    ifstream_callee::FilebufCtor(&object->mFilebuf, nullptr);   // basic_filebuf(FILE* = NULL)
+}
+
+// basic_ostream<wchar_t>(streambuf*) 0x10226c94 (WostreamConstruct, the Mac's words) on an IgnoreStream, as the ofstream
+// constructor calls it (flag 0: the virtual base is the ofstream's own ios part, already set). The ios part's stream buffer word
+// is the filebuf's arena offset.
+void ignore_callee::WostreamCtor(void* self, int32_t flag, void* streambuf) {
+    (void)flag;   // the ofstream constructor passes 0; nothing builds a standalone wide ostream on these objects
+    IgnoreStream* stream = static_cast<IgnoreStream*>(self);
+    stream->mSlot = gWostreamVtbl;
+    IgnoreIos* ios = stream->mIos;
+    ios->mVtable = VtableWord(gWostreamVtbl) + 0xc;
+    ios->mBaseOffset = static_cast<int32_t>(reinterpret_cast<intptr_t>(stream->mRest) - reinterpret_cast<intptr_t>(ios));
+    wistream_callee::IosInit(ios, tpw::ArenaOffset(streambuf));
+    std::memset(&ios->mPad3c[0], 0, 4);          // 0x3c the tie
+    const char16_t fill = wistream_callee::Widen(ios, ' ');
+    std::memcpy(&ios->mPad3c[4], &fill, 2);      // 0x40 the fill
 }

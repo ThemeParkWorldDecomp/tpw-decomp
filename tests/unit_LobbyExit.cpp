@@ -454,7 +454,7 @@ int32_t RunGlobe(const int64_t* d, int64_t* out) {
         if (entry != nullptr) tpw_cl_label(kEntry + i, entry);
     }
     for (int32_t i = 0; i < flags; ++i) {
-        CLBGlobeCityFlag* entry = d[4 + globes + i] != 0 ? new CityEntry : nullptr;
+        CLBGlobeCityFlag* entry = d[4 + globes + i] != 0 ? ::new CityEntry : nullptr;   // the global allocator the heap counts (the flag class allocates in the arena)
         cityList->AddTail(entry);
         if (entry != nullptr) tpw_cl_label(kEntry + 40 + i, entry);
     }

@@ -39,7 +39,6 @@
 #include "World.h"
 #include <cstddef>
 #include <cstdint>
-#include <dlfcn.h>
 #include <new>
 
 // ui_mainpanel2.cpp (main app), unit v5183: LoadPanelMsg 0x101a2bdc, UI_HirePanelStateChange 0x101a2a14, SavePanelMsg 0x101a2df4.
@@ -180,14 +179,11 @@ char gLoadSaveHilight[8] = "hilight";
 char16_t gLoadSaveFormat[0x40] = {'%', 'l', 's', ' ', '%', '0', '2', 'd', ':', '%', '0', '2', 'd', 0, 0, 0, 0, 0,
                                   '\\', '/', ':', '*', '?', '"', '<', '>', '|', 0};
 
-// The real constructor, named by its symbol and weakly so the unit's test library (which fakes CursorPosCtor) links without it.
-// (looked up at run time).
-// Weak: the test library defines the recording fakes.
-__attribute__((weak)) void loadsave_callee::CursorPosCtor(void* mem) {
-    using Ctor = void (*)(void*, void*);
-    static Ctor ctor = reinterpret_cast<Ctor>(dlsym(RTLD_DEFAULT, "_ZN34InterfaceCursorPosTextObjectSpriteC1EPv"));
-    if (ctor != nullptr) ctor(mem, nullptr);
-}
+// The real constructor, called directly: a dlsym of its symbol finds nothing in a Linux launcher (which exports none of its own
+// symbols), and the name box then had an object no constructor had run on, so Save crashed. Weak: the unit's test library
+// defines the recording fake (and the slice leaves this one out, cmake/units/CreateLoadPanel_2.cmake).
+static_assert(sizeof(InterfaceCursorPosTextObjectSprite) <= 0x400, "lender_callee::OperatorNew hands out 0x400 bytes at least");
+__attribute__((weak)) void loadsave_callee::CursorPosCtor(void* mem) { new (mem) InterfaceCursorPosTextObjectSprite(nullptr); }
 __attribute__((weak)) void loadsave_callee::FileTimeToLocal(const void* in, void* out) {
     // The Mac's glue converts to local time; no time zone is modelled here, so the stamp is copied.
     *static_cast<NS_MacDoze::tagFILETIME*>(out) = *static_cast<const NS_MacDoze::tagFILETIME*>(in);

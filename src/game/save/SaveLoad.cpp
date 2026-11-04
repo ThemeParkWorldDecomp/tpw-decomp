@@ -414,7 +414,12 @@ constexpr uint32_t kTraceSaveLoad = 0x499602d2;
 // every path (the disc file's destructor closes it).
 //
 // Quirks kept: the open test is the debug word's (see SaveLoad.h); a block that is not a zlib block is released with delete[]
-// instead of the allocator's Free; the CTRACE of a short read is made before the packed buffer is freed.
+// instead of the allocator's Free (with the port fixes, Free); the CTRACE of a short read is made before the packed buffer is freed.
+//
+// With the port fixes (parkload) the reader does not trust the file's sizes: what is left after the header must be 1 to
+// kPortMaxPackedSave bytes and the block's unpacked size 1 to kPortMaxUnpackedSave bytes, the block is unpacked from the bytes
+// read into exactly its declared size (LbZLib_PortMemDecompressChecked), and a block that does not unpack fails the load (6).
+// A file with less than a block header left fails so too (truncsave), and both failures write a line to the log.
 int32_t CSaveLoad::Load(const char* path, CSaveLoadHeader* header, LoadType type) {
     GAME_ASSERTMSG(type != kLoadHeaderOnly || header != nullptr,
                    "Cannot have a header-only load but supply no header pointer\n");
@@ -854,12 +859,13 @@ uint32_t KeyWordAsLoadedOnTheMac(uint32_t raw) {
 // count is not the length asked for; a failed read answers 0 and leaves mError alone. `type` 2 (a park of the player's folder) lets the
 // ride database leave out its preview rides.
 //
-// Quirks kept: the language byte is not range checked (the table has 7 texts); the text is compared as a NUL terminated string and the
-// original does not terminate it (the host buffer has one more unit, 0, so a text with no 0 is compared in its 640 units); the text
-// mismatch, a failing Serialise and a failed read leave mError as it was, while a ride record the database cannot satisfy sets 8 and a
-// wrong key 6; gParkRequiredRides is overwritten before the key is read, so it holds the record of a file whose key is wrong; a flag
-// word other than 0 and 1 reads the header too (with a NULL header the original calls Serialise on NULL and crashes); a flag of 0 with a
-// header asks for one the file does not have: the assert reports and the answer is 1 with the header untouched.
+// Quirks kept: the language byte is not range checked (the table has 7 texts; with the port fixes, 7 or more fails as a text that does
+// not match); the text is compared as a NUL terminated string and the original does not terminate it (the host buffer has one more
+// unit, 0, so a text with no 0 is compared in its 640 units); the text mismatch, a failing Serialise and a failed read leave mError as
+// it was, while a ride record the database cannot satisfy sets 8 and a wrong key 6; gParkRequiredRides is overwritten before the key
+// is read, so it holds the record of a file whose key is wrong; a flag word other than 0 and 1 reads the header too (with a NULL
+// header the original calls Serialise on NULL and crashes); a flag of 0 with a header asks for one the file does not have: the assert
+// reports and the answer is 1 with the header untouched.
 int32_t CSaveLoad::LoadHeader(bfl::FileSystem::CFile& file, LoadType type, CSaveLoadHeader* header) {
     void* const handle = &file;
     uint32_t count = 0;

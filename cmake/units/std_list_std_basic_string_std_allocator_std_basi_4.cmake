@@ -13,7 +13,6 @@ set(TPW_UNIT_std_list_std_basic_string_std_allocator_std_basi_4_KEEP
   __ZN13ParkThemeTree8DestructEPS_s   # ParkThemeTree::Destruct(ParkThemeTree*, short)
   __ZN13indent_callee6AdjustEPvssss   # indent_callee::Adjust(void*, short, short, short, short)
   __ZN13indent_callee8RectDtorEPvs   # indent_callee::RectDtor(void*, short)
-  __ZN15parklist_callee7NewParkEPK10ccParkInfoP23CFSOnlineSystemParkList   # parklist_callee::NewPark(ccParkInfo const*, CFSOnlineSystemParkList*)
   __ZN17masterlist_callee11WStringDtorEPvs   # masterlist_callee::WStringDtor(void*, short)
   __ZN17masterlist_callee14OperatorDeleteEPv   # masterlist_callee::OperatorDelete(void*)
   __ZN18fontwrapper_callee12GetCharIndexEP7TbIFontRPKh   # fontwrapper_callee::GetCharIndex(TbIFont*, unsigned char const*&)

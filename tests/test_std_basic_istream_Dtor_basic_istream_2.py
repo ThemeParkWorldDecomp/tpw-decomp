@@ -38,13 +38,13 @@ PTRGLUE, IOSINIT, IOSDTOR, DELETE = 0x1023BAA8, 0x10238968, 0x10238950, 0x102382
 STRLEN, NEWARR, NEW, STRCPY, THROW = 0x10238650, 0x10238668, 0x102384B8, 0x10238410, 0x10238680
 
 ADDR = dict(A=0x102B1E04, E=0x102B1F20, FV=0x1029D084, FD=0x102661D0)
-HOST_LAYOUT = [8, 0x10, 0x18, 0x28, 0x38, 0x3C, 0x40, 0x48]
+HOST_LAYOUT = [8, 0x10, 0x18, 0x24, 0x34, 0x38, 0x3C, 0x44]
 PEEK, BUMP = 0xA028, 0xA02C
 FAIL_TYPE = b"!std::exception!!std::ios_base::failure!!"
 FAIL_TEXT = b"ios_base failure in clear"
 
 PPC_OFF = dict(gc=4, vt=8, part=0xC, sbuf=0x24, state=0x34, exc=0x38, f3c=0x3C, fill=0x40, base=0x44)
-HOST_OFF = dict(gc=8, vt=0x10, part=0x18, sbuf=0x28, state=0x38, exc=0x3C, f3c=0x40, fill=0x44, base=0x48)
+HOST_OFF = dict(gc=8, vt=0x10, part=0x18, sbuf=0x24, state=0x34, exc=0x38, f3c=0x3C, fill=0x40, base=0x44)
 
 
 def tcode(b):
@@ -200,6 +200,14 @@ class Side:
                 return (name, v - g)
         return ("raw", v)
 
+    def symw(self, v):
+        """sym for an ios block's vtable word (4 bytes on both sides: the low word of the table's address)."""
+        for name in ADDR:
+            g = self.g(name) & MASK
+            if g <= v < g + 0x20:
+                return (name, v - g)
+        return ("raw", v)
+
     def plabel(self, v):
         for name, a in (("part", self.part), ("other", self.other), ("o", self.o)):
             if v == a:
@@ -323,7 +331,7 @@ def build(s, case):
     s.words(o + P["gc"], [0x13572468])
     s.wp(o + P["vt"], 0x2222)
     for blk in (part, other):
-        s.wp(blk, 0x3333)
+        s.words(blk, [0x3333])
         s.words(blk + P["f3c"], [0x44444444])
         s.halves(blk + P["fill"], [0x5555])
         s.words(blk + P["base"], [0x66666666 + part - blk])
@@ -357,7 +365,7 @@ def observe(s, case, ans):
     d = {"ans": "o" if ans == o else ans, "log": s.log(),
          "mios": s.plabel(s.rp(o)), "gc": s.rd_word(o + P["gc"]), "vt": s.sym(s.rp(o + P["vt"]))}
     for name, blk in (("part", part), ("other", other)):
-        d[name + "_vt"] = s.sym(s.rp(blk))
+        d[name + "_vt"] = s.symw(s.rd_word(blk))
         d[name + "_f3c"] = s.rd_word(blk + P["f3c"])
         d[name + "_fill"] = s.rd_halves(blk + P["fill"], 1)
         d[name + "_base"] = (s.rd_word(blk + P["base"]) - (part - blk)) & MASK

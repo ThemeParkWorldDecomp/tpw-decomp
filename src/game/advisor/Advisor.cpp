@@ -101,7 +101,7 @@ uint32_t RealTimePauseAdjusted() {
 // ADV_UnPause (0x10007d54, 0x10007dd4), ADV_Init and ADV_Close (0x10007e5c, 0x10007fc4), GenerateAnimSequence,
 // SetCannedSequence, SetAdvisorHatHand and DressAdvisor (0x1000804c..0x100087d8), ADV_Tick2 and ADV_Tick (0x100091d8,
 // 0x10009298), and the part that makes him speak: ADV_Call, ADV_Slap, ADV_Kill, ADV_GetTag and ADV_Stat (0x1000887c,
-// 0x10008dd4, 0x10008f00, 0x10009050, 0x100090dc), over the response table of src/advisor_lines.cpp. Not translated
+// 0x10008dd4, 0x10008f00, 0x10009050, 0x100090dc), over the response table of tables/advisor_lines.cpp. Not translated
 // here: the light class that shares the range (src/Light.cpp).
 //
 // The advisor is one animated mesh (slot gAdvisorStore[mWhich], src/TPAdvisor.cpp) in ride animation set group 5. A line
@@ -866,7 +866,7 @@ void CAdvisor::UpdateTurn() {
 
 // AdvisorScoring.cpp (main app of SimTheme Park 2.04b3): the advisor's message scoring, 0x10010054..0x10010f38 and the destructor at
 // 0x1000adb0 (the inventory files it under Advisor.cpp). The constructor loads the advisor's balance table; the ten queries look a
-// message up in the static record table (src/AdvisorScoring_table.cpp) and answer one of its fields, or a number of the message's category in
+// message up in the static record table (tables/AdvisorScoring_table.cpp) and answer one of its fields, or a number of the message's category in
 // the balance table, or run the record's scorer. The scorers themselves (the _ADVISOR_* members) are not here.
 //
 // Every query repeats the original's inlined lookup of a message's record: the two numbers kAdvisorMessageCount and kAdvisorNoMessage
@@ -907,7 +907,7 @@ int32_t CAdvisor::QueueRequest(const CAdvisorRequest& request) {
 // (0x1000b048, 0x1000b1c4, 0x1000c760).
 
 namespace {
-// The slot of the advisor balance table (src/AdvisorBalance_table.cpp, the walk of CBalanceTable::Init) the original reads as the word at
+// The slot of the advisor balance table (tables/AdvisorBalance_table.cpp, the walk of CBalanceTable::Init) the original reads as the word at
 // CAdvisorScoring + 0x32c: 0x14 + 4 * 198, the row "ContextHelpScore" of the heading "HelpMessage".
 constexpr int32_t kContextHelpScoreSlot = 198;
 }  // namespace
@@ -1501,7 +1501,7 @@ void USwapBlock32_long(int32_t* words, int32_t count) { SamsUtilities::_USwapBlo
 }  // namespace v51116_swap
 
 // AdvisorBalance.cpp: CAdvisorBalance, the balance table of data:advisor:advisor.sam (main app, Advisor.cpp 0x1000e93c and 0x1000e98c).
-// The class is only its two virtuals: the description rows (src/AdvisorBalance_table.cpp, generated) and the value slots.
+// The class is only its two virtuals: the description rows (tables/AdvisorBalance_table.cpp, generated) and the value slots.
 
 // 0x1000e93c: the row's description (0x3c bytes a row from 0x1028318c); no bounds test.
 const BalanceDescription* CAdvisorBalance::GetBalanceDescription(int32_t row) {

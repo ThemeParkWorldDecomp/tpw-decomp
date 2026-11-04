@@ -1,4 +1,16 @@
-"""w240: the remaining Draw.cpp CRenderClass raster methods."""
+"""w240: the remaining Draw.cpp CRenderClass raster methods.
+
+A 16-bit pixel is compared as a value: each side keeps it in its own byte
+order (the Mac's big-endian words, the host's host-order words), so the host
+side's pixels are byte-swapped going in and coming out. A 16-bit X-flipped
+OneColourSprite is the exception: the original's flip paths step one byte per
+pixel (PutOneColourClippedFlip) or run on past the sprite (the unclipped path),
+so their words overlap or leave the pixel grid and have no value independent of
+byte order. There the area starts as one byte that is neither of the colour's,
+and what is compared is which bytes the call wrote. (The game never draws a
+16-bit one-colour sprite: the park map, the only CRenderClass16 user, draws
+lines and rectangles.)
+"""
 import ctypes as C
 import random
 import struct
@@ -60,6 +72,18 @@ def bind(lib):
     layout = [lib.tpw_rclassprim_layout(i) for i in range(5)]
     assert layout == [48, 24, 40, 36, 16], layout
     lib.rclassprim_bound = True
+
+
+def swap_pixels(data, width, height, stride):
+    """The buffer with each row's width pixels' two bytes swapped (16-bit
+    depth): the Mac's big-endian pixel words as the host's host-order ones,
+    and back."""
+    data = bytearray(data)
+    for row in range(height):
+        start = 64 + row * stride
+        end = start + 2 * width
+        data[start:end:2], data[start + 1:end:2] = data[start + 1:end:2], data[start:end:2]
+    return bytes(data)
 
 
 def sprite_data(r, width, height):
@@ -128,7 +152,13 @@ def run(emulator, lib, case):
     width, height = case['size']
     stride = width * bpp + case['padding']
     raw = r.randbytes(stride * height + 132)
-    pixels = allocate(raw)
+    written = bpp == 2 and case['operation'] == 7 and case['flags'] & 1
+    if written:
+        colour_bytes = (case['formatted'] & 0xffff).to_bytes(2, 'big')
+        fill = next(value for value in range(256) if value not in colour_bytes)
+        raw = bytes([fill]) * len(raw)
+    swapped = not emulated and bpp == 2 and not written
+    pixels = allocate(swap_pixels(raw, width, height, stride) if swapped else raw)
     origin = pixels + 64
     area = allocate(b'\xa5' * area_size)
     clip_data = b''.join((v & 0xffffffff).to_bytes(4, endian) for v in case['clip'])
@@ -210,8 +240,13 @@ def run(emulator, lib, case):
                                    palette_array, sprite_data_address, sw, sh,
                                    text_address, colour, case['formatted'])
             calls = lib.tpw_rclassprim_calls()
+        output = read(pixels, len(raw))
+        if written:
+            output = bytes(value != fill for value in output)
+        elif swapped:
+            output = swap_pixels(output, width, height, stride)
         return {
-            'pixels': read(pixels, len(raw)),
+            'pixels': output,
             'format_calls': calls,
             'unchanged': [read(address, size) == old
                           for (address, size), old in zip(protected, before)],

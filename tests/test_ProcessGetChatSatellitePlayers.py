@@ -464,7 +464,7 @@ def execute(s, case):
         for k, cmd in enumerate(case["cmds"]):
             s.words(data + 12 * k + 8, [cmd])
         s.words(vec + s.O["vsize"], [case["vsize"]])
-        s.ptr(vec + s.O["vdata"], data)
+        s.words(vec + s.O["vdata"], [data & 0xFFFFFFFF])   # a 32-bit word on both sides (on the host, an arena offset)
         return s.call("cb", [case["id"], 0, vec])
     if op == "proc":
         return s.call("proc", [])

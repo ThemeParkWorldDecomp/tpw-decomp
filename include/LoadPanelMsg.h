@@ -47,7 +47,7 @@ InterfaceWindow* SavePanelLCFormat();
 extern int32_t gSavePanelListFormat;    // 0x10394928 (name invented; 0 until the first row maker call)
 
 // Unit v51019 (src/game/ui/ui_hirePanel.cpp): CreateHireListPanel (ui_main.h). Names invented; the addresses are the Mac's.
-extern int16_t gHirePanelScript[];     // 0x102a9ee8: the hire panel's window script (the image's words, generated at configure time)
+extern int16_t gHirePanelScript[];     // 0x102a9ee8: the hire panel's window script (the image's words, include/WindowScripts.inc)
 extern int32_t gHireColumnColour;       // 0x102aa320: the column buttons' colour (8 at start)
 extern int32_t gHireSortColumn;         // 0x102aa324: the column the list is sorted on (1 at start)
 extern int32_t gHireListWord10;         // 0x10394910: the history at 0x1f7f0's newest value

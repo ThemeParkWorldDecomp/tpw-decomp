@@ -139,11 +139,11 @@ void MslThrow(const char* type, MslThrowObject* object, const void* destructors)
 void ignore_callee::FilebufDtor(IgnoreFilebuf*, int16_t flag) { ev("FilebufDtor", {flag}); }
 void ignore_callee::OstreamDtor(IgnoreStream* stream, int16_t flag) {
     ev("OstreamDtor", {reinterpret_cast<intptr_t>(stream->mSlot) - reinterpret_cast<intptr_t>(gOfsWVtbl),
-                       reinterpret_cast<intptr_t>(stream->mIos->mVtable) - reinterpret_cast<intptr_t>(gOfsWVtbl) - 0xc, flag});
+                       static_cast<int32_t>(stream->mIos->mVtable - VtableWord(gOfsWVtbl) - 0xc), flag});
 }
 void ignore_callee::IstreamDtor(IgnoreStream* stream, int16_t flag) {
     ev("IstreamDtor", {reinterpret_cast<intptr_t>(stream->mSlot) - reinterpret_cast<intptr_t>(gIfsWVtblB),
-                       reinterpret_cast<intptr_t>(stream->mIos->mVtable) - reinterpret_cast<intptr_t>(gIfsWVtblB) - 0xc, flag});
+                       static_cast<int32_t>(stream->mIos->mVtable - VtableWord(gIfsWVtblB) - 0xc), flag});
 }
 void ignore_callee::IosDtor(void* ios, int16_t flag) {
     IgnoreIos* block = static_cast<IgnoreIos*>(gCtx.block);
@@ -211,9 +211,18 @@ void online_callee::WStringCopy(void* self, const void* other, uint32_t pos, uin
 void online_callee::WStringDtor(void* self, int16_t flag) {
     ev("WStringDtor", {flag}, {narrow(static_cast<IgnoreWString*>(self)->mText).c_str()});
 }
+// LoadIgnore's host strings (the line's copies IgnoreOn is given): the same events, the text assigned to the string itself.
+void online_callee::WStringCtorFrom(std::u16string* self, const char16_t* text) {
+    ev("WStringCtor", {}, {narrow(text).c_str()});
+    *self = text;
+}
+void online_callee::WStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    ev("WStringCopy", {pos, static_cast<int32_t>(count)}, {narrow(other->c_str()).c_str()});
+    *self = *other;
+}
+void online_callee::WStringDtor(std::u16string* self, int16_t flag) { ev("WStringDtor", {flag}, {narrow(self->c_str()).c_str()}); }
 void COnlineControl::IgnoreOn(std::u16string& name) {
-    const IgnoreWString* w = reinterpret_cast<const IgnoreWString*>(&name);
-    ev("IgnoreOn", {Flag(this == gCtx.self)}, {narrow(w->mText).c_str()});
+    ev("IgnoreOn", {Flag(this == gCtx.self)}, {narrow(name.c_str()).c_str()});
 }
 void ignore_callee::ChatIgnore(uint32_t chat, const IgnoreWString* name, COnlineControl* context) {
     ev("ChatIgnore", {chat, Flag(context == gCtx.self)}, {narrow(name->mText).c_str()});

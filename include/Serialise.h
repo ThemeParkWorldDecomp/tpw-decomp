@@ -67,6 +67,7 @@ template<class Value> Value UnswapWord(Value value) {
     return value;
 }
 
+
 template<class Value> int32_t LoadVar(void* file, Value* value, const char* name, int32_t noLog) {
     if (noLog == 0) gSaveLoad.WriteSerialiseLog(sizeof(Value), name, CSaveLoad::LogfileState(1));
     uint32_t read = 0;

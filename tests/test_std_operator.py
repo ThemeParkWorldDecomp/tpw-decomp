@@ -176,13 +176,14 @@ class Ppc(Side):
 
 class Host(Side):
     fmt = "<I"
-    shift = 4
+    shift = 0
 
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
         self.stream, self.ios, self.sb = lib.tpw_wo_alloc(16), lib.tpw_wo_alloc(0x68), 0x5000
-        CL.host_begin(lib, {1: self.stream, 2: self.ios, 3: self.sb, 4: lib.tpw_wo_addr(b"vtbl"), 5: lib.tpw_wo_addr(b"dtors")},
+        # the stream buffer word is an arena offset: the callee sees the arena address
+        CL.host_begin(lib, {1: self.stream, 2: self.ios, 3: lib.tpw_wo_addr(b"arena") + self.sb, 4: lib.tpw_wo_addr(b"vtbl"), 5: lib.tpw_wo_addr(b"dtors")},
                       case["queues"])
 
     def done(self):
@@ -216,7 +217,7 @@ def bind(lib):
     lib.tpw_wo_write.restype, lib.tpw_wo_write.argtypes = C.c_uint64, [C.c_uint64, C.c_uint64]
     out = (C.c_int64 * 32)()
     n = lib.tpw_wo_layout(out)
-    assert list(out)[:n] == [0x28, 0x38, 0x3C, 0x40, 0x2C], list(out)[:n]
+    assert list(out)[:n] == [0x24, 0x34, 0x38, 0x3C, 0x28], list(out)[:n]
     lib.bound = True
 
 

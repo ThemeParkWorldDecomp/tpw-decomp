@@ -302,6 +302,10 @@ int tpw_fsm_layout(uint32_t* out) {
     return sizeof fields / sizeof fields[0];
 }
 uint64_t tpw_fsm_sema() { return reinterpret_cast<uintptr_t>(&gSemaphore); }
+// 1 when the library was built with the port fixes (the module then compares against what the fixes change).
+int32_t tpw_fsm_portfix() {
+    return 0;
+}
 uint64_t tpw_fsm_call(int op, void* obj, void* a, void* b, uint32_t c, uint64_t d) {
     auto* mem = static_cast<_TbMemFileAccess*>(obj);
     auto* zip = static_cast<_TbZLibFileAccess*>(obj);

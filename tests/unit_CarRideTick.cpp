@@ -142,6 +142,11 @@ uint64_t tpw_crt_arena_base() {
     return reinterpret_cast<uintptr_t>(tpw::ArenaBase());
 }
 
+// 1 when the library was built with the port fixes (splineend: the instance overload's walk stays on the lists of controls).
+int32_t tpw_crt_portfix() {
+    return 0;
+}
+
 // For each struct of the module's ORDER: the offset of each field of its table, then the struct's size.
 int32_t tpw_crt_layout(int64_t* out) {
     int32_t n = 0;
