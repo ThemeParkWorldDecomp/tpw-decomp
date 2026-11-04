@@ -8,6 +8,7 @@
 // Data folder (the SDL pref path in the launcher, any folder in a test):
 //   assets/us/Theme Park Data/<dest>    the US edition's game folder
 //   assets/eur/Theme Park Data/<dest>   the European edition's game folder
+//   assets/us-pc/Theme Park Data/<dest>, assets/eur-pc/Theme Park Data/<dest>   the Windows discs' editions
 //   assets/gold/<name>                  the Gold rides (manifest destinations "gold/<name>")
 //   assets/lang/<Name>/<game path>      the language packs (destinations "lang/<Name>/<game path>"; Languages())
 //   assets/.staging/                    files being written and big images being unpacked; emptied on every start
@@ -33,6 +34,18 @@
 // file's size and modification time with its line: a file with no line, or another size or time, is rehashed (as
 // VerifyEdition does) and removed when it no longer matches; an unchanged install costs only the stat sweep. A change
 // that keeps both the size and the modification time is not seen, by design: VerifyEdition ("Check again") rehashes all.
+//
+// Edited settings files (tpw-port #94): a .sam destination (the game's text settings, not their .rsrc or .finfo side
+// files) is present whatever its size, and one that no longer matches is the player's edit: the startup check and
+// VerifyEdition keep it (the game reads it) instead of removing it, and it is never written to verified.tsv, so every
+// start rehashes it again and OpenCheck::edited names it. A drop leaves it alone, as it does every present file. The
+// launcher keeps a copy of every verified .sam, assets/<edition>/originals/<dest> (OriginalPath), made only from content
+// that hashes to the manifest's: when a drop writes the file or finds it already there, when the startup check or
+// VerifyEdition finds the installed file verified and no copy is there yet (so an install from before the copies gets
+// them at its next start). RestoreOriginal puts the copy back over an edit; EditedFiles lists the edits, each with the
+// line the game's parser would stop at (sam_check.h). (With no verified.tsv yet nothing is rehashed, so an edit made
+// before then is kept but recorded and not named until it changes again or Check again; it gets no copy until its
+// disc is dropped again.)
 //
 // Threading: Import() runs on the caller's thread; Start() runs it on a worker thread. Progress goes through a
 // thread-safe queue the UI drains (ProgressQueue); Status(), Ini() and the other const calls may be made from any thread.
@@ -82,6 +95,7 @@ struct EditionStatus {
     size_t missingFiles[3] = {};                 // the same, counting files of their own only
     uint64_t bytesPresent = 0;
     bool unlocked = false;                       // every required record is present
+    size_t edited = 0;                           // present .sam files kept as the player's edit (EditedFiles)
     // "absent" (nothing present), "partial" or "unlocked": the launcher.ini word.
     const char* StateWord() const;
 };
@@ -165,11 +179,22 @@ struct ImportReport {
     // The game's icon (icon.h) when this drop wrote <data folder>/icon.png: where it came from ("TP.ico, 64x64, 8-bit");
     // empty when the drop held none, or none better than the one already there.
     std::string icon;
-    EditionStatus status[3];           // us, eur, gold after the drop
+    // us, eur, gold, (3: unused, the language packs are `languages`), us-pc, eur-pc after the drop: EditionIndex order
+    EditionStatus status[6];
     std::vector<LanguageStatus> languages;  // every language pack after the drop, in the manifest's order
     bool ChangedNothing() const { return written == 0; }
     // One plain line for the log and the Finished event, e.g. "Nothing new: 1683 files were already in place."
     std::string Summary() const;
+};
+
+// ---- edited settings files
+
+// A .sam file of an edition kept as the player's edit (importer.h, Edited settings files).
+struct EditedFile {
+    std::string dest;            // the manifest destination, "data/levels/Standard.sam"
+    std::string path;            // where it is installed
+    bool original = false;       // a copy of the verified file is kept (hashed again), so RestoreOriginal can put it back
+    int unreadableLine = 0;      // the line the game's parser stops at (sam_check.h), 0 when it reads the whole file
 };
 
 // ---- the importer
@@ -179,17 +204,23 @@ struct OpenCheck {
     bool hadRecord = false;      // verified.tsv was there; without it nothing is rehashed, it is only written
     uint64_t checked = 0;        // present files compared with their line
     uint64_t rehashed = 0;       // files with no line or another size or time, hashed again
-    uint64_t removed[4] = {0, 0, 0, 0};  // us, eur, gold, language packs: rehashed files that no longer matched, removed
-    uint64_t Removed() const { return removed[0] + removed[1] + removed[2] + removed[3]; }
+    // us, eur, gold, language packs, us-pc, eur-pc (EditionIndex): rehashed files that no longer matched, removed
+    uint64_t removed[6] = {0, 0, 0, 0, 0, 0};
+    uint64_t Removed() const { return removed[0] + removed[1] + removed[2] + removed[3] + removed[4] + removed[5]; }
     // The home screen's notice when files were removed, e.g. "3 files of the European edition had changed and were
     // removed; drop its disc to restore them." Empty when nothing was.
     std::string Notice() const;
+    // edited .sam files kept (the section above), as "us/data/levels/Standard.sam", in manifest order
+    std::vector<std::string> edited;
+    // The log's line for them, e.g. "kept 1 edited .sam file, which the game reads: us/data/levels/Standard.sam
+    // (Customized settings on the edition's tile restores an original)." Empty when there is none.
+    std::string Kept() const;
 };
 
 struct ImporterConfig {
     std::string dataRoot;           // the data folder (assets/ is created in it)
     std::string iniPath;            // empty: dataRoot/launcher.ini
-    unsigned editions = kEditionUs | kEditionEur | kEditionGold | kEditionLanguages;  // which editions a drop may write
+    unsigned editions = kEditionUs | kEditionEur | kEditionGold | kEditionLanguages | kEditionUsPc | kEditionEurPc;  // which editions a drop may write
     uint64_t spillOver = 64ull << 20;  // big compressed images are unpacked into assets/.staging first (sniff.h)
 };
 
@@ -226,16 +257,26 @@ public:
     // kLanguageBaseDateFonts one, an installed edition has the date fonts), absent when none of its own files is (a file
     // whose content another language has too does not count), partial otherwise.
     std::vector<LanguageStatus> Languages() const;
-    // Rehashes every present file of an edition; a file that no longer matches is removed. Returns the number removed,
+    // Rehashes every present file of an edition; a file that no longer matches is removed (an edited .sam is kept). Returns the number removed,
     // or -1 with a message.
     long VerifyEdition(Edition edition, std::string& err);
-    // Deletes assets/<edition>/ (assets/lang/ for kEditionLanguages) and forgets it. Not while an import runs.
+    // Deletes assets/<edition>/ (assets/lang/ for kEditionLanguages), its kept originals with it, and forgets it. Not
+    // while an import runs.
     bool RemoveEdition(Edition edition, std::string& err);
+
+    // The edition's .sam files kept as the player's edit, in manifest order. Reads each one for its read check.
+    std::vector<EditedFile> EditedFiles(Edition edition) const;
+    // Puts the kept copy of the verified file back over the edited .sam `dest` ("data/levels/Standard.sam"); the copy
+    // is hashed again first. Not while an import runs.
+    bool RestoreOriginal(Edition edition, const std::string& dest, std::string& err);
+    // Where the copy of a verified .sam is kept: assets/<edition>/originals/<dest>.
+    std::string OriginalPath(Edition edition, const ManifestRecord& record) const;
 
     LauncherIni Ini() const;
     bool SetLastChoice(const std::string& choice, std::string& err);
 
-    // Where an edition's game folder is (assets/us/Theme Park Data, assets/eur/Theme Park Data, assets/gold, assets/lang),
+    // Where an edition's game folder is (assets/us/Theme Park Data, assets/eur/Theme Park Data, assets/gold, assets/lang,
+    // assets/us-pc/Theme Park Data, assets/eur-pc/Theme Park Data),
     // and where a record of it is written.
     std::string GameFolder(Edition edition) const;
     std::string DestinationPath(Edition edition, const ManifestRecord& record) const;
@@ -258,7 +299,9 @@ private:
     bool Install(Run& run, std::string staged, const std::vector<std::pair<Edition, uint32_t>>& targets);
     bool WriteSmall(Run& run, const std::vector<uint8_t>& bytes, Edition edition, uint32_t record);
     void Count(Run& run, Edition edition, uint32_t record, bool written);
-    void MarkPresent(Edition edition, uint32_t record, bool present);
+    void MarkPresent(Edition edition, uint32_t record, bool present);  // also clears the record's edited bit
+    void MarkEdited(Edition edition, uint32_t record);
+    void KeepOriginal(Edition edition, uint32_t record, const std::vector<uint8_t>* verified);
     bool IsPresent(Edition edition, uint32_t record) const;
     std::vector<uint32_t> RecordsByPath(const std::string& path) const;
     std::string NewStagingPath();
@@ -268,8 +311,9 @@ private:
 
     ImporterConfig config_;
     std::string assetsDir_, assetsCanon_, stagingDir_, iniPath_;
-    mutable std::mutex mutex_;              // guards present_, ini_
+    mutable std::mutex mutex_;              // guards present_, edited_, ini_
     std::vector<uint8_t> present_;          // per record: Edition bits whose destination holds a file
+    std::vector<uint8_t> edited_;           // per record: Edition bits whose present file is the player's edit (.sam)
     LauncherIni ini_;
     std::multimap<std::string, uint32_t> byPath_;  // lower-case destination -> record
     std::map<uint64_t, std::vector<uint32_t>> bySize_;  // size of an accepted content -> records (editions allowed)

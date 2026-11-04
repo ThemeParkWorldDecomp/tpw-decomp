@@ -433,8 +433,8 @@ public:
 
 // Unit v5983 (src/game/ui/InterfaceTextObjectSprite.cpp): the Change overrides of five text objects as free functions. Flag 0x80
 // (0x100 for the password) makes the text and draws it with flag 0x100; any other flags go straight to InterfaceTextObjectSprite::Change.
-// Unit v5L33: the cash, null cash, percent and visitor number classes' Change members (their Mac vtables' Change slots) call these; the
-// password class has no member yet (its vtable has no key function, so the member would pull the draw object chain into that unit).
+// Unit v5L33: the cash, null cash, percent and visitor number classes' Change members (their Mac vtables' Change slots) call these, and
+// so does the password class's (include/FS_OnlineLoginPanel.h; without it the login panel showed the password as typed).
 class InterfacePasswordTextObject;
 void InterfaceCashTextObject_Change(InterfaceTextObjectSprite* self, uint32_t flags, DOChange* change);       // 0x1018e02c
 void InterfacePasswordTextObject_Change(InterfaceTextObjectSprite* self, uint32_t flags, DOChange* change);   // 0x1018dd50

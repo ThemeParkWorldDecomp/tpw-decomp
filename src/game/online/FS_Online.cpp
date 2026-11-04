@@ -389,8 +389,8 @@ void FSOnlineLoginConnectionCallback(int32_t a, int32_t b, void* c, void* d) {  
 //   LoginConnectionCallback 0x101715a0, DoLogin 0x10171234, LoggedInGetNews 0x10171eb8, NewsConnectionCallback 0x10172030,
 //   CompleteNews 0x1017253c.
 
-// 0x102a7248: the GUID the news requests carry. Only its first word (0x5c200a41, bytes 5c 20 0a 41) was read; the rest is not known.
-NS_MacDoze::_GUID gOnlineNewsGuid = {{0x5c, 0x20, 0x0a, 0x41}};
+// 0x102a7248: the GUID the news requests carry ({5C200A41-2981-11D3-ADF4-00E018904FD5} as the library writes it).
+NS_MacDoze::_GUID gOnlineNewsGuid = {{0x5c, 0x20, 0x0a, 0x41, 0x29, 0x81, 0x11, 0xd3, 0xad, 0xf4, 0x00, 0xe0, 0x18, 0x90, 0x4f, 0xd5}};
 
 namespace online_callee {
 __attribute__((weak)) void Free(void* p) {
@@ -1865,6 +1865,7 @@ __attribute__((weak)) CFSOnlineServer* ReturnFTPDownloadServer(CFSOnlineSystemSe
 __attribute__((weak)) TbDynamicStringTemplate<char16_t>* RemoveHead(TbPtrList<TbDynamicStringTemplate<char16_t>>* list) {
     return list->RemoveHead();
 }
+__attribute__((weak)) int32_t PortFTPDownloadUnavailable() { return 0; }
 }  // namespace ftpdl_callee
 
 // 0x10176e90. The end of the download job. A pending error id (word 0x398) goes to the interface and is cleared. A failed job (or one

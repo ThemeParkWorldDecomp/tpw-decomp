@@ -31,11 +31,10 @@ class CFSOnlineCity;
 class CLBGlobeCityFlag;
 // Unit v5546: the two virtuals of the online globe the flag calls (vtable slots 0x40 add, 0x44 remove; the slots
 // 0x30..0x3c in between are other virtuals, not declared here).
-class CLBGlobeFlagOwner {
-public:
-    virtual void AddFlag(CLBGlobeCityFlag* flag) = 0;      // slot 0x40
-    virtual void RemoveFlag(CLBGlobeCityFlag* flag) = 0;   // slot 0x44
-};
+// The globe's slots 0x40 and 0x44, which the city flag's constructor and destructor call through the globe's vtable: the
+// globe's Register and UnRegister of a flag (0x100ae1b0, 0x100ae228; plain members of the host class).
+void GlobeRegisterFlag(const CLBScreenComponentOnlineGlobe* globe, CLBGlobeCityFlag* flag);     // slot 0x40
+void GlobeUnRegisterFlag(const CLBScreenComponentOnlineGlobe* globe, CLBGlobeCityFlag* flag);   // slot 0x44
 extern char16_t gGlobeNoCityName[];   // 0x1023e91e: the wide string the city's name is compared with
 class CLBGlobeCityFlag {
 public:
@@ -43,6 +42,14 @@ public:
     CLBGlobeCityFlag(const CLBScreenComponentOnlineGlobe* globe, const CFSOnlineCity* city);
     CLBGlobeCityFlag() = default;      // derived classes of other units need it
     virtual ~CLBGlobeCityFlag();       // 0x100ac86c
+    // The globe keeps the flag under the cursor in a 32-bit field (its 0x70, an arena offset), so flags live in the arena. A flag
+    // built in memory from elsewhere (placement new over ::operator new, the tests' flags) is given back to where it came from.
+    static void* operator new(size_t size) { return tpw::ArenaAlloc(size); }
+    static void operator delete(void* block) {
+        if (tpw::InArena(block)) tpw::ArenaFree(block);
+        else ::operator delete(block);
+    }
+    static void* operator new(size_t, void* place) { return place; }   // in place (the tests' flags)
     CLBMeshInstance* mMesh;                       // 0x04
     const CLBScreenComponentOnlineGlobe* mGlobe;  // 0x08
     const CFSOnlineCity* mCity;                   // 0x0c
@@ -227,8 +234,8 @@ public:
     void GotoNextIsland();                   // 0x100b2638 (the theme islands' 0x100b35ac replaces it in slot 0x40)
     void GotoPreviousIsland();               // 0x100b2808 (0x100b3684 in the theme islands)
     // Slot 0x50 of the vtable, called by Tick when the zoom's fade completes: the theme islands'
-    // 0x100b346c is translated (src/game/online/lobby_island.cpp); the online islands' 0x100b45d0 is not,
-    // so nothing happens for them. (Slot 0x54 is SetCurrentIsland above: the theme override
+    // 0x100b346c and the online islands' 0x100b45d0 are translated (src/game/online/lobby_island.cpp)
+    // and override it. (Slot 0x54 is SetCurrentIsland above: the theme override
     // 0x100b3540 is a plain member of the theme class with the same text; the online override
     // 0x100b4690 is untranslated and not declared, so the base's runs for it.)
     virtual void EnterCurrentIsland() {}
@@ -306,12 +313,15 @@ public:
     uint32_t ProcessCancel() override;       // 0x100b3cd0
     void Show() override;                    // 0x100b3ec8
     void Hide() override;                    // 0x100b4170
-    // Unit v5255 (src/game/online/lobby_island.cpp). Plain members (the vtable slots 0x40, 0x48 and 0x50 etc. are not
-    // overridden here, so no unit library needs a fake of them).
+    // Unit v5255 (src/game/online/lobby_island.cpp). Plain members (the vtable slots 0x40, 0x48 etc. are not overridden
+    // here, so no unit library needs a fake of them; slot 0x50 is, below).
     // 0x100b46fc, slot 0x40: the next island, unless the camera is zooming; then the city lobby controller shows.
     void GotoNextIsland();
     void SelectCurrentIsland();              // 0x100b44ac, slot 0x48: opens the park info panel of the current island
-    void EnterCurrentIslandOnline();         // 0x100b45d0, slot 0x50 (EnterCurrentIsland of the original): the online game type, state 2
+    // 0x100b45d0, slot 0x50, the base class's virtual: the online game type, state 2. Declared as the override, since the base's
+    // Tick reaches it through the vtable when the zoom into a city's park island has faded out (before, the base's empty one ran
+    // and the screen stayed white).
+    void EnterCurrentIsland() override;
     void DownloadFailFunction();             // 0x100b4a98
     void HandleOnlineBacktrack();            // 0x100b4b48: this->Hide(), then the download globe's Show
     uint8_t mFE8[4];                         // 0xe8  (read and written as an int32 by the members above: 1 while the controller shows)
@@ -427,6 +437,13 @@ public:
     void CreateCities(TbPtrList<CFSOnlineCity>* cities) override;   // slot 0x30 (0x100ae8a0): a flag per wanted city, then the advisor says line 0x256
     // Unit v51106 (plain members; the Mac has them in vtable slots).
     int32_t IsCityValid(const CFSOnlineCity* city);   // 0x100aea58: the city's value is above 0
+    // Slot 0x48 on the Mac is IsCityValid itself: CreateCities makes a flag only for a city it accepts. Units that do not
+    // link the translation get the base's answer (inline, weak); the real one wins at link.
+#ifdef TPW_GLOBE_CITYVALID_REAL
+    int32_t IsCityWanted(CFSOnlineCity* city) override;
+#else
+    int32_t IsCityWanted(CFSOnlineCity* city) override { return 0; }
+#endif
     void HidePanels();                       // 0x100ae828
     void ShowPanels();                       // 0x100ae7b0
 };
@@ -443,6 +460,11 @@ public:
     void HandleOnlineBacktrack() override;   // slot 0x34 (0x100af094): this->Hide(), then the theme islands' Show and EnterCurrentIsland
     // Unit v51106 (plain members; the Mac has them in vtable slots).
     int32_t IsCityValid(const CFSOnlineCity* city);   // 0x100af148
+#ifdef TPW_GLOBE_CITYVALID_REAL
+    int32_t IsCityWanted(CFSOnlineCity* city) override;   // slot 0x48, as the download globe's
+#else
+    int32_t IsCityWanted(CFSOnlineCity* city) override { return 0; }
+#endif
     void HidePanels();                       // 0x100aef20
     void ShowPanels();                       // 0x100aeeb0
 };

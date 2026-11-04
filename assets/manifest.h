@@ -23,6 +23,8 @@ enum Edition : uint8_t {
     kEditionEur = 2,   // the UK/European release (PC disc, plus Mac files the PC disc cannot supply)
     kEditionGold = 4,  // the Gold ride pack (destinations are under "gold/"; where the rides go is the Gold join's job)
     kEditionLanguages = 8,  // the language packs (destinations are under "lang/<Name>/"; read by the language layer)
+    kEditionUsPc = 16,  // the US Windows release (2.0) alone: no Mac file, fonts unpacked from fonts.wad, films optional
+    kEditionEurPc = 32, // the UK/European Windows release alone, the same way
 };
 
 enum Group : uint8_t {
@@ -31,7 +33,7 @@ enum Group : uint8_t {
     kGroupMovies,            // data/Movies/
     kGroupLanguageAmerican,  // data/Language/American/ (US)
     kGroupLanguageEnglish,   // data/Language/English/ (European)
-    kGroupProgram,           // the Mac program's data fork (the run-time tables are read from it)
+    kGroupProgram,           // the Mac program's data fork (optional: the game's data tables are built in)
     kGroupGold,              // the Gold ride wads and ride configuration text
     kGroupLanguagePack,      // a language pack's text, filter, meshes, speech and pictures (kEditionLanguages)
     kGroupCount,
@@ -40,7 +42,7 @@ enum Group : uint8_t {
 // Which disc the content is read from (what the UI says is still needed).
 enum DiscSource : uint8_t {
     kSourceMacCd,   // the US Mac CD (or, for the program, the 2.04b3 patch)
-    kSourcePcCd,    // the European PC CD
+    kSourcePcCd,    // a Windows CD: the European one (eur), or the edition's own (us-pc, eur-pc)
     kSourceGoldCd,  // the Gold disc
     kSourceLanguageDisc,  // any disc with that language (a European multi-language disc or a single-language one)
 };
@@ -103,11 +105,24 @@ const ManifestLanguage* FindLanguage(const char* name);
 // The record with this destination for this edition bit, or nullptr.
 const ManifestRecord* FindByDest(Edition edition, const char* dest);
 
+// A film's other copy in the same edition: the PC CD's (data/Movies/bf.tgq, EA TQI) for the Mac CD's (data/Movies/bf.mov,
+// QuickTime) and the other way, or nullptr (a side file, a film the other disc does not have, an edition without it). The
+// game plays either (platform/files.cpp), so a folder needs one of the two; the importer counts the pair as one required
+// file, the .mov's.
+const ManifestRecord* FilmCounterpart(const ManifestRecord& record, Edition edition);
+
 // The number of records an edition (or a mask of editions: any bit) holds, optionally only required ones.
 size_t CountRecords(unsigned editions, bool required_only = false);
 
 const char* GroupName(Group group);       // "core", "fonts-rsrc", "movies", "language:american", ...
-const char* EditionName(Edition edition); // "us", "eur", "gold", "lang"
+const char* EditionName(Edition edition); // "us", "eur", "gold", "lang", "us-pc", "eur-pc"
+// The edition parsed from its name, or false.
+bool EditionFromName(const char* name, Edition& out);
+// Sim Theme Park (the US Mac and US Windows editions) rather than Theme Park World: the US game's saves, settings keys
+// and name.
+inline bool IsUsGame(Edition edition) { return edition == kEditionUs || edition == kEditionUsPc; }
+// An edition read from the Windows discs alone.
+inline bool IsWindowsEdition(Edition edition) { return edition == kEditionUsPc || edition == kEditionEurPc; }
 const char* SourceName(DiscSource source);    // "mac", "pc", "gold", "lang"
 
 }  // namespace tpw::assets

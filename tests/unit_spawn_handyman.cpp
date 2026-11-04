@@ -1,7 +1,7 @@
 // Test library for the spawn and loan key actions (unit v5028; libtpw_unit_spawn_handyman.dylib, tests/test_spawn_handyman.py), main app:
 //   src/game/keyboard.cpp
 //
-// The callees (operator new, the staff and person constructors, the CWorld calls, ApplyForLoan, CTRACE) are recording fakes.
+// The callees (the two operator news, the staff and person constructors, the CWorld calls, ApplyForLoan, CTRACE) are recording fakes.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -25,19 +25,35 @@ CWorld* gGameWorld;
 static const uint32_t kBank = 0xAC0000;
 
 // ---- the fakes
-void* online_callee::OperatorNew(uint32_t size) {
+// The game heap's operator new (the arena), which the actions use.
+namespace keyaction_callee {
+void* OperatorNew(uint32_t size) {
     ev("new", {static_cast<int64_t>(size)});
     return tpw::ArenaAllocZeroed(size);
+}
+}  // namespace keyaction_callee
+
+// The online code's operator new: the host heap, as the real one (platform/online_dispatch.cpp). A person or staff member made with it
+// is outside the arena, and the staff and visitor lists, which keep its address in 32 bits, stop the game (BMCTV's crash).
+void* online_callee::OperatorNew(uint32_t size) {
+    ev("online new", {static_cast<int64_t>(size)});
+    return ::operator new(size);
 }
 
 typedef tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> CellTag;
 
-CHandyman::CHandyman(CellTag cell) { ev("CHandyman", {newlab(this), static_cast<int64_t>(cell.mIndex)}); }
-CEntertainer::CEntertainer(CellTag cell) { ev("CEntertainer", {newlab(this), static_cast<int64_t>(cell.mIndex)}); }
-CGuard::CGuard(CellTag cell) { ev("CGuard", {newlab(this), static_cast<int64_t>(cell.mIndex)}); }
-CMechanic::CMechanic(CellTag cell) { ev("CMechanic", {newlab(this), static_cast<int64_t>(cell.mIndex)}); }
-CResearcher::CResearcher(CellTag cell) { ev("CResearcher", {newlab(this), static_cast<int64_t>(cell.mIndex)}); }
-CPerson::CPerson(CellTag cell) { ev("CPerson", {newlab(this), static_cast<int64_t>(cell.mIndex)}); }
+// A thing's address must fit the 32-bit pointer fields that keep it; one that does not is an extra event.
+static void ev_thing(const char* name, const void* self, CellTag cell) {
+    ev(name, {newlab(self), static_cast<int64_t>(cell.mIndex)});
+    if (!tpw::InArena(self)) ev("outside the arena", {}, {name});
+}
+
+CHandyman::CHandyman(CellTag cell) { ev_thing("CHandyman", this, cell); }
+CEntertainer::CEntertainer(CellTag cell) { ev_thing("CEntertainer", this, cell); }
+CGuard::CGuard(CellTag cell) { ev_thing("CGuard", this, cell); }
+CMechanic::CMechanic(CellTag cell) { ev_thing("CMechanic", this, cell); }
+CResearcher::CResearcher(CellTag cell) { ev_thing("CResearcher", this, cell); }
+CPerson::CPerson(CellTag cell) { ev_thing("CPerson", this, cell); }
 
 bool CWorld::IsPlayingWinningAnim() {
     ev("IsPlayingWinningAnim", {lab(this)});

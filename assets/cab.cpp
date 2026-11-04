@@ -2,7 +2,7 @@
 // blocks), the files (a folder, an offset and a size in that stream). Folders stored or compressed with MSZIP are
 // readable; MSZIP ([MS-MCI]) is raw deflate per block, each block starting with "CK", and each block uses the previous
 // block's 32 KB of output as its dictionary (zlib's inflateSetDictionary on a raw stream). Quantum and LZX folders are
-// listed, and Open says why it cannot read them. Names lose the leading backslash installers write. A cabinet that continues in another file is refused. The offsets in the
+// listed as unreadable entries, and Open says why it cannot read them. Names lose the leading backslash installers write. A cabinet that continues in another file is refused. The offsets in the
 // cabinet are relative to its own first byte, so one can sit inside an installer .exe (FindCabinet).
 //
 // Reading a file decodes its folder from the start, because each block depends on the one before it. Every stream owns
@@ -338,6 +338,8 @@ public:
             e.size = files_[n.second].size;
             e.kind = EntryKind::Data;
             e.id = n.second;
+            const uint16_t method = folders_[files_[n.second].folder].type & 0xF;
+            e.unreadable = method != 0 && method != 1;
             entries_.push_back(std::move(e));
         }
         return true;

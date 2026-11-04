@@ -11,6 +11,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "platform/online_slots.h"
 #include "online.h"
 #include "ui_ime.h"
 #include "ThingReceivers.h"
@@ -28,10 +29,14 @@ char IME::gMslLengthErrorDtorTV[8];
 
 namespace {
 
-alignas(16) char gArena[0x1800];
+// The blocks live in the arena (a vector's data word is an arena offset); made on first use, not at load time.
+char* Blocks() {
+    static char* const blocks = static_cast<char*>(tpw::ArenaAllocZeroed(0x1800));
+    return blocks;
+}
 uint32_t gPool = 0;
 
-void* NextPool() { return gArena + 0x1000 + 0x100 * (gPool++ & 7); }
+void* NextPool() { return Blocks() + 0x1000 + 0x100 * (gPool++ & 7); }
 
 uint32_t TextHash(const char* text) {
     uint32_t h = 0, n = 0;
@@ -86,7 +91,7 @@ void online_callee::WStringCopy(void* self, const void* other, uint32_t pos, uin
 }
 char16_t* IME::MslWideString_index(MslWideString* self, uint32_t index) {
     ev("index", {lab(self), index});
-    return reinterpret_cast<char16_t*>(gArena + 0xc00) + index;
+    return reinterpret_cast<char16_t*>(Blocks() + 0xc00) + index;
 }
 CPeep::CPeep(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, CThing::ThingModel model) {
     ev("CPeep", {lab(this), cell.mIndex, static_cast<uint32_t>(model)});
@@ -113,6 +118,13 @@ void CDelayedScript::SpawnSpriteScript(ScriptIdx script, int32_t set, int32_t in
 void SCR_SetFloatVariable(int32_t handle, uint32_t index, float value) {
     ev("SCRFloat", {static_cast<uint32_t>(handle), index, CanonBits(value)});
 }
+// The slot reader the person's name goes through (platform/online_slots.cpp): the word is the arena offset of a representation whose
+// characters' pointer is its mData.
+const char16_t* tpw::slots::WideText(uint32_t word) {
+    if (word == 0) return u"";
+    const auto* rep = reinterpret_cast<const IME::MslWideStringRep*>(tpw::ArenaBase() + word);
+    return rep->mData != nullptr ? static_cast<const char16_t*>(rep->mData) : u"";
+}
 void ignore_callee::SwprintfWide(char16_t* buffer, uint32_t count, const char16_t* format, const char16_t* text) {
     int64_t chars[12] = {0};
     for (int i = 0; i < 12 && format[i] != 0; ++i) chars[i] = format[i];
@@ -128,7 +140,7 @@ uint64_t tpw_pv_addr(const char* name) {
         const void* address;
     };
     const Entry entries[] = {
-        {"arena", gArena},           {"gWorld", &gWorld},          {"gPersonTable", gPersonTable},
+        {"arena", Blocks()},           {"gWorld", &gWorld},          {"gPersonTable", gPersonTable},
         {"vtbl", IME::gMslLengthErrorVtbl}, {"dtortv", IME::gMslLengthErrorDtorTV},
     };
     for (const Entry& entry : entries)

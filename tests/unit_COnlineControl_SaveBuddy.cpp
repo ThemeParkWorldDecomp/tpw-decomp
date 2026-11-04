@@ -109,7 +109,7 @@ void OstreamDtor(IgnoreStream* stream, int16_t flag) {
 void IosDtor(void* ios, int16_t flag) {
     IgnoreIos* block = static_cast<IgnoreIos*>(P32(gWorld[0]));
     int32_t offset = static_cast<int32_t>(reinterpret_cast<intptr_t>(ios) - reinterpret_cast<intptr_t>(block));
-    ev("ios_dtor", {flag, B(block->mBaseOffset == offset), B(block->mVtable == reinterpret_cast<const uint8_t*>(gOfsWVtbl) + 0xc)});
+    ev("ios_dtor", {flag, B(block->mBaseOffset == offset), B(block->mVtable == ignore_callee::VtableWord(gOfsWVtbl) + 0xc)});
 }
 void SwprintfWide(char16_t* buffer, uint32_t count, const char16_t* format, const char16_t* text) {
     ev("swprintf", {count}, {W(format).c_str(), W(text).c_str()});
@@ -170,10 +170,9 @@ int32_t TbITable::FormatString(char16_t* out, uint32_t size, uint32_t id, ...) c
     return 0;
 }
 
+// The text ReceiveText is given and its colour (the Mac passed the copy, a library string; the host a std::u16string with its text).
 void COnlineControl::ReceiveText(std::u16string& text, int32_t colour) {
-    const char16_t* data = *reinterpret_cast<const char16_t* const*>(&text);
-    ev("receive", {lab(this), B(&text == sSecond), static_cast<int64_t>(reinterpret_cast<const char*>(data) - reinterpret_cast<const char*>(this)), colour},
-       {W(data).c_str()});
+    ev("receive", {lab(this), colour}, {W(text.c_str()).c_str()});
 }
 
 void SamsUtilities::UDebug(const char* text, ...) { ev("udebug", {}, {text}); }

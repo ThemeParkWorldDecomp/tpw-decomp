@@ -5,6 +5,7 @@
 #include "bfl_FileSystem.h"
 #include "CMpegBase.h"
 #include "CSprocketsModule.h"
+#include "helpers/SoundPoolLock.h"
 #include "helpers/TbSoundSampleCallbackHelpers.h"
 #include "LbTime.h"
 #include "platform/samsutils.h"

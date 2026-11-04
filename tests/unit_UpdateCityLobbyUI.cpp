@@ -191,8 +191,10 @@ int swprintf(char16_t* buffer, uint32_t size, const char16_t* format, ...) {
 }
 size_t wcslen(const char16_t* text) { return Len16(text); }
 
-// The string members (a Mac std::wstring is one pointer to a representation: len +0, capacity +4, count +8, the data pointer +0xc).
+// The string members (a std::wstring is one 32-bit word, the arena offset of a representation: len +0, capacity +4, count +8, the
+// data word +0xc).
 namespace online_callee {
+MslStrRep* RepAt(void* self) { return reinterpret_cast<MslStrRep*>(tpw::gArenaBase + *static_cast<uint32_t*>(self)); }
 void WStringCtor(void* self) {
     MslStrRep* rep = static_cast<MslStrRep*>(tpw::ArenaAllocZeroed(0x10));
     char16_t* data = static_cast<char16_t*>(tpw::ArenaAllocZeroed(0x10));
@@ -200,16 +202,16 @@ void WStringCtor(void* self) {
     rep->cap = 7;
     rep->refs = 1;
     rep->data = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(data));
-    *static_cast<MslStrRep**>(self) = rep;
+    *static_cast<uint32_t*>(self) = tpw::ArenaOffset(rep);
     ev("WStringCtor", {1});
 }
 void WStringDtor(void* self, int16_t flag) {
-    MslStrRep* rep = *static_cast<MslStrRep**>(self);
+    MslStrRep* rep = RepAt(self);
     ev("WStringDtor", {flag, static_cast<int64_t>(rep->len)});
 }
 void WStringAssign(void* self, const char16_t* text, uint32_t n) {
     ev("WStringAssign", {static_cast<int64_t>(n), Hash(text, n)});
-    MslStrRep* rep = *static_cast<MslStrRep**>(self);
+    MslStrRep* rep = RepAt(self);
     char16_t* data = static_cast<char16_t*>(tpw::ArenaAllocZeroed((n + 1) * 2));
     std::memcpy(data, text, n * 2);
     rep->len = n;

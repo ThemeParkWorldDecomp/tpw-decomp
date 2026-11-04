@@ -118,6 +118,11 @@ void COnlinePersonCtor(void* self, MapTag cell, uint32_t avatar, void* name, boo
     ev("PersonCtor", {I(lab(self)), I(cell.mIndex), I(avatar), I(lab(name)), I(flag ? 1 : 0)});
 }
 
+// The constructor given the host's string (CreateVisitor's name) is the same fake.
+void COnlinePersonCtor(void* self, MapTag cell, uint32_t avatar, const std::u16string* name, bool flag) {
+    COnlinePersonCtor(self, cell, avatar, static_cast<void*>(const_cast<std::u16string*>(name)), flag);
+}
+
 bool TeleportCell(COnlineControl* self, ThingTag thing, MapTag cell) {
     ev("Teleport", {I(lab(self)), I(thing.mIndex), I(cell.mIndex)});
     return ret("Teleport") != 0;
@@ -177,6 +182,25 @@ void UIOnlineAddContact(void* ui, const char16_t* text, int32_t flag) {
     ev("OnlineAddContact", {I(lab(ui)), I(TextLen(text)), I(TextHash(text)), I(flag)});
 }
 
+// The overloads for the host's std::u16string objects are the same fakes.
+void WStringCtorFrom(std::u16string* self, const char16_t* text) { WStringCtorFrom(static_cast<void*>(self), text); }
+void WStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    WStringCopy(static_cast<void*>(self), static_cast<const void*>(other), pos, count);
+}
+void WStringDtor(std::u16string* self, int16_t flag) { WStringDtor(static_cast<void*>(self), flag); }
+void NocaseWStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    NocaseWStringCopy(static_cast<void*>(self), static_cast<const void*>(other), pos, count);
+}
+void NocaseWStringDtor(std::u16string* self, int16_t flag) { NocaseWStringDtor(static_cast<void*>(self), flag); }
+// IsThisMe's copy of the player's name slot (COnlineControl + 8).
+void NocaseWStringCopy(std::u16string* self, const uint32_t* slot, uint32_t pos, uint32_t count) {
+    NocaseWStringCopy(static_cast<void*>(self), static_cast<const void*>(slot), pos, count);
+}
+bool NocaseWStringEqual(const std::u16string* a, const std::u16string* b) {
+    return NocaseWStringEqual(static_cast<const void*>(a), static_cast<const void*>(b));
+}
+void* BuddyTreeFind(void* tree, const std::u16string* key) { return BuddyTreeFind(tree, static_cast<const void*>(key)); }
+void* NocaseSetFind(void* tree, const std::u16string* key) { return NocaseSetFind(tree, static_cast<const void*>(key)); }
 }  // namespace online_callee
 
 extern "C" {
@@ -230,7 +254,7 @@ uint32_t tpw_cv_is_this_me(uint64_t self, uint64_t text) {
 void tpw_cv_receive_text(uint64_t self, uint64_t text, int32_t colour) { Self(self)->ReceiveText(Str(text), colour); }
 void tpw_cv_feedback(uint64_t self, uint64_t text) { Self(self)->Feedback(Str(text)); }
 uint32_t tpw_cv_get_data_for_user(uint64_t self, uint64_t key) {
-    return Self(self)->GetDataForUser(*reinterpret_cast<const nocase_string*>(static_cast<uintptr_t>(key)));
+    return Self(self)->GetDataForUser(*reinterpret_cast<const std::u16string*>(static_cast<uintptr_t>(key)));   // the key is only passed on (its address)
 }
 void tpw_cv_add_contact(uint64_t self, uint64_t text, int32_t flag) { Self(self)->AddContact(Str(text), flag); }
 void tpw_cv_create_visitor(uint64_t self, uint64_t name, int32_t x, int32_t y, int32_t avatar, int32_t unused) {

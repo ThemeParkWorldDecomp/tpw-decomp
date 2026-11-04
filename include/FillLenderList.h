@@ -41,7 +41,7 @@ void WindowSetValue(InterfaceWindow* window, int32_t value);            // the v
 }  // namespace lender_callee
 
 // Unit v5698 (src/game/ui/ui_loansPanel.cpp): CreateLoansPanel 0x101a4de4 (ui_main.h).
-extern int16_t gLoansScript[];          // 0x102aa4a4: the loans panel's window script (the image's words, generated at configure time)
+extern int16_t gLoansScript[];          // 0x102aa4a4: the loans panel's window script (the image's words, include/WindowScripts.inc)
 extern int32_t gLenderColumnColour;      // 0x102aa83c: the lender list's column button colour (8 at start)
 // 0x101a4bec (untranslated; its TVector is 0x10267bf8): the message function of the lender list.
 int32_t LenderListCallback(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);

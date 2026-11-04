@@ -5,7 +5,8 @@
 //
 // The callees outside the unit are fakes that record what the real ones read (strings as length and hash, pointers as lab(p)) and answer
 // from the test's queues or the blocks the test set (tpw_dc_set). A std::wstring is one 32-bit word, the arena offset of an
-// IME::MslWideStringRep; the string fakes share reps (BStrVal, assign and the nocase copy store the source's rep). The globals of other
+// IME::MslWideStringRep; the string fakes share reps (BStrVal and assign store the source's rep). The nocase strings and the string
+// Feedback takes are the host's std::u16string objects, which the fakes record the same way (length and hash). The globals of other
 // files the unit reads (gText, gOnlineSystem, gMasterSave, gOnlineConfig) are defined here, zero at start like the Mac's bss.
 #include <cstdarg>
 #include <cstddef>
@@ -21,6 +22,7 @@
 #include "TbITable.h"
 #include "Text.h"
 #include "FS_Online.h"
+#include "FS_OnlineList.h"
 #include "TPMain.h"
 #include "FS_MasterSave.h"
 #include "ui_ErrorDisplay.h"
@@ -82,6 +84,13 @@ int64_t SigHash(const void* slot) {
     return Fnv(rep->mData, rep->mLength < 32 ? rep->mLength : 32);
 }
 
+int64_t HostLen(const std::u16string& text) { return static_cast<int64_t>(text.size()); }
+
+int64_t HostHash(const std::u16string& text) {
+    const uint32_t n = static_cast<uint32_t>(text.size());
+    return Fnv(text.data(), n < 32 ? n : 32);
+}
+
 uint32_t WLen(const char16_t* text) {
     uint32_t n = 0;
     while (text[n] != 0) ++n;
@@ -135,25 +144,27 @@ void online_parse_callee::WStringAssignRange(void* self, const void* src, uint32
     SetSlot(self, Word(src, 0));
 }
 
-void online_callee::NocaseWStringCopy(void* self, const void* other, uint32_t pos, uint32_t count) {
-    ev("NCopy", {lab(other), SigLen(other), SigHash(other), pos, static_cast<int32_t>(count)});
-    SetSlot(self, Word(other, 0));
+// The nocase strings are the host's objects (the source of a copy is a slot); they record the same values.
+void online_callee::NocaseWStringCopy(std::u16string* self, const uint32_t* slot, uint32_t pos, uint32_t count) {
+    ev("NCopy", {lab(slot), SigLen(slot), SigHash(slot), pos, static_cast<int32_t>(count)});
+    const IME::MslWideStringRep* rep = RepOf(slot);
+    self->assign(rep->mData, rep->mLength);
 }
 
-void online_callee::NocaseWStringDtor(void* self, int16_t flag) { ev("NDtor", {SigLen(self), SigHash(self), flag}); }
+void online_callee::NocaseWStringDtor(std::u16string* self, int16_t flag) { ev("NDtor", {HostLen(*self), HostHash(*self), flag}); }
 
-bool online_callee::NocaseWStringEqual(const void* a, const void* b) {
-    ev("Equal", {SigLen(a), SigHash(a), SigLen(b), SigHash(b)});
+bool online_callee::NocaseWStringEqual(const std::u16string* a, const std::u16string* b) {
+    ev("Equal", {HostLen(*a), HostHash(*a), HostLen(*b), HostHash(*b)});
     return ret("Equal") != 0;
 }
 
-void* online_callee::NocaseSetFind(void* tree, const void* key) {
-    ev("SetFind", {lab(tree), SigLen(key), SigHash(key)});
+void* online_callee::NocaseSetFind(void* tree, const std::u16string* key) {
+    ev("SetFind", {lab(tree), HostLen(*key), HostHash(*key)});
     return ret("SetFind") != 0 ? gFound : static_cast<uint8_t*>(tree) + 4;
 }
 
-void* online_callee::BuddyTreeFind(void* tree, const void* key) {
-    ev("BuddyFind", {lab(tree), SigLen(key), SigHash(key)});
+void* online_callee::BuddyTreeFind(void* tree, const std::u16string* key) {
+    ev("BuddyFind", {lab(tree), HostLen(*key), HostHash(*key)});
     return ret("BuddyFind") != 0 ? gFound : static_cast<uint8_t*>(tree) + 4;
 }
 
@@ -183,7 +194,7 @@ int32_t TbITable::FormatString(char16_t* out, uint32_t size, uint32_t id, ...) c
 
 int32_t TbUniStringVTag::Format(CStaticBuffer&, TbVarFormat&) { return 0; }
 
-void COnlineControl::Feedback(std::u16string& text) { ev("Feedback", {lab(this), SigLen(&text), SigHash(&text)}); }
+void COnlineControl::Feedback(std::u16string& text) { ev("Feedback", {lab(this), HostLen(text), HostHash(text)}); }
 
 void SamsUtilities::UDebug(const char* format, ...) { ev("UDebug", {CLen(format), CHash(format)}); }
 
@@ -242,9 +253,10 @@ CFSFTPParkInfo* CFSOnlineSystem::GetFTPDownloadParkInfo() {
     ev("GetFTP", {lab(this)});
     return static_cast<CFSFTPParkInfo*>(gPark);
 }
-void* init_callee::ReturnCityInfo(uint32_t cityList, int32_t id) {
-    ev("CityInfo", {cityList, id});
-    return gCity;
+// The list is logged as its low word (the test stores the Mac's 32-bit word as the pointer).
+CFSOnlineCity* park_info_callee::ReturnCityInfo(CFSOnlineSystemCityList* list, int32_t id) {
+    ev("CityInfo", {static_cast<uint32_t>(reinterpret_cast<uintptr_t>(list)), id});
+    return static_cast<CFSOnlineCity*>(gCity);
 }
 const char16_t* online_callee::LoginPassword(CFSOnlineSystem* sys) {
     ev("Password", {lab(sys)});
@@ -315,6 +327,29 @@ void tpw_dc_set(const char* name, uint64_t value) {
 void tpw_dc_set_server(const char* server, int32_t port) {
     gOnlineConfig.mVoteServer = server;
     gOnlineConfig.mVotePort = static_cast<int16_t>(port);
+}
+
+// The host's park, city and system: the fields the Mac read at the park's +8 and +0x48, the city's +0x60 and the system's +0xe0.
+uint64_t tpw_dc_park(int32_t id, int32_t city) {
+    auto* park = static_cast<CFSOnlinePark*>(tpw::ArenaAllocZeroed(sizeof(CFSOnlinePark)));
+    park->mParkID = id;
+    park->mF48 = city;
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(park));
+}
+
+uint64_t tpw_dc_city(int32_t f60) {
+    auto* city = static_cast<CFSOnlineCity*>(tpw::ArenaAllocZeroed(sizeof(CFSOnlineCity)));
+    city->mF60 = f60;
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(city));
+}
+
+// EnsureSystem's own block is operator new's 0x404 bytes, so the list must lie inside them.
+static_assert(offsetof(CFSOnlineSystem, mCityList) + sizeof(void*) <= 0x404, "the system's city list lies inside a 0x404-byte block");
+uint32_t tpw_dc_system_size() { return static_cast<uint32_t>(sizeof(CFSOnlineSystem) > 0x404 ? sizeof(CFSOnlineSystem) : 0x404); }
+
+void tpw_dc_set_list(uint64_t system, uint32_t list) {
+    reinterpret_cast<CFSOnlineSystem*>(static_cast<uintptr_t>(system))->mCityList =
+        reinterpret_cast<CFSOnlineSystemCityList*>(static_cast<uintptr_t>(list));
 }
 
 int64_t tpw_dc_lab(uint64_t p) { return lab(reinterpret_cast<const void*>(static_cast<uintptr_t>(p))); }

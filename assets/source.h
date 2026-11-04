@@ -35,6 +35,9 @@ struct Entry {
     bool hasFinderInfo = false;
     char finderType[4] = {};
     char finderCreator[4] = {};
+    // Listed, but this reader cannot read the bytes (a cab folder compressed with Quantum or LZX, as the DirectX
+    // installers on the Windows discs are): the importer counts it with the files it ignores, never as an error.
+    bool unreadable = false;
 };
 
 // Random access to immutable bytes. Safe to call from several threads.
@@ -96,6 +99,12 @@ std::unique_ptr<Source> OpenCab(std::shared_ptr<Blob> blob, uint64_t offset, std
 // The offset of the first plausible cabinet header ("MSCF" with consistent sizes) in the first maxScan bytes of a blob,
 // or -1 when there is none. Never a fixed offset: installers move it.
 int64_t FindCabinet(Blob& blob, uint64_t maxScan, std::string& err);
+// A Bullfrog DWFB wad (wad.cpp), as the PC disc's data/fonts.wad: one entry per file of the wad, RefPack-compressed
+// ones listed at their unpacked size and unpacked in memory when opened. Kind() is "wad".
+std::unique_ptr<Source> OpenWad(std::shared_ptr<Blob> blob, std::string& err);
+// Unpacks a RefPack (EA's LZ77) stream with its 10 FB header into out, refusing one that would be over maxOut bytes. False
+// with a message in err when the stream is damaged or does not unpack to the size its header gives.
+bool RefPackDecode(const uint8_t* in, size_t n, uint64_t maxOut, std::vector<uint8_t>& out, std::string& err);
 
 // ---- Helpers (source.cpp)
 // Hashes the rest of a stream. False with a message in err on a read error.

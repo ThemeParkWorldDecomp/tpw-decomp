@@ -74,6 +74,11 @@ int32_t Recv(int32_t sock, void* buffer, int32_t size, int32_t flags) {
 }
 void CloseSocket(int32_t sock) { ev("CloseSocket", {sock}); }
 
+// No online server is set: the client does its own work, as on the Mac.
+bool PortFTPConnect(FTPClient*, const char*, const char*) { return false; }
+bool PortFTPDownload(FTPClient*, const char*, const char*) { return false; }
+bool PortFTPDisconnect(FTPClient*) { return false; }
+void PortFTPEnd(FTPClient*) {}
 }  // namespace ftp_callee
 
 extern "C" {

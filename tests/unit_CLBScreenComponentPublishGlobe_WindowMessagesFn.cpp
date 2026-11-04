@@ -159,7 +159,7 @@ uint64_t tpw_pg_make(int32_t what) {
         case 2:
         case 3: return P(tpw::ArenaAllocZeroed(sizeof(ListBlock)));
         case 4: return P(new CLBGlobe());
-        case 5: return P(new CLBGlobeCityFlag());
+        case 5: return P(::new CLBGlobeCityFlag());   // the global allocator (the flag class allocates in the arena)
         case 6: return P(new CFSOnlineCity());
         case 7: return P(tpw::ArenaAllocZeroed(sizeof(CLBScreenSystem)));
         case 8: return P(tpw::ArenaAllocZeroed(sizeof(CLBScreenComponentAdvisor)));

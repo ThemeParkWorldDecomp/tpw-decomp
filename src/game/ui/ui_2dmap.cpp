@@ -108,6 +108,7 @@ template <class T>
 inline T& MacAt(void* base, size_t offset) {
     return *reinterpret_cast<T*>(static_cast<char*>(base) + offset);
 }
+constexpr size_t kHoverOffset = 0x200a0;   // HoverOf, below
 }  // namespace
 
 int16_t gMapPanelScript[] = {TPW_WINDOW_SCRIPT_102B2366};   // 0x102b2366: the image's words (generated, devtools/gen_game_tables.py)
@@ -210,6 +211,7 @@ void CUI2DMap::CreateMapPanel() {
     panel->GetWindow(0x992)->SetCallbackFunction(reinterpret_cast<InterfaceWindowCallback>(&UI_2DMap_MapAreaCallback));
 
     MacAt<uint32_t>(self, 0x20060) = 0;
+    MacAt<CUI2DMapSprite*>(self, kHoverOffset) = nullptr;   // the host's place of that word: the last opening's sprites are deleted
     MacAt<uint16_t>(self, 0x20064) = 0;
     MacAt<uint32_t>(self, 0x20084) = 0;
     GetHFieldMaxVertexIndices(&MacAt<uint32_t>(self, 0x24), &MacAt<uint32_t>(self, 0x28));
@@ -432,7 +434,6 @@ template <class T> T& Field(CUI2DMap* map, size_t offset) { return *reinterpret_
 // Host-only places (the Mac keeps a 32-bit word at 0x20060 and the flag at 0x20084, which a native pointer cannot share with the
 // list pointer at 0x20080): the hovered sprite and the drag flag. The map panel window stays the Mac's word at 4, a Ptr32 (an arena
 // offset) as CreateMapPanel stores it.
-constexpr size_t kHoverOffset = 0x200a0;
 constexpr size_t kDragOffset = 0x200a8;
 CUI2DMapSprite*& HoverOf(CUI2DMap* map) { return Field<CUI2DMapSprite*>(map, kHoverOffset); }
 CUI2DMapSprite* SpriteOf(CUI2DMapSprite* p) { return p; }
@@ -979,8 +980,8 @@ void CUI2DMap::UpdateAllDrawRelated() {
         rect[1] = perY * static_cast<int32_t>(a >> 7) + 0x2a;
         rect[2] = perX * (static_cast<int32_t>(b & 0x7f) + 1) + 0xf;
         rect[3] = perY * (static_cast<int32_t>(b >> 7) + 1) + 0x2a;
-        void* current = nullptr;
-        std::memcpy(&current, map + 0x20060, sizeof(current));
+        // The hovered sprite: the Mac's word at 0x20060; the host keeps it at HoverOf, where MapAreaCallbackResult stores it.
+        const CUI2DMapSprite* const current = HoverOf(this);
         Colour9 frame;
         std::memset(&frame, 0, sizeof(frame));
         CopyEntry(frame, sprite == current ? 0x1d4 : 0x1b0);

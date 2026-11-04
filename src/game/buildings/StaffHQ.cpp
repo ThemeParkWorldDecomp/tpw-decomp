@@ -303,6 +303,7 @@ int32_t CStaffHQ::IsStriking(StaffType type) { return static_cast<int32_t>(mStri
 // 0x1012be24: element at 0x24 + 0xc * type, second word.
 void CStaffHQ::StopStrikeInProgress(StaffType type) { mStrikes[static_cast<int32_t>(type)].mF04 = 0; }
 
+
 // 0x1012be78 (368 bytes; the result goes through a hidden pointer). The cell argument is never read: the distance is measured from
 // this object's own cell bytes (+4 and +6), as the listing does.
 tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> CStaffHQ::FindNearestAvailableGuard(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell) {

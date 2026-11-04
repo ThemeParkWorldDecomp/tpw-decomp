@@ -118,6 +118,10 @@ void CObject::GoFirstPerson(int32_t on) const { ev("GoFirstPerson", {lab(this), 
 void ToggleFirstPersonWalkAround() { ev("ToggleFirstPersonWalkAround"); }
 void CoasterAcceptLeftMouseClick(int32_t down) { ev("CoasterAcceptLeftMouseClick", {down}); }
 COnlineControl::COnlineControl() { ev("Online.ctor", {lab(this)}); }
+// The class's own allocator (the arena in the game) is the global one here.
+void* COnlineControl::operator new(std::size_t size) { return ::operator new(size); }
+void* COnlineControl::operator new(std::size_t size, const std::nothrow_t& tag) noexcept { return ::operator new(size, tag); }
+void COnlineControl::operator delete(void* block) noexcept { ::operator delete(block); }
 void COnlineControl::SetAvatarDestination(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell) { ev("SetAvatarDestination", {lab(this), cell.mIndex}); }
 void COnlineControl::TeleportAvatar(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell) { ev("TeleportAvatar", {lab(this), cell.mIndex}); }
 

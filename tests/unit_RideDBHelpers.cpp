@@ -131,4 +131,9 @@ uint32_t tpw_rh_layout(uint32_t kind, uint32_t field) {
     return kind == 0 ? coaster[field] : kind == 1 ? texture[field] : kind == 2 ? ride[field] : balance[field];
 }
 const char16_t* tpw_rh_tag(uint32_t index) { return gRideStringTags[index]; }
+// 1 when the unit is built with the port fixes on (coasterpreview): LoadCoasterTypeDataFile then names the shared texture folder with
+// colons instead of the Mac's backslashes.
+int32_t tpw_rh_portfix() {
+    return 0;
+}
 }

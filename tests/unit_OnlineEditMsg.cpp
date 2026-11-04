@@ -100,6 +100,10 @@ int32_t CMMOnline::GetMode() { return 7; }
 void CMMOnline::OnAssign() {}
 void CMouse::AssignMouseMode(CMouseMode* mode) { ev("AssignMouseMode", {lab(this), lab(mode)}); }
 COnlineControl::COnlineControl() { ev("COnlineControl", {newlab(this)}); }
+// The class's own allocator (the arena in the game) is the global one here.
+void* COnlineControl::operator new(std::size_t size) { return ::operator new(size); }
+void* COnlineControl::operator new(std::size_t size, const std::nothrow_t& tag) noexcept { return ::operator new(size, tag); }
+void COnlineControl::operator delete(void* block) noexcept { ::operator delete(block); }
 void COnlineControl::SendText(std::u16string text) { ev("SendText", {lab(this), Hash(text.c_str())}); }
 void CreateMainMenu(int32_t a) { ev("CreateMainMenu", {a}); }
 void ContactMenu(int32_t a) { ev("ContactMenu", {a}); }

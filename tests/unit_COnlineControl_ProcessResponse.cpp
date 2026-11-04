@@ -109,11 +109,26 @@ void* NocaseSetFind(void* tree, const void* key) {
     ev("NSetFind", {lab(tree), lab(key)}, {Text(key)});
     return FindAnswer("NSetFind", tree, 4);
 }
+// The overloads for the host's std::u16string objects are the same fakes.
+void WStringCtorFrom(std::u16string* self, const char16_t* text) { WStringCtorFrom(static_cast<void*>(self), text); }
+void WStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    WStringCopy(static_cast<void*>(self), static_cast<const void*>(other), pos, count);
+}
+void WStringDtor(std::u16string* self, int16_t flag) { WStringDtor(static_cast<void*>(self), flag); }
+void NocaseWStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    NocaseWStringCopy(static_cast<void*>(self), static_cast<const void*>(other), pos, count);
+}
+void NocaseWStringDtor(std::u16string* self, int16_t flag) { NocaseWStringDtor(static_cast<void*>(self), flag); }
+void* BuddyTreeFind(void* tree, const std::u16string* key) { return BuddyTreeFind(tree, static_cast<const void*>(key)); }
+void* NocaseSetFind(void* tree, const std::u16string* key) { return NocaseSetFind(tree, static_cast<const void*>(key)); }
 }  // namespace online_callee
 
 namespace online_parse_callee {
 void WStringAssignRange(void* self, const void* src, uint32_t pos, uint32_t count) {
     ev("WAssign", {lab(self), lab(src), pos, count}, {Text(src)});
+}
+void WStringAssignRange(void* self, const std::u16string* src, uint32_t pos, uint32_t count) {
+    WStringAssignRange(self, static_cast<const void*>(src), pos, count);
 }
 }  // namespace online_parse_callee
 
@@ -127,11 +142,11 @@ bool WStringEqual(const std::u16string& a, const void* b) {
     ev("WEqual", {lab(&a), lab(b)}, {NN(a.c_str())});
     return (ret("WEqual") & 0xff) != 0;
 }
-void* WStringSetFind(void* tree, const void* key) {
+void* WStringSetFind(void* tree, const std::u16string* key) {
     ev("WSetFind", {lab(tree), lab(key)}, {Text(key)});
     return FindAnswer("WSetFind", tree, 5);
 }
-void NocaseSetInsertOne(void* tree, const void* key) { ev("NInsert", {lab(tree), lab(key)}, {Text(key)}); }
+void NocaseSetInsertOne(void* tree, const std::u16string* key) { ev("NInsert", {lab(tree), lab(key)}, {Text(key)}); }
 void NocaseSetErase(void* tree, void* node) { ev("NErase", {lab(tree), lab(node)}); }
 void UIOnlineUpdateBuddy(void* ui, const char16_t* name, int32_t flags) { ev("UIBuddy", {lab(ui), flags}, {NN(name)}); }
 void UIOnlineUpdateContact(void* ui, const char16_t* name, int32_t flags) { ev("UIContact", {lab(ui), flags}, {NN(name)}); }
@@ -247,7 +262,7 @@ void COnlineControl::Feedback(std::u16string& text) { ev("Feedback", {lab(this),
 void COnlineControl::ReceiveText(std::u16string& text, int32_t colour) {
     ev("ReceiveText", {lab(this), lab(&text), colour}, {NN(text.c_str())});
 }
-uint32_t COnlineControl::GetDataForUser(const nocase_string& key) const {
+uint32_t COnlineControl::GetDataForUser(const std::u16string& key) const {
     ev("GetData", {lab(this), lab(&key)}, {Text(&key)});
     return static_cast<uint32_t>(ret("GetData"));
 }
@@ -311,12 +326,18 @@ void tpw_pr_set_world(uint64_t table, uint64_t system) {
 
 int64_t tpw_pr_system_label() { return lab(gOnlineSystem); }
 
+// 1 when the unit is built with the port fixes on (unit chatevents): ProcessResponse then drops a visitor's event that is short or off
+// the map.
+int32_t tpw_pr_portfix() {
+    return 0;
+}
+
 void tpw_pr_process(uint64_t self, uint32_t capacity, uint32_t size, uint64_t data) {
     uint8_t* block = static_cast<uint8_t*>(tpw::ArenaAllocZeroed(16));
     ArgumentVector* vector = reinterpret_cast<ArgumentVector*>(block);
     vector->mCapacity = capacity;
     vector->mSize = size;
-    vector->mData = reinterpret_cast<Argument*>(static_cast<uintptr_t>(data));
+    vector->set_data(reinterpret_cast<Argument*>(static_cast<uintptr_t>(data)));
     reinterpret_cast<COnlineControl*>(static_cast<uintptr_t>(self))->ProcessResponse(vector);
 }
 

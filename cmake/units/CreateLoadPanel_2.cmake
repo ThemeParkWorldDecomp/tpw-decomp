@@ -8,7 +8,6 @@ set(TPW_UNIT_CreateLoadPanel_2_KEEP
   __Z15CreateLoadPaneli   # CreateLoadPanel(int)
   __Z15CreateSavePaneli   # CreateSavePanel(int)
   __Z20LoadSaveLCPostFormatP15InterfaceWindow   # LoadSaveLCPostFormat(InterfaceWindow*)
-  __ZN15loadsave_callee13CursorPosCtorEPv   # loadsave_callee::CursorPosCtor(void*)
   __ZN15loadsave_callee15FileTimeToLocalEPKvPv   # loadsave_callee::FileTimeToLocal(void const*, void*)
   _gLoadSaveFormat
   _gLoadSaveHilight

@@ -2,6 +2,7 @@
 
 #define TPW_GLOBE_INIT_REAL 1
 #define TPW_GLOBE_SHOWHIDE_REAL 1
+#define TPW_GLOBE_CITYVALID_REAL 1
 #include "AdvisorScoring.h"
 #include "Bitmap.h"
 #include "BMP_InsideArea.h"
@@ -59,8 +60,10 @@ CLBGlobe::~CLBGlobe() { mScreen->UnRegisterGlobe(this); }
 
 // CLBGlobeCityFlag (lobby_globe.cpp): a city's flag on the online globe. 0x100ac5c8 constructor, 0x100ac86c destructor.
 
-// 0x1023e91e: the wide string the city's name is compared with (its text is not known here; the Mac's starts "No").
-char16_t gGlobeNoCityName[16] = u"No";
+// 0x1023e91e: the wide string the city's name is compared with: a city named "North Pole" (any case) gets the Bullfrog flag
+// in place of the pin. The file's next wide string, "upload", follows it in the Mac's data (0x1023e934, 11 characters on),
+// and __sinit_lobby_globe_cpp builds a global string from it.
+char16_t gGlobeNoCityName[] = u"North Pole\0upload";
 
 CLBGlobeCityFlag::CLBGlobeCityFlag(const CLBScreenComponentOnlineGlobe* globe, const CFSOnlineCity* city) {
     mCity = city;
@@ -101,12 +104,20 @@ CLBGlobeCityFlag::CLBGlobeCityFlag(const CLBScreenComponentOnlineGlobe* globe, c
     mMesh->Scale(s, s, k);
 
     mGlobe = globe;
-    reinterpret_cast<CLBGlobeFlagOwner*>(const_cast<CLBScreenComponentOnlineGlobe*>(mGlobe))->AddFlag(this);
+    GlobeRegisterFlag(mGlobe, this);
 }
 
 // Complete-object destructor; the Mac's delete flag and the NULL check belong to the caller here.
 CLBGlobeCityFlag::~CLBGlobeCityFlag() {
-    reinterpret_cast<CLBGlobeFlagOwner*>(const_cast<CLBScreenComponentOnlineGlobe*>(mGlobe))->RemoveFlag(this);
+    GlobeUnRegisterFlag(mGlobe, this);
+}
+
+void GlobeRegisterFlag(const CLBScreenComponentOnlineGlobe* globe, CLBGlobeCityFlag* flag) {
+    const_cast<CLBScreenComponentOnlineGlobe*>(globe)->Register(flag);
+}
+
+void GlobeUnRegisterFlag(const CLBScreenComponentOnlineGlobe* globe, CLBGlobeCityFlag* flag) {
+    const_cast<CLBScreenComponentOnlineGlobe*>(globe)->UnRegister(flag);
 }
 
 // The lobby's online globe screens (main app of SimTheme Park 2.04b3): the base class's constructor (0x100ac90c) and the
@@ -676,6 +687,7 @@ void CLBScreenComponentDownloadGlobe::HandleOnlineBacktrack() {
 
 // 0x100aea58
 int32_t CLBScreenComponentDownloadGlobe::IsCityValid(const CFSOnlineCity* city) { return city->mValue > 0 ? 1 : 0; }
+int32_t CLBScreenComponentDownloadGlobe::IsCityWanted(CFSOnlineCity* city) { return IsCityValid(city); }   // the same slot 0x48
 
 void CLBScreenComponentPublishGlobe::Init() { mF70 = 0; }
 
@@ -768,6 +780,7 @@ int32_t CLBScreenComponentPublishGlobe::IsCityValid(const CFSOnlineCity* city) {
     if (city->mF60 != 0) return 0;
     return city->mValue < city->mF64 ? 1 : 0;
 }
+int32_t CLBScreenComponentPublishGlobe::IsCityWanted(CFSOnlineCity* city) { return IsCityValid(city); }   // the same slot 0x48
 
 // 0x100af1c8: the base destructor's text is inlined (both lists emptied, destroyed and cleared); CLBScreenComponent's destructor
 // follows (the compiler's, after this body).

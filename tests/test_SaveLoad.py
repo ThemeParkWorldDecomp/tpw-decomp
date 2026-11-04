@@ -21,6 +21,22 @@ The bullfrog strings are functional and unrecorded on both sides. What the cases
 the heap traffic (blocks handled by operator new, new[], delete and delete[]), and the allocator and user info pointers afterwards
 (by label). The file's first word is placed as the file has it (little endian bytes): the PowerPC side reads it as a big endian word
 and swaps it, the host reads it as it is.
+
+With the port fixes (tpw_sl_portfix answers 1) the host's Load does not trust the file's sizes (port_fix tag parkload): what is
+left after the header must be 1 to 64 MiB and the unpacked size 1 to 256 MiB, a block that is not one goes back to the allocator
+(Free, not delete[]), and the block is unpacked by LbZLib_PortMemDecompressChecked, whose failure fails the load (6). The original
+then runs a derived case and its result is changed as the fixes change it (port_expected):
+
+  - a size out of range: the original runs the case with that size made 0 (nothing left, or not a zlib block);
+  - less than a block header (0x1c bytes) left (port_fix truncsave): the original runs the case as a block that is not one,
+    without its call for the block's size (the port does not read a header the file does not hold);
+  - a block that is not one: the original's delete event (and its delete[] count) becomes the allocator's Free;
+  - the unpack: the original's LbZLib_MemDecompress event becomes the checked call's (block, bytes read, buffer, size); when the
+    case makes it fail (the host's queue "LbZLib_PortMemDecompressChecked"), the log ends there with the two Frees and the disc
+    file's destructor, the answer 0 and the error 6. Only Load's own cases make it fail.
+  - the read watch: Load arms it around LoadModules, and a module's read that fails while it runs (the host's queue "read watch",
+    answered by the LoadModules stand-in only when the watch is armed) fails the load as LoadModules answering 0 does: the original
+    runs the case with that answer. The watch is checked to be left disarmed and clear after every call.
 """
 import ctypes as C
 import random
@@ -421,10 +437,16 @@ def ppc_observe(e, res):
 
 
 STUBS = None
+PORT_FIX = False
+MAX_PACKED, MAX_UNPACKED = 64 << 20, 256 << 20      # the port's limits (port_fix parkload)
+HEADER = 0x1c                                       # a block's header: less left fails the load (port_fix truncsave)
 
 
 def setup(runner):
-    global STUBS
+    global STUBS, PORT_FIX
+    lib = runner.lib
+    lib.tpw_sl_portfix.restype, lib.tpw_sl_portfix.argtypes = I32, []
+    PORT_FIX = lib.tpw_sl_portfix() == 1
     A["gMemoryTemporary"] = runner.emu.data_imports["gMemoryTemporary__13SamsUtilities"]
     T.install_std_stubs(runner.emu)
     make_vtables(runner.emu)
@@ -526,16 +548,80 @@ class SlTest(FnTest):
         return mism
 
 
+def first_answer(c, key, dflt=0):
+    q = c["q"].get(key)
+    return q[0] if q else dflt
+
+
+def port_derived(c):
+    """The case the original runs for what the port's Load does with case c (see the module comment)."""
+    d = dict(c, q={k: list(v) for k, v in c["q"].items() if k != "LbZLib_PortMemDecompressChecked"})
+    q = d["q"]
+    position = first_answer(d, "CFile::Seek")
+    remaining = T.s32((first_answer(d, "CFile::GetSize") - position) & 0xFFFFFFFF)
+    if remaining < 0 or remaining > MAX_PACKED:
+        q["CFile::GetSize"] = [position]
+    elif remaining < HEADER:                      # less than a block header left (truncsave): fails as a block that is not one
+        q["LbZLib_MemDecompressedSize"] = [0]
+    if first_answer(d, "LbZLib_MemDecompressedSize", 64) & 0xFFFFFFFF > MAX_UNPACKED:
+        q["LbZLib_MemDecompressedSize"] = [0]
+    if first_answer(d, "read watch"):
+        q["LoadModules"] = [0]
+    return d
+
+
+def port_expected(c, d, out):
+    """The original's result `out` on the derived case d, changed as the port's fixes change it."""
+    log = list(out["log"])
+    out = dict(out, log=log, heap=list(out["heap"]))
+    sizes = [i for i, ev in enumerate(log) if ev[0] == "LbZLib_MemDecompressedSize"]
+    if not sizes:
+        return out
+    k = sizes[0]
+    allocator = [ev for ev in log[:k] if ev[0] == "Allocate"][-1][1][0]
+    packed = log[k][1][0]
+    unpacked_size = first_answer(d, "LbZLib_MemDecompressedSize", 64) & 0xFFFFFFFF
+    if unpacked_size == 0:                        # not a zlib block: the allocator's Free, not delete[]
+        if k + 1 < len(log) and log[k + 1][0] == "delete":
+            del log[k + 1]
+        log.insert(k + 1, ("Free", (allocator, packed), ()))
+        out["heap"][3] -= 1
+        rest = T.s32((first_answer(d, "CFile::GetSize") - first_answer(d, "CFile::Seek")) & 0xFFFFFFFF)
+        if 0 < rest < HEADER:                     # truncsave: the block's header is not read
+            del log[k]
+        return out
+    unpacks = [i for i, ev in enumerate(log) if ev[0] == "LbZLib_MemDecompress"]
+    if not unpacks:
+        return out
+    j = unpacks[0]
+    remaining = (first_answer(d, "CFile::GetSize") - first_answer(d, "CFile::Seek")) & 0xFFFFFFFF
+    unpacked = log[j][1][1]
+    log[j] = ("LbZLib_PortMemDecompressChecked", (packed, remaining, unpacked, unpacked_size), ())
+    answer = first_answer(c, "LbZLib_PortMemDecompressChecked", unpacked_size) & 0xFFFFFFFF
+    if answer != unpacked_size:                   # the unpack fails: the load ends there
+        disc = [ev for ev in log if ev[0] == "CDiscFile::Open"][0][1][0]
+        del log[j + 1:]
+        log += [("Free", (allocator, packed), ()), ("Free", (allocator, unpacked), ()), ("CFile::~CFile", (disc,), ())]
+        out.update(result=0, error=6)
+    return out
+
+
 def sl_test(name, ppc_call, host_call, edge, rnd):
     t = SlTest(name, None, None, edge=edge, rnd=rnd)
     ppc, host = ppc_run(ppc_call), host_run(host_call)
 
     def p(e, c):
-        t._p = ppc(e, c)
+        if PORT_FIX:
+            d = port_derived(c)
+            t._p = port_expected(c, d, ppc(e, d))
+        else:
+            t._p = ppc(e, dict(c, q={k: v for k, v in c["q"].items() if k != "LbZLib_PortMemDecompressChecked"}))
         return t._p
 
     def h(lib, c):
         out = host(lib, c)
+        if PORT_FIX and lib.tpw_sl_watch() != 0:
+            out = dict(out, watch_left=lib.tpw_sl_watch())
         t._last = (t._p, out)
         return out
 
@@ -625,8 +711,22 @@ def stage_case(r, stage, type_=None):
             q["Access::Write"] = [r.choice([-1, -7, -0x80000000])]
     elif stage == 15:                         # LoadModules fails
         q["LoadModules"] = [r.choice([0])]
+    elif stage == 17:                         # the sizes the port refuses: a park that asks for gigabytes, or a negative rest
+        if r.random() < 0.5:
+            q["LbZLib_MemDecompressedSize"] = [r.choice([MAX_UNPACKED, MAX_UNPACKED + 1, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFF])]
+        else:
+            size = r.choice([(MAX_PACKED + 4, 4), (MAX_PACKED + 5, 4), (0, 4), (4, 5), (0x7FFFFFFF, 0), (1, -1)])
+            q["CFile::GetSize"], q["CFile::Seek"] = [size[0]], [size[1], 0]
+    elif stage == 18:                         # the block does not unpack (the port's checked unpack; the original goes on)
+        q["LbZLib_PortMemDecompressChecked"] = [r.choice([0, 0, 1, 63, 0xFFFFFFFF])]
+        q["LbZLib_MemDecompressedSize"] = [r.choice([16, 64, 5000])]
+        q["CFile::GetSize"], q["CFile::Seek"] = [r.choice([100, 4097, 9])], [4, 0]
+    elif stage == 19:                         # a module's read fails (the port's read watch; the original goes on)
+        q["LoadModules"] = [r.choice([1, 2, -1, 0x100, 0x80000000])]
+        q["read watch"] = [1]
     else:                                     # it loads
         q["LoadModules"] = [r.choice([1, 2, -1, 0x100, 0x80000000])]
+        q["read watch"] = [0] if r.random() < 0.3 else []
         q["Access::Write"] = [r.choice([0, 1, 5, 64])] if r.random() < 0.3 else []
         q["CMemFile::Open"] = [r.choice([0, 1, 5])] if r.random() < 0.3 else []
     if r.random() < 0.15:
@@ -637,7 +737,7 @@ def stage_case(r, stage, type_=None):
     return c
 
 
-STAGES = 17
+STAGES = 20
 
 
 def edge_load():
@@ -660,6 +760,17 @@ def edge_load():
             c["open_word"] = word
             c["q"]["CDiscFile::Open"] = [-1 if fail else 0]
             cases.append(c)
+    # what is left of the file against the size of a block's header (port_fix truncsave), and the checked unpack's answer
+    for left in (1, 4, HEADER - 1, HEADER, HEADER + 1, 0x100):
+        for type_ in (1, 2):
+            for answer in (None, 0, 1):
+                c = stage_case(r, 16, type_)
+                c["q"]["CFile::GetSize"] = [0x1000]
+                c["q"]["CFile::Seek"] = [0x1000 - left, 0]
+                c["q"].pop("Access::Read", None)
+                if answer is not None:
+                    c["q"]["LbZLib_PortMemDecompressChecked"] = [answer]
+                cases.append(c)
     return cases
 
 

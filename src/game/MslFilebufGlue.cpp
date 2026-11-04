@@ -208,6 +208,23 @@ bool IsCharFilebuf(const void* sb) {
     return w == LowWord(gFilebufCharVtblB) || w == LowWord(gFilebufCharVtblA);
 }
 
+// The wide filebuf's locale (Mac 0x1c, two words) does not fit the host's LocaleRefPtr (two pointers): written in place it ran over
+// the FILE word at 0x24 and the state at 0x28. The slot's first word is the arena offset of a LocaleRefPtr block instead, as the
+// ios part keeps its locale (MslRuntimeGlue.cpp IosBaseInit), and the second word stays 0. getloc (UIInterface.cpp) copies the two
+// words as on the Mac and counts nothing (the count word is 0), so a copy is only a name of the block, dropped by doing nothing.
+LocaleRefPtr* WideFilebufLocale(const void* slot) {
+    const uint32_t offset = FirstWord(slot);
+    return offset == 0 ? nullptr : reinterpret_cast<LocaleRefPtr*>(tpw::gArenaBase + offset);
+}
+void WideFilebufLocaleRelease(void* slot) {
+    if (LocaleRefPtr* locale = WideFilebufLocale(slot)) {
+        ::LocaleRefPtrDestroy(locale, -1);
+        AnyDelete(locale);
+    }
+    const uint32_t words[2] = {0, 0};
+    std::memcpy(slot, words, sizeof(words));
+}
+
 }  // namespace
 
 // ---- filebuf_callee: the wide filebuf's callees outside the unit.
@@ -318,8 +335,21 @@ void Getloc(void* out, void* streambuf) {
     }
 }
 
-// 0x10072d24 std::locale::locale().
-void LocaleCtor(void* locale) { ::LocaleConstruct(static_cast<LocaleRefPtr*>(locale)); }
+// 0x10072d24 std::locale::locale(). Its caller is the wide filebuf's constructor, on the filebuf's locale slot (0x1c): the locale goes
+// into an arena block the slot names (WideFilebufLocale).
+void LocaleCtor(void* locale) {
+    uint8_t* slot = static_cast<uint8_t*>(locale);
+    if (!IsWideFilebuf(slot - 0x1c)) {
+        ::LocaleConstruct(static_cast<LocaleRefPtr*>(locale));
+        return;
+    }
+    uint32_t words[2] = {0, 0};
+    if (auto* block = static_cast<LocaleRefPtr*>(tpw::ArenaAllocZeroed(sizeof(LocaleRefPtr)))) {
+        ::LocaleConstruct(block);
+        words[0] = tpw::ArenaOffset(block);
+    }
+    std::memcpy(slot, words, sizeof(words));
+}
 
 // 0x10071f34 ~_RefCountedPtr<__locale_imp>.
 void LocaleDtor(void* locale, int32_t flag) { ::LocaleRefPtrDestroy(static_cast<LocaleRefPtr*>(locale), static_cast<int16_t>(flag)); }
@@ -395,8 +425,10 @@ int32_t Fflush(uint32_t file) {
     return f != nullptr ? std::fflush(f) : -1;
 }
 
-void LocaleDtor(void* locale, int32_t flag) {   // 0x10071f34
-    ::LocaleRefPtrDestroy(static_cast<LocaleRefPtr*>(locale), static_cast<int16_t>(flag));
+// 0x10071f34 ~_RefCountedPtr<__locale_imp>: the wide filebuf's destructor drops its locale slot (the block it names is freed).
+void LocaleDtor(void* locale, int32_t flag) {
+    (void)flag;
+    WideFilebufLocaleRelease(locale);
 }
 
 }  // namespace filebuf_unshift_callee
@@ -407,8 +439,13 @@ namespace filebuf_wclose_callee {
 // 0x100737a0 std::__locale_imp::~__locale_imp with the delete flag.
 void LocaleImpDtor(void* impl, int32_t flag) { ::LocaleImpDestroy(static_cast<LocaleImp*>(impl), static_cast<int16_t>(flag)); }
 
-// 0x10225cb8 use_facet<codecvt<wchar_t,char,int>>.
-void* UseFacetCodecvtW(void* locale) { return ::UseFacetCodecvtWcharChar(static_cast<const UseFacetLocale*>(locale)); }
+// 0x10225cb8 use_facet<codecvt<wchar_t,char,int>>. Its callers pass the two words getloc (UIInterface.cpp) copied from the wide
+// filebuf's slot: the first names the locale block (WideFilebufLocale), the second, the Mac's count word, is 0.
+void* UseFacetCodecvtW(void* locale) {
+    const LocaleRefPtr* block = WideFilebufLocale(locale);
+    if (block == nullptr) block = v51033_callee::LocaleClassic();
+    return ::UseFacetCodecvtWcharChar(reinterpret_cast<const UseFacetLocale*>(block));
+}
 
 // __ptr_glue vtable 0x2c: the filebuf's virtual uflow (the narrow and the wide filebuf are the two classes that reach here).
 int32_t VirtualUnderflow(void* fb) {

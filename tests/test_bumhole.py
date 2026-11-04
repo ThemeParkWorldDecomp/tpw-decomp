@@ -12,6 +12,12 @@ table behind +0x118 of the Mac object) go through __ptr_glue: the PowerPC stub t
 The world of a case: the three key tables, the world's state word (+0x1da738), the first person flags, the windows (game, bumhole, root),
 the toggle flag, the string buffer. What is compared: the answer, those globals, the buffer and the event log.
 
+The widescreen bumhole window (unit v5L26): a library built with the port fixes, with a unit space wider than 4:3 (and, with a smaller
+interface size, taller), makes the bumhole window as wide and as high as that space, 0..units-1, where the Mac has 0..0x7ff by 0..0x5ff.
+"the widescreen bumhole window" runs ToggleGameWindow's cases on the original and expects that rectangle from the host, the rest unchanged.
+A library built without the port fixes keeps 0x7ff by 0x5ff; there its own rectangle is replaced the same way, so the test is the 4:3
+comparison again.
+
 No fused operations. Not tested: strings of 31 or more characters as the first string of SetOnOffText (the original copies 31 characters
 without a terminator and then reads the uninitialised stack).
 """
@@ -367,6 +373,7 @@ def bind(lib):
     getattr(lib, p + "bumhole").restype = C.c_int32
     getattr(lib, p + "bumhole").argtypes = [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
     getattr(lib, p + "toggle").restype, getattr(lib, p + "toggle").argtypes = None, []
+    getattr(lib, p + "units").restype, getattr(lib, p + "units").argtypes = C.c_int32, [C.c_int32, C.c_int32]
     getattr(lib, p + "onoff").restype = None
     getattr(lib, p + "onoff").argtypes = [C.c_int32] * 6
     out = (C.c_int64 * 32)()
@@ -417,6 +424,8 @@ def ppc(e, case):
 
 
 def host(lib, case):
+    bind(lib)
+    lib.tpw_bh_units(*case.get("units", (0x800, 0x600)))
     return run(Host(lib, case), case)
 
 
@@ -506,8 +515,56 @@ def oo_edges():
             yield c
 
 
+# ---------------------------------------------------------------------------------------------------------------- the widescreen bumhole window
+
+WIDE_UNITS = [(2730, 0x600), (2457, 0x600), (3640, 2048), (0x800, 0x600)]   # 16:9, 16:10, 16:9 at a smaller interface size, 4:3
+
+
+def wide_rect(out, case):
+    """out with the bumhole window the unit space gives: CreateObject's right and bottom are the units less 1."""
+    width, height = case["units"]
+    out = dict(out)
+    log = []
+    for name, ints, texts in out["log"]:
+        if name == "CreateObject":
+            ints = tuple(ints[:6]) + (width - 1, height - 1)
+        log.append((name, ints, texts))
+    out["log"] = log
+    return out
+
+
+def wide_case(r, units=None):
+    c = tg_case(r)
+    c["units"] = r.choice(WIDE_UNITS) if units is None else units
+    return c
+
+
+def wide_edges():
+    r = random.Random(5126)
+    for units in WIDE_UNITS:
+        for toggled in (0, 1):
+            for bum in (False, True):
+                for obj in (0, 1):
+                    c = wide_case(r, units)
+                    c.update(game=True, toggled=toggled, flags=0, bum=bum)
+                    c["queues"]["CreateObject"] = [obj]
+                    yield c
+
+
+def ppc_wide(e, case):
+    return wide_rect(ppc(e, case), case)
+
+
+def host_wide(lib, case):
+    out = host(lib, case)
+    if lib.tpw_bh_units(0x800, 0x600) == 0:
+        out = wide_rect(out, case)
+    return out
+
+
 TESTS = [
     FnTest("bumhole", ppc, host, edge=bh_edges, rnd=bh_case),
     FnTest("ToggleGameWindow", ppc, host, edge=tg_edges, rnd=tg_case),
     FnTest("SetOnOffText", ppc, host, edge=oo_edges, rnd=oo_case),
+    FnTest("the widescreen bumhole window", ppc_wide, host_wide, edge=wide_edges, rnd=wide_case),
 ]

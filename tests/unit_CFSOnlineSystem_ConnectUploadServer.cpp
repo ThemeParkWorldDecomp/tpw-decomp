@@ -306,6 +306,7 @@ TbDynamicStringTemplate<char16_t>* RemoveHead(TbPtrList<TbDynamicStringTemplate<
     EV("RemoveHead", I(list->mCount));
     return list->RemoveHead();
 }
+int32_t PortFTPDownloadUnavailable() { return 0; }   // the client downloads, as on the Mac
 }  // namespace ftpdl_callee
 
 // The text is "S:online".

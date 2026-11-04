@@ -26,6 +26,7 @@
 
 #include "../icon.h"
 #include "../importer.h"
+#include "../sam_check.h"
 #include "../sha256.h"
 #include "../sniff.h"
 
@@ -72,7 +73,10 @@ std::string Env(const char* name) {
 }
 
 // The player's own discs are named in a file of theirs, not here: TPW_TEST_SOURCES, or sources.txt in TPW_TEST_TRANSFER, one
-// "key = path under TPW_TEST_TRANSFER" per line (keys: mac-zip, eur-a, eur-first, gold-zip). A missing key skips its test.
+// "key = path under TPW_TEST_TRANSFER" per line (keys: mac-zip, eur-a, eur-first, gold-zip, and for the Windows-disc
+// editions pc-us, the US 2.0 Windows CD, pc-us-first, the US first release 1.0, and pc-eur, a European Windows-only CD, such as
+// the English one sold as Sim Theme Park, volume SIM_THEME_PARK: its files are the European edition's). A missing key skips
+// its test.
 std::string SourceFor(const std::string& transfer, const std::string& key) {
     std::string file = Env("TPW_TEST_SOURCES");
     if (file.empty()) file = transfer + "/sources.txt";
@@ -233,9 +237,9 @@ size_t CountKind(const std::vector<ImportProgress>& ev, ImportProgress::Kind kin
 
 void PrintStatus(const char* what, const ImportReport& r) {
     std::printf("  %s: %s\n", what, r.Summary().c_str());
-    for (int i = 0; i < 3; ++i) {
+    for (int i : {0, 1, 2, 4, 5}) {
         const EditionStatus& s = r.status[i];
-        std::printf("    %-4s %-8s records %zu/%zu required %zu/%zu files %zu/%zu missing mac %zu pc %zu gold %zu\n",
+        std::printf("    %-6s %-8s records %zu/%zu required %zu/%zu files %zu/%zu missing mac %zu pc %zu gold %zu\n",
                     EditionName(s.edition), s.StateWord(), s.present, s.records, s.requiredPresent, s.required,
                     s.filesPresent, s.files, s.missing[kSourceMacCd], s.missing[kSourcePcCd], s.missing[kSourceGoldCd]);
     }
@@ -689,6 +693,340 @@ void TestStartupCheck(const std::string& scratch) {
     RemoveTree(root);
 }
 
+// ---- edited .sam files (tpw-port #94): the startup check and Check again keep a player's edited settings file, and
+// every start names it again; a changed file of any other kind (a .sam's own .rsrc side file included) is still removed
+
+const ManifestRecord* RecordOf(const char* dest, Edition edition) {
+    for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+        const ManifestRecord& r = ManifestRecords()[i];
+        if ((r.editions & edition) && std::strcmp(r.dest, dest) == 0) return &r;
+    }
+    return nullptr;
+}
+
+void TestEditedSettings(const std::string& scratch) {
+    std::printf("edited .sam files\n");
+    std::string root = scratch + "/edited-sam-data";
+    RemoveTree(root);
+    // the US Standard.sam (BMCTV's edit kept its size), the European med.sam (an edit that changes the size), the
+    // European med.sam's resource fork and another US file (no .sam), each written with its right size
+    const ManifestRecord* usSam = RecordOf("data/levels/Standard.sam", kEditionUs);
+    const ManifestRecord* eurSam = RecordOf("data/med.sam", kEditionEur);
+    const ManifestRecord* eurRsrc = RecordOf("data/med.sam.rsrc", kEditionEur);
+    std::map<std::string, int> usDests;
+    for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+        if (ManifestRecords()[i].editions & kEditionUs) usDests[ManifestRecords()[i].dest]++;
+    }
+    const ManifestRecord* usOther = nullptr;
+    for (size_t i = 0; i < ManifestRecordCount() && !usOther; ++i) {
+        const ManifestRecord& r = ManifestRecords()[i];
+        const char* dot = std::strrchr(r.dest, '.');
+        if ((r.editions & kEditionUs) && !(r.flags & (kFlagRsrc | kFlagFinfo)) && r.hash_count == 1 &&
+            usDests[r.dest] == 1 && RecordHash(r, 0).size > 0 && !(dot && std::strcmp(dot, ".sam") == 0))
+            usOther = &r;
+    }
+    CHECK(usSam && eurSam && eurRsrc && usOther);
+    if (!usSam || !eurSam || !eurRsrc || !usOther) return;
+    auto sized = [](const ManifestRecord* r, char c) { return std::string(static_cast<size_t>(RecordHash(*r, 0).size), c); };
+
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    std::string usSamPath, eurSamPath, eurRsrcPath, usOtherPath, tsvPath;
+    {
+        Importer layout(cfg);
+        usSamPath = layout.DestinationPath(kEditionUs, *usSam);
+        eurSamPath = layout.DestinationPath(kEditionEur, *eurSam);
+        eurRsrcPath = layout.DestinationPath(kEditionEur, *eurRsrc);
+        usOtherPath = layout.DestinationPath(kEditionUs, *usOther);
+        tsvPath = layout.VerifiedPath();
+    }
+    WriteFile(usSamPath, sized(usSam, 'a'));
+    WriteFile(eurSamPath, sized(eurSam, 'a'));
+    WriteFile(eurRsrcPath, sized(eurRsrc, 'a'));
+    WriteFile(usOtherPath, sized(usOther, 'a'));
+    std::string err;
+    size_t usPresent = 0, eurPresent = 0;
+    {   // the first start writes the record (nothing rehashed)
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        CHECK(!imp.LastOpenCheck().hadRecord);
+        usPresent = imp.Status(kEditionUs).present;
+        eurPresent = imp.Status(kEditionEur).present;
+        CHECK_EQ(usPresent, 2);
+        CHECK_EQ(eurPresent, 2);
+    }
+
+    // the player edits: Standard.sam keeps its size, med.sam grows; the other two change too
+    WriteFile(usSamPath, sized(usSam, 'b'));
+    WriteFile(eurSamPath, sized(eurSam, 'b') + "\r\nBankAccountInfo.InitialCash 1000000\r\n");
+    WriteFile(eurRsrcPath, sized(eurRsrc, 'b'));
+    WriteFile(usOtherPath, sized(usOther, 'b'));
+    for (const std::string& path : {usSamPath, eurRsrcPath, usOtherPath}) {
+        std::error_code ec;
+        fs::last_write_time(path, fs::last_write_time(path, ec) + std::chrono::seconds(5), ec);
+        CHECK(!ec);
+    }
+    // in manifest order (by destination)
+    const std::vector<std::string> named = {std::string("us/") + usSam->dest, std::string("eur/") + eurSam->dest};
+    {
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        OpenCheck c = imp.LastOpenCheck();
+        CHECK_EQ(c.rehashed, 4);
+        CHECK_EQ(c.removed[0], 1);
+        CHECK_EQ(c.removed[1], 1);
+        CHECK(c.edited == named);
+        CHECK(Exists(usSamPath) && Exists(eurSamPath));
+        CHECK(!Exists(eurRsrcPath) && !Exists(usOtherPath));
+        CHECK_EQ(imp.Status(kEditionUs).present, usPresent - 1);
+        CHECK_EQ(imp.Status(kEditionEur).present, eurPresent - 1);
+        CHECK(ReadText(eurSamPath).find("InitialCash 1000000") != std::string::npos);
+        std::string tsv = ReadText(tsvPath);
+        CHECK(!LineFor(tsv, "us", usSam->dest) && !LineFor(tsv, "eur", eurSam->dest));
+        CHECK(c.Kept() == "kept 2 edited .sam files, which the game reads: us/data/levels/Standard.sam, eur/data/med.sam "
+                          "(Customized settings on the edition's tile restores an original).");
+        std::printf("  %s\n  %s\n", c.Kept().c_str(), c.Notice().c_str());
+    }
+    {   // every start names them again; nothing else is rehashed
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        OpenCheck c = imp.LastOpenCheck();
+        CHECK_EQ(c.rehashed, 2);
+        CHECK_EQ(c.Removed(), 0);
+        CHECK(c.edited == named);
+        // Check again keeps them too, and leaves them out of the record
+        CHECK_EQ(imp.VerifyEdition(kEditionUs, err), 0);
+        CHECK_EQ(imp.VerifyEdition(kEditionEur, err), 0);
+        CHECK(Exists(usSamPath) && Exists(eurSamPath));
+        CHECK_EQ(imp.Status(kEditionUs).present, usPresent - 1);
+        std::string tsv = ReadText(tsvPath);
+        CHECK(!LineFor(tsv, "us", usSam->dest) && !LineFor(tsv, "eur", eurSam->dest));
+        // the tile's badge counts them; the list has each with its read check and no original (an edit is never copied)
+        CHECK_EQ(imp.Status(kEditionUs).edited, 1);
+        CHECK_EQ(imp.Status(kEditionEur).edited, 1);
+        CHECK_EQ(imp.Status(kEditionGold).edited, 0);
+        std::vector<EditedFile> us = imp.EditedFiles(kEditionUs);
+        CHECK_EQ(us.size(), 1);
+        if (us.size() == 1) {
+            CHECK(us[0].dest == usSam->dest && us[0].path == usSamPath);
+            CHECK(!us[0].original);
+            CHECK_EQ(us[0].unreadableLine, 1);   // "bbbb...": no group name the parser takes
+        }
+        CHECK(!Exists(imp.OriginalPath(kEditionUs, *usSam)) && !Exists(imp.OriginalPath(kEditionEur, *eurSam)));
+        CHECK(!imp.RestoreOriginal(kEditionUs, usSam->dest, err));
+        CHECK(err.find("drop the disc again") != std::string::npos);
+        // a kept copy that no longer hashes to the original is no original: not offered, not restored
+        WriteFile(imp.OriginalPath(kEditionUs, *usSam), sized(usSam, 'c'));
+        us = imp.EditedFiles(kEditionUs);
+        CHECK(us.size() == 1 && !us[0].original);
+        CHECK(!imp.RestoreOriginal(kEditionUs, usSam->dest, err));
+        CHECK(ReadText(usSamPath) == sized(usSam, 'b'));
+        CHECK_EQ(imp.Status(kEditionUs).edited, 1);
+        // only a .sam of the edition
+        CHECK(!imp.RestoreOriginal(kEditionUs, usOther->dest, err));
+        CHECK(!imp.RestoreOriginal(kEditionUs, eurSam->dest + std::string("x"), err));
+    }
+    // the original back: the edited file deleted, the next start finds it missing (a drop would write it)
+    fs::remove(usSamPath);
+    {
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        OpenCheck c = imp.LastOpenCheck();
+        CHECK(c.edited == std::vector<std::string>{std::string("eur/") + eurSam->dest});
+        CHECK(c.Kept() == "kept 1 edited .sam file, which the game reads: eur/data/med.sam (Customized settings on the "
+                          "edition's tile restores an original).");
+        CHECK_EQ(imp.Status(kEditionUs).present, usPresent - 2);
+        CHECK_EQ(imp.Status(kEditionUs).edited, 0);
+        // removing the edition takes its kept originals with it (assets/us/originals)
+        CHECK(Exists(imp.OriginalPath(kEditionUs, *usSam)));
+        CHECK(imp.RemoveEdition(kEditionUs, err));
+        CHECK(!Exists(imp.OriginalPath(kEditionUs, *usSam)));
+    }
+    RemoveTree(root);
+}
+
+// ---- the read check (assets/sam_check.h): the game's balance parser rules, with any value the parser takes
+
+void TestSamReadCheck() {
+    std::printf("the .sam read check\n");
+    // a table laid out as the game's: a group's fields above its heading (type 1), an array group between a type 2 and
+    // its type 3 (name: the group, arrayCount: its capacity), blank rows between groups
+    auto row = [](int32_t type, const char* name, int32_t minI = 0, int32_t maxI = 0, float minF = 0, float maxF = 0,
+                  int32_t count = 0, uint32_t flags = 0) {
+        SamRow r{};
+        r.type = type;
+        std::snprintf(r.name, sizeof r.name, "%s", name);
+        r.minInteger = minI;
+        r.maxInteger = maxI;
+        r.minFloat = minF;
+        r.maxFloat = maxF;
+        r.arrayCount = count;
+        r.flags = flags;
+        return r;
+    };
+    const std::vector<SamRow> table = {
+        row(0, ""),
+        row(4, "Cash"), row(5, "People"), row(6, "Level", 0, 5), row(7, "Rate"), row(8, "Speed"),
+        row(9, "Mix", 0, 0, 0.0f, 1.0f), row(10, "Name"), row(1, "Bank"),
+        row(0, ""),
+        row(2, ""), row(4, "Price"), row(11, "Shape", 0, 0, 0, 0, 0, 1), row(3, "Ride", 0, 0, 0, 0, 2),
+        row(12, ""),
+    };
+    struct Case {
+        const char* text;
+        int line;
+    };
+    const Case cases[] = {
+        // any value the parser takes is fine: huge, negative, saturating
+        {"Bank.Cash 2147483647999\r\nBank.Cash -99999999999\r\nBank.Rate -12345.5\r\n", 0},
+        {"# a comment\n\n   \nBank.Cash 1 and words the parser never reads\n", 0},
+        {"Bank.Cash.People.Level 5 6 4\n", 0},
+        {"Bank.Name \"Hello park\"\nBank.Mix 0.5\nBank.Speed 0\n", 0},
+        {"Ride[1].Price 10\n", 0},
+        // a map: the line after its closing --- is skipped, whatever it holds
+        {"Ride[0].Shape\n---\n. * Q\n@ +\n---\n!! skipped !!\nBank.Cash 1\n", 0},
+        // where the game stops
+        {"Bank.Cash 1\r\nBank.Cash x\r\n", 2},
+        {"Bank.Cash 1\nBank.People -1\n", 2},
+        {"Bank.Level 5\n", 1},
+        {"Bank.Level -1\n", 1},
+        {"Bank.Level 4\n", 0},
+        {"Bank.Speed -0.5\n", 1},
+        {"Bank.Mix 1.0\n", 1},
+        {"Bank.Rate 1.2.3\n", 1},
+        {"Bank.Rate 1e5\n", 1},
+        {"Bank.Name \"open\n", 1},
+        {"\nBank.Gold 5\n", 2},
+        {"Vault.Cash 1\n", 1},
+        {"Ride[2].Price 10\n", 1},
+        {"Bank[0].Cash 1\n", 1},
+        {"Ride.Price 1\n", 1},
+        {"Bank Cash 1\n", 1},
+        {"Bank.Cash\n5\n", 2},          // the value is read from the next line, which is then read as a line of its own
+        {"Ride[0].Shape\n---\n. Z\n---\n", 3},
+        {"Ride[0].Shape\n. *\n---\n", 2},
+        {"Ride[0].Shape.Price\n---\n.\n---\n", 1},
+        {"Ride[0].Shape\n---\n.\n", 2},     // never closed: the line it opens on
+    };
+    for (const Case& c : cases) {
+        const int line = SamUnreadableLine(table, std::string(c.text));
+        if (line != c.line) std::printf("  \"%s\": line %d, expected %d\n", c.text, line, c.line);
+        CHECK_EQ(line, c.line);
+    }
+    // the game's text ends at a NUL
+    CHECK_EQ(SamUnreadableLine(table, std::string("Bank.Cash 1\n\0Bank.Cash x\n", 26)), 0);
+    // no table (a name nothing registered): only what every table holds
+    const std::vector<SamRow> none;
+    CHECK_EQ(SamUnreadableLine(none, "Anything.Goes 5 7\nWhatever[3].X.Y \"s\"\nMap.Shape\n---\nZZZ\n---\n\nA.B 1\n"), 0);
+    CHECK_EQ(SamUnreadableLine(none, "A.B 1\nA B 1\n"), 2);
+    CHECK_EQ(SamUnreadableLine(none, "A.B 1\n---\n"), 2);
+    CHECK_EQ(SamUnreadableLine(none, "A[x].B 1\n"), 1);
+    // by file name, any case and folder, as the launcher registers the game's tables
+    SetSamTable("Test.sam", table.data(), table.size());
+    CHECK_EQ(SamUnreadableLine(std::string("data/levels/TEST.SAM"), std::string("Vault.Cash 1\n")), 1);
+    CHECK_EQ(SamUnreadableLine(std::string("data/levels/other.sam"), std::string("Vault.Cash 1\n")), 0);
+    CHECK_EQ(SamTableFor("x/test.sam").size(), table.size());
+}
+
+// ---- the kept originals, with the player's own US game folder (TPW_GAME_DIR, the folder that holds "data"): a copy of
+// every verified .sam made at the first start, restored over an edit; an edit made before any copy gets one from a drop
+
+void TestOriginals(const std::string& scratch) {
+    const std::string game = Env("TPW_GAME_DIR");
+    if (game.empty()) {
+        Skip("the kept originals: TPW_GAME_DIR (a US game folder) is not set");
+        return;
+    }
+    std::printf("kept originals of .sam files\n");
+    std::vector<const ManifestRecord*> sams;
+    for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+        const ManifestRecord& r = ManifestRecords()[i];
+        const size_t n = std::strlen(r.dest);
+        if ((r.editions & kEditionUs) && n > 4 && std::strcmp(r.dest + n - 4, ".sam") == 0) sams.push_back(&r);
+    }
+    const ManifestRecord* standard = RecordOf("data/levels/Standard.sam", kEditionUs);
+    CHECK(standard && !sams.empty());
+    if (!standard) return;
+    const std::string original = ReadText(game + "/" + standard->dest);
+    if (original.empty()) {
+        Skip("the kept originals: no data/levels/Standard.sam in TPW_GAME_DIR");
+        return;
+    }
+    const std::string edited = original + "\r\nBankAccountInfo.InitialCash 123456789\r\n";
+    std::string err;
+    ImporterConfig cfg;
+    cfg.dataRoot = scratch + "/originals-data";
+    RemoveTree(cfg.dataRoot);
+    {   // every .sam as the disc has it: the first start keeps a copy of each
+        Importer layout(cfg);
+        for (const ManifestRecord* r : sams) {
+            const std::string bytes = ReadText(game + "/" + r->dest);
+            if (!bytes.empty()) WriteFile(layout.DestinationPath(kEditionUs, *r), bytes);
+        }
+    }
+    {
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        size_t copies = 0;
+        for (const ManifestRecord* r : sams) {
+            if (!Exists(imp.DestinationPath(kEditionUs, *r))) continue;
+            ++copies;
+            CHECK(ReadText(imp.OriginalPath(kEditionUs, *r)) == ReadText(imp.DestinationPath(kEditionUs, *r)));
+        }
+        std::printf("  %zu originals kept\n", copies);
+        CHECK(copies > 0);
+        CHECK(fs::path(imp.OriginalPath(kEditionUs, *standard)).generic_string() ==
+              cfg.dataRoot + "/assets/us/originals/data/levels/Standard.sam");
+        WriteFile(imp.DestinationPath(kEditionUs, *standard), edited);
+    }
+    {   // the edit is kept and listed with its original; Restore original puts the disc's file back
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        CHECK_EQ(imp.Status(kEditionUs).edited, 1);
+        std::vector<EditedFile> list = imp.EditedFiles(kEditionUs);
+        CHECK(list.size() == 1 && list[0].original && list[0].unreadableLine == 0);
+        CHECK(ReadText(imp.OriginalPath(kEditionUs, *standard)) == original);   // never the edit
+        CHECK(imp.RestoreOriginal(kEditionUs, standard->dest, err));
+        CHECK(ReadText(imp.DestinationPath(kEditionUs, *standard)) == original);
+        CHECK_EQ(imp.Status(kEditionUs).edited, 0);
+        CHECK(imp.EditedFiles(kEditionUs).empty());
+    }
+    {   // and it stays verified: the next start rehashes nothing
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        CHECK_EQ(imp.LastOpenCheck().rehashed, 0);
+        CHECK(imp.LastOpenCheck().edited.empty());
+    }
+    RemoveTree(cfg.dataRoot);
+
+    // an install edited before it had copies: no copy from the edit; dropping the disc's file keeps one and leaves the
+    // edit in place; then it can be restored
+    {
+        Importer layout(cfg);
+        WriteFile(layout.DestinationPath(kEditionUs, *standard), edited);
+    }
+    const std::string drop = scratch + "/originals-drop";
+    RemoveTree(drop);
+    WriteFile(drop + "/Standard.sam", original);
+    {
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        CHECK(!Exists(imp.OriginalPath(kEditionUs, *standard)));
+        CHECK_EQ(imp.VerifyEdition(kEditionUs, err), 0);
+        std::vector<EditedFile> list = imp.EditedFiles(kEditionUs);
+        CHECK(list.size() == 1 && !list[0].original);
+        imp.Import({drop});
+        CHECK(ReadText(imp.DestinationPath(kEditionUs, *standard)) == edited);
+        CHECK(ReadText(imp.OriginalPath(kEditionUs, *standard)) == original);
+        list = imp.EditedFiles(kEditionUs);
+        CHECK(list.size() == 1 && list[0].original);
+        CHECK(imp.RestoreOriginal(kEditionUs, standard->dest, err));
+        CHECK(ReadText(imp.DestinationPath(kEditionUs, *standard)) == original);
+    }
+    RemoveTree(cfg.dataRoot);
+    RemoveTree(drop);
+}
+
 // ---- damaged containers: an error naming the file and the reason, never a drop that quietly holds nothing
 
 void Put16(std::string& v, uint32_t x) {
@@ -698,6 +1036,40 @@ void Put16(std::string& v, uint32_t x) {
 void Put32(std::string& v, uint32_t x) {
     Put16(v, x & 0xffff);
     Put16(v, x >> 16);
+}
+
+// A Bullfrog DWFB wad (wad.cpp) of stored entries: the 0x58-byte header, 40-byte entries, the names, the data.
+std::string WadOf(const std::vector<std::pair<std::string, std::string>>& files) {
+    std::string out(0x58, '\0');
+    std::memcpy(&out[0], "DWFB", 4);
+    out[4] = 2;
+    std::string names, data;
+    const uint32_t table = 0x58 + 40 * uint32_t(files.size());
+    uint32_t nameAt = table;
+    for (const auto& f : files) nameAt += uint32_t(f.first.size() + 1);
+    uint32_t dataAt = nameAt;
+    std::string entries;
+    uint32_t nameOff = table;
+    for (const auto& f : files) {
+        Put32(entries, 0);
+        Put32(entries, nameOff);
+        Put32(entries, uint32_t(f.first.size() + 1));
+        Put32(entries, dataAt);
+        Put32(entries, uint32_t(f.second.size()));
+        Put32(entries, 0);
+        Put32(entries, uint32_t(f.second.size()));
+        entries.append(12, '\0');   // the rest of the 40-byte entry
+        names += f.first + '\0';
+        data += f.second;
+        nameOff += uint32_t(f.first.size() + 1);
+        dataAt += uint32_t(f.second.size());
+    }
+    std::string count;
+    Put32(count, uint32_t(files.size()));
+    Put32(count, table);
+    Put32(count, uint32_t(names.size()));
+    out.replace(0x48, 12, count);
+    return out + entries + names + data;
 }
 
 // A zip of one member, built here from bytes. `crcXor` is XORed into the CRC both headers carry (0: a good zip);
@@ -773,6 +1145,76 @@ size_t FileCount(const std::string& dir) {
     size_t n = 0;
     for (const auto& kv : Tree(dir, false)) n += kv.first.find("/.staging/") == std::string::npos && kv.first != "launcher.ini";
     return n;
+}
+
+// ---- the films: a folder holds each as the Mac CD's .mov or the PC CD's .tgq (FilmCounterpart), counted once
+
+void TestFilms(const std::string& scratch) {
+    std::printf("films: the Mac CD's or the PC CD's\n");
+    std::string root = scratch + "/films-data";
+    RemoveTree(root);
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    // Files of the films' sizes (sparse, no content), which the stat sweep of Open() counts as present when there is no
+    // verified.tsv (TestStartupCheck).
+    auto place = [&](Edition e, const char* extension) {
+        Importer layout(cfg);
+        size_t n = 0;
+        for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+            const ManifestRecord& r = ManifestRecords()[i];
+            const std::string dest = r.dest;
+            if (!FilmCounterpart(r, e) || dest.compare(dest.size() - 4, 4, extension) != 0) continue;
+            const std::string path = layout.DestinationPath(e, r);
+            WriteFile(path, "");
+            fs::resize_file(path, RecordHash(r, 0).size);
+            ++n;
+        }
+        CHECK_EQ(n, 9);
+        fs::remove(layout.VerifiedPath());
+    };
+    auto status = [&](Edition e) {
+        Importer imp(cfg);
+        std::string err;
+        CHECK(imp.Open(err));
+        return imp.Status(e);
+    };
+    for (Edition e : {kEditionUs, kEditionEur}) {
+        const size_t required = CountRecords(e, true) - 9;   // a film and its .tgq are one required file
+        EditionStatus none = status(e);
+        CHECK_EQ(none.required, required);
+        CHECK_EQ(none.requiredPresent, 0);
+        CHECK_EQ(none.missing[kSourceMacCd] + none.missing[kSourcePcCd], required);   // a film missing is the .mov
+        // the PC CD's films alone: each counts for its .mov
+        place(e, ".tgq");
+        EditionStatus pc = status(e);
+        CHECK_EQ(pc.present, 9);
+        CHECK_EQ(pc.required, required);
+        CHECK_EQ(pc.requiredPresent, 9);
+        CHECK_EQ(none.missing[kSourceMacCd] - pc.missing[kSourceMacCd], 9);
+        CHECK_EQ(none.missing[kSourcePcCd], pc.missing[kSourcePcCd]);
+        // and the Mac CD's too: the same 9 required files
+        place(e, ".mov");
+        EditionStatus both = status(e);
+        CHECK_EQ(both.present, 18);
+        CHECK_EQ(both.requiredPresent, 9);
+        CHECK_EQ(both.missing[kSourceMacCd], pc.missing[kSourceMacCd]);
+        // the Mac CD's alone, as before
+        Importer layout(cfg);
+        for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+            const ManifestRecord& r = ManifestRecords()[i];
+            const std::string dest = r.dest;
+            if (FilmCounterpart(r, e) && dest.compare(dest.size() - 4, 4, ".tgq") == 0) fs::remove(layout.DestinationPath(e, r));
+        }
+        fs::remove(layout.VerifiedPath());
+        EditionStatus mac = status(e);
+        CHECK_EQ(mac.present, 9);
+        CHECK_EQ(mac.requiredPresent, 9);
+        CHECK_EQ(mac.missing[kSourceMacCd], pc.missing[kSourceMacCd]);
+        CHECK_EQ(mac.missing[kSourcePcCd], pc.missing[kSourcePcCd]);
+        std::printf("  %s: required %zu; with the PC films %zu present, missing mac %zu pc %zu; with the Mac films the same\n",
+                    EditionName(e), required, pc.requiredPresent, pc.missing[kSourceMacCd], pc.missing[kSourcePcCd]);
+        RemoveTree(root);
+    }
 }
 
 void TestDamagedContainers(const std::string& scratch) {
@@ -869,6 +1311,29 @@ void TestDamagedContainers(const std::string& scratch) {
         }
         Events(imp);
     }
+
+    // the Windows disc's data/fonts.wad is opened as a container (its members are matched by content); the same bytes
+    // under another name are one plain file, and a damaged fonts.wad is an error that names it
+    {
+        std::string wad = WadOf({{"fonts\\one.ttf", member}, {"fonts\\two.ttf", Junk(700)}});
+        WriteFile(drop + "/pc/Data/fonts.wad", wad);
+        WriteFile(drop + "/other/Data/other.wad", wad);
+        ImportReport fonts = imp.Import({drop + "/pc"});
+        ImportReport other = imp.Import({drop + "/other"});
+        CHECK(fonts.errors.empty() && other.errors.empty());
+        CHECK_EQ(fonts.containers, other.containers + 1);
+        CHECK_EQ(fonts.entries, other.entries + 2);
+        CHECK_EQ(fonts.unknownFiles, 2);   // two.ttf and the wad; one.ttf has a manifest size, so it is read and hashed
+        CHECK_EQ(other.unknownFiles, 1);
+        CHECK_EQ(fonts.written, 0);
+        std::string bad = wad;
+        bad[0x48] = char(0xff);   // more entries than the file holds
+        WriteFile(drop + "/badwad/Data/fonts.wad", bad);
+        ImportReport damaged = imp.Import({drop + "/badwad"});
+        CHECK_EQ(damaged.errors.size(), 1);
+        CHECK(AnyContains(damaged.errors, "fonts.wad"));
+        Events(imp);
+    }
     CHECK_EQ(FileCount(root), 0);
     RemoveTree(root);
     RemoveTree(drop);
@@ -877,7 +1342,7 @@ void TestDamagedContainers(const std::string& scratch) {
 // ---- the discs
 
 struct Discs {
-    std::string toast, eurImg, eurFirst, goldZip, allitems, gameEur;
+    std::string toast, eurImg, eurFirst, goldZip, allitems, gameEur, pcUs, pcUsFirst, pcEur;
 };
 
 bool CompareUs(const std::string& folder) {
@@ -1031,7 +1496,10 @@ void TestUsAndEur(const Discs& d, const std::string& scratch) {
     CHECK(eur.status[1].unlocked);
     CHECK_EQ(eur.status[1].present, 913);
     CHECK_EQ(eur.status[1].filesPresent, 845);
-    CHECK_EQ(eur.differentVersions.size(), 2);  // the PC tuning files; the other languages' speech files are not news
+    // none: the PC tuning files are the European Windows edition's own; the other languages' speech files are not news
+    CHECK_EQ(eur.differentVersions.size(), 0);
+    CHECK(eur.status[5].unlocked);   // the same image holds the European Windows edition
+    CHECK_EQ(eur.status[5].present, 817);
     CompareEur(imp.GameFolder(kEditionEur), d.gameEur);
 
     // (c) both again: nothing changes
@@ -1052,7 +1520,69 @@ void TestUsAndEur(const Discs& d, const std::string& scratch) {
     LauncherIni ini;
     CHECK(LoadLauncherIni(root + "/launcher.ini", ini, err));
     CHECK(ini.editions["us"] == "unlocked" && ini.editions["eur"] == "unlocked" && ini.editions["gold"] == "absent");
+    CHECK(ini.editions["eur-pc"] == "unlocked" && ini.editions["us-pc"] == "partial");
     RemoveTree(root);
+}
+
+// The Windows discs alone, no Mac file: the European image and a European Windows-only CD (even one sold as Sim Theme
+// Park) unlock the European Windows edition and nothing else, the US 2.0 CD the US one; the US first release (1.0)
+// unlocks nothing and reports its files as different versions.
+void TestWindowsDiscs(const Discs& d, const std::string& scratch) {
+    struct Case {
+        const char* name;
+        std::string path;
+        int index;                // EditionIndex of the edition the disc is for
+        bool unlocks;
+    } cases[] = {{"the European Windows image", d.eurImg, 5, true},
+                 {"a European Windows CD", d.pcEur, 5, true},
+                 {"the US 2.0 Windows CD", d.pcUs, 4, true},
+                 {"the US first release", d.pcUsFirst, 4, false}};
+    for (const Case& c : cases) {
+        if (c.path.empty()) {
+            Skip(std::string("Windows disc import of ") + c.name + ": not under TPW_TEST_TRANSFER");
+            continue;
+        }
+        std::printf("%s alone\n", c.name);
+        std::string root = scratch + "/windows";
+        RemoveTree(root);
+        ImporterConfig cfg;
+        cfg.dataRoot = root;
+        Importer imp(cfg);
+        std::string err;
+        CHECK(imp.Open(err));
+        ImportReport r = imp.Import({c.path});
+        Events(imp);
+        PrintStatus(c.name, r);
+        for (const std::string& e : r.errors) std::printf("    error: %s\n", e.c_str());
+        CHECK(r.errors.empty());
+        const EditionStatus& s = r.status[c.index];
+        CHECK_EQ(s.unlocked, c.unlocks);
+        for (int i : {0, 1, 2, 4, 5}) {
+            if (i != c.index) CHECK(!r.status[i].unlocked);
+        }
+        if (c.unlocks) {
+            CHECK_EQ(s.present, c.index == 5 ? 817u : 749u);   // the films too: an installed folder lacks them
+            CHECK_EQ(r.differentVersions.size(), 0);
+            // the sign fonts, unpacked from data/fonts.wad, are plain TrueType files
+            size_t fonts = 0;
+            for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+                const ManifestRecord& m = ManifestRecords()[i];
+                std::string dest = m.dest;
+                if (!(m.editions & s.edition) || dest.size() < 4 || dest.compare(dest.size() - 4, 4, ".TTF") != 0) continue;
+                std::ifstream f(imp.DestinationPath(s.edition, m), std::ios::binary);
+                char head[4] = {};
+                f.read(head, 4);
+                if (f && std::memcmp(head, "\0\1\0\0", 4) == 0) ++fonts;
+            }
+            CHECK_EQ(fonts, 17);
+        } else {
+            CHECK(s.filesPresent > 0 && !r.differentVersions.empty());
+            std::printf("  %zu of %zu files present, %zu different versions\n", s.filesPresent, s.files,
+                        r.differentVersions.size());
+            for (const std::string& v : r.differentVersions) std::printf("    different version (not used): %s\n", v.c_str());
+        }
+        RemoveTree(root);
+    }
 }
 
 void TestFirstPressing(const Discs& d, const std::string& scratch) {
@@ -1312,6 +1842,10 @@ int main() {
     TestSynthetic(scratch);
     TestIcon(scratch);
     TestStartupCheck(scratch);
+    TestEditedSettings(scratch);
+    TestSamReadCheck();
+    TestOriginals(scratch);
+    TestFilms(scratch);
     TestDamagedContainers(scratch);
     TestLanguageLines();
     TestLanguageSynthetic(scratch);
@@ -1331,6 +1865,9 @@ int main() {
         d.eurImg = source("eur-a");
         d.eurFirst = source("eur-first");
         d.goldZip = source("gold-zip");
+        d.pcUs = source("pc-us");
+        d.pcUsFirst = source("pc-us-first");
+        d.pcEur = source("pc-eur");
     }
     if (!expect.empty()) d.allitems = pick(expect + "/allitems.exe");
     if (!gdi.empty()) d.gameEur = pick(gdi + "/game-eur/tpw-eur/Theme Park Data");
@@ -1343,6 +1880,7 @@ int main() {
         TestUsAndEur(d, scratch);
         TestFirstPressing(d, scratch);
         TestGold(d, scratch);
+        TestWindowsDiscs(d, scratch);
     }
     RemoveTree(scratch);
 

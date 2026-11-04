@@ -49,14 +49,30 @@ namespace {
 
 int64_t P(const void* p) { return static_cast<int64_t>(reinterpret_cast<uintptr_t>(p)); }
 
+// The hide cases put the two menu windows above 4 GB (kHighWindows over the token, as a host window is): the menu word keeps only
+// their low 32 bits. The window fakes record such a window as its token, and a menu window's pointer cut to 32 bits as a value no
+// token has.
+constexpr uint64_t kHighWindows = 0x7A5Aull << 32;
+bool gHighWindows = false;
+int64_t W(const void* p) {
+    const uint64_t v = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(p));
+    if (!gHighWindows || v == 0) return static_cast<int64_t>(v);
+    if ((v & ~0xFFFFFFFFull) == kHighWindows) return static_cast<int64_t>(v & 0xFFFFFFFFull);
+    for (const InterfaceWindow* menu : {gOnlineWindowE90, gOnlineWindowE8c}) {
+        const uint64_t m = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(menu));
+        if (m > 0xFFFFFFFFull && v == (m & 0xFFFFFFFFull)) return static_cast<int64_t>(v | (0xBADull << 48));
+    }
+    return static_cast<int64_t>(v);
+}
+
 }  // namespace
 
 // ---- the fakes
 int32_t InterfaceWindow::Show(int16_t on) {
-    ev("Show", {P(this), on});
+    ev("Show", {W(this), on});
     return 0;
 }
-void InterfaceWindow::unlink() { ev("unlink", {P(this)}); }
+void InterfaceWindow::unlink() { ev("unlink", {W(this)}); }
 void InterfaceWindow::CaptureKb(int32_t on) { ev("CaptureKb", {P(this), on}); }
 int32_t InterfaceWindow::CallDefaultWindowHandler(int32_t message, int32_t a, int32_t b) {
     ev("CDWH", {P(this), message, a, b});
@@ -177,6 +193,7 @@ int32_t tpw_bum_buttons(uint64_t window, int32_t message, int32_t a, int32_t b) 
     return ButtonsUnderlayMsg(reinterpret_cast<InterfaceWindow*>(window), message, a, b);
 }
 void tpw_bum_hide() { HideButtonsMenu(); }
+void tpw_bum_high_windows(int32_t on) { gHighWindows = on != 0; }
 void tpw_bum_sinit_info() { __sinit_ui_onlineParkInfoPanel_cpp(); }
 void tpw_bum_remove() { RemoveOnlineParkListPanel(); }
 void tpw_bum_sinit_list() { __sinit_ui_onlineParkListPanel_cpp(); }

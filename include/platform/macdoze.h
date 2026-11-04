@@ -16,6 +16,10 @@ void SetCursor(SamsUtilities::UCursor* cursor);
 // Critical sections: the handle is the word the caller keeps (bthread_mutex's first word).
 void EnterCriticalSection(void** handle);   // macdoze 0x1000bb14
 void LeaveCriticalSection(void** handle);   // macdoze 0x1000bb74
+// The same on a 4 byte word (a Mac object's handle: bthread_mutex): the word is a handle, index + 1 into the host's table of
+// mutexes, 0 for none yet (Enter makes one).
+void EnterCriticalSection(uint32_t* handle);
+void LeaveCriticalSection(uint32_t* handle);
 void ZeroMemory(void*, uint32_t);
 void CopyMemory(void* dest, const void* source, uint32_t size);
 int32_t ShowWindow(GrafPort*, int32_t);

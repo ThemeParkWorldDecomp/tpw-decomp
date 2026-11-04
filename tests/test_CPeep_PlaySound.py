@@ -9,9 +9,9 @@ the map and its cell tests, the Pilot, CThing::Move, the map time stamp, IsLocal
 GAME_ASSERTMSG) are fakes on both sides that record their arguments (pointers as offsets from the peep) and answer from the case's queues.
 
 What is compared: the answer, the event log, every byte of the peep block (the fields the code writes typed, the rest as bytes). Fused
-operations: UpdateTurn fmadds and PlaySound fctiwz run under HardwareRounding. Not tested: the SetDest answer beyond zero/non-zero (the
-original answers what the void Pilot::new_target leaves in r3, which the header does not model); NaN scripts positions (fctiwz of NaN
-differs in the emulator).
+operations: UpdateTurn fmadds and PlaySound fctiwz run under HardwareRounding. The original SetDest answers what Pilot::new_target
+leaves in r3, recalc_path's answer (0 when no path leads to the target); the host calls recalc_path as new_target does, and both fakes
+answer from the case's "new_target" queue. Not tested: NaN scripts positions (fctiwz of NaN differs in the emulator).
 """
 import ctypes as C
 import random
@@ -110,7 +110,7 @@ def stub_get_pos(e):
 
 
 STUBS.internal(0x10134888, stub_get_pos)
-mk(0x101347EC, "new_target", lambda e: [off(e.r(3)), s32(e.r(4)), s32(e.r(5))])
+mk(0x101347EC, "new_target", lambda e: [off(e.r(3)), s32(e.r(4)), s32(e.r(5)), 0], "new_target")   # recalc_path's answer, mode 0
 mk(0x101349CC, "set_speed", lambda e: [off(e.r(3)), canon_f(fb(e.f(1)))])
 mk(0x100FACC0, "ProcessSpriteScripts", lambda e: [off(e.r(3))])
 mk(0x1012E5B4, "Move", lambda e: [off(e.r(3)), (e.r(4) >> 16) & 0xFFFF, (e.r(5) >> 16) & 0xFFFF])
@@ -284,8 +284,6 @@ def observe(s, peep, answer, case):
     f = lambda a, n: [s.rd_word(a + 4 * i) for i in range(n)]
     d = struct.unpack(s.fmt[0] + "HH", s.read(peep + 0x18, 4))
     h = struct.unpack(s.fmt[0] + "HHH", s.read(peep + 0xC0, 6))
-    if case["op"] in ("setdest", "setdest_cell"):
-        answer = 1 if answer else 0
     if case["op"] in ("play", "teleport", "turn", "setstr"):
         answer = 0      # void: r3 is whatever the last callee left
     return {"answer": answer, "log": s.log(), "block": bytes(block), "dest": d, "turns": h, "speed": canon_f(s.rd_word(peep + 0xC8)),
@@ -345,7 +343,7 @@ def base(r, op):
             "queues": {"scrx": [rfloat(r)], "scry": [rfloat(r)], "scrz": [rfloat(r)], "SOUND_SendEvent": [r.getrandbits(32)],
                        "IsPath": [0], "IsQueue": [0], "IsEntrance": [0], "IsExit": [0], "IsGrass": [0],
                        "gpx": [r.getrandbits(32)], "gpy": [r.getrandbits(32)], "MakeNewTimeStamp": [now],
-                       "IsLocal": [r.choice([0, 1])], "GetThingId": [r.getrandbits(16)]}}
+                       "IsLocal": [r.choice([0, 1])], "GetThingId": [r.getrandbits(16)], "new_target": [r.choice([0, 1])]}}
 
 
 def case_for(r, op, edge=None):

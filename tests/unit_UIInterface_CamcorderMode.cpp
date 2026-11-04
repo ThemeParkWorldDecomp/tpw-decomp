@@ -104,6 +104,7 @@ namespace errdeque_callee {
 void OperatorDelete(void* p) { ev("delete", {lab(p)}); }
 }  // namespace errdeque_callee
 
+
 extern "C" {
 
 uint64_t tpw_cam_addr(const char* name) {

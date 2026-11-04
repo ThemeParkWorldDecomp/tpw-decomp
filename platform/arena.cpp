@@ -59,9 +59,27 @@ std::vector<LargeHole>* gHoles = nullptr;
     std::abort();
 }
 
+// The range starts on a 4 GB boundary when the system allows it, so that an arena offset is also the low half of the host address
+// (the translation's other pointer model, a 32-bit word and gMslMacAddressHigh, then names the same byte). mmap reserves 4 GB more
+// than the arena and gives back what lies outside the aligned range.
+constexpr uint64_t kAlign = uint64_t(1) << 32;
+
+#ifndef _WIN32
+void* MapAligned() {
+    void* wide = mmap(nullptr, kArenaBytes + kAlign, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON | MAP_NORESERVE, -1, 0);
+    if (wide == MAP_FAILED) return mmap(nullptr, kArenaBytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON | MAP_NORESERVE, -1, 0);
+    const uintptr_t start = reinterpret_cast<uintptr_t>(wide);
+    const uintptr_t aligned = (start + kAlign - 1) & ~(kAlign - 1);
+    if (aligned > start) munmap(wide, aligned - start);
+    const uintptr_t end = start + kArenaBytes + kAlign, used = aligned + kArenaBytes;
+    if (end > used) munmap(reinterpret_cast<void*>(used), end - used);
+    return reinterpret_cast<void*>(aligned);
+}
+#endif
+
 void Reserve() {
     if (gArenaBase != nullptr) return;
-    void* base = mmap(nullptr, kArenaBytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON | MAP_NORESERVE, -1, 0);
+    void* base = MapAligned();
     if (base == MAP_FAILED) Fail("could not reserve the address range", nullptr);
     gArenaBase = static_cast<uint8_t*>(base);
     gTop = 4096;   // offset 0 is the null pointer; the first page stays unused

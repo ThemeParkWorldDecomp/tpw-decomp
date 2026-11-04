@@ -159,9 +159,6 @@ bool FilterMsl(SwearFilter* filter, void* slot, bool replace) {
     if (ret("FilterChanges") != 0 && rep->mData[0] != 0) rep->mData += 1;
     return false;
 }
-}  // namespace parklist_callee
-
-namespace online_callee {
 void WStringCtor(void* self) {
     ev("WStringCtor", {});
     gRep.mLength = 0;
@@ -177,7 +174,7 @@ void WStringAssign(void* self, const char16_t* text, uint32_t n) {
     rep->mData = const_cast<char16_t*>(text);
 }
 void WStringDtor(void*, int16_t flag) { ev("WStringDtor", {I(flag)}); }
-}  // namespace online_callee
+}  // namespace parklist_callee
 
 CFSGlobalMasterSave::CFSGlobalMasterSave() { ev("MasterSaveCtor", {I(newlab(this))}); }
 bool CFSGlobalMasterSave::IsSwearFilterOn() const {

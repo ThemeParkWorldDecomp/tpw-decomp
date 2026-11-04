@@ -73,6 +73,10 @@ void InterfaceListControl2::GetItem(int32_t position, int32_t column, UI_LCAdd& 
 }
 void InterfaceListControl2::RemoveAllItems() { ev("RemoveAllItems", {lab(this)}); }
 COnlineControl::COnlineControl() { ev("COnlineControl::COnlineControl", {newlab(this)}); }
+// The class's own allocator (the arena in the game) is the global one here.
+void* COnlineControl::operator new(std::size_t size) { return ::operator new(size); }
+void* COnlineControl::operator new(std::size_t size, const std::nothrow_t& tag) noexcept { return ::operator new(size, tag); }
+void COnlineControl::operator delete(void* block) noexcept { ::operator delete(block); }
 bool COnlineControl::IsThisMe(const char16_t* name) {
     ev("IsThisMe", {lab(this), lab(name)});
     return ret("IsThisMe") != 0;

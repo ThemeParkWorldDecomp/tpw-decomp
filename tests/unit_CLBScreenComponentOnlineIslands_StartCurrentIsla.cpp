@@ -68,6 +68,7 @@ uint32_t CLBScreenComponentOnlineIslands::ProcessCancel() { return 0; }
 void CLBScreenComponentOnlineIslands::Show() {}
 void CLBScreenComponentOnlineIslands::GotoNextIsland() { ev("vcall", {0x40, lab(this)}); }
 void CLBScreenComponentOnlineIslands::SelectCurrentIsland() { ev("vcall", {0x48, lab(this)}); }
+void CLBScreenComponentOnlineIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/game/online/lobby_island.cpp)
 
 CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
 void CLBScreenComponentOnlineGlobe::Render() {}

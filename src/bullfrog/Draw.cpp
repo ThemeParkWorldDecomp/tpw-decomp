@@ -49,6 +49,19 @@ template<unsigned Bytes> void StorePixel(uint8_t* p, uint32_t value) {
         p[i] = static_cast<uint8_t>(value >> ((Bytes - 1 - i) * 8));
 }
 
+// A 16-bit pixel as the engine keeps it: a host-order word, as TbRaConvert.cpp's Store16 and the font writers store it
+// and COpenGLTexture::Download reads it (the Mac's lhz and sth used its own big-endian order).
+template<> uint32_t LoadPixel<2>(const uint8_t* p) {
+    uint16_t value;
+    std::memcpy(&value, p, sizeof(value));
+    return value;
+}
+
+template<> void StorePixel<2>(uint8_t* p, uint32_t value) {
+    const uint16_t pixel = static_cast<uint16_t>(value);
+    std::memcpy(p, &pixel, sizeof(pixel));
+}
+
 template<> void StorePixel<3>(uint8_t* p, uint32_t value) {
     // The original copies the first three bytes of its big-endian word.
     p[0] = static_cast<uint8_t>(value >> 24);

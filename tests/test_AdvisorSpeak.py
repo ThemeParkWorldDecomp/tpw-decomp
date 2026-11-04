@@ -1,5 +1,5 @@
 """Differential test for the advisor's speech: ADV_Call, ADV_Slap, ADV_Kill, ADV_GetTag and ADV_Stat (src/game/advisor/Advisor.cpp) and
-the response table (src/advisor_lines.cpp), against libtpw_unit_Advisor.dylib (tests/unit_Advisor.cpp).
+the response table (tables/advisor_lines.cpp), against libtpw_unit_Advisor.dylib (tests/unit_Advisor.cpp).
 
 The world, the sides and the fakes are those of tests/test_Advisor.py (imported, not copied): a script of operations over
 up to two advisor meshes, the state dumped after every operation, the call logs compared at the end. This module adds

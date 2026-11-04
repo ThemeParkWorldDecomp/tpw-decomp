@@ -123,7 +123,8 @@ void GotoCallbackFn(int32_t status, const void*) {
 // The Mac object is 0xe8c bytes of 32-bit words (strings, sets and deques are one pointer each, or small blocks): the class declares
 // them as opaque bytes, so the fields are reached by their Mac offsets. A pointer the object holds (the chat at +0, the avatar's person
 // at +4, the two string blocks at +8 and +0xc and the character pointer inside a string block at +0xc) does not fit a 32-bit word on the
-// host: the word is a handle, index + 1 into a table of pointers, 0 for NULL (as CWorld keeps its control pointer). The container and string
+// host: the word is a handle. A block in the arena is its arena offset (the pointer's low half: the arena starts on a 4 GB boundary); any
+// other pointer is 0xF0000000 + index + 1 into a table (above every arena offset), and 0 is NULL. The container and string
 // members are built and torn down by library code that is faked by the tests (online_callee, include/online.h).
 
 extern OnlineConfig gOnlineConfig;   // 0x102b2b70
@@ -141,19 +142,24 @@ std::unordered_map<const void*, uint32_t>& HandleIndex() {
 }
 }  // namespace
 
+constexpr uint32_t kTableHandles = 0xF0000000u;   // the arena's size: every word from here up is a table handle
+
 uint32_t PointerToHandle(const void* p) {
     if (p == nullptr) return 0;
+    if (tpw::InArena(p)) return tpw::ArenaOffset(p);
     auto found = HandleIndex().find(p);
     if (found != HandleIndex().end()) return found->second;
     HandleTable().push_back(const_cast<void*>(p));
-    const uint32_t handle = static_cast<uint32_t>(HandleTable().size());
+    const uint32_t handle = kTableHandles + static_cast<uint32_t>(HandleTable().size());
     HandleIndex()[p] = handle;
     return handle;
 }
 
 void* HandleToPointer(uint32_t handle) {
-    if (handle == 0 || handle > HandleTable().size()) return nullptr;
-    return HandleTable()[handle - 1];
+    if (handle == 0) return nullptr;
+    if (handle < kTableHandles) return tpw::gArenaBase + handle;
+    if (handle - kTableHandles > HandleTable().size()) return nullptr;
+    return HandleTable()[handle - kTableHandles - 1];
 }
 
 }  // namespace online_callee
@@ -167,14 +173,18 @@ const char kConnectionFailed[] = "ONLINE CHAT: connection failed!\n";   // 0x102
 
 inline uint8_t* Bytes(COnlineControl* self) { return reinterpret_cast<uint8_t*>(self); }
 inline uint32_t& Word(COnlineControl* self, std::size_t offset) { return *reinterpret_cast<uint32_t*>(Bytes(self) + offset); }
-inline void* Ptr(uint32_t word) { return reinterpret_cast<void*>(static_cast<std::uintptr_t>(word)); }   // a raw word (the deque's)
+// The deque's table word: an arena offset (its blocks come from the arena, include/Ptr32.h).
+inline void* Ptr(uint32_t word) { return word != 0 ? static_cast<void*>(tpw::gArenaBase + word) : nullptr; }
 inline void* Deref(uint32_t handle) { return online_callee::HandleToPointer(handle); }
 inline uint32_t ToHandle(const void* pointer) { return online_callee::PointerToHandle(pointer); }
 
-// The string's character data: a string is one handle of a block whose word at +0xc is the handle of the characters.
+// The string's character data: a string is one handle of its representation, whose character pointer is at +0xc on the Mac (a native
+// pointer at +0x10 here: IME::MslWideStringRep).
 inline void* StringData(uint32_t stringWord) {
     const uint8_t* block = static_cast<const uint8_t*>(Deref(stringWord));
-    return Deref(*reinterpret_cast<const uint32_t*>(block + 0xc));
+    void* data;
+    std::memcpy(&data, block + 0x10, sizeof(data));
+    return data;
 }
 
 // gOnlineSystem is made on first use; the original inlines this at every use.
@@ -188,10 +198,20 @@ CFSOnlineSystem* MakeOnlineSystem() {
 
 }  // namespace
 
+void* COnlineControl::operator new(std::size_t size) {
+    void* block = tpw::ArenaAllocZeroed(size);   // zeroed, as the block IME::MslNew grants
+    if (block == nullptr) throw std::bad_alloc();
+    return block;
+}
+
+void* COnlineControl::operator new(std::size_t size, const std::nothrow_t&) noexcept { return tpw::ArenaAllocZeroed(size); }
+
+void COnlineControl::operator delete(void* block) noexcept { tpw::ArenaFree(block); }
+
 // 0x10213870
 COnlineControl::COnlineControl() {
     uint8_t* self = Bytes(this);
-    uint32_t tempDeque[6];   // the temporary deque on the stack
+    uint32_t tempDeque[7];   // the temporary deque on the stack (MslArgumentDeque, 0x1c bytes)
     char16_t text[0x400];
     Word(this, 0) = 0;
     Word(this, 4) = 0;
@@ -551,10 +571,6 @@ int CaseOf(uint32_t command) {
 inline uint32_t Word_2(const void* base, uint32_t offset) {
     return *reinterpret_cast<const uint32_t*>(static_cast<const uint8_t*>(base) + offset);
 }
-// A 32-bit pointer word of a Mac-layout block (an offset into the arena on the host).
-inline const char16_t* WideAt(const void* base, uint32_t offset) {
-    return reinterpret_cast<const Ptr32<const char16_t>*>(static_cast<const uint8_t*>(base) + offset)->get();
-}
 
 // "if (*gOnlineSystem == NULL) *gOnlineSystem = new CFSOnlineSystem": the original repeats it before every use.
 CFSOnlineSystem* System() {
@@ -598,28 +614,30 @@ void ErrorCase(const char* message, int32_t error) {
 
 // 0x10214e80
 void COnlineControl::ProcessInitResponse(void* arguments) {
-    const uint8_t* data = *reinterpret_cast<uint8_t* const*>(static_cast<const uint8_t*>(arguments) + 8);   // vector's first element
+    const uint8_t* data = reinterpret_cast<const uint8_t*>(static_cast<const ArgumentVector*>(arguments)->data());   // the first element
     const uint32_t command = Word_2(data, 8);
     switch (CaseOf(command)) {
     case 1: {
         SamsUtilities::UDebug(kMsgB2);
-        uint8_t* info = reinterpret_cast<uint8_t*>(System()->GetFTPDownloadParkInfo());
+        // The park and the city are the host's objects (the Mac read the park's words at +8, +0x14 and +0x48, the system's list at
+        // +0xe0 and the city's name at +0x14).
+        CFSOnlinePark* park = reinterpret_cast<CFSOnlinePark*>(System()->GetFTPDownloadParkInfo());
         char buffer[16];
-        std::sprintf(buffer, kFormatD, static_cast<int>(Word_2(info, 8)));
+        std::sprintf(buffer, kFormatD, static_cast<int>(park->mParkID));
         uint64_t text;
         init_callee::StringFromChars(&text, buffer);
         init_callee::ChatSetPlayerData(Word_2(this, 0), static_cast<int32_t>(online_callee::AvatarID(System())), this);
-        info = reinterpret_cast<uint8_t*>(System()->GetFTPDownloadParkInfo());
+        park = reinterpret_cast<CFSOnlinePark*>(System()->GetFTPDownloadParkInfo());
         uint64_t name;
-        online_callee::WStringCtorFrom(&name, WideAt(info, 0x14));
+        online_callee::WStringCtorFrom(&name, park->mText0C.mData);
         uint64_t topic;
         online_callee::WStringCtorFrom(&topic, kRandomName);
         CFSOnlineSystem* system = System();
         System();
-        info = reinterpret_cast<uint8_t*>(System()->GetFTPDownloadParkInfo());
-        uint8_t* city = static_cast<uint8_t*>(init_callee::ReturnCityInfo(Word_2(system, 0xe0), static_cast<int32_t>(Word_2(info, 0x48))));
+        park = reinterpret_cast<CFSOnlinePark*>(System()->GetFTPDownloadParkInfo());
+        CFSOnlineCity* city = park_info_callee::ReturnCityInfo(system->mCityList, park->mF48);
         uint64_t cityName;
-        online_callee::WStringCtorFrom(&cityName, WideAt(city, 0x14));
+        online_callee::WStringCtorFrom(&cityName, city->mName);
         init_callee::ChatCreateRoom(Word_2(this, 0), &name, &topic, &cityName, &text, 0x100, this);
         online_callee::WStringDtor(&cityName, -1);
         online_callee::WStringDtor(&topic, -1);
@@ -639,15 +657,18 @@ void COnlineControl::ProcessInitResponse(void* arguments) {
     case 7: ErrorCase(kMsg1fe, 0xa3); break;
     case 8: ErrorCase(kMsg243, 0xa2); break;
     case 9: ErrorCase(kMsg243, 0xaa); break;
-    case 10:
+    case 10: {
         mClientReady = 1;
-        AddContact(*reinterpret_cast<std::u16string*>(reinterpret_cast<uint8_t*>(this) + 8), 0);
+        // The player's name: the Mac passes the field at +8 itself, a slot here, so AddContact is given the host's string of its text.
+        std::u16string me(static_cast<const char16_t*>(StringData(Word(this, 8))));
+        AddContact(me, 0);
         gGameWorld->StartingPopulationForOnline();
         SamsUtilities::UDebug(kMsg276);
         SamsUtilities::UDebug(kMsg2ab);
         LoadBuddy(kEmptyPath);
         LoadIgnore(kEmptyPath);
         break;
+    }
     case 11: break;   // a table entry that points at the epilogue
     default:
         SamsUtilities::UDebug(kMsg2d8);
@@ -783,7 +804,7 @@ uint8_t* FindBuddy(COnlineControl* self, const WString& name) {
 void UpdateUser(COnlineControl* self, const WString& key, const char16_t* text, bool contact) {
     WString nocase;
     online_callee::NocaseWStringCopy(&nocase, &key, 0, kWhole);
-    const uint32_t flags = self->GetDataForUser(reinterpret_cast<const nocase_string&>(nocase));
+    const uint32_t flags = self->GetDataForUser(nocase);
     if (contact)
         response_callee::UIOnlineUpdateContact(&gUIInterface, text, static_cast<int32_t>(flags));
     else
@@ -1060,12 +1081,13 @@ void GotoPark(COnlineControl* self, const Argument* args) {
     online_callee::WStringDtor(&name, -1);
 }
 
+
 }  // namespace
 
 // 0x10215560
 void COnlineControl::ProcessResponse(void* arguments) {
     const ArgumentVector* vector = static_cast<const ArgumentVector*>(arguments);
-    const Argument* args = vector->mData;
+    const Argument* args = vector->data();
     switch (args[0].mCommand) {
     case 0x0b:
         Table()->FormatString(Buffer(this), 0x400, 0x60);
@@ -1228,11 +1250,6 @@ namespace {
 
 constexpr uint32_t kParserVtableWord = 0x102b1b2c;   // TOC -0x5edc: the address CParser's destructor leaves in the object
 
-// A host tree node of the contact set: the node base, then the std::wstring (the Mac has it at node + 0xc).
-struct ContactNode : MslRedBlackTree::node_base {
-    std::u16string mValue;
-};
-
 // An Argument is three words: 0 the char string, 4 the wide string, 8 the command number.
 // Pushes an Argument that carries only a command number.
 void PushCommand(void* vec, uint32_t command) {
@@ -1245,8 +1262,9 @@ void PushCommand(void* vec, uint32_t command) {
     online_callee::StringDtor(argument, -1);
 }
 
-// Pushes an Argument that carries a copy of the wide string.
-void PushText(void* vec, const void* text) {
+// Pushes an Argument that carries a copy of the wide string (a slot, or the host's string).
+template <typename Text>
+void PushText(void* vec, const Text* text) {
     alignas(8) uint8_t copy[16] = {};
     alignas(8) uint8_t argument[16] = {};
     online_callee::WStringCopy(copy, text, 0, 0xffffffffu);
@@ -1339,16 +1357,14 @@ void COnlineControl::ReceiveText(std::u16string& text, int32_t colour) {
 
 // 0x10217f34: the name against the player's own (field 8), both as case-insensitive copies.
 bool COnlineControl::IsThisMe(const char16_t* name) {
-    alignas(8) uint8_t plain[16] = {};
-    alignas(8) uint8_t first[16] = {};
-    alignas(8) uint8_t second[16] = {};
-    online_callee::WStringCtorFrom(plain, name);
-    online_callee::NocaseWStringCopy(first, plain, 0, 0xffffffffu);
-    online_callee::WStringDtor(plain, -1);
-    online_callee::NocaseWStringCopy(second, reinterpret_cast<uint8_t*>(this) + 8, 0, 0xffffffffu);
-    bool same = online_callee::NocaseWStringEqual(first, second);
-    online_callee::NocaseWStringDtor(second, 0);
-    online_callee::NocaseWStringDtor(first, 0);
+    std::u16string plain, first, second;
+    online_callee::WStringCtorFrom(&plain, name);
+    online_callee::NocaseWStringCopy(&first, &plain, 0, 0xffffffffu);
+    online_callee::WStringDtor(&plain, -1);
+    online_callee::NocaseWStringCopy(&second, reinterpret_cast<const uint32_t*>(reinterpret_cast<uint8_t*>(this) + 8), 0, 0xffffffffu);
+    bool same = online_callee::NocaseWStringEqual(&first, &second);
+    online_callee::NocaseWStringDtor(&second, 0);
+    online_callee::NocaseWStringDtor(&first, 0);
     return same;
 }
 
@@ -1479,7 +1495,7 @@ void COnlineControl::VoteForThisPark() {
 // 0x10218c44
 void COnlineControl::BuddyOn(std::u16string& name) {
     uint8_t* self = reinterpret_cast<uint8_t*>(this);
-    uint32_t key;
+    std::u16string key;
     online_callee::NocaseWStringCopy(&key, &name, 0, 0xffffffffu);
     void* found = online_callee::BuddyTreeFind(self + 0xe34, &key);
     online_callee::NocaseWStringDtor(&key, 0);
@@ -1489,10 +1505,10 @@ void COnlineControl::BuddyOn(std::u16string& name) {
 // 0x10218e3c: sends command 0xf when the name is in the buddy map (0xe34)
 void COnlineControl::BuddyOff(std::u16string& name) {
     uint8_t* self = reinterpret_cast<uint8_t*>(this);
-    alignas(8) uint8_t key[16] = {};
-    online_callee::NocaseWStringCopy(key, &name, 0, 0xffffffffu);
-    void* found = online_callee::BuddyTreeFind(self + 0xe34, key);
-    online_callee::NocaseWStringDtor(key, 0);
+    std::u16string key;
+    online_callee::NocaseWStringCopy(&key, &name, 0, 0xffffffffu);
+    void* found = online_callee::BuddyTreeFind(self + 0xe34, &key);
+    online_callee::NocaseWStringDtor(&key, 0);
     if (found == self + 0xe38) return;
     SendNameCommand(this, 0xf, name);
 }
@@ -1500,10 +1516,10 @@ void COnlineControl::BuddyOff(std::u16string& name) {
 // 0x10219034: sends command 0xd when the name is not in the ignore set (0xe44)
 void COnlineControl::IgnoreOn(std::u16string& name) {
     uint8_t* self = reinterpret_cast<uint8_t*>(this);
-    alignas(8) uint8_t key[16] = {};
-    online_callee::NocaseWStringCopy(key, &name, 0, 0xffffffffu);
-    void* found = online_callee::NocaseSetFind(self + 0xe44, key);
-    online_callee::NocaseWStringDtor(key, 0);
+    std::u16string key;
+    online_callee::NocaseWStringCopy(&key, &name, 0, 0xffffffffu);
+    void* found = online_callee::NocaseSetFind(self + 0xe44, &key);
+    online_callee::NocaseWStringDtor(&key, 0);
     if (found != self + 0xe48) return;
     SendNameCommand(this, 0xd, name);
 }
@@ -1511,10 +1527,10 @@ void COnlineControl::IgnoreOn(std::u16string& name) {
 // 0x1021922c: sends command 0xd when the name is in the ignore set (0xe44)
 void COnlineControl::IgnoreOff(std::u16string& name) {
     uint8_t* self = reinterpret_cast<uint8_t*>(this);
-    alignas(8) uint8_t key[16] = {};
-    online_callee::NocaseWStringCopy(key, &name, 0, 0xffffffffu);
-    void* found = online_callee::NocaseSetFind(self + 0xe44, key);
-    online_callee::NocaseWStringDtor(key, 0);
+    std::u16string key;
+    online_callee::NocaseWStringCopy(&key, &name, 0, 0xffffffffu);
+    void* found = online_callee::NocaseSetFind(self + 0xe44, &key);
+    online_callee::NocaseWStringDtor(&key, 0);
     if (found == self + 0xe48) return;
     SendNameCommand(this, 0xd, name);
 }
@@ -1570,7 +1586,7 @@ namespace ignore_callee {
 // 0x1021cbb8 std::basic_ios<wchar_t>::~basic_ios (the original answers this).
 void IosDtor(void* ios, int16_t flag) {
     if (ios != nullptr) {
-        *static_cast<const void**>(ios) = gIfsWVtblE;
+        static_cast<IgnoreIos*>(ios)->mVtable = VtableWord(gIfsWVtblE);
         ifstream_callee::IosBaseDtor(ios, 0);
         if (flag > 0) ifstream_callee::Delete(ios);
     }
@@ -1582,10 +1598,10 @@ void OstreamDtor(IgnoreStream* stream, int16_t flag) {
     if (stream != nullptr) {
         void* ios = stream->mRest;
         stream->mSlot = gOfsWVtblB;
-        stream->mIos->mVtable = reinterpret_cast<const char*>(gOfsWVtblB) + 0xc;
+        stream->mIos->mVtable = VtableWord(gOfsWVtblB) + 0xc;
         stream->mIos->mBaseOffset = static_cast<int32_t>(static_cast<char*>(ios) - reinterpret_cast<char*>(stream->mIos));
         if (flag != 0) {
-            *static_cast<const void**>(ios) = gIfsWVtblE;
+            static_cast<IgnoreIos*>(ios)->mVtable = VtableWord(gIfsWVtblE);
             ifstream_callee::IosBaseDtor(ios, 0);
         }
         if (flag > 0) ifstream_callee::Delete(stream);
@@ -1706,7 +1722,9 @@ uint32_t gVoteSendData[4] = {0x5c200a41u, 0x298111d3u, 0xadf400e0u, 0x18904fd5u}
 
 namespace {
 
-using Slot = uint64_t;   // a std::wstring (or nocase string) on the stack: one 32-bit word, 8 bytes kept
+// A std::wstring on the stack: one 32-bit word, a slot (include/platform/online_slots.h). The nocase strings (the keys of the finds and
+// the == tests) are the host's std::u16string objects, as the client's other finds take them (platform/online_containers.cpp).
+using Slot = uint32_t;
 
 uint32_t Word_4(const void* block, size_t offset) {
     uint32_t value;
@@ -1722,7 +1740,14 @@ uint32_t Addr32(const void* p) { return p != nullptr ? tpw::ArenaOffset(p) : 0; 
 
 const IME::MslWideStringRep* Rep(const void* slot) { return static_cast<const IME::MslWideStringRep*>(Ptr_2(Word_4(slot, 0))); }
 
-std::u16string& AsString(Slot& slot) { return *reinterpret_cast<std::u16string*>(&slot); }
+// A slot the object keeps at that address (the player's name at + 8, a contact node's key at + 0xc).
+const uint32_t* SlotAt(const void* p) { return static_cast<const uint32_t*>(p); }
+
+// The host's copy of the characters a slot holds (what Feedback takes).
+std::u16string HostText(const void* slot) {
+    const IME::MslWideStringRep* rep = Rep(slot);
+    return std::u16string(rep->mData, rep->mLength);
+}
 
 const char kGotoBusy[] = "Goto already in progress. Can't goto again!\n";                          // 0x10250e7f + 0x4b1
 const char kIgnoreSelf[] = "You can't ignore yourself\n";                                          // + 0x525
@@ -1761,13 +1786,14 @@ void COnlineControl::DoCommand(void* arguments) {
     char16_t* buffer = reinterpret_cast<char16_t*>(self + 0x220);
 
     auto count = [&]() { return vector->mSize; };
-    auto arg = [&](uint32_t i) -> const void* { return &vector->mData[i]; };
+    auto arg = [&](uint32_t i) -> const void* { return &vector->data()[i]; };
     auto chat = [&]() { return Word_4(self, 0); };
     // The buffer as a string, handed to Feedback.
     auto feed = [&]() {
         Slot text = 0;
         online_callee::WStringCtorFrom(&text, buffer);
-        Feedback(AsString(text));
+        std::u16string host = HostText(&text);
+        Feedback(host);
         online_callee::WStringDtor(&text, -1);
     };
     auto report = [&](uint32_t id) {
@@ -1834,7 +1860,7 @@ void COnlineControl::DoCommand(void* arguments) {
             reportWith(whoId, rep->mData);
     };
     // Argument 1 as a nocase string, and the player's name as one.
-    auto nocaseArg = [&](Slot* out) {
+    auto nocaseArg = [&](std::u16string* out) {
         Slot text = 0;
         docommand_callee::ArgumentBStrVal(&text, arg(1));
         online_callee::NocaseWStringCopy(out, &text, 0, 0xffffffffu);
@@ -1842,11 +1868,11 @@ void COnlineControl::DoCommand(void* arguments) {
     };
 
     if (vector->mSize == 0) return;
-    if (vector->mData[0].mCommand != 0x12) {
+    if (vector->data()[0].mCommand != 0x12) {
         self[0xe51] = 0;
         docommand_callee::ChatNotAFK(chat(), this);
     }
-    const uint32_t command = vector->mData[0].mCommand;
+    const uint32_t command = vector->data()[0].mCommand;
     if (command > 0x18) return;
 
     switch (command) {
@@ -1916,7 +1942,7 @@ void COnlineControl::DoCommand(void* arguments) {
         }
         Slot text = 0;
         docommand_callee::ArgumentBStrVal(&text, arg(1));
-        Slot key = 0;
+        std::u16string key;
         online_callee::NocaseWStringCopy(&key, &text, 0, 0xffffffffu);
         void* found = online_callee::NocaseSetFind(self + 0xe44, &key);
         online_callee::NocaseWStringDtor(&key, 0);
@@ -1925,10 +1951,10 @@ void COnlineControl::DoCommand(void* arguments) {
             nameCommand(docommand_callee::ChatUnIgnore);
             return;
         }
-        Slot who = 0;
+        std::u16string who;
         nocaseArg(&who);
-        Slot me = 0;
-        online_callee::NocaseWStringCopy(&me, self + 8, 0, 0xffffffffu);
+        std::u16string me;
+        online_callee::NocaseWStringCopy(&me, SlotAt(self + 8), 0, 0xffffffffu);
         if (online_callee::NocaseWStringEqual(&who, &me)) {
             SamsUtilities::UDebug(kIgnoreSelf);
             report(0xb1);
@@ -1947,10 +1973,10 @@ void COnlineControl::DoCommand(void* arguments) {
             report(0x69);
             return;
         }
-        Slot who = 0;
+        std::u16string who;
         nocaseArg(&who);
-        Slot me = 0;
-        online_callee::NocaseWStringCopy(&me, self + 8, 0, 0xffffffffu);
+        std::u16string me;
+        online_callee::NocaseWStringCopy(&me, SlotAt(self + 8), 0, 0xffffffffu);
         if (online_callee::NocaseWStringEqual(&who, &me)) {
             SamsUtilities::UDebug(kBlackmarkSelf);
             report(0xb0);
@@ -1972,7 +1998,7 @@ void COnlineControl::DoCommand(void* arguments) {
         }
         Slot text = 0;
         docommand_callee::ArgumentBStrVal(&text, arg(1));
-        Slot key = 0;
+        std::u16string key;
         online_callee::NocaseWStringCopy(&key, &text, 0, 0xffffffffu);
         void* found = online_callee::BuddyTreeFind(self + 0xe34, &key);
         online_callee::NocaseWStringDtor(&key, 0);
@@ -1981,10 +2007,10 @@ void COnlineControl::DoCommand(void* arguments) {
             nameCommand(docommand_callee::ChatRemoveBuddy);
             return;
         }
-        Slot who = 0;
+        std::u16string who;
         nocaseArg(&who);
-        Slot me = 0;
-        online_callee::NocaseWStringCopy(&me, self + 8, 0, 0xffffffffu);
+        std::u16string me;
+        online_callee::NocaseWStringCopy(&me, SlotAt(self + 8), 0, 0xffffffffu);
         if (online_callee::NocaseWStringEqual(&who, &me))
             report(0x9b);
         else
@@ -2025,10 +2051,10 @@ void COnlineControl::DoCommand(void* arguments) {
             report(0x72);
             return;
         }
-        Slot who = 0;
+        std::u16string who;
         nocaseArg(&who);
-        Slot me = 0;
-        online_callee::NocaseWStringCopy(&me, self + 8, 0, 0xffffffffu);
+        std::u16string me;
+        online_callee::NocaseWStringCopy(&me, SlotAt(self + 8), 0, 0xffffffffu);
         if (online_callee::NocaseWStringEqual(&who, &me)) {
             report(0x9c);
         } else if (nonEmpty()) {
@@ -2037,12 +2063,12 @@ void COnlineControl::DoCommand(void* arguments) {
             online_parse_callee::WStringAssignRange(self + 0xe88, &target, 0, 0xffffffffu);
             online_callee::WStringDtor(&target, -1);
             bool found = false;
-            Slot key = 0;
+            std::u16string key;
             nocaseArg(&key);
             uint32_t node = Word_4(self, 0xe30);
             while (node != Addr32(self + 0xe2c)) {
-                Slot other = 0;
-                online_callee::NocaseWStringCopy(&other, static_cast<uint8_t*>(Ptr_2(node)) + 0xc, 0, 0xffffffffu);
+                std::u16string other;
+                online_callee::NocaseWStringCopy(&other, SlotAt(static_cast<uint8_t*>(Ptr_2(node)) + 0xc), 0, 0xffffffffu);
                 if (online_callee::NocaseWStringEqual(&key, &other)) {
                     found = true;
                     online_callee::NocaseWStringDtor(&other, 0);
@@ -2095,11 +2121,13 @@ void COnlineControl::DoCommand(void* arguments) {
         report(0x72);
         return;
     case 0x15: {   // vote
+        // The park and the city are the host's objects (the Mac read the park's words at +8 and +0x48, the system's list at +0xe0 and
+        // the city's word at +0x60).
         EnsureSystem();
         CFSOnlineSystem* system = EnsureSystem();
-        CFSFTPParkInfo* info = gOnlineSystem->GetFTPDownloadParkInfo();
-        void* city = init_callee::ReturnCityInfo(Word_4(system, 0xe0), static_cast<int32_t>(Word_4(info, 0x48)));
-        if (Word_4(city, 0x60) != 0) return;
+        CFSOnlinePark* park = reinterpret_cast<CFSOnlinePark*>(gOnlineSystem->GetFTPDownloadParkInfo());
+        CFSOnlineCity* city = park_info_callee::ReturnCityInfo(system->mCityList, park->mF48);
+        if (city->mF60 != 0) return;
         if (Word_4(self, 0xe64) != 0) {
             SamsUtilities::UDebug(kVoteBusy);
             return;
@@ -2124,8 +2152,8 @@ void COnlineControl::DoCommand(void* arguments) {
         int32_t player = online_callee::LoginPlayerID(forPlayer);
         docommand_callee::VoteSetSessionInfo(Ptr_2(Word_4(self, 0xe64)), 9, player, customer, password);
         EnsureSystem();
-        info = gOnlineSystem->GetFTPDownloadParkInfo();
-        docommand_callee::VoteSendVote(Ptr_2(Word_4(self, 0xe64)), static_cast<int32_t>(Word_4(info, 8)), data, 1, nullptr);
+        park = reinterpret_cast<CFSOnlinePark*>(gOnlineSystem->GetFTPDownloadParkInfo());
+        docommand_callee::VoteSendVote(Ptr_2(Word_4(self, 0xe64)), park->mParkID, data, 1, nullptr);
         SamsUtilities::UDebug(kVoteSent);
         return;
     }
@@ -2164,7 +2192,7 @@ void COnlineControl::Feedback(std::u16string& text) {
 }
 
 // 0x1021b854
-uint32_t COnlineControl::GetDataForUser(const nocase_string& key) const {
+uint32_t COnlineControl::GetDataForUser(const std::u16string& key) const {
     const uint8_t* base = reinterpret_cast<const uint8_t*>(this);
     uint32_t result = 0;
     const uint8_t* node = static_cast<const uint8_t*>(online_callee::BuddyTreeFind(const_cast<uint8_t*>(base) + 0xe34, &key));
@@ -2189,7 +2217,7 @@ void COnlineControl::AddContact(std::u16string& name, int32_t flag) {
 void COnlineControl::RemoveContact(std::u16string& name) {
     uint8_t* self = reinterpret_cast<uint8_t*>(this);
     online_callee::UIOnlineRemoveContact(&gUIInterface, name.c_str());
-    reinterpret_cast<WStringTree*>(self + 0xe28)->erase_one(reinterpret_cast<const MslWideString&>(name));
+    online_callee::WStringSetEraseOne(self + 0xe28, &name);
 }
 
 // 0x1021baf8
@@ -2197,7 +2225,7 @@ bool COnlineControl::AddBuddy(std::u16string& name, int32_t flags) {
     uint8_t* self = Bytes(this);
     const uint8_t direct = (flags & 2) != 0 ? 1 : 0;
     const uint8_t second = (flags & 4) != 0 ? 1 : 0;
-    uint64_t key = 0;
+    std::u16string key;
     online_callee::NocaseWStringCopy(&key, &name, 0, 0xffffffffu);
     uint8_t* node = static_cast<uint8_t*>(online_callee::BuddyTreeFind(self + 0xe34, &key));
     online_callee::NocaseWStringDtor(&key, 0);
@@ -2207,8 +2235,8 @@ bool COnlineControl::AddBuddy(std::u16string& name, int32_t flags) {
         node[0x11] = second;
         added = false;
     } else {
-        uint64_t copy = 0;
-        BuddyEntry entry{};
+        std::u16string copy;
+        BuddyKeyEntry entry{};
         online_callee::NocaseWStringCopy(&copy, &name, 0, 0xffffffffu);
         online_callee::NocaseWStringCopy(&entry.mKey, &copy, 0, 0xffffffffu);
         entry.mDirect = direct;
@@ -2218,60 +2246,29 @@ bool COnlineControl::AddBuddy(std::u16string& name, int32_t flags) {
         online_callee::NocaseWStringDtor(&copy, 0);
         added = true;
     }
-    uint64_t lookup = 0;
+    std::u16string lookup;
     online_callee::NocaseWStringCopy(&lookup, &name, 0, 0xffffffffu);
-    const uint32_t data = GetDataForUser(*reinterpret_cast<const nocase_string*>(&lookup));
+    const uint32_t data = GetDataForUser(lookup);
     online_callee::NocaseWStringDtor(&lookup, 0);
-    // the name is a pointer to the representation, whose data pointer is at +0xc (native pointer at +0x10 here)
-    const char16_t* text;
-    const uint8_t* rep = *reinterpret_cast<const uint8_t* const*>(&name);
-    std::memcpy(&text, rep + 0x10, sizeof(text));
-    online_callee::UIOnlineAddBuddy(&gUIInterface, text, static_cast<int32_t>(data));
-    rep = *reinterpret_cast<const uint8_t* const*>(&name);
-    std::memcpy(&text, rep + 0x10, sizeof(text));
-    online_callee::UIOnlineUpdateContact(&gUIInterface, text, static_cast<int32_t>(data));
+    online_callee::UIOnlineAddBuddy(&gUIInterface, name.c_str(), static_cast<int32_t>(data));
+    online_callee::UIOnlineUpdateContact(&gUIInterface, name.c_str(), static_cast<int32_t>(data));
     return added;
 }
 
 // 0x1021bdcc
 void COnlineControl::RemoveBuddy(std::u16string& name) {
     uint8_t* self = reinterpret_cast<uint8_t*>(this);
-    alignas(8) uint8_t key[16] = {};
-    online_callee::NocaseWStringCopy(key, &name, 0, 0xffffffffu);
-    online_callee::BuddyTreeEraseOne(self + 0xe34, key);
-    online_callee::NocaseWStringDtor(key, 0);
-    alignas(8) uint8_t second[16] = {};
-    online_callee::NocaseWStringCopy(second, &name, 0, 0xffffffffu);
-    uint32_t data = GetDataForUser(reinterpret_cast<const nocase_string&>(second));
-    online_callee::NocaseWStringDtor(second, 0);
+    std::u16string key;
+    online_callee::NocaseWStringCopy(&key, &name, 0, 0xffffffffu);
+    online_callee::BuddyTreeEraseOne(self + 0xe34, &key);
+    online_callee::NocaseWStringDtor(&key, 0);
+    std::u16string second;
+    online_callee::NocaseWStringCopy(&second, &name, 0, 0xffffffffu);
+    uint32_t data = GetDataForUser(second);
+    online_callee::NocaseWStringDtor(&second, 0);
     online_callee::UIOnlineRemoveBuddy(&gUIInterface, name.c_str());
     online_callee::UIOnlineUpdateContact(&gUIInterface, name.c_str(), static_cast<int32_t>(data));
 }
-
-// 0x1021bf30: every contact goes to the contact list with its buddy / online / ignore bits
-void COnlineControl::UpdateUserList() const {
-    const uint8_t* self = reinterpret_cast<const uint8_t*>(this);
-    uint32_t first;
-    std::memcpy(&first, self + 0xe30, 4);
-    // the first node's link is a 32-bit arena offset (Ptr32 convention)
-    MslRedBlackTree::node_base* node =
-        first != 0 ? reinterpret_cast<MslRedBlackTree::node_base*>(tpw::ArenaBase() + first) : nullptr;
-    while (node != reinterpret_cast<const MslRedBlackTree::node_base*>(self + 0xe2c)) {
-        const std::u16string& value = static_cast<ContactNode*>(node)->mValue;
-        alignas(8) uint8_t key[16] = {};
-        online_callee::NocaseWStringCopy(key, &value, 0, 0xffffffffu);
-        uint32_t data = GetDataForUser(reinterpret_cast<const nocase_string&>(key));
-        online_callee::NocaseWStringDtor(key, 0);
-        online_callee::UIOnlineAddContact(&gUIInterface, static_cast<ContactNode*>(node)->mValue.c_str(), static_cast<int32_t>(data));
-        MslRedBlackTree::increment(node);
-    }
-}
-
-// Unit v5903: the buddy / ignore list helpers of COnlineControl, GotoFailed, GotoStoredPerson, the pair<const nocase_string, BuddyInfo>
-// destructor 0x1021bd24 and the basic_ofstream<wchar_t> destructor 0x1021ce74.
-
-// 0x102b1f08 (TOC -0x5eb4): the vtable the ofstream destructor stores last (initial word 0x102b1f00).
-uint32_t gOfsWVtblB[4];
 
 namespace {
 inline uint32_t RdW(const void* base, uint32_t off) {
@@ -2284,14 +2281,43 @@ inline void* P32(uint32_t v) {
     return p.get();
 }
 inline uint32_t A32(const void* p) { return tpw::ArenaOffset(p); }
+// The characters of a container node's key (a slot at node + 0xc: the representation's length at +0, its characters' word at +0xc).
+std::u16string KeyText(uint32_t node) {
+    const uint32_t rep = RdW(P32(node), 0xc);
+    if (rep == 0) return std::u16string();
+    return std::u16string(static_cast<const char16_t*>(P32(RdW(P32(rep), 0xc))), RdW(P32(rep), 0));
+}
 }  // namespace
+
+// 0x1021bf30: every contact goes to the contact list with its buddy / online / ignore bits (the contact set's first node word 0xe30,
+// its end node 0xe2c).
+void COnlineControl::UpdateUserList() const {
+    const uint8_t* self = reinterpret_cast<const uint8_t*>(this);
+    uint32_t it = RdW(self, 0xe30);
+    while (it != A32(self) + 0xe2c) {
+        const std::u16string value = KeyText(it);
+        std::u16string key;
+        online_callee::NocaseWStringCopy(&key, &value, 0, 0xffffffffu);
+        uint32_t data = GetDataForUser(key);
+        online_callee::NocaseWStringDtor(&key, 0);
+        online_callee::UIOnlineAddContact(&gUIInterface, value.c_str(), static_cast<int32_t>(data));
+        ignore_callee::TreeIncrement(&it);
+    }
+}
+
+// Unit v5903: the buddy / ignore list helpers of COnlineControl, GotoFailed, GotoStoredPerson, the pair<const nocase_string, BuddyInfo>
+// destructor 0x1021bd24 and the basic_ofstream<wchar_t> destructor 0x1021ce74.
+
+// 0x102b1f08 (TOC -0x5eb4): the vtable the ofstream destructor stores last (initial word 0x102b1f00).
+uint32_t gOfsWVtblB[4];
+
 
 // 0x1021c02c: every buddy to the UI, with its data word.
 void COnlineControl::UpdateBuddyList() const {
     const uint8_t* self = reinterpret_cast<const uint8_t*>(this);
     uint32_t it = RdW(self, 0xe40);
     while (it != A32(self) + 0xe38) {
-        uint32_t data = GetDataForUser(*static_cast<const nocase_string*>(P32(it + 0xc)));
+        uint32_t data = GetDataForUser(KeyText(it));
         uint32_t rep = RdW(P32(it + 0xc), 0);
         online_callee::UIOnlineAddBuddy(&gUIInterface, static_cast<const char16_t*>(P32(RdW(P32(rep), 0xc))),
                                         static_cast<int32_t>(data));
@@ -2325,10 +2351,10 @@ void COnlineControl::GotoFailed() {
     char16_t* buffer = reinterpret_cast<char16_t*>(self + 0x220);
     const TbITable* table = static_cast<const TbITable*>(gText.mResourcePointers[19]);   // Mac 0x598
     table->FormatString(buffer, 0x400, 0x9d);
-    ignore_callee::IgnoreWString first, second;
+    std::u16string first, second;
     online_callee::WStringCtorFrom(&first, buffer);
     online_callee::WStringCopy(&second, &first, 0, 0xffffffffu);
-    ReceiveText(*reinterpret_cast<std::u16string*>(&second), 7);
+    ReceiveText(second, 7);
     online_callee::WStringDtor(&second, -1);
     self[0xe84] = 0;
     online_callee::WStringDtor(&first, -1);
@@ -2393,18 +2419,20 @@ namespace {
 // The 32-bit words of the Mac's objects hold pointers as offsets from the arena base (Ptr32's convention).
 uint8_t* Deref_2(uint32_t offset) { return offset != 0 ? reinterpret_cast<uint8_t*>(tpw::gArenaBase + offset) : nullptr; }
 uint32_t* Word_5(uint8_t* address) { return reinterpret_cast<uint32_t*>(address); }
+// A wide string representation's characters: the word at +0xc on the Mac, a native pointer at +0x10 here (IME::MslWideStringRep).
+const char16_t* RepText(const uint8_t* rep) {
+    const char16_t* text;
+    std::memcpy(&text, rep + 0x10, sizeof(text));
+    return text;
+}
 
 const char16_t kLineFormat[] = u"%ls\n";      // 0x10251810
 const char kTypeName[] = "!std::exception!!std::ios_base::failure!!";   // 0x102517e6
 const char kFailureMessage[] = "ios_base failure in clear";               // 0x1025148b
 const char kBuddyFile[] = ":buddy.dat";                                  // 0x10251480
 
-// The stack object of the original: stream at 0x1f0, filebuf at 0x1f8, ios part at 0x248 (host layout differs, the code never relies on it).
-struct BuddyStreamObject {
-    ignore_callee::IgnoreStream mStream;
-    ignore_callee::IgnoreFilebuf mBuf;
-    ignore_callee::IgnoreIos mIos;
-};
+// The stack object of the original (stream at 0x1f0, filebuf at 0x1f8, ios part at 0x248) is an IgnoreFstream in the arena here.
+using BuddyStreamObject = ignore_callee::IgnoreFstream;
 
 struct IosFailureObject {
     const void* mVtable;   // 0x00 gIosFailureVtbl
@@ -2435,11 +2463,12 @@ void Teardown(BuddyStreamObject& o, ignore_callee::IgnorePathString& path, void*
     PathDtor(&path, -1);
     online_callee::StringDtor(name, -1);
     o.mStream.mSlot = gOfsWVtbl;
-    o.mStream.mIos->mVtable = reinterpret_cast<const uint8_t*>(gOfsWVtbl) + 0xc;
+    o.mStream.mIos->mVtable = VtableWord(gOfsWVtbl) + 0xc;
     o.mStream.mIos->mBaseOffset = static_cast<int32_t>(reinterpret_cast<intptr_t>(&o.mIos) - reinterpret_cast<intptr_t>(o.mStream.mIos));
-    FilebufDtor(&o.mBuf, -1);
+    FilebufDtor(&o.mFilebuf, -1);
     OstreamDtor(&o.mStream, 0);
     IosDtor(&o.mIos, 0);
+    tpw::ArenaFree(&o);
 }
 
 }  // namespace
@@ -2447,7 +2476,7 @@ void Teardown(BuddyStreamObject& o, ignore_callee::IgnorePathString& path, void*
 bool OnlineSaveBuddy(COnlineControl* self, const char* path) {
     using namespace ignore_callee;
     uint8_t* me = reinterpret_cast<uint8_t*>(self);
-    BuddyStreamObject o;
+    BuddyStreamObject& o = *static_cast<BuddyStreamObject*>(tpw::ArenaAllocZeroed(sizeof(BuddyStreamObject)));
     OfstreamCtor(&o.mStream, 1);
     void* name[2];
     online_callee::StringCtor(name);
@@ -2463,34 +2492,34 @@ bool OnlineSaveBuddy(COnlineControl* self, const char* path) {
     PathDtor(&temp, -1);
     PathAppendString(&full, reinterpret_cast<const uint8_t*>(&gTPGlobals) + 0x44c0);
     uint32_t nameRep = *reinterpret_cast<uint32_t*>(me + 8);
-    uint32_t nameText = *Word_5(Deref_2(nameRep) + 0xc);
-    PathAppendText(&full, reinterpret_cast<const char16_t*>(Deref_2(nameText)));
+    PathAppendText(&full, RepText(Deref_2(nameRep)));
     PathAppendText(&full, kPathSuffix);
     CharStringAssign(name, path, static_cast<uint32_t>(std::strlen(path)));
     CharStringAppend(name, kBuddyFile, static_cast<uint32_t>(std::strlen(kBuddyFile)));
     char buffer[260];
     SprintfWide(buffer, "%ls", full.mData);
-    if (FilebufOpen(&o.mBuf, buffer, 0x10) == 0) SetFailure(o.mStream.mIos);
-    if (o.mBuf.mFile == 0) {
+    if (FilebufOpen(&o.mFilebuf, buffer, 0x10) == 0) SetFailure(o.mStream.mIos);
+    if (o.mFilebuf.mFile == 0) {
         Teardown(o, full, name);
         return false;
     }
     uint32_t node = *reinterpret_cast<uint32_t*>(me + 0xe40);
     while (node != tpw::ArenaOffset(me + 0xe38)) {
         uint32_t key = *Word_5(Deref_2(node) + 0xc);
-        uint32_t text = *Word_5(Deref_2(key) + 0xc);
         char16_t line[32];
-        SwprintfWide(line, 0x20, kLineFormat, reinterpret_cast<const char16_t*>(Deref_2(text)));
+        SwprintfWide(line, 0x20, kLineFormat, RepText(Deref_2(key)));
         OstreamWrite(&o.mStream, line);
         TreeIncrement(&node);
     }
-    if (FilebufClose(&o.mBuf) == 0) SetFailure(o.mStream.mIos);
+    if (FilebufClose(&o.mFilebuf) == 0) SetFailure(o.mStream.mIos);
     Teardown(o, full, name);
     return true;
 }
 
 // The answer of the vote connection: the string picked by the code is formatted from the UI table into the buffer at 0x220, copied
-// into a std::wstring and shown as chat text (colour 7); then the done-voting flag goes on.
+// into a std::wstring and shown as chat text (colour 7); then the done-voting flag goes on. ReceiveText takes a std::u16string, so it
+// is given one with the copy's text (the formatted buffer's): the Mac passed the library string, which here is a slot, not a
+// std::u16string.
 void COnlineControl::ProcessVoteResponse(int32_t code) {
     uint32_t id = 0x81;
     if (code == 0) id = 0x80;
@@ -2504,7 +2533,8 @@ void COnlineControl::ProcessVoteResponse(int32_t code) {
     online_callee::WStringCtorFrom(first, buffer);
     void* second[2];
     online_callee::WStringCopy(second, first, 0, 0xffffffffu);
-    ReceiveText(*reinterpret_cast<std::u16string*>(second), 7);
+    std::u16string text(buffer);
+    ReceiveText(text, 7);
     online_callee::WStringDtor(second, -1);
     online_callee::WStringDtor(first, -1);
     me[0xe60] = 1;
@@ -2515,9 +2545,10 @@ void COnlineControl::SaveBuddy(const char* path) { OnlineSaveBuddy(this, path); 
 // 0x1021d004
 bool COnlineControl::LoadBuddy(const char* path) {
     if (Word(this, 0) == 0) return false;
-    IgnoreStream stream{};
-    IgnoreFilebuf filebuf{};
-    alignas(8) uint8_t iosPart[0x50] = {};
+    IgnoreFstream& object = *static_cast<IgnoreFstream*>(tpw::ArenaAllocZeroed(sizeof(IgnoreFstream)));
+    IgnoreStream& stream = object.mStream;
+    IgnoreFilebuf& filebuf = object.mFilebuf;
+    uint8_t* iosPart = reinterpret_cast<uint8_t*>(&object.mIos);
     IgnorePathString filePath{};
     char buffer[260];
     char16_t line[32];
@@ -2538,22 +2569,23 @@ bool COnlineControl::LoadBuddy(const char* path) {
         uint32_t more = 0;
         if ((ios->mState & 5) == 0) more = ios->mStreamBuf;
         if (more == 0) break;
-        IgnoreWString first, name;
+        std::u16string first, name;
         online_callee::WStringCtorFrom(&first, line);
         online_callee::WStringCopy(&name, &first, 0, 0xffffffffu);
         online_callee::WStringDtor(&first, -1);
-        AddBuddy(*reinterpret_cast<std::u16string*>(&name), 0);
+        AddBuddy(name, 0);
         online_callee::WStringDtor(&name, -1);
     }
     if (FilebufClose(&filebuf) == 0) SetFailed(stream.mIos);
     PathDtor(&filePath, -1);
     online_callee::StringDtor(&text, -1);
     stream.mSlot = gIfsWVtblB;
-    stream.mIos->mVtable = reinterpret_cast<const uint8_t*>(gIfsWVtblB) + 0xc;
+    stream.mIos->mVtable = VtableWord(gIfsWVtblB) + 0xc;
     stream.mIos->mBaseOffset = static_cast<int32_t>(iosPart - reinterpret_cast<uint8_t*>(stream.mIos));
     FilebufDtor(&filebuf, -1);
     IstreamDtor(&stream, 0);
     IosDtor(iosPart, 0);
+    tpw::ArenaFree(&object);
     return true;
 }
 
@@ -2602,9 +2634,10 @@ void BuildPath_2(COnlineControl* self, const char* path, void* text, IgnorePathS
 
 // 0x1021d74c
 bool OnlineSaveIgnore(COnlineControl* self, const char* path) {
-    IgnoreStream stream{};
-    IgnoreFilebuf filebuf{};
-    alignas(8) uint8_t iosPart[0x50] = {};
+    IgnoreFstream& object = *static_cast<IgnoreFstream*>(tpw::ArenaAllocZeroed(sizeof(IgnoreFstream)));
+    IgnoreStream& stream = object.mStream;
+    IgnoreFilebuf& filebuf = object.mFilebuf;
+    uint8_t* iosPart = reinterpret_cast<uint8_t*>(&object.mIos);
     uint64_t text = 0;   // the narrow std::string (one word on the Mac)
     IgnorePathString filePath{};
     char buffer[260];
@@ -2634,11 +2667,12 @@ bool OnlineSaveIgnore(COnlineControl* self, const char* path) {
     PathDtor(&filePath, -1);
     online_callee::StringDtor(&text, -1);
     stream.mSlot = gOfsWVtbl;
-    stream.mIos->mVtable = reinterpret_cast<const uint8_t*>(gOfsWVtbl) + 0xc;
+    stream.mIos->mVtable = VtableWord(gOfsWVtbl) + 0xc;
     stream.mIos->mBaseOffset = static_cast<int32_t>(iosPart - reinterpret_cast<uint8_t*>(stream.mIos));
     FilebufDtor(&filebuf, -1);
     OstreamDtor(&stream, 0);
     IosDtor(iosPart, 0);
+    tpw::ArenaFree(&object);
     return answer;
 }
 
@@ -2647,9 +2681,10 @@ void COnlineControl::SaveIgnore(const char* path) { OnlineSaveIgnore(this, path)
 // 0x1021db98
 bool COnlineControl::LoadIgnore(const char* path) {
     if (Word_6(this, 0) == 0) return false;
-    IgnoreStream stream{};
-    IgnoreFilebuf filebuf{};
-    alignas(8) uint8_t iosPart[0x50] = {};
+    IgnoreFstream& object = *static_cast<IgnoreFstream*>(tpw::ArenaAllocZeroed(sizeof(IgnoreFstream)));
+    IgnoreStream& stream = object.mStream;
+    IgnoreFilebuf& filebuf = object.mFilebuf;
+    uint8_t* iosPart = reinterpret_cast<uint8_t*>(&object.mIos);
     uint64_t text = 0;
     IgnorePathString filePath{};
     char buffer[260];
@@ -2670,11 +2705,12 @@ bool COnlineControl::LoadIgnore(const char* path) {
         uint32_t more = 0;
         if ((ios->mState & 5) == 0) more = ios->mStreamBuf;
         if (more == 0) break;
-        IgnoreWString first, name, second;
+        std::u16string first, name;
+        IgnoreWString second;
         online_callee::WStringCtorFrom(&first, line);
         online_callee::WStringCopy(&name, &first, 0, 0xffffffffu);
         online_callee::WStringDtor(&first, -1);
-        IgnoreOn(*reinterpret_cast<std::u16string*>(&name));
+        IgnoreOn(name);
         online_callee::WStringCtorFrom(&second, line);
         ChatIgnore(Word_6(this, 0), &second, this);
         online_callee::WStringDtor(&second, -1);
@@ -2684,11 +2720,12 @@ bool COnlineControl::LoadIgnore(const char* path) {
     PathDtor(&filePath, -1);
     online_callee::StringDtor(&text, -1);
     stream.mSlot = gIfsWVtblB;
-    stream.mIos->mVtable = reinterpret_cast<const uint8_t*>(gIfsWVtblB) + 0xc;
+    stream.mIos->mVtable = VtableWord(gIfsWVtblB) + 0xc;
     stream.mIos->mBaseOffset = static_cast<int32_t>(iosPart - reinterpret_cast<uint8_t*>(stream.mIos));
     FilebufDtor(&filebuf, -1);
     IstreamDtor(&stream, 0);
     IosDtor(iosPart, 0);
+    tpw::ArenaFree(&object);
     return true;
 }
 
@@ -2829,7 +2866,13 @@ inline IgnoreIos* IosPart(WideIstream* self) {
 
 inline MacStreamBuf* StreamBufOf(IgnoreIos* ios) { return Ptr32<MacStreamBuf>{ios->mStreamBuf}.get(); }
 
-inline uint32_t Entry(MacStreamBuf* sb, uint32_t offset) { return *reinterpret_cast<uint32_t*>(sb->mVtable.get() + offset); }
+// The entry of a vtable slot. The wide filebuf's vtable word is a host table's low word (FilebufWcharConstruct) with no Mac table
+// behind it, so its slot itself names the call, as __ptr_glue takes it (MslRuntimeGlue.cpp, StreamBufCall).
+inline uint32_t Entry(MacStreamBuf* sb, uint32_t offset) {
+    const uint32_t word = sb->mVtable.mOffset;
+    if (word == ignore_callee::VtableWord(gIfsWVtblD) || word == ignore_callee::VtableWord(gIfsWVtblC)) return offset;
+    return *reinterpret_cast<uint32_t*>(sb->mVtable.get() + offset);
+}
 
 // Builds the ios_base::failure the stream throws once its state meets the exception mask (the fake __throw returns).
 void ThrowFailure_2() {
@@ -2870,11 +2913,11 @@ void IstreamDtor(IgnoreStream* stream, int16_t flag) {
     if (self != nullptr) {
         self->mVtable = gIfsWVtblA;
         IgnoreIos* part = IosPart(self);
-        self->mIos->mVtable = reinterpret_cast<const uint8_t*>(gIfsWVtblA) + 0xc;
+        self->mIos->mVtable = VtableWord(gIfsWVtblA) + 0xc;
         self->mIos->mBaseOffset = static_cast<int32_t>(reinterpret_cast<uint8_t*>(part) - reinterpret_cast<uint8_t*>(self->mIos));
         if (flag != 0) {
             // The original also tests this + 0xc != 0, always true for a real object.
-            part->mVtable = gIfsWVtblE;
+            part->mVtable = VtableWord(gIfsWVtblE);
             ifstream_callee::IosBaseDtor(part, 0);
         }
         if (flag > 0) MslOperatorDelete(self);
@@ -2933,10 +2976,10 @@ IgnoreStream* IstreamCtor(IgnoreStream* stream, int16_t withVirtualBase, uint32_
     IgnoreIos* part = IosPart(self);
     if (withVirtualBase != 0) {
         self->mIos = part;
-        part->mVtable = gIfsWVtblE;   // the original first stores __vt__ios_base, overwritten at once
+        part->mVtable = VtableWord(gIfsWVtblE);   // the original first stores __vt__ios_base, overwritten at once
     }
     self->mVtable = gIfsWVtblA;
-    self->mIos->mVtable = reinterpret_cast<const uint8_t*>(gIfsWVtblA) + 0xc;
+    self->mIos->mVtable = VtableWord(gIfsWVtblA) + 0xc;
     self->mIos->mBaseOffset = static_cast<int32_t>(reinterpret_cast<uint8_t*>(part) - reinterpret_cast<uint8_t*>(self->mIos));
     self->mGcount = 0;
     IgnoreIos* ios = self->mIos;

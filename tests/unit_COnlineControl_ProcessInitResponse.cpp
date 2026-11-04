@@ -9,10 +9,12 @@
 #include <cstdint>
 #include <cstring>
 #include <cstdarg>
+#include <new>
 
 #include "calllog.h"
 #include "platform/arena.h"
 #include "FS_Online.h"
+#include "FS_OnlineList.h"
 #include "Text.h"
 #include "UI_pump.h"
 #include "World.h"
@@ -70,6 +72,8 @@ void* OperatorNew(uint32_t size) {
     gLastNew = reinterpret_cast<uintptr_t>(p);
     return p;
 }
+// The player's name at +8 is an arena offset of its representation (the test makes it with tpw_pir_name).
+void* HandleToPointer(uint32_t handle) { return handle != 0 ? static_cast<void*>(tpw::gArenaBase + handle) : nullptr; }
 uint32_t AvatarID(CFSOnlineSystem* sys) {
     ev("GetAvatarID", {Cls(sys)});
     return static_cast<uint32_t>(ret("GetAvatarID"));
@@ -89,10 +93,6 @@ void StringFromChars(void* self, const char* text) {
     *static_cast<uint32_t*>(self) = h;
     ev("StrCtor", {static_cast<int64_t>(h)});
 }
-void* ReturnCityInfo(uint32_t cityList, int32_t id) {
-    ev("ReturnCityInfo", {static_cast<int64_t>(cityList), static_cast<int64_t>(static_cast<uint32_t>(id))});
-    return reinterpret_cast<void*>(gCity);
-}
 void ChatSetPlayerData(uint32_t chat, int32_t avatar, void* context) {
     ev("SetPlayerData", {static_cast<int64_t>(chat), static_cast<int64_t>(static_cast<uint32_t>(avatar)), Cls(context)});
 }
@@ -103,6 +103,15 @@ void ChatCreateRoom(uint32_t chat, const void* name, const void* topic, const vo
 }
 void LockChatPanelOff() { ev("LockOff", {}); }
 }  // namespace init_callee
+
+// The list is logged as its low word (the test stores the Mac's 32-bit word as the pointer).
+namespace park_info_callee {
+CFSOnlineCity* ReturnCityInfo(CFSOnlineSystemCityList* list, int32_t city) {
+    ev("ReturnCityInfo", {static_cast<int64_t>(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(list))),
+                          static_cast<int64_t>(static_cast<uint32_t>(city))});
+    return reinterpret_cast<CFSOnlineCity*>(gCity);
+}
+}  // namespace park_info_callee
 
 CFSOnlineSystem::CFSOnlineSystem() { ev("SysCtor", {Cls(this)}); }
 CFSFTPParkInfo* CFSOnlineSystem::GetFTPDownloadParkInfo() {
@@ -116,8 +125,7 @@ COnlineControl::COnlineControl() { ev("CtrlCtor", {Cls(this)}); }
 void bthread_mutex::lock() { ev("lock", {Cls(reinterpret_cast<uint8_t*>(this) - 0x1c)}); }
 void bthread_mutex::unlock() { ev("unlock", {Cls(reinterpret_cast<uint8_t*>(this) - 0x1c)}); }
 void COnlineControl::AddContact(std::u16string& name, int32_t flag) {
-    ev("AddContact", {Cls(this), static_cast<int64_t>(reinterpret_cast<uint8_t*>(&name) - reinterpret_cast<uint8_t*>(this)),
-                      static_cast<int64_t>(static_cast<uint32_t>(flag))});
+    ev("AddContact", {Cls(this), static_cast<int64_t>(HashW(name.c_str())), static_cast<int64_t>(static_cast<uint32_t>(flag))});
 }
 void CWorld::StartingPopulationForOnline() { ev("StartingPop", {Cls(this)}); }
 bool COnlineControl::LoadBuddy(const char* path) {
@@ -151,6 +159,41 @@ uint64_t tpw_pir_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret
 
 // The Ptr32 word of a block's address (an offset from the arena base).
 uint32_t tpw_pir_offset(uint64_t address) { return tpw::ArenaOffset(reinterpret_cast<void*>(static_cast<uintptr_t>(address))); }
+
+// The host's park, city and system: the fields the Mac read at the park's +8, +0x14 and +0x48, the city's +0x14 and the system's +0xe0.
+uint64_t tpw_pir_park(int32_t id, uint64_t name, int32_t city) {
+    auto* park = static_cast<CFSOnlinePark*>(tpw::ArenaAllocZeroed(sizeof(CFSOnlinePark)));
+    park->mParkID = id;
+    park->mText0C.mData = reinterpret_cast<char16_t*>(static_cast<uintptr_t>(name));
+    park->mF48 = city;
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(park));
+}
+
+uint64_t tpw_pir_city(uint64_t name) {
+    auto* city = new (tpw::ArenaAllocZeroed(sizeof(CFSOnlineCity))) CFSOnlineCity();
+    city->mName = reinterpret_cast<char16_t*>(static_cast<uintptr_t>(name));
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(city));
+}
+
+// The player's name at +8: the arena offset of a representation whose native character pointer is at +0x10 (the Mac's at +0xc).
+void tpw_pir_name(uint64_t self, uint64_t text) {
+    uint8_t* rep = static_cast<uint8_t*>(tpw::ArenaAllocZeroed(0x18));
+    const char16_t* data = reinterpret_cast<const char16_t*>(static_cast<uintptr_t>(text));
+    std::memcpy(rep + 0x10, &data, sizeof(data));
+    const uint32_t word = tpw::ArenaOffset(rep);
+    std::memcpy(reinterpret_cast<uint8_t*>(static_cast<uintptr_t>(self)) + 8, &word, sizeof(word));
+}
+
+uint32_t tpw_pir_system_size() { return static_cast<uint32_t>(sizeof(CFSOnlineSystem) > 0x404 ? sizeof(CFSOnlineSystem) : 0x404); }
+
+void tpw_pir_set_list(uint64_t system, uint32_t list) {
+    reinterpret_cast<CFSOnlineSystem*>(static_cast<uintptr_t>(system))->mCityList =
+        reinterpret_cast<CFSOnlineSystemCityList*>(static_cast<uintptr_t>(list));
+}
+
+uint32_t tpw_pir_list(uint64_t system) {
+    return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(reinterpret_cast<CFSOnlineSystem*>(static_cast<uintptr_t>(system))->mCityList));
+}
 
 int32_t tpw_pir_layout(int64_t* out) {
     int32_t n = 0;

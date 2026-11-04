@@ -113,7 +113,7 @@ static CLBScreenComponentOnlineIslands* O(uint64_t p) {
 
 void tpw_oi_Tick(uint64_t p) { O(p)->CLBScreenComponentOnlineIslands::Tick(); }
 void tpw_oi_SelectCurrentIsland(uint64_t p) { O(p)->SelectCurrentIsland(); }
-void tpw_oi_EnterCurrentIsland(uint64_t p) { O(p)->EnterCurrentIslandOnline(); }
+void tpw_oi_EnterCurrentIsland(uint64_t p) { O(p)->CLBScreenComponentOnlineIslands::EnterCurrentIsland(); }
 void tpw_oi_GotoNextIsland(uint64_t p) { O(p)->GotoNextIsland(); }
 void tpw_oi_DownloadFailFunction(uint64_t p) { O(p)->DownloadFailFunction(); }
 void tpw_oi_HandleOnlineBacktrack(uint64_t p) { O(p)->HandleOnlineBacktrack(); }

@@ -26,6 +26,10 @@ Compared: the answer (DistanceBetweenPoints), the call log, and a snapshot of th
 built (a pointer as a label or as an index into its array, floats canonical, the Ptr32 words decoded), the order list, the nodes'
 matrices, the buffers with their guards, the car's mF10 and the instance's orientation block, the globals the code writes.
 
+InterpolateCoasterSpline_end: a first chain ended by a finite knot (0..18 and 19.999, as LinearSampleTrack leaves the European Shocker's
+station track) and places up to past the track's end, where the original walks off the chain (reads address 8). With the port's fix
+(tpw_crt_portfix) the host runs the case and the original the derived case it walks the same way on; without it both run the derived case.
+
 Fused operations (fmadds and relatives, fctiwz saturation) run under HardwareRounding over the eight functions and the helpers.
 Not tested (the original crashes, loops for ever or reads out of range there): a NaN, infinite or out-of-range place into the index
 math, an infinite or negative nose where the collision sound can play, a centre car without flag 1, a negative or NaN train speed or a
@@ -33,6 +37,7 @@ zero distance in the tick (the half-sample step never ends), a divisor mF2F4 of 
 stretch), mLength below 1 or past the samples, ride 0 in SetCarOrientation (gRideAnimSets[0] is NULL), a NULL point for the sample
 overload's output.
 """
+import copy
 import ctypes as C
 import math
 import random
@@ -461,6 +466,8 @@ def bind(lib):
     lib.tpw_crt_Tick.argtypes = [C.c_uint64]
     lib.tpw_cl_label.argtypes = [C.c_int32, C.c_void_p]
     lib.tpw_cl_lab.restype, lib.tpw_cl_lab.argtypes = C.c_int32, [C.c_void_p]
+    lib.tpw_crt_portfix.restype, lib.tpw_crt_portfix.argtypes = C.c_int32, []
+    lib.port_fix = lib.tpw_crt_portfix() == 1
     out = (C.c_int64 * 512)()
     n = lib.tpw_crt_layout(out)
     got, i = list(out)[:n], 0
@@ -1030,6 +1037,75 @@ def interp_random(r):
     return interp_case(r)
 
 
+# ---- InterpolateCoasterSpline past the last control (the port fix: the walk stays on the lists)
+# A track whose first chain ends at a finite knot: controls at 0..18 and the last one moved back to 19.999 (LinearSampleTrack's 0.001),
+# the length a little past it (the European Shocker's 20.0000019). Sample j starts at control min(j, 18) of both chains, so every walk
+# ends at the same pair of each chain; with `last`, sample 19 starts at the last control (its next is NULL). The original reads address 8
+# there; the port walks from the sample before and holds a place past the last control at it (t 1). The original runs the derived case,
+# the one it walks the same way on: such a sample starts where the one before it does, and the place is the last control's.
+END_N, END_S = 20, 22
+
+
+def end_case(r, pos, last=False, orient=None):
+    track = gen_track(r, END_S, nA=END_N)
+    for i, c in enumerate(track["ctla"]):
+        c["mF08"] = fb(float(i)) if i < END_N - 1 else fb(19.999)
+    for j, sm in enumerate(track["samples"][K:]):
+        sm["a"] = sm["b"] = min(j, END_N - 2)
+    if last:
+        track["samples"][K + 19]["a"] = track["samples"][K + 19]["b"] = END_N - 1
+    return interp_case(r, END_S, fb(pos), orient, END_N, track)
+
+
+def end_derived(case):
+    case = copy.deepcopy(case)
+    tr, args = case["spec"]["track"], case["args"]
+    last = len(tr["ctla"]) - 1
+    for i in range(K, len(tr["samples"])):
+        sm = tr["samples"][i]
+        if sm["a"] == last:
+            sm["a"], sm["b"] = tr["samples"][i - 1]["a"], tr["samples"][i - 1]["b"]
+    if bitsf(args["pos"]) > bitsf(tr["ctla"][last]["mF08"]):
+        args["pos"] = tr["ctla"][last]["mF08"]
+    return case
+
+
+def on_derived(side, x, case):
+    """A side on the derived case; the snapshot shows the case's own pieces of the samples it moved."""
+    d = end_derived(case)
+    res = side(x, d)
+    for i, (sm, dm) in enumerate(zip(case["spec"]["track"]["samples"], d["spec"]["track"]["samples"])):
+        if sm["a"] != dm["a"]:
+            row = res["snap"]["samples%d" % i]
+            for name, label, idx in (("mPiece", L_CTLA, sm["a"]), ("mPieceB", L_CTLB, sm["b"])):
+                v = list(row[name])
+                v[1] = label + idx
+                row[name] = type(row[name])(v)
+    return res
+
+
+def end_ppc(e, case):
+    return on_derived(ppc, e, case)
+
+
+def end_host(lib, case):
+    bind(lib)
+    return host(lib, case) if lib.port_fix else on_derived(host, lib, case)
+
+
+def end_edges():
+    r = random.Random(215009)
+    for last in (False, True):
+        for pos in (19.5, 19.9, 19.999, 19.9995, 20.0, 20.0000019, 20.5, 21.0, 21.9, 10.25):
+            yield end_case(r, pos, last, "buf")
+    yield end_case(r, 20.0, True, "inst")
+    yield end_case(r, 19.9995, False, "none")
+
+
+def end_random(r):
+    return end_case(r, r.uniform(18.0, END_S + 0.99), r.random() < 0.5)
+
+
 # ---- SetCarOrientation
 def orient_case(r, ride=None, point=None, angles=None, g=None):
     ride = r.randint(1, 3) if ride is None else ride
@@ -1194,6 +1270,7 @@ TESTS = [
     FnTest("GetLinearSamplePosn", ppc, host, edge=linear_edges, rnd=linear_random),
     FnTest("HandleCollisions", ppc, host, edge=collide_edges, rnd=collide_random),
     FnTest("InterpolateCoasterSpline", ppc, host, edge=interp_edges, rnd=interp_random),
+    FnTest("InterpolateCoasterSpline_end", end_ppc, end_host, edge=end_edges, rnd=end_random),
     FnTest("PlayCollisionSound", ppc, host, edge=play_edges, rnd=play_random),
     FnTest("SetTrainSoundState", ppc, host, edge=sound_edges, rnd=sound_random),
     FnTest("SetCarOrientation", ppc, host, edge=orient_edges, rnd=orient_random),

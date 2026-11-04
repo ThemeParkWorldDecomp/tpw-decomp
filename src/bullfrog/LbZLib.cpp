@@ -276,6 +276,7 @@ uint32_t LbZLib_MemDecompressedSize(void* source) {
     return decompressor.DecompressedSize(static_cast<uint8_t*>(source));
 }
 
+
 uint32_t LbZLib_CompressWorkspaceSize() { // 0x1002596c (136 bytes)
     static bfl::compress::CZLib compressor;
     return static_cast<uint32_t>(compressor.CompressWorkspaceSize());

@@ -20,6 +20,9 @@ the original's image, are compared unit for unit with the host's table, and the 
 The language index is not range checked by the original; the cases use it up to 255 and the compare is a fake, so no table entry beyond the
 seventh is read. The text always has a 0 among its 640 units (the original does not terminate it). A flag word other than 0 and 1 is only
 used with a header (the original calls Serialise on NULL otherwise).
+
+With the port fixes (tpw_sh_portfix answers 1; port_fix tag parkload) a language of 7 or more fails as a text that does not match, without
+the compare: the original runs such a case with the compare answering "differs", and its compare event is left out of its log.
 """
 import ctypes as C
 import random
@@ -167,8 +170,13 @@ STUBS = None
 SINIT_STUBS = None
 
 
+PORT_FIX = False
+
+
 def setup(runner):
-    global STUBS, SINIT_STUBS
+    global STUBS, SINIT_STUBS, PORT_FIX
+    runner.lib.tpw_sh_portfix.restype, runner.lib.tpw_sh_portfix.argtypes = I32, []
+    PORT_FIX = runner.lib.tpw_sh_portfix() == 1
     T.install_std_stubs(runner.emu)
     STUBS = build_stubs()
     SINIT_STUBS = build_sinit_stubs()
@@ -240,6 +248,17 @@ def ppc_load_header(e, c):
     finally:
         CL.Stubs.deactivate(e, saved)
         e.cl = None
+    return out
+
+
+def ppc_load_header_fixed(e, c):
+    """The original, or with the port fixes what they make of it (see the module comment)."""
+    if not (PORT_FIX and c["lang"] >= 7):
+        return ppc_load_header(e, c)
+    q = dict(c["q"])
+    q["operator!="] = [1] + list(q.get("operator!=", []))[1:]
+    out = ppc_load_header(e, dict(c, q=q))
+    out["log"] = [ev for ev in out["log"] if ev[0] != "operator!="]
     return out
 
 
@@ -470,6 +489,6 @@ def sinit_cases(r=None):
 # (the static initialisation is first: the other two leave their error word in gSaveLoad)
 TESTS = [
     FnTest("__sinit_SaveLoad_cpp", ppc_sinit, host_sinit, edge=lambda: [sinit_cases()], rnd=sinit_cases),
-    FnTest("CSaveLoad::LoadHeader", ppc_load_header, host_load_header, edge=lh_edges, rnd=lh_rnd),
+    FnTest("CSaveLoad::LoadHeader", ppc_load_header_fixed, host_load_header, edge=lh_edges, rnd=lh_rnd),
     FnTest("CSaveLoadHeader::Serialise", ppc_serialise, host_serialise, edge=se_edges, rnd=se_rnd),
 ]

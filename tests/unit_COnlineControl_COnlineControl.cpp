@@ -104,7 +104,8 @@ void* OperatorNew(uint32_t size) {
     return tpw::ArenaAllocZeroed(size < 0x2000 ? 0x2000 : size);
 }
 void OperatorDelete(void* p) {
-    const uintptr_t raw = reinterpret_cast<uintptr_t>(p);
+    // a deque table word is an arena offset, the value the Mac passes
+    const uintptr_t raw = tpw::InArena(p) ? tpw::ArenaOffset(p) : reinterpret_cast<uintptr_t>(p);
     ev("delete", {L(p), raw < 0x10000 ? static_cast<int64_t>(raw) : 0});
 }
 void WStringCtor(void* self) { ev("wstr_ctor", {L(self)}); }

@@ -243,7 +243,7 @@ int32_t tpw_oi_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(CLBLobbyView, mLightDownward));
     out[n++] = static_cast<int64_t>(offsetof(CLBLobby, mGlobals));
     out[n++] = static_cast<int64_t>(offsetof(CLBLobbyGlobals, mIslandFov));
-    out[n++] = static_cast<int64_t>(offsetof(OnlineParkSelection, mID));
+    out[n++] = static_cast<int64_t>(offsetof(OnlineParkSelection, mCityID));
     // the sizes: the module allocates at least this much
     out[n++] = static_cast<int64_t>(sizeof(CFSOnlineSystem));
     out[n++] = static_cast<int64_t>(sizeof(CFSOnlinePark));

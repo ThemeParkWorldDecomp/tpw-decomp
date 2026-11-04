@@ -325,6 +325,7 @@ def mk_list(s, texts, end):
         rep = s.alloc(0x10)
         data = s.alloc(2 * len(t) + 4)
         s.wchars(data, t + [0])
+        s.words(rep, [len(t)])   # the length (the translation reads the key's text by it)
         s.words(rep + 0xC, [s.ptr(data)])
         s.words(node, [nxt])
         s.words(node + 0xC, [s.ptr(rep)])

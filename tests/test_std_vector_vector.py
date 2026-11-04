@@ -32,7 +32,7 @@ OWN = set(SIZES)
 
 NEW, NEWA, DELETE, STRLEN, STRCPY, THROW = 0x102384b8, 0x10238668, 0x10238218, 0x10238650, 0x10238410, 0x10238680
 RCCTOR, COPY, DESTROY_A, DESTROY_B, PLACEMENT_NEW = 0x100026ac, 0x10201878, 0x102013c0, 0x10201744, 0x10201850
-HOST_LAYOUT = [0, 4, 8, 16]
+HOST_LAYOUT = [0, 4, 8, 12]
 
 BLOCK = 128          # a data block: 16 bytes of padding, 8 Arguments (96), 16 bytes of padding
 PAD = 16
@@ -170,7 +170,7 @@ class Ppc(Side):
 
 class Host(Side):
     fmt = "<I"
-    ptr = 8
+    ptr = 4   # the data word is an arena offset; the arena starts on a 4 GB boundary, so it is the address's low half
 
     def __init__(self, lib, case):
         self.lib = lib
@@ -222,7 +222,8 @@ def put_vector(s, v, cap, size, data):
 
 
 def get_ptr(s, v):
-    return int.from_bytes(s.read(v + 8, s.ptr), "big" if s.fmt[0] == ">" else "little")
+    word = int.from_bytes(s.read(v + 8, s.ptr), "big" if s.fmt[0] == ">" else "little")
+    return word | (s.V & ~MASK) if word != 0 else 0   # the address the word names (the same on the PPC side)
 
 
 def build(s, case):

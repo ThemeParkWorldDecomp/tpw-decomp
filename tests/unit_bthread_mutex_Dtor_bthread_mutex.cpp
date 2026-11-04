@@ -15,7 +15,7 @@
 using namespace calllog;
 
 namespace NS_MacDoze {
-void DeleteCriticalSection(void** handle) {
+void DeleteCriticalSection(uint32_t* handle) {
     ev("DeleteCriticalSection", {lab(handle)});
 }
 }  // namespace NS_MacDoze

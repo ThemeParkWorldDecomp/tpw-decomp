@@ -11,7 +11,7 @@
 struct ZLibCompHeader {
     uint32_t mTag;            // 0x00  "BILZ" in the file: 0x5a4c4942 once swapped
     uint32_t mUnpackedSize;   // 0x04  bytes the stream inflates to
-    uint32_t mPackedSize;     // 0x08  bytes of the stream after the header
+    uint32_t mPackedSize;     // 0x08  bytes of the block, this header included (MemCompress writes the stream's length + 0x1c)
     uint32_t mWindowBits;     // 0x0c  zlib's window bits (15 in every block of the game)
     uint32_t mLevel;          // 0x10  memLevel (9); the compression level is -1
     uint32_t mF14;            // 0x14  0
@@ -99,6 +99,7 @@ uint32_t LbZLib_MemDecompress(void* source, void* dest, void* workspace);
 // 0x100258a0 (152 bytes, src/bullfrog/LbZLib.cpp): CZLib::DecompressedSize(source) on the library's one CZLib object. The save file
 // reader (CSaveLoad::Load) asks it how big the packed block it has read unpacks to; 0 is a block that is not one.
 uint32_t LbZLib_MemDecompressedSize(void* source);
+
 
 // Unit w216 (src/bullfrog/LbZLib.cpp).
 uint32_t LbZLib_MemCompress(void* source, void* dest, uint32_t length, void* workspace); // 0x10025708

@@ -12,7 +12,8 @@ library's on both sides.
 
 The world of a case: the argument vector whose first element holds the command number (every number 0..0x36 and some past the table), the
 object under test with random bytes and a chat word, gOnlineControl (absent, an own block, or the object under test), gOnlineSystem (absent
-or a block with a word at 0xe0), the park and city info blocks, the table word of gText at 0x598, gGameWorld. What is compared: the log, the
+or a block with its city list), the park and the city (Mac blocks for the original, the host's CFSOnlinePark and CFSOnlineCity for the
+translation, with the same values), the table word of gText at 0x598, gGameWorld. What is compared: the log, the
 three globals as classes, the object under test, the control and the system as bytes.
 
 No fused operations. Not tested: nothing skipped.
@@ -193,7 +194,7 @@ def stub_unlock(e):
 
 
 def stub_addcontact(e):
-    e.cl.rec("AddContact", (cls(e, e.r(3)), (e.r(4) - e.r(3)) & MASK, e.r(5) & MASK))
+    e.cl.rec("AddContact", (cls(e, e.r(3)), fnv(wunits(e, word(e, (word(e, e.r(4)) + 0xC) & MASK))), e.r(5) & MASK))
 
 
 def stub_startpop(e):
@@ -271,6 +272,32 @@ class Ppc(Side):
     def off(self, a):
         return a
 
+    def park(self, pid, name, cityid):
+        a = self.alloc(0x60)
+        self.words(a + 8, [pid])
+        self.words(a + 0x14, [name])
+        self.words(a + 0x48, [cityid])
+        return a
+
+    def city(self, name):
+        a = self.alloc(0x20)
+        self.words(a + 0x14, [name])
+        return a
+
+    def system_size(self):
+        return 0x404
+
+    def name(self, this, text):
+        rep = self.alloc(0x10)
+        self.words(rep + 0xC, [text])
+        self.words(this + 8, [rep])
+
+    def set_list(self, a, v):
+        self.words(a + 0xE0, [v])
+
+    def list(self, a):
+        return self.rd_word(a + 0xE0)
+
     def log(self):
         return self.L.log
 
@@ -319,6 +346,24 @@ class Host(Side):
     def off(self, a):
         return self.lib.tpw_pir_offset(a)
 
+    def park(self, pid, name, cityid):
+        return self.lib.tpw_pir_park(T.s32(pid), name, T.s32(cityid))
+
+    def city(self, name):
+        return self.lib.tpw_pir_city(name)
+
+    def system_size(self):
+        return self.lib.tpw_pir_system_size()
+
+    def name(self, this, text):
+        self.lib.tpw_pir_name(this, text)
+
+    def set_list(self, a, v):
+        self.lib.tpw_pir_set_list(a, v)
+
+    def list(self, a):
+        return self.lib.tpw_pir_list(a)
+
     def log(self):
         return CL.host_end(self.lib)
 
@@ -335,6 +380,12 @@ def bind(lib):
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]
     getattr(lib, p + "offset").restype, getattr(lib, p + "offset").argtypes = C.c_uint32, [C.c_uint64]
     getattr(lib, p + "run").restype, getattr(lib, p + "run").argtypes = None, [C.c_uint64] * 4
+    getattr(lib, p + "park").restype, getattr(lib, p + "park").argtypes = C.c_uint64, [C.c_int32, C.c_uint64, C.c_int32]
+    getattr(lib, p + "city").restype, getattr(lib, p + "city").argtypes = C.c_uint64, [C.c_uint64]
+    getattr(lib, p + "system_size").restype, getattr(lib, p + "system_size").argtypes = C.c_uint32, []
+    getattr(lib, p + "set_list").restype, getattr(lib, p + "set_list").argtypes = None, [C.c_uint64, C.c_uint32]
+    getattr(lib, p + "list").restype, getattr(lib, p + "list").argtypes = C.c_uint32, [C.c_uint64]
+    getattr(lib, p + "name").restype, getattr(lib, p + "name").argtypes = None, [C.c_uint64, C.c_uint64]
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -349,16 +400,15 @@ def build(s, case):
     this = o["this"] = s.alloc(0xE8C)
     s.write(this, bytes(case["filler"]))
     s.words(this, [case["chat"]])
-    park = s.alloc(0x60)
-    city = s.alloc(0x20)
+    me = s.alloc(64)
+    s.wstr(me, case["me"])
+    s.name(this, me)   # the player's name at +8: a pointer to the representation on the Mac, a slot here
     pname = s.alloc(64)
     cname = s.alloc(64)
     s.wstr(pname, case["pname"])
     s.wstr(cname, case["cname"])
-    s.words(park + 8, [case["pid"]])
-    s.words(park + 0x14, [s.off(pname)])
-    s.words(park + 0x48, [case["cityid"]])
-    s.words(city + 0x14, [s.off(cname)])
+    park = s.park(case["pid"], pname, case["cityid"])
+    city = s.city(cname)
     o["park"], o["city"] = park, city
     for name in ("gOnlineControl", "gOnlineSystem", "gGameWorld"):
         s.ptr(s.g(name), 0)
@@ -369,9 +419,9 @@ def build(s, case):
         s.write(a, bytes(case["ctrlfill"]))
         s.ptr(s.g("gOnlineControl"), a)
     if case["sys"] == "pre":
-        o["sys_pre"] = a = s.alloc(0x404)
+        o["sys_pre"] = a = s.alloc(s.system_size())
         s.write(a, bytes(case["sysfill"]))
-        s.words(a + 0xE0, [case["list"]])
+        s.set_list(a, case["list"])
         s.ptr(s.g("gOnlineSystem"), a)
     if case["world"]:
         s.ptr(s.g("gGameWorld"), s.alloc(0x40))
@@ -404,10 +454,12 @@ def observe(s, case, answer):
     g = lambda n: s.rd_word(s.g(n))
     cv, sv = s.rdptr(s.g("gOnlineControl")), s.rdptr(s.g("gOnlineSystem"))
     d = {"log": s.log(), "ctrl": kl(s, cv), "sys": kl(s, sv), "world": g("gGameWorld") != 0, "table": g("gTextTable"),
-         "this0": s.rd_word(o["this"]), "thisb": s.read(o["this"] + 4, 0xDC)}
+         "this0": s.rd_word(o["this"]), "thisb": s.read(o["this"] + 4, 4) + s.read(o["this"] + 0xC, 0xD4)}
     d["ctrlb"] = s.read(cv + 4, 0x3C) if cv else None   # the word at 0 is the chat word (a pointer on the Mac): read as a word
+    if cv and cv == o["this"]:
+        d["ctrlb"] = d["ctrlb"][:4] + d["ctrlb"][8:]   # the name at +8 (built as each side's representation) is compared by AddContact
     d["sysb"] = s.read(sv, 0x20) if sv else None
-    d["sysw"] = s.rd_word(sv + 0xE0) if sv else None
+    d["sysw"] = s.list(sv) if sv else None
     return d
 
 
@@ -441,7 +493,7 @@ def base(r, cmd, ctrl=None, sys=None):
             "ctrl": r.choice(["none", "pre", "this"]) if ctrl is None else ctrl,
             "sys": r.choice(["none", "pre"]) if sys is None else sys,
             "chat": r.getrandbits(32), "list": r.getrandbits(32), "pid": r.getrandbits(32), "cityid": r.getrandbits(32),
-            "pname": rstr(r), "cname": rstr(r), "table": r.choice([0, r.getrandbits(32)]), "world": r.random() < 0.8,
+            "pname": rstr(r), "cname": rstr(r), "me": rstr(r), "table": r.choice([0, r.getrandbits(32)]), "world": r.random() < 0.8,
             "filler": bytes(r.randrange(256) for _ in range(0xE0)), "ctrlfill": bytes(r.randrange(256) for _ in range(0x40)),
             "sysfill": bytes(r.randrange(256) for _ in range(0x20)),
             "queues": {"GetAvatarID": [r.getrandbits(32)]}}
