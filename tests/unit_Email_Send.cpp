@@ -86,4 +86,14 @@ uint32_t tpw_email_send(uint64_t self, uint64_t server, int16_t port, uint64_t e
                reinterpret_cast<char*>(static_cast<uintptr_t>(extra)), reinterpret_cast<Outbox*>(static_cast<uintptr_t>(outbox)));
 }
 
+// Email::Send with no mail to send, given an outbox outside the arena as Outbox::Send gives it: the word the field holds.
+uint32_t tpw_email_send_heap_outbox() {
+    static uint8_t heapOutbox[16];
+    static uint32_t block[0x4c / 4];
+    Email* email = reinterpret_cast<Email*>(block);
+    std::memset(block, 0, sizeof(block));
+    email->Send("", 0, nullptr, reinterpret_cast<Outbox*>(heapOutbox));
+    return email->mOutbox.mOffset == kOutboxOnHeap && email->mF3d == 0 && gEmailHeapOutbox == reinterpret_cast<Outbox*>(heapOutbox);
+}
+
 }  // extern "C"

@@ -1,5 +1,5 @@
 // Test library for the CAdvisorScoring word getters (unit v51055), main app: the src file named in the cmake. No callees, no globals.
-// The object is a zeroed arena block; the getters read raw words at Mac offsets from this.
+// The object is a zeroed arena block; the getters read the balance slots, which the test writes through tpw_adv_layout.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -10,6 +10,17 @@
 extern "C" {
 
 uint64_t tpw_adv_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
+
+// The host offset of the advisor's first balance value, the byte size of a value slot, the size of the scoring object.
+int32_t tpw_adv_layout(int64_t* out) {
+    int32_t n = 0;
+    alignas(16) static unsigned char buf[sizeof(CAdvisorScoring)];
+    CAdvisorScoring* p = reinterpret_cast<CAdvisorScoring*>(buf);
+    out[n++] = static_cast<int64_t>(reinterpret_cast<unsigned char*>(&p->mBalance.mValues[0]) - buf);
+    out[n++] = static_cast<int64_t>(sizeof(BalanceValue));
+    out[n++] = static_cast<int64_t>(sizeof(CAdvisorScoring));
+    return n;
+}
 
 uint32_t tpw_adv_call(int32_t idx, uint64_t object) {
     CAdvisorScoring* o = reinterpret_cast<CAdvisorScoring*>(static_cast<uintptr_t>(object));

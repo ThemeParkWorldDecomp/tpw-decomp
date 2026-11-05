@@ -101,6 +101,9 @@ int32_t tpw_ecb_layout(int64_t* out) {
     return n;
 }
 
+// An outbox Email::Send kept outside the field (kOutboxOnHeap).
+void tpw_ecb_keep_outbox(uint64_t outbox) { gEmailHeapOutbox = reinterpret_cast<Outbox*>(static_cast<uintptr_t>(outbox)); }
+
 void tpw_ecb_callback(uint64_t self, uint32_t message, int32_t code) {
     Email* email = reinterpret_cast<Email*>(static_cast<uintptr_t>(self));
     gEmailBase = reinterpret_cast<const uint8_t*>(email);

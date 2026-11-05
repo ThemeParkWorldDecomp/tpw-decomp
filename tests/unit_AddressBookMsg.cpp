@@ -220,6 +220,10 @@ int32_t tpw_ab_layout(int64_t* out) {
     return n;
 }
 
+int32_t tpw_ab_park_text() {
+    return static_cast<int32_t>(offsetof(CFSOnlinePark, mText94) + offsetof(TbDynamicStringTemplate<char16_t>, mData));
+}
+
 int32_t tpw_ab_msg(uint64_t window, int32_t message, int32_t a, int32_t b) {
     return AddressBookMsg(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(window)), message, a, b);
 }

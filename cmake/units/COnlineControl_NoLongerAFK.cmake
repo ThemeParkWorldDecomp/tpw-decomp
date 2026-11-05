@@ -9,6 +9,8 @@ set(TPW_UNIT_COnlineControl_NoLongerAFK_KEEP
   __ZN13ignore_callee7IosDtorEPvs   # ignore_callee::IosDtor(void*, short)
   __ZN13nocase_callee10DeallocateEPvS0_m   # nocase_callee::Deallocate(void*, void*, unsigned long)
   __ZN13nocase_callee10StringDtorEP13nocase_strings   # nocase_callee::StringDtor(nocase_string*, short)
+  __ZN13online_callee15HandleToPointerEj   # online_callee::HandleToPointer(unsigned int)
+  __ZN13online_callee15PointerToHandleEPKv   # online_callee::PointerToHandle(void const*)
   __ZN14COnlineControl10HideAvatarEv   # COnlineControl::HideAvatar()
   __ZN14COnlineControl11NoLongerAFKEb   # COnlineControl::NoLongerAFK(bool)
   __ZN14COnlineControl14DestroyVisitorERNSt3__112basic_stringIDsNS0_11char_traitsIDsEENS0_9allocatorIDsEEEE   # COnlineControl::DestroyVisitor(std::__1::basic_string<char16_t, std::__1::char_traits<char16_t>, std::__1::allocator<char16_t>>&)

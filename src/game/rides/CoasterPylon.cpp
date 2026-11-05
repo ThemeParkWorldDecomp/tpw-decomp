@@ -396,10 +396,10 @@ float RdF(const void* base, size_t offset) {
 
 void WrF(void* base, size_t offset, float v) { std::memcpy(static_cast<uint8_t*>(base) + offset, &v, sizeof v); }
 
-float BraceF4C(const tag_sTrackBrace* b) { return RdF(b->mF0C, 0x4c - 0x0c); }
-float BraceF54(const tag_sTrackBrace* b) { return RdF(b->mF0C, 0x54 - 0x0c); }
-float BraceFEC(const tag_sTrackBrace* b) { return RdF(b->mFE8, 0xec - 0xe8); }
-float BraceFF8(const tag_sTrackBrace* b) { return RdF(b->mFE8, 0xf8 - 0xe8); }
+float BraceF4C(const tag_sTrackBrace* b) { return b->mX4C; }
+float BraceF54(const tag_sTrackBrace* b) { return b->mZ54; }
+float BraceFEC(const tag_sTrackBrace* b) { return b->mFEC; }
+float BraceFF8(const tag_sTrackBrace* b) { return b->mFF8; }
 
 // The length of the vector at c+off: fmul (double) of the first, fmuls of the others, fadd, sqrt, frsp.
 float Length_2(void* c, size_t off) {

@@ -36,7 +36,7 @@ uint32_t Bump(uint32_t size) {
     gPoolNext += (size + 15) & ~15u;
     return static_cast<uint32_t>(gPoolBase) + at;
 }
-void* Ptr(uint32_t w) { return reinterpret_cast<void*>(static_cast<uintptr_t>(gMslMacAddressHigh | w)); }
+void* Ptr(uint32_t w) { return reinterpret_cast<void*>(static_cast<uintptr_t>((gMslMacAddressHigh << 32) | w)); }
 uint32_t W(const void* p) { return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(p)); }
 // A word inside the pool as its offset, any other word (a null, a stray value) as it is.
 int64_t Off(uint32_t w) {
@@ -194,7 +194,7 @@ uint64_t tpw_argdq_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpr
 // The pool of one case: the fakes bump-allocate from kBumpStart on.
 void tpw_argdq_pool(uint64_t base) {
     gPoolBase = base;
-    gMslMacAddressHigh = base & ~0xFFFFFFFFull;   // the arena lies above 4 GB: the upper half of every address
+    gMslMacAddressHigh = base >> 32;   // the arena lies above 4 GB: the upper half of every address
     gPoolNext = kBumpStart;
     gSeq = 0;
 }

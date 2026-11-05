@@ -24,6 +24,10 @@ uint32_t Rd(const void* p) {
 
 void Wr(void* p, uint32_t v) { std::memcpy(p, &v, 4); }
 
+// The host's strings (BuddyOn's key) carry the marker word as their one unit.
+void Mark(std::u16string* s, uint32_t v) { s->assign(1, static_cast<char16_t>(v)); }
+uint32_t Mk(const std::u16string* s) { return s->empty() ? 0 : (*s)[0]; }
+
 }  // namespace
 
 namespace online_callee {
@@ -47,6 +51,11 @@ void WStringCopy(void* self, const void* other, uint32_t pos, uint32_t count) {
     Wr(self, 0xE9);
 }
 
+// The copy from the host's string (the commands' name) is the same fake.
+void WStringCopy(void* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    WStringCopy(self, static_cast<const void*>(other), pos, count);
+}
+
 void NocaseWStringCopy(void* self, const void* other, uint32_t pos, uint32_t count) {
     ev("NCopy", {lab(const_cast<void*>(other)), pos, count});
     Wr(self, 0xF1);
@@ -56,6 +65,19 @@ void NocaseWStringDtor(void* self, int16_t flag) { ev("NDtor", {flag, Rd(self)})
 
 void* BuddyTreeFind(void* tree, const void* key) {
     ev("Find", {lab(tree), Rd(key)});
+    const int64_t answer = ret("Find");
+    return static_cast<uint8_t*>(tree) + (answer ? 4 : 8);
+}
+
+void NocaseWStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    ev("NCopy", {lab(const_cast<std::u16string*>(other)), pos, count});
+    Mark(self, 0xF1);
+}
+
+void NocaseWStringDtor(std::u16string* self, int16_t flag) { ev("NDtor", {flag, Mk(self)}); }
+
+void* BuddyTreeFind(void* tree, const std::u16string* key) {
+    ev("Find", {lab(tree), Mk(key)});
     const int64_t answer = ret("Find");
     return static_cast<uint8_t*>(tree) + (answer ? 4 : 8);
 }

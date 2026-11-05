@@ -466,9 +466,9 @@ uint32_t GAMESYSTEM_Tick() {
     case 9: {   // load the park
         if (OnlineSystem()->mFTPParkPending != 0) {
             CFSOnlineSystem* online = OnlineSystem();
-            CFSFTPParkInfo* info = OnlineSystem()->GetFTPDownloadParkInfo();
+            CFSOnlinePark* info = reinterpret_cast<CFSOnlinePark*>(OnlineSystem()->GetFTPDownloadParkInfo());
             gGame.SetCurrentTheme(
-                TbDynamicStringTemplate<char>(online->mThemeList->ReturnOnlineThemeName(info->mTheme)));
+                TbDynamicStringTemplate<char>(online->mThemeList->ReturnOnlineThemeName(info->mF4C)));
             gGame.mF3C = 0;
         } else {
             gGame.mF3C = 1;

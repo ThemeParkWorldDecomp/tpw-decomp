@@ -98,12 +98,12 @@ static void TestStructure() {
         // a plain relative ASCII path
         CHECK(!dest.empty() && dest[0] != '/' && dest.find("..") == std::string::npos && dest.find('\\') == std::string::npos);
         for (unsigned char c : dest) CHECK(c >= 0x20 && c < 0x7f);
-        CHECK(r.editions != 0 && (r.editions & ~(kEditionUs | kEditionEur | kEditionGold | kEditionLanguages)) == 0);
+        CHECK(r.editions != 0 && (r.editions & ~(kEditionUs | kEditionEur | kEditionGold | kEditionLanguages | kEditionUsPc | kEditionEurPc)) == 0);
         CHECK(r.group < kGroupCount);
         CHECK(r.source == kSourceMacCd || r.source == kSourcePcCd || r.source == kSourceGoldCd ||
               r.source == kSourceLanguageDisc);
         // no duplicate (dest, edition)
-        for (int e : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages}) {
+        for (int e : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages, kEditionUsPc, kEditionEurPc}) {
             if (r.editions & e) CHECK(seen.insert({dest, e}).second);
         }
         // the flags say what the name says
@@ -112,8 +112,8 @@ static void TestStructure() {
         CHECK(((r.flags & kFlagFinfo) == 0) || ((r.flags & kFlagRequired) == 0));
         CHECK(((r.editions & kEditionGold) != 0) == StartsWith(dest, "gold/"));
         CHECK(((r.group == kGroupGold)) == ((r.editions & kEditionGold) != 0));
-        CHECK(r.group != kGroupLanguageAmerican || r.editions == kEditionUs);
-        CHECK(r.group != kGroupLanguageEnglish || r.editions == kEditionEur);
+        CHECK(r.group != kGroupLanguageAmerican || (r.editions & ~(kEditionUs | kEditionUsPc)) == 0);
+        CHECK(r.group != kGroupLanguageEnglish || (r.editions & ~(kEditionEur | kEditionEurPc)) == 0);
         CHECK(r.group != kGroupProgram || (r.hash_count == 2 && r.editions == kEditionUs));
         // a language pack's file: lang/<Name>/<game path>, that edition alone, a known language
         const bool lang = (r.editions & kEditionLanguages) != 0;
@@ -144,7 +144,7 @@ static void TestStructure() {
     // lookups: every record by destination and edition, every content by size and hash
     for (size_t i = 0; i < n; ++i) {
         const ManifestRecord& r = records[i];
-        for (int e : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages}) {
+        for (int e : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages, kEditionUsPc, kEditionEurPc}) {
             if (r.editions & e) CHECK(FindByDest(static_cast<Edition>(e), r.dest) == &r);
             else CHECK(FindByDest(static_cast<Edition>(e), r.dest) != &r);
         }
@@ -180,15 +180,15 @@ static void TestStructure() {
 // ---- counts (the generator prints the same figures)
 
 static void TestCounts() {
-    CHECK_EQ(ManifestRecordCount(), 3011);
-    CHECK_EQ(ManifestHashCount(), 3020);
-    CHECK_EQ(CountRecords(kEditionUs), 770);
+    CHECK_EQ(ManifestRecordCount(), 3140);   // the PC CDs' films share the US and European records
+    CHECK_EQ(ManifestHashCount(), 3149);
+    CHECK_EQ(CountRecords(kEditionUs), 779);
     CHECK_EQ(CountRecords(kEditionEur), 913);
     CHECK_EQ(CountRecords(kEditionGold), 36);
-    CHECK_EQ(CountRecords(kEditionUs, true), 770);
-    CHECK_EQ(CountRecords(kEditionEur, true), 862);
+    CHECK_EQ(CountRecords(kEditionUs, true), 776);   // all but the program (optional) and bfj.mov and BFj2.mov (never opened)
+    CHECK_EQ(CountRecords(kEditionEur, true), 860);
     CHECK_EQ(CountRecords(kEditionGold, true), 36);
-    CHECK_EQ(CountRecords(kEditionUs | kEditionEur), 770 + 913 - 62);
+    CHECK_EQ(CountRecords(kEditionUs | kEditionEur), 779 + 913 - 71);
 
     std::map<std::pair<int, int>, size_t> by_group;      // (edition, group)
     std::map<std::pair<int, int>, size_t> by_source;     // (edition, source)
@@ -208,10 +208,10 @@ static void TestCounts() {
             ++idx;
         }
     }
-    CHECK_EQ(shared, 62);
+    CHECK_EQ(shared, 71);   // 62, and the PC CD's 9 films
     CHECK_EQ((by_group[{kEditionUs, kGroupCore}]), 663);
     CHECK_EQ((by_group[{kEditionUs, kGroupFontsRsrc}]), 34);
-    CHECK_EQ((by_group[{kEditionUs, kGroupMovies}]), 11);
+    CHECK_EQ((by_group[{kEditionUs, kGroupMovies}]), 20);
     CHECK_EQ((by_group[{kEditionUs, kGroupLanguageAmerican}]), 61);
     CHECK_EQ((by_group[{kEditionUs, kGroupProgram}]), 1);
     CHECK_EQ((by_group[{kEditionEur, kGroupCore}]), 763);
@@ -219,8 +219,9 @@ static void TestCounts() {
     CHECK_EQ((by_group[{kEditionEur, kGroupMovies}]), 33);
     CHECK_EQ((by_group[{kEditionEur, kGroupLanguageEnglish}]), 66);
     CHECK_EQ((by_group[{kEditionGold, kGroupGold}]), 36);
-    // sources: the US files all come from the Mac CD; of the European 913, 798 from the PC disc
+    // sources: the US files all come from the Mac CD but the PC CD's 9 films; of the European 913, 798 from the PC disc
     CHECK_EQ((by_source[{kEditionUs, kSourceMacCd}]), 770);
+    CHECK_EQ((by_source[{kEditionUs, kSourcePcCd}]), 9);
     CHECK_EQ((by_source[{kEditionEur, kSourcePcCd}]), 798);
     CHECK_EQ((by_source[{kEditionEur, kSourceMacCd}]), 115);  // 45 files, 2 tuning files, 21 .rsrc, 47 .finfo
     CHECK_EQ((by_source[{kEditionGold, kSourceGoldCd}]), 36);
@@ -234,6 +235,7 @@ static void TestCounts() {
     // the program: both accepted builds, one record (by SHA-256 of the data fork; the SHA-1s are in the generator)
     const ManifestRecord* program = FindByDest(kEditionUs, "SimTheme Park");
     CHECK(program != nullptr && program->group == kGroupProgram && program->hash_count == 2);
+    CHECK(program != nullptr && (program->flags & kFlagRequired) == 0);  // the game's data tables are built in
     CHECK(Hex(RecordHash(*program, 0).sha256) == "04809cd4ccee5433c7fb0b7c93d32f6a7aa629c1849181c0b7906415e5e295f5");
     CHECK_EQ(RecordHash(*program, 0).size, 2274758);
     CHECK(Hex(RecordHash(*program, 1).sha256) == "29da2392beefc1ee00b097536b7f1b202044cbf0743c0eb3a6235254fd318000");
@@ -244,7 +246,70 @@ static void TestCounts() {
     CHECK(std::strcmp(SourceName(kSourcePcCd), "pc") == 0);
     CHECK(std::strcmp(GroupName(kGroupLanguagePack), "language-pack") == 0);
     CHECK(std::strcmp(EditionName(kEditionLanguages), "lang") == 0);
+    CHECK(std::strcmp(EditionName(kEditionUsPc), "us-pc") == 0);
+    CHECK(std::strcmp(EditionName(kEditionEurPc), "eur-pc") == 0);
+    for (Edition e : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages, kEditionUsPc, kEditionEurPc}) {
+        Edition back = kEditionGold;
+        CHECK(EditionFromName(EditionName(e), back) && back == e);
+    }
+    Edition none = kEditionGold;
+    CHECK(!EditionFromName("pc", none) && none == kEditionGold);
+    CHECK(IsUsGame(kEditionUs) && IsUsGame(kEditionUsPc) && !IsUsGame(kEditionEur) && !IsUsGame(kEditionEurPc));
+    CHECK(IsWindowsEdition(kEditionUsPc) && IsWindowsEdition(kEditionEurPc) && !IsWindowsEdition(kEditionEur));
     CHECK(std::strcmp(SourceName(kSourceLanguageDisc), "lang") == 0);
+}
+
+// ---- the Windows discs' editions: PC files only, the Mac game folder's layout
+
+static void TestPcEditions() {
+    CHECK_EQ(CountRecords(kEditionUsPc), 749);
+    CHECK_EQ(CountRecords(kEditionUsPc, true), 748);   // all but fonts.wad, read through its members
+    CHECK_EQ(CountRecords(kEditionEurPc), 817);
+    CHECK_EQ(CountRecords(kEditionEurPc, true), 816);
+    for (Edition e : {kEditionUsPc, kEditionEurPc}) {
+        const char* lang = e == kEditionUsPc ? "American" : "English";
+        size_t fonts = 0, movies = 0, text = 0;
+        for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+            const ManifestRecord& r = ManifestRecords()[i];
+            if (!(r.editions & e)) continue;
+            const std::string dest = r.dest;
+            CHECK(r.source == kSourcePcCd);
+            CHECK((r.flags & (kFlagRsrc | kFlagFinfo | kFlagTuning)) == 0);
+            CHECK(r.group != kGroupProgram && r.group != kGroupFontsRsrc && StartsWith(dest, "data/"));
+            CHECK(!EndsWith(dest, ".mov") && !(StartsWith(dest, "data/levels/") && dest.find("/_") != std::string::npos));   // no Mac film, no "_" bonus ride
+            if (StartsWith(dest, "data/fonts/")) {
+                CHECK(EndsWith(dest, ".TTF") && (r.flags & kFlagRequired));
+                ++fonts;
+            }
+            if (r.group == kGroupMovies) {
+                CHECK(EndsWith(dest, ".tgq") && (r.flags & kFlagRequired));   // the port plays them
+                ++movies;
+            }
+            if (StartsWith(dest, "data/Language/")) {
+                CHECK(StartsWith(dest, (std::string("data/Language/") + lang + "/").c_str()));
+                ++text;
+            }
+        }
+        CHECK_EQ(fonts, 17);
+        CHECK_EQ(movies, 9);
+        CHECK_EQ(text, 66);
+        const ManifestRecord* wad = FindByDest(e, "data/fonts.wad");
+        CHECK(wad != nullptr && !(wad->flags & kFlagRequired));
+        for (const char* res : {"512", "640", "800", "1024"}) {
+            std::string init = std::string(e == kEditionUsPc ? "data/init/" : "data/Init/") + res + "/";
+            const ManifestRecord* legal = FindByDest(e, (init + "legal.tga").c_str());
+            const ManifestRecord* original = FindByDest(e, (init + "Legal_" + lang + ".tga").c_str());
+            CHECK(legal != nullptr && original != nullptr);
+            if (legal && original) CHECK(std::memcmp(RecordHash(*legal, 0).sha256, RecordHash(*original, 0).sha256, 32) == 0);
+        }
+    }
+    // the PC disc's own tuning, not the Mac release's
+    const ManifestRecord* eurMed = FindByDest(kEditionEur, "data/med.sam");
+    const ManifestRecord* pcMed = FindByDest(kEditionEurPc, "data/med.sam");
+    CHECK(eurMed != nullptr && pcMed != nullptr && eurMed != pcMed && (eurMed->flags & kFlagTuning));
+    // the European PC files of the European edition are the same records
+    CHECK(FindByDest(kEditionEurPc, "data/levels/jungle/Music/MusicHD.sdt") ==
+          FindByDest(kEditionEur, "data/levels/jungle/Music/MusicHD.sdt"));
 }
 
 // ---- the Python lists, read as text
@@ -351,12 +416,14 @@ static void TestPythonLists() {
         const ManifestRecord* r = FindByDest(kEditionUs, rel.c_str());
         CHECK(r != nullptr);
         CHECK(r != nullptr && HasHash(*r, sha, &size));
-        CHECK(r != nullptr && (r->flags & kFlagRequired));
+        const bool unopened = rel == "data/Movies/bfj.mov" || rel == "data/Movies/BFj2.mov";
+        CHECK(r != nullptr && ((r->flags & kFlagRequired) != 0) == !unopened);
         ++expected_us;
     }
     CHECK(entries > 1000);
     CHECK(saw_cd_program && saw_patch_program);
-    CHECK_EQ(expected_us + 1, CountRecords(kEditionUs));  // every US record but the program came from CHECKSUMS
+    // every US record but the program and the PC CD's 9 films came from CHECKSUMS
+    CHECK_EQ(expected_us + 1 + 9, CountRecords(kEditionUs));
 
     // Europe: EXPECTED "SHA-256  PATH" lines, all of them (913) and nothing else
     CHECK(ListText(eur, "EXPECTED", &list));
@@ -458,10 +525,44 @@ static void TestLanguages() {
     }
 }
 
+// ---- the films: each the program opens is the Mac CD's .mov or the PC CD's .tgq, in both editions (FilmCounterpart)
+
+static void TestFilms() {
+    size_t pairs = 0;
+    for (Edition e : {kEditionUs, kEditionEur}) {
+        for (const char* name : {"bf", "bub", "buc", "grav", "jug", "mir", "plan", "roc", "roll"}) {
+            const std::string movies = std::string("data/Movies/") + name;
+            const ManifestRecord* mov = FindByDest(e, (movies + ".mov").c_str());
+            const ManifestRecord* tgq = FindByDest(e, (movies + ".tgq").c_str());
+            CHECK(mov && tgq && (mov->flags & kFlagRequired) && (tgq->flags & kFlagRequired));
+            CHECK(mov && mov->source == kSourceMacCd && tgq && tgq->source == kSourcePcCd);
+            CHECK(mov && FilmCounterpart(*mov, e) == tgq);
+            CHECK(tgq && FilmCounterpart(*tgq, e) == mov);
+            CHECK(mov && FilmCounterpart(*mov, kEditionGold) == nullptr);
+            ++pairs;
+        }
+        for (const char* name : {"data/Movies/bfj.mov", "data/Movies/BFj2.mov"}) {
+            const ManifestRecord* r = FindByDest(e, name);
+            CHECK(r && !(r->flags & kFlagRequired) && FilmCounterpart(*r, e) == nullptr);
+        }
+    }
+    CHECK_EQ(pairs, 18);
+    // side files and everything outside data/Movies have none
+    const ManifestRecord* rsrc = FindByDest(kEditionEur, "data/Movies/bf.mov.rsrc");
+    CHECK(rsrc && FilmCounterpart(*rsrc, kEditionEur) == nullptr);
+    size_t with = 0;
+    for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+        for (Edition e : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages}) with += FilmCounterpart(ManifestRecords()[i], e) != nullptr;
+    }
+    CHECK_EQ(with, 36);
+}
+
 int main() {
     TestStructure();
     TestCounts();
+    TestFilms();
     TestLanguages();
+    TestPcEditions();
     TestPythonLists();
     std::printf("manifest: %d checks passed\n", gChecks);
     return 0;

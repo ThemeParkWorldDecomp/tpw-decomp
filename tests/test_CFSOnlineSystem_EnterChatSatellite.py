@@ -33,9 +33,11 @@ MASK = 0xFFFFFFFF
 
 F_ENTER, F_SETPUB, F_UPCB, F_COMPLETE = 0x10174BE8, 0x10174E4C, 0x10175154, 0x10175C20
 F_FTP, F_FTPID, F_GOTO, F_ARE = 0x10175DFC, 0x10176074, 0x101762E8, 0x10171498
-SIZES = {F_ENTER: 124, F_SETPUB: 164, F_UPCB: 128, F_COMPLETE: 228, F_FTP: 208, F_FTPID: 184, F_GOTO: 72, F_ARE: 208}
+F_ANSWER = 0x101753DC
+TABLE_UPPER = 0x700000000000
+SIZES = {F_ANSWER: 480, F_ENTER: 124, F_SETPUB: 164, F_UPCB: 128, F_COMPLETE: 228, F_FTP: 208, F_FTPID: 184, F_GOTO: 72, F_ARE: 208}
 OWN = set(SIZES)
-ENTRY = {"enter": F_ENTER, "setpub": F_SETPUB, "upcb": F_UPCB, "complete": F_COMPLETE, "ftp": F_FTP, "ftpid": F_FTPID, "goto": F_GOTO,
+ENTRY = {"enter": F_ENTER, "setpub": F_SETPUB, "upcb": F_UPCB, "complete": F_COMPLETE, "answer": F_ANSWER, "ftp": F_FTP, "ftpid": F_FTPID, "goto": F_GOTO,
          "are": F_ARE}
 
 # callees faked on both sides
@@ -47,7 +49,7 @@ REQ_FTP_POST, LOGIN_PANEL, GOTO_ID_POST, COMPLETE_FTP, LOGGED_IN_FTP = 0x10175F2
 TV_CANCEL, TV_GENERAL, TV_REQFTP, TV_GOTOID, TV_RAS = 0x10267478, 0x10268590, 0x10267460, 0x10267458, 0x102674B0
 VT_STR, VT_GLOBE, CBWORD = 0x7000A000, 0x7000A010, 0x7000A020
 
-ADDR = dict(gOnlineSystem=0x10380AB0, gLobbyScreens=0x102E49B8)
+ADDR = dict(gOnlineSystem=0x10380AB0, gLobbyScreens=0x102E49B8, gTextRes=0x1037FF18 + 0x564)
 
 MAC = {"sys.mLogin": 0, "sys.mLoginCallback": 4, "sys.mLoginContext": 8, "sys.mLoggedIn": 0x60, "sys.mNews": 0x6C,
        "sys.mCityList": 0xE0, "sys.mParksTop10": 0xE4, "sys.mParksInCity": 0xE8, "sys.mParksByPlayer": 0xEC, "sys.mParksByID": 0xF0,
@@ -200,6 +202,9 @@ class Ppc(Side):
     def cbword(self):
         return CBWORD
 
+    def upper(self, high):
+        return 0
+
     def cbid(self, p):
         return {0: 0, TV_REQFTP: 1, TV_GOTOID: 2}.get(p, 3)
 
@@ -218,6 +223,7 @@ class Ppc(Side):
 
 HOST_SIG = {"enter": [C.c_uint64, C.c_int32], "setpub": [C.c_uint64, C.c_int32, C.c_uint64, C.c_uint64],
             "upcb": [C.c_uint64, C.c_int32, C.c_uint64], "complete": [C.c_uint64, C.c_int32],
+            "answer": [C.c_uint64, C.c_int32, C.c_int32, C.c_uint64, C.c_uint64],
             "ftp": [C.c_uint64] * 4, "ftpid": [C.c_uint64, C.c_int32, C.c_uint64, C.c_uint64],
             "goto": [C.c_uint64, C.c_int32, C.c_uint64, C.c_uint64], "are": [C.c_uint64]}
 
@@ -261,6 +267,10 @@ class Host(Side):
     def label(self, p):
         return self.lib.tpw_cs_lab(p)
 
+    def upper(self, high):
+        self.lib.tpw_cs_upper(high)
+        return high
+
     def cbword(self):
         w = self.lib.tpw_cs_thunk()
         assert w != 0
@@ -290,6 +300,7 @@ def bind(lib):
     lib.tpw_cs_fn.restype, lib.tpw_cs_fn.argtypes = C.c_uint64, [C.c_int32]
     lib.tpw_cs_lab.restype, lib.tpw_cs_lab.argtypes = C.c_int64, [C.c_uint64]
     lib.tpw_cs_layout.argtypes = [C.POINTER(C.c_int64)]
+    lib.tpw_cs_upper.restype, lib.tpw_cs_upper.argtypes = None, [C.c_uint64]
     for op, sig in HOST_SIG.items():
         f = getattr(lib, "tpw_cs_" + op)
         f.argtypes = sig
@@ -319,6 +330,9 @@ def build(s, case):
 
     for n, v in case["words"].items():
         s.w32(so(n), v)
+    high = s.upper(TABLE_UPPER if case["op"] == "answer_complete" else 0)
+    if case["op"] == "answer_complete":
+        s.wptr(s.g("gTextRes"), high | case["args"]["table"])
     s.w32(so("mF374"), s.cbword() if case["cb"] else 0)
     s.wptr(so("mLoginCallback"), 0x1111)
     s.wptr(so("mLoginContext"), 0x2222)
@@ -369,6 +383,9 @@ def execute(s, case, O):
         return s.call_op(op, sysa, a["result"], a["ctx"])
     if op == "complete":
         return s.call_op(op, sysa, a["failed"])
+    if op == "answer_complete":
+        s.call_op("answer", sysa, a["result"], 0, 0, 0)
+        return s.call_op("complete", sysa, a["failed"])
     if op == "ftp":
         return s.call_op(op, sysa, O[7], a["cb"], a["ctx"])
     if op == "ftpid":
@@ -492,6 +509,23 @@ def complete_edges():
                                  words={"mF37C": f37c, "mF380": f380, "mF320": f320, "mF378": rw(r)}, cb=cb, upload=upload)
 
 
+# The upload server's answer, then CompleteUpload: the error table comes back whole from the word the answer stored.
+def answer_case(r, result, failed):
+    return mk(r, "answer_complete", args={"result": result, "failed": failed, "table": r.randrange(0x1000, 2 ** 32, 16)},
+              words={"mF37C": 0, "mF380": 0})
+
+
+def answer_edges():
+    r = random.Random(17)
+    for result in (-0x28, -0x14, -4, -2):
+        for failed in (0, 1):
+            yield answer_case(r, result, failed)
+
+
+def answer_random(r):
+    return answer_case(r, r.choice([-0x28, -0x28, -0x14, -6, -5, -4, -2, -1]), r.choice([0, 1]))
+
+
 def complete_random(r):
     return mk(r, "complete", args={"failed": r.choice([0, 1, -1, rw(r)])},
               words={"mF37C": r.choice([0, rw(r)]), "mF380": r.choice([0, rw(r)]), "mF320": r.choice([0, rw(r)])})
@@ -579,6 +613,7 @@ TESTS = [
     FnTest("CFSOnlineSystem::SetPublishing", ppc, host, edge=setpub_edges, rnd=setpub_random),
     FnTest("CFSOnlineSystem::RequestUploadPostLoginCallback", ppc, host, edge=upcb_edges, rnd=upcb_random),
     FnTest("CFSOnlineSystem::CompleteUpload", ppc, host, edge=complete_edges, rnd=complete_random),
+    FnTest("CFSOnlineSystem::UploadServerConnectionCallback, CompleteUpload", ppc, host, edge=answer_edges, rnd=answer_random),
     FnTest("CFSOnlineSystem::RequestFTPDownload", ppc, host, edge=ftp_edges("ftp"), rnd=ftp_random("ftp")),
     FnTest("CFSOnlineSystem::GotoPlayerRequestFTPDownloadByID", ppc, host, edge=ftp_edges("ftpid"), rnd=ftp_random("ftpid")),
     FnTest("CFSOnlineSystem::GotoPlayerFTPPostGetParkInfoCallback", ppc, host, edge=goto_edges, rnd=goto_random),

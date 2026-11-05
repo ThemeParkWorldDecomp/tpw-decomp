@@ -399,6 +399,33 @@ def month_edges():
         for same in (0, 1):
             for striking in (0, 1):
                 yield month_case(r, 1, 0, 0, t, same, striking)
+    # the whole gate against the per-type loop: park open or closed, nobody or many visitors, forced off, on or any other word, the
+    # five staff heads each present or absent, each type already done this turn or not, each type striking or not
+    for f64 in (0, 1, 0x80000000):
+        for closed in (0, 1):
+            for vis in (0, 1, 250):
+                for present, done, striking in ((0x1F, 0, 0), (0x1F, 0, 0x1F), (0, 0, 0), (0x1F, 0x1F, 0), (0x15, 0x0A, 0x13),
+                                                (0x0A, 0x15, 0x0C)):
+                    yield month_matrix_case(r, f64, closed, vis, present, done, striking)
+
+
+def month_matrix_case(r, f64, closed, vis, present, done, striking):
+    """Bit t of present: type t's list head differs from its no-staff sentinel; of done: its strike was looked at this turn; of
+    striking: IsStriking answers 1 for it (the queue is read once per type that gets that far)."""
+    c = base(r, "month")
+    c["f64"] = f64
+    c["queues"]["IsParkClosed"] = [closed]
+    c["queues"]["GetVisitorsInPark"] = [vis]
+    slot = {0: 0, 1: 1, 2: 2, 3: 4, 4: 3}
+    c["sent"] = [r.choice([0, 3, 0x27FF]) for _ in range(5)]
+    reach = []
+    for t in range(5):
+        c["heads"][slot[t]] = (c["sent"][t] + 1) & 0xFFFF if present >> t & 1 else c["sent"][t]
+        c["strikes"][3 * t + 2] = c["turn"] if done >> t & 1 else c["turn"] ^ 0x10
+        if present >> t & 1 and not done >> t & 1:
+            reach.append(striking >> t & 1)
+    c["queues"]["IsStriking"] = reach + [0]
+    return c
 
 
 def month_random(r):

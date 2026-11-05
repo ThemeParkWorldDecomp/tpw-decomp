@@ -8,6 +8,10 @@ answers a TbError, a transferred count and the four file bytes from the case.
 
 The world of a case: the value cell's old word, the file bytes, the error, the count, noLog. What is compared: the answer, the
 value cell and the event log. No fused operations. Not tested: nothing left out.
+
+With the port fixes (tpw_lv_watch answers other than -1; port_fix tag parkload) half the cases arm the port's read watch before the
+call (the case's "watch") and read it after: a load that answers 1 marks it, and nothing else does (the original has no watch: its
+side's word is made from its answer).
 """
 import ctypes as C
 import random
@@ -52,7 +56,13 @@ STUBS.imp("LbFile_Read__FPvPvUlPUl",stub_read)
 STUBS.internal(ASSERT, CL.recorder("assert", "is"))
 
 
+WATCH = False
+
+
 def setup(runner):
+    global WATCH
+    runner.lib.tpw_lv_watch.restype, runner.lib.tpw_lv_watch.argtypes = C.c_int32, [C.c_int32]
+    WATCH = runner.lib.tpw_lv_watch(0) != -1
     T.install_std_stubs(runner.emu)
 
 
@@ -153,11 +163,19 @@ def run(s, case):
 
 
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    out = run(Ppc(e, case), case)
+    if WATCH:
+        out["watch"] = (2 | int(out["answer"] == 1)) if case["watch"] else 0
+    return out
 
 
 def host(lib, case):
-    return run(Host(lib, case), case)
+    if WATCH and case["watch"]:
+        lib.tpw_lv_watch(1)
+    out = run(Host(lib, case), case)
+    if WATCH:
+        out["watch"] = lib.tpw_lv_watch(0)
+    return out
 
 
 def mk(r, err=None, n=None, nolog=None):
@@ -165,7 +183,8 @@ def mk(r, err=None, n=None, nolog=None):
     n = r.choice([4, 4, 4, 0, 3, 5, 8]) if n is None else n
     data = r.choice([0, 0xFFFFFFFF, 0x01020304, 0x80000000, r.getrandbits(32), r.getrandbits(32)])
     return {"queues": {"err": [err & MASK], "n": [n], "data": [data]}, "old": r.getrandbits(32),
-            "text": r.choice(["a", "mThought", "x" * 10]), "nolog": r.choice([0, 1, -1, 7]) if nolog is None else nolog}
+            "text": r.choice(["a", "mThought", "x" * 10]), "nolog": r.choice([0, 1, -1, 7]) if nolog is None else nolog,
+            "watch": r.randrange(2)}
 
 
 def edges():

@@ -7,7 +7,7 @@ A case is a person block and a call, built by one piece of Python in both memori
 KillSpriteScript, SetState, CTRACE, GAME_ASSERTMSG) are fakes on both sides that record their arguments (CTRACE also the %d argument).
 
 The world: the person block (+0x19c happiness, +0x210 balloon handle, +0x218 and +0x21c floats, +0x220 state) and the three balance words
-at gMainBalance +0x18, +0x1c, +0x20. Compared: the answer, the log, the whole person block, the balance words.
+of gMainBalance (Mac +0x18, +0x1c, +0x20; on the host the low halves of slots 4, 5, 6). Compared: the answer, the log, the whole person block, the balance words.
 
 No fused operations. Not tested: nothing skipped.
 """
@@ -93,6 +93,12 @@ class Side:
 
 
 class Ppc(Side):
+    def bal_put(self, off, v):
+        self.words(self.g("bal") + off, [v])
+
+    def bal_get(self, off):
+        return self.rd_words(self.g("bal") + off, 1)[0]
+
     fmt = ">I"
 
     def __init__(self, e, case):
@@ -129,6 +135,14 @@ class Ppc(Side):
 
 
 class Host(Side):
+    def bal_put(self, off, v):
+        # A slot is eight bytes on the host: the word goes in its low half, the high half is left noisy so a raw read shows.
+        a = self.lib.tpw_gb_slot((off - 8) // 4)
+        self.write(a, struct.pack("<II", v & MASK, 0xA5A5A5A5))
+
+    def bal_get(self, off):
+        return struct.unpack("<I", self.read(self.lib.tpw_gb_slot((off - 8) // 4), 4))[0]
+
     fmt = "<I"
 
     def __init__(self, lib, case):
@@ -176,6 +190,7 @@ def bind(lib):
     lib.tpw_gb_addr.restype, lib.tpw_gb_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_gb_alloc.restype, lib.tpw_gb_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_gb_layout.argtypes = [C.POINTER(C.c_int64)]
+    lib.tpw_gb_slot.restype, lib.tpw_gb_slot.argtypes = C.c_uint64, [C.c_int32]
     for n in ("getbagged", "pop", "losing"):
         f = getattr(lib, "tpw_gb_" + n)
         f.restype, f.argtypes = None, [C.c_uint64]
@@ -195,7 +210,8 @@ FLOAT_IDX = (0x19C // 4, 0x218 // 4, 0x21C // 4)
 
 
 def build(s, case):
-    s.words(s.g("bal") + 0x18, case["bal"])
+    for i, v in enumerate(case["bal"]):
+        s.bal_put(0x18 + 4 * i, v)
     s.words(s.obj, case["block"])
 
 
@@ -203,7 +219,7 @@ def observe(s, case, answer):
     blk = s.rd_words(s.obj, BLOCK // 4)
     for i in FLOAT_IDX:
         blk[i] = canon_f(blk[i])
-    return {"answer": answer, "log": s.log(), "block": blk, "bal": s.rd_words(s.g("bal") + 0x18, 3)}
+    return {"answer": answer, "log": s.log(), "block": blk, "bal": [s.bal_get(0x18 + 4 * i) for i in range(3)]}
 
 
 def run(s, case):

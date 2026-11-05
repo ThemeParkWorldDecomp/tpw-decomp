@@ -22,7 +22,7 @@ The project is three repositories, and every change belongs in exactly one of th
 
 | Repository | What it holds | Pull requests |
 | --- | --- | --- |
-| [tpw-decomp](https://github.com/ThemeParkWorldDecomp/tpw-decomp) | The translation: the Mac program's own functions in C++, each behaving exactly as the Mac build does, bugs included, with the differential tests that check it. | None. A function that behaves differently from the Mac is reported as an issue on tpw-port. |
+| [tpw-decomp](https://github.com/ThemeParkWorldDecomp/tpw-decomp) | The translation: the Mac program's own functions in C++, each behaving exactly as the Mac build does, bugs included, with the differential tests that check it and the seven data tables of the Mac program that it compiles in. | None. A function that behaves differently from the Mac is reported as an issue on tpw-port. |
 | [tpw-port](https://github.com/ThemeParkWorldDecomp/tpw-port) | The original game on today's Macs, Windows PCs and Linux machines: the launcher, the platform layer, the builds, and the fixes that make it run as it did on the Mac. | Welcome, by its CONTRIBUTING.md. |
 | [tpw-mods](https://github.com/ThemeParkWorldDecomp/tpw-mods) | Optional changes to how the game plays, each one off until the player turns it on. tpw-port carries it as a submodule at mods/. | Welcome, by its CONTRIBUTING.md. |
 
@@ -34,18 +34,24 @@ One exception: an option the original game already had in its .sam data files be
 changes how a park plays, as long as it offers only the values the original accepts and its default is the original's.
 Players set it in the launcher or a game menu, never by editing a .sam file.
 
+One addition to the game's own screens: the online login panel has a "Create account" button, a sign-up popup and a
+password reset ("Forgot password?"), drawn in the game's own style. The original made accounts and reset passwords on
+EA's website, which is gone. It belongs in tpw-port, and with the port's fixes off the panel is the original's.
+
 This repository takes no pull requests and no changes of any kind; its CONTRIBUTING.md says where each kind of change
 goes.
 
-## Nothing from the game
+## Nothing from the game but its data tables
 
-This repository holds no part of the game: no program, no data files, no memory dumps, no decompiler output and no text
-from the game. You need your own copy of the game, and the build and the tests read what they need from it:
-
-- the build reads six data tables (the advisor's lines and messages, the balance descriptions, the save file's legal text,
-  the handheld's window scripts) from any full Mac SimTheme Park program (the CD's own is fine) at configure time
-  (devtools/gen_game_tables.py; it finds each table by its content and checks the SHA-1 of every file it writes);
-- the tests run the original code out of memory dumps of the programs and read some of the game's files.
+This repository holds no program of the game, no data files, no memory dumps and no decompiler output. The one part of
+the game it holds is seven data tables of the original program, which the translation compiles in like translated code:
+the advisor's responses, messages and balance descriptions, the scorers of its messages, the save file's legal texts,
+the park panels' window scripts and the ride templates. They are in tables/ (the four source files) and include/
+(SaveLegalText.inc, WindowScripts.inc, RideTemplates.inc), exactly as devtools/gen_game_tables.py wrote them from the
+program of the Mac 2.0.1 CD; devtools/check_game_tables.py checks their SHA-1s and, given a full Mac SimTheme Park
+program, generates them again and compares byte for byte. So the build needs nothing from the game. You need your own
+copy of the game for the tests, which run the original code out of memory dumps of the programs and read some of the
+game's files.
 
 ## The working folder
 
@@ -108,11 +114,13 @@ what the game computes:
 
     src/          the translation, one file per original source file of the game (src/FILES.md lists them; each
                   function names its original address)
-    include/      the game's classes and structures as the translation uses them
+    tables/       four of the original program's data tables (devtools/gen_game_tables.py's output)
+    include/      the game's classes and structures as the translation uses them, and the three included tables
     platform/     the few host files the tests link (the arena, the C library's helpers, the pixel unpacker)
     tests/        the differential tests: difftest.py, ppcemu.py (the emulator harness), test_*.py, unit_*.cpp, shim_*.cpp
     cmake/units/  the source list of each test's library, with the definitions it builds for real (its keep list)
-    devtools/     gen_game_tables.py, mutate.py, slicer.py (the per-test copies of the src files), hfsdump.py, wad.py
+    devtools/     gen_game_tables.py, check_game_tables.py, mutate.py, slicer.py (the per-test copies of the src files),
+                  hfsdump.py, wad.py
 
 ## See also
 

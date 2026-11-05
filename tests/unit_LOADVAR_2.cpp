@@ -57,4 +57,10 @@ int32_t tpw_lv_load(uint64_t file, uint64_t value, uint64_t name, int32_t noLog)
                                            reinterpret_cast<const char*>(name), noLog);
 }
 
+// The port's read watch (port_fix tag parkload, include/Serialise.h): 1 arms it clear and answers 0; 0 answers it (armed 2 +
+// failed 1) and clears it. -1 without the port fixes.
+int32_t tpw_lv_watch(int32_t arm) {
+    return -1;
+}
+
 }  // extern "C"

@@ -9,6 +9,7 @@
 #include "InterfaceFontWrapper.h"
 #include "online.h"
 #include "platform/arena.h"
+#include "platform/online_slots.h"
 #include "Serialise.h"
 #include "TbITable.h"
 #include "TbResource.h"
@@ -391,8 +392,8 @@ const char kLogicLengthType[] = "!std::exception!!std::logic_error!!std::length_
 // 0x102108a4: destroy every element, then forget them (the storage stays)
 void online_parser_callee::ArgumentVectorClear(void* vec) {
     ArgumentVector* v = static_cast<ArgumentVector*>(vec);
-    char* first = reinterpret_cast<char*>(v->mData);
-    std_destroy::DestroyRangeClear(v->mData, reinterpret_cast<Argument*>(first + v->mSize * 12u));
+    char* first = reinterpret_cast<char*>(v->data());
+    std_destroy::DestroyRangeClear(v->data(), reinterpret_cast<Argument*>(first + v->mSize * 12u));
     v->mSize = 0;
 }
 
@@ -425,9 +426,11 @@ bool online_parse_callee::ParserGetChar(void* parser, char16_t* ch) {
     return true;
 }
 
-// 0x10212d98: the object is a block of Mac offsets (+0x0c CDelayedScript, +0x20 sprite, +0x24 set, +0x188, +0x19c name, +0xc2, +0x3a0, +0x3a4)
-void online_callee::COnlinePersonCtor(void* self, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, uint32_t avatar, void* name,
-                                      bool flag) {
+namespace {
+
+// 0x10212d98: the object is a block of Mac offsets (+0x0c CDelayedScript, +0x20 sprite, +0x24 set, +0x188, +0x19c name, +0xc2, +0x3a0, +0x3a4).
+// The name's characters come from the caller's string, a slot or the host's object (the two overloads below).
+void PersonCtor(void* self, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, uint32_t avatar, const char16_t* nameText, bool flag) {
     uint8_t* bytes = static_cast<uint8_t*>(self);
     auto word = [bytes](uint32_t off) -> int32_t& { return *reinterpret_cast<int32_t*>(bytes + off); };
     new (self) CPeep(cell, static_cast<CThing::ThingModel>(0x12));
@@ -444,11 +447,26 @@ void online_callee::COnlinePersonCtor(void* self, tag_IDX_TYPE<IDXTYPEUniqueName
     CDelayedScript* script = reinterpret_cast<CDelayedScript*>(bytes + 0xc);
     script->SpawnSpriteScript(static_cast<CDelayedScript::ScriptIdx>(3), word(0x24), word(0x20));
     SCR_SetFloatVariable(script->mSpriteScript, 8, 2.0f);
-    IME::MslWideStringRep* rep = *static_cast<IME::MslWideStringRep**>(name);
-    ignore_callee::SwprintfWide(reinterpret_cast<char16_t*>(bytes + 0x19c), 0x100, kPersonNameFormat, rep->mData);
+    ignore_callee::SwprintfWide(reinterpret_cast<char16_t*>(bytes + 0x19c), 0x100, kPersonNameFormat, nameText);
     uint16_t sprite = gPersonTable[1];
     std::memcpy(bytes + 0xc2, &sprite, sizeof sprite);
     word(0x188) = 1;
+}
+
+}  // namespace
+
+// The name is a 32-bit string slot (include/platform/online_slots.h): the Mac word names the representation.
+void online_callee::COnlinePersonCtor(void* self, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, uint32_t avatar, void* name,
+                                      bool flag) {
+    uint32_t nameWord;
+    std::memcpy(&nameWord, name, sizeof nameWord);
+    PersonCtor(self, cell, avatar, tpw::slots::WideText(nameWord), flag);
+}
+
+// The name is the host's string (CreateVisitor's).
+void online_callee::COnlinePersonCtor(void* self, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, uint32_t avatar, const std::u16string* name,
+                                      bool flag) {
+    PersonCtor(self, cell, avatar, name->c_str(), flag);
 }
 
 // 0x1020deec: std::list<std::wstring>::insert(iterator position, const std::wstring&): the new node goes before position

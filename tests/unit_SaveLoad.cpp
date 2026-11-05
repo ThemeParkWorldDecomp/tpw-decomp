@@ -25,6 +25,7 @@
 #include "FS_UserInfo.h"
 #include "LbFile.h"
 #include "SaveLoad.h"
+#include "Serialise.h"
 #include "TPGlobals.h"
 #include "TPString.h"
 #include "bfl_FileSystem.h"
@@ -341,5 +342,15 @@ int32_t tpw_sl_load(const char* path, void* header, int32_t type) {
     return gSaveLoad.Load(path, static_cast<CSaveLoadHeader*>(header), static_cast<CSaveLoad::LoadType>(type));
 }
 void tpw_sl_load_most_recent() { gLoadSave.LoadMostRecent(); }
+
+// 1 when the library was built with the port fixes (the module then compares against what the fixes change).
+int32_t tpw_sl_portfix() {
+    return 0;
+}
+
+// The read watch after a call (armed 2 + failed 1): Load leaves it 0.
+int32_t tpw_sl_watch() {
+    return 0;
+}
 
 }  // extern "C"

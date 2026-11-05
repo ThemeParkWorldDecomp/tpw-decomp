@@ -41,7 +41,7 @@ GLOBAL_LABEL = dict(pscript=70, lscript=71, desc=72, pname=73, convbuf=74, gGame
 TVEC = {60: 0x102685C0, 61: 0x102685C8, 62: 0x102685B8, 63: 0x102685B0, 64: 0x102685A8, 65: 0x102685A0, 66: 0x10270100, 67: 0x10270108}
 TV_SETTEXT = 0x10271000          # what the fake window's vtable holds at 0x2c
 GAMETYPE = 0x102B3AA0
-HOST_LAYOUT = [0x18, 8]
+HOST_LAYOUT = [0, 8]
 
 WIN_OF_ID = {0x11E3: 3, 0x11E4: 4, 0x14BEB: 5, 0x10: 6, 0x11: 7, 0x12: 8, 0x13: 9, 0x14: 10}
 STR_OF_ID = {0xDC: 30, 0xDA: 31, 0x126: 32, 0x127: 33, 0x128: 34, 0x129: 35, 0x12A: 36}

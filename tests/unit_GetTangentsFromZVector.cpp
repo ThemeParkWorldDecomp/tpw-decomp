@@ -89,7 +89,7 @@ int32_t tpw_gtz_layout(int64_t* out) {
     out[n++] = off(&b, &b.mF0C);
     out[n++] = off(&b, &b.mPrev);
     out[n++] = off(&b, &b.mNext);
-    out[n++] = off(&b, &b.mFE8);
+    out[n++] = off(&b, &b.mFEC);
     out[n++] = off(&g, &g.mSinTableMask);
     out[n++] = off(&g, &g.mSinTableScale);
     out[n++] = off(&g, &g.mSinTable);
@@ -97,6 +97,9 @@ int32_t tpw_gtz_layout(int64_t* out) {
     out[n++] = off(&p, &p.mFlags);
     out[n++] = static_cast<int64_t>(sizeof(tag_sBezierControl));
     out[n++] = static_cast<int64_t>(sizeof(tag_sTrackBrace));
+    out[n++] = off(&b, &b.mFF8);
+    out[n++] = off(&b, &b.mX4C);
+    out[n++] = off(&b, &b.mZ54);
     return n;
 }
 

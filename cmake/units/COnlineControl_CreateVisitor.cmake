@@ -10,5 +10,5 @@ set(TPW_UNIT_COnlineControl_CreateVisitor_KEEP
   __ZN14COnlineControl20SetAvatarDestinationE12tag_IDX_TYPEI22IDXTYPEUniqueNameMapIdtE   # COnlineControl::SetAvatarDestination(tag_IDX_TYPE<IDXTYPEUniqueNameMapId, unsigned short>)
   __ZN14COnlineControl8FeedbackERNSt3__112basic_stringIDsNS0_11char_traitsIDsEENS0_9allocatorIDsEEEE   # COnlineControl::Feedback(std::__1::basic_string<char16_t, std::__1::char_traits<char16_t>, std::__1::allocator<char16_t>>&)
   __ZN14COnlineControl8IsThisMeEPKDs   # COnlineControl::IsThisMe(char16_t const*)
-  __ZNK14COnlineControl14GetDataForUserERK13nocase_string   # COnlineControl::GetDataForUser(nocase_string const&) const
+  __ZNK14COnlineControl14GetDataForUserERKNSt3__112basic_stringIDsNS0_11char_traitsIDsEENS0_9allocatorIDsEEEE   # COnlineControl::GetDataForUser(std::__1::basic_string<char16_t, std::__1::char_traits<char16_t>, std::__1::allocator<char16_t>> const&) const
 )

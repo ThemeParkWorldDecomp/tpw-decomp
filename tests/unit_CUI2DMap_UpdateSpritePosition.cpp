@@ -255,6 +255,7 @@ int32_t tpw_cm_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(sizeof(tag_sBezierControl));
     out[n++] = static_cast<int64_t>(offsetof(tag_sBezierControl, mNext));
     out[n++] = static_cast<int64_t>(offsetof(CUI2DMapSprite, mX));
+    out[n++] = static_cast<int64_t>(offsetof(CUI2DMapSprite, mKind));
     return n;
 }
 

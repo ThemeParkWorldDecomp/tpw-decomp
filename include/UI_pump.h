@@ -41,7 +41,7 @@ public:
     // leaves it. The Mac's two functions also load 0 into r3 (nothing reads it); void here.
     void lock();     // 0x10200d8c
     void unlock();   // 0x10200de0
-    void* mHandle;   // 0x00  the critical section's handle (the object is the handle: the Mac's mutex is 16 bytes)
+    uint32_t mHandle;   // 0x00  the critical section's handle word (the Mac's is a 32-bit pointer: COnlineControl keeps two 4 bytes apart)
     // ~bthread_mutex (0x10200d04, unit v5120). The Mac's destructor takes the hidden "delete storage" flag (r4, a short): when this is
     // not NULL it deletes the critical section, and frees the object when the flag is above 0. Written as a plain function so that
     // the globals of this class do not get a static destructor. Answers this.

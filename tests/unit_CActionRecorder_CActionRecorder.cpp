@@ -124,11 +124,13 @@ template<> int32_t LOADVAR<unsigned int>(void* file, unsigned int* value, const 
     return static_cast<int32_t>(ret("LOADVAR_u"));
 }
 
-TbError LbFile_Read(void* file, void* buffer, uint32_t length, uint32_t*) {
+TbError LbFile_Read(void* file, void* buffer, uint32_t length, uint32_t* transferred) {
     ev("LbFile_Read", {lab(file), U(length)});
     Pattern(buffer, length);
+    (void)transferred;
     return TbError(static_cast<int32_t>(ret("LbFile_Read")));
 }
+
 
 TbError LbFile_Write(void* file, const void* buffer, uint32_t length, uint32_t*) {
     ev("LbFile_Write", {lab(file), U(length), Hash(buffer, length)});
@@ -186,6 +188,11 @@ void tpw_ar_dtor(uint64_t object) { reinterpret_cast<CActionRecorder*>(static_ca
 int32_t tpw_ar_serialise(uint64_t object, uint64_t file, int32_t saving, int32_t version, uint32_t unused) {
     return reinterpret_cast<CActionRecorder*>(static_cast<uintptr_t>(object))
         ->Serialise(reinterpret_cast<void*>(static_cast<uintptr_t>(file)), saving, version, unused);
+}
+
+// 1 when the library was built with the port fixes (the module then compares against what the fixes change).
+int32_t tpw_ar_portfix() {
+    return 0;
 }
 
 void tpw_ar_record(uint64_t object, int32_t action, uint16_t a, uint16_t b) {

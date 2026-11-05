@@ -8,7 +8,7 @@ message constructor, PostMessage, and __construct_array which the host sees as 2
 sides that record their arguments and answer from the case's queues.
 
 The world: a request object (valid flag, ids, message), the "no thing" id global, the scoring guard byte (set, so the scoring object
-exists) and its +0x20 word (3, the constant the host uses), gMessageCentre (null or a preset object). Compared: the answer, the length
+exists) and its +0x20 word (the lowest score that may speak, a balance slot on the host; varies per case), gMessageCentre (null or a preset object). Compared: the answer, the length
 word, the whole request, the message centre's state (null / preset / newly made), the event log.
 
 No fused operations. Not tested: the scoring object's lazy construction (the guard byte is always set; the host's singleton is the
@@ -151,9 +151,9 @@ class Ppc(Side):
     def log(self):
         return self.L.log
 
-    def pre(self):
+    def pre(self, case):
         self.write(ADDR["guard"], b"\x01")
-        self.words(ADDR["scoring"] + 0x20, [3])
+        self.words(ADDR["scoring"] + 0x20, [case["min"]])
 
     def set_mc(self, p):
         self.words(ADDR["mc"], [p])
@@ -195,8 +195,8 @@ class Host(Side):
     def log(self):
         return CL.host_end(self.lib)
 
-    def pre(self):
-        pass
+    def pre(self, case):
+        self.lib.tpw_adv_set_min(case["min"])
 
     def set_mc(self, p):
         self.lib.tpw_adv_set_mc(p)
@@ -217,6 +217,7 @@ def bind(lib):
     lib.tpw_adv_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_adv_set_mc.argtypes = [C.c_uint64]
     lib.tpw_adv_get_mc.restype = C.c_uint64
+    lib.tpw_adv_set_min.argtypes = [C.c_int32]
     for n in ("tpw_adv_play", "tpw_adv_playws"):
         f = getattr(lib, n)
         f.restype, f.argtypes = C.c_uint32, [C.c_uint64, C.c_uint64, C.c_int32]
@@ -227,7 +228,7 @@ def bind(lib):
 
 
 def build(s, case):
-    s.pre()
+    s.pre(case)
     s.write(s.g("nullid"), struct.pack(s.fmt[0] + "H", case["nullid"]))
     s.set_mc(s.mcblock if case["mc"] else 0)
     req = s.alloc(0x18)
@@ -266,7 +267,7 @@ def host(lib, case):
 
 def base(r, fn):
     q = {
-        "lmc": [r.choice([-1, 0, 2, 3, 4, 10])],
+        "lmc": [r.choice([-1, 0, 2, 3, 4, 10, 24, 25, 26, 100])],
         "lmc_write": [r.choice([0, 1])],
         "lmc_id": [r.choice([0, 5, 7, 0xFFFF])],
         "lmc_val": [r.choice([0, 0x1234, 0xFFFFFFFF])],
@@ -275,7 +276,7 @@ def base(r, fn):
         "call": [r.randrange(0, 5000)],
         "tag": [r.randrange(0, 0x180)],
     }
-    return {"fn": fn, "queues": q, "nullid": r.choice([0, 5]), "mc": r.choice([0, 1]), "id": r.choice([0, 3, 0xABCD]),
+    return {"fn": fn, "queues": q, "min": r.choice([3, 25, 25, 0, 100]), "nullid": r.choice([0, 5]), "mc": r.choice([0, 1]), "id": r.choice([0, 3, 0xABCD]),
             "pad": [r.randrange(256), r.randrange(256)], "sec": r.choice([0, 9, 0xFFFFFFF0]), "resp": r.randrange(-5, 99),
             "msg": r.choice([0x160, 0, 17, 0x15F]), "score": r.randrange(-3, 3), "valid": r.choice([0, 1, 1, 2, 255]),
             "once": r.randrange(256), "over": r.randrange(256), "pad17": r.randrange(256), "n": r.choice([-1, 0, 1, 2, 3, 4])}
@@ -291,16 +292,22 @@ def edges(fn, seed):
                         for first in (0x266, 7):
                             for lmc in (2, 3):
                                 c = base(r, fn)
-                                c.update(valid=valid, mc=mc, n=n)
+                                c.update(valid=valid, mc=mc, n=n, min=3)
                                 c["queues"].update(num=[num], first=[first], lmc=[lmc])
                                 yield c
         for lmc in (-1, 2, 3, 4):
             for wr in (0, 1):
                 for ident in (0, 5, 7):
                     c = base(r, fn)
-                    c.update(valid=1, nullid=5)
+                    c.update(valid=1, nullid=5, min=3)
                     c["queues"].update(lmc=[lmc], lmc_write=[wr], lmc_id=[ident], lmc_val=[r.choice([0, 77])])
                     yield c
+        for lowest in (0, 3, 25, 100):
+            for lmc in (-1, 0, 2, 3, 24, 25, 26, 99, 100, 101):
+                c = base(r, fn)
+                c.update(valid=1, min=lowest)
+                c["queues"].update(lmc=[lmc])
+                yield c
     return gen
 
 

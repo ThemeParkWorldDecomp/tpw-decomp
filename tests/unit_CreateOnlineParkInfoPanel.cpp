@@ -37,6 +37,11 @@
 using namespace calllog;
 
 InterfaceWindow* gOnlineParkInfoPanel = nullptr;   // 0x103961e4 (defined in OnlineParkInfoPanelMsg.cpp in the program)
+// The message function's globals, which the unit's names refer to (defined beside it in the program); the park is zeroed bytes.
+void (*gOnlineParkInfoClose)() = nullptr;                          // 0x10396114
+const void* gVisitParkContext = nullptr;                           // 0x1039610c
+void (*gVisitParkPostDownload)(int32_t, const void*) = nullptr;    // 0x10396110
+alignas(16) uint8_t gOnlineParkInfoParkStorage[sizeof(CFSOnlinePark)];   // 0x10396118
 
 void CreateOnlineParkInfoPanel(const CFSOnlinePark* park, InterfaceWindow* parent, void (*onCancel)(),
                                void (*onDownload)(int32_t, const void*), void* context);

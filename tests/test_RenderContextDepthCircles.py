@@ -3,7 +3,12 @@
 The tests compare complete padded framebuffers and their guards. They also
 check that the render area, palette, fade and ghost tables, pixel capabilities,
 drawing globals and inputs remain unchanged. Valid sprite RLE uses nonzero
-palette indices for painted runs; zero terminates a row.
+palette indices for painted runs; zero terminates a row. A 16-bit pixel is
+compared as a value: each side keeps it in its own byte order (the Mac's
+big-endian words, the host's host-order words), so the host side's pixels are
+byte-swapped going in and coming out. A clip relative to the origin reaches
+origin_x pixels past the area's width, so a 16-bit row has room for them: no
+pixel then straddles two rows, and each can be swapped as a value.
 """
 import ctypes as C
 import random
@@ -76,6 +81,18 @@ def bind(lib):
     lib.rdepthcircle_bound = True
 
 
+def swap_pixels(data, columns, height, stride):
+    """The buffer with each row's first columns pixels' two bytes swapped
+    (16-bit depth): the Mac's big-endian pixel words as the host's
+    little-endian ones, and back."""
+    data = bytearray(data)
+    for row in range(height):
+        start = 64 + row * stride
+        end = start + 2 * columns
+        data[start:end:2], data[start + 1:end:2] = data[start + 1:end:2], data[start:end:2]
+    return bytes(data)
+
+
 def run(emulator, lib, case):
     if lib:
         bind(lib)
@@ -110,9 +127,11 @@ def run(emulator, lib, case):
     operation = case['operation']
     entry = outline_entry if operation == 0 else FILLED[depth] if operation == 1 else OPERATIONS[operation][depth]
     width, height, padding = case['size']
-    stride = width * bytes_per_pixel + padding
+    stride = width * bytes_per_pixel + padding + (2 * case['origin_x'] if bytes_per_pixel == 2 else 0)
     raw = random_.randbytes(stride * height + 128)
-    pixels = allocate(raw)
+    swapped = not emulated and bytes_per_pixel == 2
+    columns = width + case['origin_x']
+    pixels = allocate(swap_pixels(raw, columns, height, stride) if swapped else raw)
     row_zero = pixels + 64 + case['origin_x'] * bytes_per_pixel
     origin = row_zero + (height - 1) * stride if case['negative_stride'] else row_zero
     ghost = allocate(b'\xb6' * 32 + random_.randbytes(65536) + b'\xd9' * 32)
@@ -239,7 +258,7 @@ def run(emulator, lib, case):
         else:
             state_result = read(globals_[8], 40)
         return {
-            'pixels': read(pixels, len(raw)),
+            'pixels': swap_pixels(read(pixels, len(raw)), columns, height, stride) if swapped else read(pixels, len(raw)),
             'sprite_state': state_result,
             'unchanged': [read(address, size) == old
                           for (address, size), old in zip(protected, before)],

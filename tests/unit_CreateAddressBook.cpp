@@ -284,6 +284,7 @@ int32_t tpw_ab_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(sizeof(AddressBookNode));
     AddressBookNode node;
     out[n++] = reinterpret_cast<char*>(&node.mText) - reinterpret_cast<char*>(&node);
+    out[n++] = static_cast<int64_t>(offsetof(CFSOnlinePark, mText94) + offsetof(TbDynamicStringTemplate<char16_t>, mData));
     return n;
 }
 

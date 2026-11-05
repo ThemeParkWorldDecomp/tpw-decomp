@@ -313,8 +313,8 @@ uint64_t tpw_pp_system(int32_t label, uint64_t parkList) {
 
 uint64_t tpw_pp_city(int32_t label, int32_t id, uint64_t name) {
     OnlineParkSelection* city = static_cast<OnlineParkSelection*>(Block(label, sizeof(OnlineParkSelection)));
-    city->mID = id;
-    city->mName = reinterpret_cast<const char16_t*>(name);
+    city->mCityID = id;
+    city->mName = reinterpret_cast<char16_t*>(name);
     return reinterpret_cast<uintptr_t>(city);
 }
 

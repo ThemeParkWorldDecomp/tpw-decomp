@@ -47,11 +47,11 @@ A_IOSBASE, A_LOCDTOR, A_LOCASSIGN = 0x10238950, 0x10071f34, 0x10072128
 A_CMPNK, A_CMPKN, A_TREEERASE = 0x1021f000, 0x1021eed0, 0x102278fc
 
 ADDR = dict(gIfsWVtblC=0x102b1e60, gOfsWVtblB=0x102b1f08, gIfsWVtblE=0x102b1f20)
-HOST_LAYOUT = [0xe8c, 0x20, 8, 0x10, 0x48, 8, 0x10, 8, 0x18]
+HOST_LAYOUT = [0xe8c, 0x20, 8, 0x10, 0x44, 8, 0x10, 8, 0x18]
 
 # Mac and host offsets of the fields the module touches (the host has native pointers in the stream, streambuf and tree headers)
 OFF_PPC = dict(slot=4, ios=8, baseoff=0x44, sbloc=0x1c, troot=4, tf8=8, nleft=0, nright=4, npair=0xc)
-OFF_HOST = dict(slot=8, ios=0x10, baseoff=0x48, sbloc=0x20, troot=8, tf8=0x10, nleft=0, nright=8, npair=0x18)
+OFF_HOST = dict(slot=8, ios=0x10, baseoff=0x44, sbloc=0x20, troot=8, tf8=0x10, nleft=0, nright=8, npair=0x18)
 SENT = 0x11223344
 
 OBJS = []        # (base, size) of the case's blocks, for the PowerPC fakes
@@ -300,6 +300,15 @@ def normptr(s, v, names):
     return ("raw", v)
 
 
+def normword(s, v, names):
+    """An ios block's vtable word (4 bytes on both sides: the low word of the table's address) as normptr names it."""
+    for nm in names:
+        d = (v - s.g(nm)) & MASK
+        if d < 0x20:
+            return (nm, d)
+    return ("raw", v)
+
+
 # ---------------------------------------------------------------------------------------------------------------- the worlds
 
 
@@ -370,7 +379,7 @@ def do_ios(s, c):
     s.fill(A, 0x20, 0x5A)
     s.wptr(A, SENT)
     s.call("ios", [0 if c["null"] else A, c["flag"]])
-    return {"log": s.log(), "vt": normptr(s, s.rptr(A), ["gIfsWVtblE"])}
+    return {"log": s.log(), "vt": normword(s, s.r32(A), ["gIfsWVtblE"])}
 
 
 def do_ostream(s, c):
@@ -386,7 +395,7 @@ def do_ostream(s, c):
     off = s.r32(Tb + s.o("baseoff"))
     exp = (A + s.o("ios") - Tb) & MASK
     return {"log": s.log(), "vb": s.rptr(A) == Tb, "slot": normptr(s, s.rptr(A + s.o("slot")), ["gOfsWVtblB"]),
-            "ios": normptr(s, s.rptr(A + s.o("ios")), ["gIfsWVtblE"]), "tab": normptr(s, s.rptr(Tb), ["gOfsWVtblB"]),
+            "ios": normword(s, s.r32(A + s.o("ios")), ["gIfsWVtblE"]), "tab": normword(s, s.r32(Tb), ["gOfsWVtblB"]),
             "base": "raw" if off == SENT else (off - exp) & MASK}
 
 
@@ -499,15 +508,20 @@ def mapword(r, cell=None, off=None):
     return (cell << 24 | off << 16 | r.getrandbits(16)) & MASK
 
 
+def chatword(r):
+    # the Chat block's arena offset (the host's words from 0xF0000000 up are table handles)
+    return r.randrange(1, 0xF0000000)
+
+
 def mk_updpos(r, x=None, y=None, chat=None):
     c = base("updpos", [0xe90])
-    c.update(chat=r.getrandbits(32) if chat is None else chat, x=mapword(r) if x is None else x, y=mapword(r) if y is None else y)
+    c.update(chat=chatword(r) if chat is None else chat, x=mapword(r) if x is None else x, y=mapword(r) if y is None else y)
     return c
 
 
 def mk_hide(r, hx=None, hy=None, chat=None):
     c = base("hide", [0xe90, 0x20])
-    c.update(chat=r.getrandbits(32) if chat is None else chat, hx=pick(r, hx, [0, -1, 0x7fff, -0x8000, r.randrange(-0x8000, 0x8000)]),
+    c.update(chat=chatword(r) if chat is None else chat, hx=pick(r, hx, [0, -1, 0x7fff, -0x8000, r.randrange(-0x8000, 0x8000)]),
              hy=pick(r, hy, [0, -1, 0x7fff, -0x8000, r.randrange(-0x8000, 0x8000)]))
     return c
 

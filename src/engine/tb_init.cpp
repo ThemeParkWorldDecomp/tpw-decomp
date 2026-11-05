@@ -287,8 +287,7 @@ void SMachineParameters::Output() {
         file = fopen(path, "w+b");
     }
     if (file == nullptr) return;
-    // CDirectDraw + 0x21c: mDeviceInfo (0x1c) + the 512 bytes of szDriver = szDescription
-    fprintf(file, "Graphics card description: %s\n", reinterpret_cast<const char*>(gei_DDraw) + 0x21c);
+    fprintf(file, "Graphics card description: %s\n", gei_DDraw->mDeviceInfo.description);   // the Mac's +0x21c
     fprintf(file, "VRAM Size: %d\n", mVRAMSize);
     fprintf(file, "VRAM Speed: %f\n", static_cast<double>(mVRAMSpeed));
     fprintf(file, "RAM Size: %d\n", mRAMSize);

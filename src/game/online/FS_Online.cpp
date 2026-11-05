@@ -34,6 +34,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <map>
 #include <new>
 
 // Unit v5917: std::__tree<unsigned short> find 0x1016d1f8, insert_one 0x1016e9c4, insert_node_at 0x1016f164; IPSystem::Startup 0x1016f3c8
@@ -389,8 +390,8 @@ void FSOnlineLoginConnectionCallback(int32_t a, int32_t b, void* c, void* d) {  
 //   LoginConnectionCallback 0x101715a0, DoLogin 0x10171234, LoggedInGetNews 0x10171eb8, NewsConnectionCallback 0x10172030,
 //   CompleteNews 0x1017253c.
 
-// 0x102a7248: the GUID the news requests carry. Only its first word (0x5c200a41, bytes 5c 20 0a 41) was read; the rest is not known.
-NS_MacDoze::_GUID gOnlineNewsGuid = {{0x5c, 0x20, 0x0a, 0x41}};
+// 0x102a7248: the GUID the news requests carry ({5C200A41-2981-11D3-ADF4-00E018904FD5} as the library writes it).
+NS_MacDoze::_GUID gOnlineNewsGuid = {{0x5c, 0x20, 0x0a, 0x41, 0x29, 0x81, 0x11, 0xd3, 0xad, 0xf4, 0x00, 0xe0, 0x18, 0x90, 0x4f, 0xd5}};
 
 namespace online_callee {
 __attribute__((weak)) void Free(void* p) {
@@ -443,20 +444,26 @@ void CFSOnlineSystem::StopProcessing() {   // 0x10171404
 namespace {
 
 // The Mac keeps callbacks and contexts as 32-bit words in the system's int32 members; they come back as unsigned words.
-int32_t PointerWord(const void* pointer) { return static_cast<int32_t>(reinterpret_cast<intptr_t>(pointer)); }
-uintptr_t WordPointer(int32_t word) { return static_cast<uintptr_t>(static_cast<uint32_t>(word)); }
-
-// A function pointer kept in such a word (PointerWord drops its upper half): the program's code sits in one 4 GB window, so the upper half is
-// that of any function of this file.
-void AnchorFunction() {}
-uintptr_t WordFunction(int32_t word) {
-    return (reinterpret_cast<uintptr_t>(&AnchorFunction) & ~static_cast<uintptr_t>(0xFFFFFFFFu)) | static_cast<uint32_t>(word);
+// A host pointer does not fit such a word, so the whole pointer is also kept here by its word (the upload's error table is on the heap).
+std::map<uint32_t, uintptr_t>& PointersOfWords() {
+    static std::map<uint32_t, uintptr_t> pointers;
+    return pointers;
+}
+int32_t PointerWord(const void* pointer) {
+    if (pointer != nullptr) PointersOfWords()[static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pointer))] = reinterpret_cast<uintptr_t>(pointer);
+    return static_cast<int32_t>(reinterpret_cast<intptr_t>(pointer));
+}
+uintptr_t WordPointer(int32_t word) {
+    const auto kept = PointersOfWords().find(static_cast<uint32_t>(word));
+    return kept != PointersOfWords().end() ? kept->second : static_cast<uintptr_t>(static_cast<uint32_t>(word));
 }
 
 // The literal the original reads at 0x1024cc03 + 0x167 (a pooled string next to "ONLINE LOGIN: About to connect").
 const char kDefaultPublishText[] = "";
 
 }  // namespace
+
+int32_t KeepPointerWord(const void* pointer) { return PointerWord(pointer); }
 
 // 0x10171498. 1 when any connection is open, any of the nine lists has a request out, or the upload or FTP download runs.
 int32_t CFSOnlineSystem::AreWeProcessing() {
@@ -1416,10 +1423,6 @@ void FSOnlineUploadServerConnectionCallback(int32_t a, int32_t b, void* c, void*
 
 namespace {
 
-uintptr_t WordPointer_2(int32_t word) {
-    return (reinterpret_cast<uintptr_t>(&AnchorFunction) & ~static_cast<uintptr_t>(0xFFFFFFFFu)) | static_cast<uint32_t>(word);
-}
-
 // 0x1024d220 (base + 0x61d): the Pascal string DebugStr is given for every file looked for.
 const unsigned char kDebugStrText[] = {0x11, ' ', 'n', 'e', 'e', 'd', ' ', 't', 'o', ' ', 'f', 'i', 'x', ' ', 't', 'h', 'i', 's'};
 // 0x1024d232 (base + 0x62f): appended to the download folder name.
@@ -1514,7 +1517,7 @@ void CFSOnlineSystem::CompleteUpload(int32_t failed) {
     if ((failed != 0 || errorShown) && mF320 != 0) Logout();
     if (static_cast<uint32_t>(callback) != 0) {
         typedef void (*Callback)(int32_t, const void*);
-        Callback function = reinterpret_cast<Callback>(WordFunction(callback));
+        Callback function = reinterpret_cast<Callback>(WordPointer(callback));
         function(failed, reinterpret_cast<const void*>(WordPointer(context)));
     }
     if (mUpload != nullptr) {
@@ -1770,8 +1773,8 @@ void CFSOnlineSystem::LoggedInRequestFTPDownload(const CFSOnlinePark* park) {
     if (missingNow == 0 && mF3C8.mCount == 0) {
         if (mF3C0 != 0) {
             typedef void (*Callback)(int32_t, const void*);
-            Callback function = reinterpret_cast<Callback>(WordFunction(mF3C0));
-            function(0, reinterpret_cast<const void*>(WordPointer_2(mF3C4)));
+            Callback function = reinterpret_cast<Callback>(WordPointer(mF3C0));
+            function(0, reinterpret_cast<const void*>(WordPointer(mF3C4)));
         }
         int32_t parkId = mFTPPark->mParkID;
         if (mCity == nullptr) {
@@ -1865,6 +1868,7 @@ __attribute__((weak)) CFSOnlineServer* ReturnFTPDownloadServer(CFSOnlineSystemSe
 __attribute__((weak)) TbDynamicStringTemplate<char16_t>* RemoveHead(TbPtrList<TbDynamicStringTemplate<char16_t>>* list) {
     return list->RemoveHead();
 }
+__attribute__((weak)) int32_t PortFTPDownloadUnavailable() { return 0; }
 }  // namespace ftpdl_callee
 
 // 0x10176e90. The end of the download job. A pending error id (word 0x398) goes to the interface and is cleared. A failed job (or one
@@ -1910,7 +1914,7 @@ void CFSOnlineSystem::CompleteFTPDownload(int32_t failed) {
     }
     if (static_cast<uint32_t>(callback) != 0) {
         typedef void (*Callback)(int32_t, const void*);
-        Callback function = reinterpret_cast<Callback>(WordFunction(callback));
+        Callback function = reinterpret_cast<Callback>(WordPointer(callback));
         function(failed, reinterpret_cast<const void*>(WordPointer(context)));
     }
     ReleaseFTPDownloadServerConnection();

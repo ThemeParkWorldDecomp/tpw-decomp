@@ -37,5 +37,10 @@ set(TPW_UNIT_StampZLib_KEEP
   __ZNK3bfl8compress5CZLib21CompressWorkspaceSizeEv   # bfl::compress::CZLib::CompressWorkspaceSize() const
   __ZNK3bfl8compress5CZLib23DecompressWorkspaceSizeEv   # bfl::compress::CZLib::DecompressWorkspaceSize() const
 )
+# The port's sized unpack for the park reader (parkload; absent from a build without the fixes), checked against a model
+# of it by tests/test_StampZLib.py.
+list(APPEND TPW_UNIT_StampZLib_KEEP
+  __Z31LbZLib_PortMemDecompressCheckedPvjS_j   # LbZLib_PortMemDecompressChecked(void*, unsigned int, void*, unsigned int)
+)
 set(TPW_UNIT_StampZLib_OWN_CALLLOG ON)
 cmake_language(DEFER CALL target_link_libraries tpw_unit_StampZLib PRIVATE ZLIB::ZLIB)

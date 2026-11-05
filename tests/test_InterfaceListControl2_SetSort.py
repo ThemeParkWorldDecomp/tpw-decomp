@@ -132,6 +132,7 @@ class Side:
 class Ppc(Side):
     order = "big"
     psize = 4
+    wsize = 4     # an item word
     O = MAC
 
     def __init__(self, e, case):
@@ -174,6 +175,7 @@ class Ppc(Side):
 class Host(Side):
     order = "little"
     psize = 8
+    wsize = 8     # an item word, LCWord (its low half mInt holds the number)
 
     def __init__(self, lib, case):
         self.lib = lib
@@ -248,7 +250,7 @@ def build(s, c):
     s.wf("rowh", c["rowh"], 2)
     s.wf("vis", c["vis"], 2)
     for i, w in enumerate(c["words"]):
-        s.w(s.storage + 4 * i, w, 4)
+        s.w(s.storage + s.wsize * i, w, s.wsize)
     for i in range(16):
         slot = c["slots"][i] if i < len(c["slots"]) else 0
         s.w(s.winarr + i * s.psize, s.pool + slot * 0x200 if slot else 0, s.psize)

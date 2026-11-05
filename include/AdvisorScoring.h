@@ -1,5 +1,5 @@
 // AdvisorScoring.cpp (main app): the advisor's message scoring. A message is one of 351 (kAdvisorMessageCount) things the advisor may
-// say; each has a record in the static table gAdvisorMessages (src/AdvisorScoring_table.cpp, generated from the file image at 0x1027efa4,
+// say; each has a record in the static table gAdvisorMessages (tables/AdvisorScoring_table.cpp, generated from the file image at 0x1027efa4,
 // 0x30 bytes a record) and a scoring function, one of the _ADVISOR_* members, that the record points to. The queries of this file
 // read the record, or the per-category numbers of the advisor balance table (data:advisor:advisor.sam, loaded by the constructor).
 // Translated here: the constructor 0x10010054, the destructor 0x1000adb0 and the ten queries 0x1001019c..0x10010f38; the other members (GetFirstResponseFor,
@@ -51,7 +51,7 @@ extern AdvisorMessageRecord gAdvisorMessageBlock[kAdvisorMessageCount + 2];
 inline AdvisorMessageRecord* const gAdvisorMessages = gAdvisorMessageBlock + 1;   // 0x1027efa4
 
 // The balance table of data:advisor:advisor.sam (CAdvisorBalance, Advisor.cpp 0x1000e93c and 0x1000e98c; its description rows are
-// generated into src/AdvisorBalance_table.cpp from 0x1028318c). 393 value slots (the walk of CBalanceTable::Init over the 775 rows; the
+// generated into tables/AdvisorBalance_table.cpp from 0x1028318c). 393 value slots (the walk of CBalanceTable::Init over the 775 rows; the
 // last slot any scorer reads is 392). The array group MessageGroups[10] has three slots a group from slot 4: MinTimeSameMessage,
 // SayOnlyOnce and DiscardAfterSlaps, and its count in slot 34.
 constexpr int32_t kAdvisorBalanceSlots = 393;

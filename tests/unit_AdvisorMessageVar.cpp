@@ -61,4 +61,10 @@ uint32_t tpw_amv_call(int32_t op, uint64_t a, uint64_t b, uint64_t c, int32_t d)
     return static_cast<uint32_t>(SAVEVAR<AdvisorMessage>(file, value, name, d));
 }
 
+// The port's read watch (port_fix tag parkload, include/Serialise.h): 1 arms it clear and answers 0; 0 answers it (armed 2 +
+// failed 1) and clears it. -1 without the port fixes.
+int32_t tpw_amv_watch(int32_t arm) {
+    return -1;
+}
+
 }  // extern "C"

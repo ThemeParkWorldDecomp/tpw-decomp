@@ -3,7 +3,9 @@
 # tests/unit_CFSOnlineSystem_EnterChatSatellite.cpp, which also defines the globals of other files.
 set(TPW_UNIT_CFSOnlineSystem_EnterChatSatellite src/game/online/FS_Online.cpp platform/arena.cpp)
 set(TPW_UNIT_CFSOnlineSystem_EnterChatSatellite_KEEP
+  __Z15KeepPointerWordPKv   # KeepPointerWord(void const*)
   __ZN15CFSOnlineSystem13SetPublishingEiPKcPKt   # CFSOnlineSystem::SetPublishing(int, char const*, unsigned short const*)
+  __ZN15CFSOnlineSystem30UploadServerConnectionCallbackEiiPvS0_   # CFSOnlineSystem::UploadServerConnectionCallback(int, int, void*, void*)
   __ZN15CFSOnlineSystem14CompleteUploadEi   # CFSOnlineSystem::CompleteUpload(int)
   __ZN15CFSOnlineSystem15AreWeProcessingEv   # CFSOnlineSystem::AreWeProcessing()
   __ZN15CFSOnlineSystem18EnterChatSatelliteEi   # CFSOnlineSystem::EnterChatSatellite(int)

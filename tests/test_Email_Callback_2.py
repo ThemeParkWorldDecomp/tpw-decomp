@@ -164,6 +164,9 @@ class Ppc(Side):
     def enc(self, a):
         return a
 
+    def outbox_word(self, case):
+        return self.outbox
+
     def alloc(self, n):
         return self.e.alloc(n)
 
@@ -193,6 +196,13 @@ class Host(Side):
         bind(lib)
         self.make_objects()
         CL.host_begin(lib, {lab: a for lab, a in self.pairs}, case["queues"])
+
+    def outbox_word(self, case):
+        """As the Mac's outbox pointer, or (the host only) the word Email::Send keeps for an outbox outside the arena."""
+        if case["heap_outbox"]:
+            self.lib.tpw_ecb_keep_outbox(self.outbox)
+            return 1
+        return self.enc(self.outbox)
 
     def done(self):
         pass
@@ -229,6 +239,7 @@ def bind(lib):
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]
     getattr(lib, p + "callback").restype, getattr(lib, p + "callback").argtypes = None, [C.c_uint64, C.c_uint32, C.c_int32]
     getattr(lib, p + "ctor").restype, getattr(lib, p + "ctor").argtypes = C.c_uint64, [C.c_uint64]
+    getattr(lib, p + "keep_outbox").restype, getattr(lib, p + "keep_outbox").argtypes = None, [C.c_uint64]
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -268,7 +279,7 @@ def build(s, case):
     s.write(e + 0x3e, struct.pack(s.fmt, cur))
     s.write(e + 0x42, bytes([0x5A, 0xA5]))
     s.words(e + 0x2c, [s.enc(s.att) if case["att"] else 0])
-    s.words(e + 0x44, [s.enc(s.outbox), case["cb"]])
+    s.words(e + 0x44, [s.outbox_word(case), case["cb"]])
     s.words(s.att, [JUNK, JUNK, s.enc(s.data) if case["data"] else 0])
 
 
@@ -278,6 +289,8 @@ def execute(s, case):
 
 def observe(s, case, answer):
     e = s.email
+    if case["op"] == "cb" and s.rd_words(e + 0x44, 1) == [1]:
+        s.words(e + 0x44, [s.enc(s.outbox)])  # the host's word for an outbox outside the arena, unchanged by the callback
     out = {"answer": answer, "log": s.log()}
     out["words"] = s.norms(s.rd_words(e, 15) + s.rd_words(e + 0x40 + 4, 2))
     out["flags"] = s.read(e + 0x3c, 2)
@@ -321,7 +334,7 @@ def cb_case(r, **kw):
     c = {"op": "cb", "n": r.randrange(0, 4), "state": r.choice([-1, 0, 1, 2, 3, 4, 5, 0x100]), "cursor": r.randrange(4),
          "cb": r.choice([0, 0x10268718, r.getrandbits(32) | 1]), "f3c": r.choice([0, 1, 2]), "f3d": r.choice([0, 1, 2]),
          "att": r.choice([0, 1]), "data": r.choice([0, 1]), "texts": [text(r) for _ in range(7)],
-         "msg": r.choice(MSGS), "code": r.choice(CODES)}
+         "msg": r.choice(MSGS), "code": r.choice(CODES), "heap_outbox": r.choice([0, 1])}
     c.update(kw)
     c["queues"] = {"NextMail": [kw.get("nm", r.choice([0, 1, 0x100, 0x101, 2, -1]))]}
     c.pop("nm", None)

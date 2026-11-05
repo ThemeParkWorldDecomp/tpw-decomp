@@ -10,6 +10,10 @@
 // holds. Unit w90.
 #include "Ptr32.h"
 class Outbox;
+// Outbox::Send gives the outbox inside the user info, on the host's heap, which a 32-bit field cannot hold: Email::mOutbox
+// then holds this word and the pointer stays in gEmailHeapOutbox (one user, so one outbox).
+constexpr uint32_t kOutboxOnHeap = 1;
+inline Outbox* gEmailHeapOutbox = nullptr;
 class Email {
 public:
     ~Email();   // 0x1020248c (216 bytes, unit v5129, src/game/online/EmailMessage.cpp); the outbox calls it with the delete flag 1
@@ -43,7 +47,7 @@ public:
     uint8_t mF3d;             // 0x3d  1 when no outbox was given
     uint8_t mF3e[2];          // 0x3e
     uint8_t mF40[4];          // 0x40
-    Ptr32<Outbox> mOutbox;    // 0x44  Outbox*
+    Ptr32<Outbox> mOutbox;    // 0x44  Outbox*, or kOutboxOnHeap
     uint32_t mCallback;       // 0x48  TVector of a callback(int32_t status, int32_t code), or 0
     // Unit v5950 (src/game/online/email.cpp): the attachment, 12 bytes on the Mac.
     struct Attachment {

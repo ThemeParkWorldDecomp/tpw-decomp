@@ -35,8 +35,8 @@ SIZES = {FN_A: 1784}
 OWN = set(SIZES)
 
 ADDR = dict(gTPGlobals=0x103b74c8)
-# host layout: ctrl.mBrace, brace.mFlags, brace.mF0C, brace.mPrev, brace.mNext, brace.mFE8, globals mask, scale, table, coaster f08, pylon flags,
-# sizeof control, sizeof brace
+# host layout: ctrl.mBrace, brace.mFlags, brace.mF0C, brace.mPrev, brace.mNext, brace.mFEC, globals mask, scale, table, coaster f08, pylon flags,
+# sizeof control, sizeof brace, brace.mFF8, brace.mX4C, brace.mZ54
 HL = []
 FIXED = {0: 0x10, 1: 8, 2: 0x0c, 6: 4, 7: 8, 8: 0x0c, 10: 0}
 
@@ -132,7 +132,8 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
-    prev, next, fe8, f08 = 0x64, 0x68, 0xE8, 8
+    prev, next, f08 = 0x64, 0x68, 8
+    x4c, z54, fec, ff8 = 0x4C, 0x54, 0xEC, 0xF8
 
     def __init__(self, e, case):
         self.e = e
@@ -168,7 +169,8 @@ class Host(Side):
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
-        self.prev, self.next, self.fe8, self.f08 = HL[3], HL[4], HL[5], HL[9]
+        self.prev, self.next, self.f08 = HL[3], HL[4], HL[9]
+        self.fec, self.ff8, self.x4c, self.z54 = HL[5], HL[13], HL[14], HL[15]
         CL.host_begin(lib, {}, case["queues"])
 
     def done(self):
@@ -213,17 +215,18 @@ def bind(lib):
 
 
 def put_brace(s, spec, size=0x140):
-    """A brace of the Mac layout (the host's pointer offsets differ); neighbours are built first."""
-    a = s.alloc(size)
+    """A brace through each side's real layout (on the host the pointers, and with them the words after them, are elsewhere); neighbours are
+    built first."""
+    a = s.alloc(size if s.fmt == ">I" else HL[12])
     prv = put_brace(s, spec["prev"]) if spec.get("prev") else 0
     nxt = put_brace(s, spec["next"]) if spec.get("next") else 0
     s.words(a + 8, [spec["flags"]])
-    s.words(a + 0x4C, [spec["f4c"]])
-    s.words(a + 0x54, [spec["f54"]])
+    s.words(a + s.x4c, [spec["f4c"]])
+    s.words(a + s.z54, [spec["f54"]])
     s.ptr(a + s.prev, prv)
     s.ptr(a + s.next, nxt)
-    s.words(a + s.fe8 + 4, [spec["fec"]])
-    s.words(a + s.fe8 + 0x10, [spec["ff8"]])
+    s.words(a + s.fec, [spec["fec"]])
+    s.words(a + s.ff8, [spec["ff8"]])
     return a
 
 

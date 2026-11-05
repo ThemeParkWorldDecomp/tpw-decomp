@@ -79,9 +79,9 @@ void WideStringCtor(void* string, const char16_t* text) { ev("WStringCtor", {lab
 void UIMain_DestroyWString(void* object) {}
 
 namespace NS_MacDoze {
-void InitializeCriticalSection(void** section) {
+void InitializeCriticalSection(uint32_t* section) {
     ev("InitCS", {lab(section)});
-    *reinterpret_cast<uint32_t*>(section) = static_cast<uint32_t>(ret("InitCS"));
+    *section = static_cast<uint32_t>(ret("InitCS"));
 }
 int32_t SetEvent(InternalHandle* handle) {
     ev("SetEvent", {static_cast<int64_t>(reinterpret_cast<uintptr_t>(handle) & 0xffffffffu)});

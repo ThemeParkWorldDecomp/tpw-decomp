@@ -64,6 +64,7 @@ extern "C" {
 uint64_t tpw_wo_addr(const char* name) {
     if (std::strcmp(name, "vtbl") == 0) return reinterpret_cast<uintptr_t>(gIosFailureVtbl);
     if (std::strcmp(name, "dtors") == 0) return reinterpret_cast<uintptr_t>(gIosFailureDtorVec);
+    if (std::strcmp(name, "arena") == 0) return reinterpret_cast<uintptr_t>(tpw::ArenaBase());
     return 0;
 }
 

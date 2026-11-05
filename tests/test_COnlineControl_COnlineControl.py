@@ -393,6 +393,12 @@ class Host(Side):
     def to_word(self, ptr):
         return self.lib.tpw_ocs_handle(ptr)
 
+    def rep(self, textaddr):
+        """The host representation (IME::MslWideStringRep) keeps a native character pointer at +0x10."""
+        r = self.alloc(0x20)
+        self.write(r + 0x10, struct.pack("<Q", textaddr))
+        return r
+
     def from_word(self, w):
         return self.lib.tpw_ocs_deref(w)
 

@@ -9,6 +9,10 @@ The world of a case: the 16 bytes the read delivers, the error code, the count r
 the record (words 0, 1 and 3 as numbers after the swap; word 2 and the failure case as raw bytes), and the event log.
 
 No fused operations. Not tested: the TbError constant word (0x1027dee4, a zero nothing writes).
+
+With the port fixes (tpw_lvs_watch answers other than -1; port_fix tag parkload) half the cases arm the port's read watch before the
+call (the case's "watch") and read it after: a load that answers 1 marks it, and nothing else does (the original has no watch: its
+side's word is made from its answer).
 """
 import ctypes as C
 import random
@@ -44,7 +48,13 @@ STUBS.internal(0x1015B3DC, CL.recorder("WriteSerialiseLog", "Lisi"))
 STUBS.internal(0x1000DDE8, CL.recorder("assert", "is"))
 
 
+WATCH = False
+
+
 def setup(runner):
+    global WATCH
+    runner.lib.tpw_lvs_watch.restype, runner.lib.tpw_lvs_watch.argtypes = C.c_int32, [C.c_int32]
+    WATCH = runner.lib.tpw_lvs_watch(0) != -1
     T.install_std_stubs(runner.emu)
 
 
@@ -143,11 +153,19 @@ def run(s, case):
 
 
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    out = run(Ppc(e, case), case)
+    if WATCH:
+        out["watch"] = (2 | int(out["answer"] == 1)) if case["watch"] else 0
+    return out
 
 
 def host(lib, case):
-    return run(Host(lib, case), case)
+    if WATCH and case["watch"]:
+        lib.tpw_lvs_watch(1)
+    out = run(Host(lib, case), case)
+    if WATCH:
+        out["watch"] = lib.tpw_lvs_watch(0)
+    return out
 
 
 def mk(r, err=None, cnt=None, nolog=None):
@@ -157,7 +175,7 @@ def mk(r, err=None, cnt=None, nolog=None):
     q["err"] = [err & MASK]
     q["cnt"] = [cnt & MASK]
     return {"queues": q, "init": [r.randrange(0, 1 << 32) for _ in range(4)],
-            "nolog": r.choice([0, 1, 2, MASK]) if nolog is None else nolog}
+            "nolog": r.choice([0, 1, 2, MASK]) if nolog is None else nolog, "watch": r.randrange(2)}
 
 
 def edges():

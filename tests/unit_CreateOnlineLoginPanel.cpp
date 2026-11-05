@@ -12,6 +12,7 @@
 #include "FillLenderList.h"
 #include "InterfaceWindow.h"
 #include "calllog.h"
+#include "platform/online_signup.h"
 #include "platform/arena.h"
 #include "ui_DrawObject.h"
 #include "ui_ErrorDisplay.h"

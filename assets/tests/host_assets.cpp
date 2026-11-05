@@ -757,6 +757,101 @@ void TestMacBinary() {
     CHECK(OpenMacBinary(MakeMemoryBlob(std::vector<uint8_t>(500, 'x')), err) == nullptr);
 }
 
+// ---- RefPack and DWFB wads (the PC disc's fonts.wad)
+
+// A tiny RefPack stream that uses each of the five codes once: 4 literals (1-byte code), 1 literal and a 5-byte copy
+// (2-byte code), 2 literals and an overlapping 6-byte run (3-byte code), a 7-byte copy from the start (4-byte code), and
+// the stop code with 3 literals.
+std::vector<uint8_t> TinyRefPack() {
+    const uint8_t s[] = {0x10, 0xFB, 0, 0, 28, 0xE0, 'A', 'B', 'C', 'D', 0x09, 4, 'x', 0x82, 0x80, 1, 'y', 'z',
+                         0xC0, 0, 17, 2, 0xFF, 'e', 'n', 'd'};
+    return std::vector<uint8_t>(s, s + sizeof s);
+}
+
+void TestRefPack() {
+    std::vector<uint8_t> out;
+    std::string err;
+    std::vector<uint8_t> in = TinyRefPack();
+    CHECK(RefPackDecode(in.data(), in.size(), 1 << 20, out, err));
+    CHECK_EQ_STR(std::string(out.begin(), out.end()), "ABCDxABCDxyzyzyzyzABCDxABend");
+    // cut short, a copy from before the start, a size the header does not give, over the limit, not RefPack: refused
+    CHECK(!RefPackDecode(in.data(), in.size() - 1, 1 << 20, out, err));
+    std::vector<uint8_t> bad = in;
+    bad[11] = 40;   // the 2-byte code's distance, past the 5 bytes written so far
+    CHECK(!RefPackDecode(bad.data(), bad.size(), 1 << 20, out, err));
+    bad = in;
+    bad[4] = 27;
+    CHECK(!RefPackDecode(bad.data(), bad.size(), 1 << 20, out, err));
+    CHECK(!RefPackDecode(in.data(), in.size(), 27, out, err));
+    bad = in;
+    bad[1] = 0xFA;
+    CHECK(!RefPackDecode(bad.data(), bad.size(), 1 << 20, out, err));
+}
+
+void Put32(std::vector<uint8_t>& b, size_t at, uint32_t v) {
+    for (int i = 0; i < 4; ++i) b[at + i] = static_cast<uint8_t>(v >> (8 * i));
+}
+
+// A DWFB wad with one packed entry (the tiny stream, flag 4) and one stored entry, names in a block after the data.
+std::vector<uint8_t> BuildWad() {
+    std::vector<uint8_t> packed = TinyRefPack();
+    const std::string plain = "plain bytes";
+    const char* names[2] = {"FONT___.TTF", "dir\\stored.txt"};
+    std::vector<uint8_t> b(0x58 + 2 * 40, 0);
+    std::memcpy(b.data(), "DWFB", 4);
+    Put32(b, 4, 2);
+    Put32(b, 0x48, 2);
+    const uint32_t offsets[2] = {static_cast<uint32_t>(b.size()), static_cast<uint32_t>(b.size() + packed.size())};
+    b.insert(b.end(), packed.begin(), packed.end());
+    b.insert(b.end(), plain.begin(), plain.end());
+    const uint32_t nameBlock = static_cast<uint32_t>(b.size());
+    Put32(b, 0x4C, nameBlock);
+    for (int k = 0; k < 2; ++k) {
+        const size_t at = 0x58 + 40 * k;
+        Put32(b, at + 4, static_cast<uint32_t>(b.size()));
+        Put32(b, at + 8, static_cast<uint32_t>(std::strlen(names[k]) + 1));
+        Put32(b, at + 12, offsets[k]);
+        Put32(b, at + 16, k == 0 ? static_cast<uint32_t>(packed.size()) : static_cast<uint32_t>(plain.size()));
+        Put32(b, at + 20, k == 0 ? 4 : 0);
+        Put32(b, at + 24, k == 0 ? 28 : static_cast<uint32_t>(plain.size()));
+        b.insert(b.end(), names[k], names[k] + std::strlen(names[k]) + 1);
+    }
+    Put32(b, 0x50, static_cast<uint32_t>(b.size() - nameBlock));
+    return b;
+}
+
+void TestWadInMemory() {
+    std::string err;
+    std::vector<uint8_t> wad = BuildWad();
+    auto src = OpenWad(MakeMemoryBlob(wad), err);
+    CHECK(src != nullptr);
+    if (!src) return;
+    CHECK(std::string(src->Kind()) == "wad");
+    CHECK(src->Entries().size() == 2u);
+    const Entry* font = Find(*src, "FONT___.TTF");
+    CHECK(font && font->size == 28u);
+    const std::string unpacked = "ABCDxABCDxyzyzyzyzABCDxABend";
+    if (font) CHECK_EQ_STR(HashEntry(*src, *font), Sha256::Of(unpacked.data(), unpacked.size()).Hex());
+    const Entry* stored = Find(*src, "dir/stored.txt");
+    CHECK(stored && stored->size == 11u);
+    if (stored) CHECK_EQ_STR(HashEntry(*src, *stored), Sha256::Of("plain bytes", 11).Hex());
+    // a damaged packed entry fails when opened, not when listed; a wrong magic, a table past the end: refused
+    std::vector<uint8_t> bad = wad;
+    bad[0x58 + 2 * 40 + 11] = 40;
+    auto damaged = OpenWad(MakeMemoryBlob(bad), err);
+    CHECK(damaged != nullptr);
+    if (damaged) {
+        const Entry* f = Find(*damaged, "FONT___.TTF");
+        CHECK(f && damaged->Open(*f, err) == nullptr);
+    }
+    bad = wad;
+    bad[0] = 'X';
+    CHECK(OpenWad(MakeMemoryBlob(bad), err) == nullptr);
+    bad = wad;
+    Put32(bad, 0x48, 1000);
+    CHECK(OpenWad(MakeMemoryBlob(bad), err) == nullptr);
+}
+
 uint32_t TestCabSum(const uint8_t* p, size_t n, uint32_t seed) {
     uint32_t s = seed;
     size_t i = 0;
@@ -897,6 +992,16 @@ void TestCabInMemory() {
     auto sniffed = OpenSniffed(blob, opts, 0, err);
     CHECK(sniffed != nullptr && std::string(sniffed->Kind()) == "cab");
     CHECK(FindCabinet(*MakeMemoryBlob(std::vector<uint8_t>(5000, 'x')), 1 << 20, err) == -1);
+    // A folder compressed with LZX (the DirectX installers): listed as unreadable, and Open says why.
+    std::vector<uint8_t> lzx = BuildCab(items, false, false);
+    lzx[42] = 3;   // the folder's compression type, after the 36-byte header and the folder's offset and block count
+    auto lzxSrc = OpenCab(MakeMemoryBlob(lzx), 0, err);
+    CHECK(lzxSrc != nullptr && lzxSrc->Entries().size() == 4);
+    if (lzxSrc) {
+        for (const Entry& e : lzxSrc->Entries()) CHECK(e.unreadable);
+        CHECK(lzxSrc->Open(lzxSrc->Entries()[0], err) == nullptr && err.find("compression type 3") != std::string::npos);
+    }
+    for (const Entry& e : src->Entries()) CHECK(!e.unreadable);
     std::vector<uint8_t> noCab(exe.begin(), exe.begin() + stub.size());
     CHECK(OpenSniffed(MakeMemoryBlob(noCab), opts, 0, err) == nullptr);
     // An exe without a cabinet is a plain file.
@@ -1291,6 +1396,8 @@ int main(int argc, char** argv) {
     TestHfsInMemory();
     TestIsoInMemory();
     TestSniffDepth();
+    TestRefPack();
+    TestWadInMemory();
     if (root.empty()) Skip("folder source: TPW_GDI_ROOT is not set"); else TestFolder(root);
     if (transfer.empty()) {
         Skip("zip and iso sources: TPW_TEST_TRANSFER is not set");

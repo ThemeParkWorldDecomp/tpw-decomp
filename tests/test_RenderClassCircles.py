@@ -1,4 +1,9 @@
-"""w239: Draw.cpp CRenderClass circle rasterizers against the Mac binary."""
+"""w239: Draw.cpp CRenderClass circle rasterizers against the Mac binary.
+
+A 16-bit pixel is compared as a value: each side keeps it in its own byte
+order (the Mac's big-endian words, the host's host-order words), so the host
+side's pixels are byte-swapped going in and coming out.
+"""
 import ctypes as C
 import random
 
@@ -52,6 +57,18 @@ def bind(lib):
     lib.rclasscircle_bound = True
 
 
+def swap_pixels(data, width, height, stride):
+    """The buffer with each row's width pixels' two bytes swapped (16-bit
+    depth): the Mac's big-endian pixel words as the host's host-order ones,
+    and back."""
+    data = bytearray(data)
+    for row in range(height):
+        start = 64 + row * stride
+        end = start + 2 * width
+        data[start:end:2], data[start + 1:end:2] = data[start + 1:end:2], data[start:end:2]
+    return bytes(data)
+
+
 def run(emulator, lib, case):
     global FORMATTED, FORMAT_CALLS
     emulated = emulator is not None
@@ -89,7 +106,8 @@ def run(emulator, lib, case):
     width, height = case['size']
     stride = width * bpp + case['padding']
     raw = r.randbytes(stride * height + 132)
-    pixels = allocate(raw)
+    swapped = not emulated and bpp == 2
+    pixels = allocate(swap_pixels(raw, width, height, stride) if swapped else raw)
     origin = pixels + 64
     area = allocate(b'\xa5' * area_size)
     clip = allocate(b''.join((v & 0xffffffff).to_bytes(4, endian) for v in case['clip']))
@@ -125,7 +143,7 @@ def run(emulator, lib, case):
                                      case['x'], case['y'], case['radius'], colour, formatted)
             calls = lib.tpw_rclasscircle_calls()
         return {
-            'pixels': read(pixels, len(raw)),
+            'pixels': swap_pixels(read(pixels, len(raw)), width, height, stride) if swapped else read(pixels, len(raw)),
             'format_calls': calls,
             'unchanged': [read(address, size) == old
                           for (address, size), old in zip(protected, before)],

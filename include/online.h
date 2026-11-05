@@ -1,6 +1,8 @@
 // online.cpp (main app): COnlineControl, the online game client. PARTIAL; untranslated.
 #pragma once
+#include <cstddef>
 #include <cstdint>
+#include <new>
 #include <string>
 
 class COnlinePerson;
@@ -14,6 +16,12 @@ class COnlineControl {
 public:
     COnlineControl();            // 0x10213870
     ~COnlineControl();           // 0x10213dd4 (nonvirtual)
+    // The Mac's operator new and delete (0xe8c bytes): the arena on the host, since the string trees inside the object keep their
+    // addresses in 32-bit fields. The code that calls operator new itself gets the same block (platform/online_dispatch.cpp).
+    static void* operator new(std::size_t size);
+    static void* operator new(std::size_t size, const std::nothrow_t&) noexcept;
+    static void* operator new(std::size_t, void* place) noexcept { return place; }
+    static void operator delete(void* block) noexcept;
     void InitClient();           // 0x102143c4
     void InitGameWorld();        // 0x10214678
     void Shutdown();             // 0x10214840
@@ -70,7 +78,7 @@ public:
     bool IsThisMe(const char16_t* name);                       // 0x10217f34
     void ReceiveText(std::u16string& text, int32_t colour);    // 0x10217dbc (the text is passed by address on the Mac)
     void Feedback(std::u16string& text);                       // 0x1021b784
-    uint32_t GetDataForUser(const nocase_string& key) const;   // 0x1021b854 (bit 0 buddy, 1 online, 2 flag at node+0x11, 3 in the second set)
+    uint32_t GetDataForUser(const std::u16string& key) const;  // 0x1021b854 (bit 0 buddy, 1 online, 2 flag at node+0x11, 3 in the second set)
     void NoLongerAFK(bool flag);                               // 0x10219634 (untranslated)
     // Unit v5660 (untranslated)
     void BuddyOff(std::u16string& name);                       // 0x10218e3c
@@ -135,7 +143,7 @@ MslArgumentQueue* ArgumentQueueDestruct(MslArgumentQueue* self, int16_t deleteFl
 #include <string>
 class CFSOnlineSystem;
 namespace online_callee {
-uint32_t PointerToHandle(const void* p);   // the host's stand-in for a 32-bit pointer word: index + 1 into a table, 0 for NULL (src/game/online/online.cpp)
+uint32_t PointerToHandle(const void* p);   // the host's stand-in for a 32-bit pointer word: an arena offset, or 0xF0000000 + index + 1 into a table, 0 for NULL (src/game/online/online.cpp)
 void* HandleToPointer(uint32_t handle);
 void* OperatorNew(uint32_t size);                                // 0x102384b8
 void OperatorDelete(void* p);                                       // 0x10238218
@@ -173,6 +181,9 @@ int32_t LoginPlayerID(CFSOnlineSystem* sys);                        // 0x101718f
 int32_t LoginCustomerID(CFSOnlineSystem* sys);                      // 0x1017193c
 uint32_t AvatarID(CFSOnlineSystem* sys);                            // 0x101719bc
 void COnlinePersonCtor(void* self, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, uint32_t avatar, void* name, bool flag);   // 0x10212d98
+// The same constructor given a name the caller keeps as the host's string (CreateVisitor's).
+void COnlinePersonCtor(void* self, tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> cell, uint32_t avatar, const std::u16string* name,
+                       bool flag);   // 0x10212d98
 }  // namespace online_callee
 
 // ---- Unit v5023: the callees of Locate, Page, Goto, BlackMark and BuddyOn (the test library fakes them). An Argument is three words:
@@ -181,7 +192,24 @@ namespace online_callee {
 void WStringCopy(void* self, const void* other, uint32_t pos, uint32_t count);        // 0x101f7424
 void NocaseWStringCopy(void* self, const void* other, uint32_t pos, uint32_t count);  // 0x1022213c
 void NocaseWStringDtor(void* self, int16_t flag);                                     // 0x10222020
+// The same library functions for the wide strings the translation keeps as std::u16string objects (ProcessResponse's, Feedback's):
+// the overloads take the host's object, so a slot or a representation pointer is never written into one or read from one.
+void WStringCtorFrom(std::u16string* self, const char16_t* text);                            // 0x10146a14
+void WStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count);   // 0x101f7424
+void WStringDtor(std::u16string* self, int16_t flag);                                        // 0x101468f8
+void NocaseWStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count);   // 0x1022213c
+void NocaseWStringDtor(std::u16string* self, int16_t flag);                                  // 0x10222020
+// A copy from a string the object keeps as a slot (the player's name at COnlineControl + 8; include/platform/online_slots.h).
+void NocaseWStringCopy(std::u16string* self, const uint32_t* slot, uint32_t pos, uint32_t count);   // 0x1022213c
+// A copy into a slot from the host's string (the names SendCommand and SendText hand on in an Argument).
+void WStringCopy(void* self, const std::u16string* other, uint32_t pos, uint32_t count);   // 0x101f7424
 void* BuddyTreeFind(void* tree, const void* key);                                     // 0x1021f8d8 (answers the node)
+// The buddy map and the ignore set on the host's strings (platform/online_containers.cpp, the Mac's words): the node, or the end
+// node (the tree + 4).
+void* BuddyTreeFind(void* tree, const std::u16string* key);                           // 0x1021f8d8
+void* NocaseSetFind(void* tree, const std::u16string* key);                           // 0x1021fd4c
+bool NocaseWStringEqual(const std::u16string* a, const std::u16string* b);            // 0x1021f254
+void WStringSetEraseOne(void* tree, const std::u16string* key);                       // 0x1021e664 erase_one on the contact set
 void ArgumentCtor(void* self, const void* text);                                      // 0x102011a8
 void ArgumentVectorPushBack(void* vec, const void* argument);                         // 0x10201478
 void ArgumentVectorTearDown(void* vec);                                               // 0x10201310
@@ -232,6 +260,8 @@ void ParserSkipWhitespace(void* parser);                                        
 bool ParserGetChar(void* parser, char16_t* ch);                                         // 0x10211ef8
 int32_t ParserParse(void* parser);                                                      // 0x102114f8
 void WStringAssignRange(void* self, const void* src, uint32_t pos, uint32_t count);    // 0x101f7014
+// The same assign into a slot from the host's string (ProcessResponse's last teller).
+void WStringAssignRange(void* self, const std::u16string* src, uint32_t pos, uint32_t count);   // 0x101f7014
 }  // namespace online_parse_callee
 extern ParserHandler gOnlineTokenHandlers[36];   // 0x102b1960, 12 bytes each (TOC -0x3a4c down to -0x3ad8)
 namespace token_callee {
@@ -314,10 +344,13 @@ class Argument;
 struct ArgumentVector {
     uint32_t mCapacity;   // 0x00
     uint32_t mSize;       // 0x04
-    Argument* mData;      // 0x08  (native pointer here: host offset 8, size 16)
+    uint32_t mData;       // 0x08  the Arguments: a 32-bit word (an arena offset), so the vector is 12 bytes, as a deque element is
+    Argument* data() const { return mData != 0 ? reinterpret_cast<Argument*>(tpw::gArenaBase + mData) : nullptr; }
+    void set_data(const Argument* p) { mData = p != nullptr ? tpw::ArenaOffset(p) : 0; }
     ArgumentVector(const ArgumentVector& other);                 // 0x10227200
     void push_back(const Argument& argument);                    // 0x10201478
 };
+static_assert(sizeof(ArgumentVector) == 12, "a deque of Argument vectors keeps 0xc byte elements");
 namespace std_vector_callee {
 void ArgumentCopy(Argument* self, const Argument* other);        // 0x10201878 Argument::Argument(const Argument&)
 void ArgumentDestroyRange(Argument* first, Argument* last);      // 0x10201744 / 0x102013c0 / 0x10222458 std::__destroy<Argument*>
@@ -347,33 +380,45 @@ const char16_t* NocaseWStringBegin(const void* self);         // 0x102260c8 begi
 bool NocaseWStringLess(const void* a, const void* b);         // 0x10225d2c operator<(a, b)
 
 // ---- Unit v5235: SaveIgnore 0x1021d74c and LoadIgnore 0x1021db98 (they answer 0 or 1; the member SaveIgnore is declared void above, so
-// the answer comes from OnlineSaveIgnore). The stream objects are stack objects the library builds; the host structs keep the fields
-// the code reads (Mac offsets in comments; host pointers are 8 bytes, so fields after a pointer sit 4 bytes higher).
+// the answer comes from OnlineSaveIgnore). The stream objects are stack objects the library builds. The ios part and the filebuf
+// are the library's own objects and keep the Mac's words (the library glue reads and writes them at the Mac offsets, and the ios
+// part's stream buffer is the filebuf's arena offset); the stream part keeps a host pointer to its ios part.
 extern uint32_t gOfsWVtbl[4];   // 0x102b1f50 (TOC -0x5eac): the ofstream part's vtable
 bool OnlineSaveIgnore(COnlineControl* self, const char* path);   // 0x1021d74c
 class CFSUserInfo;
 namespace ignore_callee {
-struct IgnoreIos {              // the stream's virtual base, pointed to by the stream's first word
-    const void* mVtable;        // Mac 0x00
-    uint8_t mPad04[0x20];       // Mac 0x04
-    uint32_t mStreamBuf;        // Mac 0x24 (host 0x28)
-    uint8_t mPad28[0xc];        // Mac 0x28
-    uint32_t mState;            // Mac 0x34 (host 0x38)
-    uint32_t mExceptions;       // Mac 0x38
-    uint8_t mPad3c[8];          // Mac 0x3c
-    int32_t mBaseOffset;        // Mac 0x44 (host 0x48): the ios part's address minus this block's
+struct IgnoreIos {              // the stream's virtual base (std::basic_ios<wchar_t>), pointed to by the stream's first word
+    uint32_t mVtable;           // 0x00 the vtable word (a host table's low word)
+    uint8_t mPad04[0x20];       // 0x04
+    uint32_t mStreamBuf;        // 0x24 the stream buffer's arena offset
+    uint8_t mPad28[0xc];        // 0x28 (the format flags at 0x30)
+    uint32_t mState;            // 0x34
+    uint32_t mExceptions;       // 0x38
+    uint8_t mPad3c[8];          // 0x3c the tie word, 0x40 the fill
+    int32_t mBaseOffset;        // 0x44 the ios part's address minus this block's
     uint8_t mPad48[0x10];
 };
+static_assert(offsetof(IgnoreIos, mStreamBuf) == 0x24 && offsetof(IgnoreIos, mBaseOffset) == 0x44, "the Mac's ios words");
 struct IgnoreStream {           // basic_ofstream / basic_ifstream (the stream part)
     IgnoreIos* mIos;            // Mac 0x00
     const void* mSlot;          // Mac 0x04 (host 0x08)
     uint8_t mRest[0x50];
 };
-struct IgnoreFilebuf {
+struct IgnoreFilebuf {          // basic_filebuf<wchar_t> (BasicFilebufWchar, 0x50 bytes on the Mac)
     uint8_t mPad[0x24];
     uint32_t mFile;             // 0x24
     uint8_t mRest[0x30];
 };
+// The whole wide fstream as the Mac's stack frame holds it: the stream part, then its filebuf, then its ios part. The callers
+// allocate it in the arena, so the ios part's stream buffer word names the filebuf (IfstreamCtor and OfstreamCtor wire the
+// three parts of one object together, as the library's constructors do from the stream's address).
+struct IgnoreFstream {
+    IgnoreStream mStream;
+    IgnoreFilebuf mFilebuf;
+    IgnoreIos mIos;
+};
+inline IgnoreFstream* FstreamOf(IgnoreStream* stream) { return reinterpret_cast<IgnoreFstream*>(stream); }
+inline uint32_t VtableWord(const void* table) { return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(table)); }
 struct IgnorePathString {       // TbDynamicStringTemplate<wchar_t> (0x14 bytes on the Mac)
     const void* mVtable;        // Mac 0x00
     uint32_t mLength;           // Mac 0x04
@@ -608,9 +653,9 @@ extern uint32_t gVoteSendData[4];   // 0x102b1b58 (TOC -0x3970): the 16 bytes Do
 // function builds are std::u16string objects here (one word on the Mac, a pointer to a rep whose data pointer is at +0xc).
 namespace response_callee {
 void ArgumentBStrVal(std::u16string* result, const Argument* argument);   // 0x10217764 Argument::BStrVal (the wide string by value)
-bool WStringEqual(const std::u16string& a, const void* b);                // 0x1021f130 operator==(const wstring&, const wstring&)
-void* WStringSetFind(void* tree, const void* key);                        // 0x1021fae4 (answers the node; the end node is the tree + 4)
-void NocaseSetInsertOne(void* tree, const void* key);                     // 0x102243c0 (the result pair is dropped)
+bool WStringEqual(const std::u16string& a, const void* b);                // 0x1021f130 operator==(const wstring&, const wstring&); b a slot
+void* WStringSetFind(void* tree, const std::u16string* key);              // 0x1021fae4 (answers the node; the end node is the tree + 4)
+void NocaseSetInsertOne(void* tree, const std::u16string* key);           // 0x102243c0 (the result pair is dropped)
 void NocaseSetErase(void* tree, void* node);                              // 0x1022419c (the iterator by value)
 void UIOnlineUpdateBuddy(void* ui, const char16_t* name, int32_t flags);     // 0x101f0bc8 UIInterface::OnlineUpdateBuddy(wchar_t*, long)
 void UIOnlineUpdateContact(void* ui, const char16_t* name, int32_t flags);   // 0x101f0aa0 UIInterface::OnlineUpdateContact(wchar_t*, long)
@@ -624,8 +669,14 @@ struct BuddyEntry {
     uint8_t mDirect;    // Mac 0x04  BuddyInfo byte 0 (node offset 0x10)
     uint8_t mFlag;      // Mac 0x05  BuddyInfo byte 1 (node offset 0x11)
 };
+// The same entry as AddBuddy builds it, its key the host's string (the map keeps its own slot: platform/online_containers.cpp).
+struct BuddyKeyEntry {
+    std::u16string mKey;
+    uint8_t mDirect;
+    uint8_t mFlag;
+};
 namespace online_callee {
-void BuddyTreeInsert(void* tree, const BuddyEntry* entry);                   // 0x10222d9c insert_one (the result iterator is dropped)
+void BuddyTreeInsert(void* tree, const BuddyKeyEntry* entry);                // 0x10222d9c insert_one (the result iterator is dropped)
 void UIOnlineAddBuddy(void* ui, const char16_t* text, int32_t data);          // 0x101f0b08 UIInterface::OnlineAddBuddy(wchar_t*, long)
 void UIOnlineUpdateContact(void* ui, const char16_t* text, int32_t data);     // 0x101f0aa0 UIInterface::OnlineUpdateContact(wchar_t*, long)
 void ArgumentDequePopFront(void* deque);                                       // 0x1022488c std::deque<std::vector<Argument>>::pop_front
@@ -665,7 +716,7 @@ void BalanceInsert(NocaseSetTree::node* node, NocaseSetTree::node* root);      /
 
 // ---- Unit v5897: callees of RemoveBuddy and RemoveContact that no header declared (the test library fakes them).
 namespace online_callee {
-void BuddyTreeEraseOne(void* tree, const void* key);          // 0x1021e8e8 erase_one on the buddy map
+void BuddyTreeEraseOne(void* tree, const std::u16string* key);   // 0x1021e8e8 erase_one on the buddy map
 void UIOnlineRemoveContact(void* ui, const char16_t* text);   // 0x101f0a40 UIInterface::OnlineRemoveContact(wchar_t*)
 void UIOnlineRemoveBuddy(void* ui, const char16_t* text);     // 0x101f0b68 UIInterface::OnlineRemoveBuddy(wchar_t*)
 }  // namespace online_callee
@@ -708,6 +759,7 @@ void CdequePushBack(void* cdeque, const uint32_t* value);                    // 
 void CdequePopFront(void* cdeque);                                           // 0x101f25e8
 void* CdequeIndex(void* cdeque, uint32_t index);                             // 0x101f2004 answers the slot's address
 bool GrowBufBack(MslArgumentDeque* self, uint32_t from, void* spare, uint32_t* added, uint32_t to);   // 0x102287e4
+void* OperatorNew(uint32_t size);   // 0x102384b8 for GrowBufBack's blocks: their addresses are 32-bit words, so they come from the arena
 void VectorCopy(void* target, const void* source);                           // 0x10227200
 void VectorDtor(void* vec, int16_t flag);                                    // 0x102010f8
 void CursorAdd(MslArgumentCursor* cursor, int32_t count);                    // 0x101f5508

@@ -7,6 +7,11 @@ below the real storage are template fakes. No floating point operations.
 Excluded: dereferenced NULL disc access after allocation failure plus successful
 Open, wide dynamic conversion returning zero on the second call (writes index
 0xffffffff), and FullPath sizes above its original 260-byte local buffer.
+
+With the port fixes (tpw_fsm_portfix answers 1; port_fix tag parkload) _TbMemFileAccess::Read compares the
+bytes left in a block with the size asked for unsigned, so a size of 0x80000000 or more reads what the file
+holds: the original runs such a case with the size 0x7fffffff, more than any case's file holds, which takes
+the same path.
 """
 import ctypes as C
 import random
@@ -60,7 +65,13 @@ VT = {0: 0x10071a60, 1: 0x10071d60, 2: 0x10071e88, 3: 0x10071e88,
       4: 0x10071ed4, 6: 0x10072380, 7: 0x10072580, 8: 0x100719a4, 9: 0x10071dec, 10: 0x10071da4}
 
 
+PORT_FIX = False
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_fsm_portfix.restype, runner.lib.tpw_fsm_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_fsm_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -457,6 +468,12 @@ def edges(op):
             c.update(block=4, count=1, size=4, position=1, n=n)
             c["queues"]["array failure"] = [0, 1]
             yield c
+    if op == 16:
+        for n in [0x7fffffff, 0x80000000, 0x80000001, MASK - 3, MASK]:
+            for position in [0, 3, 5, 10]:
+                c = base(r, op)
+                c.update(block=4, count=3, size=10, position=position, n=n)
+                yield c
     if op in (9, 12):
         for fail in (0, 1):
             c = base(r, op)
@@ -693,6 +710,8 @@ def run(s, c):
 
 
 def ppc(e, c):
+    if PORT_FIX and c["op"] == 16 and c["n"] >= 0x80000000:
+        c = dict(c, n=0x7fffffff)
     return run(Ppc(e, c), c)
 
 

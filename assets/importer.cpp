@@ -16,6 +16,7 @@
 #include <unordered_map>
 
 #include "icon.h"
+#include "sam_check.h"
 #include "sha256.h"
 #include "sniff.h"
 
@@ -32,13 +33,26 @@ namespace {
 
 namespace fs = std::filesystem;
 
-const Edition kAllEditions[3] = {kEditionUs, kEditionEur, kEditionGold};      // the editions launcher.ini and the report list
-const Edition kFileEditions[4] = {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages};  // everything a file can be
+// the editions launcher.ini and the report list
+const Edition kAllEditions[5] = {kEditionUs, kEditionEur, kEditionGold, kEditionUsPc, kEditionEurPc};
+// everything a file can be
+const Edition kFileEditions[6] = {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages, kEditionUsPc, kEditionEurPc};
 const uint64_t kSmall = 1ull << 20;          // read whole and written from memory
 const uint64_t kProgressStep = 16ull << 20;  // a Hashing event every this many bytes of a big file
 const size_t kChunk = 1 << 20;
 
-int EditionIndex(Edition e) { return e == kEditionUs ? 0 : (e == kEditionEur ? 1 : (e == kEditionGold ? 2 : 3)); }
+// us 0, eur 1, gold 2, language packs 3, us-pc 4, eur-pc 5 (ImportReport::status, OpenCheck::removed)
+int EditionIndex(Edition e) {
+    switch (e) {
+        case kEditionUs: return 0;
+        case kEditionEur: return 1;
+        case kEditionGold: return 2;
+        case kEditionLanguages: return 3;
+        case kEditionUsPc: return 4;
+        case kEditionEurPc: return 5;
+    }
+    return 3;
+}
 
 std::string Lower(std::string s) {
     for (char& c : s) {
@@ -90,6 +104,13 @@ bool SizeAccepted(const ManifestRecord& r, uint64_t size) {
         if (RecordHash(r, i).size == size) return true;
     }
     return false;
+}
+
+// A settings file the player may edit (tpw-port #94): a destination ending in ".sam", in any case (its .rsrc and .finfo
+// side files are not). Present whatever its size; one that no longer matches is kept as the player's edit (importer.h).
+bool PlayerEditable(const ManifestRecord& r) {
+    size_t n = std::strlen(r.dest);
+    return n > 4 && Lower(r.dest + n - 4) == ".sam";
 }
 
 // Content that proves nothing by itself: an empty file, or a Finder info side file (ten bytes many files share).
@@ -374,7 +395,7 @@ const char* EditionStatus::StateWord() const {
 const char* SourceDiscName(DiscSource source) {
     switch (source) {
         case kSourceMacCd: return "the US Mac CD";
-        case kSourcePcCd: return "the European PC CD";
+        case kSourcePcCd: return "the European PC CD";   // the Windows editions' texts name their own disc
         case kSourceGoldCd: return "the Gold CD";
         case kSourceLanguageDisc: return "a disc with that language";
     }
@@ -518,6 +539,8 @@ std::string Importer::GameFolder(Edition edition) const {
         case kEditionEur: return assetsDir_ + "/eur/Theme Park Data";
         case kEditionGold: return assetsDir_ + "/gold";
         case kEditionLanguages: return assetsDir_ + "/lang";
+        case kEditionUsPc: return assetsDir_ + "/us-pc/Theme Park Data";
+        case kEditionEurPc: return assetsDir_ + "/eur-pc/Theme Park Data";
     }
     return assetsDir_;
 }
@@ -566,6 +589,7 @@ bool Importer::Open(std::string& err) {
             return false;
         }
         CheckChanged(found);
+        for (const Stamp& st : found) KeepOriginal(st.edition, st.record, nullptr);
         RecordStamps(&found);  // a record that cannot be written only means the next start rehashes nothing
         opened_ = true;
         std::lock_guard<std::mutex> lock(mutex_);
@@ -597,13 +621,15 @@ bool Importer::ScanInstalled(std::vector<Stamp>* found) {
                 if (!(r.editions & e)) continue;
                 uint64_t size = 0;
                 int64_t mtime = 0;
-                if (!StatFile(DestinationPath(e, r), size, mtime) || !SizeAccepted(r, size)) continue;
+                if (!StatFile(DestinationPath(e, r), size, mtime) || !(SizeAccepted(r, size) || PlayerEditable(r)))
+                    continue;
                 present[i] |= e;
                 if (found) found->push_back(Stamp{e, idx, size, mtime});
             }
         }
         std::lock_guard<std::mutex> lock(mutex_);
         present_ = std::move(present);
+        edited_.assign(n, 0);
         bySize_ = std::move(bySize);
         byPath_ = std::move(byPath);
         return true;
@@ -639,6 +665,7 @@ void Importer::CheckChanged(std::vector<Stamp>& found) {
         const ManifestRecord* records = ManifestRecords();
         // Several records can name one file (other accepted contents): each changed file is hashed once.
         std::map<std::string, std::pair<bool, Sha256Digest>> hashed;
+        std::set<std::string> editedPaths;
         std::vector<Stamp> kept;
         kept.reserve(found.size());
         for (const Stamp& st : found) {
@@ -666,11 +693,18 @@ void Importer::CheckChanged(std::vector<Stamp>& found) {
                 kept.push_back(st);
                 continue;
             }
+            if (h->second.first && PlayerEditable(r)) {
+                // the player's edit: kept and read by the game, but not recorded, so every start says so again
+                MarkEdited(st.edition, st.record);
+                editedPaths.insert(path);
+                check.edited.push_back(std::string(EditionName(st.edition)) + "/" + r.dest);
+                continue;
+            }
             MarkPresent(st.edition, st.record, false);
             ++check.removed[EditionIndex(st.edition)];
         }
         // a file goes only when no record of it still accepts it
-        std::set<std::string> used;
+        std::set<std::string> used = editedPaths;
         if (!hashed.empty()) {
             for (const Stamp& st : kept) {
                 std::string path = DestinationPath(st.edition, records[st.record]);
@@ -687,10 +721,11 @@ void Importer::CheckChanged(std::vector<Stamp>& found) {
 }
 
 std::string OpenCheck::Notice() const {
-    static const char* const kNames[4] = {"the US edition", "the European edition", "the Gold bonus rides",
-                                          "the language packs"};
+    static const char* const kNames[6] = {"the US edition", "the European edition", "the Gold bonus rides",
+                                          "the language packs", "the US edition (Windows)",
+                                          "the European edition (Windows)"};
     std::vector<std::string> parts;
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 6; ++i) {
         if (removed[i] == 0) continue;
         parts.push_back(std::to_string(removed[i]) + (removed[i] == 1 ? " file of " : " files of ") + kNames[i]);
     }
@@ -707,6 +742,16 @@ std::string OpenCheck::Notice() const {
     return text;
 }
 
+std::string OpenCheck::Kept() const {
+    if (edited.empty()) return "";
+    bool one = edited.size() == 1;
+    std::string text = "kept " + std::to_string(edited.size()) + (one ? " edited .sam file" : " edited .sam files");
+    text += ", which the game reads: ";
+    for (size_t i = 0; i < edited.size(); ++i) text += (i > 0 ? ", " : "") + edited[i];
+    text += " (Customized settings on the edition's tile restores an original).";
+    return text;
+}
+
 OpenCheck Importer::LastOpenCheck() const {
     std::lock_guard<std::mutex> lock(mutex_);
     return openCheck_;
@@ -719,14 +764,15 @@ bool Importer::RecordStamps(const std::vector<Stamp>* found) {
         const ManifestRecord* records = ManifestRecords();
         std::vector<Stamp> swept;
         if (!found) {
-            std::vector<uint8_t> present;
+            std::vector<uint8_t> present, edited;
             {
                 std::lock_guard<std::mutex> lock(mutex_);
                 present = present_;
+                edited = edited_;
             }
             for (size_t i = 0; i < present.size(); ++i) {
                 for (Edition e : kFileEditions) {
-                    if (!(present[i] & e)) continue;
+                    if (!(present[i] & e) || (i < edited.size() && (edited[i] & e))) continue;
                     uint64_t size = 0;
                     int64_t mtime = 0;
                     if (StatFile(DestinationPath(e, records[i]), size, mtime)) {
@@ -758,6 +804,112 @@ void Importer::MarkPresent(Edition edition, uint32_t record, bool present) {
     if (record >= present_.size()) return;
     if (present) present_[record] |= edition;
     else present_[record] &= static_cast<uint8_t>(~edition);
+    if (record < edited_.size()) edited_[record] &= static_cast<uint8_t>(~edition);
+}
+
+void Importer::MarkEdited(Edition edition, uint32_t record) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (record < edited_.size()) edited_[record] |= edition;
+}
+
+namespace {
+
+// A whole small file, or false.
+bool ReadSmallFile(const std::string& path, std::vector<uint8_t>& out) {
+    out.clear();
+    FILE* f = std::fopen(path.c_str(), "rb");
+    if (!f) return false;
+    uint8_t buf[16384];
+    size_t n;
+    bool ok = true;
+    while ((n = std::fread(buf, 1, sizeof buf, f)) > 0) {
+        out.insert(out.end(), buf, buf + n);
+        if (out.size() > kSmall) {
+            ok = false;
+            break;
+        }
+    }
+    ok = ok && !std::ferror(f);
+    std::fclose(f);
+    return ok;
+}
+
+}  // namespace
+
+std::string Importer::OriginalPath(Edition edition, const ManifestRecord& record) const {
+    return assetsDir_ + "/" + EditionName(edition) + "/originals/" + record.dest;
+}
+
+// The copy of a verified .sam (importer.h): made when there is none of an accepted size, from `verified` (bytes that
+// matched the manifest in a drop) or from the installed file, and only when those bytes hash to the manifest's.
+void Importer::KeepOriginal(Edition edition, uint32_t record, const std::vector<uint8_t>* verified) {
+    const ManifestRecord& r = ManifestRecords()[record];
+    if (!PlayerEditable(r)) return;
+    std::string copy = OriginalPath(edition, r);
+    uint64_t size = 0;
+    int64_t mtime = 0;
+    if (StatFile(copy, size, mtime) && SizeAccepted(r, size)) return;
+    std::vector<uint8_t> bytes;
+    if (verified) bytes = *verified;
+    else if (!ReadSmallFile(DestinationPath(edition, r), bytes)) return;
+    if (!Accepts(r, bytes.size(), Sha256::Of(bytes.data(), bytes.size()))) return;
+    std::error_code ec;
+    fs::create_directories(fs::path(copy).parent_path(), ec);
+    std::string err;
+    if (!ec) ReplaceFile(copy, std::string(bytes.begin(), bytes.end()), err);
+}
+
+std::vector<EditedFile> Importer::EditedFiles(Edition edition) const {
+    std::vector<EditedFile> files;
+    std::vector<uint8_t> edited;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        edited = edited_;
+    }
+    const ManifestRecord* records = ManifestRecords();
+    for (size_t i = 0; i < edited.size() && i < ManifestRecordCount(); ++i) {
+        if (!(edited[i] & edition) || !(records[i].editions & edition)) continue;
+        EditedFile f;
+        f.dest = records[i].dest;
+        f.path = DestinationPath(edition, records[i]);
+        std::vector<uint8_t> bytes;
+        f.original = ReadSmallFile(OriginalPath(edition, records[i]), bytes) &&
+                     Accepts(records[i], bytes.size(), Sha256::Of(bytes.data(), bytes.size()));
+        if (ReadSmallFile(f.path, bytes)) f.unreadableLine = SamUnreadableLine(f.dest, std::string(bytes.begin(), bytes.end()));
+        files.push_back(f);
+    }
+    return files;
+}
+
+bool Importer::RestoreOriginal(Edition edition, const std::string& dest, std::string& err) {
+    if (running_) {
+        err = "an import is running";
+        return false;
+    }
+    const ManifestRecord* r = FindByDest(edition, dest.c_str());
+    if (!r || !PlayerEditable(*r)) {
+        err = dest + " is not a settings file of this edition";
+        return false;
+    }
+    std::vector<uint8_t> bytes;
+    if (!ReadSmallFile(OriginalPath(edition, *r), bytes) ||
+        !Accepts(*r, bytes.size(), Sha256::Of(bytes.data(), bytes.size()))) {
+        err = "no verified copy of " + dest + " is kept; drop the disc again for the original";
+        return false;
+    }
+    std::string tmp = NewStagingPath();
+    std::string target = DestinationPath(edition, *r);
+    if (!ReplaceFile(tmp, std::string(bytes.begin(), bytes.end()), err)) return false;
+    std::error_code ec;
+    fs::rename(tmp, target, ec);
+    if (ec) {
+        std::remove(tmp.c_str());
+        err = "cannot write " + target + ": " + ec.message();
+        return false;
+    }
+    MarkPresent(edition, RecordIndex(r), true);  // no longer the player's edit
+    RecordStamps(nullptr);
+    return true;
 }
 
 bool Importer::IsPresent(Edition edition, uint32_t record) const {
@@ -780,15 +932,26 @@ EditionStatus Importer::StatusLocked(Edition edition) const {
         bool have = i < present_.size() && (present_[i] & edition) != 0;
         bool required = (r.flags & kFlagRequired) != 0;
         bool file = !SideFile(r);
+        // A film the folder may hold as the Mac CD's .mov or the PC CD's .tgq (FilmCounterpart): one required file, the
+        // .mov's, there when either is.
+        bool satisfied = have;
+        if (const ManifestRecord* other = required ? FilmCounterpart(r, edition) : nullptr) {
+            if (other->flags & kFlagRequired) {
+                size_t j = RecordIndex(other);
+                if (Extension(r.dest) == "tgq") required = false;
+                else satisfied = have || (j < present_.size() && (present_[j] & edition) != 0);
+            }
+        }
         ++s.records;
         s.required += required;
+        s.requiredPresent += required && satisfied;
         s.files += file;
         if (have) {
             ++s.present;
-            s.requiredPresent += required;
+            if (i < edited_.size() && (edited_[i] & edition)) ++s.edited;
             s.filesPresent += file;
             s.bytesPresent += RecordHash(r, 0).size;
-        } else if (required && r.source < 3) {
+        } else if (required && !satisfied && r.source < 3) {
             ++s.missing[r.source];
             if (file) ++s.missingFiles[r.source];
         }
@@ -809,7 +972,9 @@ std::vector<LanguageStatus> Importer::LanguagesLocked() const {
     // the date fonts of an installed edition, for the packs that use the base edition's
     bool dateFonts = false;
     const std::pair<Edition, const char*> bases[] = {{kEditionEur, "data/Language/English/"},
-                                                     {kEditionUs, "data/Language/American/"}};
+                                                     {kEditionUs, "data/Language/American/"},
+                                                     {kEditionEurPc, "data/Language/English/"},
+                                                     {kEditionUsPc, "data/Language/American/"}};
     for (const auto& base : bases) {
         bool all = true;
         for (const char* font : {"DATEBIG.bf4", "DATEMED.bf4", "DATESMALL.bf4", "DATETINY.bf4"}) {
@@ -1108,6 +1273,12 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
         if (cancel_ || run.stop) return;
         if (!skip.empty() && Under(e.path, skip)) continue;
         std::string name = display.empty() ? e.path : display + "/" + e.path;
+        if (e.unreadable) {   // no game file is in such a cab folder: an installer's own files, ignored
+            ++run.report.entries;
+            ++run.report.unknownFiles;
+            run.report.unknownBytes += e.size;
+            continue;
+        }
         bool known = bySize_.count(e.size) != 0;
         // The game's icon (icon.h): the Mac program's resource fork, TP.ico or the PC program, read whole and decoded; the
         // best picture of the drop is written as icon.png at the end. Never an error: a file that will not read is skipped.
@@ -1161,6 +1332,25 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
             // A plain file with a container's name stays silent (it is counted among the other files below); every
             // container that failed to open is an error with its path and the reader's message.
             if (childStatus == SniffStatus::Failed) {
+                run.report.errors.push_back(name + ": " + err);
+                ImportProgress ev;
+                ev.kind = ImportProgress::Kind::Error;
+                ev.path = name;
+                ev.message = err;
+                progress_.Push(ev);
+            }
+        }
+        // The PC disc's data/fonts.wad holds the 17 sign fonts RefPack-compressed (wad.cpp): its entries are matched as
+        // files of their own (the Windows-disc editions' plain data/fonts/*.TTF), and the wad itself as a file too.
+        if (e.kind == EntryKind::Data && e.size >= 0x58 && Lower(BaseName(e.path)) == "fonts.wad" && depth < kMaxNesting) {
+            std::string err;
+            std::shared_ptr<Blob> blob = folderRoot.empty() ? OpenEntryBlob(source, e, err)
+                                                            : OpenFileBlob(folderRoot + "/" + e.path, err);
+            std::shared_ptr<Source> wad = blob ? std::shared_ptr<Source>(OpenWad(blob, err)) : nullptr;
+            if (wad) {
+                ++run.report.containers;
+                Enumerate(run, wad, name, std::string(), depth + 1);
+            } else {
                 run.report.errors.push_back(name + ": " + err);
                 ImportProgress ev;
                 ev.kind = ImportProgress::Kind::Error;
@@ -1337,8 +1527,12 @@ void Importer::Process(Run& run, Work& work) {
         uint32_t idx = RecordIndex(r);
         for (Edition ed : kFileEditions) {
             if (!(r->editions & config_.editions & ed)) continue;
-            if (IsPresent(ed, idx)) Count(run, ed, idx, false);
-            else targets.emplace_back(ed, idx);
+            if (IsPresent(ed, idx)) {
+                Count(run, ed, idx, false);
+                if (e.size <= kSmall) KeepOriginal(ed, idx, &small);  // a .sam edited before its copy was kept
+            } else {
+                targets.emplace_back(ed, idx);
+            }
         }
     }
     bool ok = true;
@@ -1410,9 +1604,15 @@ bool Importer::Install(Run& run, std::string staged, const std::vector<std::pair
         fs::create_directories(dest.parent_path(), ec);
         std::string from = staged;
         if (!ec && i + 1 < targets.size()) {
-            // more destinations follow: this one gets a copy, the last one the staged file itself
+            // more destinations follow: this one gets a hard link to the staged file (a copy where the file system has
+            // none), the last one the staged file itself. The European disc's files belong to the European edition and
+            // to the Windows one, so linking keeps them on disk once.
             from = NewStagingPath();
-            fs::copy_file(staged, from, ec);
+            fs::create_hard_link(staged, from, ec);
+            if (ec) {
+                ec.clear();
+                fs::copy_file(staged, from, ec);
+            }
         }
         if (!ec) fs::rename(from, dest, ec);
         if (ec) {
@@ -1428,6 +1628,7 @@ bool Importer::Install(Run& run, std::string staged, const std::vector<std::pair
             return false;
         }
         MarkPresent(ed, idx, true);
+        KeepOriginal(ed, idx, nullptr);
         Count(run, ed, idx, true);
     }
     return true;
@@ -1447,17 +1648,22 @@ long Importer::VerifyEdition(Edition edition, std::string& err) {
             std::string path = DestinationPath(edition, records[i]);
             std::error_code ec;
             uint64_t size = fs::file_size(path, ec);
-            bool good = false;
+            bool read = false, good = false;
             if (!ec) {
                 FILE* f = std::fopen(path.c_str(), "rb");
                 if (f) {
                     PlainFileStream s(f, size);
                     Sha256Digest d;
                     std::string readErr;
-                    good = HashStream(s, d, readErr) && Accepts(records[i], size, d);
+                    read = HashStream(s, d, readErr);
+                    good = read && Accepts(records[i], size, d);
                 }
             }
-            if (!good) {
+            if (good) {
+                KeepOriginal(edition, idx, nullptr);
+            } else if (read && PlayerEditable(records[i])) {
+                MarkEdited(edition, idx);  // the player's edit, kept as the startup check keeps it
+            } else {
                 std::remove(path.c_str());
                 MarkPresent(edition, idx, false);
                 ++removed;
@@ -1488,6 +1694,7 @@ bool Importer::RemoveEdition(Edition edition, std::string& err) {
     {
         std::lock_guard<std::mutex> lock(mutex_);
         for (uint8_t& p : present_) p &= static_cast<uint8_t>(~edition);
+        for (uint8_t& p : edited_) p &= static_cast<uint8_t>(~edition);
     }
     RecordStamps(nullptr);
     std::lock_guard<std::mutex> lock(mutex_);

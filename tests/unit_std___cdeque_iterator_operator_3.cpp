@@ -51,6 +51,10 @@ uint32_t MaxSize(const std::__cdeque<const void*, std::allocator<const void*>>*)
     ev("MaxSize", {});
     return static_cast<uint32_t>(ret("MaxSize"));
 }
+void* TableNew(uint32_t size) {
+    ev("New", {size});
+    return NewBlock(size);
+}
 }  // namespace cdeque_callee
 
 namespace errdeque_callee {

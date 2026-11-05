@@ -90,6 +90,11 @@ int32_t ParseFileSize(FTPClient* self, char* text) {
     return static_cast<int32_t>(ret("ParseFileSize"));
 }
 
+// No online server is set: the client does its own work, as on the Mac.
+bool PortFTPConnect(FTPClient*, const char*, const char*) { return false; }
+bool PortFTPDownload(FTPClient*, const char*, const char*) { return false; }
+bool PortFTPDisconnect(FTPClient*) { return false; }
+void PortFTPEnd(FTPClient*) {}
 }  // namespace ftp_callee
 
 int32_t FTPClient::RecvData(bool save, int32_t count) {

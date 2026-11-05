@@ -172,6 +172,14 @@ int32_t tpw_bh_bumhole(uint64_t window, int32_t message, int32_t a, int32_t b) {
     return bumhole(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(window)), message, a, b);
 }
 void tpw_bh_toggle() { ToggleGameWindow(); }
+
+// The unit space (the port's widescreen and interface size); 0 when the library is built without the port fixes.
+int32_t tpw_bh_units(int32_t width, int32_t height) {
+    (void)width;
+    (void)height;
+    return 0;
+}
+
 void tpw_bh_onoff(int32_t window, int32_t text, int32_t first, int32_t second, int32_t button, int32_t buttonId) {
     SetOnOffText(window, text, first != 0, second != 0, button != 0, buttonId);
 }

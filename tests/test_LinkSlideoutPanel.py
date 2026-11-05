@@ -10,6 +10,9 @@ setExtraParam, UI_SendMessage, UI_PostMessage, SetState) are fakes on both sides
 The world of a case: gMainPanel (NULL or block 1), gGameWindow (NULL or non-NULL), the byte at +0x134 of block 2 (the slot), the queues.
 What is compared: the answer (as a label), both globals, the byte, the whole event log.
 
+LinkSlideoutPanelPair links two panels one after the other and then follows both posted words to their windows, the two messages still
+waiting. A word is the whole pointer on the Mac. The host blocks all have the same bits 4..7 of their word (tests/unit_LinkSlideoutPanel.cpp).
+
 No fused operations. Not tested: nothing skipped (the fakes never read their `this`, so the Mac's missing NULL checks are exercised too).
 """
 import ctypes as C
@@ -150,6 +153,9 @@ class Ppc(Side):
         T.call_ppc(self.e, FN_REMOVE, [which & MASK])
         return 0
 
+    def word_window(self, word):
+        return word
+
 
 class Host(Side):
     def __init__(self, lib, case):
@@ -190,6 +196,10 @@ class Host(Side):
         self.lib.tpw_lsp_remove(s32(which))
         return 0
 
+    def word_window(self, word):
+        assert (word >> 4) & 15 == 0
+        return self.lib.tpw_lsp_word_window(s32(word))
+
 
 def bind(lib):
     if getattr(lib, "bound", False):
@@ -199,6 +209,7 @@ def bind(lib):
     lib.tpw_lsp_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_lsp_link.restype, lib.tpw_lsp_link.argtypes = C.c_uint64, [C.c_uint64, C.c_int32]
     lib.tpw_lsp_remove.restype, lib.tpw_lsp_remove.argtypes = None, [C.c_int32]
+    lib.tpw_lsp_word_window.restype, lib.tpw_lsp_word_window.argtypes = C.c_uint64, [C.c_int32]
     out = (C.c_int64 * 32)()
     n = lib.tpw_lsp_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -213,6 +224,10 @@ def build(s, case):
 
 
 def execute(s, case):
+    if case["op"] == "pair":
+        a, b, n = case["args"]
+        answers = [s.label(s.link(s.blk(a), n)), s.label(s.link(s.blk(b), n))]
+        return answers + [s.label(s.word_window(s.blk(k) & MASK)) for k in (a, b)]
     if case["op"] == "link":
         panel, n = case["args"]
         return s.label(s.link(s.blk(panel) if panel else 0, n))
@@ -274,6 +289,26 @@ def link_random(r):
     return link_case(r)
 
 
+def pair_case(r, a, b):
+    c = base(r, "pair")
+    c["main"], c["game"] = 1, 1
+    c["queues"]["GetWindow:33"] = [2, 2]
+    c["queues"]["getExtraParam"] = [0, 0]
+    c["args"] = [a, b, r.choice([0, 1, -1, 0x7FFFFFFF])]
+    return c
+
+
+def pair_edges():
+    r = random.Random(5264)
+    for a in (3, 4, 5):
+        for b in (3, 4, 5):
+            yield pair_case(r, a, b)
+
+
+def pair_random(r):
+    return pair_case(r, r.choice([3, 4, 5]), r.choice([3, 4, 5]))
+
+
 def rem_case(r, game=None, main=None, w=None, kind=None, extra=None, which=None, g25=None, g27=None):
     c = base(r, "remove")
     if game is not None:
@@ -315,5 +350,6 @@ def rem_random(r):
 
 TESTS = [
     FnTest("LinkSlideoutPanel", ppc, host, edge=link_edges, rnd=link_random),
+    FnTest("LinkSlideoutPanelPair", ppc, host, edge=pair_edges, rnd=pair_random),
     FnTest("RemoveSlideoutPanel", ppc, host, edge=rem_edges, rnd=rem_random),
 ]

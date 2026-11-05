@@ -1,5 +1,5 @@
 """Unit v5L42, the window scripts of src/game/ui/ui_allStaffPanel.cpp, src/game/ui/ui_cityLobbyController.cpp, src/game/ui/ui_onlineCityInfoOverlay.cpp, src/game/ui/ui_onlineOutbox.cpp, src/game/ui/ui_onlineParkInfoPanel.cpp, src/game/ui/ui_parkStatus.cpp, against libtpw_unit_WindowScripts.dylib (tests/unit_WindowScripts.cpp), main app
-("SimTheme Park"): the arrays the launcher had as all-zero stand-ins until devtools/gen_game_tables.py generated them (WINDOW_SCRIPTS). Also
+("SimTheme Park"): the arrays the launcher had as all-zero stand-ins until devtools/gen_game_tables.py wrote them (WINDOW_SCRIPTS, include/WindowScripts.inc). Also
 the scripts that were two-word placeholders until then, which their panels' files define: each is read from that unit's library (ELSEWHERE).
 And the online world's ten scripts (the city lobby, the online login, news, panel, underlays, park finder, park list, publish panel and
 world lobby), two-word placeholders until the island lobby's globe was given back its online world.

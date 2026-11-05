@@ -292,7 +292,7 @@ int32_t CRain::RenderLightning2(D3DVECTOR* from, D3DVECTOR* to) {
 //   0x10038b14 GetCycleCount             (40)
 //
 // CRain::Render (src/tb_rain_frame.cpp) calls the first three every frame. __RenderLightning
-// draws the white flash of a lightning strike (a sprite over the whole screen), ages the bolts
+// draws the flash of a lightning strike (a sprite over the whole screen), ages the bolts
 // and draws each live one through RenderLightning2. __RenderRain draws a streak for each drop
 // and __RenderSnow a small triangle with a quarter of the snow texture for each flake; both
 // move the drops into the camera's space first (the wrapped positions Render works out) and
@@ -402,7 +402,8 @@ D3DVECTOR SnowCubic(const CRain& rain, float t) {
 uint32_t GetCycleCount();
 
 // The flash of a strike: the flash flag is cleared and a white sprite covering the screen (corners
-// at +-1, depth 0.001, blending mode 0x9a1, no texture, colour -1) is drawn. Answers DrawSprite's.
+// at +-1, depth 0.001, blending mode 0x9a1, no texture, colour -1) is drawn. That blending multiplies it by one minus
+// what is on the screen, so the screen turns to its colour negative. Answers DrawSprite's.
 int32_t CRain::__LightningFlash() {
     mLightningFlash = 0;
     float corners[4][4] = {

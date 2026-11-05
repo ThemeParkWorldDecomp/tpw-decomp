@@ -17,6 +17,12 @@ object, whether each file slot holds a vtable and an access object, and the even
 
 No fused operations. Not tested: the destructor with a positive delete flag (the original calls operator delete on the object, the host
 destructor has no such parameter) and a NULL this (the host has none).
+
+With the port fixes (tpw_ar_portfix answers 1; port_fix tag parkload) a load compares the recording size with the bytes the file has
+left (the size less the position, the queues PortSize and PortPos, which the original never reads) and with the count the read gave
+(the queue Got): a size larger than what is left answers 1 right after the size is read, and a short read answers 1 right after
+LbFile_Read. The original's side is cut there (its answer 1, its log up to that event; nothing before it touches the object), and in
+the first case it runs with a recording size of 0 (only the port's cases ask for more than the file holds, up to 0xffffffff).
 """
 import ctypes as C
 import random
@@ -179,8 +185,13 @@ STUBS.internal(0x10143CF0, stub_activate)
 STUBS.internal(0x10143CAC, stub_save)
 
 
+PORT_FIX = False
+
+
 def setup(runner):
-    global VT_BASE
+    global VT_BASE, PORT_FIX
+    runner.lib.tpw_ar_portfix.restype, runner.lib.tpw_ar_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_ar_portfix() == 1
     e = runner.emu
     T.install_std_stubs(e)
     VT_BASE = T.persist_alloc(e, 0x400)
@@ -362,8 +373,35 @@ def run(s, case):
         s.done()
 
 
+def port_stop(case):
+    """With the port fixes: the event after which the port's load gives up (answering 1), else None."""
+    if case["op"] != "ser":
+        return None
+    saving, version, _ = case["args"]
+    q = case["queues"]
+    if saving != 0 or not 0 <= s32(version) < 2 or q["LOADVAR_i"][0] != 0 or q["LOADVAR_u"][0] != 0:
+        return None
+    size = q["LOADVAR_u_v"][0] & MASK
+    left = s32(q["PortSize"][0] - q["PortPos"][0])
+    if left < 0 or size > left:
+        return "LOADVAR<uint>"
+    if s32(q["LbFile_Read"][0]) < 0:
+        return None
+    if q["Got"][0] & MASK != size:
+        return "LbFile_Read"
+    return None
+
+
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    stop = port_stop(case) if PORT_FIX else None
+    if stop == "LOADVAR<uint>":
+        # nothing the original does after the size is read is kept, so it runs with an empty recording (not a 4 GB one)
+        case = dict(case, queues=dict(case["queues"], LOADVAR_u_v=[0]))
+    out = run(Ppc(e, case), case)
+    if stop is not None:
+        at = max(i for i, ev in enumerate(out["log"]) if ev[0] == stop)
+        out = dict(out, answer=1, log=out["log"][:at + 1])
+    return out
 
 
 def host(lib, case):
@@ -393,6 +431,13 @@ def queues(r, **over):
         "LbFile_Write": [r.choice([0, 0, 5, -1, -2])],
     }
     q.update(over)
+    # the port's view of the file (read only with the port fixes): mostly room for the recording and all of it read
+    size = q["LOADVAR_u_v"][0] & MASK
+    if "PortSize" not in q:
+        q["PortPos"] = [r.choice([0, 4, 0x200, r.randrange(0, 0x10000)])]
+        q["PortSize"] = [(q["PortPos"][0] + r.choice([size, size, size + 1, size + 100, max(size - 1, 0), 0, -1])) & MASK]
+    if "Got" not in q:
+        q["Got"] = [r.choice([size, size, size, size, max(size - 1, 0), 0, size + 1]) & MASK]
     return q
 
 
@@ -458,6 +503,14 @@ def ser_edges():
         for version in (-2, -1, 0, 1, 2, 3):
             for v in variants:
                 yield ser_case(r, [saving, version, r32(r)], **v)
+    # a load's recording size against the bytes the file has left, and a short read (what the port fixes change)
+    ok = dict(LOADVAR_i=[0], LOADVAR_u=[0], LbFile_Read=[1])
+    for size in (0, 1, 130, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFF) if PORT_FIX else (0, 1, 130):
+        for pos, end in ((0, 0), (0, 130), (10, 140), (10, 139), (100, 50), (0, 0x7FFFFFFF), (0x7FFFFFFF, 0x80000000)):
+            if size > 0x100000 and end - pos >= size:
+                continue   # the original would really allocate and copy it
+            for got in {size, max(size - 1, 0), 0}:
+                yield ser_case(r, [0, 1, 0], LOADVAR_u_v=[size], PortPos=[pos & MASK], PortSize=[end & MASK], Got=[got & MASK], **ok)
 
 
 # ---- RecordAction

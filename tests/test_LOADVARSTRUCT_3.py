@@ -116,9 +116,10 @@ class Side:
         return a
 
     def table(self, rows):
-        """rows: 0x17e tuples (id, w4, h8, w0c, w10, w14, w18, w1c); the halfword at +8 in the side's own order."""
-        f = self.fmt[0] + "IIHHIIIII"
-        self.write(self.g("table"), b"".join(struct.pack(f, r[0] & MASK, r[1], r[2] & 0xFFFF, 0, *r[3:]) for r in rows))
+        """rows: 0x17e tuples (id, w4, h8, w0c, w10, w14, w18, w1c); the halfword at +8 is the high half of the third word, as the
+        table holds the Mac's words as numbers on both sides."""
+        f = self.fmt[0] + "8I"
+        self.write(self.g("table"), b"".join(struct.pack(f, r[0] & MASK, r[1], (r[2] & 0xFFFF) << 16, *r[3:]) for r in rows))
 
     def message(self, case):
         m = case["msg"]

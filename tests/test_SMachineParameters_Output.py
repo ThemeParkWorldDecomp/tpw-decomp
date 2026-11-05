@@ -42,7 +42,7 @@ ADDR = dict(
     **{"sys.mClocksPerMs": SYS + 0x14, "sys.mTotalPhys": SYS + 0x18, "sys.mRenderer": SYS + 0x1C, "sys.mF20": SYS + 0x20,
        "sys.mRenderSystem": SYS + 0x24},
     ddraw=0x10052AD0, tcache=0x10173184, mathunit=0x100AFE94, prim=0x10052B3C, count=0x100AF124)
-HOST_LAYOUT = [0x10, 0x24, 0x28]
+HOST_LAYOUT = [0x10, 0x24, 0x28, 0x238]
 
 
 def fb(x):
@@ -173,6 +173,7 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
+    DESC = 0x21C   # CDirectDraw::mDeviceInfo.description
 
     def __init__(self, e, case):
         self.e = e
@@ -223,6 +224,7 @@ class Ppc(Side):
 
 class Host(Side):
     fmt = "<I"
+    DESC = HOST_LAYOUT[3]
 
     def __init__(self, lib, case):
         self.lib = lib
@@ -294,7 +296,7 @@ def build(s, case):
     s.ptr(s.g("mathunit"), s.mu)
     s.ptr(s.g("prim"), s.prim)
     s.words(s.g("count"), [case["count"]])
-    s.write(s.dd + 0x21C, case["desc"] + b"\0")
+    s.write(s.dd + s.DESC, case["desc"] + b"\0")
     s.words(s.obj, case["p"])
 
 

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cstring>
 #include <iterator>
+#include <string>
 
 namespace tpw::assets {
 
@@ -60,6 +61,17 @@ const ManifestRecord* FindByDest(Edition edition, const char* dest) {
     return nullptr;
 }
 
+const ManifestRecord* FilmCounterpart(const ManifestRecord& record, Edition edition) {
+    if (record.group != kGroupMovies || (record.flags & (kFlagRsrc | kFlagFinfo)) || !(record.editions & edition)) return nullptr;
+    std::string dest = record.dest;
+    if (dest.size() <= 4) return nullptr;
+    const std::string ext = dest.substr(dest.size() - 4);
+    if (ext != ".mov" && ext != ".tgq") return nullptr;
+    dest.replace(dest.size() - 4, 4, ext == ".mov" ? ".tgq" : ".mov");
+    const ManifestRecord* other = FindByDest(edition, dest.c_str());
+    return other && other->group == kGroupMovies && !(other->flags & (kFlagRsrc | kFlagFinfo)) ? other : nullptr;
+}
+
 size_t CountRecords(unsigned editions, bool required_only) {
     size_t n = 0;
     for (const ManifestRecord& r : kManifestRecords) {
@@ -80,8 +92,20 @@ const char* EditionName(Edition edition) {
         case kEditionEur: return "eur";
         case kEditionGold: return "gold";
         case kEditionLanguages: return "lang";
+        case kEditionUsPc: return "us-pc";
+        case kEditionEurPc: return "eur-pc";
     }
     return "?";
+}
+
+bool EditionFromName(const char* name, Edition& out) {
+    for (Edition e : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages, kEditionUsPc, kEditionEurPc}) {
+        if (std::strcmp(name, EditionName(e)) == 0) {
+            out = e;
+            return true;
+        }
+    }
+    return false;
 }
 
 const char* SourceName(DiscSource source) {

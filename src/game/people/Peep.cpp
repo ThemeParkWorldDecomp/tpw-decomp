@@ -272,6 +272,7 @@ inline uint16_t Step(uint16_t cell, const MapDelta& d) {
     return static_cast<uint16_t>(static_cast<uint32_t>(cell) + (static_cast<uint32_t>(d.mY) << 7) + static_cast<uint32_t>(d.mX));
 }
 
+
 }  // namespace
 
 // 0x10113870: a random walk target. A stranded peep whose surroundings are unchanged only shows its bubble. Otherwise it follows up to 1-5
@@ -748,9 +749,10 @@ int32_t CPeep::SetDest(MapPos x, MapPos y) {
     SetStranded(0);
     Half(this, 0x18) = static_cast<uint16_t>(PosHalf(x));
     Half(this, 0x1a) = static_cast<uint16_t>(PosHalf(y));
-    PilotOf(this)->new_target(PosHalf(x) << 8, PosHalf(y) << 8);
-    // The original answers what new_target leaves in r3; the header declares it void, so 1 is answered.
-    return 1;
+    // The original answers what new_target (0x101347ec; 0x100ffcfc in the 2.0.1 CD's program) leaves in r3: it returns straight after
+    // recalc_path, which answers 0 when the wall hugger finds no way to the target and 1 when it plans one. The header declares
+    // new_target void, so recalc_path is called as new_target calls it (the target in 16.16, mode 0) and its answer is answered.
+    return PilotOf(this)->recalc_path(Vector2d(PosHalf(x) << 8, PosHalf(y) << 8), static_cast<Vehicle::RecalcPathMode>(0));
 }
 
 // 0x101155bc

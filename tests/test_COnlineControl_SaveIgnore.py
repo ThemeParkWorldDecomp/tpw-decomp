@@ -30,7 +30,7 @@ FN_SAVE, FN_LOAD = 0x1021d74c, 0x1021db98
 OWN = {FN_SAVE, FN_LOAD}
 
 ADDR = dict(userinfo=0x10380b34, tpg=0x103b74c8, ofsvtbl=0x102b1f50, ifsvtbl=0x102b1e40, ifv=0x1029d084, dv=0x102661d0)
-HOST_LAYOUT = [0x28, 0x38, 0x3C, 0x48, 0x24, 0x10, 8]
+HOST_LAYOUT = [0x24, 0x34, 0x38, 0x44, 0x24, 0x10, 8]
 TVEC = 0x12345670
 
 
@@ -356,17 +356,12 @@ class Side:
     def rd_word(self, a):
         return self.rd_words(a, 1)[0]
 
-    def o(self, mac):
-        """The side's offset of a Mac offset in the ios block (host pointers are 8 bytes)."""
-        return mac if mac < 4 else mac + self.shift
-
     def enc(self, text):
         return text.encode("utf-16-be" if self.fmt[0] == ">" else "utf-16-le") + b"\0\0"
 
 
 class Ppc(Side):
     fmt = ">I"
-    shift = 0
     psz = 4
     rep_off = 0xC
 
@@ -410,7 +405,6 @@ class Ppc(Side):
 
 class Host(Side):
     fmt = "<I"
-    shift = 4
     psz = 8
     rep_off = 0x10
 
@@ -488,8 +482,8 @@ def build(s, case):
     op = case["op"]
     s.putp(s.g("userinfo"), case["ui"])
     B = s.alloc(0x60)
-    s.words(B + s.o(0x24), [case["rdbuf"]])
-    s.words(B + s.o(0x34), [case["state"], case["exc"]])
+    s.words(B + 0x24, [case["rdbuf"]])
+    s.words(B + 0x34, [case["state"], case["exc"]])
     this = s.alloc(0xE90)
     s.words(this, [case["chat"]])
     s.words(this + 8, [s.h(make_rep(s, case["name"]))])
@@ -518,13 +512,13 @@ def execute(s, case, w):
 
 def observe(s, case, w, answer):
     key = "ofsvtbl" if case["op"] == "save" else "ifsvtbl"
-    v0 = s.getp(w["B"])
+    v0 = s.rd_word(w["B"])
     ui = s.getp(s.g("userinfo"))
     if case["ui"] == 0:
         ui = 1 if ui else 0
     return {"answer": answer, "log": s.log(), "ui": ui,
             "vt": 0 if v0 == 0 else (v0 - s.g(key)) & MASK,
-            "B": s.rd_words(w["B"] + s.o(4), 16),
+            "B": s.rd_words(w["B"] + 4, 16),
             "idx": s.rd_word(s.g("lines") + 4)}
 
 

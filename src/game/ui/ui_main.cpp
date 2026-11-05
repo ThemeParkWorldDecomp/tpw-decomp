@@ -2109,7 +2109,7 @@ int32_t BankruptWindowMsg(InterfaceWindow* window, int32_t message, int32_t a, i
 
 extern "C" void __register_global_object(void* object, void* destructor, void* node);   // runtime glue 0x10239940
 
-// ---- the image's data (the two window scripts are generated at configure time, unit v5L42) and the file's globals
+// ---- the image's data (the two window scripts are in include/WindowScripts.inc, unit v5L42) and the file's globals
 int16_t gCongratsScript[] = {TPW_WINDOW_SCRIPT_102A772C};   // 0x102a772c (21 words)
 int16_t gBankruptScript[] = {TPW_WINDOW_SCRIPT_102A7756};   // 0x102a7756 (21 words)
 // The window animations (the image's frames): the congratulations window slides in, rises, spins once, drops and slides out, then again

@@ -10,7 +10,10 @@ map's other methods, the map zoom, the advisor and the help text) are fakes on b
 
 The world of a case: the map object's header words, its sprite words, the camera target, the heightfield size, the game and display
 words, the windows (the depth of window 0x990) and the answers of the fakes. What is compared: the event log, the map's words and halves the
-function reads or writes, the game's word at +0x3c and the display's fog colour.
+function reads or writes, the hovered sprite, the game's word at +0x3c and the display's fog colour.
+
+The hovered sprite is the Mac's word at 0x20060 and a native pointer at 0x200a0 on the host (HoverOf in ui_2dmap.cpp). A map closed with a
+sprite under the pointer leaves it there with the sprite deleted, so the opening has to clear the host's place as the Mac clears its word.
 
 No fused operations (fmuls only; fctiwz is given values far below 2^31). Not tested: a NULL window from GetWindow (the original reads it).
 
@@ -204,6 +207,10 @@ class Ppc(Side):
     def ptr(self, a, v):
         self.write(a, struct.pack(">I", v & MASK))
 
+    def rd_ptr(self, a):
+        return self.rd_word(a)
+
+    hover = 0x20060
     zoff = 0xdc
     f3coff = 0x3c
 
@@ -242,6 +249,10 @@ class Host(Side):
         """A native pointer: eight bytes on the host."""
         self.write(a, struct.pack("<Q", v))
 
+    def rd_ptr(self, a):
+        return struct.unpack("<Q", self.read(a, 8))[0]
+
+    hover = 0x200a0
     zoff = 360
     f3coff = 96
 
@@ -339,6 +350,7 @@ def build(s, case):
     for off, w in zip(MAPW, case["mapw"]):
         s.words(m + off, [w])
     s.words(m + 0x20060, [case["p0"]])
+    s.ptr(m + s.hover, case["p0"])
     s.half(m + 0x20064, case["h0"])
     s.half(m + 0x20066, case["h1"])
     s.words(m + 0x20068, case["p1"])
@@ -364,6 +376,7 @@ def observe(s, case, answer):
         "log": s.log(),
         "words": words,
         "w60": s.rd_word(m + 0x20060),
+        "hover": s.rd_ptr(m + s.hover),
         "h64": s.rd_half(m + 0x20064),
         "h66": s.rd_half(m + 0x20066),
         "p1": s.rd_words(m + 0x20068, 7),

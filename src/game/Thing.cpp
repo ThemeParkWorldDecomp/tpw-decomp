@@ -468,7 +468,8 @@ const char kTextB[] = "TAG SYSTEM says: Postcard to outbox\n";                  
 const char kTextC[] = "TAG SYSTEM says: Postcard failed\n";                                      // 0x10246496
 const char kBadMessage[] = "CTagSystem::ReceiveMessage has encountered an unknown (to it) message type (%d).\n";                                  // 0x102464b8
 
-int16_t ElementShort(const TagTableElement* e) { return *reinterpret_cast<const int16_t*>(&e->mF00[2]); }
+// The halfword at the element's +8 (lha): the high half of its third word, which the table holds as a number (the Mac is big-endian).
+int16_t ElementShort(const TagTableElement* e) { return static_cast<int16_t>(e->mF00[2] >> 16); }
 
 }  // namespace
 

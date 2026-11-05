@@ -24,7 +24,11 @@ void* gBlk[6];
 
 void* Blk(int i) {
     if (gBlk[1] == nullptr)
-        for (int k = 1; k < 6; ++k) gBlk[k] = tpw::ArenaAllocZeroed(0x800);
+        for (int k = 1; k < 6; ++k) {
+            // On a 0x100 boundary, so every block's word has the same bits 4..7 (the pair cases of the test need that).
+            const uintptr_t raw = reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(0x900));
+            gBlk[k] = reinterpret_cast<void*>((raw + 0xff) & ~static_cast<uintptr_t>(0xff));
+        }
     return gBlk[i];
 }
 }  // namespace
@@ -85,6 +89,9 @@ int32_t tpw_lsp_layout(int64_t* out) {
 uint64_t tpw_lsp_link(uint64_t panel, int32_t n) {
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(LinkSlideoutPanelResult(reinterpret_cast<InterfaceWindow*>(panel), n)));
 }
+
+// The window a posted word names, as RailsCallback's WindowFromWord gets it back.
+uint64_t tpw_lsp_word_window(int32_t word) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(SlideoutWordWindow(word))); }
 
 void tpw_lsp_remove(int32_t which) { RemoveSlideoutPanel(static_cast<int16_t>(which)); }
 

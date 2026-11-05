@@ -505,5 +505,30 @@ def host_orient(lib, case):
     return [canon(w) for w in list(out)], CL.host_end(lib)
 
 
-TESTS = [FnTest("HandleCamera", ppc, host, edge=edges, rnd=rnd), FnTest("SetLMatrixOrientationHi", ppc_orient, host_orient,
-                                                                         edge=orient_edges, rnd=orient_rnd)]
+def port_fix(lib):
+    if not hasattr(lib, "port_fix"):
+        lib.tpw_cam_portfix.restype, lib.tpw_cam_portfix.argtypes = C.c_int32, []
+        lib.port_fix = lib.tpw_cam_portfix() == 1
+    return lib.port_fix
+
+
+class HandleCameraTest(FnTest):
+    """FnTest, with the port's frame time when the unit is built with the port fixes (unit framerate, the HandleCamera comment in
+    src/game/TPCamera.cpp: the frame's time is the clock's microseconds in milliseconds, 0 on the first frame, and the halvings go by
+    that time in 31 ms steps). The two agree at one step: the fixed clock's 30 ms plus the Mac's 1 is 31 ms on the PowerPC side, and
+    unit_Camera.cpp's clock gives the port 31 ms, so the comparison stays exact with no case changed but its clock and first-frame
+    flag. Other frame times have no PowerPC side to compare with. The clock is below 2^24 so that its floats are whole, and a first
+    call, not of the external camera, sets the port's last frame."""
+
+    def run_case(self, runner, case):
+        if port_fix(runner.lib):
+            now = (case["now"] & 0xFFFFF) + 31
+            case = dict(case, now=now, stamp=now - 30, f5aac=0)
+            if not hasattr(runner.lib, "camera_primed"):
+                runner.lib.camera_primed = True
+                self.host(runner.lib, dict(case, flags=case["flags"] & ~0x80))
+        return FnTest.run_case(self, runner, case)
+
+
+TESTS = [HandleCameraTest("HandleCamera", ppc, host, edge=edges, rnd=rnd), FnTest("SetLMatrixOrientationHi", ppc_orient, host_orient,
+                                                                                  edge=orient_edges, rnd=orient_rnd)]

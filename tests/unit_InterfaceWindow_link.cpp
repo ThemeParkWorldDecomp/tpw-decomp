@@ -147,7 +147,7 @@ extern "C" int fprintf(FILE* file, const char* format, ...) {
     va_start(args, format);
     const char* path = va_arg(args, const char*);
     va_end(args);
-    ev("fprintf_file", {reinterpret_cast<uint8_t*>(file) == gIfsWFiles + 0xa8 ? 1 : 0});
+    ev("fprintf_file", {file == stderr ? 1 : 0});   // the Mac's __files + 0xa8 is stderr; the block of that name here is not a host FILE
     ev("fprintf", {}, {format, path});
     return 0;
 }

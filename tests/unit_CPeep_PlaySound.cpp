@@ -15,6 +15,7 @@
 #include "ThingReceivers.h"
 #include "TPSound.h"
 #include "World.h"
+#include "vector2d.h"
 #include "WorldSavvy.h"
 
 using namespace calllog;
@@ -65,7 +66,11 @@ void Pilot::get_pos(int32_t& x, int32_t& y) {
     x = static_cast<int32_t>(ret("gpx"));
     y = static_cast<int32_t>(ret("gpy"));
 }
-void Pilot::new_target(int32_t x, int32_t y) { ev("new_target", {Off(this), x, y}); }
+// Pilot::new_target (0x101347ec) is recalc_path((x, y), mode 0): SetDest calls recalc_path as it does and answers its answer (logged as new_target).
+int32_t Vehicle::recalc_path(const Vector2d& target, RecalcPathMode mode) {
+    ev("new_target", {Off(this), target.x, target.y, mode});
+    return static_cast<int32_t>(ret("new_target"));
+}
 void Pilot::set_speed(float speed) {
     uint32_t bits = fbits(speed);
     if ((bits & 0x7f800000u) == 0x7f800000u && (bits & 0x7fffffu) != 0) bits = 0x7fc00000u;

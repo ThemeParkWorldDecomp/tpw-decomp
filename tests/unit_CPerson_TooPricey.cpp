@@ -2,7 +2,7 @@
 //   src/game/people/Person.cpp
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues. The ride record blocks
-// (GetDBInfo: the first call answers block A, every later call block B) and the control block are set by the test; gMainBalance is raw bytes here
+// (GetDBInfo: the first call answers block A, every later call block B) and the control block are set by the test; gMainBalance is raw bytes with the real class's layout here
 // (the real one is built by a constructor this library does not link); gGameWorld is defined here.
 #include <cstddef>
 #include <cstdint>
@@ -65,6 +65,10 @@ void CParkAnalyser::OfferOpinionOn(int32_t opinion, uint8_t value) {
 }
 
 extern "C" {
+
+uint64_t tpw_t_slot(int32_t slot) {
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&reinterpret_cast<CMainBalance*>(gMainBalanceRaw)->mValues[slot]));
+}
 
 uint64_t tpw_t_addr(const char* name) {
     struct Entry {

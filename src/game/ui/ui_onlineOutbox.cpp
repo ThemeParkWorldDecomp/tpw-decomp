@@ -66,22 +66,22 @@ void UpdateOutboxMailIcon() {
 // The online outbox panel's helpers (the inventory files them under ui_onlineOutbox.cpp; unit v5017): the address list's scroll bar,
 // the current e-mail's address text, the outbox list and the picture preview.
 //
-// The outbox cursor functions (Outbox::First and Next) are untranslated, and the Mac's outbox is read by its Mac offsets (the words are
-// 32-bit pointers there): a word of the outbox or of an entry is read with Word() below, from the object's address plus the Mac offset.
+// The Mac reads the current mail's words from the outbox + 4 (a cursor kept in 0x10395e38); the host reads the same fields by name:
+// the address text is mF08 (+8), the addresses are the list mF0C (+0xc), the picture's path is mF18 (+0x18), the numbers are mF1C (+0x1c).
 
 InterfaceWindow* gOutboxWindow;      // 0x10395e3c
-uint8_t* gOutboxCursor;              // 0x10395e38
+Outbox* gOutboxCursor;               // 0x10395e38, the outbox itself (the Mac's holds the outbox + 4)
 alignas(8) uint32_t gOutboxPreview[12];   // 0x10395e10, the sinit's TbRenderArea (0x28 bytes on the Mac, 0x30 on the host)
 const char16_t gEmailSeparators[10] = u"\0\n\0upload";   // 0x1024eeca, the image's words: the sinit's text at +6 is u"upload"
 
 namespace {
 
-// The word of a Mac object at Mac offset `offset`. On the host a Mac word (a pointer or a number) is a slot of 8 bytes, so the slot
-// sits at twice the Mac offset; the value is the slot's full width (pointers are 64 bits here).
-uintptr_t Word(const void* object, uint32_t offset) {
-    return *reinterpret_cast<const uintptr_t*>(reinterpret_cast<const uint8_t*>(object) + 2 * offset);
+// One of the current mail's three numbers: `index` words into mF1C, where Outbox::ReadMailData stores them.
+int32_t MailNumber(const Outbox* outbox, int32_t index) {
+    int32_t value;
+    std::memcpy(&value, outbox->mF1C + 4 * index, 4);
+    return value;
 }
-const void* Ptr(const void* object, uint32_t offset) { return reinterpret_cast<const void*>(Word(object, offset)); }
 
 uint8_t* OutboxOf(CFSUserInfo* info) { return reinterpret_cast<uint8_t*>(&info->mOutbox); }
 
@@ -97,17 +97,15 @@ CFSUserInfo* UserInfo() {
 // mail formatted by string 0x1c0 of the interface table (variable tags 0x10, 0x11, 0x12); the row's data word is its number | 0x1000000.
 void FillOutboxList() {
     Outbox* outbox = &UserInfo()->mOutbox;
-    uint8_t* cursor = reinterpret_cast<uint8_t*>(outbox) + 2 * 4;   // the Mac's outbox + 4
     InterfaceListControl2* list = static_cast<InterfaceListControl2*>(gOutboxWindow->GetWindow(0xee8));
     outbox->First();
     uint32_t index = 0;
     do {
-        const char* text = static_cast<const char*>(Ptr(Ptr(cursor, 4), 0xc));
-        NS_MacDoze::MultiByteToWideChar(0, 0, text, -1, gUIMainConvertBuffer, 0x3fff);
+        NS_MacDoze::MultiByteToWideChar(0, 0, outbox->mF08.c_str(), -1, gUIMainConvertBuffer, 0x3fff);
         char16_t formatted[32];
-        TbIntegerVTag first(0x10, static_cast<int32_t>(Word(cursor, 0x18)));
-        TbIntegerVTag second(0x11, static_cast<int32_t>(Word(cursor, 0x1c)));
-        TbIntegerVTag third(0x12, static_cast<int32_t>(Word(cursor, 0x20)));
+        TbIntegerVTag first(0x10, MailNumber(outbox, 0));
+        TbIntegerVTag second(0x11, MailNumber(outbox, 1));
+        TbIntegerVTag third(0x12, MailNumber(outbox, 2));
         static_cast<TbITable*>(gText.mResourcePointers[6])->FormatString(formatted, 0x1f, 0x1c0, &first, &second, &third);
         UI_LCAdd item[4];
         item[0].mRaw = 0;
@@ -128,17 +126,14 @@ void FillOutboxList() {
 // is the low 24 bits and bits 26 up), the cursor is kept, and gPostcardText5da5 becomes the addresses of that mail, each followed by a newline.
 void SetCurrentEmailInfo(int32_t number) {
     Outbox* outbox = &UserInfo()->mOutbox;
-    gOutboxCursor = reinterpret_cast<uint8_t*>(outbox) + 2 * 4;   // the Mac's outbox + 4
+    gOutboxCursor = outbox;
     outbox->First();
     for (uint32_t count = static_cast<uint32_t>(number) & 0xfcffffffu; count != 0; --count) outbox->Next();
-    uintptr_t node = Word(gOutboxCursor, 0x10);
     wcscpy(gPostcardText5da5, gEmailSeparators);
-    while (node != reinterpret_cast<uintptr_t>(gOutboxCursor) + 2 * 0xc) {
-        const char* text = static_cast<const char*>(Ptr(Ptr(reinterpret_cast<const void*>(node), 8), 0xc));
-        NS_MacDoze::MultiByteToWideChar(0, 0, text, -1, gUIMainConvertBuffer, 0x3fff);
+    for (const std::string& address : outbox->mF0C) {
+        NS_MacDoze::MultiByteToWideChar(0, 0, address.c_str(), -1, gUIMainConvertBuffer, 0x3fff);
         wcscat(gPostcardText5da5, gUIMainConvertBuffer);
         wcscat(gPostcardText5da5, gEmailSeparators + 1);
-        node = Word(reinterpret_cast<const void*>(node), 4);
     }
 }
 
@@ -186,11 +181,13 @@ void UpdatePreview() {
     int32_t height;
     uint8_t* surface = window->GetClientObjectSurface(&width, &height);
     if (surface == nullptr) return;
-    PostcardBitmap bitmap(gOutboxPreview[7], gOutboxPreview[8], 4);
+    // The Mac's words 7 and 8 of the area; the host's mData is 8 bytes, so they are read by name.
+    const TbRenderArea& previewArea = *reinterpret_cast<const TbRenderArea*>(gOutboxPreview);
+    PostcardBitmap bitmap(previewArea.mWidth, previewArea.mPictureHeight, 4);
     typedef decltype(SamsUtilities::kPixels32ARGB) Format;   // the format numbers 7 and 9 of the listing
-    SamsUtilities::UPixels source(static_cast<Format>(7), gOutboxPreview[7], gOutboxPreview[8], nullptr);
-    SamsUtilities::UPixels dest(static_cast<Format>(9), bitmap.mPixels, gOutboxPreview[7], gOutboxPreview[8], -1, nullptr);
-    char* path = const_cast<char*>(static_cast<const char*>(Ptr(Ptr(gOutboxCursor, 0x14), 0xc)));
+    SamsUtilities::UPixels source(static_cast<Format>(7), previewArea.mWidth, previewArea.mPictureHeight, nullptr);
+    SamsUtilities::UPixels dest(static_cast<Format>(9), bitmap.mPixels, previewArea.mWidth, previewArea.mPictureHeight, -1, nullptr);
+    char* path = const_cast<char*>(gOutboxCursor->mF18.c_str());
     read_JPEG_file(path, reinterpret_cast<uint8_t*>(source.GetData()));
     dest.Convert(source, false);
     switch (gei_TextureSettings.mFormat) {
@@ -321,7 +318,7 @@ int32_t OutboxSendingMsg(InterfaceWindow* window, int32_t message, int32_t a, in
 
 extern OnlineConfig gOnlineConfig;   // 0x102b2b70 (include/TPMain.h)
 
-// 0x10268500: the TVector of OutboxCallback (0x101e4124, untranslated). Only its address is used: the outbox's word at 0x58 holds it.
+// 0x10268500: the TVector of OutboxCallback (0x101e4124). Only its address is used: the outbox's word at 0x58 holds it, cut to 32 bits.
 uint32_t gOutboxCallbackVector[2];
 
 // 0x101e4378: makes the user info when there is none, gives the outbox the callback vector and deletes the outbox's mail. When `send`,
@@ -584,7 +581,7 @@ int32_t read_JPEG_fileChecked(char* path, uint8_t* pixels) {
     uint8_t* rows = pixels;
     FILE* file = fopen(path, "rb");
     if (file == nullptr) {
-        fprintf(reinterpret_cast<FILE*>(gIfsWFiles + 0xa8), "can't open %s\n", path);
+        fprintf(stderr, "can't open %s\n", path);   // the Mac's __files + 0xa8; gIfsWFiles is not a host FILE, the real fprintf faults on it
         return 0;
     }
     struct {
@@ -629,7 +626,7 @@ void __sinit_ui_onlineOutbox_cpp() {
 
 // Window scripts that InterfaceWindow::Build reads and that no translated file defined (unit v5L42): the launcher had all-zero
 // stand-ins for them, so opening the panel failed the lpNew assertion in ProcessLevel. A file of their own because each building
-// function's unit test defines its array with its fakes; the words are the image's, generated at configure time
-// (devtools/gen_game_tables.py, WindowScripts.inc).
+// function's unit test defines its array with its fakes; the words are the image's, generated by
+// devtools/gen_game_tables.py (include/WindowScripts.inc).
 
 int16_t gOutboxPanelData[] = {TPW_WINDOW_SCRIPT_102B05C4};         // 0x102b05c4, CreateOnlineOutboxPanel 0x101e4f28

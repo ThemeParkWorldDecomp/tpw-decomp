@@ -937,7 +937,7 @@ void CLBScreenComponentOnlineIslands::Show() {
         OnlineSystem()->StopProcessing();
     }
     mFE4 = 0;
-    OnlineSystem()->mParksTop10->GetList(gOnlineParkSelection->mID, PostGetTop10ParksListCallbackFunction, this);
+    OnlineSystem()->mParksTop10->GetList(gOnlineParkSelection->mCityID, PostGetTop10ParksListCallbackFunction, this);
     CLBIsland* island = mCurrent;
     if (island != nullptr) {
         island->mSound1 = SOUND_SendEvent(island->mSound1, gLobbyIslandSounds[island->mSoundSet * 2 + 1], 1, 0, 0, 0);
@@ -1047,7 +1047,8 @@ void CLBScreenComponentOnlineIslands::SetCurrentIsland(const CLBIsland* island) 
     mCameraState = 0;
 }
 
-void CLBScreenComponentOnlineIslands::EnterCurrentIslandOnline() {
+// 0x100b45d0, slot 0x50: the base's Tick calls it when the zoom's fade completes.
+void CLBScreenComponentOnlineIslands::EnterCurrentIsland() {
     gLobby->mState = 2;
     TheGameType().SetGameType(kGameTypeOnline);
 }

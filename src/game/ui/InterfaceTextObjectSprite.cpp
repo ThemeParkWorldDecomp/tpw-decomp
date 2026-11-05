@@ -333,6 +333,7 @@ void InterfaceVisitorNumTextObject_Change(InterfaceTextObjectSprite* self, uint3
 
 // The classes' own Change (each Mac vtable's Change slot holds the function above): InterfaceWindow::SetValue reaches the text through these.
 void InterfaceCashTextObject::Change(uint32_t flags, DOChange* change) { InterfaceCashTextObject_Change(this, flags, change); }
+void InterfacePasswordTextObject::Change(uint32_t flags, DOChange* change) { InterfacePasswordTextObject_Change(this, flags, change); }
 
 InterfaceCashAndGTickTextObject::InterfaceCashAndGTickTextObject(void* data) : InterfaceTextObjectSprite(data) {}
 

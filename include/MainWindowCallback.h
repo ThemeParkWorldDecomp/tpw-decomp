@@ -19,7 +19,7 @@ extern int32_t gAllShopsSort;                // 0x102a8cfc
 extern int32_t gAllShowsSort;                // 0x102a8d00
 extern int32_t gAllFeaturesSort;             // 0x102a8d04
 extern int32_t gAllColumnButtonFont;         // 0x102a8cf4 the font number of the column buttons (8 at start)
-extern int16_t gAllFeaturesScript[];         // 0x102a8c3c the all-features list's window script (the image's words, generated at configure time)
+extern int16_t gAllFeaturesScript[];         // 0x102a8c3c the all-features list's window script (the image's words, include/WindowScripts.inc)
 extern int16_t gAllShowsScript[];            // 0x102a8b42 the all-sideshows list's window script (data: only its address is used here)
 
 // ---- the unit's functions
@@ -64,7 +64,7 @@ extern int32_t gStaffColumnFont;         // 0x102a9084 the font number of the co
 extern int32_t gStaffSort;               // 0x102a9088 the sort column of the staff list (1 at start)
 extern InterfaceWindow* gStaffPanel;     // 0x103947f0 the open all-staff panel
 extern int32_t gStaffType;               // 0x103947ec the kind of staff the panel lists
-extern int16_t gAllStaffScript[];        // 0x102a8d0e the panel's window script (the image's words, generated at configure time)
+extern int16_t gAllStaffScript[];        // 0x102a8d0e the panel's window script (the image's words, include/WindowScripts.inc)
 int32_t AllStaffPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);       // 0x10198ac4 (untranslated)
 int32_t AllStaffPanelLCHandler(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x10198d54 (untranslated)
 void FillAllStaffList(StaffType type, int32_t flag);   // 0x101987fc (untranslated)
@@ -72,7 +72,7 @@ void RemoveAllStaffPanel();   // 0x10199e20 (56 bytes, stand-in)
 
 // Unit v5066 (src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allStaffPanel.cpp): CreateAllItemsPanel (ui_main.h), the entry handler and the staff list.
 class CObject;
-extern int16_t gAllItemsScript[];        // 0x102a8884 the all-items panel's window script (the image's words, generated at configure time)
+extern int16_t gAllItemsScript[];        // 0x102a8884 the all-items panel's window script (the image's words, include/WindowScripts.inc)
 extern uint16_t gAllItemsNoParent;       // 0x102a8d0c the upgrade-parent id meaning "none" (0 at start)
 extern InterfaceListControl2* gStaffListControl;   // 0x103947e8 the staff list being filled
 int32_t AllItemsLCEntryHandler(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x10198264
@@ -117,7 +117,7 @@ void DetermineRidePreviewScale(uint32_t ride, float w, float h, float* scale, fl
 void SetRideMobile(uint32_t& ride);   // 0x10068280 (stand-in elsewhere)
 
 // Unit v5219 (src/game/ui/ui_allItemsPanel.cpp, src/game/ui/ui_allKidsPanel.cpp): the all-kids panel's creation and rows, the rides and sideshows list rows.
-extern int16_t gAllKidsScript[];            // 0x102a868c the all-kids panel's window script (the image's words, generated at configure time)
+extern int16_t gAllKidsScript[];            // 0x102a868c the all-kids panel's window script (the image's words, include/WindowScripts.inc)
 extern int32_t gAllKidsColumnFont;          // 0x102a887c the font number of the column buttons (8 at start)
 extern int32_t gAllKidsCounter;             // 0x103947c0 cleared before the list is filled
 extern uint16_t gAllRidesNoParent;          // 0x102a8d0a the upgrade-parent id meaning "no other ride" (0 at start)
@@ -162,7 +162,7 @@ void WindowSetValue(InterfaceWindow* window, int32_t value);   // the virtual Se
 // Unit v5572 (src/game/ui/ui_parkStatus.cpp): CreateParkStatusPanel (declared above).
 int32_t ThoughtMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);       // 0x101ab968 (untranslated; weak stand-in in the unit's file)
 int32_t GraphPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);    // 0x101ac044 (untranslated; weak stand-in)
-extern int16_t gParkStatusScript[];        // 0x102ab734 the park status panel's window script (the image's words, generated at configure time)
+extern int16_t gParkStatusScript[];        // 0x102ab734 the park status panel's window script (the image's words, include/WindowScripts.inc)
 extern const char gParkStatusMeshNames[];  // 0x1024e180 "sad_undec.wct", then at +0xe "hap.wct" (the gradients' mesh names)
 // Callees the host cannot call as the Mac does (the allocation, constructors of classes whose vtables live elsewhere, the virtual calls
 // at vtable +0x24 / +0x2c of the table at window +0x118): weak definitions in the unit's file, faked by the test library.
@@ -193,7 +193,7 @@ void RectDtor(void* rect);        // 0x101c74e0 CoolRect::~CoolRect() (flag -1)
 }  // namespace kidlist_callee
 
 // Unit v5964 (src/game/ui/ui_allItemsPanel.cpp)
-extern int16_t gAllRidesScript[];                   // 0x102a8a5a the rides and shops lists' window script (the image's words, generated at configure time)
+extern int16_t gAllRidesScript[];                   // 0x102a8a5a the rides and shops lists' window script (the image's words, include/WindowScripts.inc)
 int32_t FillAllRidesListCallback(CThing* thing);    // 0x10195b40 (UI_IterateThingList's function, untranslated)
 
 // Unit v5977 (src/game/rides/RidePreview.cpp)

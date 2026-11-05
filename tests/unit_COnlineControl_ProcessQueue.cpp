@@ -122,7 +122,7 @@ void LogVector(const char* name, const COnlineControl* self, void* vector) {
 void COnlineControl::ProcessResponse(void* vector) { LogVector("ProcessResponse", this, vector); }
 void COnlineControl::ProcessInitResponse(void* vector) { LogVector("ProcessInitResponse", this, vector); }
 
-uint32_t COnlineControl::GetDataForUser(const nocase_string& key) const {
+uint32_t COnlineControl::GetDataForUser(const std::u16string& key) const {
     ev("GetDataForUser", {lab(this), lab(&key)});
     return static_cast<uint32_t>(ret("GetDataForUser"));
 }
@@ -167,9 +167,25 @@ void* BuddyTreeFind(void* tree, const void* key) {
     ev("BuddyTreeFind", {Rel(tree), lab(key)});
     return ret("find") != 0 ? static_cast<void*>(gNode) : static_cast<void*>(static_cast<uint8_t*>(tree) + 4);
 }
-void BuddyTreeInsert(void* tree, const BuddyEntry* entry) {
+void BuddyTreeInsert(void* tree, const BuddyKeyEntry* entry) {
     ev("BuddyTreeInsert", {Rel(tree), lab(entry), entry->mDirect, entry->mFlag});
 }
+// The host strings the translation keeps (AddBuddy's keys, LoadBuddy's line): the same events, the text assigned to the string itself.
+void WStringCtorFrom(std::u16string* self, const char16_t* text) {
+    ev("WStringCtorFrom", {newlab(self), static_cast<int64_t>(WLen(text)), SigSumW(text)});
+    *self = text;
+}
+void WStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    ev("WStringCopy", {newlab(self), lab(other), pos, count});
+    *self = *other;
+}
+void WStringDtor(std::u16string* self, int16_t flag) { ev("WStringDtor", {lab(self), flag}); }
+void NocaseWStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    ev("NocaseWStringCopy", {newlab(self), lab(other), pos, count});
+    *self = *other;
+}
+void NocaseWStringDtor(std::u16string* self, int16_t flag) { ev("NocaseWStringDtor", {lab(self), flag}); }
+void* BuddyTreeFind(void* tree, const std::u16string* key) { return BuddyTreeFind(tree, static_cast<const void*>(key)); }
 void UIOnlineAddBuddy(void* ui, const char16_t* text, int32_t data) {
     ev("OnlineAddBuddy", {lab(ui), data, static_cast<int64_t>(WLen(text)), SigSumW(text)});
 }
@@ -236,10 +252,12 @@ char* StrCpy(char* to, const char* from) {
 }
 void FilebufDtor(IgnoreFilebuf*, int16_t flag) { ev("FilebufDtor", {flag}); }
 void IstreamDtor(IgnoreStream* stream, int16_t flag) {
-    ev("IstreamDtor", {lab(stream), flag, Delta(stream->mSlot, gIfsWVtblB), Delta(stream->mIos->mVtable, gIfsWVtblB)});
+    ev("IstreamDtor", {lab(stream), flag, Delta(stream->mSlot, gIfsWVtblB), static_cast<int32_t>(stream->mIos->mVtable - ignore_callee::VtableWord(gIfsWVtblB))});
 }
 void IosDtor(void* ios, int16_t flag) {
-    const bool consistent = reinterpret_cast<uint8_t*>(Ios()) + Ios()->mBaseOffset == static_cast<uint8_t*>(ios);
+    // The Mac's 32-bit sum: the ios part is in the arena stream object, the fake's block is not.
+    const bool consistent = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(Ios()) + static_cast<uint32_t>(Ios()->mBaseOffset)) ==
+                            static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ios));
     ev("IosDtor", {flag, consistent ? 1 : 0});
 }
 void IosGetloc(IgnoreLocale* out, IgnoreIos* ios) { ev("IosGetloc", {newlab(out), lab(ios)}); }
@@ -290,6 +308,12 @@ uint64_t tpw_pq_addr(const char* name) {
 }
 
 uint64_t tpw_pq_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
+
+// A host string (AddBuddy's name) in the arena; its address.
+uint64_t tpw_pq_u16(const uint16_t* data, uint32_t n) {
+    auto* made = new (tpw::ArenaAllocZeroed(sizeof(std::u16string))) std::u16string(reinterpret_cast<const char16_t*>(data), n);
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(made));
+}
 
 // The 32-bit word that stands for a host address inside Mac-layout memory (a Ptr32 offset), and the label of a pointer global.
 uint32_t tpw_pq_word(uint64_t address) { return address == 0 ? 0 : tpw::ArenaOffset(reinterpret_cast<const void*>(static_cast<uintptr_t>(address))); }

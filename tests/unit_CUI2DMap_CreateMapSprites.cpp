@@ -9,6 +9,7 @@
 
 #include "calllog.h"
 #include "platform/arena.h"
+#include "MainBalance.h"
 #include "analyser.h"
 #include "World.h"
 #include "ui_main.h"
@@ -20,8 +21,8 @@ uint16_t gThingIdNone;
 uint16_t gObjectIdNone;
 CWorld* gGameWorld;
 CThingArrayEntry gThingArray[kThingArraySize];
-// gMainBalance is the real class on the program; here raw bytes under the same symbol (the unit reads words of it by offset)
-alignas(16) uint8_t gBalanceStore[0x800] __asm__("_gMainBalance");
+// gMainBalance is the real class on the program; here raw bytes under the same symbol, with the real class's layout
+alignas(16) uint8_t gBalanceStore[sizeof(CMainBalance)] __asm__("_gMainBalance");
 
 namespace {
 
@@ -75,6 +76,10 @@ uint64_t tpw_cm_addr(const char* name) {
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));
     return 0;
+}
+
+uint64_t tpw_cm_slot(int32_t slot) {
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&reinterpret_cast<CMainBalance*>(gBalanceStore)->mValues[slot]));
 }
 
 uint64_t tpw_cm_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }
