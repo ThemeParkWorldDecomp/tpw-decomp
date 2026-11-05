@@ -306,7 +306,7 @@ class Side:
 class Ppc(Side):
     e_ = ">"
     psize = 4
-    off_cur, off_z, off_text = 0x14C, 0xDC, 0xC
+    off_cur, off_z, off_text, off_park = 0x14C, 0xDC, 0xC, 0x9C
 
     def __init__(self, e, case):
         self.e = e
@@ -353,6 +353,7 @@ class Host(Side):
         bind(lib)
         self.off_cur, self.off_z = lib.hl[0], lib.hl[1]
         self.off_text = lib.hl[4]
+        self.off_park = lib.hl[5]
 
     def done(self):
         pass
@@ -435,7 +436,7 @@ def build(s, case):
             s.ptr(s.g("online"), W["OS"])
         data = case["data"]
         W["FTP"] = s.alloc(0x100)
-        s.ptr(W["FTP"] + 0x9C, s.wstr(case["park"]))
+        s.ptr(W["FTP"] + s.off_park, s.wstr(case["park"]))
         slots = []
         if data >= 0:
             for i in range(data + 1):

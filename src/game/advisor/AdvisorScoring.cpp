@@ -49,12 +49,11 @@
 #include "World.h"
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <new>
 
 // AdvisorScoring.cpp (main app of SimTheme Park 2.04b3): the advisor's message scoring, 0x10010054..0x10010f38 and the destructor at
 // 0x1000adb0 (the inventory files it under Advisor.cpp). The constructor loads the advisor's balance table; the ten queries look a
-// message up in the static record table (src/AdvisorScoring_table.cpp) and answer one of its fields, or a number of the message's category in
+// message up in the static record table (tables/AdvisorScoring_table.cpp) and answer one of its fields, or a number of the message's category in
 // the balance table, or run the record's scorer. The scorers themselves (the _ADVISOR_* members) are not here.
 //
 // Every query repeats the original's inlined lookup of a message's record: the two numbers kAdvisorMessageCount and kAdvisorNoMessage
@@ -666,17 +665,9 @@ int32_t CAdvisorScoring::_ADVISOR_STAFF_TRAIN_RESEARCHERS() {
     return 0;
 }
 
-namespace {
-// lwz r3, off(r3): the word at the Mac offset from this (unaligned-safe).
-int32_t WordAt(const void* self, size_t off) {
-    int32_t v;
-    std::memcpy(&v, static_cast<const char*>(self) + off, 4);
-    return v;
-}
-}  // namespace
-
+// lwz r3, off(r3): off is a Mac offset into the balance table, so the word is the slot's.
 #define ADV_WORD(name, off) \
-    int32_t CAdvisorScoring::name() { return WordAt(this, off); }
+    int32_t CAdvisorScoring::name() { return mBalance.mValues[(off - 0x14) / 4].mInteger; }
 
 ADV_WORD(_ADVISOR_STAFF_UNHAPPY_MECHANICS, 0x1bc)
 ADV_WORD(_ADVISOR_STAFF_UNHAPPY_HANDYMEN, 0x1c0)

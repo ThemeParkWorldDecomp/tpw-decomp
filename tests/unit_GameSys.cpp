@@ -646,6 +646,10 @@ COnlineControl::COnlineControl() {
     ev("COnlineControl", {newlab(this)});
     mClientReady = 0;
 }
+// The class's own allocator (the arena in the game) is the global one here.
+void* COnlineControl::operator new(std::size_t size) { return ::operator new(size); }
+void* COnlineControl::operator new(std::size_t size, const std::nothrow_t& tag) noexcept { return ::operator new(size, tag); }
+void COnlineControl::operator delete(void* block) noexcept { ::operator delete(block); }
 COnlineControl::~COnlineControl() { ev("~COnlineControl", {lab(this)}); }
 void COnlineControl::InitClient() { ev("COnlineControl::InitClient", {lab(this)}); }
 void COnlineControl::InitGameWorld() { ev("COnlineControl::InitGameWorld", {lab(this)}); }
@@ -665,10 +669,12 @@ namespace {
 // fake), so its storage is left raw.
 alignas(16) unsigned char gFakeThemeListStore[sizeof(CFSOnlineSystemThemeList)];
 CFSOnlineSystemThemeList* FakeThemeList() { return reinterpret_cast<CFSOnlineSystemThemeList*>(gFakeThemeListStore); }
-CFSFTPParkInfo gFakeParkInfo;
+// The park is read as the host's CFSOnlinePark (constructor not linked here), so its storage is left raw too.
+alignas(16) unsigned char gFakeParkStore[sizeof(CFSOnlinePark)];
+CFSOnlinePark* FakePark() { return reinterpret_cast<CFSOnlinePark*>(gFakeParkStore); }
 }
 extern "C" CFSOnlineSystemThemeList* tpw_gs_themelist() { return FakeThemeList(); }
-extern "C" CFSFTPParkInfo* tpw_gs_parkinfo() { return &gFakeParkInfo; }
+extern "C" CFSFTPParkInfo* tpw_gs_parkinfo() { return reinterpret_cast<CFSFTPParkInfo*>(FakePark()); }
 CFSOnlineSystem::CFSOnlineSystem() {
     ev("CFSOnlineSystem", {newlab(this)});
     mThemeList = FakeThemeList();
@@ -677,7 +683,7 @@ CFSOnlineSystem::CFSOnlineSystem() {
 CFSOnlineSystem::~CFSOnlineSystem() { ev("~CFSOnlineSystem", {lab(this)}); }
 CFSFTPParkInfo* CFSOnlineSystem::GetFTPDownloadParkInfo() {
     ev("CFSOnlineSystem::GetFTPDownloadParkInfo", {lab(this)});
-    return &gFakeParkInfo;
+    return reinterpret_cast<CFSFTPParkInfo*>(FakePark());
 }
 char* CFSOnlineSystem::ReturnFTPDownloadLocalPath() {
     ev("CFSOnlineSystem::ReturnFTPDownloadLocalPath", {lab(this)});
@@ -873,7 +879,7 @@ void tpw_gs_set_values(const int32_t* v) {
     gei_System.mFlags = static_cast<uint32_t>(v[18]);
     gei_Display.mFlags = static_cast<uint32_t>(v[19]);
     if (gGameWorld != nullptr) gGameWorld->mF1DA738 = v[20];
-    gFakeParkInfo.mTheme = v[21];
+    FakePark()->mF4C = v[21];
 }
 
 void tpw_gs_get_values(int32_t* v) {
@@ -898,7 +904,7 @@ void tpw_gs_get_values(int32_t* v) {
     v[18] = static_cast<int32_t>(gei_System.mFlags);
     v[19] = static_cast<int32_t>(gei_Display.mFlags);
     v[20] = gGameWorld != nullptr ? gGameWorld->mF1DA738 : 0;
-    v[21] = gFakeParkInfo.mTheme;
+    v[21] = FakePark()->mF4C;
 }
 
 // Fields of the objects the pointer globals point at.

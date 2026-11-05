@@ -7,6 +7,7 @@
 #include <thread>
 
 #include "platform.h"
+#include "platform/online_boss.h"
 
 namespace SamsUtilities {
 
@@ -210,7 +211,9 @@ void UTimer::SetRate(const UMicroseconds& rate, bool start) {
     mNextTick = static_cast<int64_t>(GetAbsolute()) + mRate;
 }
 
-void UThread::Yield() { std::this_thread::yield(); }
+void UThread::Yield() {
+    std::this_thread::yield();
+}
 
 // ---- USoundChannel -------------------------------------------------------------------
 // The class is declared in include/TbAudioSystem.h (the sound start-up calls SetSafeMode when Option and Command are held);

@@ -14,6 +14,7 @@
 #include "m3d2.h"
 #include "online.h"
 #include "platform/macdoze.h"
+#include "platform/macdoze_system.h"
 #include "platform/msl.h"
 #include "ppc_math.h"
 #include "rsse.h"
@@ -78,7 +79,7 @@ bool bthread_cond::wait(int32_t milliseconds) {
 }
 
 bthread_mutex* bthread_mutex::Construct(bthread_mutex* self) {
-    NS_MacDoze::InitializeCriticalSection(reinterpret_cast<void**>(self));
+    NS_MacDoze::InitializeCriticalSection(&self->mHandle);
     return self;
 }
 

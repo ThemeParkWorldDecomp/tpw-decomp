@@ -22,6 +22,7 @@
 #include "TPString.h"
 #include "Text.h"
 #include "calllog.h"
+#include "far_code_stub.h"
 #include "platform/arena.h"
 #include "platform/samsutils.h"
 
@@ -308,7 +309,10 @@ void tpw_ftpdl_world(uint64_t server, uint64_t cityInfo, uint64_t item) {
     gItem = reinterpret_cast<TbDynamicStringTemplate<char16_t>*>(item);
 }
 
-uint32_t tpw_ftpdl_cbword() { return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&FtpCallback)); }
+uint32_t tpw_ftpdl_cbword() {
+    static void* const stub = FarCodeStub(reinterpret_cast<void*>(&FtpCallback));
+    return static_cast<uint32_t>(KeepPointerWord(stub));
+}
 
 void tpw_ftpdl_complete(uint64_t sys, int32_t failed) {
     reinterpret_cast<CFSOnlineSystem*>(sys)->CompleteFTPDownload(failed);

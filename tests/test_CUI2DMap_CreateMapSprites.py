@@ -105,6 +105,9 @@ class Side:
 
 
 class Ppc(Side):
+    def bal_put(self, off, v):
+        self.words(self.g("bal") + off, [v])
+
     fmt = ">I"
     stride = 0x14
 
@@ -142,6 +145,11 @@ class Ppc(Side):
 
 
 class Host(Side):
+    def bal_put(self, off, v):
+        # A slot is eight bytes on the host: the word goes in its low half, the high half is left noisy so a raw read shows.
+        a = self.lib.tpw_cm_slot((off - 8) // 4)
+        self.write(a, struct.pack("<II", v & MASK, 0xA5A5A5A5))
+
     fmt = "<I"
     stride = 48
 
@@ -185,6 +193,7 @@ def bind(lib):
     if getattr(lib, "bound", False):
         return
     p = "tpw_cm_"
+    lib.tpw_cm_slot.restype, lib.tpw_cm_slot.argtypes = C.c_uint64, [C.c_int32]
     getattr(lib, p + "addr").restype, getattr(lib, p + "addr").argtypes = C.c_uint64, [C.c_char_p]
     getattr(lib, p + "alloc").restype, getattr(lib, p + "alloc").argtypes = C.c_uint64, [C.c_uint32]
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]
@@ -206,9 +215,8 @@ def build(s, case):
     s.ptr(s.g("world"), s.world)
     s.half(s.g("none"), case["none"])
     s.half(s.g("objnone"), case["objnone"])
-    s.words(s.g("bal") + 0, [])
     for off, v in zip(BAL_OFFS, case["bal"]):
-        s.words(s.g("bal") + off, [v])
+        s.bal_put(off, v)
     s.words(s.map + 0x24, [case["w"], case["h"]])
     s.images([0xA00 + k for k in range(len(IMAGES))])
     for (x, y), v in case["cells"].items():

@@ -13,8 +13,9 @@ and answer from the case's queues or blocks.
 
 The world of a case: the COnlineControl block (Chat word, the player's name, the strings at 0xe20, 0xe24 and 0xe88, the contact set's
 nodes, the bytes at 0xe50, 0xe51 and 0xe84, the word at 0xe64), three Arguments and the vector (size 0 to 3, command any number),
-gOnlineSystem and gMasterSave (NULL or a block), gText's string table, gOnlineConfig's vote server and port, gVoteSendData, the park,
-city and password blocks the fakes answer. What is compared: the bytes at 0xe50 and 0xe51, the word at 0xe64 (as a label), the strings at
+gOnlineSystem and gMasterSave (NULL or a block; the system with its city list), gText's string table, gOnlineConfig's vote server and
+port, gVoteSendData, the park and city the fakes answer (Mac blocks for the original, the host's CFSOnlinePark and CFSOnlineCity for the
+translation, with the same values) and the password. What is compared: the bytes at 0xe50 and 0xe51, the word at 0xe64 (as a label), the strings at
 0xe20, 0xe24 and 0xe88, the first units of the buffer at 0x220, gOnlineSystem and gMasterSave (as labels) and the event log.
 
 No float work. Not tested: an operator new of the online system that fails (the original then reads the null block's 0xe0); the tree
@@ -421,6 +422,23 @@ class Ppc(Side):
     def lab(self, a):
         return plab(self.e, a)
 
+    def park(self, pid, cityid):
+        a = self.alloc(0x50)
+        self.words(a + 8, [pid])
+        self.words(a + 0x48, [cityid])
+        return a
+
+    def city(self, city60):
+        a = self.alloc(0x64)
+        self.words(a + 0x60, [city60])
+        return a
+
+    def system_size(self):
+        return 0x404
+
+    def set_list(self, a, v):
+        self.words(a + 0xE0, [v])
+
     def log(self):
         return self.L.log
 
@@ -478,6 +496,18 @@ class Host(Side):
     def lab(self, a):
         return self.lib.tpw_dc_lab(a)
 
+    def park(self, pid, cityid):
+        return self.lib.tpw_dc_park(s32(pid), s32(cityid))
+
+    def city(self, city60):
+        return self.lib.tpw_dc_city(s32(city60))
+
+    def system_size(self):
+        return self.lib.tpw_dc_system_size()
+
+    def set_list(self, a, v):
+        self.lib.tpw_dc_set_list(a, v)
+
     def log(self):
         return CL.host_end(self.lib)
 
@@ -497,6 +527,10 @@ def bind(lib):
     getattr(lib, p + "set_server").restype, getattr(lib, p + "set_server").argtypes = None, [C.c_char_p, C.c_int32]
     getattr(lib, p + "lab").restype, getattr(lib, p + "lab").argtypes = C.c_int64, [C.c_uint64]
     getattr(lib, p + "call").restype, getattr(lib, p + "call").argtypes = None, [C.c_uint64, C.c_uint64]
+    getattr(lib, p + "park").restype, getattr(lib, p + "park").argtypes = C.c_uint64, [C.c_int32, C.c_int32]
+    getattr(lib, p + "city").restype, getattr(lib, p + "city").argtypes = C.c_uint64, [C.c_int32]
+    getattr(lib, p + "system_size").restype, getattr(lib, p + "system_size").argtypes = C.c_uint32, []
+    getattr(lib, p + "set_list").restype, getattr(lib, p + "set_list").argtypes = None, [C.c_uint64, C.c_uint32]
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]
     out = (C.c_int64 * 32)()
     n = getattr(lib, p + "layout")(out)
@@ -529,12 +563,11 @@ def build(s, c):
         s.words(data + 12 * i, [0, s.p32(s.wstr(c["args"][i])), c["cmds"][i]])
     vec = w["vec"] = s.alloc(16)
     s.words(vec, [3, c["count"]])
-    s.ptr(vec + 8, data)
-    table, park, city, found = s.alloc(16), s.alloc(0x50), s.alloc(0x64), s.alloc(16)
+    s.words(vec + 8, [data & 0xFFFFFFFF])   # a 32-bit word on both sides (on the host, an arena offset)
+    table, found = s.alloc(16), s.alloc(16)
+    park = s.park(c["parkid"], c["cityid"])
+    city = s.city(c["city60"])
     password = s.wtext("secret")
-    s.words(park + 8, [c["parkid"]])
-    s.words(park + 0x48, [c["cityid"]])
-    s.words(city + 0x60, [c["city60"]])
     for name, a in (("table", table), ("park", park), ("city", city), ("password", password), ("found", found)):
         s.setp(name, a)
     labels = {this: 1, table: 2, this + 8: 3, this + 0xE20: 4, this + 0xE24: 5, this + 0xE88: 6, this + 0xE34: 7, this + 0xE44: 8,
@@ -545,8 +578,8 @@ def build(s, c):
         labels[node + 0xC] = 40 + i
     system = 0
     if c["sys"] is not None:
-        system = s.alloc(0x404)
-        s.words(system + 0xE0, [c["sys"]])
+        system = s.alloc(s.system_size())
+        s.set_list(system, c["sys"])
         labels[system] = 14
     s.ptr(s.g("gOnlineSystem"), system)
     save = 0

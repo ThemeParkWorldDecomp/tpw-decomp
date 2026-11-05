@@ -180,6 +180,7 @@ int32_t tpw_smp_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(SMachineParameters, mVRAMSize));
     out[n++] = static_cast<int64_t>(offsetof(SMachineParameters, mFillRate));
     out[n++] = static_cast<int64_t>(sizeof(SMachineParameters));
+    out[n++] = static_cast<int64_t>(offsetof(CDirectDraw, mDeviceInfo.description));
     return n;
 }
 

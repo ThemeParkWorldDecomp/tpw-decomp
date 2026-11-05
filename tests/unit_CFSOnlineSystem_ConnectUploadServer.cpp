@@ -15,6 +15,7 @@
 #include <type_traits>
 
 #include "calllog.h"
+#include "far_code_stub.h"
 #include "platform/arena.h"
 #include "FS_Online.h"
 #include "FS_System.h"
@@ -306,6 +307,7 @@ TbDynamicStringTemplate<char16_t>* RemoveHead(TbPtrList<TbDynamicStringTemplate<
     EV("RemoveHead", I(list->mCount));
     return list->RemoveHead();
 }
+int32_t PortFTPDownloadUnavailable() { return 0; }   // the client downloads, as on the Mac
 }  // namespace ftpdl_callee
 
 // The text is "S:online".
@@ -368,8 +370,15 @@ int32_t FTPClient::Connect(char* a, char* b, char* c, char* server) {
 }
 
 namespace {
+// The context words are kept with this upper half (never followed), so that only the kept whole pointer comes out right;
+// a null context stays null. A wrong upper half is logged as its own value, which the Mac's log does not have.
+constexpr uintptr_t kFarContext = static_cast<uintptr_t>(0x5A5Au) << 32;
+
 void FakeCallback(int32_t result, const void* context) {
-    EV("Callback", I(result), I(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(context))));
+    const uintptr_t pointer = reinterpret_cast<uintptr_t>(context);
+    const uintptr_t low = static_cast<uint32_t>(pointer);
+    const bool whole = pointer == (low != 0 ? (kFarContext | low) : 0);
+    EV("Callback", I(result), whole ? I(low) : I(-static_cast<int64_t>(pointer >> 32)));
 }
 
 // ---- the offsets of the host layout, by the module's names
@@ -572,7 +581,15 @@ void tpw_cu_known(uint64_t p, int64_t label) {
 }
 int64_t tpw_cu_lab(uint64_t p) { return lab(reinterpret_cast<void*>(static_cast<uintptr_t>(p))); }
 
-uint32_t tpw_cu_callback_word() { return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(&FakeCallback)); }
+uint32_t tpw_cu_callback_word() {
+    static void* const stub = FarCodeStub(reinterpret_cast<void*>(&FakeCallback));
+    return static_cast<uint32_t>(KeepPointerWord(stub));
+}
+
+uint32_t tpw_cu_context_word(uint32_t word) {
+    if (word != 0) KeepPointerWord(reinterpret_cast<const void*>(kFarContext | word));
+    return word;
+}
 
 int32_t tpw_cu_connect(uint64_t sys) { return reinterpret_cast<CFSOnlineSystem*>(static_cast<uintptr_t>(sys))->ConnectUploadServer(); }
 

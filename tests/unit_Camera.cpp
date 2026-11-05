@@ -151,6 +151,11 @@ extern "C" void tpw_cam_field(int32_t mode, uint32_t sx, uint32_t sz, uint32_t w
     if (quads) field->mQuads = static_cast<sHFieldQuad*>(tpw::ArenaAllocZeroed(64));
     gHeightfieldHeader->mHField = field;
 }
+// 1 when the unit is built with the port fixes on (unit framerate, HandleCamera): test_Camera.py then runs each case as one
+// 31 ms step.
+extern "C" int32_t tpw_cam_portfix() {
+    return 0;
+}
 // g: see test_Camera.py (GLOBALS); the in/out words are listed there as well.
 extern "C" void tpw_cam_run(const uint32_t* g, uint32_t* out) {
     int32_t i = 0;

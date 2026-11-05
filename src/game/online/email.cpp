@@ -848,7 +848,7 @@ Argument* Argument::Destruct(Argument* self, int16_t deleteFlag) {
 // bthread_mutex::~bthread_mutex (0x10200d04), unit v5120. Neighbour of src/email.cpp (lock, unlock).
 
 namespace NS_MacDoze {
-void DeleteCriticalSection(void** handle);   // 0x1023b338 (glue import)
+void DeleteCriticalSection(uint32_t* handle);   // 0x1023b338 (glue import)
 }
 
 // The Mac's destructor with its hidden delete flag (r4, a short): a NULL object does nothing; otherwise the critical section is

@@ -159,8 +159,8 @@ void CMouse::AssignMouseMode(CMouseMode* mode) { ev("AssignMouseMode", {lab(this
 void CInGame::Start() { ev("CInGame.Start"); }
 
 // ---- the critical section: the handle's address is recorded as a label
-void NS_MacDoze::EnterCriticalSection(void** handle) { ev("EnterCriticalSection", {lab(handle)}); }
-void NS_MacDoze::LeaveCriticalSection(void** handle) { ev("LeaveCriticalSection", {lab(handle)}); }
+void NS_MacDoze::EnterCriticalSection(uint32_t* handle) { ev("EnterCriticalSection", {lab(handle)}); }
+void NS_MacDoze::LeaveCriticalSection(uint32_t* handle) { ev("LeaveCriticalSection", {lab(handle)}); }
 
 namespace {
 constexpr int kGlobeWords = 31;   // 0x7c bytes in words
@@ -301,8 +301,8 @@ int32_t tpw_ll4_book(int32_t fill) {
 
 // ---- the two mutexes (addresses for the labels, the handle word, the calls)
 void* tpw_ll4_mutex(int32_t which) { return &gMutexes[which & 1]; }
-void tpw_ll4_mutex_set(int32_t which, uint32_t handle) { gMutexes[which & 1].mHandle = Ptr<void>(handle); }
-uint32_t tpw_ll4_mutex_get(int32_t which) { return Low(gMutexes[which & 1].mHandle); }
+void tpw_ll4_mutex_set(int32_t which, uint32_t handle) { gMutexes[which & 1].mHandle = handle; }
+uint32_t tpw_ll4_mutex_get(int32_t which) { return gMutexes[which & 1].mHandle; }
 void tpw_ll4_mutex_run(int32_t which, int32_t lock) {
     if (lock != 0) gMutexes[which & 1].lock();
     else gMutexes[which & 1].unlock();

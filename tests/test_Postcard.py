@@ -38,6 +38,7 @@ FIND_FILE_PATH, UDEBUG = 0x100597F8, 0x10000E40
 TEMP_SIZE = 0x4B000
 STORE_SIZE = 1 << 19
 OUT_GUARD = 16
+GRAB_WIDTH, GRAB_HEIGHT = 320, 240
 PATTERN_SIZE = 4099
 BITMAPS = 7
 NAMES = ["tpwlogo", "bullfrog", "stamp", "frank", "legal", "card", "grab"]
@@ -367,16 +368,120 @@ STUBS = None
 # With the port fixes on (unit previewcolours) resize_into_buffer stores format 2's halfwords in host order: on a little-endian
 # host the original's output is compared with each halfword's two bytes swapped.
 SWAP_FORMAT2 = False
+# With the port fixes on (unit postcardstretch) resize_into_buffer fills the pixels and rows a stretch leaves without a source:
+# the output of a stretched case is compared with stretch_model's instead of the original's.
+STRETCH_FIX = False
 
 
 def setup(runner):
-    global STUBS, SWAP_FORMAT2
+    global STUBS, SWAP_FORMAT2, STRETCH_FIX
     e = runner.emu
     T.install_std_stubs(e)
     STUBS = build_stubs(e)
     lib = runner.lib
     lib.tpw_pc_portfix.restype, lib.tpw_pc_portfix.argtypes = C.c_int32, []
     SWAP_FORMAT2 = lib.tpw_pc_portfix() == 1 and sys.byteorder == "little"
+    STRETCH_FIX = lib.tpw_pc_portfix() == 1
+
+
+def stretches(source, width, height):
+    """Whether resize_into_buffer stretches the source across (wider) or down (higher), where the original leaves runs of 0."""
+    sw, sh = source[0], source[1]
+    return (0 < sw < width) or (0 < sh < height)
+
+
+def stretch_model(source, width, height, fmt):
+    """The output of resize_into_buffer with the port fixes on: the original's box filter, except that a run of 0 source pixels
+    across a stretched width (or of 0 rows down a stretched height) takes the next pixel (row), or the last one at the end,
+    without using it up. None for a format that writes nothing."""
+    if fmt not in (1, 2, 3):
+        return None
+    sw, sh, _, data = source
+    mask = 0xFFFFFFFF
+
+    def runs(size, count):
+        step = (size * 0x10000 + 0x8000) & mask
+        step = step // count if count else step
+        out, acc = [], 0
+        for _ in range(count):
+            nxt = (acc + step) & mask
+            out.append(((nxt >> 16) - (acc >> 16)) & 0xFF)
+            acc = nxt
+        return out
+
+    def div(a, b):
+        return a // b if b else a
+
+    x_runs, y_runs = runs(sw, width), runs(sh, height)
+    stretch_x, stretch_y = 0 < sw < width, 0 < sh < height
+    src, rows_done, out = 0, 0, bytearray()
+    for y in range(height):
+        rows, again = y_runs[y], None
+        if stretch_y and rows == 0:
+            rows, again = 1, src
+            if rows_done == sh:
+                src -= sw * 4
+        lines = []
+        for _ in range(rows):
+            line, column = [], 0
+            for x in range(width):
+                count, back = x_runs[x], None
+                if stretch_x and count == 0:
+                    count, back = 1, src
+                    if column == sw:
+                        src -= 4
+                sums = [0, 0, 0, 0]
+                for _ in range(count):
+                    for c in range(4):
+                        sums[c] += data[src + c]
+                    src += 4
+                if back is not None:
+                    src = back
+                else:
+                    column += count
+                line.append([div(s & 0xFFFF, count) & 0xFF for s in sums])
+            lines.append(line)
+        if again is not None:
+            src = again
+        else:
+            rows_done += rows
+        for x in range(width):
+            a = [div(sum(line[x][c] for line in lines) & 0xFFFF, rows) & 0xFFFF for c in range(4)]
+            if fmt == 1:
+                out += bytes([a[1] & 0xFF, a[2] & 0xFF, a[3] & 0xFF, 0xFF])
+            elif fmt == 2:
+                half = ((a[2] << 4) & 0xF00) | ((a[1] << 8) & 0xF000) | (a[3] & 0xF0) | 0xF
+                out += struct.pack("<H" if sys.byteorder == "little" else ">H", half)
+            else:
+                out += bytes([0xFF, a[0] & 0xFF, a[1] & 0xFF, a[2] & 0xFF])
+    return bytes(out)
+
+
+def stretch_grab(log, case, state, index):
+    """copy_from_opengl scales the screen it read (display width x height) to the 320x240 grab: on a display smaller than that
+    the scaled picture is stretch_model's. It is in the temporary buffer (its crc in the converter's wrap and in Free) and,
+    converted, in the bitmap at `index`. Only when the screen was read into a new block and the scaling's three blocks were had."""
+    width, height = case["display"]
+    if case["alloc_null"] or not stretches((width, height), GRAB_WIDTH, GRAB_HEIGHT):
+        return
+    news = {entry[1][0]: entry[1][2] for entry in log if entry[0] == "new[]"}
+    if any(news.get(number, 1) for number in (1, 2, 3, 4)):
+        return
+    count = width * height * 4
+    screen = (case["pattern"] * (count // len(case["pattern"]) + 1))[:count]
+    temp = stretch_model((width, height, 4, screen), GRAB_WIDTH, GRAB_HEIGHT, 3)
+    crc = zlib.crc32(temp)
+    for i, (name, ints, texts) in enumerate(log):
+        if name == "UPixels.wrap" and ints[2] == 1:
+            log[i] = (name, ints[:3] + (crc,) + ints[4:], texts)
+        elif name == "Free" and ints[1] == 1:
+            log[i] = (name, ints[:2] + (crc,), texts)
+    if any(entry[0] == "UPixels.Convert" for entry in log):
+        row = GRAB_WIDTH * 4
+        pixels = xor5a(b"".join(temp[(GRAB_HEIGHT - 1 - r) * row:(GRAB_HEIGHT - r) * row] for r in range(GRAB_HEIGHT)))
+        at = 1 + 7 * index
+        state[at + 5] = zlib.crc32(pixels)
+        state[at + 6] = signed64(int.from_bytes(pixels[:8], "big"))
 
 
 def ppc(e, case):
@@ -435,8 +540,16 @@ def ppc(e, case):
             words = bytearray(data[:out_size])
             words[0::2], words[1::2] = data[1:out_size:2], data[0:out_size:2]
             data = bytes(words) + data[out_size:]
+        if STRETCH_FIX and fn in (RESIZE, PREVIEW) and not set(case["fail"]) & {1, 2, 3}:
+            source = case["bitmaps"][0 if fn == RESIZE else 5]
+            if source[3] is not None and stretches(source, a[0], a[1]):
+                model = stretch_model(source, a[0], a[1], a[2])
+                if model is not None:
+                    data = model + data[out_size:]
         state.append(zlib.crc32(data))
         state.append(int(u32(e, cell) != 0))
+        if STRETCH_FIX and fn in (COPY_FROM_OPENGL, GRAB):
+            stretch_grab(e.cl.log, case, state, 0 if fn == COPY_FROM_OPENGL else 6)
         return dict(state=state, log=e.cl.log)
     finally:
         e.write(display + 8, saved[0])
@@ -680,6 +793,11 @@ def resize_edges(fn):
         yield resize_case(r, fn, bitmap(r, 640, 240), 320, 240, 1)
         yield resize_case(r, fn, bitmap(r, 640, 240), 80, 60, 2)
         yield resize_case(r, fn, bitmap(r, 640, 480), 320, 240, 3)
+        for out in [(67, 27), (134, 53), (100, 40)]:                        # the preview's shape at 1024, 2048 and 1600 wide, a tenth
+            for fmt in (1, 2, 3):
+                yield resize_case(r, fn, bitmap(r, 64, 24), *out, fmt)
+        yield resize_case(r, fn, bitmap(r, 2, 3), 9, 2, 1)                  # stretched across only, then down only
+        yield resize_case(r, fn, bitmap(r, 3, 2), 2, 9, 3)
         yield resize_case(r, fn, bitmap(r, 300, 2), 1, 1, 3)                # a run of 300 wraps to 44 in its byte
         yield resize_case(r, fn, bitmap(r, 2, 300), 1, 1, 3)
         yield resize_case(r, fn, bitmap(r, 1024, 2), 2, 1, 3)               # 512 wraps to 0
@@ -834,6 +952,7 @@ def preview_edges():
     yield preview_case(r, bitmap(r, 640, 240), (160, 60), 3)
     yield preview_case(r, bitmap(r, 640, 240), (640, 240), 1)
     yield preview_case(r, bitmap(r, 12, 12), (30, 30), 2)
+    yield preview_case(r, bitmap(r, 64, 24), (134, 53), 1)
     yield preview_case(r, bitmap(r, 16, 8), (4, 2), 3, fail=[1])
     yield preview_case(r, bitmap(r, 16, 8), (4, 2), 3, fail=[3])
     # the card has no pixels: the original composes (from address 0) and then scales; only a card of no pixels and sources

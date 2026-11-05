@@ -244,6 +244,7 @@ class Side:
 class Ppc(Side):
     fmt = ">I"
     guard_pad = b""
+    off_park = 0x9C
 
     def __init__(self, e, case):
         self.e = e
@@ -290,6 +291,7 @@ class Host(Side):
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
+        self.off_park = lib.tpw_ab_park_text()
         CL.host_begin(lib, {1: self.g("list"), 2: self.g("edit"), 3: self.g("parent"), 4: self.g("panel")}, case["queues"])
 
     def done(self):
@@ -357,13 +359,13 @@ def build(s, case):
     # user info and online system
     s.ptr(s.g("gUserInfo"), s.alloc(0x100) if case["user"] else 0)
     s.ptr(s.g("gOnlineSystem"), s.alloc(0x100) if case["online"] else 0)
-    # the park info's folder text at +0x9c
+    # the park info's folder text (the Mac's +0x9c, the host's CFSOnlinePark field)
     park = case["park"]
-    s.ptr(s.g("parkinfo") + 0x9C, 0)
+    s.ptr(s.g("parkinfo") + s.off_park, 0)
     if park is not None:
         a = s.alloc(2 * len(park) + 2)
         s.u16s(a, list(park) + [0])
-        s.ptr(s.g("parkinfo") + 0x9C, a)
+        s.ptr(s.g("parkinfo") + s.off_park, a)
     s.u16s(s.g("str121"), OTHER + [0])
     s.words(s.g("gtype"), [case["mtype"]])
     s.write(s.g("gguard"), bytes([case["guard"]]) + s.guard_pad)

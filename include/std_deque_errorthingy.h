@@ -95,4 +95,7 @@ void QueueCdequeDtor(void* cdeque, int16_t flag);   // 0x101f2520 std::__cdeque<
 }
 namespace cdeque_callee {
 uint32_t MaxSize(const std::__cdeque<const void*, std::allocator<const void*>>* self);   // 0x101f492c
+// 0x102384b8 operator new for reserve's block table: the deque keeps the table's address in a 32-bit word (mWordC), so the host's
+// table comes from the arena (src/game/MslContainerGlue.cpp); the old table goes back through IME::MslDelete.
+void* TableNew(uint32_t size);
 }

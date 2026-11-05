@@ -1,8 +1,11 @@
 """Unit v51055, the CAdvisorScoring word getters (lwz r3, off(r3); blr) and the two that return 0, against
 libtpw_unit_CAdvisorScoring__ADVISOR_STAFF_STRIKING_ENTERTAI.dylib, main app, src/game/advisor/AdvisorScoring.cpp.
 
-A case is a 0x260-byte object of random words. The same bytes are written on both sides; compared: the answer and the whole object
-after the call. No callees, no fused operations. Not tested: nothing.
+A case is a 0x260-byte Mac object of random words. The Mac side holds them at their Mac offsets. The host's balance slots are 8 bytes
+wide and start where tpw_adv_layout says, so the host side writes the word at Mac offset off to slot (off - 0x14) / 4 through that
+layout, with random bits in each slot's high half: a getter that reads this + off instead of the slot gets a different word.
+Compared: the answer, every slot's word after the call, and that nothing in the object changed. No callees, no fused operations.
+Not tested: nothing.
 """
 import ctypes as C
 import random
@@ -14,6 +17,7 @@ from tpwtest import FnTest
 SHIM_LIBRARY = "unit_CAdvisorScoring__ADVISOR_STAFF_STRIKING_ENTERTAI"
 MASK = 0xFFFFFFFF
 SIZE = 0x260
+FIRST_SLOT = 0x14
 
 # (name, address, offset or None for "returns 0")
 FUNCS = [
@@ -55,6 +59,11 @@ def bind(lib):
         return
     lib.tpw_adv_call.restype, lib.tpw_adv_call.argtypes = C.c_uint32, [C.c_int32, C.c_uint64]
     lib.tpw_adv_alloc.restype, lib.tpw_adv_alloc.argtypes = C.c_uint64, [C.c_uint32]
+    lib.tpw_adv_layout.restype, lib.tpw_adv_layout.argtypes = C.c_int32, [C.POINTER(C.c_int64)]
+    out = (C.c_int64 * 8)()
+    n = lib.tpw_adv_layout(out)
+    lib.layout = list(out)[:n]
+    assert lib.layout[1] == 8, lib.layout
     lib.bound = True
 
 
@@ -63,22 +72,32 @@ def make(idx):
 
     def ppc(e, case):
         a = e.alloc(SIZE)
-        e.write(a, b"".join(struct.pack(">I", w) for w in case["words"]))
+        before = b"".join(struct.pack(">I", w) for w in case["words"])
+        e.write(a, before)
         r3, _, _ = T.call_ppc(e, addr, [a])
-        return {"answer": r3 & MASK, "obj": list(struct.unpack(">%dI" % (SIZE // 4), e.read(a, SIZE)))}
+        after = e.read(a, SIZE)
+        return {"answer": r3 & MASK, "slots": list(struct.unpack(">%dI" % (SIZE // 4), after))[FIRST_SLOT // 4:],
+                "unchanged": after == before}
 
     def host(lib, case):
         bind(lib)
-        a = lib.tpw_adv_alloc(SIZE)
-        C.memmove(a, b"".join(struct.pack("<I", w) for w in case["words"]), SIZE)
+        values, stride, size = lib.layout
+        a = lib.tpw_adv_alloc(size + 64)
+        words = case["words"][FIRST_SLOT // 4:]
+        for i, (w, high) in enumerate(zip(words, case["highs"])):
+            C.memmove(a + values + i * stride, struct.pack("<II", w, high), stride)
+        before = C.string_at(a, size)
         r = lib.tpw_adv_call(idx, a) & MASK
-        return {"answer": r, "obj": list(struct.unpack("<%dI" % (SIZE // 4), C.string_at(a, SIZE)))}
+        after = C.string_at(a, size)
+        slots = [struct.unpack_from("<I", after, values + i * stride)[0] for i in range(len(words))]
+        return {"answer": r, "slots": slots, "unchanged": after == before}
 
     return ppc, host
 
 
 def case(r):
-    return {"words": [r.choice([0, MASK, 0x80000000, 0x7FFFFFFF, r.getrandbits(32)]) for _ in range(SIZE // 4)]}
+    return {"words": [r.choice([0, MASK, 0x80000000, 0x7FFFFFFF, r.getrandbits(32)]) for _ in range(SIZE // 4)],
+            "highs": [r.getrandbits(32) for _ in range((SIZE - FIRST_SLOT) // 4)]}
 
 
 def edges():
@@ -89,11 +108,6 @@ def edges():
 
 def rnd(r):
     return case(r)
-
-
-def _host_wrap(host):
-    # the host objects are little-endian: the words are written byte-swapped, so the answer and the object compare as the Mac's
-    return host
 
 
 TESTS = []

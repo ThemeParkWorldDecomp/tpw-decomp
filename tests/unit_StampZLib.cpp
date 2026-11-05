@@ -146,6 +146,7 @@ uint32_t tpw_szl_size(uint32_t k) {
     return LbZLib_CompressWorkspaceSize();
 }
 
+
 // Construction precedes the observed destruction. The abstract base is constructed as a Callbacks subobject.
 void tpw_szl_construct(uint32_t k, void* obj) {
     if (k == 0) new (obj) CZLib;

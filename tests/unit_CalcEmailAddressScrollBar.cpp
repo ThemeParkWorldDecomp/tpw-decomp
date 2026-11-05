@@ -9,7 +9,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <list>
 #include <new>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -115,15 +117,14 @@ struct Init {
 extern "C" void FakeUserInfoCtor(CFSUserInfo* self) __asm__("__ZN11CFSUserInfoC1Ev");
 extern "C" void FakeUserInfoCtor(CFSUserInfo* self) {
     ev("CFSUserInfo", {});
-    uint8_t* outbox = reinterpret_cast<uint8_t*>(&self->mOutbox);
-    // A Mac word is an 8-byte slot at twice the Mac offset; the entries are pointers of the arena (64 bits on the host).
-    uint64_t* w = reinterpret_cast<uint64_t*>(outbox);
-    w[2] = static_cast<uint32_t>(gCtl[14]) | (static_cast<uint64_t>(gCtl[19]) << 32);
-    w[5] = reinterpret_cast<uintptr_t>(outbox + 2 * 0x10);
-    w[6] = static_cast<uint32_t>(gCtl[15]) | (static_cast<uint64_t>(gCtl[20]) << 32);
-    w[7] = static_cast<uint32_t>(gCtl[16]);
-    w[8] = static_cast<uint32_t>(gCtl[17]);
-    w[9] = static_cast<uint32_t>(gCtl[18]);
+    // The real fields, made one by one (Outbox's constructor is in another file): the entries of the case are the texts' addresses.
+    Outbox* outbox = &self->mOutbox;
+    new (&outbox->mF08) std::string(reinterpret_cast<const char*>(static_cast<uint32_t>(gCtl[14]) | (static_cast<uint64_t>(gCtl[19]) << 32)));
+    new (&outbox->mF0C) std::list<std::string>();
+    new (&outbox->mF18) std::string(reinterpret_cast<const char*>(static_cast<uint32_t>(gCtl[15]) | (static_cast<uint64_t>(gCtl[20]) << 32)));
+    std::memcpy(outbox->mF1C + 0, &gCtl[16], 4);
+    std::memcpy(outbox->mF1C + 4, &gCtl[17], 4);
+    std::memcpy(outbox->mF1C + 8, &gCtl[18], 4);
 }
 
 void Outbox::First() { ev("OutboxFirst", {I(IsOutbox(this))}); }
@@ -311,7 +312,22 @@ int32_t tpw_ob_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(sizeof(CFSUserInfo));
     out[n++] = static_cast<int64_t>(offsetof(CText, mResourcePointers) + 6 * sizeof(void*));
     out[n++] = static_cast<int64_t>(offsetof(CTextureSettings, mFormat));
+    out[n++] = static_cast<int64_t>(offsetof(TbRenderArea, mWidth));
     return n;
+}
+
+// A made user info's outbox, through its real fields: the current mail's address text, picture path and three numbers, then its addresses.
+void tpw_ob_mail(uint64_t outbox, const char* address, const char* path, int32_t a, int32_t b, int32_t c) {
+    Outbox* self = reinterpret_cast<Outbox*>(static_cast<uintptr_t>(outbox));
+    new (&self->mF08) std::string(address);
+    new (&self->mF0C) std::list<std::string>();
+    new (&self->mF18) std::string(path);
+    std::memcpy(self->mF1C + 0, &a, 4);
+    std::memcpy(self->mF1C + 4, &b, 4);
+    std::memcpy(self->mF1C + 8, &c, 4);
+}
+void tpw_ob_address(uint64_t outbox, const char* address) {
+    reinterpret_cast<Outbox*>(static_cast<uintptr_t>(outbox))->mF0C.push_back(address);
 }
 
 void tpw_ob_fill() { FillOutboxList(); }

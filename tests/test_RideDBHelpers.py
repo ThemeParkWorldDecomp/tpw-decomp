@@ -22,6 +22,8 @@ HOST = None
 STUBS = None
 PTR_FIELDS = {2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14}
 SHARED = 'Data\\Generic\\Dynamic\\Textures'
+# With the port fixes on (coasterpreview) the host names the same folder with colons; it compares as the Mac's name.
+SHARED_COLONS = 'Data:Generic:Dynamic:Textures'
 VP, U32, I32 = C.c_void_p, C.c_uint32, C.c_int32
 
 
@@ -147,7 +149,7 @@ def setup(runner):
         ('line', VP, [VP]), ('coaster', VP, [U32, VP, VP, VP]),
         ('particle', U32, [VP, I32]), ('sound', I32, [VP]),
         ('reset', None, [VP, VP, VP]), ('alloc', VP, [U32]), ('size', U32, [U32]),
-        ('nalloc', U32, []), ('count', VP, []), ('table', VP, []), ('tag', VP, [U32])]:
+        ('nalloc', U32, []), ('count', VP, []), ('table', VP, []), ('tag', VP, [U32]), ('portfix', I32, [])]:
         bind(lib, 'tpw_rh_' + name, result, *args)
     bind(lib, 'tpw_cl_lab', I32, VP)
     S = CL.Stubs()
@@ -338,6 +340,17 @@ def composition_run(m, c):
                 guards=[m.read(a + n, 16) for a, n in m.allocations()], log=m.end())
 
 
+def mac_folder(value):
+    """Maps the fixed host's colon folder to the Mac's name, and marks a backslash name the fixed host should not have left."""
+    if isinstance(value, str):
+        return SHARED if value == SHARED_COLONS else 'unfixed ' + value if value == SHARED else value
+    if isinstance(value, dict):
+        return {k: mac_folder(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return type(value)(mac_folder(v) for v in value)
+    return value
+
+
 def run(target, c, op, ppc):
     m = Memory(target, ppc)
     if ppc:
@@ -347,7 +360,8 @@ def run(target, c, op, ppc):
         target.tpw_rh_reset(None, None, None)
     try:
         if op == 4:
-            return coaster_run(m, c)
+            result = coaster_run(m, c)
+            return result if ppc or target.tpw_rh_portfix() != 1 else mac_folder(result)
         if op in (5, 6):
             return getter_run(m, c, op)
         if op == 7:

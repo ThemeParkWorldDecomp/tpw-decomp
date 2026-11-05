@@ -53,7 +53,7 @@ OFF = dict(brace_f90=(0x90, 0), brace_prev=(0x64, 1), ctl_brace=(4, 2), spl_a=(4
            set_flags=(4, 6), set_hoard=(0xB0, 7), set_speed=(0xBC, 8), set_heads=(8, 9), set_size=(0x100, 10),
            mesh_f28=(0x28, 11), mesh_hdr=(4, 12), emb_rec=(4, 13), rec_size=(0x14, 14), rec_f08=(8, 15), ptr=(4, 16),
            inst_type=(4, 17), inst_3c=(0x3C, 18), inst_oid=(0x14, 19), hdr_hf=(0x6C, 20), hdr_f78=(0x78, 21), hf_18=(0x18, 22),
-           node_mat=(0x10, 23))
+           node_mat=(0x10, 23), inst_f70=(0x70, 24), inst_size=(0x200, 25))
 LAY = []
 
 
@@ -338,11 +338,14 @@ def op_SetInitialOrientationParams(s, c):
 
 
 def op_SetInitialCoasterInterpParams(s, c):
-    blk = s.alloc(0x80)
-    s.junk(blk, 32, c)
+    # A real instance: the block is its mBlock3C, and the words the function sets are the instance's mF74 to mF94 (the same run of
+    # words on both sides, but further from the block on the host). The word before mF70 to the word after mF94's first are compared.
+    inst = s.alloc(s.o("inst_size"))
+    first = inst + s.o("inst_f70") - 4
+    s.junk(first, 12, c)
     s.start({})
-    s.call("SetInitialCoasterInterpParams", blk)
-    return {"blk": s.rd_words(blk, 32), "log": s.log()}
+    s.call("SetInitialCoasterInterpParams", inst + s.o("inst_3c"))
+    return {"blk": s.rd_words(first, 12), "log": s.log()}
 
 
 def op_RecalcTrackParams(s, c):

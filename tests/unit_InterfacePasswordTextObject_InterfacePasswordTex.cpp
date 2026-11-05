@@ -93,6 +93,7 @@ void InterfaceCashTextObject::Change(uint32_t, DOChange*) { gChangeRan = 1; }
 void InterfaceNullCashTextObject::Change(uint32_t, DOChange*) { gChangeRan = 2; }
 void InterfacePercentTextObject::Change(uint32_t, DOChange*) { gChangeRan = 3; }
 void InterfaceVisitorNumTextObject::Change(uint32_t, DOChange*) { gChangeRan = 4; }
+void InterfacePasswordTextObject::Change(uint32_t, DOChange*) { gChangeRan = 6; }
 
 int32_t UIMenu_DefaultItemCallback(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
 uint32_t UIMenuHandlerHandle(int32_t (*handler)(InterfaceWindow*, int32_t, int32_t, int32_t)) {

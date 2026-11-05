@@ -4,20 +4,14 @@
 #pragma once
 #include <cstdint>
 
+#include "FS_Online.h"
 #include "FS_OnlineList.h"
 #include "InterfaceWindow.h"
 #include "TbTList.h"
 
-// 0x102e4864 points to this: the park the player picked (the Mac's words at 0x08 and 0x14; the host's pointer is wider, so the name
-// is after the gap).
-struct OnlineParkSelection {
-    int32_t mF00;                // 0x00
-    int32_t mF04;                // 0x04
-    int32_t mID;                 // 0x08  the city (list) or the park (upload) number
-    int32_t mF0C;                // 0x0c
-    int32_t mF10;                // 0x10
-    const char16_t* mName;       // 0x14  a pointer on the Mac (the host's is at 0x18)
-};
+// 0x102e4864 points to the city the player picked on a globe: the city object itself (the Mac reads its words at 0x08, the id, and
+// 0x14, the name). The host's city keeps them elsewhere, so the selection is the city's own class.
+using OnlineParkSelection = CFSOnlineCity;
 // 0x102e4868: a global whose word at 0x08 is the path of the park file to upload (a pointer on the Mac). __sinit_lobby_cpp builds a
 // narrow string in it (0x14 bytes on the Mac, gLobbyNode487C follows); the host's string is 0x20 bytes, so the tail makes room for it.
 struct OnlineUploadFile {
@@ -58,4 +52,9 @@ namespace parklist_callee {
 void RankCtor(void* mem);                                  // 0x1018f93c InterfaceRankTextObject(NULL) (class undeclared)
 // SwearFilter::Filter on the library string the slot holds (a pointer to its representation); defined weakly in the unit's file.
 bool FilterMsl(SwearFilter* filter, void* slot, bool replace);
+// FillParkList's local std::wstring (one pointer to its representation, the data pointer native): the empty constructor, assign and
+// the destructor of the string library, the online UI's (online_callee) under this file's name, whose strings have that layout.
+void WStringCtor(void* self);                                       // 0x101e0b84
+void WStringAssign(void* self, const char16_t* text, uint32_t n);   // 0x101b2510
+void WStringDtor(void* self, int16_t flag);                         // 0x101468f8
 }  // namespace parklist_callee

@@ -11,8 +11,14 @@ records its arguments; text is logged as a hash of its UTF-16 units, pointers in
 at all (the events and their order carry them). Queues answer the finds (found or not), GetDataForUser, and what the parser fake does.
 
 The world of a case: a COnlineControl block (0xe90 bytes), the name as a wide string (a rep with the length at +0 and the data pointer at
-+0xc on the Mac, a std::u16string on the host), and for UpdateUserList a chain of contact nodes (the first node in the word at 0xe30, the
-end node at 0xe2c; the increment fake walks the chain). What is compared: the log of events (the whole call sequence).
++0xc on the Mac, a std::u16string on the host), and for UpdateUserList a chain of contact nodes on the Mac's words on both sides (the key
+rep's word at +0xc, the first node in the word at 0xe30, the end node at 0xe2c; the increment fake walks the chain). What is compared: the log of events (the whole call sequence).
+
+With the port fixes (tpw_cocig_portfix answers 1; port_fix tags parser64 and chatslash) SendText builds every line that is not empty
+as command 0 with the whole line, without the parser: a line starting with '/' (after spaces and tabs), a bare "/", a line of only
+spaces included. Those cases compare the host's log with that sequence (the string made from the line, the two Arguments pushed,
+DoCommand, the vector torn down, and no parser event) instead of the original's. The edge names include "/afk", "/", " /x", "a/b", a
+line of spaces and a tab, and the empty line (which returns before anything on both sides).
 
 No fused operations. Not tested: nothing skipped; SendText assumes the first word of the string's rep is its length (empty returns early).
 """
@@ -33,10 +39,11 @@ SIZES = {0x1021922C: 388, 0x10219034: 388, 0x10218E3C: 388, 0x10217B5C: 492, 0x1
 OWN = set(SIZES)
 
 ADDR = dict(ui=0x10396440)
-HOST_LAYOUT = [0xE8C, 24]
+HOST_LAYOUT = [0xE8C]
 PARSE_TEXTS = [[], list("hi there".encode("utf-16-be")[1::2]), list("Zed".encode("utf-16-be")[1::2])]
 
 ST = {}       # per-case state of the stubs: obj, nodes, parser, vec, output
+PORT_FIX = False
 
 
 def H(units):
@@ -219,6 +226,9 @@ for a, f in ((0x1007363C, st_string_ctor), (0x1000221C, st_string_dtor), (0x101E
 
 
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_cocig_portfix.restype, runner.lib.tpw_cocig_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_cocig_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -298,7 +308,7 @@ class Host(Side):
         return self.lib.tpw_cocig_u16(self.buf(units), len(units))
 
     def mknode(self, units):
-        node = self.alloc(0x30)
+        node = self.alloc(0x10)
         self.lib.tpw_cocig_node(node, self.buf(units), len(units))
         return node
 
@@ -352,7 +362,20 @@ def run(s, case):
         s.done()
 
 
+def direct_send(units):
+    """The log of SendText with the port fixes for a line that is not empty, '/' or not: command 0, then the line."""
+    t, empty = H(units), H([])
+    return [("WStringCtorFrom", (t,), ()),
+            ("StringCtor", (), ()), ("WStringCtor", (), ()), ("PushBack", (0, 0, empty), ()), ("WStringDtor", (-1, empty), ()),
+            ("StringDtor", (-1,), ()),
+            ("WStringCopy", (0, MASK, t), ()), ("ArgumentCtor", (t,), ()), ("PushBack", (0, 0, t), ()), ("WStringDtor", (-1, t), ()),
+            ("StringDtor", (-1,), ()), ("WStringDtor", (-1, t), ()),
+            ("WStringDtor", (-1, t), ()), ("DoCommand", (0, 0), ()), ("TearDown", (0,), ())]
+
+
 def ppc(e, case):
+    if PORT_FIX and case["op"] == "SendText" and case["name"]:
+        return {"log": direct_send(case["name"])}
     return run(Ppc(e, case), case)
 
 
@@ -362,7 +385,8 @@ def host(lib, case):
 
 # ---------------------------------------------------------------------------------------------------------------- case generators
 
-NAMES = [[], [0x61], list(b"Bob"), list(b"Zed Q"), [0x63, 0x61, 0x66, 0xE9], [0x4E2D, 0x6587], [0x78] * 40, [0xFFFF, 0x100, 0x20]]
+NAMES = [[], [0x61], list(b"Bob"), list(b"Zed Q"), [0x63, 0x61, 0x66, 0xE9], [0x4E2D, 0x6587], [0x78] * 40, [0xFFFF, 0x100, 0x20],
+         list(b"/afk"), [0x2F], list(b" /x"), list(b"a/b"), [0x20, 0x09, 0x20]]
 
 
 def runits(r):

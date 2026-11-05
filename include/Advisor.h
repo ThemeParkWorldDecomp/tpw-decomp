@@ -1,7 +1,7 @@
 // Advisor.cpp (main app): the advisor's speech and animation (ADV_*). src/game/advisor/Advisor.cpp translates the start-up and
 // close, the pause pair, the animation sequences, the accessories and dressing, the per-frame ticks and the part that
 // makes him speak (ADV_Call, ADV_Slap, ADV_Kill, ADV_GetTag and ADV_Stat, 0x1000887c..0x10009194); the response table
-// they read is data (src/advisor_lines.cpp).
+// they read is data (tables/advisor_lines.cpp).
 #pragma once
 #include <cstdint>
 
@@ -56,7 +56,7 @@ struct AdvisorLine {
     int32_t mTag;                 // 0x1c  what ADV_GetTag answers
 };
 constexpr int32_t kAdvisorLastLine = 9999;   // the id of the terminator row
-extern AdvisorLine gAdvisorLines[611];       // 0x10278ce4, src/advisor_lines.cpp (not const so that a test can patch a row)
+extern AdvisorLine gAdvisorLines[611];       // 0x10278ce4, tables/advisor_lines.cpp (not const so that a test can patch a row)
 // The lip-sync file ADV_Call opened last (TPFile_Open's answer; the original name is unknown): 0x102b3548.
 extern void* gAdvisorFile;
 

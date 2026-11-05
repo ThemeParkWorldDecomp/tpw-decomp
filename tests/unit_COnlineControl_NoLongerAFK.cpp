@@ -66,7 +66,8 @@ void docommand_callee::ChatNotAFK(uint32_t chat, void* context) {
 }
 
 void online_callee::ChatMovePlayer(void* chat, int32_t x, int32_t y, int32_t mode, void* context) {
-    ev("MovePlayer", {static_cast<int64_t>(reinterpret_cast<uintptr_t>(chat) & 0xffffffffu), static_cast<int64_t>(x), static_cast<int64_t>(y),
+    // the word the whole pointer stands for: a pointer cut down to the 32-bit word is outside the arena and gets a new handle
+    ev("MovePlayer", {static_cast<int64_t>(online_callee::PointerToHandle(chat)), static_cast<int64_t>(x), static_cast<int64_t>(y),
                       static_cast<int64_t>(mode), PtrId(context)});
 }
 

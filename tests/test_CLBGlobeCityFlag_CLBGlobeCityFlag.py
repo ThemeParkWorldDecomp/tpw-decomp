@@ -10,11 +10,17 @@ flag. Names and strings are logged as a hash of their characters.
 The world of a case: the city (name, position, value), gLobbyMeshes, the flag block. What is compared: the answer, the flag's fields as
 labels, the city's numbers, the mesh block, the event log.
 
+With the port fixes (tpw_cf_portfix answers 1; port_fix tag globeflag) the flag's height starts at 0.05, not 0.02: a Mac Scale
+event whose height is below 0.05 (the floor 0.02, or 0.0005 * value + 0.02 under 60 parks) is compared as Scale(s, s, 0.05) with s =
+0.2 * 0.05 + 0.035 fused and rounded once, as the fix computes it; every other event and height is the Mac's own. The edge values
+include 59, 60 and 61 parks around the new floor.
+
 fmadds is hooked with HardwareRounding. Not tested: a NULL city or globe (read unconditionally); the delete flag > 0 on the host is
-the wrapper's event (the compiler's delete), and the Mac's string at 0x1023e91e is not known, so both sides compare against their own.
+the wrapper's event (the compiler's delete). The name the city's is compared with (0x1023e91e, "North Pole") is logged by its hash.
 """
 import ctypes as C
 import random
+from fractions import Fraction
 import struct
 
 from unicorn import UC_HOOK_CODE
@@ -39,6 +45,7 @@ HOST_LAYOUT = [8, 16, 24, 32, 0, 8, 12, 16, 20, 168]
 OFF_PPC = dict(mesh=4, globe=8, city=0xC, name=0x14, value=0x40, x=0x34, y=0x38, z=0x3C)
 OFF_HOST = dict(mesh=8, globe=16, city=24, name=0, value=8, x=12, y=16, z=20)
 PN = ("meshes", "mesh", "globe", "flag", "city", "name")
+PORT_FIX = False
 LABELS = {"meshes": 1, "mesh": 2, "globe": 3, "flag": 4, "city": 5}
 P = {}
 
@@ -100,7 +107,7 @@ def wide_units(e, a):
 
 def stub_wcsicmp(e):
     L = e.cl
-    L.rec("wcsicmp", (hsh(wide_units(e, e.r(3))), 1 if e.r(4) else 0))
+    L.rec("wcsicmp", (hsh(wide_units(e, e.r(3))), hsh(wide_units(e, e.r(4)))))
     e.set_r(3, L.ret("wcsicmp") & MASK)
 
 
@@ -153,6 +160,9 @@ STUBS.internal(DELETE, keep_toc(stub_delete))
 
 
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_cf_portfix.restype, runner.lib.tpw_cf_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_cf_portfix() == 1
     e = runner.emu
     T.install_std_stubs(e)
     sizes = dict(meshes=16, mesh=64, globe=16, flag=64, city=0x68, name=96)
@@ -324,8 +334,35 @@ def run(s, case):
         s.done()
 
 
+def f32(x):
+    """The single-precision value nearest x (a double holding it exactly, as the sums here do)."""
+    return struct.unpack(">f", struct.pack(">f", float(x)))[0]
+
+
+def fused(a, b, c):
+    """fmadds: a * b + c of three singles, exact, rounded once to single (the exact sum here fits a double)."""
+    exact = Fraction(f32(a)) * Fraction(f32(b)) + Fraction(f32(c))
+    assert Fraction(float(exact)) == exact
+    return fb(f32(exact))
+
+
+FIX_LO = fb(f32(0.05))
+
+
+def fix_scale(event):
+    """The Mac's Scale event as the globeflag fix makes it: a height below 0.05 becomes 0.05, its width with it."""
+    name, ints, texts = event
+    if name != "Scale" or bitsf(ints[3]) >= bitsf(FIX_LO):
+        return event
+    s = fused(0.2, bitsf(FIX_LO), 0.035)
+    return (name, (ints[0], s, s, FIX_LO), texts)
+
+
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    r = run(Ppc(e, case), case)
+    if PORT_FIX and case["op"] == "ct":
+        r["log"] = [fix_scale(ev) for ev in r["log"]]
+    return r
 
 
 def host(lib, case):
@@ -335,7 +372,7 @@ def host(lib, case):
 # ---------------------------------------------------------------------------------------------------------------- cases
 
 SPECIAL = [0, 0x80000000, 0x7FC00000, 0x7F800000, 0xFF800000, 0x00000001, 0x3F800000, 0xBF800000, 0x7F7FFFFF, 0x00800000]
-VALUES = [-5, 0, 1, 79, 80, 81, 160, 161, 1000, 0x7FFFFFFF, -0x80000000, -41, -40, -39]
+VALUES = [-5, 0, 1, 59, 60, 61, 79, 80, 81, 160, 161, 1000, 0x7FFFFFFF, -0x80000000, -41, -40, -39]
 
 
 def rf(r):

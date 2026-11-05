@@ -82,6 +82,16 @@ void WStringCopy(void* self, const void* other, uint32_t pos, uint32_t count) {
     *reinterpret_cast<const char16_t**>(self) = StrOf(other);
 }
 void WStringDtor(void* self, int16_t flag) { ev("WStringDtor", {Th(StrOf(self)), static_cast<int64_t>(flag)}); }
+// GotoFailed's host strings: the same events, the text assigned to the string itself.
+void WStringCtorFrom(std::u16string* self, const char16_t* text) {
+    ev("WStringCtorFrom", {Th(text)});
+    *self = text;
+}
+void WStringCopy(std::u16string* self, const std::u16string* other, uint32_t pos, uint32_t count) {
+    ev("WStringCopy", {Th(other->c_str()), static_cast<int64_t>(pos), static_cast<int64_t>(static_cast<int32_t>(count))});
+    *self = *other;
+}
+void WStringDtor(std::u16string* self, int16_t flag) { ev("WStringDtor", {Th(self->c_str()), static_cast<int64_t>(flag)}); }
 void OperatorDelete(void* p) { ev("Delete", {Oid(p)}); }
 void NocaseWStringDtor(void* self, int16_t flag) { ev("NocaseDtor", {Oid(self), static_cast<int64_t>(flag)}); }
 void UIOnlineAddBuddy(void* ui, const char16_t* text, int32_t data) {
@@ -117,13 +127,13 @@ void LocaleDtor(void* locale, int32_t flag) { ev("LocaleDtor", {Oid(locale), sta
 void IosBaseDtor(void* ios, int32_t flag) { ev("IosBaseDtor", {Oid(ios), static_cast<int64_t>(flag)}); }
 }  // namespace ifstream_callee
 
-uint32_t COnlineControl::GetDataForUser(const nocase_string& key) const {
-    ev("GetDataForUser", {IsObj(this), KeyHash(&key)});
+uint32_t COnlineControl::GetDataForUser(const std::u16string& key) const {
+    ev("GetDataForUser", {IsObj(this), Th(key.c_str())});
     return static_cast<uint32_t>(ret("GetDataForUser"));
 }
 
 void COnlineControl::ReceiveText(std::u16string& text, int32_t colour) {
-    ev("ReceiveText", {IsObj(this), Th(StrOf(&text)), static_cast<int64_t>(colour)});
+    ev("ReceiveText", {IsObj(this), Th(text.c_str()), static_cast<int64_t>(colour)});
 }
 
 int32_t TbITable::FormatString(char16_t* out, uint32_t size, uint32_t id, ...) const {

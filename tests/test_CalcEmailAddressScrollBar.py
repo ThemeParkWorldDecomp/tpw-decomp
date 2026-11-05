@@ -9,9 +9,8 @@ conversion functions, the bitmap and pixel classes, the JPEG reader); the number
 The windows are fixed blocks (their vtable slots 0x24 and 0x2c are the SetValue and SetText virtual calls).
 
 The world of a case: the user info (made by the original when the global is NULL: then its constructor fake fills the outbox words), the
-outbox words read by Mac offset (the current mail at +8, the list at +0x10 with its mail nodes, the preview mail at +0x18, three numbers at
-+0x1c), the gText table pointer, the screen size globals, the texture format, the preview size, the cursor. What is compared: the event
-log, the postcard text buffer and the conversion buffer (whole), the cursor (relative to the outbox) and whether the user info was made.
+current mail (Mac words at +8, the list at +0x10 with its nodes, +0x18, three numbers at +0x1c; on the host the real fields of Outbox), the gText table pointer,
+the screen size globals, the texture format, the preview size, the cursor. What is compared: the event log, the postcard text buffer and the conversion buffer (whole), the cursor (relative to the outbox) and whether the user info was made.
 
 No fused operations. Not tested: a screen height of 0 or below (the original divides by it), a count of mails that is huge (the loop of
 Next calls), a window id the original cannot find (GetWindow's answer NULL is dereferenced).
@@ -42,7 +41,7 @@ JPEG_CTOR, JPEG_DTOR, RA_CTOR, READJPEG = 0x102393A0, 0x102394C0, 0x10238E30, 0x
 
 ADDR = dict(gUserInfo=0x10380B34, gText=0x1037FF18, gei=0x103BC920, gOutboxWindow=0x10395E3C, gOutboxCursor=0x10395E38,
             gOutboxPreview=0x10395E10, post=0x103952EC, conv=0x10380C48, height=0x10395BBA, width=0x10395BBC)
-MAC_LAY = dict(ob=0x64, usize=0xD4, table=0x564, tex=4, ptr=4)
+MAC_LAY = dict(ob=0x64, usize=0xD4, table=0x564, tex=4, ptr=4, preview=0x1C)
 MARK_SETVALUE, MARK_SETTEXT = 0x7A24, 0x7A2C
 
 WIN = []       # the Mac addresses of the five window blocks (persistent)
@@ -371,16 +370,6 @@ class Side:
     def words(self, a, ws):
         self.write(a, b"".join(struct.pack(self.fmt, w & MASK) for w in ws))
 
-    def sc(self, off):
-        return off * (2 if self.fmt == "<I" else 1)
-
-    def slot(self, base, off, v):
-        # a Mac word: 4 bytes at the Mac offset on the PowerPC, an 8-byte slot at twice the offset on the host
-        if self.fmt == "<I":
-            self.write(base + 2 * off, struct.pack("<Q", v))
-        else:
-            self.words(base + off, [v])
-
     def u16s(self, a, n):
         return list(struct.unpack(self.fmt[0] + "%dH" % n, self.read(a, 2 * n)))
 
@@ -393,6 +382,7 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
+    cursor = 4       # the Mac's cursor word holds the outbox + 4
     lay = MAC_LAY
 
     def __init__(self, e, case):
@@ -443,6 +433,7 @@ LAY = {}
 
 class Host(Side):
     fmt = "<I"
+    cursor = 0       # the host's holds the outbox
 
     def __init__(self, lib, case):
         self.lib = lib
@@ -498,10 +489,12 @@ def bind(lib):
     lib.tpw_ob_alloc.restype, lib.tpw_ob_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_ob_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_ob_setcur.argtypes = [C.c_int32]
+    lib.tpw_ob_mail.argtypes = [C.c_uint64, C.c_char_p, C.c_char_p, C.c_int32, C.c_int32, C.c_int32]
+    lib.tpw_ob_address.argtypes = [C.c_uint64, C.c_char_p]
     out = (C.c_int64 * 32)()
     n = lib.tpw_ob_layout(out)
-    LAY.update(ob=out[0], usize=out[1], table=out[2], tex=out[3], ptr=8)
-    assert n == 4
+    LAY.update(ob=out[0], usize=out[1], table=out[2], tex=out[3], preview=out[4], ptr=8)
+    assert n == 5
     lib.bound = True
 
 
@@ -515,15 +508,18 @@ def build(s, c):
     s.write(s.g("height"), struct.pack(s.fmt[0] + "h", c["H"]))
     s.write(s.g("width"), struct.pack(s.fmt[0] + "h", c["W"]))
     s.wptr(s.g("gOutboxWindow"), s.win(0))
-    s.words(s.g("gOutboxPreview"), c["preview"])
+    s.words(s.g("gOutboxPreview") + lay["preview"], c["preview"])   # the area's width and height
     s.words(s.g("gei") + lay["tex"], [c["texfmt"]])
     s.wptr(s.g("gText") + lay["table"], c["table"])
 
     def entry(text):
+        # the Mac's string: a word at +0xc holds its characters; the host's fields take the text itself
         t = s.alloc(len(text) + 1)
         s.write(t, text + b"\0")
+        if isinstance(s, Host):
+            return t
         e = s.alloc(0x40)
-        s.slot(e, 0xC, t)
+        s.words(e + 0xC, [t])
         return e
 
     e1, e2 = entry(c["t1"]), entry(c["t2"])
@@ -540,18 +536,23 @@ def build(s, c):
     else:
         u = s.alloc(lay["usize"] + 0x80)
         ob = u + lay["ob"]
-        sentinel = ob + s.sc(0x10)
-        nodes = [s.alloc(0x40) for _ in c["mails"]]
-        for i, node in enumerate(nodes):
-            s.slot(node, 4, nodes[i + 1] if i + 1 < len(nodes) else sentinel)
-            s.slot(node, 8, entry(c["mails"][i]))
-        s.slot(ob, 8, e1)
-        s.slot(ob, 0x14, nodes[0] if nodes else sentinel)
-        s.slot(ob, 0x18, e2)
-        for k, n in enumerate(c["nums"]):
-            s.slot(ob, 0x1C + 4 * k, n)
+        if isinstance(s, Host):
+            n = [s32(k) for k in c["nums"]]
+            s.lib.tpw_ob_mail(ob, c["t1"], c["t2"], *n)
+            for text in c["mails"]:
+                s.lib.tpw_ob_address(ob, text)
+        else:
+            sentinel = ob + 0x10
+            nodes = [s.alloc(0x40) for _ in c["mails"]]
+            for i, node in enumerate(nodes):
+                s.words(node + 4, [nodes[i + 1] if i + 1 < len(nodes) else sentinel])
+                s.words(node + 8, [entry(c["mails"][i])])
+            s.words(ob + 8, [e1])
+            s.words(ob + 0x14, [nodes[0] if nodes else sentinel])
+            s.words(ob + 0x18, [e2])
+            s.words(ob + 0x1C, c["nums"])
         s.wptr(s.g("gUserInfo"), u)
-        s.wptr(s.g("gOutboxCursor"), ob + s.sc(4) if c["op"] == "prev" else 0)
+        s.wptr(s.g("gOutboxCursor"), ob + s.cursor if c["op"] == "prev" else 0)
     if isinstance(s, Host):
         s.words(s.g("ctl"), ctl)
 
@@ -563,7 +564,7 @@ def observe(s, c):
     ui = s.rptr(s.g("gUserInfo"))
     cur = s.rptr(s.g("gOutboxCursor"))
     return {"log": s.log(), "post": s.u16s(s.g("post"), 0x200), "conv": s.u16s(s.g("conv"), 0x4000),
-            "cursor": (((cur - ui - lay["ob"]) & MASK) // s.sc(1)) if cur else -1, "user": int(ui != 0)}
+            "cursor": ((cur - ui - lay["ob"] - s.cursor) & MASK) if cur else -1, "user": int(ui != 0)}
 
 
 def run(s, c):
@@ -588,7 +589,7 @@ def host(lib, case):
 
 
 def txt(r):
-    n = r.randrange(0, 7)
+    n = r.choice([r.randrange(0, 7), r.randrange(0, 7), r.randrange(23, 40)])     # short and long std::string forms on the host
     return bytes(r.randrange(0x80, 0x100) if r.random() < 0.1 else r.randrange(0x21, 0x7F) for _ in range(n))
 
 
@@ -625,7 +626,7 @@ def base(r, op, **kw):
     ctl[13] = r.choice([0, 1, 2, 0x10000, 0xFFFF, MASK, 0x20000])
     c["ctl"] = ctl
     c["texfmt"] = r.choice(range(-1, 9))
-    c["preview"] = [0] * 7 + [r.randrange(0, 0x400), r.randrange(0, 0x400)]
+    c["preview"] = [r.randrange(0, 0x400), r.randrange(0, 0x400)]
     c["number"] = r.choice([0, 1, 2, 3, 0x01000002, 0x02000001, 0x03000003, 0x02000000])
     ones = r.randrange(0, 4)
     c["queues"] = {"Next": [1] * ones + [0]}

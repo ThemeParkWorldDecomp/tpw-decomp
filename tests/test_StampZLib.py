@@ -507,3 +507,123 @@ TESTS += [Check(name, z_side(k, True), z_side(k, False), edge=z_edges, rnd=z_cas
 TESTS += [Check(name, d_side(k, True), d_side(k, False), edge=d_edges, rnd=d_case) for k, name in enumerate(D_NAMES)]
 TESTS += [Check(name, size_side(k, True), size_side(k, False), edge=lambda: [{"q": {}}], rnd=lambda r: {"q": {}})
           for k, name in enumerate(["CZLib::DecompressWorkspaceSize", "LbZLib_DeCompressWorkspaceSize", "LbZLib_CompressWorkspaceSize"])]
+
+# ---- The port's sized unpack for the park reader (port_fix parkload; with the fixes only)
+#
+# LbZLib_PortMemDecompressChecked has no original: the port's park reader calls it instead of LbZLib_MemDecompress. Its cases run
+# against a model with Python's zlib: the answer is the destination size only for a whole block (tag, window bits 8 to 15 or -8 to
+# -15, the declared size the destination's, a packed size of 0x1c to the bytes given) whose stream ends inside the block at exactly
+# that size; the header gets the swap marker (once it is 0x1c bytes or more); the destination holds the bytes on success and nothing
+# is written past it.
+PC_TAG, PC_MARKER, PC_GUARD = 0x5A4C4942, 0x53574150, 16
+
+
+def pc_block(data, wbits=15, level=-1, unpacked=None, packed_delta=0, tail=b"", tag=PC_TAG, header_wbits=None):
+    z = zlib.compressobj(level, zlib.DEFLATED, wbits, 9)
+    stream = z.compress(data) + z.flush()
+    packed = 0x1C + len(stream) + packed_delta
+    head = struct.pack("<7I", tag, len(data) if unpacked is None else unpacked, packed & 0xFFFFFFFF,
+                       (wbits if header_wbits is None else header_wbits) & 0xFFFFFFFF, 9, 0, 0)
+    return head + stream + tail
+
+
+def pc_case(block, size=None, dest=None, flip=None):
+    block = bytearray(block)
+    if flip is not None and flip < len(block):
+        block[flip] ^= 0x5A
+    if dest is None:
+        dest = struct.unpack_from("<I", block, 4)[0] if len(block) >= 8 else 0
+    return dict(block=bytes(block), size=len(block) if size is None else size, dest=dest)
+
+
+def pc_model(e, c):
+    b, n, d = bytearray(c["block"]), c["size"], c["dest"]
+    if n < 0x1C:
+        return dict(ret=0, source=bytes(b), out=None, guard_ok=True)
+    b[0x18:0x1C] = struct.pack("<I", PC_MARKER)
+    tag, unpacked, packed, wbits = struct.unpack_from("<4I", b)
+    wbits = T.s32(wbits)
+    answer, out = 0, None
+    if tag == PC_TAG and (8 <= wbits <= 15 or -15 <= wbits <= -8) and unpacked == d and 0x1C <= packed <= n:
+        z = zlib.decompressobj(wbits)
+        try:
+            data = z.decompress(bytes(b[0x1C:packed]))
+            if z.eof and len(data) == d and d != 0:
+                answer, out = d, data
+        except zlib.error:
+            pass
+    return dict(ret=answer, source=bytes(b), out=out, guard_ok=True)
+
+
+def pc_host(lib, c):
+    f = lib.tpw_szl_port_checked
+    f.restype, f.argtypes = U32, [VP, U32, VP, U32]
+    source = C.create_string_buffer(c["block"], max(len(c["block"]), 1))
+    dest = C.create_string_buffer(b"\xCC" * (c["dest"] + PC_GUARD), c["dest"] + PC_GUARD)
+    answer = f(source, c["size"], dest, c["dest"])
+    return dict(ret=answer, source=source.raw[:len(c["block"])], out=dest.raw[:c["dest"]] if answer else None,
+                guard_ok=dest.raw[c["dest"]:] == b"\xCC" * PC_GUARD)
+
+
+def pc_data(r, n):
+    kind = r.randrange(3)
+    if kind == 0:
+        return bytes(r.getrandbits(8) for _ in range(n))
+    if kind == 1:
+        return bytes([r.getrandbits(8)]) * n
+    return bytes((i * 7 + 3) & 0xFF for i in range(n))
+
+
+def pc_edges():
+    r = random.Random(41)
+    text = pc_data(r, 5000)
+    good = pc_block(text)
+    cases = [pc_case(good), pc_case(pc_block(text, wbits=-15)), pc_case(pc_block(text, wbits=12)), pc_case(pc_block(b"x")),
+             pc_case(pc_block(text, level=0)), pc_case(pc_block(text, level=9))]
+    cases += [pc_case(good, size=s) for s in (0, 1, 0x1B, 0x1C, 0x1D, len(good) - 1, len(good) - 9)]
+    cases += [pc_case(good, dest=d) for d in (0, 1, 4999, 5001)]
+    cases += [pc_case(pc_block(text, unpacked=u), dest=5000) for u in (0, 4999, 5001, 0xFFFFFFFF)]
+    cases += [pc_case(pc_block(text, packed_delta=k)) for k in (-1, -9, 1)]
+    cases += [pc_case(pc_block(text, packed_delta=k, tail=b"\0" * 8)) for k in (0, 1, 8)]
+    cases += [pc_case(pc_block(text, packed_delta=-(len(good) - 0x1C) + k)) for k in (-1, 0)]
+    cases += [pc_case(pc_block(text, packed_delta=0x7FFFFFFF)), pc_case(pc_block(text, packed_delta=-0x1D))]
+    cases += [pc_case(pc_block(text, tag=t)) for t in (0, PC_TAG ^ 1, 0x424C495A)]
+    cases += [pc_case(pc_block(text, header_wbits=w)) for w in (7, 16, 0, -7, -16, 31, 47, -1)]
+    cases += [pc_case(pc_block(text, wbits=-15, header_wbits=15)), pc_case(pc_block(text, wbits=15, header_wbits=-15))]
+    cases += [pc_case(good, flip=k) for k in (0x1C, 0x1D, 0x30, len(good) - 1, len(good) - 3)]
+    cases += [pc_case(bytes(32)), pc_case(b"\0" * 0x1C), pc_case(b"BILZ")]
+    marked = bytearray(good)
+    marked[0x18:0x1C] = struct.pack("<I", PC_MARKER)
+    cases.append(pc_case(bytes(marked)))
+    return cases
+
+
+def pc_rnd(r):
+    data = pc_data(r, r.choice([1, 2, 100, 4096, 30000]))
+    k = r.randrange(8)
+    if k == 0:
+        return pc_case(pc_block(data, wbits=r.choice([15, -15, 9, 12, -9])))
+    if k == 1:
+        block = pc_block(data)
+        return pc_case(block, size=r.randrange(len(block) + 1))
+    if k == 2:
+        return pc_case(pc_block(data, unpacked=r.choice([0, len(data) - 1, len(data) + 1, r.getrandbits(32)])), dest=len(data))
+    if k == 3:
+        return pc_case(pc_block(data, packed_delta=r.choice([-1, -2, -20, 1, 5, -(1 << 31)]), tail=b"\0" * r.choice([0, 0, 8])))
+    if k == 4:
+        block = pc_block(data)
+        return pc_case(block, flip=r.randrange(0x1C, len(block)))
+    if k == 5:
+        return pc_case(pc_block(data), dest=r.choice([0, len(data) - 1, len(data) + 1]))
+    if k == 6:
+        return pc_case(bytes(r.getrandbits(8) for _ in range(r.choice([0, 0x1C, 100]))))
+    return pc_case(pc_block(data, header_wbits=r.choice([7, 8, 16, -8, -16, 0, r.getrandbits(32)])))
+
+
+_setup_without_checked = setup
+
+
+def setup(runner):  # noqa: F811
+    _setup_without_checked(runner)
+    if hasattr(runner.lib, "tpw_szl_port_checked"):
+        TESTS.append(FnTest("LbZLib_PortMemDecompressChecked (port fix)", pc_model, pc_host, edge=pc_edges, rnd=pc_rnd))

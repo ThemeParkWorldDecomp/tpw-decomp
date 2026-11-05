@@ -9,7 +9,7 @@ and its OfferOpinionOn) are fakes on both sides that record their arguments and 
 the first time and block B afterwards (the original keeps the first answer in a register and re-asks for the type).
 
 The world of a case: a person block (floats at +0x19c, +0x1a4, +0x1a8, +0x1b0, the word at +0x1a0), the four balance words of gMainBalance
-(+0x24 to +0x30), the ride records and the control block, gGameWorld. What is compared: the answer, the whole person block, the event log.
+(Mac +0x24 to +0x30; on the host the low halves of slots 7 to 10), the ride records and the control block, gGameWorld. What is compared: the answer, the whole person block, the event log.
 The ride records' words are written at the Mac's offsets on the PPC side and at the host fields of the same names on the host side
 (tests/ridelayout.py).
 
@@ -126,6 +126,9 @@ class Side:
 
 
 class Ppc(Side):
+    def bal_put(self, off, v):
+        self.words(self.g("gMainBalance") + off, [v])
+
     fmt = ">I"
 
     def __init__(self, e, case):
@@ -167,6 +170,11 @@ class Ppc(Side):
 
 
 class Host(Side):
+    def bal_put(self, off, v):
+        # A slot is eight bytes on the host: the word goes in its low half, the high half is left noisy so a raw read shows.
+        a = self.lib.tpw_t_slot((off - 8) // 4)
+        self.write(a, struct.pack("<II", v & MASK, 0xA5A5A5A5))
+
     fmt = "<I"
 
     def __init__(self, lib, case):
@@ -212,6 +220,7 @@ def bind(lib):
     lib.tpw_t_addr.restype, lib.tpw_t_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_t_alloc.restype, lib.tpw_t_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_t_layout.argtypes = [C.POINTER(C.c_int64)]
+    lib.tpw_t_slot.restype, lib.tpw_t_slot.argtypes = C.c_uint64, [C.c_int32]
     lib.tpw_t_set.argtypes = [C.c_uint64, C.c_uint64, C.c_uint64]
     ridelayout.bind(lib)
     lib.tpw_t_pricey.restype, lib.tpw_t_pricey.argtypes = C.c_uint32, [C.c_uint64, C.c_uint64]
@@ -229,7 +238,8 @@ def build(s, case):
     s.words(p + 0x1A4, [case["f1a4"]])
     s.words(p + 0x1A8, [case["f1a8"]])
     s.words(p + 0x1B0, [case["f1b0"]])
-    s.words(s.g("gMainBalance") + 0x24, case["bal"])
+    for i, v in enumerate(case["bal"]):
+        s.bal_put(0x24 + 4 * i, v)
     s.words(s.g("gGameWorld"), [WORLD])
     a, b, c = s.alloc(s.rec_size()), s.alloc(s.rec_size()), s.alloc(0x10)
     for blk, fields in ((a, case["dbA"]), (b, case["dbB"])):

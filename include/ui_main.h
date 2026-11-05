@@ -580,7 +580,7 @@ extern uint8_t gResearchPanelMade;              // 0x10395978: set to 1 when the
 extern int32_t gResearchSoundA;                 // 0x10395968: UIMain_UISound(0x9a)'s answer
 extern int32_t gResearchSoundB;                 // 0x10395964: UIMain_UISound(0x9b)'s answer
 extern uint32_t gResearchFontIndex;             // 0x102aca94: initialised data, 6 (the font of the five bars)
-extern int16_t gResearchPanelScript[];          // 0x102ac35a: the panel's window script (the image's words, generated at configure time)
+extern int16_t gResearchPanelScript[];          // 0x102ac35a: the panel's window script (the image's words, include/WindowScripts.inc)
 void InitAll();                                 // 0x101b4000 (516 bytes, untranslated)
 // The message functions of the panel and its bars (untranslated; the unit's test library fakes them).
 int32_t ResearchPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101b45e0
@@ -660,16 +660,19 @@ void WhichSpecialButton();                                // 0x1019c3e8 (368 byt
 void LinkSlideoutPanel(InterfaceWindow* panel, int32_t n);
 InterfaceWindow* LinkSlideoutPanelResult(InterfaceWindow* panel, int32_t n);   // same code, keeps r3 (the panel, or NULL)   // 0x101a82ec (src/game/ui/ui_mainpanel2.cpp): answers the panel, or NULL when slot 0x21 already holds one
 // Host only: the slide-out slot's message 0xa carries the arriving panel as a 32-bit word (the Mac's pointer); a host window is above
-// 4 GB, so LinkSlideoutPanel notes the panel here and RailsCallback's WindowFromWord gets it back from the word's low 32 bits.
+// 4 GB, so LinkSlideoutPanel notes the panel here and RailsCallback's WindowFromWord gets it back from the word's low 32 bits. The last
+// sixteen panels are kept, in the order they came: every posted word is still there when its message arrives.
 inline InterfaceWindow* gSlideoutWordWindows[16] = {};
+inline uint32_t gSlideoutWordNext = 0;
 inline void NoteSlideoutWord(InterfaceWindow* window) {
-    const uint32_t word = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(window));
-    InterfaceWindow** slot = &gSlideoutWordWindows[(word >> 4) & 15];
-    *slot = window;
+    for (InterfaceWindow* noted : gSlideoutWordWindows)
+        if (noted == window) return;
+    gSlideoutWordWindows[gSlideoutWordNext] = window;
+    gSlideoutWordNext = (gSlideoutWordNext + 1) & 15;
 }
 inline InterfaceWindow* SlideoutWordWindow(int32_t word) {
-    InterfaceWindow* window = gSlideoutWordWindows[(static_cast<uint32_t>(word) >> 4) & 15];
-    if (window != nullptr && static_cast<uint32_t>(reinterpret_cast<uintptr_t>(window)) == static_cast<uint32_t>(word)) return window;
+    for (InterfaceWindow* noted : gSlideoutWordWindows)
+        if (noted != nullptr && static_cast<uint32_t>(reinterpret_cast<uintptr_t>(noted)) == static_cast<uint32_t>(word)) return noted;
     return reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(static_cast<uint32_t>(word)));
 }
 int32_t IsTrackClosed(void* coaster);                     // 0x10052850 (stand-in)
@@ -687,7 +690,7 @@ void CoasterButtonsEnabled(uint32_t buttons);             // 0x1019cd6c (576 byt
 // Unit v5986 (src/CUI2DMap_..._CUI2DMap_CreateMapPanel.cpp)
 void GetHFieldMaxVertexIndices(uint32_t* width, uint32_t* height);   // 0x1005c250 (stand-in): the heightfield's last vertex indices
 int32_t UI_2DMap_CallbackFn(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x1022bf74 (stand-in)
-extern int16_t gMapPanelScript[];   // 0x102b2366 (name invented): the map panel's window script (the image's words, generated at configure time)
+extern int16_t gMapPanelScript[];   // 0x102b2366 (name invented): the map panel's window script (the image's words, include/WindowScripts.inc)
 class InterfaceDrawObject;
 namespace mappanel_callee {
 InterfaceDrawObject* NewTextSprite();   // operator new(0x19c), then InterfaceTextObjectSprite(NULL) 0x1018d11c; faked by the test library
@@ -705,7 +708,7 @@ extern int16_t gEditParkNameScript[];         // 0x102a9834: the panel's window 
 int32_t EntryPricePanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);        // 0x1019d350
 int32_t EntryPricePanelTitleMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x1019d544
 void RemoveEntryPricePanel();                  // 0x1019da08 (stand-in)
-extern int16_t gEntryPriceScript[];           // 0x102a96a8: the panel's window script (the image's words, generated at configure time)
+extern int16_t gEntryPriceScript[];           // 0x102a96a8: the panel's window script (the image's words, include/WindowScripts.inc)
 extern int32_t gEntryPriceClosed;              // 0x10394840: IsParkClosed as the panel was built
 extern uint32_t gEntryPriceFee;                // 0x10394844: the admission fee being edited
 namespace entry_callee {
@@ -1241,7 +1244,7 @@ extern uint16_t gRideListNoneA;        // 0x102aceec: the selected id that means
 extern uint16_t gRideListNoneB;        // 0x102aceee: the same when the panel is new
 extern int32_t gRideListButtonFont;    // 0x102acedc: 8 at start; MAKECOLUMNBUTTON's third argument
 extern int32_t gRideListSortColumn;    // 0x102acee4: 1 at start
-extern int16_t gRideListScript[];      // 0x102aca9c: the panel's window script (the image's words, generated at configure time)
+extern int16_t gRideListScript[];      // 0x102aca9c: the panel's window script (the image's words, include/WindowScripts.inc)
 extern int32_t gRideListF90;           // 0x10395990: zeroed by a new panel
 extern int16_t gRideListF8C;           // 0x1039598c: zeroed by a new panel
 extern int16_t gRideListF8A;           // 0x1039598a: zeroed by a new panel
@@ -1268,7 +1271,7 @@ int32_t BankruptWindowMsg(InterfaceWindow* window, int32_t message, int32_t a, i
 // 0x101877b8 (436 bytes): ui_main.cpp's static initialiser: the interface light, the cursor table and the four name strings are built and
 // registered for destruction. (The vtable words it stores into gUIClockTick are that object's own construction; not repeated here.)
 void __sinit_ui_main_cpp();
-// Data of the image (names invented; the scripts are generated at configure time and the animations hold the image's frames).
+// Data of the image (names invented; the scripts are in include/WindowScripts.inc and the animations hold the image's frames).
 extern int16_t gCongratsScript[];          // 0x102a772c
 extern int16_t gBankruptScript[];          // 0x102a7756
 extern UI_RectDelta gCongratsAnim[];       // 0x102a79d4
@@ -1332,7 +1335,7 @@ extern int32_t gStaffCostsDeposits;          // 0x10395a1c: the deposits history
 extern int32_t gStaffCostsWithdrawals;       // 0x10395a18: the withdrawals history's newest value (0x1f5a0)
 extern int32_t gStaffCostsWord10;            // 0x10395a10: the history at 0x1f7f0's newest value
 extern int32_t gStaffCostsWord14;            // 0x10395a14: word 18 less word 10
-extern int16_t gStaffCostsScript[];         // 0x102adc20: the panel's window script (the image's words, generated at configure time)
+extern int16_t gStaffCostsScript[];         // 0x102adc20: the panel's window script (the image's words, include/WindowScripts.inc)
 int32_t StaffCostsPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101be1f4 (untranslated)
 
 // ---- Unit v5097 (src/game/ui/ui_researchPanel.cpp): the research panel's scroll handling, InitAll and ResearchPanelMsg.
@@ -1471,7 +1474,7 @@ void HideButtonsMenu();          // 0x101e8b18 (88 bytes, stand-in)
 
 // ---- Unit v5913 (src/game/ui/ui_yearEndPanel.cpp). Names invented.
 extern InterfaceWindow* gYearEndPanel;   // 0x10395b70: the year end panel, NULL while it is not up (a 32-bit pointer on the Mac)
-extern int16_t gYearEndScript[];         // 0x102af524: the panel's window script, 478 words (the image's words, generated at configure time)
+extern int16_t gYearEndScript[];         // 0x102af524: the panel's window script, 478 words (the image's words, include/WindowScripts.inc)
 int32_t YearEndPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101c67b4 (TVector 0x10268078; unit v51007 translates it in src/game/ui/ui_yearEndPanel.cpp, src/game/ui/ui_upgradeStatus.cpp)
 // Unit v51007
 void RemoveYearEndPanel();   // 0x101c73e4 (56 bytes, stand-in)

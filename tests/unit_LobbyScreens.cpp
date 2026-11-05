@@ -71,6 +71,7 @@ RECORD(CLBScreenComponentOnlineIslands, "OnlineIslands", Tick)
 RECORD_INPUT(CLBScreenComponentOnlineIslands, "OnlineIslands")
 RECORD_CANCEL(CLBScreenComponentOnlineIslands, "OnlineIslands")
 QUIET_SHOW(CLBScreenComponentOnlineIslands)
+void CLBScreenComponentOnlineIslands::EnterCurrentIsland() {}   // (the class's vtable has it; src/game/online/lobby_island.cpp)
 CLBScreenComponentOnlineGlobe::CLBScreenComponentOnlineGlobe() { ev("Globe.ctor", {newlab(this)}); }
 RECORD_DTOR(CLBScreenComponentOnlineGlobe, "Globe")
 RECORD(CLBScreenComponentOnlineGlobe, "Globe", Render)

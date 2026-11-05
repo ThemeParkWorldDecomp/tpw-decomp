@@ -200,6 +200,7 @@ class Host(Side):
 def bind(lib):
     if getattr(lib, "bound", False):
         return
+    assert lib.tpw_email_send_heap_outbox() == 1  # Outbox::Send gives the outbox inside the user info, on the host's heap
     lib.tpw_email_alloc.restype, lib.tpw_email_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_email_new.restype, lib.tpw_email_new.argtypes = C.c_uint64, [C.c_int32]
     lib.tpw_email_reset.restype, lib.tpw_email_reset.argtypes = None, []

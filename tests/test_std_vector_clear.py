@@ -235,6 +235,14 @@ class Side:
     def rd_ptr(self, a):
         return struct.unpack(self.pfmt, self.read(a, self.psize))[0]
 
+    def put_vdata(self, a, v):
+        """An argument vector's data word: 32 bits on both sides (on the host, an arena offset: the low half of the address)."""
+        self.write(a, struct.pack(self.fmt, v & MASK))
+
+    def rd_vdata(self, a):
+        word = struct.unpack(self.fmt, self.read(a, 4))[0]
+        return word | (self.g("A") & ~MASK) if word != 0 else 0
+
     def name(self, v):
         """A pointer as a block name (and offset), so both memories compare."""
         if v == 0:
@@ -349,7 +357,7 @@ def build(s, case):
     A, B, C_, D = s.g("A"), s.g("B"), s.g("C"), s.g("D")
     if op in ("clear", "tear"):
         s.words(A, [case["cap"], case["size"]])
-        s.put_ptr(A + 8, s.ref(case["data"][0], case["data"][1]))
+        s.put_vdata(A + 8, s.ref(case["data"][0], case["data"][1]))
     elif op in ("tokcopy", "tokctor"):
         s.words(A, case["mine"])
         s.words(B, case["other"])
@@ -404,7 +412,7 @@ def observe(s, case, answer):
     A, B, C_ = s.g("A"), s.g("B"), s.g("C")
     o = {"log": s.log()}
     if op in ("clear", "tear"):
-        o["vec"] = s.rd_words(A, 2) + [s.name(s.rd_ptr(A + 8))]
+        o["vec"] = s.rd_words(A, 2) + [s.name(s.rd_vdata(A + 8))]
     elif op in ("tokcopy", "tokctor"):
         o["a"] = s.rd_words(A, 4)
         o["b"] = s.rd_words(B, 4)

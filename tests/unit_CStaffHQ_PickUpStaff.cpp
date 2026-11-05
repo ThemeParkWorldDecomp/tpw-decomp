@@ -36,6 +36,7 @@ void OperatorDelete(void* block) { ev("OperatorDelete", {lab(block)}); }
 
 void UIMain_DestroyWString(void*) {}
 
+
 extern "C" void __register_global_object(void* object, void* destructor, void* node) {
     ev("RegisterGlobal", {lab(object), lab(destructor), lab(node)});
 }

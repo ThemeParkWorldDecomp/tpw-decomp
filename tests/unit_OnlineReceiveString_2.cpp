@@ -103,6 +103,10 @@ void FillBuddyList() { ev("FillBuddyList", {}); }
 void UI_DoPostcard() { ev("UI_DoPostcard", {}); }
 
 COnlineControl::COnlineControl() {}
+// The class's own allocator (the arena in the game) is the global one here.
+void* COnlineControl::operator new(std::size_t size) { return ::operator new(size); }
+void* COnlineControl::operator new(std::size_t size, const std::nothrow_t& tag) noexcept { return ::operator new(size, tag); }
+void COnlineControl::operator delete(void* block) noexcept { ::operator delete(block); }
 void COnlineControl::EarmuffsOn() { ev("EarmuffsOn", {lab(this)}); }
 void COnlineControl::EarmuffsOff() { ev("EarmuffsOff", {lab(this)}); }
 void COnlineControl::VoteForThisPark() { ev("VoteForThisPark", {lab(this)}); }

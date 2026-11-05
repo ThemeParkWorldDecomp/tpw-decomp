@@ -1,7 +1,7 @@
 // Test library for the CPerson balloon, happiness and catch helpers (unit v5293; libtpw_unit_CPerson_GetBagged.dylib, tests/test_CPerson_GetBagged.py), main app:
 //   src/game/people/Person.cpp
 //
-// The callees outside the unit are recording fakes; gMainBalance is raw storage under the program's symbol name (its constructor lives in files this
+// The callees outside the unit are recording fakes; gMainBalance is raw storage under the program's symbol name, with the real class's layout (its constructor lives in files this
 // library does not compile).
 #include <cstdarg>
 #include <cstddef>
@@ -59,6 +59,10 @@ uint64_t tpw_gb_addr(const char* name) {
     if (std::strcmp(name, "bal") == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&gMainBalanceStorage[0]));
     if (std::strcmp(name, "target") == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&gBalloonPopTarget));
     return 0;
+}
+
+uint64_t tpw_gb_slot(int32_t slot) {
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&reinterpret_cast<CMainBalance*>(gMainBalanceStorage)->mValues[slot]));
 }
 
 uint64_t tpw_gb_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(size))); }

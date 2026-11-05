@@ -8,6 +8,7 @@
 class InterfacePasswordTextObject : public InterfaceCursorPosTextObjectSprite {   // (unit v51115: the Mac constructor calls 0x1018f1d0)
 public:
     explicit InterfacePasswordTextObject(void* data);   // 0x1018dc38
+    void Change(uint32_t flags, DOChange* change) override;   // 0x1018dd50 (vtable 0x102a81ac): the text drawn as stars
 };
 
 extern int16_t gOnlineLoginPanelScript[];       // 0x102b02fc: the Dialog script

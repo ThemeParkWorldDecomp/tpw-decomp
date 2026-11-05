@@ -22,6 +22,13 @@ NULL converter (the original calls through them and the fakes only log), a guard
 A last test (unit v5L39), "the window animations": the host's congratulations and bankrupt animations as the library was loaded against
 the program image's frames (tests/imagedata.py), one case per frame. Before v5L39 the host had one frame of each, and the animation ran on
 into the memory after it.
+
+The widescreen Bankrupt and Congratulations windows (unit v5L26): a library built with the port fixes, with a unit space wider than 4:3
+(and, with a smaller interface size, taller), makes UI_Bankrupt's and UI_Congratulations's window, the one that takes the right click that
+closes the screen, as wide and as high as that space, 0..units-1, where the Mac has 0..0x7ff by 0..0x5ff. "the widescreen Bankrupt window"
+and "the widescreen Congratulations window" run those functions' cases on the original and expect that rectangle from the host, the rest
+unchanged. A library built without the port fixes keeps 0x7ff by 0x5ff; there its own
+rectangle is replaced the same way, so the test is the 4:3 comparison again.
 """
 import ctypes as C
 import random
@@ -342,6 +349,7 @@ def bind(lib):
     getattr(lib, p + "cong").restype, getattr(lib, p + "cong").argtypes = None, [C.c_uint64]
     getattr(lib, p + "bank").restype, getattr(lib, p + "bank").argtypes = None, [C.c_uint64]
     getattr(lib, p + "sinit").restype, getattr(lib, p + "sinit").argtypes = None, []
+    getattr(lib, p + "units").restype, getattr(lib, p + "units").argtypes = C.c_int32, [C.c_int32, C.c_int32]
     getattr(lib, p + "msg").restype = C.c_uint32
     getattr(lib, p + "msg").argtypes = [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
     out = (C.c_int64 * 32)()
@@ -417,6 +425,8 @@ def ppc(e, case):
 
 
 def host(lib, case):
+    bind(lib)
+    lib.tpw_u5022_units(*case.get("units", (0x800, 0x600)))
     h = run(Host(lib, case), case)
     p = LAST.get("p")
     if p is not None and p != h:
@@ -575,10 +585,71 @@ def msg_random(r):
     return c
 
 
+# ---- the widescreen Bankrupt and Congratulations windows
+WIDE_UNITS = [(2730, 0x600), (2457, 0x600), (3640, 2048), (0x800, 0x600)]   # 16:9, 16:10, 16:9 at a smaller interface size, 4:3
+
+
+def wide_rect(out, case):
+    """out with the window the unit space gives: CreateObject's right and bottom are the units less 1."""
+    width, height = case["units"]
+    out = dict(out)
+    log = []
+    for name, ints, texts in out["log"]:
+        if name == "CreateObject":
+            ints = tuple(ints[:6]) + (width - 1, height - 1)
+        log.append((name, ints, texts))
+    out["log"] = log
+    return out
+
+
+def wide_edges(op, seed):
+    r = random.Random(seed)
+    for units in WIDE_UNITS:
+        for c in window_edges(op, r.randrange(1 << 30)):
+            c["units"] = units
+            yield c
+
+
+def wide_random(r, op):
+    c = base(r, op)
+    c["units"] = r.choice(WIDE_UNITS)
+    return c
+
+
+def wide_bank_edges():
+    return wide_edges("bank", 50226)
+
+
+def wide_bank_random(r):
+    return wide_random(r, "bank")
+
+
+def wide_cong_edges():
+    return wide_edges("cong", 50227)
+
+
+def wide_cong_random(r):
+    return wide_random(r, "cong")
+
+
+def ppc_wide(e, case):
+    LAST["p"] = wide_rect(ppc(e, case), case)
+    return LAST["p"]
+
+
+def host_wide(lib, case):
+    out = host(lib, case)
+    if lib.tpw_u5022_units(0x800, 0x600) == 0:
+        out = wide_rect(out, case)
+    return out
+
+
 TESTS = [
     FnTest("UI_Congratulations", ppc, host, edge=cong_edges, rnd=cong_random),
     FnTest("UI_Bankrupt", ppc, host, edge=bank_edges, rnd=bank_random),
     FnTest("__sinit_ui_main_cpp", ppc, host, edge=sinit_edges, rnd=sinit_random),
     FnTest("CongratsWindowMsg", ppc, host, edge=msg_edges, rnd=msg_random),
+    FnTest("the widescreen Bankrupt window", ppc_wide, host_wide, edge=wide_bank_edges, rnd=wide_bank_random),
+    FnTest("the widescreen Congratulations window", ppc_wide, host_wide, edge=wide_cong_edges, rnd=wide_cong_random),
     imagedata.table_test("the window animations", [("canim", ADDR["canim"], "hhhh", 29), ("banim", ADDR["banim"], "hhhh", 24)]),
 ]

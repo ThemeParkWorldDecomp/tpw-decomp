@@ -11,8 +11,9 @@ and the four render context slots (0x10, 0x14, 0x24, 0x28) the drawing goes thro
 TVectors built by the SetCurrent fake, the host through the CUI2DMapDrawOps interface).
 
 The world of a case: the map (size, filters, a grid of cells with a type and a thing id), the colour table, the thing array and its objects
-(a float at +0x40), the sprite list (kind, mode, match, the thing's two halfwords) and the current sprite. What is compared: the log of
-every fake with every argument (rectangles, lines and the nine words of every colour) and the head of the map object.
+(a float at +0x40), the sprite list (kind, mode, match, the thing's two halfwords) and the current sprite (the hovered one: the Mac's
+word at 0x20060, the host's pointer at HoverOf, 0x200a0, where MapAreaCallbackResult keeps it). What is compared: the log of every fake
+with every argument (rectangles, lines and the nine words of every colour) and the head of the map object.
 
 No fused operations; the two fctiwz conversions run under HardwareRounding. Not tested: a map of width or height 0 (480/0 saturates in
 fctiwz and Unicorn answers differently), a map larger than the log holds, a cell outside the 128 x 128 grid.
@@ -45,8 +46,11 @@ ADDR = dict(things=0x1034cbfc, colours=0x103970f0)
 # CNode mNext, sizeof(SpriteList), sizeof(CNode)
 HOST_LAYOUT = [0x40, 0x30, 0x30, 0x34, 0x38, 0x18, 0x50, 0x08, 0x08, 0x20, 0x18]
 
-HOST_SP = dict(size=0x50, kind=0x30, mode=0x34, match=0x38, thing=0x18, ptrw=8, lsize=0x20, head=0x08, nsize=0x18, nnext=0x08, estride=0x30)
-PPC_SP = dict(size=0x40, kind=0x14, mode=0x1c, match=0x20, thing=0x18, ptrw=4, lsize=0x10, head=0x04, nsize=0x0c, nnext=0x04, estride=0x14)
+# hover: where the hovered sprite is kept (the Mac's word at 0x20060; the host's pointer at HoverOf, 0x200a0, in ui_2dmap.cpp)
+HOST_SP = dict(size=0x50, kind=0x30, mode=0x34, match=0x38, thing=0x18, ptrw=8, lsize=0x20, head=0x08, nsize=0x18, nnext=0x08, estride=0x30,
+               hover=0x200a0)
+PPC_SP = dict(size=0x40, kind=0x14, mode=0x1c, match=0x20, thing=0x18, ptrw=4, lsize=0x10, head=0x04, nsize=0x0c, nnext=0x04, estride=0x14,
+              hover=0x20060)
 
 
 def s32(v):
@@ -328,7 +332,7 @@ def build(s, case):
     s.ptr(lst + sp["head"], nodes[0] if nodes else 0)
     s.ptr(m + 0x20080, lst)
     cur = case["cur"]
-    s.ptr(m + 0x20060, sprites[cur] if 0 <= cur < len(sprites) else 0)
+    s.ptr(m + sp["hover"], sprites[cur] if 0 <= cur < len(sprites) else 0)
     return m
 
 

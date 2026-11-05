@@ -551,6 +551,9 @@ class Ppc(Side):
     def cbword(self):
         return 0xFC000001
 
+    def ctxword(self, word):
+        return word
+
     def listadd(self, units):
         obj = self.e.alloc(0x14)
         init_obj(self.e, obj, 2)
@@ -649,6 +652,11 @@ class Host(Side):
     def cbword(self):
         return self.lib.tpw_cu_callback_word()
 
+    def ctxword(self, word):
+        self.lib.tpw_cu_context_word.restype = C.c_uint32
+        self.lib.tpw_cu_context_word.argtypes = [C.c_uint32]
+        return self.lib.tpw_cu_context_word(word)
+
     def listadd(self, units):
         arr = (C.c_uint16 * max(1, len(units)))(*units)
         self.lib.tpw_cu_list_add(self.W["sys"], arr, len(units))
@@ -707,7 +715,7 @@ def build(s, case):
     s.setptr(sysa + o("sys.mFTP"), 0)
     s.setptr(sysa + o("sys.mF39C"), 0)
     s.words(sysa + o("sys.mF3C0"), [s.cbword() if case["cb"] else 0])
-    s.words(sysa + o("sys.mF3C4"), [case["cbctx"]])
+    s.words(sysa + o("sys.mF3C4"), [s.ctxword(case["cbctx"])])
     for n, v in (("mCityClock", 0x5A5A0001), ("mCityListsWanted", 0x5A5A0002), ("mF398", 0x5A5A0003), ("mFTPActive", 0x5A5A0004),
                  ("mF3D8", 0x5A5A0005), ("mFTPParkPending", 0x5A5A0006)):
         s.words(sysa + o("sys." + n), [v])

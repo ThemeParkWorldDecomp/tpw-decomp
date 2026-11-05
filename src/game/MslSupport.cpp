@@ -136,10 +136,10 @@ void std_vector_callee::ArgumentCopy(Argument* self, const Argument* other) {
 // 0x10201310: destroy the elements and free the storage when there is any
 void online_callee::ArgumentVectorTearDown(void* vec) {
     ArgumentVector* v = static_cast<ArgumentVector*>(vec);
-    char* first = reinterpret_cast<char*>(v->mData);
+    char* first = reinterpret_cast<char*>(v->data());
     if (first != nullptr) {
-        std_destroy::DestroyRangeTagged(v->mData, reinterpret_cast<Argument*>(first + v->mSize * 12u));
-        slc_callee::OperatorDelete(v->mData);
+        std_destroy::DestroyRangeTagged(v->data(), reinterpret_cast<Argument*>(first + v->mSize * 12u));
+        slc_callee::OperatorDelete(v->data());
     }
 }
 
@@ -1104,7 +1104,7 @@ void std::__cdeque<const void*, std::allocator<const void*>>::reserve(uint32_t n
         MslThrow("!std::exception!!std::logic_error!!std::length_error!!", &object, gMslLengthErrorDtorTV);
     }
     if (n > mWord0) {
-        uint32_t* block = static_cast<uint32_t*>(MslNew(n << 2));
+        uint32_t* block = static_cast<uint32_t*>(cdeque_callee::TableNew(n << 2));
         if (mWordC != 0) {
             uint32_t* source = BlockPtr(mWordC) + mWord8;
             uint32_t* destination = block;
@@ -3661,11 +3661,11 @@ BasicFilebufWchar* FilebufWcharConstruct(BasicFilebufWchar* self, uint32_t file)
     self->mEback = Word_3(self->mBuf);
     self->mGptr = Word_3(self->mBuf);
     self->mEgptr = Word_3(self->mBuf);
-    uint32_t loc[2];
-    filebuf_wclose_callee::Getloc(loc, self);
-    void* cvt = filebuf_wclose_callee::UseFacetCodecvtW(loc);   // the second argument is an uninitialised slot in the original
+    LocaleRefPtr loc{};   // getloc fills the Mac's two words; LocaleDtor reads a host LocaleRefPtr (its count pointer stays null)
+    filebuf_wclose_callee::Getloc(&loc, self);
+    void* cvt = filebuf_wclose_callee::UseFacetCodecvtW(&loc);   // the second argument is an uninitialised slot in the original
     self->mCodecvt = Word_3(cvt);
-    filebuf_char_callee::LocaleDtor(loc, -1);
+    filebuf_char_callee::LocaleDtor(&loc, -1);
     self->mUnbuffered = static_cast<uint8_t>(filebuf_char_callee::CodecvtAlwaysNoconv(Ptr_2(self->mCodecvt)));
     return self;
 }
@@ -4396,7 +4396,7 @@ BasicIstreamChar* BasicIstreamChar::getline(char* buffer, int32_t count, char de
 
 // std::basic_ofstream<wchar_t>::basic_ofstream() 0x10221f20 (unit v5755).
 // Mac layout: +0 virtual-base pointer, +4 vtable word, +8 filebuf, +0x58 the ios_base part (the virtual base).
-// The host object uses native pointers: the slot sits at +8, the filebuf at +0x10 and the ios part at +0x38 (as basic_ifstream's).
+// The host object is an IgnoreFstream (online.h): the stream part (its slot at +8), then the filebuf and the ios part in the Mac's words.
 
 extern uint32_t gOfsWVtbl[4];     // 0x102b1f50 (TOC -0x5eac)
 extern uint32_t gIfsWVtblE[4];    // 0x102b1f20 (TOC -0x5eb0)
@@ -4404,19 +4404,19 @@ extern uint32_t gIfsWVtblE[4];    // 0x102b1f20 (TOC -0x5eb0)
 namespace ignore_callee {
 
 void OfstreamCtor(IgnoreStream* stream, int32_t flag) {
-    uint8_t* base = reinterpret_cast<uint8_t*>(stream);
-    IgnoreIos* ios = reinterpret_cast<IgnoreIos*>(base + 0x38);
+    IgnoreFstream* object = FstreamOf(stream);
+    IgnoreIos* ios = &object->mIos;
     // The virtual-base pointer and the ios_base vtable words are stored only when the flag (a short) is set.
     if (static_cast<int16_t>(flag) != 0) {
         stream->mIos = ios;
-        ios->mVtable = gIosBaseVt;
-        ios->mVtable = gIfsWVtblE;
+        ios->mVtable = VtableWord(gIosBaseVt);
+        ios->mVtable = VtableWord(gIfsWVtblE);
     }
-    WostreamCtor(stream, 0, base + 0x10);                 // basic_ostream(streambuf* = this + 8), flag 0
+    WostreamCtor(stream, 0, &object->mFilebuf);           // basic_ostream(streambuf* = this + 8), flag 0
     stream->mSlot = gOfsWVtbl;
-    stream->mIos->mVtable = reinterpret_cast<const uint8_t*>(gOfsWVtbl) + 0xc;
+    stream->mIos->mVtable = VtableWord(gOfsWVtbl) + 0xc;
     stream->mIos->mBaseOffset = static_cast<int32_t>(reinterpret_cast<intptr_t>(ios) - reinterpret_cast<intptr_t>(stream->mIos));
-    ifstream_callee::FilebufCtor(base + 0x10, nullptr);   // basic_filebuf(FILE* = NULL)
+    ifstream_callee::FilebufCtor(&object->mFilebuf, nullptr);   // basic_filebuf(FILE* = NULL)
 }
 
 }  // namespace ignore_callee
@@ -5153,7 +5153,7 @@ bool GrowBufBack(MslArgumentDeque* self, uint32_t from, void* spareObject, uint3
     uint32_t remaining = to - from;
     bool swapped = false;
     for (;;) {
-        uint32_t block = WordOf(online_callee::OperatorNew(self->mBlockSize * 0xc));
+        uint32_t block = WordOf(argdeque_callee::OperatorNew(self->mBlockSize * 0xc));
         if (!swapped && self->mCount == self->mCapacity) {
             if (table != spare) {
                 for (int i = 0; i < 4; i++) {
@@ -5235,7 +5235,7 @@ uint32_t gArgDequeFill = 0;           // 0x102b1f98
 
 namespace {
 
-void* Native_2(uint32_t word) { return reinterpret_cast<void*>(static_cast<uintptr_t>(gMslMacAddressHigh | word)); }
+void* Native_2(uint32_t word) { return reinterpret_cast<void*>(static_cast<uintptr_t>((gMslMacAddressHigh << 32) | word)); }
 uint32_t Word_4(const void* p) { return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(p)); }
 uint32_t* Table(const MslArgumentDeque* d) { return static_cast<uint32_t*>(Native_2(d->mTable)); }
 
@@ -5981,7 +5981,8 @@ void ignore_callee::OstreamWrite(IgnoreStream* stream, const char16_t* text) {
     }
     if (sentry) {
         ios = stream->mIos;
-        void* iter = reinterpret_cast<void*>(static_cast<uintptr_t>(ios->mStreamBuf));
+        // The stream buffer word is the filebuf's arena offset.
+        void* iter = ios->mStreamBuf != 0 ? static_cast<void*>(tpw::gArenaBase + ios->mStreamBuf) : nullptr;
         int32_t length = static_cast<int32_t>(wc::Wcslen(text));
         uint16_t fill;
         std::memcpy(&fill, &ios->mPad3c[4], 2);   // Mac 0x40
@@ -6052,12 +6053,12 @@ inline Argument* At_4(Argument* base, uint32_t index) {
 ArgumentVector::ArgumentVector(const ArgumentVector& other) {
     mCapacity = other.mSize;
     mSize = other.mSize;
-    mData = nullptr;
+    mData = 0;
     if (mCapacity != 0) {
-        mData = static_cast<Argument*>(IME::MslNew(mCapacity * 12u));
-        Argument* dst = mData;
-        Argument* src = other.mData;
-        Argument* end = At_4(other.mData, other.mSize);
+        set_data(static_cast<Argument*>(IME::MslNew(mCapacity * 12u)));
+        Argument* dst = data();
+        Argument* src = other.data();
+        Argument* end = At_4(other.data(), other.mSize);
         for (; src != end; src = At_4(src, 1)) {
             if (dst) ArgumentCopy(dst, src);   // placement new: the address itself
             dst = At_4(dst, 1);
@@ -6077,23 +6078,23 @@ void ArgumentVector::push_back(const Argument& argument) {
         IME::MslThrow(kLengthErrorType, &exc, IME::gMslLengthErrorDtorTV);
     }
     if (mSize < mCapacity) {
-        Argument* slot = At_4(mData, mSize);
+        Argument* slot = At_4(data(), mSize);
         if (slot) ArgumentCopy(slot, &argument);
         mSize = mSize + 1;
         return;
     }
-    Argument* old = mData;
+    Argument* old = data();
     uint32_t newCapacity = mCapacity == 0 ? 1u : mCapacity << 1;
-    mData = static_cast<Argument*>(IME::MslNew(newCapacity * 12u));
+    set_data(static_cast<Argument*>(IME::MslNew(newCapacity * 12u)));
     uint32_t count = mSize;
-    Argument* dst = mData;
+    Argument* dst = data();
     Argument* src = old;
     Argument* end = At_4(old, count);
     for (; src != end; src = At_4(src, 1)) {
         if (dst) ArgumentCopy(dst, src);
         dst = At_4(dst, 1);
     }
-    Argument* slot = At_4(mData, mSize);
+    Argument* slot = At_4(data(), mSize);
     if (slot) ArgumentCopy(slot, &argument);
     if (old) {
         ArgumentDestroyRange(old, At_4(old, mSize));

@@ -14,11 +14,16 @@
 #include <sys/mman.h>
 
 #include "calllog.h"
+#include "far_code_stub.h"
 #include "platform/arena.h"
+#include "Text.h"
 #include "FS_Online.h"
 #include "lobby.h"
 
 using namespace calllog;
+
+// raw zeroed storage under the program's symbol name (larger than the class)
+__asm__(".comm _gText,0x10000,6\n");
 
 CFSOnlineSystem* gOnlineSystem;
 CLBScreenSystem* gLobbyScreens;
@@ -80,7 +85,17 @@ CFSOnlinePark& CFSOnlinePark::operator=(const CFSOnlinePark& other) {
 }
 
 void Upload::Release() { ev("UploadRelease", {lab(this)}); }
-void AddUIError(int32_t error, TbITable* table) { ev("AddUIError", {error, U32(table)}); }
+// Not reached: the answer case takes only the error answers.
+namespace SamsUtilities {
+void UDebug(const char*, ...) {}
+}
+void Upload::UploadParkFile(char*, void*) {}
+
+// The answer case's table is above 4 GB as the program's is; the upper half is taken off, so a pointer cut to its word logs differently.
+int64_t gTableUpper;
+void AddUIError(int32_t error, TbITable* table) {
+    ev("AddUIError", {error, table == nullptr ? 0 : static_cast<int64_t>(reinterpret_cast<intptr_t>(table)) - gTableUpper});
+}
 
 void FSOnlineLoginRASFailureCallback() {}
 void SatelliteOnlineParkInfoPanelCancelCallback() {}
@@ -108,6 +123,7 @@ uint64_t tpw_cs_addr(const char* name) {
     const Entry entries[] = {
         {"gOnlineSystem", &gOnlineSystem},
         {"gLobbyScreens", &gLobbyScreens},
+        {"gTextRes", &gText.mResourcePointers[6]},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));
@@ -161,7 +177,11 @@ uint64_t tpw_cs_vt(int32_t which) {
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(which == 0 ? stringTable : globeTable));
 }
 
-uint32_t tpw_cs_thunk() { return MakeThunk(reinterpret_cast<void*>(&FakeCallback)); }
+uint32_t tpw_cs_thunk() {
+    static void* const stub = FarCodeStub(reinterpret_cast<void*>(&FakeCallback));
+    KeepPointerWord(stub);
+    return MakeThunk(stub);
+}
 
 uint64_t tpw_cs_fn(int32_t which) {
     void* p = which == 1 ? reinterpret_cast<void*>(&RequestFTPPostLoginCallbackFn)
@@ -179,6 +199,11 @@ void tpw_cs_setpub(uint64_t sys, int32_t publishing, uint64_t text, uint64_t wor
 }
 void tpw_cs_upcb(uint64_t sys, int32_t result, uint64_t context) {
     reinterpret_cast<CFSOnlineSystem*>(sys)->RequestUploadPostLoginCallback(result, reinterpret_cast<const void*>(context));
+}
+void tpw_cs_upper(uint64_t upper) { gTableUpper = static_cast<int64_t>(upper); }
+void tpw_cs_answer(uint64_t sys, int32_t result, int32_t unused, uint64_t unused2, uint64_t context) {
+    reinterpret_cast<CFSOnlineSystem*>(sys)->UploadServerConnectionCallback(result, unused, reinterpret_cast<void*>(unused2),
+                                                                            reinterpret_cast<void*>(context));
 }
 void tpw_cs_complete(uint64_t sys, int32_t failed) { reinterpret_cast<CFSOnlineSystem*>(sys)->CompleteUpload(failed); }
 void tpw_cs_ftp(uint64_t sys, uint64_t park, uint64_t callback, uint64_t context) {

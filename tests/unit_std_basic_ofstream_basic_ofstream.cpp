@@ -52,6 +52,8 @@ int32_t tpw_ofs_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = static_cast<int64_t>(offsetof(ignore_callee::IgnoreStream, mSlot));
     out[n++] = static_cast<int64_t>(offsetof(ignore_callee::IgnoreIos, mBaseOffset));
+    out[n++] = static_cast<int64_t>(offsetof(ignore_callee::IgnoreFstream, mFilebuf));
+    out[n++] = static_cast<int64_t>(offsetof(ignore_callee::IgnoreFstream, mIos));
     return n;
 }
 

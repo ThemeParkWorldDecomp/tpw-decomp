@@ -26,6 +26,7 @@ from tpwtest import FnTest
 
 SHIM_LIBRARY = "unit_ButtonsUnderlayMsg_2"
 MASK = 0xFFFFFFFF
+HIGH_WINDOWS = 0x7A5A << 32   # the hide cases' host menu windows: above 4 GB (tests/unit_ButtonsUnderlayMsg_2.cpp, kHighWindows)
 
 F_BUTTONS, F_HIDE, F_SINIT_INFO, F_REMOVE, F_SINIT_LIST = 0x101E86C4, 0x101E8B18, 0x101EBAE0, 0x101EC840, 0x101EC90C
 F_DATE, F_STAFF, F_PEEP, F_DEATH = 0x101EFE60, 0x101F07B4, 0x101F0834, 0x101F0C2C
@@ -100,6 +101,13 @@ class Side:
     def wptr(self, a, v):
         self.write(a, struct.pack(self.pfmt, v))
 
+    def menu_window(self, case, token):
+        """A menu window's pointer for its token (the original's: the token itself)."""
+        return token
+
+    def menu_token(self, v):
+        return v
+
     def rptr(self, a):
         return struct.unpack(self.pfmt, self.read(a, struct.calcsize(self.pfmt)))[0]
 
@@ -170,7 +178,18 @@ class Host(Side):
         CL.host_begin(lib, fixed, case["queues"])
 
     def done(self):
-        pass
+        self.lib.tpw_bum_high_windows(0)
+
+    def menu_window(self, case, token):
+        """A host window is above 4 GB, and the menu word keeps only its low 32 bits: the hide cases put the two menu windows
+        there (the library's fakes record them as their tokens)."""
+        high = case["fn"] == F_HIDE and token != 0
+        if case["fn"] == F_HIDE:
+            self.lib.tpw_bum_high_windows(1)
+        return token | HIGH_WINDOWS if high else token
+
+    def menu_token(self, v):
+        return v & MASK if v >> 32 == HIGH_WINDOWS >> 32 else v
 
     def g(self, name):
         return self.lib.tpw_bum_addr(name.encode())
@@ -226,6 +245,7 @@ def bind(lib):
     lib.tpw_bum_buttons.restype, lib.tpw_bum_buttons.argtypes = C.c_int32, [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
     for n in ("hide", "sinit_info", "remove", "sinit_list", "staff", "peep"):
         getattr(lib, p + n).restype, getattr(lib, p + n).argtypes = None, []
+    lib.tpw_bum_high_windows.restype, lib.tpw_bum_high_windows.argtypes = None, [C.c_int32]
     lib.tpw_bum_date.restype, lib.tpw_bum_date.argtypes = None, [C.POINTER(C.c_int32)]
     lib.tpw_bum_death.restype, lib.tpw_bum_death.argtypes = None, [C.c_uint32]
     out = (C.c_int64 * 32)()
@@ -239,8 +259,8 @@ def bind(lib):
 # ------------------------------------------------------------------------------------------------------------------ the world
 
 def build(s, case):
-    s.wptr(s.g("e90"), case["e90"])
-    s.wptr(s.g("e8c"), case["e8c"])
+    s.wptr(s.g("e90"), s.menu_window(case, case["e90"]))
+    s.wptr(s.g("e8c"), s.menu_window(case, case["e8c"]))
     s.words(s.g("word88"), [case["word88"]])
     s.wptr(s.g("panel"), case["panel"])
     s.wptr(s.g("sthing"), case["sthing"])
@@ -269,7 +289,7 @@ def sys_state(s):
 
 def observe(s, case, answer):
     return {"answer": answer, "log": s.log(),
-            "e90": s.rptr(s.g("e90")), "e8c": s.rptr(s.g("e8c")), "word88": s.rd_word(s.g("word88")),
+            "e90": s.menu_token(s.rptr(s.g("e90"))), "e8c": s.menu_token(s.rptr(s.g("e8c"))), "word88": s.rd_word(s.g("word88")),
             "panel": s.rptr(s.g("panel")), "sthing": s.rptr(s.g("sthing")), "listpanel": s.rptr(s.g("listpanel")),
             "spanel": s.rd_word(s.g("spanel") + 0xC), "vpanel": s.rd_word(s.g("vpanel") + 0xC), "sys": sys_state(s)}
 
@@ -347,6 +367,13 @@ def hide_edges():
         for p in TOKENS[:3]:
             c = base(r, F_HIDE, [0])
             c["word88"], c["panel"] = w, p
+            yield c
+    # the word as ContactMenu leaves it: one of the two menu windows
+    for menu in ("e90", "e8c"):
+        for e90, e8c in ((0x11000, 0x22000), (0x33000, 0x44000)):
+            c = base(r, F_HIDE, [0])
+            c["e90"], c["e8c"] = e90, e8c
+            c["word88"] = c[menu]
             yield c
 
 

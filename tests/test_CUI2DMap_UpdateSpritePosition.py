@@ -50,7 +50,7 @@ CDRAW_CT, CDRAW_SET, CDRAW_CLIP, CDRAW_DT = 0x1023AED0, 0x1023AEE8, 0x1023AF00, 
 
 ADDR = dict(thing=0x1034CBFC, gworld=0x1037EBFC, end=0x102B2912, colours=0x103970F0, sw=0x102B2B54, sh=0x102B2B50)
 # sizeof(CThingArrayEntry) is the host's own (checked for being larger than the Mac's 20); the rest is checked exactly
-HOST_LAYOUT = [0x1DA748, 0x50, 0x58, 0x18, 4]   # the sprite is 0x50 on the host since v5652 added its show status fields
+HOST_LAYOUT = [0x1DA748, 0x50, 0x58, 0x18, 4, 0x30]   # the sprite is 0x50 on the host since v5652 added its show status fields (mKind, the Mac's +0x14, is at 0x30)
 HOST_ENTRY = [0]
 
 PPC_OBJ = {}          # the persistent objects of the PowerPC side
@@ -265,6 +265,7 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
+    KIND = 0x14
 
     def __init__(self, e, case):
         self.e = e
@@ -328,6 +329,7 @@ class Ppc(Side):
 class Host(Side):
     fmt = "<I"
     endian = "<"
+    KIND = 0x30
 
     def __init__(self, lib, case):
         self.lib = lib
@@ -424,7 +426,8 @@ def build(s, case):
         s.words(s.g("sw"), [case["sw"]])
         s.words(s.g("sh"), [case["sh"]])
         s.words(m + 0x54, case["centre"])      # 0x54 x, 0x58 y, 0x5c zoom
-        s.words(sp, [0, case["sx"], case["sy"], case["old_x"], case["old_y"], case["status"]])
+        s.words(sp, [0, case["sx"], case["sy"], case["old_x"], case["old_y"]])
+        s.words(sp + s.KIND, [case["status"]])   # the word the constructor stores: the Mac's +0x14, the host's mKind
         s.words(sp + 0x24, [case["scale"]])
     elif op == "draw":
         s.words(m + 0x3C, [case["depth"]])
@@ -474,6 +477,7 @@ def observe(s, case):
     if op == "update":
         w = s.rd_words(s.obj("sprite"), 12)
         w[3], w[4] = canon_f(w[3]), canon_f(w[4])
+        w[5] = s.rd_words(s.obj("sprite") + s.KIND, 1)[0]
         out["sprite"] = w
     elif op == "store":
         raw = s.read(m + 0x60, 0x20000)

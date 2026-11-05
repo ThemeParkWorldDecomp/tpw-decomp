@@ -58,20 +58,21 @@ void SetInitialOrientationParams(sCoasterOrientation* orient, sCoasterTrackParam
     std::memcpy(p + 0x1c, &big, 4);
 }
 
-// 0x100509bc
+// 0x100509bc: the block is the instance's mBlock3C (gCoasterCurrentData), so the Mac's +0x38 to +0x58 are the instance's mF74 to mF94,
+// which are further from the block on the host.
 void SetInitialCoasterInterpParams(sCoasterTrackParams* params) {
-    uint8_t* p = reinterpret_cast<uint8_t*>(params);
-    const float zero = 0.0f;
+    tag_sCoasterInstance* instance =
+        reinterpret_cast<tag_sCoasterInstance*>(reinterpret_cast<char*>(params) - offsetof(tag_sCoasterInstance, mBlock3C));
     const float big = std::numeric_limits<float>::max();
-    std::memcpy(p + 0x38, &zero, 4);
-    std::memset(p + 0x3c, 0, 4);
-    std::memcpy(p + 0x54, &zero, 4);
-    std::memcpy(p + 0x50, &zero, 4);
-    std::memcpy(p + 0x4c, &zero, 4);
-    std::memcpy(p + 0x48, &zero, 4);
-    std::memcpy(p + 0x44, &zero, 4);
-    std::memcpy(p + 0x40, &zero, 4);
-    std::memcpy(p + 0x58, &big, 4);
+    instance->mF74 = 0.0f;
+    instance->mF78 = 0.0f;
+    instance->mF90 = 0.0f;
+    instance->mF8C = 0.0f;
+    instance->mF88 = 0.0f;
+    instance->mF84 = 0.0f;
+    instance->mF80 = 0.0f;
+    instance->mF7C = 0.0f;
+    std::memcpy(instance->mF94, &big, 4);
 }
 
 // Globals of this unit (no other source names them).

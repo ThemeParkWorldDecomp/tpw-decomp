@@ -13,6 +13,7 @@
 #include <new>
 
 #include "calllog.h"
+#include "platform/online_signup.h"
 #include "platform/arena.h"
 #include "FS_Online.h"
 #include "InterfaceWindow.h"
@@ -39,6 +40,7 @@ union TextHolder {
     CText t;
 };
 TextHolder gTextHolder __asm__("_gText");   // gText: the unit needs only its resource pointers; no constructor runs
+
 
 // The Mac's constructor of the text sprite, defined by its symbol (the class has bases this library does not compile).
 extern "C" void FakeSpriteCtor(void* self, void* data) __asm__("__ZN25InterfaceTextObjectSpriteC1EPv");

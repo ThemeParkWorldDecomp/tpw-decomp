@@ -1018,20 +1018,19 @@ void Offer(int32_t opinion, uint32_t value) {
 
 // 0x10119c0c
 void CPerson::ExtraExcitementEffects(const CObject* object) {
-    char* balance = reinterpret_cast<char*>(&gMainBalance);
     if ((object->GetExcitementLevel(false) & 0xff) == 0) return;
     int32_t preferred = GetPreferredExcitement() & 0xff;
     int32_t diff = preferred - (object->GetExcitementLevel(false) & 0xff);
     if (diff < 0) diff = -diff;
     float& happy = At_2<float>(this, 0x19c);
     if (diff < 5) {
-        AddClamped(happy, At_2<int32_t>(static_cast<const void*>(balance), 0x24));
+        AddClamped(happy, gMainBalance.mValues[(0x24 - 8) / 4].mInteger);
     } else if (diff < 0xf) {
-        AddClamped(happy, At_2<int32_t>(static_cast<const void*>(balance), 0x28));
+        AddClamped(happy, gMainBalance.mValues[(0x28 - 8) / 4].mInteger);
     } else if (diff < 0x28) {
-        AddClamped(happy, At_2<int32_t>(static_cast<const void*>(balance), 0x2c));
+        AddClamped(happy, gMainBalance.mValues[(0x2c - 8) / 4].mInteger);
     }
-    int32_t divisor = At_2<int32_t>(static_cast<const void*>(balance), 0x30);
+    int32_t divisor = gMainBalance.mValues[(0x30 - 8) / 4].mInteger;
     int32_t level = object->GetExcitementLevel(false) & 0xff;
     int32_t quotient = level / divisor;
     int32_t p = 100 - static_cast<int32_t>(Low8_2(At_2<float>(this, 0x1a8)));
@@ -1351,9 +1350,9 @@ T* FieldAt(void* base, uint32_t offset) {
     return reinterpret_cast<T*>(reinterpret_cast<char*>(base) + offset);
 }
 
-// The balance rows at +0x18, +0x1c, +0x20 of gMainBalance, low byte only.
+// The balance rows at Mac +0x18, +0x1c, +0x20 of gMainBalance, low byte only.
 uint32_t BalanceByte(uint32_t offset) {
-    return *FieldAt<uint32_t>(&gMainBalance, offset) & 0xff;
+    return static_cast<uint32_t>(gMainBalance.mValues[(offset - 8) / 4].mInteger) & 0xff;
 }
 
 uint32_t AmountOf(int32_t amount) {

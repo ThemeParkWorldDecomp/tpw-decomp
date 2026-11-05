@@ -241,7 +241,8 @@ void Email::Callback(uint32_t message, int32_t code, uint8_t* data) {
                             mAttachment.mOffset = 0;
                             const char* second = kEmailTexts + 0x13;
                             email_callee::StringAssign(&mString38, second, static_cast<uint32_t>(std::strlen(second)));
-                            int32_t result = mOutbox.get()->NextMail(this);
+                            Outbox* outbox = mOutbox.mOffset == kOutboxOnHeap ? gEmailHeapOutbox : mOutbox.get();
+                            int32_t result = outbox->NextMail(this);
                             if ((result & 0xff) == 0) {
                                 mF3c = 1;
                                 emailcb_callee::MailQuit(mMail.get());
@@ -267,7 +268,12 @@ void Email::Callback(uint32_t message, int32_t code, uint8_t* data) {
 
 bool Email::Send(const char* server, int16_t port, char* extra, Outbox* outbox) {
     mF3d = 1;
-    mOutbox.set(outbox);
+    if (outbox == nullptr || tpw::InArena(outbox)) {
+        mOutbox.set(outbox);
+    } else {
+        gEmailHeapOutbox = outbox;
+        mOutbox.mOffset = kOutboxOnHeap;
+    }
     if (mOutbox.mOffset != 0) mF3d = 0;
     if (mListSize == 0) {
         if (mCallback != 0) email_callee::PtrGlue(mCallback, 1, 8);

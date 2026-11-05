@@ -94,6 +94,8 @@ uint64_t tpw_adv_alloc(uint32_t size) { return static_cast<uint64_t>(reinterpret
 void tpw_adv_set_mc(uint64_t p) { gMessageCentre = reinterpret_cast<CMessageCentre*>(static_cast<uintptr_t>(p)); }
 uint64_t tpw_adv_get_mc() { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(gMessageCentre)); }
 
+void tpw_adv_set_min(int32_t value) { TheScoring().mBalance.mValues[kAdvisorBalanceMinScore].mInteger = value; }
+
 int32_t tpw_adv_layout(int64_t* out) {
     int32_t n = 0;
     out[n++] = static_cast<int64_t>(offsetof(CAdvisorRequest, mSecondary));

@@ -53,7 +53,7 @@ FILEBUF_DTOR, ISTREAM_DTOR, IOS_DTOR = 0x1021CD4C, 0x1021D4A0, 0x1021CBB8
 ADDR = dict(gOnlineControl=0x10396D28, gUserInfo=0x10380B34, gTPGlobals=0x103B74C8, gUIInterface=0x10396440,
             ifs=0x102B1E40, iosvtbl=0x1029D084, iosdtor=0x102661D0)
 # ---- the host's offsets and sizes the module relies on, checked once against tpw_pq_layout (catches a header that moved)
-HOST_LAYOUT = [0x28, 0x38, 0x3C, 0x48, 8, 8, 0x10, 16]
+HOST_LAYOUT = [0x24, 0x34, 0x38, 0x44, 8, 8, 0x10, 16]
 
 TEXTS = ["alice", "Bob", "", "abcdefghijklmnopqrstuvwxyz01234", "Carol D"]     # the fake getline's lines (code k writes TEXTS[k-1])
 NAMES = ["", "x", "Alice", "bob smith", "CAROL", "a long buddy name 0123456789", "été"]
@@ -541,6 +541,9 @@ class Ppc(Side):
         mkrep(self.e, obj, text)
         return obj, rw(self.e, obj)
 
+    def mkname(self, text):
+        return self.mkstr(text)[0]
+
     def glab(self, name):
         v = rw(self.e, ADDR[name])
         return self.L.lab(v) if v else 0
@@ -596,6 +599,10 @@ class Host(Side):
         self.set_ptr(obj, rep)
         return obj, rep
 
+    def mkname(self, text):
+        data = self.text_bytes(text)
+        return self.lib.tpw_pq_u16(data, len(data) // 2 - 1)
+
     def glab(self, name):
         return (self.lib.tpw_pq_label_online if name == "gOnlineControl" else self.lib.tpw_pq_label_user)()
 
@@ -611,6 +618,7 @@ def bind(lib):
     lib.tpw_pq_addr.restype, lib.tpw_pq_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_pq_alloc.restype, lib.tpw_pq_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_pq_word.restype, lib.tpw_pq_word.argtypes = C.c_uint32, [C.c_uint64]
+    lib.tpw_pq_u16.restype, lib.tpw_pq_u16.argtypes = C.c_uint64, [C.c_void_p, C.c_uint32]
     lib.tpw_pq_label_online.restype = C.c_int64
     lib.tpw_pq_label_user.restype = C.c_int64
     lib.tpw_pq_layout.argtypes = [C.POINTER(C.c_int64)]
@@ -669,8 +677,7 @@ def build(s, case):
         s.write(p, case["spath"].encode() + b"\0")
         case["_p"] = p
     if case["op"] == "add":
-        obj, rep = s.mkstr(case["name"])
-        case["_n"] = obj
+        case["_n"] = s.mkname(case["name"])   # a host string on the host (AddBuddy takes the name as one)
 
 
 def execute(s, case):

@@ -68,12 +68,8 @@ constexpr int32_t kAddressList = 0x26;   // the list of the panel
 constexpr int32_t kListString = 0x121;   // the string of the last row ("other" entry of the online park)
 constexpr int32_t kRemoveAddressNameSize = 0x40;
 
-// The Mac's word at +0x9c of the FTP park info: a wide string pointer (4 bytes there, a native pointer here).
-const char16_t* ParkText(CFSFTPParkInfo* info) {
-    const char16_t* text;
-    std::memcpy(&text, reinterpret_cast<const char*>(info) + 0x9c, sizeof(text));
-    return text;
-}
+// The Mac's word at +0x9c of the FTP park info: the data pointer of the park's wide string at +0x94.
+const char16_t* ParkText(CFSFTPParkInfo* info) { return reinterpret_cast<CFSOnlinePark*>(info)->mText94.mData; }
 
 CFSUserInfo* UserInfo() {
     if (gUserInfo == nullptr) gUserInfo = new CFSUserInfo;
@@ -184,7 +180,7 @@ InterfaceWindow* gAddressBookPanel;        // 0x103956f8, original name unknown
 char16_t gAddressEditText[0x40];           // 0x10394ba6, original name unknown: the edit box's text (capacity 0x3f)
 char16_t gAddressRemoveName[0x40];         // 0x10394b24, original name unknown: the address the removal dialog names
 
-// 0x102ac1e6: the panel's script, the image's 184 words (generated at configure time, unit v5L42).
+// 0x102ac1e6: the panel's script, the image's 184 words (include/WindowScripts.inc, unit v5L42).
 int16_t gAddressBookDescription[] = {TPW_WINDOW_SCRIPT_102AC1E6};
 
 // 0x1024e1e1: "%ls" and, 4 bytes on, "hilight" (the selection and cursor draw object's name).
@@ -310,10 +306,7 @@ void RemoveAddressBookEntry() {
         swprintf(gAddressRemoveName, 0x40, kWideStrings_2, text);
     } else {
         if (gOnlineSystem == nullptr) gOnlineSystem = new CFSOnlineSystem;
-        const uint8_t* info = reinterpret_cast<const uint8_t*>(gOnlineSystem->GetFTPDownloadParkInfo());
-        const char16_t* parkName;
-        std::memcpy(&parkName, info + 0x9c, sizeof parkName);   // QUIRK: a pointer at +0x9c, as the Mac's word
-        name = parkName;
+        name = reinterpret_cast<CFSOnlinePark*>(gOnlineSystem->GetFTPDownloadParkInfo())->mText94.mData;
     }
     char16_t message[0x80];
     TbUniStringVTag tag(3, name);

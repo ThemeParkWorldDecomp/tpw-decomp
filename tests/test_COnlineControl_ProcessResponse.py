@@ -351,8 +351,14 @@ st(0x10177654, stub_parkinfo)
 st(0x10176074, stub_gotoreq)
 
 
+PORT_FIX = False      # the host library was built with the port fixes on (setup; unit chatevents)
+
+
 def setup(runner):
+    global PORT_FIX
     T.install_std_stubs(runner.emu)
+    bind(runner.lib)
+    PORT_FIX = runner.lib.port_fix
 
 
 # ---------------------------------------------------------------------------------------------------------------- the two sides
@@ -368,6 +374,9 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
+
+    def park_id_offset(self):
+        return 8
 
     def __init__(self, e, case):
         self.e = e
@@ -415,6 +424,9 @@ class Ppc(Side):
 
 class Host(Side):
     fmt = "<I"
+
+    def park_id_offset(self):
+        return self.lib.tpw_pr_park_id_offset()
 
     def __init__(self, lib, case):
         self.lib = lib
@@ -467,6 +479,8 @@ def bind(lib):
     lib.tpw_pr_system_label.restype, lib.tpw_pr_system_label.argtypes = C.c_int64, []
     lib.tpw_pr_process.restype = None
     lib.tpw_pr_process.argtypes = [C.c_uint64, C.c_uint32, C.c_uint32, C.c_uint64]
+    lib.tpw_pr_portfix.restype, lib.tpw_pr_portfix.argtypes = C.c_int32, []
+    lib.port_fix = lib.tpw_pr_portfix() == 1
     out = (C.c_int64 * 32)()
     n = lib.tpw_pr_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -502,7 +516,7 @@ def build(s, case):
         s.words(W[k] + 0xC, [case[k + "_scr"]])
     for k in ("bnode", "inode", "cnode"):
         s.write(W[k], bytes(case["nodes"][k]))
-    s.words(W["info"] + 8, [case["park"]])
+    s.words(W["info"] + s.park_id_offset(), [case["park"]])
     W["args"] = s.alloc(12 * N_ARGS)
     for i, (sw, ww, cmd) in enumerate(case["args"]):
         s.words(W["args"] + 12 * i, [sw, ww, cmd])
@@ -522,7 +536,7 @@ def observe(s, W):
         "nodes": [s.read(W[k], 0x20) for k in ("bnode", "inode", "cnode")],
         "people": [s.read(W[k], 0xC) for k in ("person", "other")],
         "scr": [s.rd_words(W[k] + 0xC, 1)[0] for k in ("person", "other")],
-        "info": s.rd_words(W["info"], 8),
+        "info": s.rd_words(W["info"] + s.park_id_offset(), 1),
         "sys": s.sys_label(),
     }
     out["log"] = s.log()
@@ -538,7 +552,30 @@ def run(s, case):
         s.done()
 
 
+def in_map(v):
+    return (v & MASK) < 0x8000
+
+
+def dropped(case):
+    """With the port fixes on (unit chatevents) the translation drops a visitor's event that is short or off the map: 0x22 Move with
+    fewer than 5 Arguments, or x or y outside 0..0x7fff in a walk, teleport or unhide; 0x25 EnteredPark with fewer than 4; 0x27 Visitor
+    with fewer than 6, or x or y outside the map unless y is -1 (the entrance)."""
+    args, size = case["args"], case["size"] & MASK
+    cmd = args[0][2] & MASK
+    if cmd == 0x22:
+        return size < 5 or ((args[4][2] & MASK) in (0, 1, 3) and not (in_map(args[2][2]) and in_map(args[3][2])))
+    if cmd == 0x25:
+        return size < 4
+    if cmd == 0x27:
+        return size < 6 or ((args[5][2] & MASK) != MASK and not (in_map(args[4][2]) and in_map(args[5][2])))
+    return False
+
+
 def ppc(e, case):
+    if PORT_FIX and dropped(case):
+        # The original with the same world and an event it ignores (0): what a dropped event leaves.
+        case = dict(case, args=[list(a) for a in case["args"]])
+        case["args"][0][2] = 0
     return run(Ppc(e, case), case)
 
 
@@ -629,6 +666,24 @@ def edges():
                 c["queues"]["BuddyFind"] = [b]
                 c["queues"]["WSetFind"] = [w]
                 yield c
+    for cmd, xi, yi in ((34, 2, 3), (39, 4, 5)):
+        for size in (3, 4, 5, 6, 0xFFFFFFFF):
+            for x in (0, 0x7FFF, 0x8000, -1, 0x7F00, 0x8100):
+                for y in (0, 0x7FFF, 0x8000, -1, -2):
+                    c = base(r, cmd)
+                    c["size"] = size
+                    c["queues"]["GetPerson"] = [1]
+                    c["queues"]["WEqual"] = [0]
+                    c["me"] = 0
+                    if cmd == 34:
+                        c["args"][4][2] = 0   # a walk
+                    c["args"][xi][2] = x & MASK
+                    c["args"][yi][2] = y & MASK
+                    yield c
+    for size in (2, 3, 4, 6):
+        c = base(r, 37)
+        c["size"] = size
+        yield c
     for eq in (0, 1, 0x100, 0x1FE):
         c = base(r, 39)
         c["queues"]["WEqual"] = [eq]

@@ -148,6 +148,8 @@ int32_t tpw_sip_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(offsetof(tag_sM3D2Header, mF78));                  // 21
     out[n++] = static_cast<int64_t>(offsetof(sHField, mF18));                          // 22
     out[n++] = static_cast<int64_t>(offsetof(tag_sMiniNode, mMatrix));                 // 23
+    out[n++] = static_cast<int64_t>(offsetof(tag_sCoasterInstance, mF70));             // 24
+    out[n++] = static_cast<int64_t>(sizeof(tag_sCoasterInstance));                     // 25
     return n;
 }
 

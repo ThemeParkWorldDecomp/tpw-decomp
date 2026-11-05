@@ -75,8 +75,8 @@ int32_t CloseHandle(InternalHandle* handle) {
 }
 
 // bthread_mutex (src/game/online/bthread.cpp, src/game/online/email.cpp): not used by the test.
-void EnterCriticalSection(void**) {}
-void LeaveCriticalSection(void**) {}
+void EnterCriticalSection(uint32_t*) {}
+void LeaveCriticalSection(uint32_t*) {}
 
 }  // namespace NS_MacDoze
 

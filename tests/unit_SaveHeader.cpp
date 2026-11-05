@@ -175,6 +175,11 @@ int32_t tpw_sh_legal(int32_t index, uint16_t* out, int32_t max) {
     return text.mLength;
 }
 
+// 1 when the library was built with the port fixes (the module then compares against what the fixes change).
+int32_t tpw_sh_portfix() {
+    return 0;
+}
+
 // The words the static initialisation sets in gSaveLoad (0x1037fefc +0, +4, +0x14, +0x18).
 void tpw_sh_saveload(uint32_t* out) {
     out[0] = gSaveLoad.mF00;

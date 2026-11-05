@@ -70,6 +70,7 @@ struct Config {
     struct ScriptedTyping {
         int32_t pass;
         std::string text;
+        bool hidden = false;   // --type-env: the log shows '*' for each character (a password)
     };
     std::vector<ScriptedTyping> typing;
     // A scripted drag with the left button (--drag X0,Y0-X1,Y1@N[/K]): the pointer goes to (X0, Y0) on pass N, the button
@@ -167,7 +168,8 @@ std::FILE* OpenHostFile(const std::filesystem::path& path, const char* mode);
 
 // The host file or folder a game path names: the user folder's copy if there is one, else
 // the game folder's. Names are matched ignoring case, as on the Mac. Empty if neither
-// exists.
+// exists. A film (".mov") no folder holds is looked for again as the PC CD's ".tgq" of the
+// same name.
 std::filesystem::path FindHostPath(const std::string& gamePath);
 // The host file an FSSpec made by FSMakeFSSpec stands for (the spec itself keeps only the
 // name); empty when there is none.
@@ -271,6 +273,11 @@ struct KeyRepeatTiming {
 };
 KeyRepeatTiming SystemKeyRepeat();                                                    // the host's keyboard settings
 KeyRepeatTiming WindowsKeyRepeat(uint32_t delaySetting, uint32_t speedSetting);       // SPI_GETKEYBOARDDELAY, SPEED
+
+// The launcher's "Several keys at once" (gamework.cpp, reported by Addable13): set before the game starts. True: a key that
+// goes down keeps the keys already down and each comes up at its own key-up, as on the PC. False, the original's way: a
+// key that goes down first releases the one that was down (0x100054c4), so the game sees one key at a time.
+inline bool gPortSeveralKeys = false;
 
 // The number of GDI handles (DCs, fonts, bitmaps) alive in gdi.cpp; the platform test checks that none leak.
 size_t GdiLiveHandles();

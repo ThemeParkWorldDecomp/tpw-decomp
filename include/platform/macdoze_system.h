@@ -16,6 +16,8 @@ uint32_t _beginthreadex(void* security, uint32_t stackSize, void* (*start)(void*
                         uint32_t* id);                                // macdoze 0x1000c478
 void InitializeCriticalSection(void** section);                       // macdoze 0x1000ba90
 void DeleteCriticalSection(void** section);                           // macdoze 0x1000bad4
+void InitializeCriticalSection(uint32_t* section);                    // the same on a 4 byte handle word (macdoze.h,
+void DeleteCriticalSection(uint32_t* section);                        // platform/macdoze_misc.cpp)
 int32_t SetEvent(InternalHandle* handle);                             // macdoze 0x1000be2c
 
 char* _itoa(int32_t value, char* buffer, int32_t radix);              // macdoze 0x10002f40

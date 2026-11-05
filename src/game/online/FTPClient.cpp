@@ -29,6 +29,7 @@ using namespace ftp_callee;
 
 FTPClient::~FTPClient() { Destruct(0); }
 
+
 // 0x1020b46c
 FTPClient* FTPClient::Destruct(int16_t deleteFlag) {
     while (mReady == 0) Sleep(1);

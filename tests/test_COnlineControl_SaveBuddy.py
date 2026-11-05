@@ -32,7 +32,7 @@ OWN = set(SIZES)
 ADDR = dict(gUserInfo=0x10380B34, gTPGlobals=0x103B74C8, gText=0x1037FF18, gOfsWVtbl=0x102B1F50,
             gIosFailureDtorVec=0x102661D0, gIosFailureVtbl=0x1029D084)
 MAC_IOS = dict(streambuf=0x24, state=0x34, exc=0x38, base=0x44)
-HOST_LAYOUT_FIXED = [0x28, 0x38, 0x3C, 0x48, 0x24]      # IgnoreIos mStreamBuf, mState, mExceptions, mBaseOffset; IgnoreFilebuf mFile
+HOST_LAYOUT_FIXED = [0x24, 0x34, 0x38, 0x44, 0x24]      # IgnoreIos mStreamBuf, mState, mExceptions, mBaseOffset; IgnoreFilebuf mFile
 HOST = {}                                                # filled by bind: the text object's slot offset
 
 ST = {}                                                  # per case, the PowerPC side's remembered objects
@@ -213,8 +213,8 @@ def st_wstr_copy(e):
 
 
 def st_receive(e):
-    data = e.u32(e.r(4))
-    rec(e, "receive", (e.cl.lab(e.r(3)), int(e.r(4) == ST.get("second")), data - ST["this"], e.r(5)), (wstr(e, data),))
+    # The text it is given (the copy's) and the colour; the host passes a std::u16string, not the copy.
+    rec(e, "receive", (e.cl.lab(e.r(3)), e.r(5)), (wstr(e, e.u32(e.r(4))),))
 
 
 def st_wstr_dtor(e):
@@ -297,6 +297,10 @@ class Ppc(Side):
     def putptr(self, a, v):
         self.words(a, [v])
 
+    def put_text(self, rep, text):
+        """A string representation's character pointer: a word at +0xc on the Mac."""
+        self.words(rep + 0xC, [text])
+
     def getptr(self, a):
         return self.rd_word(a)
 
@@ -349,6 +353,10 @@ class Host(Side):
 
     def putptr(self, a, v):
         self.write(a, struct.pack("<Q", v))
+
+    def put_text(self, rep, text):
+        """The host representation (IME::MslWideStringRep) keeps a native character pointer at +0x10."""
+        self.write(rep + 0x10, struct.pack("<Q", text))
 
     def getptr(self, a):
         lo, hi = self.rd_words(a, 2)
@@ -404,7 +412,7 @@ def build(s, case):
         rep = s.alloc(0x20)
         namew = s.alloc(0x80)
         s.wstr(namew, case["name"])
-        s.words(rep + 0xC, [s.ptr(namew)])
+        s.put_text(rep, namew)
         s.words(this + 8, [s.ptr(rep)])
         sentinel = this + 0xE38
         nodes = []
@@ -413,7 +421,7 @@ def build(s, case):
             key = s.alloc(0x20)
             data = s.alloc(0x80)
             s.wstr(data, text)
-            s.words(key + 0xC, [s.ptr(data)])
+            s.put_text(key, data)
             s.words(node + 0xC, [s.ptr(key)])
             nodes.append(node)
         for i, node in enumerate(nodes):
