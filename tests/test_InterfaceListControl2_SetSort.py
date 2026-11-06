@@ -15,6 +15,10 @@ the functions write (sort column and direction, first visible entry) and the eve
 
 No fused operations. Not tested: an AdvanceIndex answer below -1 or past the item words (the original reads outside the block); FindData on
 a list without storage that has entries; SetCurrent's and SelectClick's windows being NULL (the original reads through them).
+
+SetCurrent on a list with fewer entries than rows, an empty one or a short one scrolled further than it reaches, leaves the original with
+a negative first visible entry. With the port fixes off that is what the host must do. With them on (unit listtop) the host stops it at 0:
+the original's result is rewritten by list_top_model before the comparison, so the rest of it still has to match.
 """
 import ctypes as C
 import random
@@ -95,8 +99,17 @@ STUBS.internal(PTRGLUE, stub_glue)
 STUBS.imp("labs", stub_labs)
 
 
+# With the port fixes on (unit listtop) SetCurrent stops the first visible entry at 0: an original that ends with a negative one is compared
+# through list_top_model.
+LIST_TOP_FIX = False
+
+
 def setup(runner):
+    global LIST_TOP_FIX
     T.install_std_stubs(runner.emu)
+    lib = runner.lib
+    lib.tpw_ilc2s_portfix.restype, lib.tpw_ilc2s_portfix.argtypes = C.c_int32, []
+    LIST_TOP_FIX = lib.tpw_ilc2s_portfix() == 1
 
 
 # ---------------------------------------------------------------------------------------------------------------- the two sides
@@ -275,8 +288,29 @@ def run(s, c):
         s.done()
 
 
+def list_top_model(c, out):
+    """What SetCurrent does with the port fixes on, from the original's result: the first visible entry is 0, the row and the scroll bar
+    follow it, and the parent hears of the move only if the entry was not 0 already, with the last visible entry counted from 0."""
+    if c["entry"] != FN_CUR or out["top"] >= 0:
+        return out
+    assert c["top"] >= 0, c["top"]
+    log = []
+    for name, ints, texts in out["log"]:
+        if name == "ChangeCur":
+            ints = (ints[0], min(s32(c["args"][0]), c["count"] - 1))
+        elif name == "SetValue":
+            ints = (ints[0], 0)
+        elif name == "Send":
+            if c["top"] == 0:
+                continue
+            ints = (ints[0], ints[1], 0, c["count"] - 1 if c["vis"] >= c["count"] else c["vis"])
+        log.append((name, ints, texts))
+    return dict(out, top=0, log=log)
+
+
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    out = run(Ppc(e, case), case)
+    return list_top_model(case, out) if LIST_TOP_FIX else out
 
 
 def host(lib, case):
@@ -355,6 +389,21 @@ def cur_edges():
             for count in (0, 1, 10, 20):
                 for vis in (0, 5, 12):
                     yield dict(curcase(r, position, top, count, vis), has_storage=True)
+    # the empty list, as Down or Home finds it: no entries, nothing current, the first visible entry anywhere
+    for vis in (0, 1, 2, 6, 12):
+        for top in (0, 3):
+            for position in (0, 1, 5):
+                yield dict(curcase(r, position, top, 0, vis), has_storage=True, cur=-1, first=-1)
+    # the short list: fewer entries than rows, the first visible entry in reach and past it
+    for count in (1, 2, 5):
+        for top in (0, 1, 4, 9):
+            for position in (0, 1, count - 1, count, 20):
+                yield dict(curcase(r, position, top, count, 6), has_storage=True)
+    # as many entries as rows and more, which stay as they were
+    for count in (6, 7, 11):
+        for top in (0, 1, 4, 9):
+            for position in (0, 1, count - 1, count, 20):
+                yield dict(curcase(r, position, top, count, 6), has_storage=True)
 
 
 def cur_random(r):

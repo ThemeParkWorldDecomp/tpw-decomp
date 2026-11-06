@@ -138,7 +138,10 @@ uint32_t PAR_InitEmitter(int32_t type, int32_t a, int32_t b, int32_t c) {
 void LinkSlideoutPanel(InterfaceWindow* panel, int32_t n) { ev("LinkSlideoutPanel", {lab(panel), n}); }
 void RemoveSlideoutPanel(int16_t which) { ev("RemoveSlideoutPanel", {which}); }
 void UIMain_AdvisorMessage(AdvisorMessage message) { ev("UIMain_AdvisorMessage", {static_cast<int32_t>(message)}); }
-void UIMain_UISound(int32_t code) { ev("UIMain_UISound", {code}); }
+int32_t UIMain_UISound(int32_t code) {
+    ev("UIMain_UISound", {code});
+    return 0;
+}
 void UIMain_MidWindowParticles(int32_t id, InterfaceWindow* window) { ev("UIMain_MidWindowParticles", {id, lab(window)}); }
 int32_t FindStaticTag(InterfaceWindow* window) {
     ev("FindStaticTag", {lab(window)});

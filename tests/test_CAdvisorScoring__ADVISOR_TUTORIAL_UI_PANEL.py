@@ -13,6 +13,12 @@ The world of a case: the scoring object with its balance values, the game world 
 "no drinks" id, the message table (every record's number and first response). What is compared: the answer, the object's fields, the
 master save pointer (none, the old one or a new one) and the event log.
 
+Load and Save: the fakes see the file's bytes, and the same file must give the same cursor as a number, the same cursor the same file.
+A failed read leaves the file's raw bytes in the cursor: that compares as bytes. With the port's fixes on, Load also takes a park
+from a port build before 0.3.0, whose cursor is byte-swapped ("saveorder" in src/game/advisor/AdvisorScoring.cpp): "Load, either
+order" runs every cursor the game can hold in both orders and words in neither, against the Mac reading the original's file of the
+cursor the host must end with. With the fixes off it is plain Load: the host and the Mac read the same file.
+
 No fused operations. Not tested: a message index outside -1 .. 0x15e in GetFirstResponseFor (the original reads outside the table),
 NaN or huge products in the gold ticket scorer (fctiwz differs between the emulator and the hardware).
 """
@@ -40,6 +46,8 @@ HANDLE = 0x12345678
 DIVISOR = 864000000000
 
 LAY = []          # the host's layout, filled by bind
+CURSORS = 0x160   # the walk's cursor is 0 to the message count (0x15f), both included
+PORT_FIX = False
 
 
 def s32(v):
@@ -147,6 +155,8 @@ STUBS.internal(C_DIV, stub_div)
 
 
 def setup(runner):
+    global PORT_FIX
+    PORT_FIX = runner.lib.tpw_v5767_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -215,10 +225,10 @@ class Ppc(Side):
         return self.cell
 
     def fields(self):
-        return (self.read(self.obj, 4), self.rd_half(self.obj + 4), self.rd_words(self.obj + 8, 1)[0])
+        return (self.rd_words(self.obj, 1)[0], self.rd_half(self.obj + 4), self.rd_words(self.obj + 8, 1)[0])
 
-    def set_fields(self, raw, w4, w8):
-        self.write(self.obj, raw)
+    def set_fields(self, cursor, w4, w8):
+        self.words(self.obj, [cursor])
         self.half(self.obj + 4, w4)
         self.words(self.obj + 8, [w8])
 
@@ -289,10 +299,10 @@ class Host(Side):
         return self.cell
 
     def fields(self):
-        return (self.read(self.obj, 4), self.rd_half(self.obj + LAY[0]), self.rd_words(self.obj + LAY[1], 1)[0])
+        return (self.rd_words(self.obj, 1)[0], self.rd_half(self.obj + LAY[0]), self.rd_words(self.obj + LAY[1], 1)[0])
 
-    def set_fields(self, raw, w4, w8):
-        self.write(self.obj, raw)
+    def set_fields(self, cursor, w4, w8):
+        self.words(self.obj, [cursor])
         self.half(self.obj + LAY[0], w4)
         self.words(self.obj + LAY[1], [w8])
 
@@ -346,7 +356,10 @@ def build(s, case):
 
 
 def observe(s, case, answer):
-    return {"answer": answer, "log": s.log(), "fields": s.fields(), "master": s.master_state()}
+    fields = s.fields()
+    if case["op"] == "load" and not answer:      # the read failed: the file's bytes are still in the cursor
+        fields = (s.read(s.obj, 4),) + fields[1:]
+    return {"answer": answer, "log": s.log(), "fields": fields, "master": s.master_state()}
 
 
 def run(s, case):
@@ -372,7 +385,7 @@ def rbits(r):
 
 
 def rfields(r):
-    return (bytes(r.randrange(256) for _ in range(4)), r.randrange(1 << 16), r.randrange(1 << 32))
+    return (r.randrange(1 << 32), r.randrange(1 << 16), r.randrange(1 << 32))
 
 
 def base(r, op):
@@ -472,11 +485,45 @@ def drinks_random(r):
 
 
 # ---- Load and Save
+def swap(w):
+    return struct.unpack(">I", struct.pack("<I", w))[0]
+
+
 def io_case(r, op, xfer=None):
     c = base(r, op)
-    c["queues"] = {"xfer": [r.choice([0, 1, 3, 4, 5, 7, 8, 12, 16, MASK, r.randrange(1 << 32)]) if xfer is None else xfer],
-                   "readdata": [r.randrange(1 << 32)]}
+    x = r.choice([0, 1, 3, 4, 5, 7, 8, 12, 16, MASK, r.randrange(1 << 32)]) if xfer is None else xfer
+    data = r.randrange(1 << 32)
+    if PORT_FIX and op == "load" and x >> 2 == 1:      # "Load, either order" has the other words
+        data = swap(r.randrange(CURSORS))
+    c["queues"] = {"xfer": [x], "readdata": [data]}
     return c
+
+
+# readdata is the file's 4 bytes as a big-endian number on both sides, so a word w of the file, little-endian, is readdata swap(w).
+def order_case(r, w):
+    c = base(r, "load")
+    want = w if not PORT_FIX or w < CURSORS else swap(w) if swap(w) < CURSORS else 0
+    c["queues"] = {"xfer": [4], "readdata": [swap(w)]}
+    c["mac_readdata"] = swap(want)
+    return c
+
+
+def order_ppc(e, case):
+    c = dict(case, queues=dict(case["queues"], readdata=[case["mac_readdata"]]))
+    return run(Ppc(e, c), c)
+
+
+def order_edges():
+    r = random.Random(5772)
+    for v in range(CURSORS):
+        yield order_case(r, v)        # the original's order
+        yield order_case(r, swap(v))  # the order of a port build before 0.3.0
+    for w in (CURSORS, CURSORS + 1, 0xFFFF, 0x10000, 0x80000000, 0x7FFFFFFF, 0xFFFFFFFF, 0xFEFFFFFF, 0x01000100, swap(CURSORS)):
+        yield order_case(r, w)        # neither
+
+
+def order_random(r):
+    return order_case(r, r.randrange(1 << 32))
 
 
 def load_edges():
@@ -526,5 +573,6 @@ TESTS = [
     FnTest("CAdvisorScoring::_ADVISOR_PRICING_DRINKS_POOR_VALUE", ppc, host, edge=drinks_edges, rnd=drinks_random),
     FnTest("CAdvisorScoring::Save", ppc, host, edge=save_edges, rnd=lambda r: io_case(r, "save")),
     FnTest("CAdvisorScoring::Load", ppc, host, edge=load_edges, rnd=lambda r: io_case(r, "load")),
+    FnTest("CAdvisorScoring::Load, either order", order_ppc, host, edge=order_edges, rnd=order_random),
     FnTest("CAdvisorScoring::GetFirstResponseFor", ppc, host, edge=first_edges, rnd=lambda r: first_case(r)),
 ]

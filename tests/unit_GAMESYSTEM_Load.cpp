@@ -74,4 +74,8 @@ int32_t tpw_gsl_layout(int64_t*) { return 0; }
 int32_t tpw_gsl_save(uint64_t file) { return GAMESYSTEM_Save(reinterpret_cast<void*>(file)); }
 int32_t tpw_gsl_load(uint64_t file) { return GAMESYSTEM_Load(reinterpret_cast<void*>(file)); }
 
+int32_t tpw_gsl_portfix() {
+    return 0;
+}
+
 }  // extern "C"

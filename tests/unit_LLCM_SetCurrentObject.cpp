@@ -143,8 +143,9 @@ int32_t LLCC_SystemGetMode() {
     return static_cast<int32_t>(ret("GetMode"));
 }
 
-void LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     ev("DrawTrackLine", {static_cast<int32_t>(mode), x, y, *endX, *endY});
+    return 1;
 }
 
 void LLCC_SystemConstructTrackClickStack(CObject* obj) { ev("ConstructTrackClickStack", {lab(obj)}); }
@@ -159,7 +160,10 @@ int32_t CTrackCell::ConnectionType(CELL_MODES mode, int32_t a, uint8_t b) {
     return static_cast<int32_t>(ret("ConnectionType"));
 }
 
-void LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) { ev("TraceTrack", {CellIndex(from), CellIndex(to), flag}); }
+int32_t LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) {
+    ev("TraceTrack", {CellIndex(from), CellIndex(to), flag});
+    return 0;
+}
 
 extern "C" {
 

@@ -81,7 +81,9 @@ void CThing::KillMe() {
 }
 
 MslCharString* msl_char_string::construct(MslCharString* self, const MslCharString* src, uint32_t pos, uint32_t n) {
-    ev("StringCopy", {PtrId(self), PtrId(src), static_cast<int64_t>(pos), static_cast<int64_t>(n)});
+    // The source's word, not its address: StrVal copies from a local string that the Argument's word points at.
+    ev("StringCopy", {PtrId(self), static_cast<int64_t>(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src->mRep))),
+                      static_cast<int64_t>(pos), static_cast<int64_t>(n)});
     return self;
 }
 

@@ -5,7 +5,9 @@ libtpw_unit_CLBScreenComponentOnlineIslands_StartCurrentIsla.dylib (tests/unit_C
   ShowPanels 0x100b42d4, ShowInfoOverlayPanel 0x100b4828, Hide 0x100b4170, the destructor 0x100b4be0, WindowMessagesFn 0x100b3bc8;
   Islands::WindowMessagesFn 0x100b1e3c; PublishGlobe: destructor 0x100af1c8, IsCityValid 0x100af148, HidePanels 0x100aef20,
   ShowPanels 0x100aeeb0, Tick 0x100aeb10; DownloadGlobe: IsCityValid 0x100aea58, HidePanels 0x100ae828, ShowPanels 0x100ae7b0,
-  Tick 0x100ae318; OnlineGlobe::Register 0x100ae1b0.
+  Tick 0x100ae318; OnlineGlobe::Register 0x100ae1b0. And the three lobby calls the program makes through the screens' vtables, each run as
+  the Mac's table names it: slot 0x50 and slot 0x4c of the download globe's 0x1029e7dc, slot 0x30 of the online islands' 0x1029e950, against
+  the program's own definitions (the Slot50 member, src/game/GameShimGlue.cpp).
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian, 8-byte pointers) for the translation. The callees outside the unit
@@ -36,6 +38,8 @@ FN = dict(
     dicv=(0x100aea58, 28), dhide=(0x100ae828, 52), dshow=(0x100ae7b0, 52), dtick=(0x100ae318, 32), reg=(0x100ae1b0, 40),
 )
 OWN = set(a for a, _ in FN.values())
+# The vtable entries (a pointer to a TVector whose first word is the code), read from the Mac's image by each case.
+VSLOT = dict(dslot50=(0x1029e7dc, 0x50), dslot4c=(0x1029e7dc, 0x4c), islot30=(0x1029e950, 0x30))
 
 # ---- the callees faked on both sides
 ADDR = dict(gLobbyMeshes=0x102e48d0, gLobbyFlyingMeshes=0x102e48d4)
@@ -250,7 +254,12 @@ class Ppc(Side):
         return self.L.log
 
     def call(self, op, args, ret):
-        r3, _, _ = T.call_ppc(self.e, FN[op][0], [a & MASK for a in args])
+        if op in VSLOT:
+            table, slot = VSLOT[op]
+            code = self.e.u32(self.e.u32(table + slot))
+        else:
+            code = FN[op][0]
+        r3, _, _ = T.call_ppc(self.e, code, [a & MASK for a in args])
         return r3 & MASK
 
 
@@ -299,7 +308,7 @@ class Host(Side):
 
 HOSTFN = dict(zoom="zoom", setcur="setcur", prev="prev", hidep="hidep", showp="showp", showinfo="showinfo", hide="hide", dtor="dtor",
               wmf="wmf", wmfi="wmfi", pdtor="pdtor", picv="picv", phide="phide", pshow="pshow", ptick="ptick", dicv="dicv",
-              dhide="dhide", dshow="dshow", dtick="dtick", reg="reg")
+              dhide="dhide", dshow="dshow", dtick="dtick", reg="reg", dslot50="dslot50", dslot4c="dslot4c", islot30="islot30")
 
 
 def bind(lib):
@@ -438,7 +447,7 @@ THIS = ("P", 0)
 NULL = ("N",)
 SCREEN = dict(zoom="onl", setcur="onl", prev="onl", hidep="onl", showp="onl", showinfo="onl", hide="onl", dtor="onl", wmf="onl",
               wmfi="onl", pdtor="glob", picv="glob", phide="glob", pshow="glob", ptick="glob", dicv="glob", dhide="glob",
-              dshow="glob", dtick="glob", reg="glob")
+              dshow="glob", dtick="glob", reg="glob", dslot50="glob", dslot4c="glob", islot30="onl")
 RET = dict(dtor="p", pdtor="p", picv="u", dicv="u")
 
 MESSAGES = [0x1000B, 0x10005, 0, 0x1000A, 0x1000C, -1, 5, 0x10006, 0x20005]
@@ -522,6 +531,9 @@ NAMES = [
     ("dshow", "CLBScreenComponentDownloadGlobe::ShowPanels"),
     ("dtick", "CLBScreenComponentDownloadGlobe::Tick"),
     ("reg", "CLBScreenComponentOnlineGlobe::Register"),
+    ("dslot50", "CLBScreenComponentDownloadGlobe::Slot50"),
+    ("dslot4c", "parkinfo_callee::DownloadGlobeSlot4c"),
+    ("islot30", "parkinfo_callee::OnlineIslandsSlot30"),
 ]
 
 TESTS = [FnTest(name, ppc, host, edge=(lambda op=op: edges(op)), rnd=rnd(op)) for op, name in NAMES]

@@ -26,8 +26,8 @@ extern char16_t gUIMainConvertBuffer[0x4000];
 void UIMain_GetFullyOutOfFirstPerson();                     // 0x10187434
 // ---- the panel helpers (src/game/ui/ui_main.cpp, unit w101)
 enum AdvisorMessage : int32_t;
-// 0x101802cc: the sound event `code` of the UI's sound category (gSoundBanks[3]).
-void UIMain_UISound(int32_t code);
+// 0x101802cc: the sound event `code` of the UI's sound category (gSoundBanks[3]); answers the sound's handle.
+int32_t UIMain_UISound(int32_t code);
 // 0x10180514: when there is a panel, tells it message 5, forgets it and has the keyboard capture decided again; answers whether there was one.
 bool UIMain_CheckPanel();
 // 0x101805a0: makes the mouse and its default mode when there is none (and when the current mode answers 9 gives it a fresh default mode),
@@ -411,7 +411,7 @@ void __sinit_ui_visitorStatus_cpp();   // 0x101435c4 (100 bytes)
 // Unit v5521: callees outside the unit that the host cannot call as the Mac does (constructors); weak stand-ins in the src file, faked by the test library.
 namespace vsp_callee {
 void GradientCtor(void* mem, void* data);   // 0x101898c8 InterfaceDrawEngineHGradient(data)
-void TimeCtor(void* mem);                   // 0x1018edf4 InterfaceVisitorTimeTextObject(NULL) (stand-in: the class is not declared)
+void TimeCtor(void* mem);                   // 0x1018edf4 InterfaceVisitorTimeTextObject(NULL)
 }  // namespace vsp_callee
 // Unit v5058: the map's sprite (0x30 bytes on the Mac; the constructor 0x10230d64 is untranslated and faked by the test library). Mac offsets: the
 // x at 0x04 and y at 0x08 (floats), the thing at 0x18 (a Ptr32 on the Mac, native here, the members after it only keep the size).
@@ -602,9 +602,7 @@ class CPeep;
 enum CELL_MODES : int32_t;
 void UIMain_ZoomToPeep(CPeep* peep);            // 0x10181c70 (stand-in)
 void GetNextStaffMember();                      // 0x101bf32c (stand-in; sets gStaffPanelThing)
-void LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);   // 0x1009c0d0 (768 bytes, src/game/park/MapCell.cpp)
-// The real text of LLCC_DrawLine, answering r3 (0 when a Modify refused, else 1); the void declaration above is what other files use.
-int32_t LLCC_DrawLineBody(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);
+int32_t LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);   // 0x1009c0d0 (768 bytes, src/game/park/MapCell.cpp): 0 when a Modify refused, else 1
 int32_t UIMain_GetStaffStateFrame(int32_t state);   // 0x10180a1c (stand-in)
 extern int8_t gStaffPanelFrameGuard;            // 0x10395a2c: guard byte of UpdateStatus's frame
 extern int32_t gStaffPanelFrame;                // 0x10395a30: the frame last shown (9 at first)
@@ -1378,9 +1376,6 @@ namespace bfl { namespace draw { struct CColour; } }
 namespace tpw_intensify { template <int N> struct CTraits; }
 // 0x102b2912 (initialised data, the halfword 0; name invented): the end marker of the thing id list StoreMapGridDetails walks. Defined in the unit's src file.
 extern uint16_t gUI2DMapGridThingListEnd;
-// 0x103970f0 (name invented): the map panel's colour table, 0x264 bytes; the CColours at +0x1f8, +0x21c and +0x240 are the coaster colours.
-// Defined in the unit's src file (words, so that the CColours inside are aligned).
-extern uint32_t gUI2DMapColourTable[0x264 / 4];
 // 0x100458e8 (64 bytes, stand-in): the start control of the Nth coaster track; *control gets the track's first control (its point at +0x40).
 tag_sBezierControl* GetNthCoasterTrackStart(uint32_t index, void** control);
 // 0x1022bb44 (800 bytes, stand-in): the colour of a coaster track for a colour index (0 to 255) between three colours; answers through a hidden pointer.
@@ -1466,7 +1461,6 @@ extern int32_t gOnlineWord88;                // 0x10395e88: CreateOnlinePanel cl
 extern char16_t gOnlineEditText[256];        // 0x10395e9c: the edit box's static text area
 extern char16_t gFindPanelPlayerName[64];    // 0x103960a4: the player name the park find panel looks for
 extern void (*gFindPanelCloseCallback)();    // 0x103960c4: called when the find panel closes
-extern int32_t gFindPanelWord;               // 0x103960c8: cleared by message 0x14
 // Unit v5660 (src/game/ui/ui_onlinePanel.cpp). Names invented.
 void FillBuddyList();            // 0x101e8608 (152 bytes): empties the contacts list and has the online control refill it
 void ContactMenu(int32_t position);   // 0x101e8b98 (844 bytes): pops the buttons menu up at the mouse for the contact at `position`

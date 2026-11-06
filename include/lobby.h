@@ -389,8 +389,9 @@ public:
     virtual void CreateCities(TbPtrList<CFSOnlineCity>* cities);   // slot 0x30 (0x100ade44)
     virtual void HandleOnlineBacktrack() {}                        // slot 0x34
     void UnRegister(CLBGlobeCityFlag* flag);               // 0x100ae228
-    // Slots 0x38 and 0x48 (the download and publish globes override them; inline defaults keep those classes buildable).
-    virtual void RegisterGlobe(CLBGlobe* globe) {}         // slot 0x38
+    // Slot 0x48 (the download and publish globes override it; the inline default keeps those classes buildable).
+    // Mac 0x100adff4, slot 0x38 of vtable 0x1029e830, which the download globe's vtable 0x1029e7dc shares: Show puts its globe on the list.
+    virtual void RegisterGlobe(CLBGlobe* globe) { Register(globe); }
     virtual int32_t IsCityWanted(CFSOnlineCity* city) { return 0; }   // slot 0x48
     // The Mac words at 0x0c (the globe made by Show), 0x10..0x18 (the camera constants: the host keeps them in
     // mF0C + 4, + 8, + 12), 0x34, and 0x44..0x68 (inside mF44) are reached through mF0C, mF34 and mF44.
@@ -401,8 +402,8 @@ public:
     // under the cursor (an arena offset, as the download and publish globes read it).
     void Tick() override;
     void WindowMessagesFn(int32_t message, int32_t a, int32_t b) override;
-    // Unit v51031: slot 0x3c, called by ~CLBGlobe on its screen with the globe (name unknown; the base does nothing).
-    virtual void UnRegisterGlobe(CLBGlobe* globe) {}
+    // Mac 0x100ae064, slot 0x3c, called by ~CLBGlobe on its screen with the globe: takes it off the list if it is still there.
+    virtual void UnRegisterGlobe(CLBGlobe* globe) { UnRegister(globe); }
     // Unit v51106.
     void TickGlobe();                      // 0x100acce0: the globe's own Tick, which the download and publish globes' Ticks call
     void Register(CLBGlobeCityFlag* flag); // 0x100ae1b0: at the end of the city flag list
@@ -432,7 +433,7 @@ public:
     uint32_t ProcessCancel() override;       // 0x100ae46c
     void Show() override;                    // 0x100ae590
     void Hide() override;                    // 0x100ae63c
-    virtual void Slot50() {}                 // slot 0x50 (unit v5130: EnterChatSatellite calls it on the lobby's download globe; body unknown)
+    virtual void Slot50();                   // slot 0x50 of the Mac's vtable 0x1029e7dc: HidePanels (0x100ae828), as Find Parks and EnterChatSatellite call it
     // Unit v5957 (src/game/online/lobby_globe.cpp).
     void HandleOnlineBacktrack() override;   // slot 0x34 (0x100ae9c0): this->Hide(), then the theme islands' Show
     void CreateCities(TbPtrList<CFSOnlineCity>* cities) override;   // slot 0x30 (0x100ae8a0): a flag per wanted city, then the advisor says line 0x256

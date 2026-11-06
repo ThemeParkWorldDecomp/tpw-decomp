@@ -1,8 +1,9 @@
 // Test library for CreateMainMenu and HideMainMenu (unit v5303; libtpw_unit_HideMainMenu.dylib, tests/test_HideMainMenu.py), main app:
 //   src/game/ui/ui_mainmenu.cpp   CreateMainMenu, HideMainMenu, gMainMenuPauseFlag
+//   src/game/ui/UIMenu.cpp        UIMenuDestruct (UIMenu::~UIMenu), the menu's operator delete
 //
-// The callees are recording fakes (the menus' makers set gMainMenu to the menu the test allocated; UIMenu::~UIMenu logs and the real
-// delete then frees the menu the test made with new). gMainMenu and gGame are defined here.
+// The other callees are recording fakes (the menus' makers set gMainMenu to the menu the test allocated; UI_SendMessage records what the
+// real destructor tells the menu's window). gMainMenu and gGame are defined here.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -40,9 +41,9 @@ void UI_PauseTimerSystem() { ev("UI_PauseTimerSystem", {}); }
 void UI_UnPauseTimerSystem() { ev("UI_UnPauseTimerSystem", {}); }
 void UIMenu::Show(int32_t a) { ev("Show", {lab(this), a}); }
 void UIMenu::Hide() { ev("Hide", {lab(this)}); }
-void DestroyUIMenu(UIMenu* menu) {
-    ev("dtor", {lab(menu), 1});
-    delete menu;
+int32_t UI_SendMessage(InterfaceWindow* window, int32_t message, int32_t a, int32_t b) {
+    ev("UI_SendMessage", {lab(window), message, a, b});
+    return 0;
 }
 
 extern "C" {
@@ -69,6 +70,9 @@ uint64_t tpw_hm_newmenu() {
     gTestMenu = new UIMenu();
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(gTestMenu));
 }
+
+// The menu's window word (a label of the test's, the window is never touched).
+void tpw_hm_setwindow(uint64_t window) { gTestMenu->mWindow = reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(window)); }
 
 int32_t tpw_hm_layout(int64_t* out) {
     int32_t n = 0;

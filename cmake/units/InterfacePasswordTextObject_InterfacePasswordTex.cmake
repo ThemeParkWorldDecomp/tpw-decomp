@@ -14,6 +14,7 @@ set(TPW_UNIT_InterfacePasswordTextObject_InterfacePasswordTex_KEEP
   __ZN16InterfaceTextBox10ClientDrawEv   # InterfaceTextBox::ClientDraw()
   __ZN23InterfaceCashTextObjectC1EPv   # InterfaceCashTextObject::InterfaceCashTextObject(void*)
   __ZN23InterfaceCashTextObjectD1Ev   # InterfaceCashTextObject::~InterfaceCashTextObject()
+  __ZN23InterfaceRankTextObjectD1Ev   # InterfaceRankTextObject::~InterfaceRankTextObject()
   __ZN23InterfaceRankTextObjectC1EPv   # InterfaceRankTextObject::InterfaceRankTextObject(void*)
   __ZN25InterfaceTextObjectSpriteC1EPv   # InterfaceTextObjectSprite::InterfaceTextObjectSprite(void*)
   __ZN26InterfacePercentTextObjectC1EPv   # InterfacePercentTextObject::InterfacePercentTextObject(void*)

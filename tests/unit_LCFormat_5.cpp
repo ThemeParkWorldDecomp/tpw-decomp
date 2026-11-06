@@ -66,7 +66,10 @@ InterfaceWindow* InterfaceWindow::CreateObject(int32_t kind, int32_t attributes,
     return nullptr;
 }
 
-void CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) { ev("Save", {lab(this), lab(&name)}); }
+int32_t CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) {
+    ev("Save", {lab(this), lab(&name)});
+    return 1;
+}
 
 void RemoveSavePanel() { ev("RemoveSavePanel", {}); }
 

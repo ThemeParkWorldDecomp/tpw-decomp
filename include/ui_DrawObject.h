@@ -429,6 +429,8 @@ public:
 class InterfaceRankTextObject : public InterfaceTextObjectSprite {
 public:
     explicit InterfaceRankTextObject(void* data);                   // 0x1018f93c
+    ~InterfaceRankTextObject() override;                            // 0x1018fa18
+    void Change(uint32_t flags, DOChange* change) override;         // 0x1018fb08 (vtable 0x102a7ee4)
 };
 
 // Unit v5983 (src/game/ui/InterfaceTextObjectSprite.cpp): the Change overrides of five text objects as free functions. Flag 0x80
@@ -452,7 +454,7 @@ void Delete(void* self);                              // operator delete, glue 0
 }  // namespace textobj_callee
 
 // Unit v51114 (src/game/ui/ui_StatusPanel.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/Particles.cpp): InterfaceRankTextObject::~InterfaceRankTextObject
-// 0x1018fa18 (188 bytes) with the hidden delete flag; answers self. The class is not declared (see InterfaceRankTextObject_Change); the Mac
+// 0x1018fa18 (188 bytes) with the hidden delete flag; answers self. The class declared above runs this chain from its C++ destructor; this spelled-out form is for the test library. The Mac
 // stores its vtables at +0x38 (not kept). Callees (faked by the test library): the sprite chain's destructors, inlined into this one.
 class InterfaceRankTextObject;
 namespace rank_callee {

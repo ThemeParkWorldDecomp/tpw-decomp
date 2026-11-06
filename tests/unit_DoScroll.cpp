@@ -30,9 +30,6 @@ uint8_t gResearchPanelMade;
 int32_t gResearchSoundA;
 int32_t gResearchSoundB;
 
-// The Mac's UIMain_UISound answers the sound handle (the header says void): the fake carries the answer under the same symbol.
-int32_t UIMain_UISoundFake(int32_t code) __asm__("__Z13UIMain_UISoundi");
-
 namespace {
 
 InterfaceWindow* gWin[9];   // ids 0xd2d0b to 0xd2d12, then any other id
@@ -126,7 +123,7 @@ void UIMain_SetTitleText(InterfaceWindow* window, int32_t id, char16_t* text) {
     ev("UIMain_SetTitleText", {lab(window), id, static_cast<int64_t>(reinterpret_cast<uintptr_t>(text))});
 }
 
-int32_t UIMain_UISoundFake(int32_t code) {
+int32_t UIMain_UISound(int32_t code) {
     ev("UIMain_UISound", {code});
     return static_cast<int32_t>(ret("UIMain_UISound"));
 }

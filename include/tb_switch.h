@@ -22,7 +22,7 @@ int32_t Switch_Init();    // 0x100326f0
 int32_t Switch_Close();   // 0x100327a8
 
 // Unit v51066 (src/engine/Switch.cpp, src/engine/EngineUtil.cpp, src/engine/tb_init.cpp, src/engine/tb_hfield.cpp)
-// ToggleFullScreen 0x1003281c answers 1 (keytable_actions.h declares it void; this file's src declares it int32_t locally).
+// ToggleFullScreen 0x1003281c answers 1 (declared in keytable_actions.h).
 bool IsAlignedTo64Bit(void*& pointer);   // 0x100391c8: the pointer's low three bits are clear
 extern uint32_t gei_ParameterSettings[4];   // engine data 0x100af128 (name from the Ghidra draft), zeroed by __sinit_tb_init_cpp
 extern float gei_HFieldOne;                 // engine data 0x100af120 (name invented), 1.0f after __sinit_tb_hfield_cpp

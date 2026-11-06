@@ -29,6 +29,5 @@ set(TPW_UNIT_MapReset_KEEP
   _gScriptCommandList
   __ZTS7TbTListIP23CIndividualChunkHandlerS1_E   # template class TbTList<CIndividualChunkHandler*, CIndividualChunkHandler*> (explicit instantiation)
   __ZTS9TbPtrListI23CIndividualChunkHandlerE   # template class TbPtrList<CIndividualChunkHandler> (explicit instantiation)
-  TPW_LLCC_DRAWTRACKLINE_R3@game/park/TrackCell.cpp   # the #define TPW_LLCC_DRAWTRACKLINE_R3 of src/game/park/TrackCell.cpp (a guard macro the regroup brought into it)
 )
 set(TPW_UNIT_MapReset_OWN_CALLLOG ON)

@@ -10,5 +10,4 @@ set(TPW_UNIT_CTrackCell_CalculateDirections_KEEP
   _gTrackTileRand
   _gTrackTileTableA
   _gTrackTileTableB
-  TPW_LLCC_DRAWTRACKLINE_R3@game/park/TrackCell.cpp   # the #define TPW_LLCC_DRAWTRACKLINE_R3 of src/game/park/TrackCell.cpp (a guard macro the regroup brought into it)
 )

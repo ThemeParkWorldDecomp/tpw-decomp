@@ -109,6 +109,7 @@ inline T& MacAt(void* base, size_t offset) {
     return *reinterpret_cast<T*>(static_cast<char*>(base) + offset);
 }
 constexpr size_t kHoverOffset = 0x200a0;   // HoverOf, below
+constexpr size_t kDragOffset = 0x200a8;    // the drag flag, below
 }  // namespace
 
 int16_t gMapPanelScript[] = {TPW_WINDOW_SCRIPT_102B2366};   // 0x102b2366: the image's words (generated, devtools/gen_game_tables.py)
@@ -214,6 +215,7 @@ void CUI2DMap::CreateMapPanel() {
     MacAt<CUI2DMapSprite*>(self, kHoverOffset) = nullptr;   // the host's place of that word: the last opening's sprites are deleted
     MacAt<uint16_t>(self, 0x20064) = 0;
     MacAt<uint32_t>(self, 0x20084) = 0;
+    MacAt<int32_t>(self, kDragOffset) = 0;   // the host's place of that word: a drag still on when the map closed would go on scrolling this one
     GetHFieldMaxVertexIndices(&MacAt<uint32_t>(self, 0x24), &MacAt<uint32_t>(self, 0x28));
 
     const float scale = 0.1f;
@@ -434,7 +436,6 @@ template <class T> T& Field(CUI2DMap* map, size_t offset) { return *reinterpret_
 // Host-only places (the Mac keeps a 32-bit word at 0x20060 and the flag at 0x20084, which a native pointer cannot share with the
 // list pointer at 0x20080): the hovered sprite and the drag flag. The map panel window stays the Mac's word at 4, a Ptr32 (an arena
 // offset) as CreateMapPanel stores it.
-constexpr size_t kDragOffset = 0x200a8;
 CUI2DMapSprite*& HoverOf(CUI2DMap* map) { return Field<CUI2DMapSprite*>(map, kHoverOffset); }
 CUI2DMapSprite* SpriteOf(CUI2DMapSprite* p) { return p; }
 CUI2DMapSprite* WordOf(CUI2DMapSprite* p) { return p; }
@@ -694,7 +695,6 @@ void* CUI2DMap::GetMapGridCell(int32_t x, int32_t y) {
 
 // Globals nobody else defines (initialised data / BSS of the Mac).
 uint16_t gUI2DMapGridThingListEnd = 0;           // 0x102b2912
-uint32_t gUI2DMapColourTable[0x264 / 4] = {};    // 0x103970f0
 
 namespace {
 
@@ -1002,7 +1002,7 @@ void CUI2DMap::DrawCoasterTracks() {
     const float mapW = static_cast<float>(At_2<int32_t>(self, 0x24));
     const float scale = 480.0f / (10.0f * mapW);   // f31
     const uint32_t tracks = static_cast<uint32_t>(ui_GetNumCoasterTracks());
-    const char* table = reinterpret_cast<const char*>(gUI2DMapColourTable);
+    const char* table = reinterpret_cast<const char*>(gUI2DMapColours);
     for (uint32_t i = 0; i < tracks; i++) {
         void* firstControl;
         tag_sBezierControl* segment = GetNthCoasterTrackStart(i, &firstControl);

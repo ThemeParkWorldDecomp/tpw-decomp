@@ -39,7 +39,7 @@ ADDR = dict(
     gOnlinePanelShown=0x10395E7A, gOnlineByte78=0x10395E78, gOnlineWord88=0x10395E88, gOnlineEditFontIndex=0x102B0C50,
     gGameWindowCentreX=0x102B2B5C, gGameWindowCentreY=0x102B2B58, gGameWindowHalfWidth=0x10278A28, gGameWindowHalfHeight=0x10278A2C,
     gScreenCentreX=0x102B2B64, gScreenCentreY=0x102B2B60, gViewCentreX=0x102B2B6C, gViewCentreY=0x102B2B68,
-    gFindPanelWord=0x103960C8, gFindPanelCloseCallback=0x103960C4, gFindPanelPlayerName=0x103960A4, gOnlineEditText=0x10395E9C,
+    gOnlineParkFindPanel=0x103960C8, gFindPanelCloseCallback=0x103960C4, gFindPanelPlayerName=0x103960A4, gOnlineEditText=0x10395E9C,
     gOnlineEmptyHelp=0x1024EF54, gOnlinePanelScript=0x102B0834, gOnlineUnderlayScriptA=0x102B0A22, gOnlineUnderlayScriptB=0x102B0B5E,
     OnlinePanelMsg=0x10268560, OnlinePanelSubPanelMsg=0x10268558, ContactListHandler=0x10268538, OnlineEditMsg=0x10268550,
     ButtonsMenuMsg=0x10268528, ButtonsUnderlayMsg=0x10268530, ContactsLCFormat=0x10268520, ContactsLCPostFormat=0x10268518,
@@ -58,9 +58,9 @@ LABELS = {
 HOST_LAYOUT = [360, 8]      # the host's own offsets of mParksByPlayer and mWindow (native pointers); the Mac's are 0xec and 4, written in Ppc.link
 FLOATS = ["gGameWindowCentreX", "gGameWindowCentreY", "gGameWindowHalfWidth", "gGameWindowHalfHeight",
           "gScreenCentreX", "gScreenCentreY", "gViewCentreX", "gViewCentreY"]
-INTS = ["gOnlineContactsBusy", "gOnlineCursorState", "gOnlineWord88", "gFindPanelWord", "gOnlineEditFontIndex"]
+INTS = ["gOnlineContactsBusy", "gOnlineCursorState", "gOnlineWord88", "gOnlineEditFontIndex"]
 BYTES = ["gOnlinePanelShown", "gOnlineByte78"]
-PTRS = ["gOnlinePanel", "gOnlineWindow", "gOnlineWindowE8c", "gOnlineWindowE90", "gOnlineSystem", "gUIRootWindow", "gLobby"]
+PTRS = ["gOnlinePanel", "gOnlineWindow", "gOnlineWindowE8c", "gOnlineWindowE90", "gOnlineParkFindPanel", "gOnlineSystem", "gUIRootWindow", "gLobby"]
 
 
 def s32(v):
@@ -344,7 +344,7 @@ def build(s, case):
     s.setp(s.g("gLobby"), s.blk("lobby"))
     s.setp(s.g("gOnlineSystem"), s.blk("sys") if case["sysmode"] else 0)
     s.setp(s.g("gFindPanelCloseCallback"), s.blk("closecb") if case["closecb"] else 0)
-    for name in ("gOnlinePanel", "gOnlineWindow", "gOnlineWindowE8c", "gOnlineWindowE90"):
+    for name in ("gOnlinePanel", "gOnlineWindow", "gOnlineWindowE8c", "gOnlineWindowE90", "gOnlineParkFindPanel"):
         s.setp(s.g(name), s.obj(case[name]) if case[name] else 0)
     for name in INTS:
         s.words(s.g(name), [case[name]])
@@ -416,12 +416,11 @@ def base(r, op):
         "GetData": [r.choice([0, -1, 0x1234, 0x7FFFFFFF, -2, r.randrange(1, 1 << 30)])],
         "CallDefault": [r.choice([0, 1, -1, r.randrange(-1000, 1000)])],
     }
-    for name in ("gOnlinePanel", "gOnlineWindow", "gOnlineWindowE8c", "gOnlineWindowE90"):
+    for name in ("gOnlinePanel", "gOnlineWindow", "gOnlineWindowE8c", "gOnlineWindowE90", "gOnlineParkFindPanel"):
         c[name] = r.choice([0, r.randrange(1, 39)])
     c["gOnlineContactsBusy"] = r.choice([0, 1, -1, r.randrange(-5, 5)])
     c["gOnlineCursorState"] = r.choice([0, 1, 2, 3, r.randrange(-5, 9)])
     c["gOnlineWord88"] = r.choice([0, 1, -1, r.randrange(-100, 100)])
-    c["gFindPanelWord"] = r.choice([0, 1, -1, r.randrange(-100, 100)])
     c["gOnlineEditFontIndex"] = r.choice([0, 7, 1, 20, 0xFFFFFFFF, r.randrange(0, 40)])
     c["gOnlinePanelShown"] = r.choice([0, 1, 0xFF])
     c["gOnlineByte78"] = r.choice([0, 1, 0xFF])

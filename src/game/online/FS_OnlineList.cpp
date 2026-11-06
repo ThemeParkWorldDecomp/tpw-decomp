@@ -79,6 +79,7 @@ CFSOnlineCity* ReturnCityInfo(CFSOnlineSystemCityList* list, int32_t city) {
 }
 }  // namespace park_info_callee
 
+
 // 0x101783a4 (60): the same for the city list.
 void PostLoginCallbackFn_City(int32_t error, const void* context) {
     CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList>* list =
@@ -955,7 +956,6 @@ CFSOnlinePark& CFSOnlinePark::operator=(const CFSOnlinePark& other) {
 }
 
 // 0x1017c96c (228): leaves the list, then the members' destructors (the strings, last to first) run. The deleting form is the compiler's.
-// (the destructor itself is now defined by the CFSOnlineServer unit; this is the body, which the test library's destructor calls)
 void CFSOnlineServer_DestructBody(CFSOnlineServer* self) {
     CFSOnlineServer* const server = self;
     CFSOnlineSystemServerList* owner = server->mList;
@@ -1025,8 +1025,8 @@ CFSOnlineServer::CFSOnlineServer(const ccServerInfo* info, CFSOnlineSystemServer
     mText6C = info->mStr22.get();
     mList->mList->AddTail(this);
 }
-// The destructor is not translated yet; this empty body is the vtable's key function so the vtable is emitted.
-CFSOnlineServer::~CFSOnlineServer() {}
+// Mac 0x1017c96c. The known delete paths remove the head first, so there Find answers NULL and nothing is removed twice.
+CFSOnlineServer::~CFSOnlineServer() { CFSOnlineServer_DestructBody(this); }
 
 // CFSOnlineRide::CFSOnlineRide 0x1017ca7c (unit v5141): copies a ride record from the library's info and adds itself to the list's tail.
 

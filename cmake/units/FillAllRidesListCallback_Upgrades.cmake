@@ -9,7 +9,6 @@ set(TPW_UNIT_FillAllRidesListCallback_Upgrades_KEEP
   __Z24FillAllShopsListCallbackP6CThing   # FillAllShopsListCallback(CThing*)
   __Z27FillAllFeaturesListCallbackP6CThing   # FillAllFeaturesListCallback(CThing*)
   __Z33FillAllRidesListCallback_UpgradesP6CThing   # FillAllRidesListCallback_Upgrades(CThing*)
-  __ZN14kidlist_callee14VisitorNumCtorEPv   # kidlist_callee::VisitorNumCtor(void*)
   __ZN14kidlist_callee8RectCtorEPv   # kidlist_callee::RectCtor(void*)
   __ZN14kidlist_callee8RectDtorEPv   # kidlist_callee::RectDtor(void*)
   _gAllRidesNoUpgradeParent

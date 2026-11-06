@@ -180,7 +180,7 @@ class Host(Side):
         self.C = C
         self.lib = lib
         bind(lib)
-        self.walk = lib.tpw_peep_walkfix() == 1
+        self.walk = True   # the host keeps the walk's places as halfwords, the Mac's bytes read whole
         self.peep = lib.tpw_peep_alloc(0x1C0)
         self.file = lib.tpw_peep_alloc(16)
         self.out = lib.tpw_peep_alloc(16)

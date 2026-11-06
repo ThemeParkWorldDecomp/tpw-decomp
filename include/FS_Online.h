@@ -660,11 +660,11 @@ extern uint8_t gOnlineParkListStringA[];     // 0x10396258
 extern uint8_t gOnlineParkListNodeA[];       // 0x1039626c
 extern uint8_t gOnlineParkListStringB[];     // 0x10396238
 extern uint8_t gOnlineParkListNodeB[];       // 0x1039624c
-// Virtual calls on lobby screens the host cannot make as the Mac does (weak definitions in src/game/ui/ui_onlineParkInfoPanel.cpp, fakes in the
-// test library).
+// Virtual calls on lobby screens the host cannot make as the Mac does (the real ones in src/game/GameShimGlue.cpp; weak empty ones in
+// src/game/ui/ui_onlineParkInfoPanel.cpp for the unit libraries, some with fakes).
 namespace parkinfo_callee {
-void OnlineIslandsSlot30(void* screen);                      // slot 0x30 of the online islands screen (identity unknown; untranslated)
-void DownloadGlobeSlot4c(void* screen);                      // slot 0x4c of the download globe screen (identity unknown; untranslated)
+void OnlineIslandsSlot30(void* screen);                      // slot 0x30 of the online islands screen: ShowPanels 0x100b42d4
+void DownloadGlobeSlot4c(void* screen);                      // slot 0x4c of the download globe screen: ShowPanels 0x100ae7b0
 }  // namespace parkinfo_callee
 
 // Unit v5227: the hostent as gethostbyname answers it (the host's native layout; on the Mac the address list pointer is at 0xc and the

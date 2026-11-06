@@ -123,9 +123,8 @@ void FakeTCtor(void* self, void* data) {
 void FakeTCtor2(void* self, void* data) __asm__("__ZN25InterfaceTextObjectSpriteC2EPv");
 void FakeTCtor2(void* self, void* data) { FakeTCtor(self, data); }
 
-// UIMain_UISound, as the int the panel stores
-int32_t UIMain_UISoundHandle(int32_t code) __asm__("__Z14UIMain_UISoundi");
-int32_t UIMain_UISoundHandle(int32_t code) {
+// UIMain_UISound: the panel stores the answer
+int32_t UIMain_UISound(int32_t code) {
     ev("UIMain_UISound", {I(code)});
     return static_cast<int32_t>(code == 0x9a ? gCfg[5] : gCfg[6]);
 }

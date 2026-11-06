@@ -104,11 +104,8 @@ int32_t CFSLoadSave::Load(const TbDynamicStringTemplate<char16_t>& name) {
     return static_cast<int32_t>(ret("FSLoad"));
 }
 
-// CFSLoadSave::Save is void in the header; the unit's caller reads the answer, so the fake is an int-returning function on the same symbol.
-extern "C++" int32_t CFSLoadSave_SaveFake(CFSLoadSave* self, const TbDynamicStringTemplate<char16_t>& name)
-    asm("__ZN11CFSLoadSave4SaveERK23TbDynamicStringTemplateIDsE");
-int32_t CFSLoadSave_SaveFake(CFSLoadSave* self, const TbDynamicStringTemplate<char16_t>& name) {
-    ev("FSSave", {lab(self), lab(&name)});
+int32_t CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) {
+    ev("FSSave", {lab(this), lab(&name)});
     return static_cast<int32_t>(ret("FSSave"));
 }
 

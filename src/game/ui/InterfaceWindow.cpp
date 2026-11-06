@@ -1753,11 +1753,3 @@ int32_t InterfaceWindow::GetValue() { return 0; }
 //
 // The word at 0 (mF00) holds the item handler (a function pointer on the Mac). The host's pointers are wider than the word, so the
 // word holds a handle that UIMenuHandlerHandle makes of the pointer (0 for NULL), see the end of this file.
-// The callees that the host cannot call as the Mac does are the menu_callee functions below (weak: the test library defines its own).
-
-// The callees the host cannot call as the Mac does: the program's versions here (weak), the test library's fakes in
-// tests/unit_UIMenu_AddItem.cpp replace them.
-namespace menu_callee {
-// 0x101d7b60: InterfaceStringHeap::GetAndCopy (a stand-in on the Mac side, no translation yet: the program's stand-in answers the text).
-__attribute__((weak)) void* GetAndCopy(const char16_t* text) { return const_cast<char16_t*>(text); }
-}  // namespace menu_callee

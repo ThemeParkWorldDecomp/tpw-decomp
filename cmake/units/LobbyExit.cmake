@@ -8,6 +8,8 @@ set(TPW_UNIT_LobbyExit src/game/Game.cpp src/game/TPCamera.cpp src/game/ui/UIInt
     src/game/online/lobby_globe.cpp src/game/ui/CoolRect.cpp src/game/ui/CoolRegion.cpp src/game/ui/UI_Base.cpp
     src/game/Light.cpp platform/arena.cpp)
 set(TPW_UNIT_LobbyExit_KEEP
+  __ZN29CLBScreenComponentOnlineGlobe10UnRegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::UnRegister(CLBGlobe*)
+  __ZN29CLBScreenComponentOnlineGlobe8RegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::Register(CLBGlobe*)
   __Z13DeInitLobbyUIv   # DeInitLobbyUI()
   __Z13UI_hash_cakesPKcj   # UI_hash_cakes(char const*, unsigned int)
   __Z17ESP_RemoveSpritesv   # ESP_RemoveSprites()

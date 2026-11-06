@@ -137,6 +137,11 @@ uint8_t* PeepBytes(CPeep* peep) { return reinterpret_cast<uint8_t*>(peep); }
 // The Mac's int -> single conversion of the magic-number trick: the exact int, rounded to single.
 float IntToSingle(int32_t value) { return static_cast<float>(static_cast<double>(value)); }
 
+// A place SetDest kept as the halfword cell << 8 | offset (+0x18, +0x1a), as the MapPos it was made from.
+MapPos WalkTarget(int16_t kept) {
+    const uint16_t half = static_cast<uint16_t>(kept);
+    return MapPos{static_cast<uint8_t>(half >> 8), static_cast<uint8_t>(half & 0xffu)};
+}
 
 }  // namespace
 
@@ -215,9 +220,9 @@ int32_t CPeep::Serialise(void* file, int32_t save, int32_t version, uint32_t unu
         if (thoughts->Serialise(file, 0, version, unused) != 0) return 1;
     }
 
-    MapPos x, y;
-    std::memcpy(&x, self + 0x18, sizeof(MapPos));
-    std::memcpy(&y, self + 0x1a, sizeof(MapPos));
+    // The place the walk was set to: the Mac reads the bytes SetDest wrote, the host's halfwords hold them the other way round (samueleagle91, tpw-port PR #41).
+    const MapPos x = WalkTarget(*destX);
+    const MapPos y = WalkTarget(*destY);
     if (SetDest(x, y) == 0) CTRACE(2, "Couldn't renav to my accurate dest!!");
     return 0;
 }

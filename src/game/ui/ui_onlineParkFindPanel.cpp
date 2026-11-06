@@ -48,7 +48,6 @@ void FindParksPostGetPlayerParksCallbackFn(int32_t error, const void* context, T
 
 char16_t gFindPanelPlayerName[64];              // 0x103960a4
 void (*gFindPanelCloseCallback)();              // 0x103960c4
-int32_t gFindPanelWord;                         // 0x103960c8
 
 namespace {
 const char kStopSearchText[] = "WL / MW : Stop the search and display whatever has been got in the search\n";   // 0x1024ef8d
@@ -75,7 +74,7 @@ int32_t OnlineParkFindPanelMsg(InterfaceWindow* window, int32_t message, int32_t
         if (message != 0x15) {
             if (message < 0x15) {
                 if (message >= 0x14) {
-                    gFindPanelWord = 0;
+                    gOnlineParkFindPanel = nullptr;
                     gLobby->mWindow->CaptureKb(0);
                 }
             } else if (message == 0x1f) {

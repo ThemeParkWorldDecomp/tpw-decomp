@@ -76,12 +76,8 @@ __attribute__((weak)) void RectCtor(void* mem) { new (mem) CoolRect(); }
 __attribute__((weak)) void RectDtor(void* mem) { static_cast<CoolRect*>(mem)->~CoolRect(); }
 // 0x1018fbe8: InterfaceTitleTextObject::InterfaceTitleTextObject(NULL).
 __attribute__((weak)) void TitleTextCtor(void* mem) { new (mem) InterfaceTitleTextObject(nullptr); }
-// 0x101d7b60: InterfaceStringHeap::GetAndCopy (a stand-in on the Mac side, no translation yet: the program's stand-in answers the text).
-__attribute__((weak)) void* GetAndCopy(const char16_t* text) { return const_cast<char16_t*>(text); }
 // The virtual call through slot 0x2c of the table at +0x118 (SetText).
 __attribute__((weak)) void WindowSetText(InterfaceWindow* window, char16_t* text) { window->SetText(text); }
-// rand from the C library.
-__attribute__((weak)) int32_t Rand() { return std::rand(); }
 }  // namespace menu_callee
 
 namespace {
@@ -109,10 +105,10 @@ void UIMenu::Init(int32_t (*handler)(InterfaceWindow*, int32_t, int32_t, int32_t
     if (mWindow != nullptr) return;
     void* memory = lender_callee::OperatorNew(0x138);
     if (memory != nullptr) {
-        uint32_t first = static_cast<uint32_t>(menu_callee::Rand());
-        uint32_t second = static_cast<uint32_t>(menu_callee::Rand());
+        uint32_t first = static_cast<uint32_t>(msl_rand());
+        uint32_t second = static_cast<uint32_t>(msl_rand());
         uint32_t product = second * first;
-        uint32_t third = static_cast<uint32_t>(menu_callee::Rand());
+        uint32_t third = static_cast<uint32_t>(msl_rand());
         lender_callee::WindowCtor(memory, nullptr, 1, static_cast<int32_t>(third + product), 0, 0, 0x7ff, 0x5ff);
     }
     mWindow = static_cast<InterfaceWindow*>(memory);
@@ -142,7 +138,7 @@ int32_t UIMenu::AddItem(int32_t position, const char16_t* text, int32_t id, int3
                                                   static_cast<int16_t>(x + width), static_cast<int16_t>(bottom));
     if (item != nullptr) {
         item->SetCallbackFunction(UIMenuHandlerFromHandle(mF00));
-        item->setExtraParam(1, menu_callee::GetAndCopy(text));
+        item->setExtraParam(1, InterfaceStringHeap::GetAndCopy(text));   // Mac 0x1018ae78: the item's own copy, released by its handler on 0x14
         void* memory = lender_callee::OperatorNew(0x19c);
         if (memory != nullptr) menu_callee::TitleTextCtor(memory);
         item->SetClientDrawObject(static_cast<InterfaceDrawObject*>(memory));

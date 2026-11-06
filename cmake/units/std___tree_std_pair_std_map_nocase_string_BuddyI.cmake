@@ -21,6 +21,7 @@ set(TPW_UNIT_std___tree_std_pair_std_map_nocase_string_BuddyI_KEEP
   __ZN6v5112620WStringTreeInsertOneEPNS_16TreeInsertResultEPNS_11TreeHeader3EPKv   # v51126::WStringTreeInsertOne(v51126::TreeInsertResult*, v51126::TreeHeader3*, void const*)
   __ZN6v5112620gWStringTreeInsertedE   # v51126::gWStringTreeInserted
   __ZN6v5112621ArgumentDequeTearDownEP16MslArgumentDeque   # v51126::ArgumentDequeTearDown(MslArgumentDeque*)
+  __ZN6v5112623ArgumentCursorDecrementEP17MslArgumentCursor   # v51126::ArgumentCursorDecrement(MslArgumentCursor*)
   __ZN6v5112621ArgumentDestroyRange2EP8ArgumentS1_   # v51126::ArgumentDestroyRange2(Argument*, Argument*)
   __ZN6v5112621ArgumentVectorDestroyEPv   # v51126::ArgumentVectorDestroy(void*)
   __ZN6v5112621NocaseWStringDestructEPjs   # v51126::NocaseWStringDestruct(unsigned int*, short)

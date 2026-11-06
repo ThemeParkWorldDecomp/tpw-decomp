@@ -93,9 +93,6 @@ CFSOnlineSystem::CFSOnlineSystem() {
 // ---- the server record's constructor (untranslated; the test builds the object with it, quietly)
 CFSOnlineServer::CFSOnlineServer(const ccServerInfo*, CFSOnlineSystemServerList* list) { mList = list; }
 
-void CFSOnlineServer_DestructBody(CFSOnlineServer* self);
-CFSOnlineServer::~CFSOnlineServer() { CFSOnlineServer_DestructBody(this); }
-
 namespace {
 template <class T>
 std::int64_t OffsetOf(std::size_t (*member)(T*)) {
