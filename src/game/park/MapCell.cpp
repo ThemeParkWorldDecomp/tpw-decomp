@@ -16,6 +16,7 @@
 #include "MapCell.h"
 #include "ObjectParts.h"
 #include "platform/arena.h"
+#include "platform/msl.h"
 #include "ppc_math.h"
 #include "RegionEffectCell.h"
 #include "RideDB.h"
@@ -889,7 +890,7 @@ uint32_t CMapCell::GetTile(int32_t* rotation) {
         if ((tile & 0xffffu) == 2) tile = tile + 0x11;
         if ((tile & 0xffffu) == 10) tile = tile + 10;
     }
-    const int32_t r = rand();
+    const int32_t r = msl_rand();
     gTileRandomFlag = static_cast<uint8_t>(r - (r / 2) * 2);
     if ((tile & 0xffff0000u) != 0x20000u) return tile;
     uint8_t dir = 1;
@@ -930,12 +931,9 @@ CMapCell* LineCell(int32_t x, int32_t y) {
 }  // namespace
 
 // 0x1009c0d0 (768 bytes): walks from (x, y) to the end point along the longer axis (the x axis when |dx| > |dy|), Modify on each valid
-// cell with the step on that axis; the last cell is done with gValidTypeChangeLock set. Answers 0 as soon as a Modify refuses.
-void LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
-    LLCC_DrawLineBody(mode, x, y, endX, endY);
-}
-
-int32_t LLCC_DrawLineBody(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+// cell with the step on that axis; the last cell is done with gValidTypeChangeLock set. Answers 0 as soon as a Modify refuses, else 1
+// (Mac 0x1009c3b8).
+int32_t LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     gCalcNeighboursJoinEntry = 1;
     gValidTypeChangeLock = 0;
     int32_t dy = Abs(*endY - y);

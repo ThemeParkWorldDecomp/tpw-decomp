@@ -6,8 +6,14 @@ A case is a world and a call. The world is built twice by ONE piece of Python co
 for the original, and in the host library's memory (little-endian) for the translation. LbFile_Read, LbFile_Write and UDebug are fakes
 on both sides that record their arguments; reads answer data words and transferred counts from queues, writes answer counts.
 
+The file is what the fakes see: a word of the file is its 4 bytes read little-endian on both sides, so the same file gives the same
+clocks and the same clocks give the same file (the Mac swaps around its reads and writes, a little-endian host does not need to).
+
 The world of a case: the six clock globals random. What is compared: the answer, the six globals, the event log (every word written,
-and the strings of UDebug). The sixth write of Save is an uninitialised stack word on the Mac: both fakes record 0 for it.
+and the strings of UDebug). A failed read leaves the file's raw bytes in the word it was reading: that word compares as bytes.
+The sixth write of Save is an uninitialised stack word on the Mac: both fakes record 0 for it.
+With the port's fixes on, a Load that succeeds sets the three clocks to gTickNow (see "saveorder" in src/game/GameSys.cpp): the host
+is checked for exactly that, and the Mac's formula for them is compared with the fixes off.
 No fused operations. Not tested: nothing skipped.
 """
 import ctypes as C
@@ -30,7 +36,9 @@ LBREAD, LBWRITE, UDEBUG = 0x10238848, 0x10238878, 0x10000E40
 ADDR = dict(gGameSys_103bc178=0x103BC178, gTickCount=0x103BC17C, gTickNow=0x103BC180,
             gLastTurnTime=0x103BC184, gLastFlyTime=0x103BC188, gTickTime=0x103BC18C)
 GLOBALS = list(ADDR)
+LOADED = ["gTickTime", "gLastFlyTime", "gLastTurnTime", "gTickCount", "gGameSys_103bc178"]    # the order of the file
 HOST_LAYOUT = []
+PORT_FIX = False
 
 STUBS = CL.Stubs()
 STUBS.real.update(OWN)
@@ -41,13 +49,13 @@ def stub_read(e):
     L.rec("Read", (L.lab(e.r(4)), e.r(6) & MASK))
     v = L.ret("RdV") & MASK
     n = L.ret("RdN") & MASK
-    e.write(e.r(5), struct.pack(">I", v))
+    e.write(e.r(5), struct.pack("<I", v))
     e.write(e.r(7), struct.pack(">I", n))
 
 
 def stub_write(e):
     L = e.cl
-    v = struct.unpack(">I", e.read(e.r(5), 4))[0]
+    v = struct.unpack("<I", e.read(e.r(5), 4))[0]
     k = getattr(L, "nwrites", 0)
     L.nwrites = k + 1
     if k == 5:
@@ -66,6 +74,9 @@ STUBS.internal(UDEBUG, stub_udebug)
 
 
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_gsl_portfix.restype, runner.lib.tpw_gsl_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_gsl_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -79,6 +90,7 @@ class Side:
 
 class Ppc(Side):
     fmt = ">I"
+    is_host = False
 
     def __init__(self, e, case):
         self.e = e
@@ -110,6 +122,7 @@ class Ppc(Side):
 
 class Host(Side):
     fmt = "<I"
+    is_host = True
 
     def __init__(self, lib, case):
         self.lib = lib
@@ -164,6 +177,14 @@ def observe(s, case, answer):
     out = {"answer": answer, "log": s.log()}
     for name in GLOBALS:
         out[name] = s.rd_words(s.g(name), 1)
+    if case["fn"] == FN_LOAD:
+        reads = [n >> 2 == 1 for n in case["queues"]["RdN"]]
+        if False in reads[:5]:
+            name = LOADED[reads.index(False)]
+            out[name] = s.read(s.g(name), 4)
+        elif PORT_FIX and answer:
+            for name in LOADED[:3]:
+                out[name] = out[name] == out["gTickNow"] if s.is_host else True
     return out
 
 

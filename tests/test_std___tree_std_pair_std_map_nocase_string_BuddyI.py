@@ -3,13 +3,13 @@ libtpw_unit_std___tree_std_pair_std_map_nocase_string_BuddyI.dylib (tests/unit_s
 ("SimTheme Park"), src/game/MslSupport.cpp, src/game/ui/UIInterface.cpp, src/game/ui/ui_FeatureStatus.cpp:
   the three tree constructors 0x10222fe0 0x10223c74 0x10224540, the two insert_one 0x10223a24 0x102243c0, the node deallocates 0x102229f8
   0x10223670, std::__destroy<Argument> 0x102224e8, <Argument*> 0x10222458, <vector> 0x102254e4, <vector*> 0x102253cc, the nocase wide string
-  destructor 0x10222020, the deque tear_down 0x1022462c, the cdeque destructor 0x10224ea4, getloc 0x10220ab4, make_iterator 0x101f56f8,
+  destructor 0x10222020, the deque tear_down 0x1022462c with the real cursor operator-- 0x101f4c84 under it, the cdeque destructor 0x10224ea4, getloc 0x10220ab4, make_iterator 0x101f56f8,
   UIInterface::InitOnline 0x101ef7f8, FeatureStatusPanel::Remove 0x1019ee48, DeInitWindow 0x1019e91c, DeInitStatusWindow 0x1019e6e4.
 
 A case is a world and a call. The world is one block of 0x800 bytes allocated on each side (objects at fixed offsets, pointers written as
 block offsets); every aligned address of the block is a label of the call log, so a pointer a fake sees is its offset. The callees outside
 the unit (operator delete, the string destructors, the string compares, insert_node_at, the vector tear_down, the deque make_iterator and
-destroy, the cdeque iterator operations, InitOnlineUI, CloseWindow) are fakes on both sides that record their arguments and answer from the
+destroy, the cdeque iterator's operator+=, InitOnlineUI, CloseWindow) are fakes on both sides that record their arguments and answer from the
 case's queues. What is compared: the answer (pointers as block offsets), the whole block (words numeric, pointers as offsets, byte fields as
 bytes), the seven globals the constructors and insert_one read, and the event log.
 
@@ -31,7 +31,7 @@ PFX = "tpw_v51126_"
 
 SIZES = {0x10222fe0: 44, 0x102229f8: 40, 0x10223670: 40, 0x10223a24: 236, 0x102224e8: 68, 0x10222458: 76, 0x10223c74: 44,
          0x10222020: 188, 0x102243c0: 236, 0x10224540: 44, 0x1022462c: 432, 0x10224ea4: 104, 0x102253cc: 76, 0x102254e4: 40,
-         0x10220ab4: 44, 0x101f56f8: 240, 0x101ef7f8: 36, 0x1019ee48: 36, 0x1019e91c: 4, 0x1019e6e4: 4}
+         0x10220ab4: 44, 0x101f56f8: 240, 0x101ef7f8: 36, 0x1019ee48: 36, 0x1019e91c: 4, 0x1019e6e4: 4, 0x101f4c84: 64}
 OWN = set(SIZES)
 
 # the Mac's addresses of the globals; (name, size)
@@ -90,14 +90,6 @@ def stub_destroy(e):
     L.rec("DestroyLast", tuple(last))
 
 
-def stub_decrement(e):
-    L = e.cl
-    c = e.r(3)
-    w0, w1, w2 = e.u32(c), e.u32(c + 4), e.u32(c + 8)
-    L.rec("CdequeDecrement", (L.lab(w0), w1, L.lab(w2)))
-    e.write(c + 4, pack_words([w1 - 1]))
-
-
 def stub_cursor_add(e):
     L = e.cl
     c, n = e.r(3), s32(e.r(4))
@@ -108,7 +100,6 @@ def stub_cursor_add(e):
 
 STUBS.internal(0x10228e2c, stub_make_iterator)
 STUBS.internal(0x10228fd4, stub_destroy)
-STUBS.internal(0x101f4c84, stub_decrement)
 STUBS.internal(0x101f2bec, stub_cursor_add)
 
 
@@ -157,6 +148,7 @@ OPS = {
     "vec_range": (0x102253cc, "vec_range", (), False),
     "cdeque_dtor": (0x10224ea4, "cdeque_dtor", (), True),
     "tear_down": (0x1022462c, "tear_down", (), False),
+    "cursor_dec": (0x101f4c84, "cursor_dec", (), False),
     "getloc": (0x10220ab4, "getloc", (), False),
     "make_iterator": (0x101f56f8, "make_iterator", (), False),
     "init_online": (0x101ef7f8, "init_online", (), False),
@@ -239,7 +231,7 @@ def bind(lib):
     f("layout").argtypes = [C.POINTER(C.c_int64)]
     sig = {"ctor": [i32, u64, u64], "insert_one": [i32, u64, u64, u64], "dealloc": [i32, u64, u64, u32],
            "nocase_dtor": [u64, i32], "arg_destroy": [u64], "arg_range": [u64, u64], "vec_destroy": [u64], "vec_range": [u64, u64],
-           "cdeque_dtor": [u64, i32], "tear_down": [u64], "getloc": [u64, u64], "make_iterator": [u64, u64, u32],
+           "cdeque_dtor": [u64, i32], "tear_down": [u64], "cursor_dec": [u64], "getloc": [u64, u64], "make_iterator": [u64, u64, u32],
            "init_online": [u64], "remove": [u64], "deinit_window": [u64], "deinit_status": [u64]}
     for n, a in sig.items():
         f(n).argtypes = a
@@ -469,6 +461,25 @@ def td_edges(op):
     return gen
 
 
+# ---- the cursor's operator--
+def cd_case(op, r, cap=None, at=None, index=None):
+    cap = r.randrange(1, 9) if cap is None else cap
+    at = r.randrange(0, cap + 1) if at is None else at
+    index = r.choice([0, 1, 2, 0x2a, 0xFFFFFFFF, 0x80000000, r.randrange(0, 0x100)]) if index is None else index
+    words = {0: P(0x10), 4: index, 8: P(0x40 + 4 * at), 0x10: cap, 0x14: r.randrange(0, 9), 0x18: r.randrange(0, 9), 0x1C: P(0x40)}
+    return mk(op, r, [P(0)], words=words)
+
+
+def cd_edges(op):
+    def gen():
+        r = random.Random(19)
+        for cap in (1, 2, 4, 8):
+            for at in (0, 1, cap - 1, cap):
+                for index in (0, 1, 0xFFFFFFFF):
+                    yield cd_case(op, r, cap, at, index)
+    return gen
+
+
 # ---- getloc
 def getloc_case(op, r, counter=None, ref=None):
     counter = r.choice([0, 1, 5, 0xFFFFFFFF, 0x7FFFFFFF]) if counter is None else counter
@@ -531,7 +542,7 @@ FAMILIES = [
     ("insert_nocase", insert_case, insert_edges), ("insert_wstring", insert_case, insert_edges),
     ("arg_destroy", arg_case, arg_edges), ("arg_range", arg_case, arg_edges), ("vec_destroy", arg_case, arg_edges),
     ("vec_range", arg_case, arg_edges), ("nocase_dtor", dtor_case, dtor_edges), ("cdeque_dtor", cdeque_case, cdeque_edges),
-    ("tear_down", td_case, td_edges), ("getloc", getloc_case, getloc_edges), ("make_iterator", mi_case, mi_edges),
+    ("tear_down", td_case, td_edges), ("cursor_dec", cd_case, cd_edges), ("getloc", getloc_case, getloc_edges), ("make_iterator", mi_case, mi_edges),
     ("init_online", ui_case, ui_edges), ("remove", ui_case, ui_edges), ("deinit_window", ui_case, ui_edges),
     ("deinit_status", ui_case, ui_edges),
 ]
@@ -555,6 +566,7 @@ NAMES = {
     "ctor_nocase": NT + "::__tree",
     "tear_down": "std::deque<%s,std::allocator<%s>>::tear_down" % (V, V),
     "cdeque_dtor": "std::__cdeque<%s*,std::allocator<%s*>>::~__cdeque" % (V, V),
+    "cursor_dec": "std::__cdeque<const void*,std::allocator<const void*>>::iterator::operator--",
     "vec_range": "std::__destroy<%s*>" % V,
     "vec_destroy": "std::__destroy<%s>" % V,
     "getloc": "std::basic_streambuf<wchar_t,std::char_traits<wchar_t>>::getloc",

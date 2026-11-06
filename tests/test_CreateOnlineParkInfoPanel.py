@@ -502,7 +502,13 @@ def st_advisor_add(e):
     e.cl.rec("AdvisorAdd", (s32(e.r(4)), s32(e.r(5))))
 
 
+PORT_FIX = False
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_pi_portfix.restype, runner.lib.tpw_pi_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_pi_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -630,6 +636,7 @@ class Host(Side):
 
     def prepare(self, case, login):
         self.lib.tpw_pi_prepare(s32(case["f60"]), case["swear"], login, s32(case["z"]))
+        self.lib.tpw_pi_unlisted(1 if case.get("unlisted") else 0, s32(case["park"]["f48"]))
 
     def token(self, p):
         return self.lib.tpw_pi_token(p)
@@ -653,6 +660,7 @@ def bind(lib):
     getattr(lib, p + "layout").argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_pi_prepare.restype, lib.tpw_pi_prepare.argtypes = None, [C.c_int32, C.c_int32, C.c_uint32, C.c_int32]
     lib.tpw_pi_token.restype, lib.tpw_pi_token.argtypes = C.c_uint32, [C.c_uint64]
+    lib.tpw_pi_unlisted.restype, lib.tpw_pi_unlisted.argtypes = None, [C.c_int32, C.c_int32]
     lib.tpw_pi_park_dump.restype, lib.tpw_pi_park_dump.argtypes = C.c_int32, [C.POINTER(C.c_int64)]
     lib.tpw_pi_call.restype, lib.tpw_pi_call.argtypes = None, [C.c_uint64, C.c_int32, C.c_uint32, C.c_uint32, C.c_uint32]
     out = (C.c_int64 * 32)()
@@ -689,6 +697,9 @@ def build(s, case):
 
 
 def execute(s, case, blk):
+    # The port fix unlistedcity: the original would read a NULL city here; the guard must leave everything as if never called, even the stored park.
+    if PORT_FIX and case.get("unlisted") and not case["panel"] and isinstance(s, Ppc):
+        return
     try:
         s.call(blk, case["parent"], *case["cb"])
     except RuntimeError:
@@ -795,6 +806,15 @@ def edges():
         c["panel"] = 1
         c["parent"] = parent
         yield c
+        c = base(r)
+        c["panel"] = 1
+        c["parent"] = parent
+        c["unlisted"] = 1
+        yield c
+        for sys in (0, 1):
+            c = base(r)
+            c.update(parent=parent, sys=sys, unlisted=1)
+            yield c
     for f60 in (1, -1, 0x10000):
         for parent in (0, 1):
             for sys in (0, 1):
@@ -832,6 +852,7 @@ def rnd(r):
     c = base(r)
     if r.random() < 0.05:
         c["panel"] = 1
+    c["unlisted"] = r.choice([0, 0, 0, 1])
     return c
 
 

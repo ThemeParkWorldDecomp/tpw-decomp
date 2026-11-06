@@ -10,9 +10,9 @@ fake on both sides that records its arguments (pointers as labels, MapDelta as i
 and answers from the case's queues; the fakes that answer a cell answer a cell number (0 NULL, k the k-th of five cell blocks).
 
 The world of a case: the track cell (id, type, parent id), five cell blocks (id, type), the cell system's globals (gLLCC4858, gLLCC4854,
-gLLCCDC21C, gLLCC4800, gLLCC4804, gLLCC4818, gLLCCDB48, gLLCCDB68, the hoarding ends, the two no-parent ids, gLLCCDE0B4/B8, gGameWorld
+gModifyLastMode, gLLCC4800, gLLCC4804, gLLCC4818, gLLCCDB48, gLLCCDB68, the hoarding ends, the two no-parent ids, gLLCCDE0B4/B8, gGameWorld
 as an address never dereferenced), entries 0 and k of gThingArray, and on the Mac the five compass offsets. What is compared: the answer
-(r3), the event log, gLLCC4854, gLLCCDC21C, gLLCC4800 and gLLCC4804.
+(r3), the event log, gLLCC4854, gModifyLastMode, gLLCC4800 and gLLCC4804.
 
 No fused operations; fctiwz runs under HardwareRounding (heights stay small so the wall loops stay short; GetWorldGSquareHeight also
 answers NaN and -inf). Not tested: +inf or huge ground heights (the original's fctiwz + 9 overflows), NaN or infinite cell heights
@@ -78,11 +78,11 @@ MAP_DELETE = 0x1009d0f4
 LLCC_SYSTEM_SET_MODE_NR = 0x100911f0
 
 # ---- the Mac's addresses of the globals
-ADDR = dict(gLLCC4858=0x102e4858, gLLCC4854=0x102e4854, gLLCCDC21C=0x102dc21c, gLLCC4800=0x102e4800, gLLCC4804=0x102e4804,
+ADDR = dict(gLLCC4858=0x102e4858, gLLCC4854=0x102e4854, gModifyLastMode=0x102dc21c, gLLCC4800=0x102e4800, gLLCC4804=0x102e4804,
             gLLCC4818=0x102e4818, gLLCCDB48=0x102ddb48, gLLCCDB68=0x102ddb68, gHoardingRight=0x1029e03c, gHoardingBottom=0x1029e040,
             gHoardingLeft=0x1029e044, gHoardingTop=0x1029e048, gModifyNoParent=0x1029e284, gModifyNoThing=0x1029e286,
             gLLCCDE0B4=0x102de0b4, gLLCCDE0B8=0x102de0b8, gGameWorld=0x1037ebfc, gThingArray=0x1034cbfc)
-WORDS = ["gLLCC4858", "gLLCC4854", "gLLCCDC21C", "gLLCC4800", "gLLCC4804", "gHoardingRight", "gHoardingBottom", "gHoardingLeft",
+WORDS = ["gLLCC4858", "gLLCC4854", "gModifyLastMode", "gLLCC4800", "gLLCC4804", "gHoardingRight", "gHoardingBottom", "gHoardingLeft",
          "gHoardingTop", "gLLCCDE0B4", "gLLCCDE0B8"]
 HALVES = ["gLLCCDB68", "gModifyNoParent", "gModifyNoThing"]
 # The compass offsets (only the Mac's need writing; the host's are constants of the test library).
@@ -431,7 +431,7 @@ def execute(s, case):
 
 def observe(s, case, answer):
     return {"answer": answer, "log": s.log(), "gLLCC4854": s.rd_words(s.g("gLLCC4854"), 1),
-            "gLLCCDC21C": s.rd_words(s.g("gLLCCDC21C"), 1), "gLLCC4800": s.rd_words(s.g("gLLCC4800"), 1),
+            "gModifyLastMode": s.rd_words(s.g("gModifyLastMode"), 1), "gLLCC4800": s.rd_words(s.g("gLLCC4800"), 1),
             "gLLCC4804": s.rd_words(s.g("gLLCC4804"), 1)}
 
 
@@ -494,7 +494,7 @@ def base(r, mode=None, a=None, b=None):
     self_cell = {"id": rid(r), "type": rtype(r), "parent": r.choice([0, 1, 5, 0x1234, 0xFFFF, r.randrange(0x10000)])}
     cells = [{"id": rid(r), "type": rtype(r)} for _ in range(NCELLS)]
     g = {name: r.randrange(-3, 4) for name in WORDS}
-    g.update(gLLCC4858=r.choice([0, 1, 7]), gLLCC4854=r.choice([0, 1]), gLLCCDC21C=r.choice([0, 0x19, r.randrange(0x400)]),
+    g.update(gLLCC4858=r.choice([0, 1, 7]), gLLCC4854=r.choice([0, 1]), gModifyLastMode=r.choice([0, 0x19, r.randrange(0x400)]),
              gLLCC4800=r.randrange(-1, 128), gLLCC4804=r.randrange(-1, 128), gLLCC4818=r.choice([0, 0, 1, 0x80]),
              gLLCCDB48=r.choice([0, 1]), gLLCCDB68=r.randrange(0x10000),
              gModifyNoParent=r.choice([self_cell["parent"], 0xFFFF, r.randrange(0x10000)]), gModifyNoThing=r.choice([0xFFFF, 0, 3]))

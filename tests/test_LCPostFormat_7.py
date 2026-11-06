@@ -322,7 +322,13 @@ for _addr, _fn in [
     stub(_addr, _fn)
 
 
+PORT_FIX = False
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_opf_portfix.restype, runner.lib.tpw_opf_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_opf_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -366,6 +372,8 @@ class Side:
         self.string = self.text(case.get("nothing", [0x6E, 0x6F]))
         for i, city in enumerate((self.city0, self.city1)):
             self.ptr(city + o["city_name"], self.text(case.get("city%d" % i, [0x43, 0x30 + i])))
+        if case.get("city1wide"):
+            self.ptr(self.city1 + o["city_name"], WIDE)
         self.ptr(self.os + o["os_theme"], self.themelist)
         self.ptr(self.os + o["os_city"], self.citylist)
         self.game = None
@@ -470,6 +478,7 @@ class Host(Side):
         self.O = dict(zip(HOST_KEYS, HLAY))
         self.ptr = lambda a, v: self.write(a, struct.pack("<Q", v))
         self.make_world(case)
+        lib.tpw_opf_unlisted(1 if PORT_FIX and case.get("unlisted") else 0)
         fixed = {l: a for a, l in self.labels().items()}
         fixed[11] = self.g("game")
         for i in range(16):
@@ -527,6 +536,7 @@ def bind(lib):
     lib.tpw_opf_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_opf_format.restype, lib.tpw_opf_format.argtypes = C.c_uint64, []
     lib.tpw_opf_post.restype, lib.tpw_opf_post.argtypes = None, [C.c_uint64]
+    lib.tpw_opf_unlisted.restype, lib.tpw_opf_unlisted.argtypes = None, [C.c_int32]
     lib.tpw_opf_fill.restype, lib.tpw_opf_fill.argtypes = None, [C.c_uint64]
     out = (C.c_int64 * 32)()
     n = lib.tpw_opf_layout(out)
@@ -583,6 +593,10 @@ def run(s, case):
 
 
 def ppc(e, case):
+    # The port fix unlistedcity: an odd city is off the list on the host, whose row must take the empty cell constant; the original would read a
+    # NULL city there, so it is shown an odd city named by that same constant instead, and the rows must then be the same.
+    if PORT_FIX and case.get("unlisted"):
+        case = dict(case, city1wide=1)
     return run(Ppc(e, case), case)
 
 
@@ -676,10 +690,19 @@ def fill_edges():
     c = fill_case(r, 3, True, False, False)
     c["queues"]["Swear"] = [0x100, 1, 0x101]
     yield c
+    for master in (False, True):
+        for os in (False, True):
+            c = fill_case(r, 3, True, master, os)
+            c["unlisted"] = 1
+            for p, city in zip(c["parks"], (1, 2, 3)):
+                p["city"] = city
+            yield c
 
 
 def fill_random(r):
-    return fill_case(r)
+    c = fill_case(r)
+    c["unlisted"] = r.choice([0, 0, 0, 1])
+    return c
 
 
 TESTS = [

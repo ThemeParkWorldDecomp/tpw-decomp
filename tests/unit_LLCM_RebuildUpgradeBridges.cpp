@@ -65,8 +65,9 @@ CTrackCell* CTrackCell::GetNeighbouringCell(MapDelta delta, int32_t offset) {
     return static_cast<CTrackCell*>(At(ret("nb")));
 }
 
-void LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     ev("DrawTrackLine", {static_cast<int32_t>(mode), x, y, *endX, *endY});
+    return 1;
 }
 
 extern "C" {

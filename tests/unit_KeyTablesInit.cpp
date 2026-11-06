@@ -238,7 +238,7 @@ int32_t WeatherDownLots() { calllog::ev("Action", {132}); return 0; }
 int32_t WeatherUpLots() { calllog::ev("Action", {133}); return 0; }
 int32_t WeatherDown() { calllog::ev("Action", {134}); return 0; }
 int32_t WeatherUp() { calllog::ev("Action", {135}); return 0; }
-void ToggleFullScreen() { calllog::ev("Action", {136}); }
+int32_t ToggleFullScreen() { calllog::ev("Action", {136}); return 1; }
 
 
 namespace {

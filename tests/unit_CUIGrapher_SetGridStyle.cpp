@@ -166,8 +166,8 @@ TPW_STYLE(tpw_v51056_bg, SetBGStyle)
 void tpw_v51056_save_hidden(uint64_t o, uint64_t name) {
     reinterpret_cast<CFSLoadSave*>(o)->SaveHidden(*reinterpret_cast<TbDynamicStringTemplate<char16_t>*>(name));
 }
-void tpw_v51056_save(uint64_t o, uint64_t name) {
-    reinterpret_cast<CFSLoadSave*>(o)->Save(*reinterpret_cast<TbDynamicStringTemplate<char16_t>*>(name));
+int32_t tpw_v51056_save(uint64_t o, uint64_t name) {
+    return reinterpret_cast<CFSLoadSave*>(o)->Save(*reinterpret_cast<TbDynamicStringTemplate<char16_t>*>(name));
 }
 void tpw_v51056_load_hidden(uint64_t o, uint64_t name) {
     reinterpret_cast<CFSLoadSave*>(o)->LoadHidden(*reinterpret_cast<TbDynamicStringTemplate<char16_t>*>(name));

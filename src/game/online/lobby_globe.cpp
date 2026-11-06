@@ -653,6 +653,9 @@ void CLBScreenComponentDownloadGlobe::ShowPanels() {
     ShowWorldLobbySats();
 }
 
+// Slot 0x50 of the Mac's vtable 0x1029e7dc is HidePanels itself.
+void CLBScreenComponentDownloadGlobe::Slot50() { HidePanels(); }
+
 // 0x100ae828
 void CLBScreenComponentDownloadGlobe::HidePanels() {
     HideWorldLobbyController();

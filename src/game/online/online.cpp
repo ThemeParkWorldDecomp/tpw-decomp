@@ -233,7 +233,7 @@ COnlineControl::COnlineControl() {
     if (tempDeque[4] != 0) online_callee::OperatorDelete(Ptr(tempDeque[4]));
     self[0xe84] = 0;
     online_callee::WStringCtor(self + 0xe88);
-    const int32_t random = rand();
+    const int32_t random = msl_rand();
     swprintf(text, 0x400, kFormatRandomName, random);
     const uint32_t length = wcslen(text);
     online_callee::WStringAssign(self + 8, text, length);
@@ -1556,7 +1556,11 @@ void COnlineControl::NoLongerAFK(bool) {
 // 0x10217684 Argument::StrVal: the narrow string at the Argument's start, copied whole.
 namespace chat_satellite_callee {
 void ArgumentStrVal(MslCharString* result, const Argument* argument) {
-    msl_char_string::construct(result, reinterpret_cast<const MslCharString*>(argument), 0, 0xffffffffu);
+    // The Mac's string is the Argument's first word. Here the word is an arena offset and a string is a native pointer, which read
+    // straight from the Argument would take the wide string's word as its high half.
+    MslCharString whole;
+    whole.mRep = reinterpret_cast<MslCharRep*>(tpw::gArenaBase + argument->mString);
+    msl_char_string::construct(result, &whole, 0, 0xffffffffu);
 }
 }  // namespace chat_satellite_callee
 

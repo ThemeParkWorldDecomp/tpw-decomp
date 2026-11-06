@@ -2,5 +2,7 @@
 # recording fakes in tests/unit_PostGetCityListCallbackFunction.cpp.
 set(TPW_UNIT_PostGetCityListCallbackFunction src/game/online/lobby_globe.cpp platform/arena.cpp)
 set(TPW_UNIT_PostGetCityListCallbackFunction_KEEP
+  __ZN29CLBScreenComponentOnlineGlobe10UnRegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::UnRegister(CLBGlobe*)
+  __ZN29CLBScreenComponentOnlineGlobe8RegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::Register(CLBGlobe*)
   __Z31PostGetCityListCallbackFunctioniPKvP9TbPtrListI13CFSOnlineCityE   # PostGetCityListCallbackFunction(int, void const*, TbPtrList<CFSOnlineCity>*)
 )

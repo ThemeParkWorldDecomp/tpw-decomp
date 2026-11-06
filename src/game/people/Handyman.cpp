@@ -92,6 +92,12 @@ int32_t BalanceAt(int32_t slot) { return gMainBalance.mValues[slot].mInteger; }
 int32_t CellX(MapId id) { return static_cast<int32_t>((static_cast<uint32_t>(id.mIndex) - 1u) & 0x7fu); }
 int32_t CellY(MapId id) { return static_cast<int32_t>((static_cast<uint32_t>(id.mIndex) - 1u) >> 7); }
 
+// A place CPeep::SetDest kept as the halfword cell << 8 | offset (mPosX, mPosY), as the MapPos it was made from.
+MapPos WalkTarget(const MapPos& kept) {
+    uint16_t half;
+    std::memcpy(&half, &kept, sizeof(half));
+    return MapPos{static_cast<uint8_t>(half >> 8), static_cast<uint8_t>(half & 0xffu)};
+}
 
 }  // namespace
 
@@ -320,7 +326,8 @@ void CHandyman::ProcessWalkingToLitter() {
             mTargetLitterCell.mIndex = 0;
             ChooseNextAction();
         } else {
-            AsPeep(this)->Teleport(mPosX, mPosY);
+            // The place the walk was set to: the Mac reads the bytes CPeep::SetDest wrote, the host's halfwords hold them the other way round (samueleagle91, tpw-port PR #41).
+            AsPeep(this)->Teleport(WalkTarget(mPosX), WalkTarget(mPosY));
             SetState(static_cast<CStaff::StaffState>(kStateCleaningLitter));
         }
     } else if (walks == 2) {

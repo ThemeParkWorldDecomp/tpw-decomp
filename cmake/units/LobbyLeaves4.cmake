@@ -4,6 +4,8 @@
 set(TPW_UNIT_LobbyLeaves4 src/game/online/lobby_globe.cpp src/game/online/FS_Online.cpp src/game/online/bthread.cpp
     src/game/online/email.cpp src/game/Game.cpp src/game/InGame.cpp src/bullfrog/FileSystem.cpp platform/msl.cpp)
 set(TPW_UNIT_LobbyLeaves4_KEEP
+  __ZN29CLBScreenComponentOnlineGlobe10UnRegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::UnRegister(CLBGlobe*)
+  __ZN29CLBScreenComponentOnlineGlobe8RegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::Register(CLBGlobe*)
   __ZN11AddressBook4NextEv   # AddressBook::Next()
   __ZN11AddressBook5FirstEv   # AddressBook::First()
   __ZN11AddressBookC1Ev   # AddressBook::AddressBook()

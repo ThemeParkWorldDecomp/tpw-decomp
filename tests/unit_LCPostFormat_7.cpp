@@ -236,9 +236,12 @@ void CGame::GetLocalisedThemeName(const TbDynamicStringTemplate<char>& theme, Tb
     out.mData = const_cast<char16_t*>(sLocalised.back().c_str());
 }
 
+int32_t gOddCitiesUnlisted;   // set by the cases of the port fix unlistedcity only
+
 namespace park_info_callee {
 CFSOnlineCity* ReturnCityInfo(CFSOnlineSystemCityList* list, int32_t city) {
     ev("ReturnCityInfo", {lab(list), city});
+    if (gOddCitiesUnlisted != 0 && (city & 1) != 0) return nullptr;
     return static_cast<CFSOnlineCity*>((city & 1) != 0 ? gTestCity1 : gTestCity0);
 }
 }  // namespace park_info_callee
@@ -352,6 +355,12 @@ int32_t tpw_opf_layout(int64_t* out) {
 }
 
 uint64_t tpw_opf_format() { return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(OnlineParkFindLCFormat())); }
+
+int32_t tpw_opf_portfix() {
+    return 0;
+}
+
+void tpw_opf_unlisted(int32_t on) { gOddCitiesUnlisted = on; }
 
 void tpw_opf_post(uint64_t window) { OnlineParkFindLCPostFormat(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(window))); }
 

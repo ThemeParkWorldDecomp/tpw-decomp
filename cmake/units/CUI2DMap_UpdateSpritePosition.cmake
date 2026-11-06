@@ -6,6 +6,6 @@ set(TPW_UNIT_CUI2DMap_UpdateSpritePosition_KEEP
   __ZN8CUI2DMap17DrawCoasterTracksEv   # CUI2DMap::DrawCoasterTracks()
   __ZN8CUI2DMap19StoreMapGridDetailsEv   # CUI2DMap::StoreMapGridDetails()
   __ZN8CUI2DMap20UpdateSpritePositionEP14CUI2DMapSprite   # CUI2DMap::UpdateSpritePosition(CUI2DMapSprite*)
-  _gUI2DMapColourTable
+  _gUI2DMapColours
   _gUI2DMapGridThingListEnd
 )

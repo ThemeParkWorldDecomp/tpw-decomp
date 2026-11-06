@@ -5,8 +5,6 @@
 //
 // Every callee is a fake that records what the real one reads and answers from the case's queues (cells are named by their offset
 // from the world block, objects by label); the globals of other files the unit reads are defined here, zero at start like the Mac's bss.
-// LLCC_DrawLine, LLCC_DrawTrackLine and LLCC_TraceTrack are declared void but the original reads their r3: their fakes answer an int
-// under the declared function's symbol.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -114,16 +112,13 @@ void MoveFake(const char* name, int32_t* x, int32_t* y) {
 }  // namespace
 
 // ---- the fakes: one per callee outside the unit, the same event name and arguments as the module's PowerPC stub
-int32_t FakeDrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) __asm__("__Z13LLCC_DrawLine10CELL_MODESiiPiS0_");
-int32_t FakeDrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     return LineFake("DrawLine", "DrawLineMove", static_cast<int32_t>(mode), x, y, endX, endY);
 }
-int32_t FakeDrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) __asm__("__Z18LLCC_DrawTrackLine10CELL_MODESiiPiS0_");
-int32_t FakeDrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     return LineFake("DrawTrackLine", "DrawTrackLineMove", static_cast<int32_t>(mode), x, y, endX, endY);
 }
-int32_t FakeTraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) __asm__("__Z15LLCC_TraceTrackP10CTrackCellS0_i");
-int32_t FakeTraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) {
+int32_t LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) {
     ev("Trace", {Ofs(from), Ofs(to), flag});
     return Ret("Trace");
 }

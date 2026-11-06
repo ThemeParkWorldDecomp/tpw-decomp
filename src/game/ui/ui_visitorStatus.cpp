@@ -156,8 +156,6 @@ extern "C" void VspGradientCtorSym(void*, void*) __asm__("__ZN28InterfaceDrawEng
 
 namespace vsp_callee {
 __attribute__((weak)) void GradientCtor(void* mem, void* data) { VspGradientCtorSym(mem, data); }
-// Stand-in: InterfaceVisitorTimeTextObject (0x1018edf4) is not declared anywhere; the sprite constructor stands for it.
-__attribute__((weak)) void TimeCtor(void* mem) { lender_callee::SpriteCtor(mem); }
 }  // namespace vsp_callee
 
 namespace {

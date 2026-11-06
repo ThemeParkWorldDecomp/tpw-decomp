@@ -91,15 +91,17 @@ int32_t LLCC_SystemGetLastMode() {
     ev("LLCC_SystemGetLastMode", {});
     return static_cast<int32_t>(ret("GetLastMode"));
 }
-void LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     ev("LLCC_DrawLine", {static_cast<int32_t>(mode), x, y, *endX, *endY});
     *endX += static_cast<int32_t>(ret("LineDX"));
     *endY += static_cast<int32_t>(ret("LineDY"));
+    return 1;
 }
-void LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     ev("LLCC_DrawTrackLine", {static_cast<int32_t>(mode), x, y, *endX, *endY});
     *endX += static_cast<int32_t>(ret("LineDX"));
     *endY += static_cast<int32_t>(ret("LineDY"));
+    return 1;
 }
 RideInfo* CRideDatabase::GetRideInfo(tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> id) {
     ev("CRideDatabase::GetRideInfo", {lab(this), id.mIndex});
@@ -178,7 +180,10 @@ int32_t CTrackCell::ConnectionType(CELL_MODES mode, int32_t a, uint8_t b) {
     ev("CTrackCell::ConnectionType", {Off(this), static_cast<int32_t>(mode), a, b});
     return static_cast<int32_t>(ret("Conn"));
 }
-void LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) { ev("LLCC_TraceTrack", {Off(from), Off(to), flag}); }
+int32_t LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) {
+    ev("LLCC_TraceTrack", {Off(from), Off(to), flag});
+    return 0;
+}
 int32_t IsValidPylonPosition(uint32_t x, uint32_t z, void* a, uint32_t b, uint32_t c, uint32_t d, uint32_t e) {
     ev("IsValidPylonPosition", {static_cast<int64_t>(x), static_cast<int64_t>(z), lab(a), static_cast<int64_t>(b), static_cast<int64_t>(c),
                                 static_cast<int64_t>(d), static_cast<int64_t>(e)});

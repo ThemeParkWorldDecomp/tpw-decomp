@@ -9,5 +9,4 @@ set(TPW_UNIT_LLCC_DrawTrackLine_KEEP
   _gLobbyNode48C0
   _gLobbyWString488C
   _gLobbyWString48AC
-  TPW_LLCC_DRAWTRACKLINE_R3@game/park/TrackCell.cpp   # the #define TPW_LLCC_DRAWTRACKLINE_R3 of src/game/park/TrackCell.cpp (a guard macro the regroup brought into it)
 )

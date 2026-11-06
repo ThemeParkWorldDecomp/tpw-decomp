@@ -5,6 +5,7 @@ set(TPW_UNIT_MapCells src/game/World.cpp src/game/park/Map.cpp src/game/park/Map
 set(TPW_UNIT_MapCells_KEEP
   __Z30GetMapCellFromPointerWorldPosnP8s3DPoint   # GetMapCellFromPointerWorldPosn(s3DPoint*)
   __ZN10CTrackCell10ModifyTypeE10CELL_MODES   # CTrackCell::ModifyType(CELL_MODES)
+  __ZN10CTrackCell14ModifyTypeBodyE10CELL_MODES   # CTrackCell::ModifyTypeBody(CELL_MODES)
   __ZN4CMap4InitEv   # CMap::Init()
   __ZN6CWorld8RegisterEP11CResearcher   # CWorld::Register(CResearcher*)
   __ZN6CWorld8RegisterEP12CEntertainer   # CWorld::Register(CEntertainer*)
@@ -22,5 +23,4 @@ set(TPW_UNIT_MapCells_KEEP
   _gMapDeltaPlusXMinusY
   _gMapDeltaPlusXPlusY
   _gMapDeltaPlusY
-  TPW_LLCC_DRAWTRACKLINE_R3@game/park/TrackCell.cpp   # the #define TPW_LLCC_DRAWTRACKLINE_R3 of src/game/park/TrackCell.cpp (a guard macro the regroup brought into it)
 )

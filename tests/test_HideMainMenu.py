@@ -4,12 +4,13 @@
 
 A case is a world and a call. The world is built twice by ONE piece of Python code: in emulator memory at the Mac's addresses (big-endian)
 for the original, and in the host library's memory (little-endian) for the translation. The callees (the two menu makers, RemoveSlideoutPanel,
-CGame::Pause and Unpause, the timer system's pause and unpause, UIMenu::Show, Hide and the destructor with its delete flag) are fakes on both
-sides that record their arguments; the makers set gMainMenu to the case's menu.
+CGame::Pause and Unpause, the timer system's pause and unpause, UIMenu::Show and Hide, and UI_SendMessage and the operator delete under the
+menu's real destructor UIMenu::~UIMenu 0x1018ac8c) are fakes on both sides that record their arguments; the makers set gMainMenu to the
+case's menu.
 
-The world of a case: gMainMenu (NULL or the menu), the pause byte 0x10396a54, gGame's word +0x3c, the argument. What is compared: the
-globals, gGame's word and the event log. No fused operations. Not tested: HideMainMenu with gMainMenu NULL (the host's delete of NULL
-does not call the destructor the original calls, a Mac crash anyway).
+The world of a case: gMainMenu (NULL or the menu), the menu's window (NULL or a label), the pause byte 0x10396a54, gGame's word +0x3c, the
+argument. What is compared: the globals, gGame's word and the event log. No fused operations. Not tested: HideMainMenu with gMainMenu NULL
+(UIMenu::Hide on NULL, a crash on both). The window's own teardown under the message 4 is tests/test_MainMenuTeardown.py.
 """
 import ctypes as C
 import random
@@ -21,8 +22,8 @@ from tpwtest import FnTest
 SHIM_LIBRARY = "unit_HideMainMenu"
 MASK = 0xFFFFFFFF
 
-FN_CREATE, FN_HIDE = 0x101FC05C, 0x101FC140
-SIZES = {FN_CREATE: 188, FN_HIDE: 136}
+FN_CREATE, FN_HIDE, FN_DTOR = 0x101FC05C, 0x101FC140, 0x1018AC8C
+SIZES = {FN_CREATE: 188, FN_HIDE: 136, FN_DTOR: 112}
 OWN = set(SIZES)
 
 ADDR = dict(gGame=0x1037F134, flag=0x10396A54, menu=0x10396A58)
@@ -65,16 +66,19 @@ STUBS.internal(0x101D8B64, make_stub("UI_PauseTimerSystem", []))
 STUBS.internal(0x101D8BA0, make_stub("UI_UnPauseTimerSystem", []))
 STUBS.internal(0x1018B0E0, make_stub("Show", [("L", 3), ("i", 4)]))
 STUBS.internal(0x1018B1FC, make_stub("Hide", [("L", 3)]))
-def stub_dtor(e):
-    """~UIMenu with the delete flag: the destructor, then (flag > 0) the operator delete the host's real delete logs."""
+STUBS.internal(0x101C9518, make_stub("UI_SendMessage", [("L", 3), ("i", 4), ("i", 5), ("i", 6)]))
+
+
+def stub_delete(e):
+    """The operator delete under the real ~UIMenu, as the host's real delete logs it. An import, so the real glue keeps r2."""
     L = e.cl
-    obj, flag = L.lab(e.r(3)), T.s32(e.r(4))
-    L.rec("dtor", (obj, flag))
-    if flag > 0:
+    obj = L.lab(e.r(3))
+    if obj > 0:
         L.rec("delete", (obj,))
+    L.forget(e.r(3))
 
 
-STUBS.internal(0x1018AC8C, stub_dtor)
+STUBS.imp("__dl__FPv", stub_delete)
 
 
 def setup(runner):
@@ -97,7 +101,8 @@ class Ppc(Side):
         self.e = e
         self.menu = e.alloc(0x14)
         e.menu_addr = self.menu
-        self.L = e.cl = CL.PpcLog({ADDR["gGame"]: 1, self.menu: 2}, case["queues"])
+        self.window = e.alloc(8)
+        self.L = e.cl = CL.PpcLog({ADDR["gGame"]: 1, self.menu: 2, self.window: 3}, case["queues"])
         self.saved = STUBS.activate(e)
 
     def done(self):
@@ -115,6 +120,9 @@ class Ppc(Side):
     def log(self):
         return self.L.log
 
+    def set_window(self):
+        self.words(self.menu + 0x10, [self.window])
+
     def create(self, a):
         T.call_ppc(self.e, FN_CREATE, [a & MASK])
 
@@ -130,7 +138,8 @@ class Host(Side):
         bind(lib)
         self.f3c = HOST_F3C[0]
         self.menu = lib.tpw_hm_newmenu()
-        CL.host_begin(lib, {1: self.g("gGame"), 2: self.menu}, case["queues"])
+        self.window = lib.tpw_hm_alloc(8)
+        CL.host_begin(lib, {1: self.g("gGame"), 2: self.menu, 3: self.window}, case["queues"])
 
     def done(self):
         pass
@@ -147,6 +156,9 @@ class Host(Side):
     def log(self):
         return CL.host_end(self.lib)
 
+    def set_window(self):
+        self.lib.tpw_hm_setwindow(self.window)
+
     def create(self, a):
         self.lib.tpw_hm_create(T.s32(a))
 
@@ -159,6 +171,8 @@ def bind(lib):
         return
     lib.tpw_hm_addr.restype, lib.tpw_hm_addr.argtypes = C.c_uint64, [C.c_char_p]
     lib.tpw_hm_newmenu.restype, lib.tpw_hm_newmenu.argtypes = C.c_uint64, []
+    lib.tpw_hm_alloc.restype, lib.tpw_hm_alloc.argtypes = C.c_uint64, [C.c_uint32]
+    lib.tpw_hm_setwindow.restype, lib.tpw_hm_setwindow.argtypes = None, [C.c_uint64]
     lib.tpw_hm_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_hm_create.restype, lib.tpw_hm_create.argtypes = None, [C.c_int32]
     lib.tpw_hm_hide.restype, lib.tpw_hm_hide.argtypes = None, []
@@ -173,6 +187,8 @@ def build(s, case):
     s.write(s.g("menu"), mv.to_bytes(4 if s.order == "big" else 8, s.order))
     s.write(s.g("flag"), bytes([case["flag"]]))
     s.words(s.g("gGame") + s.f3c, [case["f3c"]])
+    if case["has_window"]:
+        s.set_window()
 
 
 def execute(s, case):
@@ -208,7 +224,7 @@ def host(lib, case):
 
 
 def base(r, op, has_menu):
-    return {"op": op, "queues": {}, "has_menu": has_menu, "flag": r.choice([0, 1, 2, 255]),
+    return {"op": op, "queues": {}, "has_menu": has_menu, "has_window": r.random() < 0.7, "flag": r.choice([0, 1, 2, 255]),
             "f3c": r.choice([0, 1, 2, MASK, 0x80000000]), "a": r.choice([0, 1, -1, 5, 0x80000000])}
 
 
@@ -231,9 +247,10 @@ def hide_edges():
     r = random.Random(5304)
     for f3c in (0, 1, 2, MASK):
         for flag in (0, 1, 2, 255):
-            c = base(r, "hide", True)
-            c.update(f3c=f3c, flag=flag)
-            yield c
+            for has_window in (False, True):
+                c = base(r, "hide", True)
+                c.update(f3c=f3c, flag=flag, has_window=has_window)
+                yield c
 
 
 def hide_random(r):

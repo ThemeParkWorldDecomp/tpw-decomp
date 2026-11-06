@@ -1,8 +1,5 @@
 // TrackCell.cpp: guessed name (the binary has no __sinit for this file): a contiguous range of free functions, named after what they do.
 
-// LLCellSystem.h declares LLCC_DrawTrackLine void, but the listing answers r3 and this file defines it so (the same
-// mangled name): the header leaves its declaration out here.
-#define TPW_LLCC_DRAWTRACKLINE_R3
 #include "ActionRecorder.h"
 #include "analyser.h"
 #include "CellBase.h"
@@ -70,10 +67,6 @@ float GetTrackMapCellHeight(CMapCell* cell, float height, int32_t x, int32_t y) 
     return height;
 }
 
-// LLCellSystem.h declares this void, but the listing answers r3 (1, or 0 when a cell refused); the same mangled name, so it is
-// declared here with its real return type.
-int32_t LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);
-
 namespace {
 
 // 0x1009dfe4 and CMap::IsXYValid are the callees; the cell is the track cell of the map cell (x + (y << 7) + 1), 16 bits.
@@ -106,7 +99,6 @@ int32_t Snap(int32_t from, int32_t* end) {
 #define gModifyNoThing gTrackModifyNoThing
 
 // Globals only this function names so far (names invented; the launcher zero-fills them like the Mac's bss).
-int32_t gLLCCDC21C;        // 0x102dc21c  the last mode a type change accepted (CalculateNeighbours's mode)
 int32_t gLLCC4854;         // 0x102e4854  set before a type change of a track or hoarding cell, cleared by mode 0x81
 uint16_t gModifyNoParent;  // 0x1029e284  the parent id of a cell with no ride (mode 0x86)
 uint16_t gModifyNoThing;   // 0x1029e286  the thing id of a map cell with no object (mode 0x86)
@@ -166,14 +158,6 @@ void HoardingNeighbour(CMapCell* cell, const MapDelta& delta, bool clear) {
 }
 
 }  // namespace
-
-// Stand-in for the answer of CTrackCell::ModifyType (0x100a0828): the original returns r3 (read here), the translation in
-// src/TrackCell_modify.cpp is void. Until ModifyType is translated again with its answer this guesses it from the type it leaves
-// (weak: a translation that defines ModifyTypeBody replaces it; the test library defines a fake).
-__attribute__((weak)) int32_t CTrackCell::ModifyTypeBody(CELL_MODES mode) {
-    ModifyType(mode);
-    return mType == mode ? 1 : 0;
-}
 
 // The cell types modes 0x81 and 0x83 leave alone while the cell system's flag byte is set (0xc is tested twice in the original).
 bool CTrackCell::ModifyLocked() {
@@ -239,7 +223,7 @@ int32_t CTrackCell::ModifyBody(CELL_MODES mode, int32_t a, int32_t b) {
         return 1;
 
     case 0x80:
-        CalculateNeighbours(static_cast<CELL_MODES>(gLLCCDC21C), a, b);
+        CalculateNeighbours(static_cast<CELL_MODES>(gModifyLastMode), a, b);
         return 1;
 
     case 0x81: {
@@ -311,7 +295,7 @@ int32_t CTrackCell::ModifyBody(CELL_MODES mode, int32_t a, int32_t b) {
         } else if (IsCorner() != 0 || IsCrossRoad() != 0) {
             UnSetFlag(0xf);
         }
-        gLLCCDC21C = 0;
+        gModifyLastMode = 0;
         if (static_cast<int32_t>(mType) != 0xd && static_cast<int32_t>(mType) != 0x12) SetHFieldTile();
         if (gLLCC4858 != 0 && gLLCC4854 != 0) {
             gLLCC4854 = 0;
@@ -438,7 +422,7 @@ int32_t CTrackCell::ModifyBody(CELL_MODES mode, int32_t a, int32_t b) {
             gLLCC4854 = 1;
         }
         if (ModifyTypeBody(mode) != 0) {
-            gLLCCDC21C = full;
+            gModifyLastMode = full;
             return 1;
         }
         return full == 0x19 ? 1 : 0;
@@ -455,9 +439,13 @@ int32_t CTrackCell::ModifyBody(CELL_MODES mode, int32_t a, int32_t b) {
 // stored, the map stamps the cell with a new time stamp, and (for a plain track cell with gLLCC4858 set) the four map cells of the 2 x 2
 // block the cell stands for are deleted when all four exist and their modes are 0 or 1. Last the cost is withdrawn (not for modes 0 and 7,
 // nor when tracks are free). The Mac answers 1 (done / counted), 0 (refused or unaffordable) or (mode == 0x19) when the change is invalid;
-// the declaration returns void and no caller reads it, so the answer is not reproduced.
+// ModifyTypeBody holds it all and answers r3, which CTrackCell::Modify reads; ModifyType is the void declaration of the same function.
 
 void CTrackCell::ModifyType(CELL_MODES mode) {
+    ModifyTypeBody(mode);
+}
+
+int32_t CTrackCell::ModifyTypeBody(CELL_MODES mode) {
     const int32_t m = static_cast<int32_t>(mode);
     uint32_t cost = 0;
     if (m == 0xb && gTrackCostFree == 0) {
@@ -468,11 +456,11 @@ void CTrackCell::ModifyType(CELL_MODES mode) {
     }
 
     if (ValidTypeChange(mode) == 0) {
-        return;
+        return m == 0x19 ? 1 : 0;
     }
     if (mType == mode) {
         ++mOverlapCounter;
-        return;
+        return 1;
     }
 
     int32_t canAfford = 1;
@@ -482,7 +470,7 @@ void CTrackCell::ModifyType(CELL_MODES mode) {
         canAfford = (left >> 31) + 1;
     }
     if (m != 0x19 && (canAfford & 0xff) == 0 && m != 0 && m != 7) {
-        return;
+        return 0;
     }
 
     mType = mode;
@@ -521,6 +509,7 @@ void CTrackCell::ModifyType(CELL_MODES mode) {
     if (m != 0 && m != 7 && gTrackCostFree == 0) {
         gGameWorld->GetBankAccount()->MakeWithdrawal(cost);
     }
+    return 1;
 }
 
 // 0x100a0b68, 16 bytes.
@@ -663,13 +652,13 @@ int32_t CTrackCell::ValidTypeChange(CELL_MODES mode) {
 // Unit v5629: CTrackCell::ConnectionType (0x100a1594, 4,932 bytes), how a cell of mode `mode` would join this track cell (the cell
 // system's placement test). It also owns five cell system words no other file names (see TrackCell.h).
 
-// gLLCCC20C, gLLCCDB60, gLLCCE0B4, gLLCCE0B8 are defined by other units now.
+// gLLCCC20C, gLLCCDB60, gLLCCDE0B4, gLLCCDE0B8 are defined by other units now.
 int32_t gLLCCDB40 = 0;   // 0x102ddb40
 
 namespace {
 
-// The ride rule of one map cell: a ride part (mode 4, 9 or 10) whose ride ranks below gLLCCE0B8 forbids the placement (answers false).
-// The ride's rank (kRideSlot_OverwritePriority, the record's word 0x54) is left in gLLCCE0B4 when the cell's thing is an object.
+// The ride rule of one map cell: a ride part (mode 4, 9 or 10) whose ride ranks below gLLCCDE0B8 forbids the placement (answers false).
+// The ride's rank (kRideSlot_OverwritePriority, the record's word 0x54) is left in gLLCCDE0B4 when the cell's thing is an object.
 bool RideAllows(const CMapCell* cell) {
     const int32_t type = static_cast<int32_t>(cell->mType);
     if (type != 4 && type != 9 && type != 10) return true;
@@ -680,9 +669,9 @@ bool RideAllows(const CMapCell* cell) {
     if (thing->mKind == 3) {
         tag_IDX_TYPE<IDXTYPEUniqueNameObjectId, uint16_t> ride;
         ride.mIndex = static_cast<const CObject*>(gThingArray[id].mThing)->mObjectType;
-        gLLCCE0B4 = gRideDatabase.GetRideInfo(ride)->Value(kRideSlot_OverwritePriority).mInteger;
+        gLLCCDE0B4 = gRideDatabase.GetRideInfo(ride)->Value(kRideSlot_OverwritePriority).mInteger;
     }
-    return !(gLLCCE0B8 > gLLCCE0B4);
+    return !(gLLCCDE0B8 > gLLCCDE0B4);
 }
 
 bool IsSpecial(CMapCell* cell) {

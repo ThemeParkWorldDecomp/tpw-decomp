@@ -96,8 +96,9 @@ void CTrackCell::Delete(int32_t a, int32_t b, bool c) {
     ev("Delete", {Idx(this), a, b, c ? 1 : 0});
 }
 
-void LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     ev("DrawTrackLine", {static_cast<int32_t>(mode), x, y, *endX, *endY});
+    return 1;
 }
 
 CTrackCell* LLCC_BreakTrack(int32_t x, int32_t y, uint8_t dir) {
@@ -157,7 +158,7 @@ int32_t tpw_tt_layout(int64_t* out) {
 }
 
 int32_t tpw_tt_run(uint64_t from, uint64_t to, int32_t flag) {
-    return LLCC_TraceTrackCount(reinterpret_cast<CTrackCell*>(static_cast<uintptr_t>(from)), reinterpret_cast<CTrackCell*>(static_cast<uintptr_t>(to)), flag);
+    return LLCC_TraceTrack(reinterpret_cast<CTrackCell*>(static_cast<uintptr_t>(from)), reinterpret_cast<CTrackCell*>(static_cast<uintptr_t>(to)), flag);
 }
 
 }  // extern "C"

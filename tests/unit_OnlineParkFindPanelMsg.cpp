@@ -251,7 +251,7 @@ uint64_t tpw_opfp_addr(const char* name) {
         G(gScreenCentreY),
         G(gViewCentreX),
         G(gViewCentreY),
-        G(gFindPanelWord),
+        G(gOnlineParkFindPanel),
         G(gFindPanelCloseCallback),
         G(gFindPanelPlayerName),
         G(gOnlineEditText),

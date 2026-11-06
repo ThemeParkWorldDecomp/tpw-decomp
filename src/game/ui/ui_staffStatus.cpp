@@ -280,12 +280,12 @@ int32_t StaffStatusMsg(InterfaceWindow* window, int32_t message, int32_t a, int3
                 bool handled;
                 if (b == 1) {
                     panel->SetSelected();
-                    CMMPathDraw* pathDraw = static_cast<CMMPathDraw*>(::operator new(0x14));
+                    CMMPathDraw* pathDraw = static_cast<CMMPathDraw*>(::operator new(sizeof(CMMPathDraw)));
                     if (pathDraw != nullptr) new (pathDraw) CMMPathDraw(static_cast<CELL_MODES>(0x36));
                     if (gMouse == nullptr) {
-                        CMouse* mouse = static_cast<CMouse*>(::operator new(1));
+                        CMouse* mouse = static_cast<CMouse*>(::operator new(sizeof(CMouse)));
                         if (mouse != nullptr) {
-                            CMMDefault* defaultMode = static_cast<CMMDefault*>(::operator new(8));
+                            CMMDefault* defaultMode = static_cast<CMMDefault*>(::operator new(sizeof(CMMDefault)));
                             if (defaultMode != nullptr) new (defaultMode) CMMDefault();
                             mouse->AssignMouseMode(defaultMode);
                             gMouseWord1E0 = -1;

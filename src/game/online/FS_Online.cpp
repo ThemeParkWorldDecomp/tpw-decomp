@@ -1278,7 +1278,7 @@ void CFSOnlineSystem::RequestUpload(const char* file, int32_t f344, const char16
         CreateOnlineLoginPanel(FSOnlineLoginRASFailureCallback);
     } else {
         if (gOnlineSystem == nullptr) {
-            CFSOnlineSystem* system = static_cast<CFSOnlineSystem*>(::operator new(0x404));
+            CFSOnlineSystem* system = static_cast<CFSOnlineSystem*>(::operator new(sizeof(CFSOnlineSystem)));
             if (system != nullptr) new (system) CFSOnlineSystem();
             gOnlineSystem = system;
         }
@@ -1401,7 +1401,7 @@ void CFSOnlineSystem::UploadServerConnectionCallback(int32_t result, int32_t unu
 TbDynamicStringTemplate<char16_t> CFSOnlineSystem::ReturnUploadFilename() {
     TbDynamicStringTemplate<char16_t> name;
     if (gUserInfo == nullptr) {
-        CFSUserInfo* info = static_cast<CFSUserInfo*>(::operator new(0xd4));
+        CFSUserInfo* info = static_cast<CFSUserInfo*>(::operator new(sizeof(CFSUserInfo)));
         if (info != nullptr) new (info) CFSUserInfo();
         gUserInfo = info;
     }

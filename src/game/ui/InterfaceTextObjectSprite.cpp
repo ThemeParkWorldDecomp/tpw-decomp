@@ -404,9 +404,8 @@ void InterfaceVisitorTimeTextObject::Change(uint32_t flags, DOChange* change) {
         InterfaceTextObjectSprite::Change(flags, change);
         return;
     }
-    const int32_t time = static_cast<int32_t>((static_cast<uint32_t>(change->mF00[0]) << 24) |
-                                              (static_cast<uint32_t>(change->mF00[1]) << 16) |
-                                              (static_cast<uint32_t>(change->mF00[2]) << 8) | change->mF00[3]);
+    int32_t time;   // in the machine's byte order, as InterfaceWindow::SetValue stores it (Mac 0x101dfe84)
+    std::memcpy(&time, change->mF00, 4);
     char16_t text[0x44];
     TbITable* const table = static_cast<TbITable*>(gText.mResourcePointers[6]);
     if (time > 0x18) {
@@ -500,9 +499,17 @@ __attribute__((weak)) InterfaceDrawObject* NewNumberText() {
 }  // namespace worldlobby_callee
 
 namespace vsp_callee {
-// Stand-in: InterfaceVisitorTimeTextObject (0x1018edf4) is not declared anywhere; the sprite constructor stands for it.
-__attribute__((weak)) void TimeCtor(void* mem) { lender_callee::SpriteCtor(mem); }
+// Mac 0x1018edf4: the visitor status panel's window 0x372d (0x10142238) and column 2 of the all-kids list (0x10194fa8).
+static_assert(sizeof(InterfaceVisitorTimeTextObject) == sizeof(InterfaceTextObjectSprite), "the class adds no members");
+static_assert(sizeof(InterfaceVisitorTimeTextObject) <= 0x400, "the callers' 0x19c request is served by an allocator giving at least 0x400 bytes");
+__attribute__((weak)) void TimeCtor(void* mem) { new (mem) InterfaceVisitorTimeTextObject(nullptr); }
 }  // namespace vsp_callee
+
+namespace kidlist_callee {
+// Mac 0x1018eb38: column 0 of the all-kids list (0x10194fa8).
+static_assert(sizeof(InterfaceVisitorNumTextObject) == sizeof(InterfaceTextObjectSprite), "the class adds no members");
+__attribute__((weak)) void VisitorNumCtor(void* mem) { new (mem) InterfaceVisitorNumTextObject(nullptr); }
+}  // namespace kidlist_callee
 
 // Unit v51114: the status panel's small members (EnableNameClick, EditNamePanelGone, GetPreviousObject, ObjectGone, CloseObject,
 // ZoomTo, CloseWindow, GetName, the empty base versions and the constructor), the SamsUtilities byte swaps next to them and the
@@ -551,6 +558,11 @@ namespace {
 const char16_t kRankFormat[] = u"%d";
 const char16_t kRankFormatNone[] = u"-";
 }  // namespace
+
+// The class's own slots: Mac vtable 0x102a7ee4 +0x14 is the Change below, +8 the destructor (the sprite chain InterfaceRankTextObject_Dtor spells
+// out is what C++ runs after this empty body). Without the Change the online park lists' rank column stayed blank: nothing read flag 0x80.
+InterfaceRankTextObject::~InterfaceRankTextObject() {}
+void InterfaceRankTextObject::Change(uint32_t flags, DOChange* change) { InterfaceRankTextObject_Change(this, flags, change); }
 
 // 0x1018fb08 (156 bytes)
 void InterfaceRankTextObject_Change(InterfaceTextObjectSprite* self, uint32_t flags, DOChange* change) {

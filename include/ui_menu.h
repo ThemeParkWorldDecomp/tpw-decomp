@@ -30,8 +30,6 @@ public:
     void Show(int32_t a);        // 0x1018b0e0 (248)
     void Hide();                 // 0x1018b1fc (120)
 };
-// 0x1018ac8c (112): UIMenu::~UIMenu called with the delete flag 1 by HideMainMenu (a free function so UIMenu keeps a trivial destructor).
-void DestroyUIMenu(UIMenu* menu);
 
 // The menus' handlers (untranslated; the Mac holds each as a TVector in the TOC, the address in the comment).
 int32_t MainLobbyMenuCB(InterfaceWindow* window, int32_t message, int32_t a, int32_t b);   // 0x101fb354, TVector 0x10268608
@@ -59,9 +57,7 @@ namespace menu_callee {
 void RectCtor(void* mem);                                  // 0x101c7448 CoolRect::CoolRect
 void RectDtor(void* mem);                                  // 0x101c74e0 CoolRect::~CoolRect (flag -1)
 void TitleTextCtor(void* mem);                             // 0x1018fbe8 InterfaceTitleTextObject(NULL)
-void* GetAndCopy(const char16_t* text);                    // 0x101d7b60 InterfaceStringHeap::GetAndCopy
 void WindowSetText(InterfaceWindow* window, char16_t* text);   // the virtual at slot 0x2c of the table at +0x118
-int32_t Rand();                                            // 0x10239148 rand
 }  // namespace menu_callee
 
 // Unit v5771 (src/game/ui/UIMenu.cpp): 0x1018ac8c (112) UIMenu::~UIMenu with its hidden short delete flag

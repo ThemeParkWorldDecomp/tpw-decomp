@@ -48,8 +48,8 @@ void (*gOnlineParkInfoClose)() = nullptr;                           // 0x1039611
 const void* gVisitParkContext = nullptr;                            // 0x1039610c
 void (*gVisitParkPostDownload)(int32_t, const void*) = nullptr;     // 0x10396110
 alignas(16) uint8_t gOnlineParkInfoParkStorage[sizeof(CFSOnlinePark)];   // 0x10396118
-// The program's definitions of the two virtual calls (slots 0x30 and 0x4c of lobby screens, untranslated: nothing happens). Weak, so the
-// unit's test library can define recording fakes.
+// For the unit libraries only: the program's definitions of these two virtual calls (slots 0x30 and 0x4c of lobby screens, each the screen's
+// ShowPanels) are in src/game/GameShimGlue.cpp and win at link. Weak, so a unit's test library can also define recording fakes.
 namespace parkinfo_callee {
 __attribute__((weak)) void OnlineIslandsSlot30(void*) {}
 __attribute__((weak)) void DownloadGlobeSlot4c(void*) {}

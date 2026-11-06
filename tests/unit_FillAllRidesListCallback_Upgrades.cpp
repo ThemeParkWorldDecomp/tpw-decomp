@@ -189,11 +189,6 @@ namespace vsp_callee {
 void TimeCtor(void* mem) { ev("TimeCtor", {newlab(mem)}); }
 }  // namespace vsp_callee
 
-// Only the src file's weak stand-in for VisitorNumCtor calls this; the fake below replaces that stand-in.
-namespace lender_callee {
-void SpriteCtor(void*) {}
-}  // namespace lender_callee
-
 namespace kidlist_callee {
 void VisitorNumCtor(void* mem) { ev("VisitorNumCtor", {newlab(mem)}); }
 void RectCtor(void*) { ev("CoolRectCtor", {0}); }

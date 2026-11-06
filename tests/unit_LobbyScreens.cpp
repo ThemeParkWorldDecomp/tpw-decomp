@@ -82,6 +82,9 @@ RECORD_INPUT(CLBScreenComponentOnlineGlobe, "Globe")
 void CLBScreenComponentOnlineGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
 void CLBScreenComponentDownloadGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
 void CLBScreenComponentDownloadGlobe::HandleOnlineBacktrack() {}
+void CLBScreenComponentOnlineGlobe::Register(CLBGlobe*) {}
+void CLBScreenComponentOnlineGlobe::UnRegister(CLBGlobe*) {}
+void CLBScreenComponentDownloadGlobe::Slot50() {}
 void CLBScreenComponentPublishGlobe::CreateCities(TbPtrList<CFSOnlineCity>*) {}
 void CLBScreenComponentPublishGlobe::HandleOnlineBacktrack() {}
 RECORD_DTOR(CLBScreenComponentDownloadGlobe, "DownloadGlobe")

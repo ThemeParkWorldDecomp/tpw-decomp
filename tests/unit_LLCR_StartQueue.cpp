@@ -46,10 +46,11 @@ int32_t CMapCell::ValidTypeChange(CELL_MODES mode) {
 
 void CCellBase::ModifyDirection(uint8_t direction) { ev("ModifyDirection", {Off(this), direction}); }
 
-void LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     ev("DrawTrackLine", {static_cast<int32_t>(mode), x, y, *endX, *endY});
     *endX += 1;
     *endY += 1;
+    return 1;
 }
 
 extern "C" {

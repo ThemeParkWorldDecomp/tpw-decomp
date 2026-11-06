@@ -362,7 +362,7 @@ class Host(Side):
     def __init__(self, lib, case):
         self.lib = lib
         bind(lib)
-        self.walk = lib.tpw_hm_walkfix() == 1
+        self.walk = True   # the host keeps the walk's places as halfwords, the Mac's bytes read whole
         CL.host_begin(lib, {}, case["queues"])
 
     def done(self):

@@ -12,6 +12,7 @@
 
 #include "FS_MasterSave.h"
 #include "FS_Online.h"
+#include "InterfaceFont.h"
 #include "TPMain.h"
 #include "email.h"
 #include "lobby.h"
@@ -76,6 +77,23 @@ void CLBScreenComponentOnlineGlobe_WindowMessagesFn(CLBScreenComponentOnlineGlob
 void OnlineIslandsSlot34(CLBScreenComponentOnlineIslands* screen) { screen->HidePanels(); }               // 0x100b4354
 void OnlineIslandsSlot48(CLBScreenComponentOnlineIslands* screen) { screen->SelectCurrentIsland(); }       // 0x100b44ac
 void OnlineIslandsSlot4c(CLBScreenComponentOnlineIslands* screen) { screen->StartCurrentIslandZoom(); }    // 0x100b4574
+// Slot 0x30 of the online islands' vtable 0x1029e950 and slot 0x4c of the download globe's 0x1029e7dc, called on the program's screens as
+// plain functions. These replace the weak empty definitions in src/game/ui/ui_onlineParkInfoPanel.cpp, which only the unit libraries keep.
+namespace parkinfo_callee {
+void OnlineIslandsSlot30(void* screen) { static_cast<CLBScreenComponentOnlineIslands*>(screen)->ShowPanels(); }   // 0x100b42d4
+void DownloadGlobeSlot4c(void* screen) { static_cast<CLBScreenComponentDownloadGlobe*>(screen)->ShowPanels(); }   // 0x100ae7b0
+}  // namespace parkinfo_callee
+
+// ---- The online panels' virtual calls on fonts and windows, made as plain functions. These replace the weak definitions in
+// src/game/ui/ui_onlinePanel.cpp, which only the unit libraries keep.
+namespace contacts_callee {
+// Mac 0x101e7dd8 calls the font's virtual at +0x14 of the table at +0x10: 0x10168e04 on a wrapper, 0x10169264 on a plain font.
+// InterfaceFont::GetCharWidth is not virtual on the host and picks between them by the class.
+int32_t FontCharWidth(InterfaceFont* font, char16_t character) { return font->GetCharWidth(character); }
+// Mac 0x101e7854 calls the window's virtual at +0x1c of the table at +0x118: Enable, 0x101dc320 on a plain window and 0x101caf48 on a
+// button, the same virtual as here.
+void WindowSlot1c(InterfaceWindow* window, int32_t value) { window->Enable(static_cast<int16_t>(value)); }
+}  // namespace contacts_callee
 
 // Slot 0x48 of the base islands vtable, which the base class's window messages call: the theme islands' SelectCurrentIsland
 // (0x100b3218) or the online islands' (0x100b44ac), by the object's class. The base class itself has no body.
