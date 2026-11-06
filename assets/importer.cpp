@@ -19,6 +19,7 @@
 #include "sam_check.h"
 #include "sha256.h"
 #include "sniff.h"
+#include "../platform/path_text.h"
 
 #ifdef __APPLE__
 #include <sys/xattr.h>
@@ -278,7 +279,7 @@ std::vector<std::string> CueFiles(const std::string& cue) {
     std::vector<std::string> out;
     std::ifstream in(cue, std::ios::binary);
     std::string line;
-    std::string dir = fs::path(cue).parent_path().string();
+    std::string dir = tpw::PathText(fs::path(cue).parent_path());
     while (std::getline(in, line)) {
         size_t at = line.find_first_not_of(" \t");
         if (at == std::string::npos || line.compare(at, 5, "FILE ") != 0) continue;
@@ -564,7 +565,7 @@ bool Importer::Open(std::string& err) {
             err = "cannot create " + assetsDir_ + ": " + ec.message();
             return false;
         }
-        assetsCanon_ = fs::canonical(assetsDir_, ec).generic_string();
+        assetsCanon_ = tpw::GenericPathText(fs::canonical(assetsDir_, ec));
         if (ec) assetsCanon_ = assetsDir_;
         // what an earlier run left half-written (or unpacked) goes; nothing in it was ever verified
         fs::remove_all(stagingDir_, ec);
@@ -1192,7 +1193,7 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
 void Importer::EnumeratePath(Run& run, const std::string& path) {
     std::error_code ec;
     fs::path canon = fs::weakly_canonical(fs::path(path), ec);
-    std::string key = ec ? path : canon.generic_string();
+    std::string key = ec ? path : tpw::GenericPathText(canon);
     auto fail = [&](const std::string& message) {
         run.report.errors.push_back(message);
         ImportProgress ev;
@@ -1308,7 +1309,7 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
                 std::string disk = folderRoot + "/" + e.path;
                 std::error_code ec;
                 fs::path canon = fs::weakly_canonical(fs::path(disk), ec);
-                std::string key = ec ? disk : canon.generic_string();
+                std::string key = ec ? disk : tpw::GenericPathText(canon);
                 seen = !run.opened.insert(key).second;
                 if (!seen) {
                     std::shared_ptr<Blob> blob = OpenFileBlob(key, err);
@@ -1618,7 +1619,7 @@ bool Importer::Install(Run& run, std::string staged, const std::vector<std::pair
         if (ec) {
             if (from != staged) std::remove(from.c_str());
             std::remove(staged.c_str());
-            run.report.errors.push_back("cannot write " + dest.generic_string() + ": " + ec.message());
+            run.report.errors.push_back("cannot write " + tpw::GenericPathText(dest) + ": " + ec.message());
             run.report.aborted = run.stop = true;
             ImportProgress ev;
             ev.kind = ImportProgress::Kind::Error;
