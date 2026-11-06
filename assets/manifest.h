@@ -33,7 +33,7 @@ enum Group : uint8_t {
     kGroupMovies,            // data/Movies/
     kGroupLanguageAmerican,  // data/Language/American/ (US)
     kGroupLanguageEnglish,   // data/Language/English/ (European)
-    kGroupProgram,           // the Mac program's data fork (optional: the game's data tables are built in)
+    kGroupProgram,           // the Mac program's data fork (optional)
     kGroupGold,              // the Gold ride wads and ride configuration text
     kGroupLanguagePack,      // a language pack's text, filter, meshes, speech and pictures (kEditionLanguages)
     kGroupCount,

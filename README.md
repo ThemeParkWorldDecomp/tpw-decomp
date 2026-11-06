@@ -2,7 +2,7 @@
 
 A decompilation of Sim Theme Park (AKA Theme Park World) as released for the Mac in 1999 (the 2.04b3 patch, PowerPC), into C++.
 
-Only the game's own functions are here, each translated to behave exactly as the Mac build does, bugs included. The aim is a
+The game's own functions are here, each translated to behave exactly as the Mac build does, bugs included. The aim is a
 complete, tested decompilation that is behaviour-equivalent to the original, not byte-matching: the C++ is not meant to
 compile back to the same machine code, it is meant to compute the same results. Every function is checked against the
 original by a differential test, which runs the original PowerPC code in an emulator beside the C++ build and compares the
@@ -22,7 +22,7 @@ The project is three repositories, and every change belongs in exactly one of th
 
 | Repository | What it holds | Pull requests |
 | --- | --- | --- |
-| [tpw-decomp](https://github.com/ThemeParkWorldDecomp/tpw-decomp) | The translation: the Mac program's own functions in C++, each behaving exactly as the Mac build does, bugs included, with the differential tests that check it and the seven data tables of the Mac program that it compiles in. | None. A function that behaves differently from the Mac is reported as an issue on tpw-port. |
+| [tpw-decomp](https://github.com/ThemeParkWorldDecomp/tpw-decomp) | The translation: the Mac program's own functions in C++, each behaving exactly as the Mac build does, bugs included, with the differential tests that check it. | None. A function that behaves differently from the Mac is reported as an issue on tpw-port. |
 | [tpw-port](https://github.com/ThemeParkWorldDecomp/tpw-port) | The original game on today's Macs, Windows PCs and Linux machines: the launcher, the platform layer, the builds, and the fixes that make it run as it did on the Mac. | Welcome, by its CONTRIBUTING.md. |
 | [tpw-mods](https://github.com/ThemeParkWorldDecomp/tpw-mods) | Optional changes to how the game plays, each one off until the player turns it on. tpw-port carries it as a submodule at mods/. | Welcome, by its CONTRIBUTING.md. |
 
@@ -41,17 +41,10 @@ EA's website, which is gone. It belongs in tpw-port, and with the port's fixes o
 This repository takes no pull requests and no changes of any kind; its CONTRIBUTING.md says where each kind of change
 goes.
 
-## Nothing from the game but its data tables
+## What you need from the game
 
-This repository holds no program of the game, no data files, no memory dumps and no decompiler output. The one part of
-the game it holds is seven data tables of the original program, which the translation compiles in like translated code:
-the advisor's responses, messages and balance descriptions, the scorers of its messages, the save file's legal texts,
-the park panels' window scripts and the ride templates. They are in tables/ (the four source files) and include/
-(SaveLegalText.inc, WindowScripts.inc, RideTemplates.inc), exactly as devtools/gen_game_tables.py wrote them from the
-program of the Mac 2.0.1 CD; devtools/check_game_tables.py checks their SHA-1s and, given a full Mac SimTheme Park
-program, generates them again and compares byte for byte. So the build needs nothing from the game. You need your own
-copy of the game for the tests, which run the original code out of memory dumps of the programs and read some of the
-game's files.
+The build needs nothing from the game. You need your own copy of the game for the tests, which run the original code out
+of memory dumps of the programs and read some of the game's files.
 
 ## The working folder
 
@@ -60,8 +53,8 @@ The tests look for the game's files beside this repository:
     WORK/
       tpw-decomp/                      this repository
       extracted/
-        disc-hfs/Theme Park Data/      the CD's data folder and its "SimTheme Park" program, the full Mac program the
-                                       build reads the tables from (devtools/hfsdump.py unpacks the CD's HFS partition)
+        disc-hfs/Theme Park Data/      the CD's data folder and its "SimTheme Park" program, the full Mac program
+                                       (devtools/hfsdump.py unpacks the CD's HFS partition)
         wads/                          the game's .wad archives unpacked, one NAME.wad.d folder each (devtools/wad.py)
       ghidra/
         dumps/<program>/               memory dumps of each program ("SimTheme Park", "engine symbols shared", ...)
@@ -114,8 +107,8 @@ what the game computes:
 
     src/          the translation, one file per original source file of the game (src/FILES.md lists them; each
                   function names its original address)
-    tables/       four of the original program's data tables (devtools/gen_game_tables.py's output)
-    include/      the game's classes and structures as the translation uses them, and the three included tables
+    tables/       devtools/gen_game_tables.py's output
+    include/      the game's classes and structures as the translation uses them, and three more files of that output
     platform/     the few host files the tests link (the arena, the C library's helpers, the pixel unpacker)
     tests/        the differential tests: difftest.py, ppcemu.py (the emulator harness), test_*.py, unit_*.cpp, shim_*.cpp
     cmake/units/  the source list of each test's library, with the definitions it builds for real (its keep list)

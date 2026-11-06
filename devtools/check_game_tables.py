@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""Check the seven data tables of the original program that the repository holds (tables/ and include/, as
-devtools/gen_game_tables.py wrote them from the Mac 2.0.1 CD's program).
+"""Check the files devtools/gen_game_tables.py wrote into the repository (tables/ and three .inc files of include/, from
+the Mac 2.0.1 CD's program).
 
 usage: python3 -I devtools/check_game_tables.py [--root DIR] [--program FILE | --program-if-present FILE]
 
   --root DIR                 the repository (default: the one this script is in)
   --program FILE             also run devtools/gen_game_tables.py on FILE, a full Mac "SimTheme Park" or "Theme Park
-                             World" application (its data fork), and compare its seven files with the committed ones
+                             World" application (its data fork), and compare its files with the committed ones
                              byte for byte; a FILE that does not exist is an error
   --program-if-present FILE  the same when FILE exists; without it only the committed files are checked (ctest's
                              game_tables test passes the Mac CD's program from ../extracted when it is there)
 
 Each committed file must have the SHA-1 that KNOWN_OUTPUT_SHA1 in gen_game_tables.py lists for it. The script prints
-one line per file and SHA-1s only, never a byte of the tables; the exit status is 1 when anything differs.
+one line per file and SHA-1s only, never a byte of the files; the exit status is 1 when anything differs.
 """
 import argparse
 import hashlib
@@ -27,7 +27,7 @@ spec.loader.exec_module(g)
 
 
 def committed_path(root, name):
-    """Where the repository holds a table: the source files in tables/, the included ones in include/."""
+    """Where the repository holds a file: the source files in tables/, the included ones in include/."""
     return root / ("tables" if name.endswith(".cpp") else "include") / name
 
 

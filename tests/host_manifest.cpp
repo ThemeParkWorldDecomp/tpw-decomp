@@ -235,7 +235,7 @@ static void TestCounts() {
     // the program: both accepted builds, one record (by SHA-256 of the data fork; the SHA-1s are in the generator)
     const ManifestRecord* program = FindByDest(kEditionUs, "SimTheme Park");
     CHECK(program != nullptr && program->group == kGroupProgram && program->hash_count == 2);
-    CHECK(program != nullptr && (program->flags & kFlagRequired) == 0);  // the game's data tables are built in
+    CHECK(program != nullptr && (program->flags & kFlagRequired) == 0);  // optional
     CHECK(Hex(RecordHash(*program, 0).sha256) == "04809cd4ccee5433c7fb0b7c93d32f6a7aa629c1849181c0b7906415e5e295f5");
     CHECK_EQ(RecordHash(*program, 0).size, 2274758);
     CHECK(Hex(RecordHash(*program, 1).sha256) == "29da2392beefc1ee00b097536b7f1b202044cbf0743c0eb3a6235254fd318000");

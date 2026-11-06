@@ -17,11 +17,6 @@ add_compile_options(-Wall -Wextra -Wno-unused-parameter -ffp-contract=off -fwrap
 # (third_party/zlib, static); no copy on the host is ever looked for.
 add_subdirectory(third_party/zlib)
 
-# Seven data tables of the original program (the advisor's response, message and balance description tables, the scorers
-# of the messages, the save file header's legal texts, the park panels' window scripts and the ride templates) are in
-# this repository as devtools/gen_game_tables.py wrote them from the Mac 2.0.1 CD's program: tables/ holds the four
-# source files and include/ the three included ones (SaveLegalText.inc, WindowScripts.inc, RideTemplates.inc). Every
-# build compiles them in, so neither the build nor the launcher needs a program of the game.
 # The differential tests' libraries (tests/, cmake/units/); tpw-port turns them off when it builds this tree as a subproject.
 option(TPW_BUILD_TESTS "Build the differential tests' libraries" ON)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)   # cmake/slicer.cmake and the tests' scripts
@@ -163,10 +158,10 @@ add_test(NAME manifest COMMAND tpw_manifest_tests)
 add_test(NAME manifest_generator
          COMMAND ${Python3_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR}/devtools/make_manifest.py
                  --base ${CMAKE_CURRENT_SOURCE_DIR}/assets/manifest_data.inc --keep-languages --check)
-# The seven data tables are the generator's own output: the committed files' SHA-1s are its KNOWN_OUTPUT_SHA1, and when a
-# Mac program of the game is at TPW_GAME_PROGRAM (default the CD's own, as devtools/import_originals.py writes it next to
-# this repository) the generator runs again and must write the same bytes (devtools/check_game_tables.py); the 2.04b3
-# patch's program, when it is there too, must give the same seven files.
+# tables/ and three .inc files of include/ are devtools/gen_game_tables.py's own output: the committed files' SHA-1s are its
+# KNOWN_OUTPUT_SHA1, and when a Mac program of the game is at TPW_GAME_PROGRAM (default the CD's own, as
+# devtools/import_originals.py writes it next to this repository) the generator runs again and must write the same bytes
+# (devtools/check_game_tables.py); the 2.04b3 patch's program, when it is there too, must give the same files.
 if(NOT TPW_GAME_PROGRAM AND DEFINED ENV{TPW_GAME_PROGRAM})
   set(TPW_GAME_PROGRAM "$ENV{TPW_GAME_PROGRAM}")
 elseif(NOT TPW_GAME_PROGRAM)
