@@ -8,6 +8,7 @@
 #include <map>
 
 #include "source.h"
+#include "../platform/path_text.h"
 
 #ifdef __APPLE__
 #include <sys/xattr.h>
@@ -94,8 +95,8 @@ public:
             if (!it->is_regular_file(e2) || it->is_symlink(e2)) continue;
             uint64_t size = it->file_size(e2);
             if (e2) continue;
-            std::string rel = it->path().lexically_relative(base).generic_string();
-            files[rel] = Found{it->path().string(), size};
+            std::string rel = tpw::GenericPathText(it->path().lexically_relative(base));
+            files[rel] = Found{tpw::PathText(it->path()), size};
         }
         for (const auto& kv : files) {
             const std::string& rel = kv.first;
