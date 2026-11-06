@@ -133,6 +133,10 @@ void tpw_ilc2s_PropagateMessage(uint64_t object, int32_t message, int32_t a, int
 void tpw_ilc2s_SelectClick(uint64_t object, int32_t x, int32_t y) {
     reinterpret_cast<InterfaceListControl2*>(static_cast<uintptr_t>(object))->SelectClick(static_cast<int16_t>(x), static_cast<int16_t>(y));
 }
+// 1 when the unit is built with the port fixes on (unit listtop): SetCurrent then stops the first visible entry at 0.
+int32_t tpw_ilc2s_portfix() {
+    return 0;
+}
 void tpw_ilc2s_SetCurrent(uint64_t object, int32_t position) {
     reinterpret_cast<InterfaceListControl2*>(static_cast<uintptr_t>(object))->SetCurrent(position);
 }

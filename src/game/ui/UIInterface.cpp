@@ -239,6 +239,14 @@ void* ArgVectorPtrCdequeDestruct(ArgVectorPtrCdeque* self, int16_t deleteFlag) {
     return self;
 }
 
+// Mac 0x101f4c84: the index and the slot go back one, a slot at the table's start wraps to its end first.
+void ArgumentCursorDecrement(MslArgumentCursor* cursor) {
+    cursor->mIndex -= 1;
+    const uint32_t* cdeque = W(cursor->mCdeque);
+    if (cursor->mSlot == cdeque[3]) cursor->mSlot = cdeque[3] + cdeque[0] * 4;
+    cursor->mSlot -= 4;
+}
+
 void ArgumentDequeTearDown(MslArgumentDeque* self) {
     if (self->mCount == 0) return;
     MslArgumentDequeIter end;
@@ -253,7 +261,7 @@ void ArgumentDequeTearDown(MslArgumentDeque* self) {
     cursor.mCdeque = A(&self->mCapacity);
     cursor.mIndex = count;
     cursor.mSlot = sum < self->mCapacity ? self->mTable + sum * 4 : self->mTable + (sum - self->mCapacity) * 4;
-    v51126_callee::CdequeDecrement(&cursor);
+    ArgumentCursorDecrement(&cursor);   // Mac 0x1022462c: the block count less one, the table's last slot holds no block
     uint32_t remaining = cursor.mIndex;
     uint32_t slot = self->mTable + self->mStart * 4;
     for (uint32_t i = 0; i != remaining;) {

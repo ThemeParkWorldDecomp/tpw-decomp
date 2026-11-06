@@ -10,10 +10,12 @@ map's other methods, the map zoom, the advisor and the help text) are fakes on b
 
 The world of a case: the map object's header words, its sprite words, the camera target, the heightfield size, the game and display
 words, the windows (the depth of window 0x990) and the answers of the fakes. What is compared: the event log, the map's words and halves the
-function reads or writes, the hovered sprite, the game's word at +0x3c and the display's fog colour.
+function reads or writes, the hovered sprite, the drag flag, the game's word at +0x3c and the display's fog colour.
 
 The hovered sprite is the Mac's word at 0x20060 and a native pointer at 0x200a0 on the host (HoverOf in ui_2dmap.cpp). A map closed with a
 sprite under the pointer leaves it there with the sprite deleted, so the opening has to clear the host's place as the Mac clears its word.
+The drag flag is the same: the Mac's word at 0x20084, a word at 0x200a8 on the host (kDragOffset). A map closed while dragging leaves it on, and the
+opening clears it on both.
 
 No fused operations (fmuls only; fctiwz is given values far below 2^31). Not tested: a NULL window from GetWindow (the original reads it).
 
@@ -211,6 +213,7 @@ class Ppc(Side):
         return self.rd_word(a)
 
     hover = 0x20060
+    drag = 0x20084
     zoff = 0xdc
     f3coff = 0x3c
 
@@ -253,6 +256,7 @@ class Host(Side):
         return struct.unpack("<Q", self.read(a, 8))[0]
 
     hover = 0x200a0
+    drag = 0x200a8
     zoff = 360
     f3coff = 96
 
@@ -355,6 +359,7 @@ def build(s, case):
     s.half(m + 0x20066, case["h1"])
     s.words(m + 0x20068, case["p1"])
     s.words(m + 0x20084, [case["p2"]])
+    s.words(m + s.drag, [case["p2"]])
     s.words(m + 0x20088, [case["p3"]])
     if s.fmt == "<I":
         # the host map's render area (CUI2DMap::HostArea at 0x20100) holds the data pointer (+0x18) and the row bytes (+0x28) that
@@ -377,6 +382,7 @@ def observe(s, case, answer):
         "words": words,
         "w60": s.rd_word(m + 0x20060),
         "hover": s.rd_ptr(m + s.hover),
+        "drag": s.rd_word(m + s.drag),
         "h64": s.rd_half(m + 0x20064),
         "h66": s.rd_half(m + 0x20066),
         "p1": s.rd_words(m + 0x20068, 7),

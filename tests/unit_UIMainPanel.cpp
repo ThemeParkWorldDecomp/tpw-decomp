@@ -115,7 +115,7 @@ void* operator new(std::size_t size, const std::nothrow_t&) noexcept {
 // ---- the sound, the messages, the keyboard capture
 int32_t SOUND_SendEvent(int32_t entity, int32_t bank, int32_t event, int32_t a, int32_t b, int32_t c) {
     ev("SOUND_SendEvent", {entity, bank, event, a, b, c});
-    return 0;
+    return static_cast<int32_t>(ret("Send", 0));
 }
 int32_t UI_SendMessage(InterfaceWindow* window, int32_t message, int32_t a, int32_t b) {
     ev("UI_SendMessage", {lab(window), message, a, b, lab(gUIPanelWindow)});
@@ -253,7 +253,7 @@ void tpw_up_dump(int32_t* out) {
     out[10] = static_cast<InterfaceWindow*>(Obj(3))->mDrawObject != nullptr;
 }
 
-void tpw_up_sound(int32_t code) { UIMain_UISound(code); }
+int32_t tpw_up_sound(int32_t code) { return UIMain_UISound(code); }
 int32_t tpw_up_checkpanel() { return UIMain_CheckPanel() ? 1 : 0; }
 void tpw_up_setpanel(int32_t window) { UIMain_SetPanel(static_cast<InterfaceWindow*>(Obj(window))); }
 void tpw_up_settitle(int32_t window, int32_t id, int32_t text) {

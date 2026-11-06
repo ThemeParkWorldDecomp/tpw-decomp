@@ -29,7 +29,10 @@ void InterfaceStringHeap::ReleaseString(char16_t* text) {
     ev("ReleaseString", {static_cast<int64_t>(reinterpret_cast<uintptr_t>(text))});
 }
 
-void UIMain_UISound(int32_t code) { ev("UISound", {code}); }
+int32_t UIMain_UISound(int32_t code) {
+    ev("UISound", {code});
+    return 0;
+}
 
 int32_t InterfaceWindow::GetID() {
     ev("GetID", {});

@@ -176,16 +176,6 @@ int32_t TestAdvisor4() {
 //   turn_object_counterclockwise 0x1014cafc, turn_object_clockwise 0x1014ca74, quickload_layout 0x1014c97c, quicksave_layout 0x1014c89c,
 //   place_vomit 0x1014ce2c, quickload 0x1014c7bc, quicksave 0x1014c6dc, TestAdvisor 0x1014c454. Each answers 1.
 
-// The header declares CFSLoadSave::Save as void (another unit defines it so), but the original's caller tests r3; call the same symbol
-// through a member pointer retyped to return int32_t (a member's mangled name has no return type).
-static int32_t CFSLoadSave_SaveResult(CFSLoadSave* self, const TbDynamicStringTemplate<char16_t>& name) {
-    void (CFSLoadSave::*declared)(const TbDynamicStringTemplate<char16_t>&) = &CFSLoadSave::Save;
-    int32_t (CFSLoadSave::*asInt)(const TbDynamicStringTemplate<char16_t>&);
-    static_assert(sizeof(declared) == sizeof(asInt), "member pointer size");
-    std::memcpy(&asInt, &declared, sizeof(asInt));
-    return (self->*asInt)(name);
-}
-
 int32_t gTestAdvisorIndex = 0x103;      // 0x102a4e54, original name unknown: the next advisor response TestAdvisor calls
 TbStringBase<char> gQuickSaveSuffix;     // 0x1037f248, original name unknown: appended to the theme name for the layout quick save
 
@@ -227,7 +217,7 @@ int32_t quicksave() {
     TbDynamicStringTemplate<char> name(gGame.GetCurrentThemeName());
     TbDynamicStringTemplate<char16_t> wide;
     StringToUniString(wide, name);
-    if (CFSLoadSave_SaveResult(&gLoadSave, wide) != 0)
+    if (gLoadSave.Save(wide) != 0)
         DEBUG_MESSAGE("QuickSave OK", 0);
     else
         DEBUG_MESSAGE("Quicksave failed", 0);
@@ -837,7 +827,7 @@ namespace {
 // The shared body of win_ticket_7 to 9: create the master save on first use, then earn the ticket.
 int32_t WinTicket(int32_t type) {
     if (gMasterSave == nullptr) {
-        void* mem = ::operator new(0x4c);
+        void* mem = ::operator new(sizeof(CFSGlobalMasterSave));
         CFSGlobalMasterSave* save = nullptr;
         if (mem != nullptr) save = new (mem) CFSGlobalMasterSave();
         gMasterSave = save;
@@ -876,13 +866,13 @@ int32_t save_complete_hoardings() {
 
 int32_t enter_hoarding_mode() {   // 0x1014f494
     CMMPathDraw* path = nullptr;
-    void* pathMem = ::operator new(0x14);
+    void* pathMem = ::operator new(sizeof(CMMPathDraw));
     if (pathMem != nullptr) path = new (pathMem) CMMPathDraw(static_cast<CELL_MODES>(0x39));
     if (gMouse == nullptr) {
-        CMouse* mouse = static_cast<CMouse*>(::operator new(1));
+        CMouse* mouse = static_cast<CMouse*>(::operator new(sizeof(CMouse)));
         if (mouse != nullptr) {
             CMMDefault* def = nullptr;
-            void* defMem = ::operator new(8);
+            void* defMem = ::operator new(sizeof(CMMDefault));
             if (defMem != nullptr) def = new (defMem) CMMDefault();
             mouse->AssignMouseMode(def);
             gMouseWord1E0 = -1;

@@ -7,7 +7,7 @@ set(TPW_UNIT_OnlineParkFindPanelMsg_KEEP
   __Z22OnlineParkFindPanelMsgP15InterfaceWindowiii   # OnlineParkFindPanelMsg(InterfaceWindow*, int, int, int)
   _gFindPanelCloseCallback
   _gFindPanelPlayerName
-  _gFindPanelWord
+  _gOnlineParkFindPanel
   _gOnlineByte78
   _gOnlineEditFontIndex
   _gOnlineEditText

@@ -166,7 +166,10 @@ uint32_t NS_MacDoze::GetTempPath(uint32_t n, char* out) {
     std::strcpy(out, "temp:postcard");
     return 13;
 }
-void UIMain_UISound(int32_t id) { ev("Sound", {id}); }
+int32_t UIMain_UISound(int32_t id) {
+    ev("Sound", {id});
+    return 0;
+}
 bool UIMain_CheckPanel() {
     ev("CheckPanel");
     return true;

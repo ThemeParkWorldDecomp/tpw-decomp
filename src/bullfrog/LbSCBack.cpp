@@ -136,7 +136,7 @@ void __sinit_LbSCBack_cpp() {
     __construct_array(object, reinterpret_cast<void*>(&LbSEFunctionList_Construct),
                       reinterpret_cast<void*>(&LbSEFunctionList_Destruct), 0x10, 6);
     object = &gLbSCBack;
-    object->mCriticalSection = static_cast<void**>(::operator new(4));
+    object->mCriticalSection = static_cast<void**>(::operator new(sizeof(void*)));
     NS_MacDoze::InitializeCriticalSection(object->mCriticalSection);
     __register_global_object(object, reinterpret_cast<void*>(&LbSystemEventCallback_Destruct), object->mNode);
 }

@@ -274,7 +274,7 @@ class Host(Side):
             change = FAKE_CHANGE
         else:
             change = self.alloc(0x28)
-            self.write(change, struct.pack(">I", t & MASK))
+            self.write(change, struct.pack("<I", t & MASK))   # the word as InterfaceWindow::SetValue stores it on this machine
         self.lib.tpw_ui2_time(FAKE_SELF, flags & MASK, change)
 
 

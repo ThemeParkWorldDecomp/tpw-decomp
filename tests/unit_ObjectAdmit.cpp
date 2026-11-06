@@ -172,10 +172,10 @@ void ObjectForceRideAdmittance(CPerson* person) { Tr(46, Off(person)); }
 void ObjectDismissFromQueue(CPerson* person) __asm__("__ZN7CPerson16DismissFromQueueEv");
 void ObjectDismissFromQueue(CPerson* person) { Tr(47, Off(person)); }
 
-int32_t ObjectReadyForAdmitting(CPerson* person) __asm__("__ZNK7CPerson17ReadyForAdmittingEv");
-int32_t ObjectReadyForAdmitting(CPerson* person) {
+bool ObjectReadyForAdmitting(CPerson* person) __asm__("__ZNK7CPerson17ReadyForAdmittingEv");
+bool ObjectReadyForAdmitting(CPerson* person) {
     Tr(48, Off(person));
-    return gReady[GuestSlot(person)];
+    return gReady[GuestSlot(person)] != 0;
 }
 
 void ObjectOnAdmittance(CPerson* person) __asm__("__ZN7CPerson12OnAdmittanceEv");

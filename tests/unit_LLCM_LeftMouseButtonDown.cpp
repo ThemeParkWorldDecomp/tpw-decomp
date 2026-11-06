@@ -50,12 +50,13 @@ int32_t LLCC_SystemAddToClickStack(int32_t x, int32_t y) {
     return 1;
 }
 
-void LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     ev("DrawLine", {mode, x, y, *endX, *endY});
     int32_t nx = static_cast<int32_t>(ret("DrawX"));
     int32_t ny = static_cast<int32_t>(ret("DrawY"));
     if (nx != 999) *endX = nx;
     if (ny != 999) *endY = ny;
+    return 1;
 }
 
 uint32_t DoMovePylon(uint32_t x, uint32_t z) {

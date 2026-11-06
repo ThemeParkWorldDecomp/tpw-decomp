@@ -50,7 +50,7 @@ GET_BANK_ACCOUNT, GET_BALANCE = 0x1013edfc, 0x100f32b4
 # ---- the Mac's addresses of the globals
 INT_GLOBALS = dict(gHoardingRight=0x1029e03c, gHoardingBottom=0x1029e040, gHoardingLeft=0x1029e044, gHoardingTop=0x1029e048,
                    gLLCCC200=0x102dc200, gLLCCC204=0x102dc204, gLLCCC20C=0x102dc20c, gLLCCC210=0x102dc210, gLLCCC214=0x102dc214,
-                   gLLCCDB40=0x102ddb40, gLLCCDB60=0x102ddb60, gLLCCE0B4=0x102de0b4, gLLCCE0B8=0x102de0b8, gLLCC4858=0x102e4858,
+                   gLLCCDB40=0x102ddb40, gLLCCDB60=0x102ddb60, gLLCCDE0B4=0x102de0b4, gLLCCDE0B8=0x102de0b8, gLLCC4858=0x102e4858,
                    gTrackNbrOn485C=0x102e485c, recording=0x1037ec44 + 0x24)
 ADDR = dict(INT_GLOBALS, gLLCCDB68=0x102ddb68, gTrackCostFree=0x102ddb35, gThingArray=0x1034cbfc, gGameWorld=0x1037ebfc,
             gRideDatabase=0x1037f6c8)
@@ -464,8 +464,8 @@ def make(r, mode=None, ttype=None, a=None):
 
     g = dict(gHoardingRight=hx[0], gHoardingBottom=hy[0], gHoardingLeft=hx[1], gHoardingTop=hy[1],
              gLLCCC200=flag(r, 0.3), gLLCCC204=flag(r, 0.3), gLLCCC20C=flag(r, 0.5), gLLCCC210=flag(r, q),
-             gLLCCC214=flag(r, q), gLLCCDB40=flag(r, 0.5), gLLCCDB60=flag(r, 0.5), gLLCCE0B4=r.randrange(-3, 6),
-             gLLCCE0B8=r.choice([-5, -1, 0, 1, 2, 3]), gLLCC4858=flag(r, 0.4), gTrackNbrOn485C=flag(r, 0.4),
+             gLLCCC214=flag(r, q), gLLCCDB40=flag(r, 0.5), gLLCCDB60=flag(r, 0.5), gLLCCDE0B4=r.randrange(-3, 6),
+             gLLCCDE0B8=r.choice([-5, -1, 0, 1, 2, 3]), gLLCC4858=flag(r, 0.4), gTrackNbrOn485C=flag(r, 0.4),
              recording=flag(r, 0.3), gLLCCDB68=db68, gTrackCostFree=flag(r, 0.3, (1, 0x80)))
 
     entry0 = r.random() < 0.2

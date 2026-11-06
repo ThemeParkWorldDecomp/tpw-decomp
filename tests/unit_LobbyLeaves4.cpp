@@ -116,6 +116,7 @@ void CLBScreenComponentDownloadGlobe::Tick() {}
 void CLBScreenComponentDownloadGlobe::WindowMessagesFn(int32_t, int32_t, int32_t) {}
 uint32_t CLBScreenComponentDownloadGlobe::ProcessCancel() { return 0; }
 void CLBScreenComponentDownloadGlobe::Show() {}
+void CLBScreenComponentDownloadGlobe::Slot50() {}
 void CLBScreenComponentDownloadGlobe::Hide() {}
 CLBScreenComponentPublishGlobe::~CLBScreenComponentPublishGlobe() {}
 void CLBScreenComponentPublishGlobe::Tick() {}

@@ -1,6 +1,6 @@
 // Test library for CTrackCell::Modify (unit v5881; libtpw_unit_CTrackCell_Modify.dylib, tests/test_CTrackCell_Modify.py), main app:
 //   src/game/park/TrackCell.cpp   CTrackCell::Modify, ModifyBody, ModifyLocked, the weak ModifyTypeBody, and the globals
-//   gLLCCDC21C, gLLCC4854, gModifyNoParent, gModifyNoThing
+//   gLLCC4854, gModifyNoParent, gModifyNoThing
 //
 // Every callee outside the unit is a fake that records the arguments the real one reads and answers from the test's queue (pointers the
 // fakes answer are cell numbers: 0 NULL, k the k-th cell block the test hands over with tpw_tcm_cells). The globals of other files the
@@ -22,6 +22,8 @@
 #include "analyser.h"
 
 using namespace calllog;
+
+int32_t gModifyLastMode;  // 0x102dc21c, one word with CMapCell::Modify (MapCell.cpp defines it in the game)
 
 // ---- globals of other files the unit reads or writes
 int32_t gLLCC4858;
@@ -237,7 +239,7 @@ uint64_t tpw_tcm_addr(const char* name) {
     const Entry entries[] = {
         {"gLLCC4858", &gLLCC4858},
         {"gLLCC4854", &gLLCC4854},
-        {"gLLCCDC21C", &gLLCCDC21C},
+        {"gModifyLastMode", &gModifyLastMode},
         {"gLLCC4800", &gLLCC4800},
         {"gLLCC4804", &gLLCC4804},
         {"gLLCC4818", &gLLCC4818},

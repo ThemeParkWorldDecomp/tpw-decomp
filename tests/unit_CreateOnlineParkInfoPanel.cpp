@@ -410,6 +410,9 @@ CFSOnlineCity* ReturnCityInfo(CFSOnlineSystemCityList*, int32_t city) {
 }
 }  // namespace park_info_callee
 
+int32_t gUnlistedOn;
+int32_t gUnlistedCity;
+
 char* CFSOnlineSystemThemeList::ReturnOnlineThemeName(int32_t theme) {
     EV("ThemeName", I(theme));
     static char buf[64];
@@ -561,6 +564,15 @@ void tpw_pi_prepare(int32_t f60, int32_t swear, uint32_t login, int32_t z) {
 uint32_t tpw_pi_token(uint64_t p) { return reinterpret_cast<FakeWin*>(static_cast<uintptr_t>(p))->token; }
 
 // The panel's park copy: the numbers and the texts as (length, hash).
+int32_t tpw_pi_portfix() {
+    return 0;
+}
+
+void tpw_pi_unlisted(int32_t on, int32_t city) {
+    gUnlistedOn = on;
+    gUnlistedCity = city;
+}
+
 int32_t tpw_pi_park_dump(int64_t* out) {
     const CFSOnlinePark& p = gOnlineParkInfoPark;
     int32_t n = 0;

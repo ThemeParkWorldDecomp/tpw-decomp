@@ -875,6 +875,7 @@ void ArgumentDestroyRange2(Argument* first, Argument* last);              // 0x1
 void ArgumentVectorDestroy(void* vector);                                 // 0x102254e4 std::__destroy<std::vector<Argument>>
 void ArgumentVectorDestroyRange(void* first, void* last);                 // 0x102253cc std::__destroy<std::vector<Argument>*>
 void* ArgVectorPtrCdequeDestruct(ArgVectorPtrCdeque* self, int16_t deleteFlag);   // 0x10224ea4 ~__cdeque; answers self
+void ArgumentCursorDecrement(MslArgumentCursor* cursor);                  // 0x101f4c84 std::__cdeque<const void*>::iterator::operator--
 void ArgumentDequeTearDown(MslArgumentDeque* self);                       // 0x1022462c
 }  // namespace v51126
 namespace v51126_callee {
@@ -886,7 +887,6 @@ void OperatorDelete(void* p);                               // 0x10238218
 void WStringDtor(void* string, int16_t flag);               // 0x101468f8
 void StringDtor(void* string, int16_t flag);                // 0x1000221c
 void ArgumentVectorTearDown(void* vector);                  // 0x10201310
-void CdequeDecrement(MslArgumentCursor* cursor);            // 0x101f4c84 iterator::operator-- (the index is the second word)
 void CursorAdd(MslArgumentCursor* cursor, int32_t count);   // 0x101f2bec iterator::operator+=
 }  // namespace v51126_callee
 

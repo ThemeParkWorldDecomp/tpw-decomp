@@ -79,6 +79,7 @@ CFSOnlineCity* ReturnCityInfo(CFSOnlineSystemCityList* list, int32_t city) {
 }
 }  // namespace park_info_callee
 
+
 // 0x101783a4 (60): the same for the city list.
 void PostLoginCallbackFn_City(int32_t error, const void* context) {
     CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList>* list =
@@ -153,12 +154,12 @@ void CFSOnlineSystemCityList::GetList(OnlineListCallback<TbPtrList<CFSOnlineCity
 int32_t CFSOnlineSystemCityList::ChildLocked() {
     int32_t result = 1;
     if (gOnlineSystem == nullptr) {
-        void* memory = ::operator new(0x404);
+        void* memory = ::operator new(sizeof(CFSOnlineSystem));
         gOnlineSystem = new (memory) CFSOnlineSystem();
     }
     if (gOnlineSystem->mF108 != 0) {
         if (gOnlineSystem == nullptr) {
-            void* memory = ::operator new(0x404);
+            void* memory = ::operator new(sizeof(CFSOnlineSystem));
             gOnlineSystem = new (memory) CFSOnlineSystem();
         }
         if ((gOnlineSystem->GetChildLock() & 0x10) != 0) result = 0;
@@ -179,7 +180,7 @@ int32_t CFSOnlineSystemCityList::RequestListFromServer(City* city, uint32_t unus
 void CFSOnlineSystemCityList::StoreReceivedList(const ccCityList* list) {
     const char* info = reinterpret_cast<const char*>(list->mInfos);
     for (int32_t i = 0; i < list->mCount; ++i) {
-        void* memory = ::operator new(0x68);
+        void* memory = ::operator new(sizeof(CFSOnlineCity));
         new (memory) CFSOnlineCity(reinterpret_cast<const ccCityInfo*>(info), this);
         info += 0x30;
     }
@@ -197,7 +198,7 @@ namespace parklist_callee {
 // called directly: a dlsym of its symbol finds nothing in a Linux launcher, which exports none of its own symbols. The unit's
 // slice leaves this one out (the constructor is not in it).
 TPW_WEAK void NewPark(const ccParkInfo* info, CFSOnlineSystemParkList* list) {
-    void* park = ::operator new(0xc0);
+    void* park = ::operator new(sizeof(CFSOnlinePark));
     new (park) CFSOnlinePark(info, list);
 }
 }  // namespace parklist_callee
@@ -249,7 +250,7 @@ void CFSOnlineSystemParkList_InCity::GetList(int32_t cityID, Callback callback, 
     }
 
     if (gOnlineSystem == nullptr) {
-        void* memory = ::operator new(0x404);
+        void* memory = ::operator new(sizeof(CFSOnlineSystem));
         gOnlineSystem = new (memory) CFSOnlineSystem();
     }
     if (gOnlineSystem->AreWeLoggedIn() != 0) {
@@ -257,7 +258,7 @@ void CFSOnlineSystemParkList_InCity::GetList(int32_t cityID, Callback callback, 
     } else {
         mF08 = 1;
         if (gOnlineSystem == nullptr) {   // (the original tests again; the call above cannot clear it)
-            void* memory = ::operator new(0x404);
+            void* memory = ::operator new(sizeof(CFSOnlineSystem));
             gOnlineSystem = new (memory) CFSOnlineSystem();
         }
         gOnlineSystem->Login(&PostLoginCallbackFn_Park, this);
@@ -319,7 +320,7 @@ void CFSOnlineSystemParkList_InWorldByPlayerName::GetList(const char16_t* player
     }
 
     if (gOnlineSystem == nullptr) {
-        void* memory = ::operator new(0x404);
+        void* memory = ::operator new(sizeof(CFSOnlineSystem));
         gOnlineSystem = new (memory) CFSOnlineSystem();
     }
     if (gOnlineSystem->AreWeLoggedIn() != 0) {
@@ -327,7 +328,7 @@ void CFSOnlineSystemParkList_InWorldByPlayerName::GetList(const char16_t* player
     } else {
         mF08 = 1;
         if (gOnlineSystem == nullptr) {   // (the original tests again; the call above cannot clear it)
-            void* memory = ::operator new(0x404);
+            void* memory = ::operator new(sizeof(CFSOnlineSystem));
             gOnlineSystem = new (memory) CFSOnlineSystem();
         }
         gOnlineSystem->Login(&PostLoginCallbackFn_Park, this);
@@ -439,7 +440,7 @@ template<> void CFSOnlineSystemList<TbPtrList<CFSOnlinePark>, ccParkList>::Logge
     int32_t error;
     if (ChildLocked() == 0) {
         if (gOnlineSystem == nullptr) {
-            void* memory = ::operator new(0x404);
+            void* memory = ::operator new(sizeof(CFSOnlineSystem));
             gOnlineSystem = new (memory) CFSOnlineSystem();
         }
         City* city = gOnlineSystem->ReturnConnectionToCityServer();
@@ -467,7 +468,7 @@ template<> void CFSOnlineSystemList<TbPtrList<CFSOnlinePark>, ccParkList>::Logge
 
 namespace {
 CFSOnlineSystem* MakeOnlineSystem() {
-    void* memory = ::operator new(0x404);
+    void* memory = ::operator new(sizeof(CFSOnlineSystem));
     return new (memory) CFSOnlineSystem();
 }
 }  // namespace
@@ -955,7 +956,6 @@ CFSOnlinePark& CFSOnlinePark::operator=(const CFSOnlinePark& other) {
 }
 
 // 0x1017c96c (228): leaves the list, then the members' destructors (the strings, last to first) run. The deleting form is the compiler's.
-// (the destructor itself is now defined by the CFSOnlineServer unit; this is the body, which the test library's destructor calls)
 void CFSOnlineServer_DestructBody(CFSOnlineServer* self) {
     CFSOnlineServer* const server = self;
     CFSOnlineSystemServerList* owner = server->mList;
@@ -1025,8 +1025,8 @@ CFSOnlineServer::CFSOnlineServer(const ccServerInfo* info, CFSOnlineSystemServer
     mText6C = info->mStr22.get();
     mList->mList->AddTail(this);
 }
-// The destructor is not translated yet; this empty body is the vtable's key function so the vtable is emitted.
-CFSOnlineServer::~CFSOnlineServer() {}
+// Mac 0x1017c96c. The known delete paths remove the head first, so there Find answers NULL and nothing is removed twice.
+CFSOnlineServer::~CFSOnlineServer() { CFSOnlineServer_DestructBody(this); }
 
 // CFSOnlineRide::CFSOnlineRide 0x1017ca7c (unit v5141): copies a ride record from the library's info and adds itself to the list's tail.
 

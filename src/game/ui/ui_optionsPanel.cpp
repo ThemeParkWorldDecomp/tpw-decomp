@@ -24,6 +24,7 @@
 #include "tb_texturecache.h"
 #include "ThingReceivers.h"
 #include "TPCamera.h"
+#include "TPMain.h"
 #include "TPSettings.h"
 #include "TPSound.h"
 #include "UI_Base.h"

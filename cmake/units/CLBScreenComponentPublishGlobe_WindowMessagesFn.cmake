@@ -3,6 +3,8 @@
 # are recording fakes in tests/unit_CLBScreenComponentPublishGlobe_WindowMessagesFn.cpp, which also defines the globals of other files.
 set(TPW_UNIT_CLBScreenComponentPublishGlobe_WindowMessagesFn src/game/online/lobby_globe.cpp platform/arena.cpp)
 set(TPW_UNIT_CLBScreenComponentPublishGlobe_WindowMessagesFn_KEEP
+  __ZN29CLBScreenComponentOnlineGlobe10UnRegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::UnRegister(CLBGlobe*)
+  __ZN29CLBScreenComponentOnlineGlobe8RegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::Register(CLBGlobe*)
   __ZN30CLBScreenComponentPublishGlobe12CreateCitiesEP9TbPtrListI13CFSOnlineCityE   # CLBScreenComponentPublishGlobe::CreateCities(TbPtrList<CFSOnlineCity>*)
   __ZN30CLBScreenComponentPublishGlobe16WindowMessagesFnEiii   # CLBScreenComponentPublishGlobe::WindowMessagesFn(int, int, int)
   __ZN30CLBScreenComponentPublishGlobe21HandleOnlineBacktrackEv   # CLBScreenComponentPublishGlobe::HandleOnlineBacktrack()

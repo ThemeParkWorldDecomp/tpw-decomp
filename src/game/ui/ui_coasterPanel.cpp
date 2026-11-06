@@ -264,7 +264,8 @@ int32_t CoasterPanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int
 // installs a new CMMCoaster as the mouse mode. The "make the mouse" sequence is inlined twice (the original's lazy gMouse creation).
 
 namespace coaster_end_callee {
-__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(size); }
+// The Mac allocates the sizes of its objects; the host's are larger, so the block is at least 0x400 bytes.
+__attribute__((weak)) void* OperatorNew(uint32_t size) { return ::operator new(size > 0x400 ? size : 0x400); }
 }
 
 // The constructors run on memory from the fake-able allocation (placement new keeps the order of the original's calls).

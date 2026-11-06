@@ -741,8 +741,9 @@ void CFSGlobalMasterSave::ClearFirstTimePlayer() { ev("CFSGlobalMasterSave::Clea
 void CFSLoadSave::LoadHidden(const TbDynamicStringTemplate<char16_t>& name) {
     ev("CFSLoadSave::LoadHidden", {lab(this)}, {calllog::narrow(name.mData).c_str()});
 }
-void CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) {
+int32_t CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) {
     ev("CFSLoadSave::Save", {lab(this)}, {calllog::narrow(name.mData).c_str()});
+    return 1;
 }
 void CFSLoadSave::LoadMostRecent() { ev("CFSLoadSave::LoadMostRecent", {lab(this)}); }
 int32_t CSaveLoad::Load(const char* path, CSaveLoadHeader* header, LoadType type) {

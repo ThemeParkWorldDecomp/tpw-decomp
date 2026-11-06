@@ -87,8 +87,8 @@ public:
     // Unit v5635 (LLCR_PlaceRide's callee, stand-in): 0x100a5098 (68 bytes).
     void DeleteMesh();
 
-    // Unit v5881 (src/game/park/TrackCell.cpp): Modify's real body, which answers r3 (0 or 1); the answer of ModifyType
-    // (0x100a0828, r3; a weak stand-in in that file until ModifyType is translated with it); whether modes 0x81 and 0x83 leave the cell
+    // Unit v5881 (src/game/park/TrackCell.cpp): Modify's real body, which answers r3 (0 or 1); the body of ModifyType
+    // (0x100a0828), which answers r3; whether modes 0x81 and 0x83 leave the cell
     // alone (inlined in the original); CalculateDirections 0x100a12dc (392 bytes, untranslated stand-in).
     int32_t ModifyBody(CELL_MODES mode, int32_t a, int32_t b);
     int32_t ModifyTypeBody(CELL_MODES mode);
@@ -121,11 +121,8 @@ void LLCCM_DestroyHoardingMesh(uint32_t mesh);    // 0x1008288c (36 bytes)
 extern int32_t gLLCCC20C;   // 0x102dc20c  set when a cell of the current segment joins (1 or 3 neighbours), cleared by ConnectionType
 extern int32_t gLLCCDB40;   // 0x102ddb40  nonzero: a corner does not forbid the placement
 extern int32_t gLLCCDB60;   // 0x102ddb60  read with gTrackNbrOn485C
-extern int32_t gLLCCE0B4;   // 0x102de0b4  the overwrite priority (ride record word 0x54) of the last ride met
-extern int32_t gLLCCE0B8;   // 0x102de0b8  the priority a ride must reach to be built over
 
 // Unit v5881 (src/game/park/TrackCell.cpp, which defines them): globals only CTrackCell::Modify names so far.
-extern int32_t gLLCCDC21C;         // 0x102dc21c  the last mode a type change accepted
 extern int32_t gLLCC4854;          // 0x102e4854  set before a type change of a track or hoarding cell
 extern uint16_t gTrackModifyNoParent;   // 0x1029e284  the parent id of a cell with no ride
 extern uint16_t gTrackModifyNoThing;    // 0x1029e286  the thing id of a map cell with no object

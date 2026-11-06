@@ -412,9 +412,6 @@ void InitialiseLobbyMenu() {
 
 uint8_t gMainMenuPauseFlag;   // 0x10396a54
 
-// Stand-in for UIMenu::~UIMenu 0x1018ac8c (not translated yet): frees the menu. Weak so a translation or a test fake replaces it.
-__attribute__((weak)) void DestroyUIMenu(UIMenu* menu) { delete menu; }
-
 // Makes the main menu (the lobby's when `a` is not 0) and shows it; nothing when it already exists.
 void CreateMainMenu(int32_t a) {
     if (gMainMenu != nullptr) return;
@@ -444,7 +441,7 @@ void HideMainMenu() {
         UI_UnPauseTimerSystem();
     }
     gMainMenu->Hide();
-    DestroyUIMenu(gMainMenu);
+    UIMenuDestruct(gMainMenu, 1);   // Mac 0x101fc140: UIMenu::~UIMenu 0x1018ac8c with the delete flag 1 tells the window 4, which deletes it
     gMainMenu = nullptr;
 }
 

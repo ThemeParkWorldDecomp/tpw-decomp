@@ -33,5 +33,4 @@ set(TPW_UNIT_CMapCell_IsQueue_KEEP
   __ZNK8CMapCell7IsQueueEv   # CMapCell::IsQueue() const
   __ZNK8CMapCell8IsBridgeEv   # CMapCell::IsBridge() const
   __ZNK8CMapCell8IsTrackXEv   # CMapCell::IsTrackX() const
-  TPW_LLCC_DRAWTRACKLINE_R3@game/park/TrackCell.cpp   # the #define TPW_LLCC_DRAWTRACKLINE_R3 of src/game/park/TrackCell.cpp (a guard macro the regroup brought into it)
 )

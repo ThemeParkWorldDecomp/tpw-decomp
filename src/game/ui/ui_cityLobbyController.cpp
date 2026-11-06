@@ -37,7 +37,7 @@
 // Unit v51067: the small functions of the online UI between 0x101e0388 and 0x101ec444 (callbacks, remove / show / hide wrappers of the
 // online panels, the contacts row functions, the string initialisers of three online UI files). Mac addresses in the comments.
 
-// 0x101e0388, 56 bytes: the virtual at slot 0x30 of the online islands screen (the existing empty body elsewhere is wrong).
+// 0x101e0388, 56 bytes: the virtual at slot 0x30 of the online islands screen (ShowPanels).
 void ListParkOnlineParkInfoPanelCancelCallback() { parkinfo_callee::OnlineIslandsSlot30(gLobbyScreens->mOnlineIslands); }
 
 // ui_cityLobbyController.cpp (main app): the city lobby's controller window. UpdateCityLobbyUI 0x101e0928 (552 bytes), CreateCityLobbyController

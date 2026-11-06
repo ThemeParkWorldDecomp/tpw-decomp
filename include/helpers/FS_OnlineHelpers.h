@@ -8,7 +8,7 @@
 // The Mac's "if (gOnlineSystem == 0) make it", inlined at every use.
 static inline CFSOnlineSystem* OnlineSystem() {
     if (gOnlineSystem == nullptr) {
-        CFSOnlineSystem* system = static_cast<CFSOnlineSystem*>(::operator new(0x404));
+        CFSOnlineSystem* system = static_cast<CFSOnlineSystem*>(::operator new(sizeof(CFSOnlineSystem)));
         if (system != nullptr) new (system) CFSOnlineSystem();
         gOnlineSystem = system;
     }

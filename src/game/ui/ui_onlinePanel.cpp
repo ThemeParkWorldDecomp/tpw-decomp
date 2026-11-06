@@ -506,7 +506,7 @@ int32_t OnlinePanelMsg(InterfaceWindow* window, int32_t message, int32_t a, int3
 namespace online_edit_callee {
 __attribute__((weak)) void* New(size_t size) {
     if (size == 0xe8c) return COnlineControl::operator new(sizeof(COnlineControl));   // the online control: its own allocator (the arena)
-    return ::operator new(size);
+    return ::operator new(size > 0x400 ? size : 0x400);   // the Mac allocates the sizes of its objects; the host's are larger
 }
 // the virtual at slot 0x2c of the table at window+0x118
 __attribute__((weak)) void WindowSetText(InterfaceWindow* window, char16_t* text) { window->SetText(text); }
@@ -698,7 +698,7 @@ void MessagesLCPostFormat(InterfaceWindow* window) {
 
 int32_t gContactsMaxRows = 20;   // 0x102b0c54: rows kept in the list (initial word 0x14)
 
-// Placeholders for the program (the host cannot call the Mac's virtuals through __ptr_glue); the test library defines the real ones.
+// Placeholders for the unit libraries; src/game/GameShimGlue.cpp defines the program's FontCharWidth and WindowSlot1c.
 namespace contacts_callee {
 __attribute__((weak)) int32_t FontCharWidth(InterfaceFont*, char16_t) { return 0; }   // the font's virtual at +0x14 of the table at +0x10
 __attribute__((weak)) void WindowSlot1c(InterfaceWindow*, int32_t) {}                  // the window's virtual at +0x1c of the table at +0x118

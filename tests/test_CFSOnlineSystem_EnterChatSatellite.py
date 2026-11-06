@@ -17,6 +17,11 @@ The world of a case: the system block with random words, the lists, the globe an
 compared: the answer, every word and pointer (as a label) the functions may write, the 256 halfwords at 0x120, gOnlineSystem and the event
 log.
 
+With the port fix on (unlistedcity, the park's city not on the server's list): a case with "unlisted" has that answer from a
+fake PortParkCityListed on the host, and what the original does is edited to what the guard must leave: a satellite click stops after
+ReturnParkInfo (no slot 0x50, no panel), a goto calls CompleteFTPDownload(1) instead of LoggedInRequestFTPDownload. The fake answers
+"unlisted" only for the park the call holds, so a guard that asks about another park fails too. With it off those cases are ordinary.
+
 No fused operations. Not tested: a NULL list or screen pointer (both read it unconditionally), SetPublishing with publishing set and NULL
 words (the copy reads it).
 """
@@ -132,7 +137,13 @@ STUBS.internal(LOGGED_IN_FTP, rec("LoggedInRequestFTPDownload", lambda e, L: (L.
 STUBS.internal(LOGIN_PANEL, rec("CreateOnlineLoginPanel", lambda e, L: (int(e.r(3) == TV_RAS),)))
 
 
+PORT_FIX = False
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_cs_portfix.restype, runner.lib.tpw_cs_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_cs_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -207,6 +218,9 @@ class Ppc(Side):
 
     def cbid(self, p):
         return {0: 0, TV_REQFTP: 1, TV_GOTOID: 2}.get(p, 3)
+
+    def unlisted(self, park):
+        pass
 
     def vptr(self, a, which):
         vt = self.alloc(0x80)
@@ -284,6 +298,9 @@ class Host(Side):
     def vptr(self, a, which):
         self.wptr(a, self.lib.tpw_cs_vt(0 if which == "str" else 1))
 
+    def unlisted(self, park):
+        self.lib.tpw_cs_unlisted(park)
+
     def call_op(self, op, *vals):
         r = getattr(self.lib, "tpw_cs_" + op)(*vals)
         return (r or 0) & MASK
@@ -293,6 +310,7 @@ def bind(lib):
     if getattr(lib, "bound", False):
         return
     lib.tpw_cs_addr.restype, lib.tpw_cs_addr.argtypes = C.c_uint64, [C.c_char_p]
+    lib.tpw_cs_unlisted.restype, lib.tpw_cs_unlisted.argtypes = None, [C.c_uint32]
     lib.tpw_cs_alloc.restype, lib.tpw_cs_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_cs_off.restype, lib.tpw_cs_off.argtypes = C.c_int64, [C.c_char_p]
     lib.tpw_cs_vt.restype, lib.tpw_cs_vt.argtypes = C.c_uint64, [C.c_int32]
@@ -376,6 +394,7 @@ def execute(s, case, O):
     op, a = case["op"], case["args"]
     sysa = O[1]
     if op == "enter":
+        s.unlisted((0x123400 + a["idx"] * 16) & MASK if case.get("unlisted") else 0)
         return s.call_op(op, sysa, a["idx"])
     if op == "setpub":
         return s.call_op(op, sysa, a["publishing"], O.get(15, 0), O[14])
@@ -391,6 +410,7 @@ def execute(s, case, O):
     if op == "ftpid":
         return s.call_op(op, sysa, a["id"], a["cb"], a["ctx"])
     if op == "goto":
+        s.unlisted(O.get(7, 0) & MASK if case.get("unlisted") else 0)
         return s.call_op(op, sysa, a["result"], a["ctx"], O.get(7, 0))
     return s.call_op(op, sysa)
 
@@ -424,8 +444,20 @@ def run(s, case):
         s.done()
 
 
+def guarded(ev):
+    """What the unlistedcity guards leave of one event of the original: None to drop it."""
+    if ev[0] in ("GlobeSlot50", "CreateOnlineParkInfoPanel"):
+        return None
+    if ev[0] == "LoggedInRequestFTPDownload":
+        return ("CompleteFTPDownload", (ev[1][0], 1), ev[2])
+    return ev
+
+
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    d = run(Ppc(e, case), case)
+    if PORT_FIX and case.get("unlisted"):
+        d["log"] = [g for g in map(guarded, d["log"]) if g is not None]
+    return d
 
 
 def host(lib, case):
@@ -459,12 +491,13 @@ def enter_edges():
     for count in (0, 1, 3, -1):
         for idx in (-2, -1, 0, 1, 2, 3, 4):
             yield mk(r, "enter", args={"count": count, "idx": idx})
+            yield mk(r, "enter", args={"count": count, "idx": idx}, unlisted=1)
 
 
 def enter_random(r):
     count = r.choice([0, 1, 2, 5, 100, -1, r.randrange(-3, 20)])
     idx = r.choice([0, 1, count - 1, count, count + 1, -1, r.randrange(-5, 25), r.getrandbits(32)])
-    return mk(r, "enter", args={"count": count, "idx": idx})
+    return mk(r, "enter", args={"count": count, "idx": idx}, unlisted=r.choice([0, 0, 0, 1]))
 
 
 def setpub_case(r, publishing, text):
@@ -560,10 +593,12 @@ def goto_edges():
     for result in (0, 1, -1):
         for park in (0, 1):
             yield mk(r, "goto", args={"result": result, "ctx": rw(r), "park": park})
+            yield mk(r, "goto", args={"result": result, "ctx": rw(r), "park": park}, unlisted=1)
 
 
 def goto_random(r):
-    return mk(r, "goto", args={"result": r.choice([0, 0, 1, -1, rw(r)]), "ctx": rw(r), "park": r.choice([0, 1])})
+    return mk(r, "goto", args={"result": r.choice([0, 0, 1, -1, rw(r)]), "ctx": rw(r), "park": r.choice([0, 1])},
+              unlisted=r.choice([0, 0, 0, 1]))
 
 
 def are_case(r, which=None, all_set=False):

@@ -3,7 +3,7 @@ one-liners, against libtpw_unit_InterfacePasswordTextObject_InterfacePasswordTex
 (tests/unit_InterfacePasswordTextObject_InterfacePasswordTex.cpp), main app ("SimTheme Park"),
 src/game/ui/InterfaceDrawEngine.cpp, src/game/ui/InterfaceTextObjectSprite.cpp, src/game/ui/UIMenu.cpp, src/game/ui/ui_bogStatus.cpp, src/game/ui/ui_main.cpp, src/game/ui/ui_textmanager.cpp:
   constructors 0x1018dc38 (password), 0x1018e594 (null cash), 0x1018e874 (percent), 0x1018eb38 (visitor number), 0x1018edf4 (visitor time),
-  0x1018f93c (rank), 0x1018de60 (cash, unit v5L16); destructors 0x1018df3c (cash), 0x1018e674, 0x1018e950, 0x1018ec18, 0x1018eed4;
+  0x1018f93c (rank), 0x1018de60 (cash, unit v5L16); destructors 0x1018df3c (cash), 0x1018e674, 0x1018e950, 0x1018ec18, 0x1018eed4, 0x1018fa18 (rank);
   UIMenu::UIMenu 0x1018ac44;
   InterfaceTextBox::ClientDraw 0x1018a8fc; InterfaceBar::DrawFunction 0x1018a8c4; InterfaceDrawEngineHGradient::Show 0x10189df8;
   BogStatusPanel::DeInitViewWindow 0x10199ff4, DeInitStatusWindow 0x1019a4c4, DeInitWindow 0x1019a894, ApplyChanges 0x1019a978;
@@ -17,7 +17,7 @@ engine data, 5 its mesh set).
 
 What is compared: the event log, the style bytes a constructor sets (justification, wrap, font, colour mode, offsets, the colour), the UIMenu
 words, the shown state, the colour answer, the bytes of the objects the one-liners must not touch, and which Change the vtable of a
-constructed cash, null cash, percent, visitor number or time object reaches (unit v5L33; 0 on the host is the text sprite's). Not tested: the vtable words the Mac stores
+constructed cash, null cash, percent, visitor number, time or rank object reaches (unit v5L33; 0 on the host is the text sprite's). Not tested: the vtable words the Mac stores
 (the host has native vtables), the delete flag value the Mac passes on to the callees (the host's members have no flag), a NULL object (the
 compiler's check, not a translated function). No fused operations.
 """
@@ -42,10 +42,10 @@ CTORS = {
     "InterfaceCashTextObject::InterfaceCashTextObject": (6, 0x1018DE60),   # unit v5L16
 }
 PASSWORD = "InterfacePasswordTextObject::InterfacePasswordTextObject"
-# Unit v5L33: the classes whose vtable Change slot is checked (their own Change; the host's are fakes answering the id). The password and rank
-# objects are left out: the host classes have no Change member yet (see include/ui_DrawObject.h).
-CHANGE_IDS = {0x1018E02C: 1, 0x1018E768: 2, 0x1018EA44: 3, 0x1018ED10: 4, 0x1018EFCC: 5}
-CHANGE_CLASSES = {n for n in CTORS if "Rank" not in n}
+# Unit v5L33: the classes whose vtable Change slot is checked (their own Change; the host's are fakes answering the id). The password
+# object is left out: the host class has no Change member yet (see include/ui_DrawObject.h).
+CHANGE_IDS = {0x1018E02C: 1, 0x1018E768: 2, 0x1018EA44: 3, 0x1018ED10: 4, 0x1018EFCC: 5, 0x1018FB08: 7}
+CHANGE_CLASSES = set(CTORS)
 PASSWORD_ADDR = 0x1018DC38
 DTORS = {
     "InterfaceCashTextObject::~InterfaceCashTextObject": (0, 0x1018DF3C),
@@ -53,6 +53,7 @@ DTORS = {
     "InterfacePercentTextObject::~InterfacePercentTextObject": (2, 0x1018E950),
     "InterfaceVisitorNumTextObject::~InterfaceVisitorNumTextObject": (3, 0x1018EC18),
     "InterfaceVisitorTimeTextObject::~InterfaceVisitorTimeTextObject": (4, 0x1018EED4),
+    "InterfaceRankTextObject::~InterfaceRankTextObject": (5, 0x1018FA18),
 }
 NOPS = {
     "InterfaceTextBox::ClientDraw": (0, 0x1018A8FC),

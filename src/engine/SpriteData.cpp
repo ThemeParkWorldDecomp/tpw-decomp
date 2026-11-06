@@ -21,6 +21,7 @@
 #include "tb_starfield.h"
 #include "tb_texturecache.h"
 #include "tb_textureentry.h"
+#include "UI_Base.h"
 #include "Wavelet.h"
 #include <cstddef>
 #include <cstdint>

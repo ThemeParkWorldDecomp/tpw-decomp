@@ -1,8 +1,13 @@
 # Unit v51106: the online islands' small members and the globes' panel members (src/game/online/lobby_globe.cpp, src/game/online/lobby_island.cpp).
 # The callees outside the unit are recording fakes in tests/unit_CLBScreenComponentOnlineIslands_StartCurrentIsla.cpp, which also defines the globals of other files.
 set(TPW_UNIT_CLBScreenComponentOnlineIslands_StartCurrentIsla src/game/online/lobby_globe.cpp
-    src/game/online/lobby_island.cpp platform/arena.cpp)
+    src/game/online/lobby_island.cpp src/game/GameShimGlue.cpp platform/arena.cpp)
 set(TPW_UNIT_CLBScreenComponentOnlineIslands_StartCurrentIsla_KEEP
+  __ZN29CLBScreenComponentOnlineGlobe10UnRegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::UnRegister(CLBGlobe*)
+  __ZN29CLBScreenComponentOnlineGlobe8RegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::Register(CLBGlobe*)
+  __ZN15parkinfo_callee19DownloadGlobeSlot4cEPv   # parkinfo_callee::DownloadGlobeSlot4c(void*)
+  __ZN15parkinfo_callee19OnlineIslandsSlot30EPv   # parkinfo_callee::OnlineIslandsSlot30(void*)
+  __ZN31CLBScreenComponentDownloadGlobe6Slot50Ev   # CLBScreenComponentDownloadGlobe::Slot50()
   __ZN25CLBScreenComponentIslands23WindowMessagesFnIslandsEiii   # CLBScreenComponentIslands::WindowMessagesFnIslands(int, int, int)
   __ZN29CLBScreenComponentOnlineGlobe8RegisterEP16CLBGlobeCityFlag   # CLBScreenComponentOnlineGlobe::Register(CLBGlobeCityFlag*)
   __ZN30CLBScreenComponentPublishGlobe10HidePanelsEv   # CLBScreenComponentPublishGlobe::HidePanels()

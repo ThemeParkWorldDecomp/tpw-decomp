@@ -53,7 +53,8 @@ int32_t CFSLoadSave::Load(const TbDynamicStringTemplate<char16_t>& name) { retur
 
 // ---- CFSLoadSave
 void CFSLoadSave::LoadHidden(const TbDynamicStringTemplate<char16_t>& name) { LoadInternal(name, gTPGlobals.mF44AC); }
-void CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) { SaveInternal(name, gTPGlobals.mF4420); }
+// Mac 0x101fc508: r3 stays as SaveInternal left it (quicksave tests it at 0x1014c738).
+int32_t CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) { return SaveInternal(name, gTPGlobals.mF4420); }
 void CFSLoadSave::SaveHidden(const TbDynamicStringTemplate<char16_t>& name) { SaveInternal(name, gTPGlobals.mF44AC); }
 
 // Loads "<the logged-in player's folder for the current theme>:<name><extension>" as a park (no header, type kLoadPark); the extension

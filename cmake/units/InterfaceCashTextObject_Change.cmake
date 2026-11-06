@@ -4,6 +4,7 @@ set(TPW_UNIT_InterfaceCashTextObject_Change src/game/ui/InterfaceTextObjectSprit
     platform/arena.cpp)
 set(TPW_UNIT_InterfaceCashTextObject_Change_KEEP
   __Z30InterfaceCashTextObject_ChangeP25InterfaceTextObjectSpritejP8DOChange   # InterfaceCashTextObject_Change(InterfaceTextObjectSprite*, unsigned int, DOChange*)
+  __Z30InterfaceRankTextObject_ChangeP25InterfaceTextObjectSpritejP8DOChange   # InterfaceRankTextObject_Change(InterfaceTextObjectSprite*, unsigned int, DOChange*)
   __Z32InterfacePasswordTextObject_DtorP27InterfacePasswordTextObjects   # InterfacePasswordTextObject_Dtor(InterfacePasswordTextObject*, short)
   __Z33InterfacePercentTextObject_ChangeP25InterfaceTextObjectSpritejP8DOChange   # InterfacePercentTextObject_Change(InterfaceTextObjectSprite*, unsigned int, DOChange*)
   __Z34InterfaceNullCashTextObject_ChangeP25InterfaceTextObjectSpritejP8DOChange   # InterfaceNullCashTextObject_Change(InterfaceTextObjectSprite*, unsigned int, DOChange*)
@@ -11,6 +12,8 @@ set(TPW_UNIT_InterfaceCashTextObject_Change_KEEP
   __Z36InterfaceVisitorNumTextObject_ChangeP25InterfaceTextObjectSpritejP8DOChange   # InterfaceVisitorNumTextObject_Change(InterfaceTextObjectSprite*, unsigned int, DOChange*)
   __ZN14textobj_callee4LabsEi   # textobj_callee::Labs(int)
   __ZN23InterfaceCashTextObject6ChangeEjP8DOChange   # InterfaceCashTextObject::Change(unsigned int, DOChange*)
+  __ZN23InterfaceRankTextObject6ChangeEjP8DOChange   # InterfaceRankTextObject::Change(unsigned int, DOChange*)
+  __ZN23InterfaceRankTextObjectD1Ev   # InterfaceRankTextObject::~InterfaceRankTextObject()
   __ZN26InterfacePercentTextObject6ChangeEjP8DOChange   # InterfacePercentTextObject::Change(unsigned int, DOChange*)
   __ZN27InterfaceNullCashTextObject6ChangeEjP8DOChange   # InterfaceNullCashTextObject::Change(unsigned int, DOChange*)
   __ZN29InterfaceVisitorNumTextObject6ChangeEjP8DOChange   # InterfaceVisitorNumTextObject::Change(unsigned int, DOChange*)

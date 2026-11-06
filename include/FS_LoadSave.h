@@ -18,7 +18,7 @@ public:
     TFSLoadSaveSaveFileDetails* GetNextSaveFileDetails(const TFSLoadSaveSaveFileDetails* previous);
     void LoadHidden(const TbDynamicStringTemplate<char16_t>& name);   // 0x101fc47c
     void SaveHidden(const TbDynamicStringTemplate<char16_t>& name);   // 0x101fc568
-    void Save(const TbDynamicStringTemplate<char16_t>& name);         // 0x101fc4f4
+    int32_t Save(const TbDynamicStringTemplate<char16_t>& name);      // 0x101fc4f4: answers what SaveInternal answers, 1 on success
     // 0x101fcdcc (816 bytes): loads the newest park file of the logged-in player's folder for the current theme (the files that
     // match the save pattern, no sub folders; the newest last write time wins, the first of equals wins) through CSaveLoad::Load,
     // type 2, no header. Nothing happens when the folder or a file is not there.

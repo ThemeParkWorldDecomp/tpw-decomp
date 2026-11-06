@@ -101,6 +101,7 @@ float CalcZTrans(int32_t z) {
 
 sHeapInfo* gUIHeap;
 
+
 // ---- InterfaceDrawEngineMesh
 
 // Marks the mesh as the interface's (header flag 0x200), takes its node count as the number
@@ -376,6 +377,7 @@ void InterfaceDrawEngineMesh::Change(uint32_t flags, DOChange* change) {
 
 void InterfaceDrawEngineMesh::Draw(int16_t, CoolRect*, int16_t) {}
 void InterfaceDrawEngineMesh::Draw(int16_t, CoolRect*, int16_t, char16_t*) {}
+
 
 // ---- InterfaceDrawEngineMesh
 

@@ -2,6 +2,8 @@
 # tests/unit_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo.cpp, which also defines the globes of other files.
 set(TPW_UNIT_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo src/game/online/lobby_globe.cpp platform/arena.cpp)
 set(TPW_UNIT_CLBScreenComponentDownloadGlobe_Dtor_CLBScreenCo_KEEP
+  __ZN29CLBScreenComponentOnlineGlobe10UnRegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::UnRegister(CLBGlobe*)
+  __ZN29CLBScreenComponentOnlineGlobe8RegisterEP8CLBGlobe   # CLBScreenComponentOnlineGlobe::Register(CLBGlobe*)
   __ZN31CLBScreenComponentDownloadGlobe4HideEv   # CLBScreenComponentDownloadGlobe::Hide()
   __ZN31CLBScreenComponentDownloadGlobeD1Ev   # CLBScreenComponentDownloadGlobe::~CLBScreenComponentDownloadGlobe()
 )

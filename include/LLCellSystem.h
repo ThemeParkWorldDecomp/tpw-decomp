@@ -256,10 +256,7 @@ uint8_t LLCR_FixBridgesReverse(CObject* ride, bool a, bool b, bool c);   // 0x10
 // Unit v5059 (src/game/park/LLCellMouse.cpp).
 void LLCM_CoverUpgrade(int32_t* x, int32_t* y);          // 0x100828e4 (888 bytes)
 void LLCM_RebuildUpgradeBridges(int32_t x, int32_t y);   // 0x10082cf0 (1116 bytes)
-// game/park/TrackCell.cpp defines it with the r3 the listing answers (int32_t, the same mangled name) and leaves this out.
-#ifndef TPW_LLCC_DRAWTRACKLINE_R3
-void LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);   // 0x100a30f8 (912 bytes, stand-in)
-#endif
+int32_t LLCC_DrawTrackLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY);   // 0x100a30f8 (912 bytes, src/game/park/TrackCell.cpp): 1, or 0 when a cell refused
 
 // Unit v5082 (src/game/park/LLCellRide.cpp): LLCC_BuildHoardingDB (declared above) and the rectangle clearer. The four words are defined by
 // the unit (names invented): the extents of the hoarding walk, min x / min y / max x / max y.
@@ -273,8 +270,7 @@ extern int32_t gLLCCHoardMaxY;   // 0x102de0bc  0
 // Unit v5182 (src/game/park/LLCellMouse.cpp): the current object's track end and the track edit mode's start. Names are invented.
 class CTrackCell;
 void LLCM_StartTrackEditMode(int32_t x, int32_t y, uint16_t unused);   // 0x10088a64 (1,372 bytes; the third argument is never read)
-void LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag);   // 0x1008ddfc: calls LLCC_TraceTrackCount
-int32_t LLCC_TraceTrackCount(CTrackCell* from, CTrackCell* to, int32_t flag);   // 0x1008ddfc body: the number of cells walked, -1 when a cell is no track (2,212 bytes, src/game/park/LLCellRide.cpp): the number of cells walked, -1 when a cell is no track
+int32_t LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag);   // 0x1008ddfc (2,212 bytes, src/game/park/LLCellRide.cpp): the number of cells walked, -1 when a cell is no track
 extern int32_t gLLCC9F18;        // 0x1029df18  -1 (initialised data): the current object's cell x
 extern int32_t gLLCC9F1C;        // 0x1029df1c  -1: its cell y
 extern int32_t gLLCC9F20;        // 0x1029df20  -1: its rotation

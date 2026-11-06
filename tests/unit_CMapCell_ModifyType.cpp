@@ -149,7 +149,7 @@ uint8_t ADD_DIRECTION(uint8_t first, uint8_t second) {
     ev("ADD_DIRECTION", {first, second});
     return Rotl8(first, 2);
 }
-extern "C" int rand() {
+int32_t msl_rand() {
     ev("rand", {});
     return static_cast<int>(ret("rand"));
 }

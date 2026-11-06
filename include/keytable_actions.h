@@ -137,7 +137,7 @@ int32_t WeatherDownLots();   // 0x1014d74c, .WeatherDownLots__Fv
 int32_t WeatherUpLots();   // 0x1014d6bc, .WeatherUpLots__Fv
 int32_t WeatherDown();   // 0x1014d62c, .WeatherDown__Fv
 int32_t WeatherUp();   // 0x1014d5a0, .WeatherUp__Fv
-void ToggleFullScreen();   // engine 0x1003281c (import), ToggleFullScreen__Fv
+int32_t ToggleFullScreen();   // engine 0x1003281c (import), ToggleFullScreen__Fv: answers 1
 
 #include "TbDynamicStringTemplate.h"
 extern int32_t gTestAdvisorIndex;             // 0x102a4e54, original name unknown (starts 0x103): the advisor response TestAdvisor calls

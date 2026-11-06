@@ -106,7 +106,8 @@ def stub_killme(e):
 
 @stub(A_CCOPY)
 def stub_ccopy(e):
-    e.cl.rec("StringCopy", (ptrid(e.r(3)), ptrid(e.r(4)), s32(e.r(5)), e.r(6) & MASK))
+    # The source's word, not its address: the host's StrVal copies from a local string that the Argument's word points at.
+    e.cl.rec("StringCopy", (ptrid(e.r(3)), e.u32(e.r(4)), s32(e.r(5)), e.r(6) & MASK))
 
 
 @stub(A_WCOPY)

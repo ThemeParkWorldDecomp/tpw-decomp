@@ -128,7 +128,7 @@ def build_stubs():
         e.set_r(3, L.addr.get(L.ret("Advisor", 0), 0))
 
     S.imp("__nw__FUl", new)
-    S.internal(SOUND_SEND_EVENT, R("SOUND_SendEvent", "iiiiii"))
+    S.internal(SOUND_SEND_EVENT, R("SOUND_SendEvent", "iiiiii", ret=lambda e, L: L.ret("Send", 0)))
     S.internal(UI_SEND_MESSAGE, send_message)
     S.internal(DECIDE_KB, decide)
     S.internal(DISABLE, R("Disable", "L"))
@@ -282,18 +282,18 @@ def random_state(r, **fixed):
 
 # ---------------------------------------------------------------- UIMain_UISound
 
-def sound_case(code, sound):
-    return dict(code=code, st=dict(sound=sound & MASK))
+def sound_case(code, sound, handle=0):
+    return dict(code=code, st=dict(sound=sound & MASK), q=dict(Send=[handle & MASK]))
 
 
 def sound_edges():
     for code in (0, 1, 5, 0x7F, 0x100, 0x7FFFFFFF, -1, -0x80000000):
-        for sound in (0, 1, -1, 0x2468, 0x7C0000):
-            yield sound_case(code & MASK if code < 0 else code, sound)
+        for sound, handle in ((0, 0), (1, 0x51), (-1, -1), (0x2468, 0x7FFFFFFF), (0x7C0000, -0x80000000)):
+            yield sound_case(code & MASK if code < 0 else code, sound, handle)
 
 
 def sound_random(r):
-    return sound_case(r.choice([r.getrandbits(32), r.randrange(0, 600)]), r.choice([r.getrandbits(32), 0, 7]))
+    return sound_case(r.choice([r.getrandbits(32), r.randrange(0, 600)]), r.choice([r.getrandbits(32), 0, 7]), r.getrandbits(32))
 
 
 # ---------------------------------------------------------------- UIMain_CheckPanel
@@ -442,7 +442,7 @@ def firstperson_random(r):
 # ---------------------------------------------------------------- the tests
 
 TESTS = [
-    FnTest("UIMain_UISound", ppc_case(UISOUND, lambda p, c, t: [c["code"]]), host_case("tpw_up_sound", None, lambda c: [T.s32(c["code"])]),
+    FnTest("UIMain_UISound", ppc_case(UISOUND, lambda p, c, t: [c["code"]], s32_result), host_case("tpw_up_sound", C.c_int32, lambda c: [T.s32(c["code"])]),
            edge=sound_edges, rnd=sound_random),
     FnTest("UIMain_CheckPanel", ppc_case(CHECKPANEL, lambda p, c, t: [], bool_result), host_case("tpw_up_checkpanel", C.c_int32, lambda c: []),
            edge=check_edges, rnd=check_random),

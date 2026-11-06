@@ -516,7 +516,7 @@ void MMSnap(int32_t& x, int32_t& y) {
     if (!(dx > dy)) x = gLLCC4804;
 }
 
-typedef void (*MMLineFn)(CELL_MODES, int32_t, int32_t, int32_t*, int32_t*);
+typedef int32_t (*MMLineFn)(CELL_MODES, int32_t, int32_t, int32_t*, int32_t*);
 
 // The four sides of the rectangle between the drag start and the cell, each line a call (mode < 0: the current mode | 0x100).
 void MMRectangle(MMLineFn line, int32_t mode, int32_t step, int32_t minX, int32_t minY, int32_t maxX, int32_t maxY) {
@@ -880,8 +880,8 @@ void LLCM_LeftMouseButtonDown(int32_t x, int32_t y, uint16_t shift, int32_t flag
 // Notes from the listing:
 // - The cells are found by address arithmetic on the world block: the map cell of index i at +0x2d8 + (i - 1) * 0x44, the track
 //   cell at +0x2d8 + 0x110000 + (i - 1) * 0x28 (the index is 1 + x + (y << 7), a halfword).
-// - LLCC_DrawLine, LLCC_DrawTrackLine and LLCC_TraceTrack are declared void, but the listing reads their r3 (the 0x81 line's answer
-//   decides whether the drag ends, TraceTrack's is compared with -1): they are called through an int-answering pointer type.
+// - The listing reads the r3 of LLCC_DrawLine, LLCC_DrawTrackLine and LLCC_TraceTrack: the 0x81 line's answer decides whether the drag
+//   ends, TraceTrack's is compared with -1.
 // - The click modes re-read the current object word gLLCCDB6C each time; gLLCCDB64 is the selected peep.
 // - gCalcNeighboursPrevA is stored twice where the other modes store PrevA and PrevB (the original's slip, kept).
 // - The illegal path's case 0x100884f8 stores the original arguments back into their own slots; nothing reads them after.
@@ -897,19 +897,16 @@ CThing* gLLCCDB64;
 
 namespace {
 
-using LineFn = int32_t (*)(CELL_MODES, int32_t, int32_t, int32_t*, int32_t*);
-using TraceFn = int32_t (*)(CTrackCell*, CTrackCell*, int32_t);
-
 int32_t DrawLine(int32_t mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
-    return reinterpret_cast<LineFn>(&LLCC_DrawLine)(static_cast<CELL_MODES>(mode), x, y, endX, endY);
+    return LLCC_DrawLine(static_cast<CELL_MODES>(mode), x, y, endX, endY);
 }
 
 int32_t DrawTrackLine(int32_t mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
-    return reinterpret_cast<LineFn>(&LLCC_DrawTrackLine)(static_cast<CELL_MODES>(mode), x, y, endX, endY);
+    return LLCC_DrawTrackLine(static_cast<CELL_MODES>(mode), x, y, endX, endY);
 }
 
 int32_t TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) {
-    return reinterpret_cast<TraceFn>(&LLCC_TraceTrack)(from, to, flag);
+    return LLCC_TraceTrack(from, to, flag);
 }
 
 uint16_t CellIndex(int32_t x, int32_t y) { return static_cast<uint16_t>(x + (y << 7) + 1); }
