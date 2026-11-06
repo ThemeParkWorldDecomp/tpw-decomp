@@ -6,7 +6,7 @@
 // initialised data (the value read from the program image is given), below 0x103bc8b0 BSS (zero), higher an import slot (a
 // library's variable, defined here with the library's own value). Words the Mac holds as program addresses (vtables, TVectors) have
 // no host referent: they are kept as the Mac has them, in host byte order, because only the identity of each table matters. The
-// ride templates are game data, written by devtools/gen_game_tables.py from the Mac CD's program (include/RideTemplates.inc).
+// ride templates are written by devtools/gen_game_tables.py from the Mac CD's program (include/RideTemplates.inc).
 
 #include <cstddef>
 #include <cstdint>
