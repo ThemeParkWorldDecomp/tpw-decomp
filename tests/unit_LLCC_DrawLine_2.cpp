@@ -109,7 +109,7 @@ void tpw_ldl_probe(uint64_t address) {
 void tpw_ldl_globe(uint64_t address) { new (reinterpret_cast<void*>(static_cast<uintptr_t>(address))) CLBGlobe(); }
 
 int32_t tpw_ldl_drawline(int32_t mode, int32_t x, int32_t y, uint64_t endX, uint64_t endY) {
-    return LLCC_DrawLineBody(static_cast<CELL_MODES>(mode), x, y, reinterpret_cast<int32_t*>(static_cast<uintptr_t>(endX)),
+    return LLCC_DrawLine(static_cast<CELL_MODES>(mode), x, y, reinterpret_cast<int32_t*>(static_cast<uintptr_t>(endX)),
                          reinterpret_cast<int32_t*>(static_cast<uintptr_t>(endY)));
 }
 

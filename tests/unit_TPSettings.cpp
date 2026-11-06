@@ -215,8 +215,9 @@ void CFSLoadSave::SaveHidden(const TbDynamicStringTemplate<char16_t>& name) {
 void CFSLoadSave::LoadHidden(const TbDynamicStringTemplate<char16_t>& name) {
     ev("CFSLoadSave::LoadHidden", {lab(this)}, {calllog::narrow(name.mData).c_str()});
 }
-void CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) {
+int32_t CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) {
     ev("CFSLoadSave::Save", {lab(this)}, {calllog::narrow(name.mData).c_str()});
+    return 1;
 }
 TbDynamicStringTemplate<char16_t> CFSUserInfo::ReturnPathToSaveDirectory() {
     ev("CFSUserInfo::ReturnPathToSaveDirectory", {lab(this)});

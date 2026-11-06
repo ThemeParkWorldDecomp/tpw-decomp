@@ -3,12 +3,14 @@ libtpw_unit_InterfaceCashTextObject_Change.dylib (tests/unit_InterfaceCashTextOb
 src/game/ui/InterfaceTextObjectSprite.cpp:
   InterfaceCashTextObject::Change 0x1018e02c, InterfacePasswordTextObject::Change 0x1018dd50,
   InterfacePasswordTextObject::~InterfacePasswordTextObject 0x1018dcb0, InterfaceNullCashTextObject::Change 0x1018e768,
-  InterfacePercentTextObject::Change 0x1018ea44, InterfaceVisitorNumTextObject::Change 0x1018ed10
+  InterfacePercentTextObject::Change 0x1018ea44, InterfaceVisitorNumTextObject::Change 0x1018ed10, and the rank object's Change as the program
+  calls it: slot 0x14 of the Mac's vtable 0x102a7ee4 picks the PowerPC, the host's virtual on a real rank object's vtable the C++
 
 A case is a world and a call. The world is built twice by ONE piece of Python code (Mac memory big-endian, host little-endian). The callees
 outside the unit are fakes on both sides: the sprite's Change (logs the flags, for the password also the change's words and rectangle, and
 the length and a hash of the text when flag 0x100), TbITable::FormatString (logs table, size, id and the tag; writes "id:value"),
-labs, _wcsset (really sets), swprintf and wcscpy (PowerPC stubs mirroring the host's msl; the visitor format is checked to be "%d"), the
+labs, _wcsset (really sets), swprintf and wcscpy (PowerPC stubs mirroring the host's msl; a format is "%d" or plain text, the rank's second one
+is read from the Mac image, so the program's copy of it is compared too), the
 cursor sprite's destructor and operator delete.
 
 The world: the table pointer in gText +0x564, a change block with its style and text, the shared 0x300-character buffer filled with 'A'.
@@ -28,8 +30,10 @@ MASK = 0xFFFFFFFF
 
 FN = {"cash": 0x1018e02c, "pw": 0x1018dd50, "null": 0x1018e768, "pct": 0x1018ea44, "vis": 0x1018ed10}
 FNNUM = {"cash": 0, "pw": 1, "null": 2, "pct": 3, "vis": 4}
+FNNUM["rank"] = 5
+VSLOT = dict(rank=(0x102a7ee4, 0x14))   # the rank object's Change: the Mac's own table names the code
 DTOR = 0x1018dcb0
-SIZES = {0x1018e02c: 288, 0x1018dd50: 200, 0x1018dcb0: 104, 0x1018e768: 196, 0x1018ea44: 176, 0x1018ed10: 156}
+SIZES = {0x1018e02c: 288, 0x1018dd50: 200, 0x1018dcb0: 104, 0x1018e768: 196, 0x1018ea44: 176, 0x1018ed10: 156, 0x1018fb08: 156}
 OWN = set(SIZES)
 
 ADDR = dict(table=0x1038047c, buffer=0x10380c48)
@@ -110,7 +114,11 @@ def stub_wcscpy(e):
 
 def stub_swprintf(e):
     buf, size, fmt, v = e.r(3), e.r(4), e.r(5), e.r(6)
-    assert units(e, fmt) == [0x25, 0x64], "the visitor format is not %d"
+    us = units(e, fmt)
+    if us != [0x25, 0x64]:
+        assert 0x25 not in us, "a format neither %d nor plain text"
+        put_units(e, buf, us[:size - 1])
+        return
     put_units(e, buf, [ord(c) for c in ("%d" % T.s32(v))[:size - 1]])
 
 
@@ -195,7 +203,14 @@ class Ppc(Side):
     def call_change(self, case):
         ch = self.make_change(case)
         self.self_ = self.alloc(0x200)
-        T.call_ppc(self.e, FN[case["op"]], [self.self_, case["flags"], ch])
+        op = case["op"]
+        if op in VSLOT:
+            table, slot = VSLOT[op]
+            code = self.e.u32(self.e.u32(table + slot))
+            assert code == 0x1018fb08, hex(code)
+        else:
+            code = FN[op]
+        T.call_ppc(self.e, code, [self.self_, case["flags"], ch])
         return None
 
     def call_dtor(self, case):
@@ -337,4 +352,5 @@ TESTS = [
     change_tests("null", "InterfaceNullCashTextObject::Change", 3),
     change_tests("pct", "InterfacePercentTextObject::Change", 4),
     change_tests("vis", "InterfaceVisitorNumTextObject::Change", 5),
+    change_tests("rank", "InterfaceRankTextObject::Change", 6),
 ]

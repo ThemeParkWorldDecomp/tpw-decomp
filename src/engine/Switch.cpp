@@ -43,7 +43,7 @@ int32_t Switch_Close() {
     return 1;
 }
 
-int32_t ToggleFullScreen();   // 0x1003281c (keytable_actions.h declares it void; the original answers 1)
+int32_t ToggleFullScreen();   // 0x1003281c (also in keytable_actions.h): answers 1
 
 // 0x1003281c
 int32_t ToggleFullScreen() {

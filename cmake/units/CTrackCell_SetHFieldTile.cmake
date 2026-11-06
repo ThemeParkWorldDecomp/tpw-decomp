@@ -6,5 +6,4 @@ set(TPW_UNIT_CTrackCell_SetHFieldTile_KEEP
   __ZN10CTrackCell13SetHFieldTileEv   # CTrackCell::SetHFieldTile()
   __ZN10CTrackCell17RefreshHFieldTileEv   # CTrackCell::RefreshHFieldTile()
   _gLLCC4840
-  TPW_LLCC_DRAWTRACKLINE_R3@game/park/TrackCell.cpp   # the #define TPW_LLCC_DRAWTRACKLINE_R3 of src/game/park/TrackCell.cpp (a guard macro the regroup brought into it)
 )

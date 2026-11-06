@@ -166,9 +166,9 @@ CMouse* MakeMouse() {
 }
 }  // namespace
 
-// 0x101802cc, 64 bytes.
-void UIMain_UISound(int32_t code) {
-    SOUND_SendEvent(0, gSoundBanks[3], code, 0, 0, 0);
+// 0x101802cc, 64 bytes. Mac 0x101802f4: r3 stays as SOUND_SendEvent left it, the sound's handle (the research panel keeps it).
+int32_t UIMain_UISound(int32_t code) {
+    return SOUND_SendEvent(0, gSoundBanks[3], code, 0, 0, 0);
 }
 
 // ui_main.cpp (main app of SimTheme Park 2.04b3). PARTIAL: UIMain_ConvertMulti

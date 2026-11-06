@@ -315,8 +315,8 @@ AdvisorMessage CAdvisorScoring::GetHighestScoringFromNext(int32_t count) {
     return static_cast<AdvisorMessage>(result);
 }
 
-// Reads the cursor from the file as 4 raw bytes, then swaps it. "read failed" when the count read shifted right by 2 is not 1
-// (so 4 to 7 bytes pass).
+// The cursor is little-endian in the file, like every other word of it (the original swaps it because it runs big-endian). "read
+// failed" when the count read shifted right by 2 is not 1 (so 4 to 7 bytes pass).
 int32_t CAdvisorScoring::Load(void*& file) {
     uint32_t transferred;
     LbFile_Read(file, &mCursor, 4, &transferred);
@@ -324,14 +324,12 @@ int32_t CAdvisorScoring::Load(void*& file) {
         SamsUtilities::UDebug("read failed");
         return 0;
     }
-    mCursor = static_cast<int32_t>(__builtin_bswap32(static_cast<uint32_t>(mCursor)));
     return 1;
 }
 
 int32_t CAdvisorScoring::Save(void*& file) const {
-    uint32_t swapped = __builtin_bswap32(static_cast<uint32_t>(mCursor));
     uint32_t transferred;
-    LbFile_Write(file, &swapped, 4, &transferred);
+    LbFile_Write(file, &mCursor, 4, &transferred);
     if ((transferred >> 2) != 1) {
         SamsUtilities::UDebug("write failed");
         return 0;

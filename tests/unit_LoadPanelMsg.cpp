@@ -135,7 +135,10 @@ int32_t CFSLoadSave::Load(const TbDynamicStringTemplate<char16_t>& name) {
     ev("Load", {lab(this), DetailIndex(&name), HashW(name.mData)});
     return 0;
 }
-void CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) { ev("Save", {lab(this), HashW(name.mData)}); }
+int32_t CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) {
+    ev("Save", {lab(this), HashW(name.mData)});
+    return 1;
+}
 
 int32_t DefaultDialogCallback(InterfaceWindow* window, int32_t message, int32_t a, int32_t b) {
     ev("Default", {lab(window), message, a, b});

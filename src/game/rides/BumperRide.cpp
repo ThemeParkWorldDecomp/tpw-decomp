@@ -631,7 +631,7 @@ void BMP_GenerateSinTab() {
 // BMP_OpenRide 0x10025ee4, BMP_CloseRide 0x10026118. The world is the global at 0x102b56c0 (gColList in BMP_InsideArea.h); its 0x3c bytes are
 // viewed here by Mac offset (pointer fields are Ptr32).
 
-int32_t Rand();   // 0x10239148 rand (ui_menu.h)
+int32_t Rand();   // 0x10239148 rand
 
 namespace {
 

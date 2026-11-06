@@ -1,7 +1,7 @@
 // Test library for the map panel's sprite position, coaster tracks and grid details (unit v5200; libtpw_unit_CUI2DMap_UpdateSpritePosition.dylib,
 // tests/test_CUI2DMap_UpdateSpritePosition.py), main app:
 //   src/game/ui/ui_2dmap.cpp   CUI2DMap::UpdateSpritePosition, DrawCoasterTracks,
-//   StoreMapGridDetails, and the globals gUI2DMapGridThingListEnd and gUI2DMapColourTable.
+//   StoreMapGridDetails, and the globals gUI2DMapGridThingListEnd and gUI2DMapColours.
 //
 // The callees outside the unit are fakes that record what the real ones read: the sprite's SetPosition and SetScale, the CDraw object, the coaster
 // track queries, the colour scale, the four Antialiased line routines, the cell queries, the assertion and GetDBInfo. The globals of other files
@@ -112,7 +112,7 @@ tag_sBezierControl* GetNthCoasterTrackStart(uint32_t index, void** control) {
 }
 
 bfl::draw::CColour UI2DMReturnScaleColour(int32_t index, const bfl::draw::CColour& a, const bfl::draw::CColour& b, const bfl::draw::CColour& c) {
-    const char* table = reinterpret_cast<const char*>(gUI2DMapColourTable);
+    const char* table = reinterpret_cast<const char*>(gUI2DMapColours);
     ev("UI2DMReturnScaleColour", {index, reinterpret_cast<const char*>(&a) - table, reinterpret_cast<const char*>(&b) - table,
                                   reinterpret_cast<const char*>(&c) - table});
     bfl::draw::CColour result;
@@ -215,7 +215,7 @@ uint64_t tpw_cm_addr(const char* name) {
         {"thing", gThingArray},
         {"gworld", &gGameWorld},
         {"end", &gUI2DMapGridThingListEnd},
-        {"colours", gUI2DMapColourTable},
+        {"colours", gUI2DMapColours},
         {"sw", &gScreenWidth},
         {"sh", &gScreenHeight},
         {"rect", &gClipRect},

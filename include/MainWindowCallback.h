@@ -187,7 +187,7 @@ void AllKidsPanel_KidGone(CThing* thing);                   // 0x10195708
 void AllKidsListLCPostFormat(InterfaceWindow* window);      // 0x10194fa8
 namespace kidlist_callee {
 // Callees the host cannot call as the Mac does (constructors of classes not declared, a stack CoolRect); weak stand-ins in the src file, faked by the test library.
-void VisitorNumCtor(void* mem);   // 0x1018eb38 InterfaceVisitorNumTextObject(NULL) (stand-in: the class is not declared)
+void VisitorNumCtor(void* mem);   // 0x1018eb38 InterfaceVisitorNumTextObject(NULL)
 void RectCtor(void* rect);        // 0x101c7448 CoolRect::CoolRect()
 void RectDtor(void* rect);        // 0x101c74e0 CoolRect::~CoolRect() (flag -1)
 }  // namespace kidlist_callee

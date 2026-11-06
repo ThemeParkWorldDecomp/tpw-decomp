@@ -197,7 +197,10 @@ int32_t UI_PostMessage(InterfaceWindow* window, int32_t message, int32_t a, int3
     return 0;
 }
 
-void UIMain_UISound(int32_t code) { ev("UIMain_UISound", {I(code)}); }
+int32_t UIMain_UISound(int32_t code) {
+    ev("UIMain_UISound", {I(code)});
+    return 0;
+}
 
 void RemoveSlideoutPanel(int16_t which) { ev("RemoveSlideoutPanel", {I(which)}); }
 

@@ -102,8 +102,9 @@ void GetNextStaffMember() {
     ev("GetNextStaffMember", {gStaffPanelLocation, lab(gStaffPanelThing)});
     gStaffPanelThing = ret("GetNext") ? gNextThing : nullptr;
 }
-void LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     ev("DrawLine", {static_cast<int32_t>(mode), x, y, *endX, *endY});
+    return 1;
 }
 int32_t UIMain_GetStaffStateFrame(int32_t state) {
     ev("GetStaffStateFrame", {state});

@@ -4,6 +4,7 @@
 // The UI works in a 2048 x 1536 virtual screen (ThemeParkWorld::GetUIMousePos).
 #pragma once
 #include <cstdint>
+#include <unordered_set>
 
 // A region of the UI's screen: the base answers "nothing" to everything. Mac: the vtable
 // pointer alone (4 bytes), vtable 0x102afcd8.
@@ -173,6 +174,28 @@ void UI_SetRealScreenRez(int16_t width, int16_t height);   // 0x101c9ed8
 void UI_HideCursor();                                 // 0x101ca0b0: hides the current cursor, if there is one
 void UI_ShowCursor();                                 // 0x101ca110
 int16_t UI_GetButtonFlags();                          // 0x101ca944, nonzero while a mouse button is down
+
+// The sizes the launcher starts at, named by their 4:3 size: Resolution.sam's presets 1 to 7 and the launcher's 8 to 10, each
+// at each of the shapes the UI was laid out for. The launcher's --resolution and its choice of a shape, UI_PresetSize and a
+// saved setting of the older kind read it; the options panel's slider has kUISizeLists below.
+struct UISizePreset {
+    const char* mName;
+    int32_t mWidth;       // 4:3
+    int32_t mHeight;
+    int32_t mWideWidth;   // the width a wider screen keeps; 0: it keeps the height instead
+};
+inline constexpr int32_t kUISizePresetCount = 10;
+inline constexpr UISizePreset kUISizePresets[kUISizePresetCount] = {
+    {"512x384", 512, 384, 0},       {"640x480", 640, 480, 0},       {"800x600", 800, 600, 0},
+    {"1024x768", 1024, 768, 0},     {"1280x1024", 1280, 1024, 0},   {"1600x1200", 1600, 1200, 0},
+    {"2048x1536", 2048, 1536, 0},   {"2560x1920", 2560, 1920, 2560}, {"3200x2400", 3200, 2400, 3200},
+    {"4096x3072", 4096, 3072, 3840}};
+struct UISizeShape {
+    int32_t mWide;
+    int32_t mHigh;
+};
+inline constexpr int32_t kUISizeShapeCount = 3;
+inline constexpr UISizeShape kUISizeShapes[kUISizeShapeCount] = {{4, 3}, {16, 10}, {16, 9}};
 
 extern int16_t gUIRealScreenWidth;    // 0x10395bbc, original name unknown
 extern int16_t gUIRealScreenHeight;   // 0x10395bba

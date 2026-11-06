@@ -1399,12 +1399,8 @@ void Step(uint8_t dir, int32_t& x, int32_t& y) {
 
 }  // namespace
 
-// The callers ignore the answer; other units' test fakes define LLCC_TraceTrack as void, so the header says void.
-void LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) {
-    LLCC_TraceTrackCount(from, to, flag);
-}
-
-int32_t LLCC_TraceTrackCount(CTrackCell* from, CTrackCell* to, int32_t flag) {
+// Mac 0x1008e688: answers r22, the number of cells walked, -1 when a cell is no track. LLCM_LeftMouseButtonUp compares it with -1.
+int32_t LLCC_TraceTrack(CTrackCell* from, CTrackCell* to, int32_t flag) {
     CTrackCell* startCell = nullptr;
     CTrackCell* endCell = nullptr;
     int32_t count = 0;

@@ -69,6 +69,47 @@ void InterfaceTextObjectSprite::Change(uint32_t flags, DOChange* change) {
     ev("change", {lab(this), static_cast<int64_t>(flags), w0, w1, w2, w3, rect, length, static_cast<int64_t>(hash)});
 }
 
+// The rank object's vtable links against these; a Change call reaches none of them.
+CoolRegion::~CoolRegion() {}
+int32_t CoolRegion::operator==(CoolRegion&) { return 0; }
+bool CoolRegion::PointIn(int16_t, int16_t) { return false; }
+void CoolRegion::Middle(int16_t*, int16_t*) {}
+void CoolRegion::Shift(int16_t, int16_t) {}
+void CoolRegion::Adjust(int16_t, int16_t, int16_t, int16_t) {}
+bool CoolRect::PointIn(int16_t, int16_t) { return false; }
+void CoolRect::Middle(int16_t*, int16_t*) {}
+void CoolRect::Shift(int16_t, int16_t) {}
+void CoolRect::Adjust(int16_t, int16_t, int16_t, int16_t) {}
+CMapLinkBase::~CMapLinkBase() {}
+int32_t CSpriteList::Prepare() { return 0; }
+int32_t CSpriteList::GetLinkType() { return 0; }
+void* CSpriteList::GetData() { return nullptr; }
+TbFontRender::~TbFontRender() {}
+TbFontRenderParams::~TbFontRenderParams() {}
+CoolRect::~CoolRect() {}
+CSpriteList::~CSpriteList() {}
+SSpriteEngineData::~SSpriteEngineData() {}
+TbTextFormatter::~TbTextFormatter() {}
+InterfaceDrawObject::~InterfaceDrawObject() {}
+void InterfaceDrawObject::Draw(int16_t, CoolRect*, int16_t) {}
+void InterfaceDrawObject::Draw(int16_t, CoolRect*, int16_t, char16_t*) {}
+void InterfaceDrawObject::Change(uint32_t, DOChange*) {}
+intptr_t InterfaceDrawObject::Query(uint32_t, intptr_t) { return 0; }
+void InterfaceDrawObject::Show(int16_t) {}
+void InterfaceDrawObject::Refresh() {}
+int32_t InterfaceDrawObject::GetWritableDataArea(int32_t*, int32_t*) { return 0; }
+InterfaceDrawObject* InterfaceDrawObject::InstanceMe() { return this; }
+InterfaceDrawObjectSprite::~InterfaceDrawObjectSprite() {}
+void InterfaceDrawObjectSprite::Draw(int16_t, CoolRect*, int16_t) {}
+void InterfaceDrawObjectSprite::Change(uint32_t, DOChange*) {}
+void InterfaceDrawObjectSprite::Show(int16_t) {}
+void InterfaceDrawObjectSprite::Refresh() {}
+int32_t InterfaceDrawObjectSprite::GetWritableDataArea(int32_t*, int32_t*) { return 0; }
+void InterfaceDrawObjectSprite::UpdateTextures(char16_t*) {}
+void InterfaceDrawObjectSprite::CreateTextures(char16_t*) {}
+InterfaceTextObjectSprite::~InterfaceTextObjectSprite() {}
+void InterfaceTextObjectSprite::UpdateTextures(char16_t*) {}
+
 int32_t TbITable::FormatString(char16_t* out, uint32_t size, uint32_t id, ...) const {
     bool tagged = id != 0x1c9;
     int64_t magic = 0, tid = 0, val = 0, isvt = 0;
@@ -107,6 +148,8 @@ void Delete(void*) { ev("delete", {}); }
 
 extern "C" {
 
+extern void* _ZTV23InterfaceRankTextObject[];   // the rank object's real vtable (the constructor is not in this library)
+
 uint64_t tpw_tx_addr(const char* name) {
     struct Entry {
         const char* name;
@@ -135,7 +178,7 @@ int32_t tpw_tx_layout(int64_t* out) {
     return n;
 }
 
-// fn: 0 cash, 1 password, 2 null cash, 3 percent, 4 visitor. The change's words as the Mac has them; `text` is the host address of
+// fn: 0 cash, 1 password, 2 null cash, 3 percent, 4 visitor, 5 rank (the program's call: the virtual, on the class's own vtable). The change's words as the Mac has them; `text` is the host address of
 // the style's text, `rect` that of the rectangle.
 void tpw_tx_change(int32_t fn, uint64_t self, uint32_t flags, uint32_t w0, uint32_t w1, uint32_t w2, uint32_t w3, uint64_t text, uint64_t rect) {
     DOChange change;
@@ -150,6 +193,7 @@ void tpw_tx_change(int32_t fn, uint64_t self, uint32_t flags, uint32_t w0, uint3
     style.mText = reinterpret_cast<char16_t*>(static_cast<uintptr_t>(text));
     change.mText = &style;
     change.mRect = reinterpret_cast<CoolRect*>(static_cast<uintptr_t>(rect));
+    void* const kRankVptr = &_ZTV23InterfaceRankTextObject[2];
     auto* object = reinterpret_cast<InterfaceTextObjectSprite*>(static_cast<uintptr_t>(self));
     gLogWords = fn == 1;
     switch (fn) {
@@ -157,6 +201,10 @@ void tpw_tx_change(int32_t fn, uint64_t self, uint32_t flags, uint32_t w0, uint3
     case 1: InterfacePasswordTextObject_Change(object, flags, &change); break;
     case 2: InterfaceNullCashTextObject_Change(object, flags, &change); break;
     case 3: InterfacePercentTextObject_Change(object, flags, &change); break;
+    case 5:
+        std::memcpy(static_cast<void*>(object), &kRankVptr, sizeof kRankVptr);
+        object->Change(flags, &change);
+        break;
     default: InterfaceVisitorNumTextObject_Change(object, flags, &change); break;
     }
     gLogWords = 0;

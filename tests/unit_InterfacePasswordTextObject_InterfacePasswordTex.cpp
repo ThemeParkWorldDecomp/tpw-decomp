@@ -36,7 +36,7 @@ const void* gFmt = nullptr;
 const void* gList = nullptr;
 const void* gEngine = nullptr;
 const void* gMesh = nullptr;
-int32_t gChangeRan = -1;   // which Change a virtual call reached: 0 the text sprite's, 1 cash, 2 null cash, 3 percent, 4 visitor number, 5 time
+int32_t gChangeRan = -1;   // which Change a virtual call reached: 0 the text sprite's, 1 cash, 2 null cash, 3 percent, 4 visitor number, 5 time, 6 password, 7 rank
 
 int64_t Lab(const void* p) {
     if (p == gObj) return 1;
@@ -94,6 +94,7 @@ void InterfaceNullCashTextObject::Change(uint32_t, DOChange*) { gChangeRan = 2; 
 void InterfacePercentTextObject::Change(uint32_t, DOChange*) { gChangeRan = 3; }
 void InterfaceVisitorNumTextObject::Change(uint32_t, DOChange*) { gChangeRan = 4; }
 void InterfacePasswordTextObject::Change(uint32_t, DOChange*) { gChangeRan = 6; }
+void InterfaceRankTextObject::Change(uint32_t, DOChange*) { gChangeRan = 7; }
 
 int32_t UIMenu_DefaultItemCallback(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
 uint32_t UIMenuHandlerHandle(int32_t (*handler)(InterfaceWindow*, int32_t, int32_t, int32_t)) {
@@ -207,7 +208,7 @@ void tpw_vi_label(uint64_t mem) {
     gEngine = &t->mEngineData;
 }
 
-// which: 0 Cash, 1 NullCash, 2 Percent, 3 VisitorNum, 4 VisitorTime. Answers the object; the delete flag is the caller's (> 0 deletes).
+// which: 0 Cash, 1 NullCash, 2 Percent, 3 VisitorNum, 4 VisitorTime, 5 Rank. Answers the object; the delete flag is the caller's (> 0 deletes).
 uint64_t tpw_vi_dtor(int32_t which, uint64_t mem, int32_t flag) {
     tpw_vi_label(mem);
     void* p = reinterpret_cast<void*>(static_cast<uintptr_t>(mem));
@@ -216,7 +217,8 @@ uint64_t tpw_vi_dtor(int32_t which, uint64_t mem, int32_t flag) {
         case 1: static_cast<InterfaceNullCashTextObject*>(p)->InterfaceNullCashTextObject::~InterfaceNullCashTextObject(); break;
         case 2: static_cast<InterfacePercentTextObject*>(p)->InterfacePercentTextObject::~InterfacePercentTextObject(); break;
         case 3: static_cast<InterfaceVisitorNumTextObject*>(p)->InterfaceVisitorNumTextObject::~InterfaceVisitorNumTextObject(); break;
-        default: static_cast<InterfaceVisitorTimeTextObject*>(p)->InterfaceVisitorTimeTextObject::~InterfaceVisitorTimeTextObject(); break;
+        case 4: static_cast<InterfaceVisitorTimeTextObject*>(p)->InterfaceVisitorTimeTextObject::~InterfaceVisitorTimeTextObject(); break;
+        default: static_cast<InterfaceRankTextObject*>(p)->InterfaceRankTextObject::~InterfaceRankTextObject(); break;
     }
     if (static_cast<int16_t>(flag) > 0) Ev("OperatorDelete", {Lab(p)});
     return mem;

@@ -832,27 +832,21 @@ void GAMESYSTEM_ScreenshotMovie(int32_t on) { gScreenshotMovie = on; }
 // 0x10236750
 void GAMESYSTEM_SetHudState(int32_t state) { gHudState = state; }
 
-// GAMESYSTEM_Save (0x1023678c) and GAMESYSTEM_Load (0x10236b30): the park file's clock words, big-endian.
+// GAMESYSTEM_Save (0x1023678c) and GAMESYSTEM_Load (0x10236b30): the park file's clock words, little-endian like every other word
+// of the file. The original swaps each word around its read or write because it runs big-endian.
 
 namespace {
 
-inline uint32_t Swap(uint32_t v) { return __builtin_bswap32(v); }
-
-// Writes one word big-endian and swaps it back (the original swaps the variable in place around the write).
 bool WriteWord(void* file, uint32_t* word) {
     uint32_t transferred;
-    *word = Swap(*word);
     LbFile_Write(file, word, 4, &transferred);
-    *word = Swap(*word);
     return (transferred >> 2) == 1;
 }
 
 bool ReadWord(void* file, uint32_t* word) {
     uint32_t transferred;
     LbFile_Read(file, word, 4, &transferred);
-    if ((transferred >> 2) != 1) return false;
-    *word = Swap(*word);
-    return true;
+    return (transferred >> 2) == 1;
 }
 
 }  // namespace

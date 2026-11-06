@@ -202,7 +202,7 @@ op("CUIGrapher::SetYAxisStyle", 0x101FD8D4, 28, "y_axis", [U64] + [U32] * 5, Non
 op("CUIGrapher::SetGridStyle", 0x101FD928, 28, "grid", [U64] + [U32] * 5, None, "grapher", style, "none")
 op("CUIGrapher::SetBGStyle", 0x101FD97C, 28, "bg", [U64] + [U32] * 5, None, "grapher", style, "none")
 op("CFSLoadSave::SaveHidden", 0x101FC568, 44, "save_hidden", [U64, U64], None, "fs", tn, "none")
-op("CFSLoadSave::Save", 0x101FC4F4, 44, "save", [U64, U64], None, "fs", tn, "none")
+op("CFSLoadSave::Save", 0x101FC4F4, 44, "save", [U64, U64], I32, "fs", tn, "int")
 op("CFSLoadSave::LoadHidden", 0x101FC47C, 44, "load_hidden", [U64, U64], None, "fs", tn, "none")
 op("CFSLoadSave::~CFSLoadSave", 0x101FC374, 108, "fs_dtor", [U64, I32], U64, "fsdtor", flag, "this")
 op("__sinit_ui_mainmenu_cpp", 0x101FC260, 60, "sinit_mainmenu", [], None, "mainmenu", none, "none")

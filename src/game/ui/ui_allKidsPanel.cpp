@@ -283,7 +283,6 @@ char kKidNames[] = "ti_hungry\0happygrad.wct";   // 0x1024de14, the second name 
 }  // namespace
 
 namespace kidlist_callee {
-__attribute__((weak)) void VisitorNumCtor(void* mem) { lender_callee::SpriteCtor(mem); }
 // The stack rectangle is never read by the function: its constructor and destructor have no effect that is observable here.
 __attribute__((weak)) void RectCtor(void*) {}
 __attribute__((weak)) void RectDtor(void*) {}

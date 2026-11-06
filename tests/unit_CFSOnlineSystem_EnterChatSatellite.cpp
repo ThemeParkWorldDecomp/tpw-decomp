@@ -113,7 +113,15 @@ void CreateOnlineParkInfoPanel(const CFSOnlinePark* park, InterfaceWindow* paren
                                      onDownload == &GeneralParkDownloadCompleteCallback ? 1 : 0, U32(context)});
 }
 
+uint32_t gUnlistedPark;
+
 extern "C" {
+
+int32_t tpw_cs_portfix() {
+    return 0;
+}
+
+void tpw_cs_unlisted(uint32_t park) { gUnlistedPark = park; }
 
 uint64_t tpw_cs_addr(const char* name) {
     struct Entry {

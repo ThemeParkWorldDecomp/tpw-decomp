@@ -3,6 +3,8 @@
 //
 // The callees outside the unit are fakes that record the arguments the real ones read and answer from the test's queues; the weak
 // menu_callee functions of the src file are replaced by the fakes here. The two screen size globals are defined here, zero at start.
+// The string heap (GetAndCopy, GetString, ReleaseString) and the item handler are the real ones, on tables the test builds; its globals
+// are defined here.
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -14,6 +16,7 @@
 #include "UI_Base.h"
 #include "ui_DrawObject.h"
 #include "ui_main.h"
+#include "ui_mainmenu.h"
 #include "ui_menu.h"
 
 using namespace calllog;
@@ -21,10 +24,17 @@ using namespace calllog;
 // ---- globals of other files the unit reads, defined here
 int16_t gUIRealScreenHeight;   // 0x10395bba
 int16_t gUIRealScreenWidth;    // 0x10395bbc
+uint8_t* gStringHeapTableB;    // 0x10395c34
+uint8_t* gStringHeapTableA;    // 0x10395c38
+int32_t gStringHeapRowsB;      // 0x10395c3c
+int32_t gStringHeapWidthB;     // 0x10395c40
+int32_t gStringHeapRowsA;      // 0x10395c44
+int32_t gStringHeapWidthA;     // 0x10395c48
 
 namespace {
 
 void* gNewWin = nullptr;   // what CreateObject answers when the case says so
+void* gExtra1 = nullptr;   // the last setExtraParam(1, ...): what the item handler reads back
 
 int32_t Cb1(InterfaceWindow*, int32_t, int32_t, int32_t) { return 1; }
 int32_t Cb2(InterfaceWindow*, int32_t, int32_t, int32_t) { return 2; }
@@ -87,7 +97,36 @@ void InterfaceWindow::SetCallbackFunction(InterfaceWindowCallback callback) {
 
 int32_t InterfaceWindow::setExtraParam(int16_t index, void* value) {
     ev("setExtraParam", {lab(this), index, Pv(value)});
+    if (index == 1) gExtra1 = value;
     return 0;
+}
+
+void* InterfaceWindow::getExtraParam(int16_t index) {
+    ev("getExtraParam", {lab(this), index});
+    return index == 1 ? gExtra1 : nullptr;
+}
+
+int32_t InterfaceWindow::CallDefaultWindowHandler(int32_t message, int32_t a, int32_t b) {
+    ev("CallDefault", {lab(this), message, a, b});
+    return static_cast<int32_t>(ret("default"));
+}
+
+// The item handler's click path, never taken here (tests/test_UIMenu_DefaultItemCallback.py has it).
+int32_t InterfaceWindow::GetID() { return 0; }
+InterfaceWindow* InterfaceWindow::GetParent() { return nullptr; }
+int32_t UI_SendMessage(InterfaceWindow*, int32_t, int32_t, int32_t) { return 0; }
+int32_t UIMain_UISound(int32_t) { return 0; }
+
+uint32_t wcslen(const char16_t* text) {
+    uint32_t n = 0;
+    while (text[n] != 0) ++n;
+    return n;
+}
+
+char16_t* wcscpy(char16_t* dst, const char16_t* src) {
+    char16_t* d = dst;
+    while ((*d++ = *src++) != 0) {}
+    return dst;
 }
 
 void InterfaceWindow::SetClientDrawObject(InterfaceDrawObject* object) { ev("SetClientDrawObject", {lab(this), Pv(object)}); }
@@ -139,18 +178,13 @@ void RectDtor(void*) { ev("RectDtor", {-1}); }
 
 void TitleTextCtor(void* mem) { ev("TitleCtor", {newlab(mem), 0}); }
 
-void* GetAndCopy(const char16_t* text) {
-    ev("GetAndCopy", {lab(const_cast<char16_t*>(text))});
-    return reinterpret_cast<void*>(static_cast<uintptr_t>(ret("copy")));
-}
-
 void WindowSetText(InterfaceWindow* window, char16_t* text) { ev("SetText", {lab(window), lab(text)}); }
+}  // namespace menu_callee
 
-int32_t Rand() {
+int32_t msl_rand() {
     ev("rand", {0});
     return static_cast<int32_t>(ret("rand"));
 }
-}  // namespace menu_callee
 
 // The src file's weak default TitleTextCtor still names the real constructor (its vtable lives elsewhere): a symbol of that name that is
 // never called here, so the library links.
@@ -172,6 +206,12 @@ uint64_t tpw_ua_addr(const char* name) {
     const Entry entries[] = {
         {"width", &gUIRealScreenWidth},
         {"height", &gUIRealScreenHeight},
+        {"TableB", &gStringHeapTableB},
+        {"TableA", &gStringHeapTableA},
+        {"RowsB", &gStringHeapRowsB},
+        {"WidthB", &gStringHeapWidthB},
+        {"RowsA", &gStringHeapRowsA},
+        {"WidthA", &gStringHeapWidthA},
     };
     for (const Entry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(entry.address));
@@ -215,6 +255,11 @@ uint32_t tpw_ua_additem(uint64_t menu, uint64_t newwin, uint64_t text, int32_t p
     uint32_t answer = static_cast<uint32_t>(m->AddItem(position, reinterpret_cast<const char16_t*>(static_cast<uintptr_t>(text)), id, a, b, c, d));
     Final(m);
     return answer;
+}
+
+// The item's handler on destroy (message 0x14), as the window's destruction sends it.
+int32_t tpw_ua_item_destroy(uint64_t item, int32_t a, int32_t b) {
+    return UIMenu_DefaultItemCallback(reinterpret_cast<InterfaceWindow*>(static_cast<uintptr_t>(item)), 0x14, a, b);
 }
 
 }  // extern "C"

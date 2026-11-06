@@ -7,6 +7,7 @@
 // a surface of the engine's sprite system. See include/ui_DrawObject.h for the class. The engine's sprite surfaces (SSpriteEngineData,
 // SSpriteGameData, CSpriteList) are in the engine library; the map's lists are CMapWho's.
 
+
 // The list of the map the sprite lists of the interface are linked into while shown.
 namespace {
 constexpr int32_t kSpriteMapList = 0x30;
@@ -134,3 +135,4 @@ int32_t InterfaceDrawObjectSprite::GetWritableDataArea(int32_t* a, int32_t* b) {
     *b = mEngineData.mWords.mHeight;
     return static_cast<int32_t>(reinterpret_cast<intptr_t>(mEngineData.mWords.mPixels));
 }
+

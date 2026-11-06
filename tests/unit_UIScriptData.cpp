@@ -320,6 +320,9 @@ void CLBScreenComponentThemeIslands::GotoPreviousIsland() { ev("Theme.GotoPrevio
 void CLBScreenComponentThemeIslands::SelectCurrentIsland() { ev("Theme.SelectCurrentIsland", {lab(this)}); }
 CLBScreenComponentOnlineGlobe::CLBScreenComponentOnlineGlobe() {}
 CLBScreenComponentOnlineGlobe::~CLBScreenComponentOnlineGlobe() {}
+void CLBScreenComponentOnlineGlobe::Register(CLBGlobe*) {}
+void CLBScreenComponentOnlineGlobe::UnRegister(CLBGlobe*) {}
+void CLBScreenComponentDownloadGlobe::Slot50() {}
 void CLBScreenComponentOnlineGlobe::Render() {}
 void CLBScreenComponentOnlineGlobe::Close() {}
 uint32_t CLBScreenComponentOnlineGlobe::ProcessCancel() { return 0; }

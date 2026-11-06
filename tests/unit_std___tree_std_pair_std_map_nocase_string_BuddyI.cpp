@@ -54,10 +54,6 @@ void OperatorDelete(void* p) { ev("OperatorDelete", {lab(p)}); }
 void WStringDtor(void* string, int16_t flag) { ev("WStringDtor", {lab(string), flag}); }
 void StringDtor(void* string, int16_t flag) { ev("StringDtor", {lab(string), flag}); }
 void ArgumentVectorTearDown(void* vector) { ev("ArgumentVectorTearDown", {lab(vector)}); }
-void CdequeDecrement(MslArgumentCursor* c) {
-    ev("CdequeDecrement", {lab(PW(c->mCdeque)), static_cast<int64_t>(c->mIndex), lab(PW(c->mSlot))});
-    c->mIndex -= 1;
-}
 void CursorAdd(MslArgumentCursor* c, int32_t count) {
     ev("CursorAdd", {lab(PW(c->mCdeque)), static_cast<int64_t>(c->mIndex), lab(PW(c->mSlot)), count});
     c->mIndex += static_cast<uint32_t>(count);
@@ -154,6 +150,7 @@ uint64_t tpw_v51126_cdeque_dtor(uint64_t self, int32_t flag) {
     return A(v51126::ArgVectorPtrCdequeDestruct(static_cast<ArgVectorPtrCdeque*>(P(self)), static_cast<int16_t>(flag)));
 }
 void tpw_v51126_tear_down(uint64_t self) { v51126::ArgumentDequeTearDown(static_cast<MslArgumentDeque*>(P(self))); }
+void tpw_v51126_cursor_dec(uint64_t cursor) { v51126::ArgumentCursorDecrement(static_cast<MslArgumentCursor*>(P(cursor))); }
 void tpw_v51126_getloc(uint64_t out, uint64_t sb) { filebuf_wclose_callee::Getloc(P(out), P(sb)); }
 void tpw_v51126_make_iterator(uint64_t out, uint64_t self, uint32_t index) {
     errdeque_callee::MakeIteratorMutable(static_cast<MslErrorDequeIterator*>(P(out)), static_cast<MslErrorDeque*>(P(self)), index);

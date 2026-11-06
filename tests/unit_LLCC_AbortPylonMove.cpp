@@ -29,10 +29,11 @@ RideInfo* gFakeInfo;
 }
 
 // ---- the fakes (the same event names and arguments as the module's PowerPC stubs)
-void LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
+int32_t LLCC_DrawLine(CELL_MODES mode, int32_t x, int32_t y, int32_t* endX, int32_t* endY) {
     ev("DrawLine", {static_cast<int64_t>(mode), x, y, *endX, *endY});
     *endX = static_cast<int32_t>(ret("DLx"));
     *endY = static_cast<int32_t>(ret("DLy"));
+    return 1;
 }
 
 RideInfo* CObject::GetDBInfo() const {

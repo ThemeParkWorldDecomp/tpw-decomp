@@ -8,6 +8,7 @@ set(TPW_UNIT_CFSOnlineCity_CFSOnlineCity_KEEP
   __ZN13CFSOnlineCity8DestructEs   # CFSOnlineCity::Destruct(short)
   __ZN13CFSOnlineCityC1EPK10ccCityInfoP23CFSOnlineSystemCityList   # CFSOnlineCity::CFSOnlineCity(ccCityInfo const*, CFSOnlineSystemCityList*)
   __ZN13CFSOnlineParkaSERKS_   # CFSOnlinePark::operator=(CFSOnlinePark const&)
+  __ZN15CFSOnlineServerD1Ev   # CFSOnlineServer::~CFSOnlineServer()
   __ZN17onlinelist_callee10ServerFindEP9TbPtrListI15CFSOnlineServerEPS1_   # onlinelist_callee::ServerFind(TbPtrList<CFSOnlineServer>*, CFSOnlineServer*)
   __ZN17onlinelist_callee11CityAddTailEP9TbPtrListI13CFSOnlineCityEPS1_   # onlinelist_callee::CityAddTail(TbPtrList<CFSOnlineCity>*, CFSOnlineCity*)
   __ZN17onlinelist_callee12CityRemoveAtEP9TbPtrListI13CFSOnlineCityERPv   # onlinelist_callee::CityRemoveAt(TbPtrList<CFSOnlineCity>*, void*&)

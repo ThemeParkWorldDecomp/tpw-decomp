@@ -13,6 +13,11 @@
 #include <new>
 #include <string>
 
+// MSL's real text functions (swprintf, wcslen); only its generator is the fake below.
+#define msl_rand real_msl_rand
+#include "../platform/msl.cpp"
+#undef msl_rand
+
 #include "FS_Online.h"
 #include "Mouse.h"
 #include "World.h"
@@ -60,8 +65,8 @@ int64_t L(const void* p) { return lab(p); }
 
 }  // namespace
 
-// libc's rand, answered from the test's queue (the Mac's rand is a glue import faked on the PowerPC side the same way)
-extern "C" int rand(void) { return static_cast<int>(ret("rand")); }
+// MSL's rand, answered from the test's queue (the Mac's rand is a glue import faked on the PowerPC side the same way)
+int32_t msl_rand() { return static_cast<int32_t>(ret("rand")); }
 
 // ---- the unit's callees that headers declare
 CFSOnlineSystem::CFSOnlineSystem() { ev("CFSOnlineSystem", {newlab(this)}); }

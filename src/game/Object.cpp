@@ -793,7 +793,7 @@ int32_t CObject::IsAvailableToChoose() {
 // and src/Object_opening.cpp hold other CObject members. The guests are CPerson, a placeholder class: the ride reads one word of a guest (+0x220, his
 // state) and calls five of his members, which stay untranslated (the launcher answers zero).
 
-int32_t ObjectReadyForAdmitting(CPerson*) __asm__("__ZNK7CPerson17ReadyForAdmittingEv");   // 0x1011f0b8
+bool ObjectReadyForAdmitting(CPerson*) __asm__("__ZNK7CPerson17ReadyForAdmittingEv");      // 0x1011f0b8
 void ObjectOnAdmittance(CPerson*) __asm__("__ZN7CPerson12OnAdmittanceEv");                 // 0x1011f114
 int32_t ObjectExitRide(CPerson*) __asm__("__ZN7CPerson8ExitRideEv");                       // 0x1011f5a4
 

@@ -173,6 +173,9 @@ uint32_t tpw_v5767_save(uint64_t obj, uint64_t cell) {
     return static_cast<uint32_t>(
         reinterpret_cast<const CAdvisorScoring*>(obj)->Save(*reinterpret_cast<void**>(static_cast<uintptr_t>(cell))));
 }
+int32_t tpw_v5767_portfix() {
+    return 0;
+}
 uint32_t tpw_v5767_first(uint64_t obj, int32_t message) {
     return static_cast<uint32_t>(reinterpret_cast<const CAdvisorScoring*>(obj)->GetFirstResponseFor(static_cast<AdvisorMessage>(message)));
 }

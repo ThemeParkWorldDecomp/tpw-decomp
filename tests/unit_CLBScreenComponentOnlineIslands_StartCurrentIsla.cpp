@@ -229,6 +229,9 @@ uint64_t tpw_oi_dicv(uint64_t p, int64_t x, int64_t, int64_t) {
 uint64_t tpw_oi_dhide(uint64_t p, int64_t, int64_t, int64_t) { DG(p)->CLBScreenComponentDownloadGlobe::HidePanels(); return 0; }
 uint64_t tpw_oi_dshow(uint64_t p, int64_t, int64_t, int64_t) { DG(p)->CLBScreenComponentDownloadGlobe::ShowPanels(); return 0; }
 uint64_t tpw_oi_dtick(uint64_t p, int64_t, int64_t, int64_t) { DG(p)->CLBScreenComponentDownloadGlobe::Tick(); return 0; }
+uint64_t tpw_oi_dslot50(uint64_t p, int64_t, int64_t, int64_t) { DG(p)->CLBScreenComponentDownloadGlobe::Slot50(); return 0; }
+uint64_t tpw_oi_dslot4c(uint64_t p, int64_t, int64_t, int64_t) { parkinfo_callee::DownloadGlobeSlot4c(DG(p)); return 0; }
+uint64_t tpw_oi_islot30(uint64_t p, int64_t, int64_t, int64_t) { parkinfo_callee::OnlineIslandsSlot30(OI(p)); return 0; }
 uint64_t tpw_oi_reg(uint64_t p, int64_t x, int64_t, int64_t) {
     reinterpret_cast<CLBScreenComponentOnlineGlobe*>(p)->Register(reinterpret_cast<CLBGlobeCityFlag*>(x));
     return 0;

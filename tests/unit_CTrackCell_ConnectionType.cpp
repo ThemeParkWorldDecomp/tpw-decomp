@@ -1,6 +1,6 @@
 // Test library for CTrackCell::ConnectionType (unit v5629; libtpw_unit_CTrackCell_ConnectionType.dylib, tests/test_CTrackCell_ConnectionType.py),
 // main app:
-//   src/game/park/TrackCell.cpp   CTrackCell::ConnectionType and the words gLLCCC20C, gLLCCDB40, gLLCCDB60, gLLCCE0B4, gLLCCE0B8
+//   src/game/park/TrackCell.cpp   CTrackCell::ConnectionType and the words gLLCCC20C, gLLCCDB40, gLLCCDB60, gLLCCDE0B4, gLLCCDE0B8
 //
 // Every callee is a fake that records the arguments the real one reads and answers from the test's queues; the cells, rides and the bank
 // account they answer are looked up by label in a table the module fills (tpw_ct_label). The globals of other files the unit reads are
@@ -32,8 +32,8 @@ int32_t gHoardingLeft;     // 0x1029e044
 int32_t gHoardingTop;      // 0x1029e048
 int32_t gLLCCC20C;
 int32_t gLLCCDB60;
-int32_t gLLCCE0B4;
-int32_t gLLCCE0B8;
+int32_t gLLCCDE0B4;
+int32_t gLLCCDE0B8;
 int32_t gLLCCC200;
 int32_t gLLCCC204;
 int32_t gLLCCC210;
@@ -219,8 +219,8 @@ uint64_t tpw_ct_addr(const char* name) {
         {"gLLCCDB60", &gLLCCDB60},
         {"gLLCCDB68", &gLLCCDB68},
         {"gTrackCostFree", &gTrackCostFree},
-        {"gLLCCE0B4", &gLLCCE0B4},
-        {"gLLCCE0B8", &gLLCCE0B8},
+        {"gLLCCDE0B4", &gLLCCDE0B4},
+        {"gLLCCDE0B8", &gLLCCDE0B8},
         {"gLLCC4858", &gLLCC4858},
         {"gTrackNbrOn485C", &gTrackNbrOn485C},
         {"gThingArray", &gThingArray[0]},
