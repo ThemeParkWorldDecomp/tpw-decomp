@@ -12,6 +12,14 @@ case's queues (Build, CreateObject, GetState, GetData, CallDefault). Pointers ar
 The world of a case: the globals the functions read (root window, online system, lobby, close callback, float constants, font index) and the
 globals they write (given random old values). What is compared: the answer, every global written (pointers as labels), the event log.
 
+The widescreen online window (unit v5L26): a library built with the port fixes, with a unit space wider than 4:3 (and, with a smaller
+interface size, taller), makes gOnlineWindow, the window over the view that takes the pointer for the camera, as wide and as high as that
+space, 0..units-1, where the Mac has 0..0x7ff by 0..0x5ff. "the widescreen online window" runs CreateOnlinePanel's cases on the original
+and expects that rectangle from the host, the rest unchanged. A library built without the port fixes keeps 0x7ff by 0x5ff; there its own
+rectangle is replaced the same way, so the test is the 4:3 comparison again.
+With the port fixes CreateOnlinePanel also has the two button underlays hear the whole screen (UI_HearWholeScreen, which the Mac
+does not have); every create case checks that apart from the event log.
+
 No fused operations. Not tested: a NULL lobby window (the original calls CaptureKb on it through the fake; the host cannot call a method on
 NULL), GetWindow answering NULL where the original uses the result unconditionally (SelectAll, SetCallbackFunction, Show), a NULL root window.
 """
@@ -329,6 +337,8 @@ def bind(lib):
     lib.tpw_opfp_link_lobby.argtypes = [C.c_uint64]
     lib.tpw_opfp_msg.restype, lib.tpw_opfp_msg.argtypes = C.c_uint32, [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
     lib.tpw_opfp_create.argtypes = []
+    lib.tpw_opfp_units.restype, lib.tpw_opfp_units.argtypes = C.c_int32, [C.c_int32, C.c_int32]
+    lib.tpw_opfp_heard.restype, lib.tpw_opfp_heard.argtypes = C.c_int32, []
     out = (C.c_int64 * 32)()
     n = lib.tpw_opfp_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -390,7 +400,15 @@ def ppc(e, case):
 
 
 def host(lib, case):
-    return run(Host(lib, case), case)
+    bind(lib)
+    port = lib.tpw_opfp_units(*case.get("units", (0x800, 0x600))) != 0
+    lib.tpw_opfp_heard()
+    out = run(Host(lib, case), case)
+    # The port's button underlays hear the whole screen (no Mac call, so outside the event log): both, in order,
+    # in a library built with the port fixes; none without them.
+    heard = lib.tpw_opfp_heard()
+    assert heard == (1 if port and case["op"] != "msg" else 0), heard
+    return out
 
 
 # ---------------------------------------------------------------------------------------------------------------- case generators
@@ -507,7 +525,54 @@ def create_random(r):
     return create_case(r)
 
 
+# ---------------------------------------------------------------------------------------------------------------- the widescreen online window
+
+WIDE_UNITS = [(2730, 0x600), (2457, 0x600), (3640, 2048), (0x800, 0x600)]   # 16:9, 16:10, 16:9 at a smaller interface size, 4:3
+
+
+def wide_rect(out, case):
+    """out with the online window the unit space gives: CreateObject's right and bottom are the units less 1."""
+    width, height = case["units"]
+    out = dict(out)
+    log = []
+    for name, ints, texts in out["log"]:
+        if name == "CreateObject":
+            ints = tuple(ints[:6]) + (width - 1, height - 1)
+        log.append((name, ints, texts))
+    out["log"] = log
+    return out
+
+
+def wide_case(r, units=None):
+    c = create_case(r)
+    c["units"] = r.choice(WIDE_UNITS) if units is None else units
+    return c
+
+
+def wide_edges():
+    r = random.Random(60605)
+    for units in WIDE_UNITS:
+        for first in (0, 5):
+            for panel in (0, 1):
+                c = wide_case(r, units)
+                c["queues"]["Build"] = [first, r.randrange(1, 39), r.randrange(1, 39)]
+                c["gOnlinePanel"] = panel
+                yield c
+
+
+def ppc_wide(e, case):
+    return wide_rect(ppc(e, case), case)
+
+
+def host_wide(lib, case):
+    out = host(lib, case)
+    if lib.tpw_opfp_units(0x800, 0x600) == 0:
+        out = wide_rect(out, case)
+    return out
+
+
 TESTS = [
     FnTest("OnlineParkFindPanelMsg", ppc, host, edge=msg_edges, rnd=msg_random),
     FnTest("CreateOnlinePanel", ppc, host, edge=create_edges, rnd=create_random),
+    FnTest("the widescreen online window", ppc_wide, host_wide, edge=wide_edges, rnd=wide_case),
 ]

@@ -71,7 +71,10 @@ tag_sCoasterInstance* FindCoasterInstanceFromEntranceID(uint32_t entrance) {
     return static_cast<tag_sCoasterInstance*>(Obj(ret("FindCoasterInstanceFromEntranceID")));
 }
 
-void SetCoasterEdit(void* coaster, int32_t flag) { ev("SetCoasterEdit", {Idx(coaster), flag}); }
+// SetCoasterEdit(tag_sCoasterInstance*, int) (0x100585f4) through tests/standins/LayoutSetMovePylon_callees.cpp, and the
+// void* overload (0x10058758), which the Mac's Layout functions never call: its own event, so a call of it does not match.
+void FakeSetCoasterEdit(void* coaster, int32_t flag) { ev("SetCoasterEdit", {Idx(coaster), flag}); }
+void SetCoasterEdit(void* coaster, int32_t flag) { ev("SetCoasterEdit(void*)", {Idx(coaster), flag}); }
 
 extern "C" {
 

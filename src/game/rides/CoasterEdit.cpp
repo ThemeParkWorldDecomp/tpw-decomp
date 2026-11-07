@@ -2185,9 +2185,10 @@ void LayoutSetCoasterEditOld(uint32_t entrance) {
     SetCoasterEdit(instance, entrance != 0 ? 1 : 0);
 }
 
-// 0x1005901c (88 bytes)
+// 0x1005901c (88 bytes). Calls the tag_sCoasterInstance* overload (0x100585f4), not the void* one (0x10058758), which
+// does nothing while a recording plays back.
 void LayoutSetCoasterEdit(uint32_t id) {
-    void* instance = id != 0 ? gObjectTable[id] : nullptr;
+    tag_sCoasterInstance* instance = id != 0 ? static_cast<tag_sCoasterInstance*>(gObjectTable[id]) : nullptr;
     SetCoasterEdit(instance, id != 0 ? 1 : 0);
 }
 

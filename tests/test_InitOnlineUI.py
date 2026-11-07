@@ -12,6 +12,12 @@ person, bankrupt), the UI clock and its stored tick, the key-table flag, the ans
 writes). What is compared: the answer, the light's words, the first person and bankrupt window globals, the clock global, the key-table
 flag and the event log.
 
+The widescreen first-person window (unit v5L26): a library built with the port fixes, with a unit space wider than 4:3 (and, with a
+smaller interface size, taller), makes the online first-person window as wide and as high as that space, 0..units-1, where the Mac has
+0..0x7ff by 0..0x5ff. "the widescreen first-person window" runs InitOnlineUI's cases on the original and expects that rectangle from the
+host, the rest unchanged. A library built without the port fixes keeps 0x7ff by 0x5ff; there its own rectangle is replaced the same way,
+so the test is the 4:3 comparison again.
+
 No fused operations. Not tested: a NULL root or bumhole window (the original calls through them unconditionally), a NULL answer of Build
 (it is used unconditionally).
 """
@@ -272,6 +278,7 @@ def bind(lib):
     lib.tpw_ou_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_ou_BankruptWindowMsg.restype = C.c_uint32
     lib.tpw_ou_BankruptWindowMsg.argtypes = [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
+    lib.tpw_ou_units.restype, lib.tpw_ou_units.argtypes = C.c_int32, [C.c_int32, C.c_int32]
     out = (C.c_int64 * 32)()
     n = lib.tpw_ou_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -325,6 +332,8 @@ def ppc(e, case):
 
 
 def host(lib, case):
+    bind(lib)
+    lib.tpw_ou_units(*case.get("units", (0x800, 0x600)))
     return run(Host(lib, case), case)
 
 
@@ -409,7 +418,54 @@ def bk_random(r):
     return c
 
 
+# ---------------------------------------------------------------------------------------------------------------- the widescreen first-person window
+
+WIDE_UNITS = [(2730, 0x600), (2457, 0x600), (3640, 2048), (0x800, 0x600)]   # 16:9, 16:10, 16:9 at a smaller interface size, 4:3
+
+
+def wide_rect(out, case):
+    """out with the first-person window the unit space gives: CreateObject's right and bottom are the units less 1."""
+    width, height = case["units"]
+    out = dict(out)
+    log = []
+    for name, ints, texts in out["log"]:
+        if name == "CreateObject":
+            ints = tuple(ints[:6]) + (width - 1, height - 1)
+        log.append((name, ints, texts))
+    out["log"] = log
+    return out
+
+
+def wide_case(r, units=None):
+    c = init_case(r)
+    c["units"] = r.choice(WIDE_UNITS) if units is None else units
+    return c
+
+
+def wide_edges():
+    r = random.Random(60603)
+    for units in WIDE_UNITS:
+        for tips in (0, 1):
+            for co in (0, 1):
+                c = wide_case(r, units)
+                c["settings"][2] = tips
+                c["queues"]["CreateObject"] = [co]
+                yield c
+
+
+def ppc_wide(e, case):
+    return wide_rect(ppc(e, case), case)
+
+
+def host_wide(lib, case):
+    out = host(lib, case)
+    if lib.tpw_ou_units(0x800, 0x600) == 0:
+        out = wide_rect(out, case)
+    return out
+
+
 TESTS = [
     FnTest("InitOnlineUI", ppc, host, edge=init_edges, rnd=init_random),
     FnTest("BankruptWindowMsg", ppc, host, edge=bk_edges, rnd=bk_random),
+    FnTest("the widescreen first-person window", ppc_wide, host_wide, edge=wide_edges, rnd=wide_case),
 ]

@@ -22,8 +22,15 @@ that changed and both heads, the world's four words (and that every other byte s
 (and that its other bytes still hold the fill), the pending list (count, head and tail NULL flags, the forward and backward ids), the output
 array of ConvertDLRidesUsedToIndices and the heap's delete count.
 
+With the port fixes (tpw_wsq_portfix answers 1; port_fix tag dlrides) a last test, ConvertDLRidesUsedToIndices (port folders), gives the
+function the game's own ride folders, ':' separated on every platform ("data:levels:hallow:Rides:_bellt_10:"), with '/' and no digit too.
+The Mac's strrchr finds no backslash in them and its strpbrk reads NULL, so they have no PowerPC side: the host's output array is compared
+with the numbers in the folders' last names (a last name with no digit adds nothing), its answer with 0 and its guard bytes with the fill.
+Without the port fixes the test runs nothing.
+
 Not tested: a NULL thing passed to GetPrevUsedThing, a missing ride record in the ride-database lookups, a folder without a backslash or a
-digit, a ride number outside 0 to 0x100 (the bitmap has 0x20 bytes), allocation failures (the Mac skips the constructor on NULL).
+digit on the PowerPC side, a ride number outside 0 to 0x100 (the bitmap has 0x20 bytes), allocation failures (the Mac skips the
+constructor on NULL).
 """
 import ctypes as C
 import random
@@ -992,7 +999,75 @@ def tests():
         "endwin": edges_endwin, "prev": edges_prev, "seed": edges_seed, "rfl": edges_rfl, "person": edges_person, "flag": edges_flag,
         "convert": edges_convert, "remove": edges_remove, "add": edges_add, "restore": edges_restore, "delete": edges_delete,
     }
-    return [FnTest(names[op], ppc, host, edge=edges[op], rnd=lambda r, op=op: rand_case(op, r)) for op in names]
+    return [FnTest(names[op], ppc, host, edge=edges[op], rnd=lambda r, op=op: rand_case(op, r)) for op in names] + [
+        PortFolderTest("CWorld::ConvertDLRidesUsedToIndices (port folders)", None, host, edge=edges_port_folders, rnd=rand_port_folders)]
+
+
+def bits_of(numbers):
+    b = bytearray(32)
+    for n in numbers:
+        b[(n - 1) >> 3] |= 1 << ((n - 1) & 7)
+    return bytes(b)
+
+
+def port_case(rides, want, bitmap=None):
+    """rides: (downloaded ride number, folder); want: the output array's numbers in order. Every ride's bit is set unless a bitmap is given."""
+    rs = [ride(k + 1, number, folder=folder) for k, (number, folder) in enumerate(rides)]
+    c = make("convert", rides=rs, bitmap=bitmap if bitmap is not None else bits_of({n for n, _ in rides}))
+    c["want"] = list(want)
+    return c
+
+
+# The Mac editions' add-on rides whose downloaded ride number is not the number in their file name: (file name, number, downloaded number).
+MAC_ODD = [("_flyfoun", 39, 24), ("_morpher", 27, 28), ("_pulsar", 29, 30), ("_robosta", 30, 31), ("_strengt", 34, 35), ("_wormhol", 33, 34)]
+
+
+def edges_port_folders():
+    yield port_case([(10, "data:levels:hallow:Rides:_bellt_10:")], [10])
+    yield port_case([(10, "data:levels:hallow:Rides:_bellt_10")], [10])
+    yield port_case([(10, "data/levels/hallow/Rides/_bellt_10/")], [10])
+    yield port_case([(1, "data:levels:jungle:Rides:_snake_1:"), (23, "data:levels:jungle:Rides:_acorn_23:")], [1, 23])
+    yield port_case([(dl, "data:levels:space:Rides:%s_%d:" % (name, n)) for name, n, dl in MAC_ODD],
+                    [n for _, n, dl in sorted(MAC_ODD, key=lambda t: t[2])])
+    yield port_case([(7, "data:levels:hallow:Rides:_king_7::")], [7])
+    yield port_case([(9, "_manic_9:")], [9])
+    yield port_case([(9, "_manic_9")], [9])
+    yield port_case([(5, "data:levels:hallow:Rides:_nodigit:"), (6, "data:levels:hallow:Rides:_x_6:")], [6])   # no digit: nothing added
+    yield port_case([(5, ""), (6, ":"), (7, "x7:")], [7])
+    yield port_case([(4, "data:levels9:Rides:_cards_4:")], [4])           # only the last name is read
+    yield port_case([(4, "data9:_cards:")], [])
+    yield port_case([(3, "data:Rides:_coin_3:"), (2, "pk\\ride12.wad")], [12, 3])       # a backslash is read as on the Mac
+    yield port_case([(3, "a:b\\c:x8:")], [8])                           # after the last backslash, as on the Mac
+    yield port_case([(256, "d:Rides:_r_65535:"), (255, "d:Rides:_r_65536:")], [0, 65535])
+
+
+def rand_port_folders(r):
+    rides = []
+    for number in r.sample(range(1, 257), r.randrange(1, 12)):
+        n = r.randrange(0, 70000)
+        sep = r.choice([":", ":", ":", "/"])
+        parts = ["data", "levels", r.choice(["hallow", "jungle", "space", "fantasy"]), "Rides", "_%s_%d" % (r.choice(["bellt", "acorn", "x"]), n)]
+        rides.append((number, sep.join(parts[r.randrange(0, 5):]) + sep * r.randrange(0, 3)))
+    want = [int(f.rstrip(":/").split(":")[-1].split("/")[-1].rsplit("_", 1)[1]) & 0xFFFF for _, f in sorted(rides)]
+    return port_case(rides, want)
+
+
+class PortFolderTest(FnTest):
+    """Host only, with the port fixes: the output array, the answer and the guard bytes against the case's numbers (the module docstring)."""
+
+    def run_case(self, runner, case):
+        if runner.lib.tpw_wsq_portfix() != 1:
+            return []
+        h = self.host(runner.lib, case)
+        want = case["want"] + [0] * (256 - len(case["want"]))
+        bad = []
+        if h["ret"] != 0:
+            bad.append("ret %r, want 0" % h["ret"])
+        if list(h["out"][0]) != want:
+            bad.append("out %r, want %r" % (list(h["out"][0][:len(case["want"]) + 2]), case["want"]))
+        if h["out"][1] != b"\xee" * (OUT_BYTES - 0x200):
+            bad.append("guard bytes changed")
+        return bad
 
 
 TESTS = tests()

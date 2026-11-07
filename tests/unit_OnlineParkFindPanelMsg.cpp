@@ -307,6 +307,18 @@ int32_t tpw_opfp_layout(int64_t* out) {
 uint32_t tpw_opfp_msg(uint64_t window, int32_t message, int32_t a, int32_t b) {
     return static_cast<uint32_t>(OnlineParkFindPanelMsg(reinterpret_cast<InterfaceWindow*>(window), message, a, b));
 }
+// The unit space (the port's widescreen and interface size); 0 when the library is built without the port fixes.
+int32_t tpw_opfp_units(int32_t width, int32_t height) {
+    (void)width;
+    (void)height;
+    return 0;
+}
+
 void tpw_opfp_create() { CreateOnlinePanel(); }
+// The windows CreateOnlinePanel had hear the whole screen since the last call: 1 for the two button underlays (gOnlineWindowE90, then
+// gOnlineWindowE8c), 0 for none, -1 for anything else. A library built without the port fixes has none.
+int32_t tpw_opfp_heard() {
+    return 0;
+}
 
 }  // extern "C"

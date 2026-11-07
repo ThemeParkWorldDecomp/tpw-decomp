@@ -468,4 +468,10 @@ int64_t tpw_wsq_call(int32_t op, int32_t thing, uint32_t a, uint8_t* out) {
     }
 }
 
+// 1 when the unit is built with the port fixes on (port_fix tag dlrides, ConvertDLRidesUsedToIndices): test_WorldSequences.py then also
+// runs the ':' separated ride folders, which have no PowerPC side.
+int32_t tpw_wsq_portfix() {
+    return 0;
+}
+
 }  // extern "C"

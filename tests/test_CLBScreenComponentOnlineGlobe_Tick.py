@@ -14,7 +14,15 @@ target and light offsets, and the event log.
 
 Fused operations: the whole of Tick (HardwareRounding over both functions). Not tested: NaN or infinite inputs (the processors make
 different NaNs through fused operations), a NULL city list or lobby (read unconditionally).
+
+The widescreen (the port fix globewide): the port's Tick reads the pointer in a unit space wider than 2048 (tpw_og_units), and is
+compared with the Mac's Tick given the same pointer and view in the 4:3 terms they come to. The ray: the pointer less the 4:3 box's
+offset, (units - 2048) / 2, and the display ratio times the units over 2048 (the drawn view's width over the 4:3 one's); the right
+button's spin: the pointer less the same offset; the edge spin: the pointer's share of the width, so the pointer times 2048 over the
+units. Each case takes only one of the three (the ray and the right button agree), at 4096 and 3072 units across, where each comes to
+whole units and the floats to the same bits. Without the port's fixes the library has one unit space and is given the Mac's inputs.
 """
+import copy
 import ctypes as C
 import math
 import random
@@ -248,6 +256,7 @@ def bind(lib):
     lib.tpw_og_wmf.restype, lib.tpw_og_wmf.argtypes = None, [C.c_uint64, C.c_int32, C.c_int32, C.c_int32]
     lib.tpw_og_arena_ptr.restype, lib.tpw_og_arena_ptr.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_og_arena_offset.restype, lib.tpw_og_arena_offset.argtypes = C.c_uint32, [C.c_uint64]
+    lib.tpw_og_units.restype, lib.tpw_og_units.argtypes = C.c_int32, [C.c_int32, C.c_int32]
     out = (C.c_int64 * 64)()
     n = lib.tpw_og_layout(out)
     assert n == len(NAMES), n
@@ -346,6 +355,8 @@ def ppc(e, case):
 
 
 def host(lib, case):
+    bind(lib)
+    lib.tpw_og_units(*case.get("units", (0x800, 0x600)))
     return run(Host(lib, case), case)
 
 
@@ -470,7 +481,67 @@ def wmf_random(r):
     return wmf_case(r)
 
 
+# ---------------------------------------------------------------------------------------------------------------- the widescreen
+
+WIDE_UNITS = [4096, 3072]   # across, at the full size's 1536 down: whole units and the same float bits both ways
+
+
+def wide_case(r, kind=None, units=None, w=None):
+    kind = r.choice(["ray", "rmb", "edge"]) if kind is None else kind
+    units = r.choice(WIDE_UNITS) if units is None else units
+    c = tick_case(r)
+    c["units"], c["kind"] = (units, 0x600), kind
+    c["h"] = r.choice([r.randrange(0, 1536), 0, 15, 16, 768, 1520, 1521, 1535])
+    step = units // 1024   # 4 or 3: the pointers whose share of the width is a whole number of the Mac's units
+    if kind == "edge":
+        c["rmb"], c["globe"]["g.pick"] = 0, 0
+        if w is None:
+            w = r.choice([r.randrange(0, units + 200), 0, 40, units // 2, units - 40, units - 1, units + 100])
+        c["w"] = w // step * step
+    else:
+        c["rmb"] = 1
+        c["queues"]["IsKeyDown"] = [1 if kind == "rmb" else 0]
+        if kind == "ray":
+            c["globe"]["g.pick"] = 1
+        c["w"] = r.randrange(0, units) if w is None else w
+    return c
+
+
+def four_three(case):
+    """The case in the Mac's 4:3 terms: the pointer, and the display ratio of the drawn view's width."""
+    c = copy.deepcopy(case)
+    units = case["units"][0]
+    if case["kind"] == "edge":
+        c["w"] = case["w"] * 2048 // units
+    else:
+        c["w"] = case["w"] - (units - 2048) // 2
+        c["ratio"] = fb(bitsf(case["ratio"]) * (units / 2048.0))
+    return c
+
+
+def wide_edges():
+    r = random.Random(60604)
+    for units in WIDE_UNITS:
+        for kind in ("ray", "rmb"):
+            for w in (0, 1, units // 2 - 1, units // 2, units // 2 + 1, (units - 2048) // 2, units - 1):
+                yield wide_case(r, kind, units, w)
+        for w in (0, 36, 40, 44, units // 2, units - 48, units - 44, units - 40, units - 4, units, units + 96):
+            yield wide_case(r, "edge", units, w)
+
+
+def ppc_wide(e, case):
+    return ppc(e, four_three(case))
+
+
+def host_wide(lib, case):
+    bind(lib)
+    if lib.tpw_og_units(0x800, 0x600) == 0:
+        case = four_three(case)
+    return host(lib, case)
+
+
 TESTS = [
     FnTest("CLBScreenComponentOnlineGlobe::Tick", ppc, host, edge=tick_edges, rnd=tick_random),
     FnTest("CLBScreenComponentOnlineGlobe::WindowMessagesFn", ppc, host, edge=wmf_edges, rnd=wmf_random),
+    FnTest("the globe on a widescreen", ppc_wide, host_wide, edge=wide_edges, rnd=wide_case),
 ]

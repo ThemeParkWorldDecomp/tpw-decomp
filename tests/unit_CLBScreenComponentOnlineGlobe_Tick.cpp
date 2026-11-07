@@ -167,6 +167,13 @@ int32_t tpw_og_layout(int64_t* out) {
     return n;
 }
 
+// The unit space (globewide); 0, and nothing set, without the port's fixes.
+int32_t tpw_og_units(int32_t width, int32_t height) {
+    (void)width;
+    (void)height;
+    return 0;
+}
+
 // ---- the functions (the base-class call is direct: the test never builds the object, so there is no vtable)
 void tpw_og_tick(uint64_t self) {
     reinterpret_cast<CLBScreenComponentOnlineGlobe*>(static_cast<uintptr_t>(self))->CLBScreenComponentOnlineGlobe::Tick();

@@ -158,6 +158,13 @@ int32_t tpw_ou_layout(int64_t* out) {
     return n;
 }
 
+// The unit space (the port's widescreen and interface size); 0 when the library is built without the port fixes.
+int32_t tpw_ou_units(int32_t width, int32_t height) {
+    (void)width;
+    (void)height;
+    return 0;
+}
+
 void tpw_ou_InitOnlineUI() { InitOnlineUI(); }
 int32_t tpw_ou_BankruptWindowMsg(uint64_t window, int32_t message, int32_t a, int32_t b) {
     return BankruptWindowMsg(reinterpret_cast<InterfaceWindow*>(window), message, a, b);
