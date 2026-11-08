@@ -13,6 +13,7 @@
 #include "platform/arena.h"
 #include "FS_Online.h"
 #include "FS_OnlineList.h"
+#include "FS_System.h"
 #include "Game.h"
 #include "TPSound.h"
 #include "TPString.h"
@@ -107,6 +108,7 @@ TbDynamicStringTemplate<Char>& TbDynamicStringTemplate<Char>::operator+=(const C
 template <class Char>
 TbDynamicStringTemplate<Char>& TbDynamicStringTemplate<Char>::operator+=(const Char*) { return *this; }
 
+
 template class TbDynamicStringTemplate<char>;
 template class TbDynamicStringTemplate<char16_t>;
 
@@ -186,7 +188,12 @@ int32_t SOUND_SendEvent(int32_t entity, int32_t bank, int32_t event, int32_t a, 
 }
 void SOUND_Tick() { ev("SOUND_Tick", {}); }
 
+
 extern "C" {
+
+int32_t tpw_oi_portfix() {
+    return 0;
+}
 
 uint64_t tpw_oi_addr(const char* name) {
     struct Entry {

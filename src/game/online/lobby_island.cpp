@@ -1074,7 +1074,7 @@ void CLBScreenComponentOnlineIslands::GotoPreviousIsland() {
 void CLBScreenComponentOnlineIslands::ShowInfoOverlayPanel() { SetShownOnline(this, 1); }
 
 // 0x100b4880: one ParseThemeDescriptor per online park (its theme's name and gate names), then the camera goes to the first island.
-// An empty island list would crash the Mac's last lines (the head is read unchecked); so does this.
+// An empty island list would crash the Mac's last lines (the head is read unchecked).
 void CLBScreenComponentOnlineIslands::CreateParks(TbPtrList<CFSOnlinePark>* parks) {
     int32_t order = 0;
     for (POSITION position = parks->GetHeadPosition(); position != nullptr;) {

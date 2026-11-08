@@ -15,8 +15,15 @@ advisor, park selection, sound table), the online system (absent, or present wit
 list. What is compared: the answer of ProcessCancel, the screen's words, the islands' sound words, the view's words, the online system
 global and what a made system holds, and the event log.
 
-No fused operations. Not tested: CreateParks with an empty island list (the original reads the list head unchecked), ProcessCancel with
-camera state 2 and no current island (the same unchecked read).
+With the port fix on (onlineislands): the host's fakes answer whether a park's theme description opens (the queue "TPFile_Open", one
+answer per park), and what the original does is edited to what the guards must leave: each park first asks its theme's name and opens
+and closes the description (the path string's destructor, label -1), a park whose description does not open leaves no other event and
+takes no order, the lazily made online system is made by that first question, and the labels made are renumbered in order. ON-only cases have no island
+(the original runs with one dummy island): the screen's current island and word 0xE4 stay as they were and the screen backs out
+(HandleOnlineBacktrack). With it off the queue is unused and there are no such cases.
+
+No fused operations. Not tested: CreateParks with an empty island list with the port fix off (the original reads the list head
+unchecked), ProcessCancel with camera state 2 and no current island (the same unchecked read).
 """
 import ctypes as C
 import random
@@ -226,7 +233,13 @@ for _a, _f in ((0x102384B8, stub_new), (A_CTOR_W, stub_ctor_w), (A_CTOR_C, stub_
     reg(_a, _f)
 
 
+PORT_FIX = False
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_oi_portfix.restype, runner.lib.tpw_oi_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_oi_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -487,8 +500,60 @@ def run(s, case):
         s.done()
 
 
+# the integer arguments of the create events that are labels
+LABELS = {"StrCtorW": (0,), "StrCtorC": (0,), "NewOnlineSystem": (0,), "StringToUniString": (0, 1), "StrDtorC": (0,), "StrDtorW": (0,),
+          "GetLocalisedThemeGateNames": (0, 1, 2, 3), "ReturnOnlineThemeName": (0,), "ParseThemeDescriptor": (0, 1)}
+
+
+def guarded(log, found):
+    """What the onlineislands guards leave of the original's CreateParks log: per park the theme's name, the description opened (and
+    closed when found), the path's destructor, then the park's own events only when found (its order counting only the parks found); the
+    made labels renumbered in order."""
+    ront = [i for i, (n, _, _) in enumerate(log) if n == "ReturnOnlineThemeName"]
+    starts = []
+    for k in ront[::2]:                                   # a park's events start with its theme name's string, before its first RONT
+        i = k - 1
+        if log[i][0] == "NewOnlineSystem":
+            i -= 1
+        assert log[i][0] == "StrCtorW", log[i]
+        starts.append(i)
+    assert len(starts) == len(found), (starts, found)
+    out = list(log[:starts[0]]) if starts else list(log)
+    for j, ok in enumerate(found):
+        seg = list(log[starts[j]:starts[j + 1] if j + 1 < len(starts) else len(log)])
+        made = [x for x in seg if x[0] == "NewOnlineSystem"]
+        seg = [x for x in seg if x[0] != "NewOnlineSystem"]
+        first = next(x for x in seg if x[0] == "ReturnOnlineThemeName")
+        out += made + [first, ("TPFile_Open", (), ())] + ([("TPFile_Close", (1,), ())] if ok else []) + [("StrDtorC", (-1,), ())]
+        if ok:                                            # the parks left off do not count: the next park takes the order
+            order = sum(found[:j])
+            out += [(n, ints[:2] + (order,) + ints[3:], t) if n == "ParseThemeDescriptor" else (n, ints, t) for n, ints, t in seg]
+    remap = {}
+    for n, ints, _ in out:
+        if n in ("StrCtorW", "StrCtorC", "NewOnlineSystem") and ints[0] >= CL.FIRST_NEW:
+            remap[ints[0]] = CL.FIRST_NEW + len(remap)
+    res = []
+    for n, ints, texts in out:
+        ints = list(ints)
+        for i in LABELS.get(n, ()):
+            ints[i] = remap.get(ints[i], ints[i])
+        res.append((n, tuple(ints), texts))
+    return res
+
+
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    if not (PORT_FIX and case["op"] == "create"):
+        return run(Ppc(e, case), case)
+    empty = not case["islands"]
+    if empty:                                             # the original reads the head of the island list: give it one
+        case = dict(case, islands=[{"set": 0, "s1": 0, "s2": 0}])
+    out = run(Ppc(e, case), case)
+    out["log"] = guarded(out["log"], case["queues"]["TPFile_Open"])
+    if empty:
+        out["screen"][1], out["screen"][4] = "null", case["fe4"] & MASK
+        out["islands"] = []
+        out["log"].append(("HandleOnlineBacktrack", (1,), ()))
+    return out
 
 
 def host(lib, case):
@@ -523,6 +588,7 @@ def base(r, op, **over):
          "queues": {"IsVisible": [r.choice([0, 0, 1, -1, 3]), r.choice([0, 0, 1, -1])],
                     "SOUND_SendEvent": [rw(r), rw(r)]}}
     c.update(over)
+    c["queues"].setdefault("TPFile_Open", [r.choice([1, 1, 0]) for _ in c["parks"]])
     if op == "cancel" and c["cam"] == 2 and c["cur"] < 0:
         c["cur"] = 0
     return c
@@ -532,6 +598,17 @@ def create_cases(r):
     for n in range(0, 5):
         for sysm in (0, 1):
             yield base(r, "create", parks=[r.randrange(0, 6) for _ in range(n)], sys=sysm)
+    if not PORT_FIX:
+        return
+    # the onlineislands guards: descriptions found or not per park, and no island made
+    for found in ([0], [0, 0], [0, 1], [1, 0], [1, 0, 1], [0, 0, 0, 1]):
+        for sysm in (0, 1):
+            parks = [r.randrange(0, 6) for _ in found]
+            yield base(r, "create", parks=parks, sys=sysm, queues={"TPFile_Open": list(found)})
+    for found in ([], [0], [0, 0, 0], [1], [1, 0]):
+        for sysm in (0, 1):
+            parks = [r.randrange(0, 6) for _ in found]
+            yield base(r, "create", parks=parks, sys=sysm, islands=[], cur=-1, last=-1, queues={"TPFile_Open": list(found)})
 
 
 def show_cases(r):
