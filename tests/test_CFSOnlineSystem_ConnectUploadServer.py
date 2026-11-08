@@ -50,13 +50,13 @@ MAC = {
     "sys.mFTP": 0x3A0, "sys.mFTPPark": 0x3A4, "sys.mF3C0": 0x3C0, "sys.mF3C4": 0x3C4, "sys.mF3D8": 0x3D8,
     "sys.mF3DC": 0x3DC, "sys.mFTPParkPending": 0x3F0,
     "park.mParkID": 8, "park.mF4C": 0x4C, "park.mF58": 0x58, "park.mF78": 0x78, "park.mText7C": 0x7C,
-    "server.mText24": 0x24, "server.mF3C": 0x3C, "ride.mRideID": 8,
+    "server.mText24": 0x24, "server.mF3C": 0x3C, "ride.mRideID": 8, "slist.mList": 0x2C,
 }
 LIST = 0x3C8       # the Mac's list header inside the system (head +4, tail +8, count +0xC)
 
 # (name, host kind for tpw_cu_make, Mac size)
 WORLD = [("sys", 0, 0x500), ("park", 1, 0x100), ("ftppark", 1, 0x100), ("upsrv", 2, 0x80), ("ftpsrv", 2, 0x80), ("ride", 3, 0x40),
-         ("slist", 4, 0x40), ("rlist", 4, 0x40), ("city0", 4, 0x40), ("upload0", 4, 0x40), ("uinfo0", 4, 0x40)]
+         ("slist", 5, 0x40), ("rlist", 4, 0x40), ("city0", 4, 0x40), ("upload0", 4, 0x40), ("uinfo0", 4, 0x40)]
 
 INTS = ["sys.mF34", "sys.mF38", "sys.mCityClock", "sys.mCityListsWanted", "sys.mF398", "sys.mFTPActive", "sys.mF3D8",
         "sys.mFTPParkPending", "sys.mF3C0", "sys.mF3C4"]
@@ -453,7 +453,13 @@ def stub_ftp_connect(e):
     L.rec("FTPClientConnect", (L.lab(e.r(3)), H(cstr(e, e.r(4), 1)), H(cstr(e, e.r(5), 1)), H(cstr(e, e.r(6), 1)), int(e.r(7) != 0)))
 
 
+PORT_FIX = False
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_cu_portfix.restype, runner.lib.tpw_cu_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_cu_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -708,6 +714,8 @@ def build(s, case):
     s.words(sysa + o("sys.mF38"), [case["f38"]])
     s.words(sysa + o("sys.mF58"), [case["flags"]])
     s.setptr(sysa + o("sys.mServerList"), W["slist"])
+    # the list's own list, which its constructor always makes (the port's uploadserver check looks at it)
+    s.setptr(W["slist"] + o("slist.mList"), W["uinfo0"])
     s.setptr(sysa + o("sys.mRideList"), W["rlist"])
     s.setptr(sysa + o("sys.mFTPPark"), W["ftppark"])
     s.setptr(sysa + o("sys.mUpload"), W["upload0"] if case["upload0"] else 0)
@@ -776,7 +784,13 @@ def ppc(e, case):
 
 
 def host(lib, case):
-    return run(Host(lib, case), case)
+    out = run(Host(lib, case), case)
+    if PORT_FIX and case["op"] == "connect":
+        # the port's uploadserver check asks for the upload server once before the original's two reads
+        log = out["log"]
+        first = next(i for i, ev in enumerate(log) if ev[0] == "ReturnUploadServer")
+        out["log"] = log[:first] + log[first + 1:]
+    return out
 
 
 # ---------------------------------------------------------------------------------------------------------------- case generators

@@ -396,10 +396,12 @@ int64_t FieldOffset(const char* name) {
     static unsigned char parkBuffer[sizeof(CFSOnlinePark)];
     static unsigned char serverBuffer[sizeof(CFSOnlineServer)];
     static unsigned char rideBuffer[sizeof(CFSOnlineRide)];
+    static unsigned char slistBuffer[sizeof(CFSOnlineSystemServerList)];
     CFSOnlineSystem* sys = reinterpret_cast<CFSOnlineSystem*>(sysBuffer);
     CFSOnlinePark* park = reinterpret_cast<CFSOnlinePark*>(parkBuffer);
     CFSOnlineServer* server = reinterpret_cast<CFSOnlineServer*>(serverBuffer);
     CFSOnlineRide* ride = reinterpret_cast<CFSOnlineRide*>(rideBuffer);
+    CFSOnlineSystemServerList* slist = reinterpret_cast<CFSOnlineSystemServerList*>(slistBuffer);
     const FieldEntry entries[] = {
         {"sys.mF34", OffsetOf(sys, &sys->mF34)},
         {"sys.mF38", OffsetOf(sys, &sys->mF38)},
@@ -430,6 +432,7 @@ int64_t FieldOffset(const char* name) {
         {"server.mText24", OffsetOf(server, &server->mText24)},
         {"server.mF3C", OffsetOf(server, &server->mF3C)},
         {"ride.mRideID", OffsetOf(ride, &ride->mRideID)},
+        {"slist.mList", OffsetOf(slist, &slist->mList)},
     };
     for (const FieldEntry& entry : entries)
         if (std::strcmp(entry.name, name) == 0) return entry.offset;
@@ -461,6 +464,10 @@ template<class C> void SetString(void* object, const uint16_t* units, int32_t n)
 }  // namespace
 
 extern "C" {
+
+int32_t tpw_cu_portfix() {
+    return 0;
+}
 
 // The host address of a global by the module's name for it.
 uint64_t tpw_cu_addr(const char* name) {
@@ -512,6 +519,7 @@ uint64_t tpw_cu_make(int32_t kind) {
             break;
         }
         case 3: object = tpw::ArenaAllocZeroed(sizeof(CFSOnlineRide)); break;
+        case 5: object = tpw::ArenaAllocZeroed(sizeof(CFSOnlineSystemServerList)); break;
         default: object = tpw::ArenaAllocZeroed(64); break;
     }
     return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(object));
