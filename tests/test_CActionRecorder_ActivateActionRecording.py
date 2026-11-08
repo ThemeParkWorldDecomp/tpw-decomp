@@ -9,6 +9,10 @@ fakes on both sides: CTRACE (a format id, the level and the %d arguments), the f
 and CMemFile::Open (which file, size).
 
 What is compared: the three words of the object and the event log. No fused operations. Not tested: nothing skipped.
+
+With the port fixes (tpw_ar_portfix answers 1; port_fix tag arcode) RecordAction 0x10143f48 writes the action's low byte (its code)
+where the original writes the high byte of the action word: the original's Write event takes the low byte as its hash (the hash of one
+byte is the byte).
 """
 import ctypes as C
 import random
@@ -81,7 +85,13 @@ STUBS.internal(PTR_GLUE, stub_write)
 STUBS.internal(OPEN, stub_open)
 
 
+PORT_FIX = False
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_ar_portfix.restype, runner.lib.tpw_ar_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_ar_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -227,7 +237,10 @@ def run(s, case):
 
 
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    out = run(Ppc(e, case), case)
+    if PORT_FIX and case["op"] == "r0":   # arcode: the action's code is written
+        out["log"] = [(n, (i[0], 1, case["args"][0] & 0xFF), t) if n == "Write" else (n, i, t) for n, i, t in out["log"]]
+    return out
 
 
 def host(lib, case):

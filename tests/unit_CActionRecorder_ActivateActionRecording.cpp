@@ -119,6 +119,11 @@ void tpw_ar_obs(uint32_t* out) {
     out[2] = static_cast<uint32_t>(gRec.mRecording);
 }
 
+// 1 when the library was built with the port fixes (the module then compares against what the fixes change).
+int32_t tpw_ar_portfix() {
+    return 0;
+}
+
 void tpw_ar_act(int32_t mode) { gRec.ActivateActionRecording(static_cast<CActionRecorder::RecordMode>(mode)); }
 void tpw_ar_r0(int32_t action) { gRec.RecordAction(static_cast<RecordedAction>(action)); }
 void tpw_ar_r2(int32_t action, uint8_t a, uint8_t b) { gRec.RecordAction(static_cast<RecordedAction>(action), a, b); }

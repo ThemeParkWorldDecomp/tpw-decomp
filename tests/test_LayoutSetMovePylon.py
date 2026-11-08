@@ -17,6 +17,14 @@ With the port fixes on (unit coaster64), the record's table entry the Mac reads 
 port fix in PylonTableEntry, src/game/rides/CoasterEdit.cpp): entry 0, the Mac's brace count, is the 8 bytes before mBraces. The host world
 then writes the table there, its start taken from tpw_lmp_layout.
 
+With the port fixes on (unit bracereplay), Up, Down, Delete and Move first walk the edit instance's chain of braces (its mLastBrace,
+then each brace's mPrev; ReplayBrace) for the brace the id names. The host world holds such a chain (none on the Mac's side, which never
+reads it): 0 to 3 braces, each with an index word and a pylon record with a brace count, drawn from the case (tpw_lmp_portfix gives the
+host offsets). The port does nothing when the walk ends first; Up also when the brace is the top of its pylon or has no pylon, Down when
+it is the bottom. The original's side then makes no call; for Delete with its first brace missing gCoasterDragBrace is NULL, and with
+its second missing the original's log is cut after the first DoDeleteMultiPylons and gCoasterDragBrace is NULL. Cases with no edit
+instance (made only with the port fixes) expect the same of these and of LayoutRegenerateTrack().
+
 No fused operations. Not tested: nothing skipped (ids stay inside the 0x100 object table).
 """
 import ctypes as C
@@ -92,7 +100,16 @@ for _a, _f in ((C_DISABLE, s_disable), (C_GETBRACE, s_getbrace), (C_START, s_sta
     STUBS.internal(_a, _f)
 
 
+PORT_FIX = False
+RL = {}
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_lmp_portfix.restype, runner.lib.tpw_lmp_portfix.argtypes = C.c_int32, [C.POINTER(C.c_int64)]
+    out = (C.c_int64 * 4)()
+    PORT_FIX = runner.lib.tpw_lmp_portfix(out) == 1
+    RL.update(last=out[0], prev=out[1], count=out[2])
     T.install_std_stubs(runner.emu)
 
 
@@ -247,6 +264,52 @@ def build(s, case):
     s.ptr(s.g("current"), s.obj(case["cur0"]) if case["cur0"] >= 0 else 0)
     s.ptr(s.g("currentdata"), s.obj(case["cd0"]) if case["cd0"] >= 0 else 0)
     s.words(s.g("w16e0"), [case["w0"]])
+    if case.get("noedit"):
+        s.ptr(s.g("edit"), 0)
+    if PORT_FIX and isinstance(s, Host):
+        chain = [s.alloc(L["brace"]) for _ in replay_chain(case)]
+        for k, (b, (index, count, has_data)) in enumerate(zip(chain, replay_chain(case))):
+            s.words(b + 4, [index])
+            if has_data:
+                data = s.alloc(0x100)
+                s.words(data + RL["count"], [count])
+                s.ptr(b + L["data"], data)
+            s.ptr(b + RL["prev"], chain[k + 1] if k + 1 < len(chain) else 0)
+        s.ptr(edit + RL["last"], chain[0] if chain else 0)
+
+
+def replay_chain(case):
+    """The port fix bracereplay's chain of the host world: (index word, its pylon's brace count, has a pylon) of each brace from the
+    last. Drawn from the case's own values, so the cases (and the original's side) are the same with the port fixes off."""
+    r = random.Random(hash((case["entry"], tuple(case["args"]), case["eflags"], tuple(case["bidx"]))))
+    return [(r.randrange(0, 5), r.randrange(0, 6), r.random() < 0.9) for _ in range(r.choice([0, 1, 1, 2, 2, 3]))]
+
+
+def port_expect(case):
+    """With the port fixes: None when the port does what the original does, else what it does instead: "skip" (no call),
+    "nodrag" (no call, gCoasterDragBrace NULL) or "cut" (the original's first delete only, gCoasterDragBrace NULL)."""
+    entry, args = case["entry"], case["args"]
+    if entry not in (F_UP, F_DOWN, F_DEL, F_MOVE, F_REGEN):
+        return None
+    if case.get("noedit"):
+        return "nodrag" if entry == F_DEL else "skip"
+    chain = replay_chain(case)
+
+    def walk(i):
+        return chain[i & 0xFFFF] if (i & 0xFFFF) < len(chain) else None
+    if entry == F_UP:
+        b = walk(args[0])
+        return None if b and b[2] and b[0] + 1 < b[1] else "skip"
+    if entry == F_DOWN:
+        b = walk(args[0])
+        return None if b and b[2] and 0 < b[0] < b[1] else "skip"
+    if entry == F_MOVE:
+        return None if walk(args[2]) else "skip"
+    if entry == F_DEL:
+        if not walk(args[0]):
+            return "nodrag"
+        return None if walk(args[1]) else "cut"
+    return None
 
 
 def observe(s, case):
@@ -255,17 +318,24 @@ def observe(s, case):
             "edit": s.idx(s.rd_ptr(s.g("edit")))}
 
 
-def run(s, case):
+def run(s, case, expect=None):
     try:
         build(s, case)
-        s.call(case["entry"], case["args"])
-        return observe(s, case)
+        if expect in ("skip", "nodrag"):
+            if expect == "nodrag":
+                s.ptr(s.g("drag"), 0)
+        else:
+            s.call(case["entry"], case["args"])
+        out = observe(s, case)
+        if expect == "cut":
+            out["log"], out["drag"] = out["log"][:2], -2
+        return out
     finally:
         s.done()
 
 
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    return run(Ppc(e, case), case, port_expect(case) if PORT_FIX else None)
 
 
 def host(lib, case):
@@ -323,6 +393,14 @@ def mk(entry):
         if entry in (F_EDIT, F_EDIT_OLD):
             yield base(r, entry, [0])
             yield base(r, entry, [1])
+        if PORT_FIX:
+            if entry in (F_UP, F_DOWN, F_DEL, F_MOVE, F_REGEN):
+                for _ in range(3):
+                    c = rnd(r)
+                    c["noedit"] = True
+                    yield c
+            for _ in range(24):          # more of the walks, the tops and bottoms of the pylons
+                yield rnd(r)
 
     return edges, rnd
 

@@ -4,6 +4,8 @@
 //
 // The callees outside the unit are recording fakes: the action file's Read (a stream of bytes the case supplies, a return value from
 // the queue "Read"), the twelve ProcessAction overloads, CTRACE and SamsUtilities::_USwapBlock16 (which swaps the bytes of each word).
+// The file's GetPos answers the bytes read so far and its Seek from the start moves there (the port fix arcode steps back with them);
+// tpw_rec_cursor answers where the file is after the call.
 #include <cstddef>
 #include <cstdint>
 #include <cstdarg>
@@ -57,6 +59,11 @@ public:
             default: return -1;
         }
     }
+    int32_t Seek(uint32_t offset, uint32_t whence) override {
+        if (whence == 0) gCursor = offset;
+        return static_cast<int32_t>(gCursor);
+    }
+    int32_t GetPos() override { return static_cast<int32_t>(gCursor); }
 };
 
 }  // namespace
@@ -117,6 +124,13 @@ int32_t tpw_rec_layout(int64_t* out) {
     out[n++] = static_cast<int64_t>(sizeof(CActionRecorder));
     return n;
 }
+
+// 1 when the library was built with the port fixes (the module then compares against what the fixes change).
+int32_t tpw_rec_portfix() {
+    return 0;
+}
+
+uint32_t tpw_rec_cursor() { return gCursor; }
 
 // Builds the fake file in the object's action file storage, sets the stream and calls.
 int32_t tpw_rec_run(uint64_t object, uint64_t data, uint32_t length) {

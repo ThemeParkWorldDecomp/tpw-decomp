@@ -10,8 +10,13 @@ file's Read (through __ptr_glue on the Mac; a byte stream the case supplies, the
 128-byte buffer as a hash of their bytes), CTRACE and SamsUtilities::_USwapBlock16 (swaps the bytes of each word in place).
 
 The world of a case: the recorder object with its 256-word action-kind table and the stream. What is compared: the answer, the event
-log and the table. No fused operations. Not tested: a wide-text count above 40 (kind 9) or 72 (kind 10), where the original overruns its
+log, the table and where the file is after the call (the bytes read on the Mac's side; the fake file's GetPos and Seek on the host's).
+No fused operations. Not tested: a wide-text count above 40 (kind 9) or 72 (kind 10), where the original overruns its
 stack buffer into its own locals and caller frame; the host holds 255 characters.
+
+With the port fixes (tpw_rec_portfix answers 1; port_fix tag arcode) an action 0 of kind 1 whose halfword is above 0xff is an action
+the Mac's recorder wrote as 0: the host plays nothing and steps the file back to the byte after the 0. The original's side is then
+cut before its ProcessAction (its answer 1, its log up to the two reads) and its file position is taken as 1.
 """
 import ctypes as C
 import random
@@ -149,7 +154,13 @@ for _a, (_n, _s) in PA.items():
     STUBS.internal(_a, make_pa(_n, _s))
 
 
+PORT_FIX = False
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_rec_portfix.restype, runner.lib.tpw_rec_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_rec_portfix() == 1
     T.install_std_stubs(runner.emu)
 
 
@@ -195,6 +206,9 @@ class Ppc(Side):
         self.L.obj = obj
         self.words(obj + self.o_file, [self.alloc(0x40)])        # the vtable pointer the call through the glue loads
 
+    def cursor(self):
+        return self.L.cur
+
     def call(self, obj, case):
         r3, _, _ = T.call_ppc(self.e, FN, [obj & MASK])
         return r3 & MASK
@@ -227,6 +241,9 @@ class Host(Side):
     def prepare(self, obj, case):
         pass
 
+    def cursor(self):
+        return self.lib.tpw_rec_cursor()
+
     def call(self, obj, case):
         d = case["data"]
         buf = self.alloc(len(d) + 1)
@@ -240,6 +257,7 @@ def bind(lib):
     lib.tpw_rec_alloc.restype, lib.tpw_rec_alloc.argtypes = C.c_uint64, [C.c_uint32]
     lib.tpw_rec_layout.argtypes = [C.POINTER(C.c_int64)]
     lib.tpw_rec_run.restype, lib.tpw_rec_run.argtypes = C.c_int32, [C.c_uint64, C.c_uint64, C.c_uint32]
+    lib.tpw_rec_cursor.restype, lib.tpw_rec_cursor.argtypes = C.c_uint32, []
     out = (C.c_int64 * 32)()
     n = lib.tpw_rec_layout(out)
     assert list(out)[:n] == HOST_LAYOUT, list(out)[:n]
@@ -257,7 +275,7 @@ def build(s, case):
 
 
 def observe(s, case, answer):
-    return {"answer": answer, "log": s.log(), "table": s.rd_words(s.obj + s.o_table, 256)}
+    return {"answer": answer, "log": s.log(), "table": s.rd_words(s.obj + s.o_table, 256), "cursor": s.cursor()}
 
 
 def run(s, case):
@@ -272,7 +290,12 @@ _printed = []
 
 
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    out = run(Ppc(e, case), case)
+    log = out["log"]
+    if PORT_FIX and log and log[-1][0] == "PA_h" and log[-1][1][1] == 0 and log[-1][1][2] > 0xFF:
+        out["log"] = log[:-1]           # arcode: a 0 written for an action without operands, nothing played
+        out["cursor"] = 1               # the file is back at the byte after the 0
+    return out
 
 
 def host(lib, case):
@@ -333,6 +356,12 @@ def edges():
         yield mk_case(r, kind=9, count=count)
     for count in (0, 1, 72):
         yield mk_case(r, kind=10, count=count)
+    # action 0 of kind 1 (a mode change) with a mode, and with a halfword no mode has (the port fix arcode skips the 0)
+    for half in (0x0000, 0x0015, 0x003B, 0x00FF, 0x0100, 0x0167, 0x3B00, 0xFFFF):
+        for fail in (None, (1, 1), (1, 3)):
+            c = mk_case(r, act=0, kind=1, fail=fail)
+            c["data"] = c["data"][:1] + struct.pack("<H", half) + c["data"][3:]
+            yield c
 
 
 def rnd(r):

@@ -116,6 +116,13 @@ int32_t tpw_lmp_layout(int64_t* out) {
     return n;
 }
 
+// 1 when the library was built with the port fixes; then out holds where the port fix bracereplay walks: the instance's mLastBrace,
+// the brace's mPrev and the pylon's mCount (the host world builds a chain of braces there that only the port reads).
+int32_t tpw_lmp_portfix(int64_t* out) {
+    (void)out;
+    return 0;
+}
+
 void tpw_lmp_up(uint32_t id) { LayoutStackPylonUp(static_cast<uint16_t>(id)); }
 void tpw_lmp_down(uint32_t id) { LayoutStackPylonDown(static_cast<uint16_t>(id)); }
 void tpw_lmp_delete(uint32_t a, uint32_t b) { LayoutDeleteMultiPylons(static_cast<uint16_t>(a), static_cast<uint16_t>(b)); }

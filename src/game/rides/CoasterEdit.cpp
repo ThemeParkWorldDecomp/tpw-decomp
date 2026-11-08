@@ -1274,6 +1274,7 @@ static tag_sTrackBrace* EditBrace(uint32_t id) {
     return GetTrackBrace(reinterpret_cast<sCoasterTrackParams*>(&gCoasterEditInstance->mBlock3C), id);
 }
 
+
 // 0x10055e0c
 void SetLoftPylon(float value, uint32_t id, int32_t a, int32_t b) {
     tag_sTrackBrace* brace = EditBrace(id);

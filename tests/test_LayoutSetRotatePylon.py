@@ -11,8 +11,14 @@ the instance).
 The world: the edit instance global, a brace with random flags and random words in the fields written, the draw-up-spline flag, and for
 CorrectBraceNumbering a chain of braces. Compared: the log, the brace's fields, the chain's numbers and floats, the flag.
 
-No fused operations. Not tested: a NULL edit instance for the setters (the original reads through the global without checking, only
-GetTrackBrace's fake sees the address).
+With the port fixes on (unit bracereplay), the three Layout setters first walk the edit instance's chain of braces (its mLastBrace, then
+each brace's mPrev; ReplayBrace) for the brace the id names, and do nothing when the walk ends first or there is no edit instance. The
+host world holds such a chain (none on the Mac's side, which never reads it) of 0, 1, 2 or 8 braces drawn from the case (tpw_v5039_portfix
+gives the host offsets); where the port does nothing, the original's side makes no call. Cases with a NULL edit instance are made for
+them only with the port fixes.
+
+No fused operations. Not tested: a NULL edit instance for the setters with the port fixes off (the original reads through the global
+without checking, only GetTrackBrace's fake sees the address).
 """
 import ctypes as C
 import random
@@ -79,8 +85,31 @@ STUBS.internal(HANDLE, stub_handle)
 STUBS.internal(FLAGGEN, stub_flaggen)
 
 
+PORT_FIX = False
+RL = {}
+LAYOUT_OPS = ("lset_loft", "lset_rot", "lset_wob")
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_v5039_portfix.restype, runner.lib.tpw_v5039_portfix.argtypes = C.c_int32, [C.POINTER(C.c_int64)]
+    out = (C.c_int64 * 4)()
+    PORT_FIX = runner.lib.tpw_v5039_portfix(out) == 1
+    RL.update(last=out[0], prev=out[1], count=out[2])
     T.install_std_stubs(runner.emu)
+
+
+def chain_length(case):
+    """The port fix bracereplay's chain of the host world: how many braces, drawn from the case's own values (so the cases are the same
+    with the port fixes off)."""
+    return random.Random(hash((case["op"], tuple(case["args"]), case["nodes"][0]["num"]))).choice([0, 1, 2, 8])
+
+
+def port_skips(case):
+    """With the port fixes: True when the Layout setter does nothing (no edit instance, or the id past the chain)."""
+    if case["op"] not in LAYOUT_OPS:
+        return False
+    return case.get("noedit", False) or case["args"][case["kinds"].index("u")] >= chain_length(case)
 
 
 class Side:
@@ -221,6 +250,13 @@ def build(s, case):
     case["_nodes"] = nodes
     s.set_brace(nodes[0])
     s.start = nodes[case["start"]] if case["start"] is not None else 0
+    if PORT_FIX and isinstance(s, Host) and case["op"] in LAYOUT_OPS:
+        chain = [s.alloc(off["size"] + 16) for _ in range(chain_length(case))]
+        for k, b in enumerate(chain):
+            s.wptr(b + RL["prev"], chain[k + 1] if k + 1 < len(chain) else 0)
+        s.wptr(inst + RL["last"], chain[0] if chain else 0)
+    if case.get("noedit"):
+        s.wptr(s.g("inst"), 0)
 
 
 def execute(s, case):
@@ -254,16 +290,16 @@ def observe(s, case, answer):
     return {"answer": answer, "log": s.log(), "nodes": nodes, "draw": s.rd_word(s.g("draw"))}
 
 
-def run(s, case):
+def run(s, case, skip=False):
     try:
         build(s, case)
-        return observe(s, case, execute(s, case))
+        return observe(s, case, 0 if skip else execute(s, case))
     finally:
         s.done()
 
 
 def ppc(e, case):
-    return run(Ppc(e, case), case)
+    return run(Ppc(e, case), case, PORT_FIX and port_skips(case))
 
 
 def host(lib, case):
@@ -326,6 +362,13 @@ def set_edges(op):
         for flags in (0, 0x40, 0x46, 0xFFFFFFFF):
             for ints in ((0, 0), (1, 0), (0, 5), (-1, -1), (3, 1)):
                 yield set_case(op, r, flags, ints)
+        if PORT_FIX and op in LAYOUT_OPS:
+            for _ in range(4):
+                c = set_case(op, r)
+                c["noedit"] = True
+                yield c
+            for _ in range(24):          # more of the walks
+                yield set_case(op, r)
     return gen
 
 

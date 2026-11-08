@@ -70,6 +70,13 @@ int32_t tpw_v5039_layout(int64_t* out) {
     return n;
 }
 
+// 1 when the library was built with the port fixes; then out holds where the port fix bracereplay walks: the instance's mLastBrace,
+// the brace's mPrev and the pylon's mCount (the host world builds a chain of braces there that only the port reads).
+int32_t tpw_v5039_portfix(int64_t* out) {
+    (void)out;
+    return 0;
+}
+
 void tpw_v5039_set_loft(float v, uint32_t id, int32_t a, int32_t b) { SetLoftPylon(v, id, a, b); }
 void tpw_v5039_lset_loft(float v, uint32_t id) { LayoutSetLoftPylon(v, id); }
 void tpw_v5039_set_rot(float v, uint32_t id, int32_t a, int32_t b) { SetRotatePylon(v, id, a, b); }
