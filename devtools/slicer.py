@@ -148,9 +148,9 @@ def load_libclang(compiler):
         "clang_getExpansionLocation": (None, [CXSourceLocation, ctypes.POINTER(ctypes.c_void_p),
                                               ctypes.POINTER(ctypes.c_uint), ctypes.POINTER(ctypes.c_uint),
                                               ctypes.POINTER(ctypes.c_uint)]),
-        "clang_getSpellingLocation": (None, [CXSourceLocation, ctypes.POINTER(ctypes.c_void_p),
-                                             ctypes.POINTER(ctypes.c_uint), ctypes.POINTER(ctypes.c_uint),
-                                             ctypes.POINTER(ctypes.c_uint)]),
+        "clang_getFileLocation": (None, [CXSourceLocation, ctypes.POINTER(ctypes.c_void_p),
+                                         ctypes.POINTER(ctypes.c_uint), ctypes.POINTER(ctypes.c_uint),
+                                         ctypes.POINTER(ctypes.c_uint)]),
         "clang_getFile": (ctypes.c_void_p, [ctypes.c_void_p, ctypes.c_char_p]),
         "clang_File_isEqual": (ctypes.c_int, [ctypes.c_void_p, ctypes.c_void_p]),
         "clang_getCursorLinkage": (ctypes.c_int, [CXCursor]),
@@ -221,8 +221,11 @@ class Parser:
         return f
 
     def offset(self, loc, spelling=False):
+        # spelling: where the text was written, a macro argument's in the invocation (clang_getFileLocation). LLVM 23's
+        # clang_getSpellingLocation answers the place inside the #define instead, which made a definition that only starts
+        # with an attribute macro (ui_main.cpp's TPW_WEAK) one a macro writes; earlier ones answered the file location.
         f, line, col, off = ctypes.c_void_p(), ctypes.c_uint(), ctypes.c_uint(), ctypes.c_uint()
-        get = self.cl.clang_getSpellingLocation if spelling else self.cl.clang_getExpansionLocation
+        get = self.cl.clang_getFileLocation if spelling else self.cl.clang_getExpansionLocation
         get(loc, ctypes.byref(f), ctypes.byref(line), ctypes.byref(col), ctypes.byref(off))
         return off.value, line.value
 
