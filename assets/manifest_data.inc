@@ -4909,7 +4909,7 @@ const ManifestRecord kManifestRecords[] = {
     {"data/ui/cursors/c_swapup.ani", 1748u, 1, kGroupCore, kEditionEur|kEditionUsPc|kEditionEurPc, kSourcePcCd, kFlagRequired},
     {"data/ui/cursors/c_track.ani", 1749u, 1, kGroupCore, kEditionUs, kSourceMacCd, kFlagRequired},
     {"data/ui/cursors/c_track.ani", 1750u, 1, kGroupCore, kEditionEur|kEditionUsPc|kEditionEurPc, kSourcePcCd, kFlagRequired},
-    {"gold/RideConfig.txt", 1751u, 1, kGroupGold, kEditionGold, kSourceGoldCd, kFlagRequired},
+    {"gold/RideConfig.txt", 1751u, 1, kGroupGold, kEditionGold, kSourceGoldCd, 0},
     {"gold/_acorn_23.wad", 1752u, 1, kGroupGold, kEditionGold, kSourceGoldCd, kFlagRequired},
     {"gold/_bellt_10.wad", 1753u, 1, kGroupGold, kEditionGold, kSourceGoldCd, kFlagRequired},
     {"gold/_bumpers_25.wad", 1754u, 1, kGroupGold, kEditionGold, kSourceGoldCd, kFlagRequired},

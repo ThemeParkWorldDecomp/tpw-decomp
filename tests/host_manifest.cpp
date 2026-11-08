@@ -16,6 +16,7 @@
 #include <utility>
 #include <vector>
 
+#include "gold_ride_table.h"
 #include "manifest.h"
 
 #ifndef TPW_DEVTOOLS_DIR
@@ -187,7 +188,7 @@ static void TestCounts() {
     CHECK_EQ(CountRecords(kEditionGold), 36);
     CHECK_EQ(CountRecords(kEditionUs, true), 776);   // all but the program (optional) and bfj.mov and BFj2.mov (never opened)
     CHECK_EQ(CountRecords(kEditionEur, true), 860);
-    CHECK_EQ(CountRecords(kEditionGold, true), 36);
+    CHECK_EQ(CountRecords(kEditionGold, true), 35);   // all but RideConfig.txt (optional: the built-in table places the rides)
     CHECK_EQ(CountRecords(kEditionUs | kEditionEur), 779 + 913 - 71);
 
     std::map<std::pair<int, int>, size_t> by_group;      // (edition, group)
@@ -557,8 +558,49 @@ static void TestFilms() {
     CHECK_EQ(with, 36);
 }
 
+// The built-in Gold ride table (assets/gold_ride_table.h): one row for each of the 35 Gold wads of the manifest, none
+// for anything else, unique names, a folder of the form data/levels/<theme>/<rides|features|sideshow>.
+static void TestGoldRideTable() {
+    CHECK_EQ(kGoldRideTableSize, 35);
+    std::set<std::string> rows;
+    for (const GoldRideRow& row : kGoldRideTable) {
+        const std::string wad = row.wad, folder = row.folder;
+        CHECK(rows.insert(wad).second);
+        CHECK(StartsWith(wad, "_") && EndsWith(wad, ".wad"));
+        bool lower = true;
+        for (char c : wad + folder) lower = lower && !(c >= 'A' && c <= 'Z') && c != '\\';
+        CHECK(lower);
+        CHECK(StartsWith(folder, "data/levels/"));
+        const std::string place = folder.substr(std::strlen("data/levels/"));
+        const size_t slash = place.find('/');
+        CHECK(slash != std::string::npos && place.find('/', slash + 1) == std::string::npos);
+        const std::string kind = place.substr(slash + 1);
+        CHECK(kind == "rides" || kind == "features" || kind == "sideshow");
+        CHECK(place.substr(0, slash) == "fantasy" || place.substr(0, slash) == "hallow" || place.substr(0, slash) == "jungle" ||
+              place.substr(0, slash) == "space");
+    }
+    // Every Gold wad of the manifest has a row, and every row a wad.
+    size_t wads = 0;
+    for (size_t i = 0; i < ManifestRecordCount(); ++i) {
+        const ManifestRecord& r = ManifestRecords()[i];
+        if (!(r.editions & kEditionGold)) continue;
+        const std::string dest = r.dest;
+        if (!EndsWith(dest, ".wad")) {
+            CHECK(dest == "gold/RideConfig.txt");
+            CHECK((r.flags & kFlagRequired) == 0);
+            continue;
+        }
+        ++wads;
+        CHECK(StartsWith(dest, "gold/"));
+        CHECK(rows.count(dest.substr(5)) == 1);
+        CHECK((r.flags & kFlagRequired) != 0);
+    }
+    CHECK_EQ(wads, 35);
+}
+
 int main() {
     TestStructure();
+    TestGoldRideTable();
     TestCounts();
     TestFilms();
     TestLanguages();

@@ -25,6 +25,7 @@
 #include <zlib.h>
 
 #include "../icon.h"
+#include "../gold_ride_table.h"
 #include "../importer.h"
 #include "../sam_check.h"
 #include "../sha256.h"
@@ -73,7 +74,7 @@ std::string Env(const char* name) {
 }
 
 // The player's own discs are named in a file of theirs, not here: TPW_TEST_SOURCES, or sources.txt in TPW_TEST_TRANSFER, one
-// "key = path under TPW_TEST_TRANSFER" per line (keys: mac-zip, eur-a, eur-first, gold-zip, and for the Windows-disc
+// "key = path under TPW_TEST_TRANSFER" per line (keys: mac-zip, eur-a, eur-first, gold-zip, gold-rides (a download of the 35 Gold rides without RideConfig.txt), and for the Windows-disc
 // editions pc-us, the US 2.0 Windows CD, pc-us-first, the US first release 1.0, and pc-eur, a European Windows-only CD, such as
 // the English one sold as Sim Theme Park, volume SIM_THEME_PARK: its files are the European edition's). A missing key skips
 // its test.
@@ -1342,7 +1343,7 @@ void TestDamagedContainers(const std::string& scratch) {
 // ---- the discs
 
 struct Discs {
-    std::string toast, eurImg, eurFirst, goldZip, allitems, gameEur, pcUs, pcUsFirst, pcEur;
+    std::string toast, eurImg, eurFirst, goldZip, goldRides, allitems, gameEur, pcUs, pcUsFirst, pcEur;
 };
 
 bool CompareUs(const std::string& folder) {
@@ -1614,6 +1615,31 @@ void TestFirstPressing(const Discs& d, const std::string& scratch) {
     RemoveTree(root);
 }
 
+// The built-in ride table (gold_ride_table.h) against the real RideConfig.txt just imported: the same 35 rows, in order.
+void GoldTableMatchesList(const Importer& imp) {
+    const ManifestRecord* list = FindByDest(kEditionGold, "gold/RideConfig.txt");
+    CHECK(list != nullptr);
+    std::ifstream in(imp.DestinationPath(kEditionGold, *list), std::ios::binary);
+    std::string line, name;
+    std::vector<std::pair<std::string, std::string>> rows;   // as platform/gold_rides.cpp reads them
+    while (std::getline(in, line)) {
+        size_t a = line.find_first_not_of(" \t\r\n"), b = line.find_last_not_of(" \t\r\n");
+        if (a == std::string::npos) continue;
+        line = line.substr(a, b - a + 1);
+        if (line == "x" || line == "X") { name.clear(); continue; }
+        if (name.empty()) { name = line; continue; }
+        std::string folder;
+        for (char c : line) folder += (c == '\\') ? '/' : static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+        rows.push_back({name, folder});
+        name.clear();
+    }
+    CHECK_EQ(rows.size(), kGoldRideTableSize);
+    for (size_t i = 0; i < rows.size() && i < kGoldRideTableSize; ++i) {
+        CHECK(rows[i].first == kGoldRideTable[i].wad);
+        CHECK(rows[i].second == kGoldRideTable[i].folder);
+    }
+}
+
 void TestGold(const Discs& d, const std::string& scratch) {
     std::printf("Gold\n");
     struct Case {
@@ -1640,11 +1666,52 @@ void TestGold(const Discs& d, const std::string& scratch) {
         CHECK_EQ(r.status[2].present, 36);
         CHECK_EQ(Tree(imp.GameFolder(kEditionGold), false).size(), 36);
         CHECK_EQ(r.status[0].present, 0);
+        GoldTableMatchesList(imp);
+        {   // RideConfig.txt is optional: the 35 rides alone unlock Gold (a download of the rides taken out of the installer)
+            const ManifestRecord* list = FindByDest(kEditionGold, "gold/RideConfig.txt");
+            CHECK(list != nullptr);
+            std::error_code ec;
+            CHECK(std::filesystem::remove(imp.DestinationPath(kEditionGold, *list), ec));
+            ImporterConfig again;
+            again.dataRoot = root;
+            Importer without(again);
+            CHECK(without.Open(err));
+            EditionStatus s = without.Status(kEditionGold);
+            CHECK(s.unlocked);
+            CHECK_EQ(s.filesPresent, 35);
+            CHECK_EQ(s.required, 35);
+            CHECK_EQ(s.requiredPresent, 35);
+            CHECK(std::string(s.StateWord()) == "unlocked");
+        }
         CHECK(imp.RemoveEdition(kEditionGold, err));
         CHECK(!imp.Status(kEditionGold).unlocked);
         CHECK(!Exists(root + "/assets/gold"));
         RemoveTree(root);
     }
+    if (d.goldRides.empty()) {
+        Skip("Gold import from the rides alone: no gold-rides in the sources");
+        return;
+    }
+    // A download of the 35 rides without RideConfig.txt: Gold is unlocked by the wads, and nothing else is written.
+    std::string root = scratch + "/gold-rides";
+    RemoveTree(root);
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    Importer imp(cfg);
+    std::string err;
+    CHECK(imp.Open(err));
+    ImportReport r = imp.Import({d.goldRides});
+    Events(imp);
+    PrintStatus("the Gold rides alone", r);
+    CHECK(r.errors.empty());
+    CHECK(r.status[2].unlocked);
+    CHECK_EQ(r.status[2].present, 35);
+    CHECK_EQ(r.status[2].filesPresent, 35);
+    CHECK_EQ(r.status[2].required, 35);
+    CHECK_EQ(Tree(imp.GameFolder(kEditionGold), false).size(), 35);
+    CHECK_EQ(r.status[0].present, 0);
+    CHECK(imp.RemoveEdition(kEditionGold, err));
+    RemoveTree(root);
 }
 
 // ---- the game's icon (icon.h): a .ico made here, its PNG, and a drop that carries one
@@ -1865,6 +1932,7 @@ int main() {
         d.eurImg = source("eur-a");
         d.eurFirst = source("eur-first");
         d.goldZip = source("gold-zip");
+        d.goldRides = source("gold-rides");
         d.pcUs = source("pc-us");
         d.pcUsFirst = source("pc-us-first");
         d.pcEur = source("pc-eur");
