@@ -745,7 +745,9 @@ int32_t CFSLoadSave::Save(const TbDynamicStringTemplate<char16_t>& name) {
     ev("CFSLoadSave::Save", {lab(this)}, {calllog::narrow(name.mData).c_str()});
     return 1;
 }
-void CFSLoadSave::LoadMostRecent() { ev("CFSLoadSave::LoadMostRecent", {lab(this)}); }
+void CFSLoadSave::LoadMostRecent() {
+    ev("CFSLoadSave::LoadMostRecent", {lab(this)});
+}
 int32_t CSaveLoad::Load(const char* path, CSaveLoadHeader* header, LoadType type) {
     ev("CSaveLoad::Load", {lab(this), lab(header), type}, {text_or_null(path)});
     return 1;   // (GAMESYSTEM_Tick ignores the answer)

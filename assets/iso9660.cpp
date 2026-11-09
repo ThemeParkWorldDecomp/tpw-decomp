@@ -111,6 +111,7 @@ public:
 
     uint64_t Total() const { return total_; }
     bool Raw() const { return raw_; }
+    std::shared_ptr<Blob> ImageBlob() const { return blob_; }
 
 private:
     std::shared_ptr<Blob> blob_;
@@ -221,6 +222,7 @@ class IsoSource : public Source {
 public:
     const char* Kind() const override { return "iso9660"; }
     const std::vector<Entry>& Entries() const override { return entries_; }
+    std::shared_ptr<Blob> ImageBlob() const override { return sectors_->ImageBlob(); }
 
     std::unique_ptr<Stream> Open(const Entry& entry, std::string& err) override {
         if (entry.id >= files_.size()) {

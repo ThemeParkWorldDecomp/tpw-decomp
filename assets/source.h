@@ -68,6 +68,9 @@ public:
     virtual const std::vector<Entry>& Entries() const = 0;
     // Null with a message in err when the entry cannot be read (unsupported compression, missing file, ...).
     virtual std::unique_ptr<Stream> Open(const Entry& entry, std::string& err) = 0;
+    // The original image bytes when this is an ISO source, including raw sector checks when present. Nested images
+    // keep their spilled Blob alive too, so content importers can inspect the disc without unpacking it again.
+    virtual std::shared_ptr<Blob> ImageBlob() const { return nullptr; }
 };
 
 // ---- Blobs (source.cpp)

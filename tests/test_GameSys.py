@@ -8,6 +8,10 @@ sides, runs the function, and compares the call logs, the result, the globals th
 writes, the labels of its pointer globals and the fields of the objects they reach.
 The unit's functions call each other for real on both sides (the PowerPC side lifts any
 stubs other modules left on them).
+
+With the port's fixes on, the fix heldpark (src/game/GameSys.cpp): a case's "hold" makes the park the load (state 9) brings
+in one that needs a ride the game has not got, or starts leaving (state 11) with a park held. The host is checked for
+exactly what the fix does (held_check), and the Mac's own answer is then compared for the rest.
 """
 import ctypes as C
 import random
@@ -78,6 +82,7 @@ POSTCULL_TVECTOR = 0x10268A10
 SUBSCRIPTION_CTOR, SUBSCRIPTION_DTOR = 0x102657E8, 0x10267288
 
 VP, I32, U32, U8 = C.c_void_p, C.c_int32, C.c_uint32, C.c_uint8
+PORT_FIX = False   # the library has the port's fixes (tpw_gs_hold); set by setup
 
 # The unit's own functions: real on both sides.
 UNIT = [0x10233DE0, 0x10233E78, 0x102341DC, 0x1023436C, 0x102345C8, 0x102346D0, 0x10236548, 0x10236624,
@@ -595,6 +600,8 @@ def host_begin(lib, c):
     vals = (C.c_int32 * len(VALUES))(*[T.s32(v) for v in c.get("v", [0] * len(VALUES))])
     F(lib, "tpw_gs_set_values", None, VP)(vals)
     F(lib, "tpw_gs_set_object_fields", None, I32, I32, I32, I32)(*c.get("fields", (1, -1, 0, 0)))
+    if PORT_FIX:
+        F(lib, "tpw_gs_hold", None, I32, I32)(*c.get("hold", (0, 0)))
     cam = c.get("cam", [0.0] * 19)
     (C.c_float * 16).from_address(addr("gCameraMatrix"))[:] = cam[:16]
     (C.c_float * 3).from_address(addr("gCameraTarget"))[:] = cam[16:19]
@@ -626,7 +633,8 @@ STUBS = None
 
 
 def setup(runner):
-    global STUBS
+    global STUBS, PORT_FIX
+    PORT_FIX = hasattr(runner.lib, "tpw_gs_hold")
     e = runner.emu
     T.install_std_stubs(e)
     STUBS = build_stubs(e)
@@ -685,11 +693,48 @@ def fn_test(name, ppc_call, host_call, edge, rnd):
 
     def host_keep(lib, c):
         h = host(lib, c)
+        if PORT_FIX and any(c.get("hold", (0, 0))):
+            t._p["heldpark"] = None
+            h["heldpark"] = held_check(lib, t._p, h, c)
         t._last = (t._p, h)
         return h
 
     t.ppc, t.host = ppc_keep, host_keep
     return t
+
+
+def held_check(lib, p, h, c):
+    """The port's fix heldpark: a park its load held (CFSLoadSave::LoadMostRecent, or an online park's CSaveLoad::Load) is left
+    before its first frame: state 11, the status GS_LEAVE_PARK (2), the park still held, an online park's recording not
+    replayed. Leaving a held park (state 11) saves no autosave and lets the park go. None when the host did exactly that,
+    else what it did not do; the host's answer then takes the Mac's state, status and log, so the rest compares as without
+    the fix."""
+    load, held = c["hold"]
+    now = F(lib, "tpw_gs_held", I32)()
+    state = c["g"]["gGameSystemState"]
+    reached = c["g"]["gGameSystemInitialised"] != 0
+    if load:
+        loads = [ev for ev in h["log"] if ev[0] in ("CFSLoadSave::LoadMostRecent", "CSaveLoad::Load")]
+        if not loads:
+            return None if now == 0 else f"held {now} with no load"
+        if (h["gGameSystemState"], h["gCurrentGameStatus"], now) != (11, 2, 1):
+            return f"held load: state {h['gGameSystemState']} status {h['gCurrentGameStatus']} held {now}"
+        mac = [ev for ev in p["log"] if not (loads[0][0] == "CSaveLoad::Load" and ev[0] == "CActionRecorder::ReplayRecording")]
+        if h["log"] != mac:
+            return "held load: log " + CL.first_difference(mac, h["log"])
+        h["gGameSystemState"], h["gCurrentGameStatus"] = p["gGameSystemState"], p["gCurrentGameStatus"]
+        h["log"] = p["log"]
+        return None
+    leaving = state == (10 if c.get("close") else 11)   # GAMESYSTEM_Close leaves only a park (state 10), by state 11
+    if not leaving or not reached:
+        return None if now == held else f"held {now} after state {state}"
+    mac = [ev for ev in p["log"] if ev[0] != "CFSLoadSave::Save"]
+    if now != 0:
+        return f"leaving a held park left it held ({now})"
+    if h["log"] != mac:
+        return "leaving a held park: log " + CL.first_difference(mac, h["log"])
+    h["log"] = p["log"]
+    return None
 
 
 def call(e, addr, args=()):
@@ -891,6 +936,7 @@ def tick_park_load_rnd(r):
                    "LbTime_GetClock": clock})
     c["texts"] = {"theme": r.choice(["Lost Kingdom", "Halloween", ""]), "data": "HD:TPW:Data",
                   "ftp": r.choice(["HD:Downloads:park.TPWS", ""])}
+    c["hold"] = (r.choice([0, 0, 1]), 0)   # the port's fix heldpark: the load holds its park
     return c
 
 
@@ -929,6 +975,7 @@ def tick_leave_rnd(r):
     c["v"][17] = r.choice([0, 1, 1, 2])
     c["q"].update({"CFSOnlineSystem.pending": [r.choice([0, 1])], "CFSUserInfo.user": [r.choice([-1, 0])],
                    "CFSGlobalMasterSave::IsEasyModeUser": [r.choice([0, 1])]})
+    c["hold"] = (0, r.choice([0, 0, 1]))   # the port's fix heldpark: leaving a held park
     return c
 
 
@@ -945,6 +992,7 @@ def close_rnd(r):
     c = tick_leave_rnd(r)
     c["g"]["gGameSystemState"] = r.choice([10, 10, 2, 11, 0])
     c["g"]["gGameSystemInitialised"] = r.choice([0, 1, 1, 1])
+    c["close"] = 1
     return c
 
 

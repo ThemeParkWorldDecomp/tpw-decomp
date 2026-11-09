@@ -30,6 +30,8 @@
 #include "../sam_check.h"
 #include "../sha256.h"
 #include "../sniff.h"
+#include "../ps1_disc.h"
+#include "../ps1_convert.h"
 
 #ifndef TPW_DEVTOOLS_DIR
 #define TPW_DEVTOOLS_DIR "devtools"
@@ -247,6 +249,247 @@ void PrintStatus(const char* what, const ImportReport& r) {
 }
 
 // ---- synthetic drops
+
+// A complete tiny PlayStation image made here: repeated triangles, zero texture pages, symbolic names and a table
+// builder made of constant stores. It exercises discovery without copying any bytes from a player's disc.
+void Ps1Put(std::vector<uint8_t>& b, size_t p, uint32_t v, size_t bytes = 4) {
+    if (b.size() < p + bytes) b.resize(p + bytes);
+    for (size_t i = 0; i < bytes; ++i) b[p + i] = uint8_t(v >> (8 * i));
+}
+
+std::vector<uint8_t> Ps1FolioFixture() {
+    std::vector<std::vector<uint8_t>> entries(300);
+    const char* names[] = {"HALLOW_RIDES_JACK_JACK", "HALLOW_RIDES_JUMPER_JUMPER", "HALLOW_RIDES_SLIDE_SLIDE",
+        "HALLOW_RIDES_OBVER_OBVER", "JUNGLE_RIDES_BUNGIE_BUNGIE", "JUNGLE_RIDES_INCAPOT_INCAPOT",
+        "JUNGLE_RIDES_DIPLODIP_DIPLODIP", "SPACE_RIDES_JUMPER_JUMPER", "FANTASY_RIDES_SNAIL_SNAIL",
+        "FANTASY_RIDES_FLYFISH_FLYFISH"};
+    const size_t faces[] = {672, 260, 275, 202, 352, 268, 286, 276, 254, 305};
+    for (size_t i = 0; i < 10; ++i) {
+        auto& mesh = entries[i];
+        size_t trailer = 152 + 14 * faces[i];
+        mesh.resize(trailer + 8);
+        Ps1Put(mesh, 0, 0x96); Ps1Put(mesh, 4, 1); Ps1Put(mesh, 20, uint32_t(trailer));
+        Ps1Put(mesh, 24, uint32_t(trailer)); Ps1Put(mesh, 32, 40); Ps1Put(mesh, 48, 3);
+        Ps1Put(mesh, 148, uint32_t(faces[i]), 2);
+        for (size_t f = 0; f < faces[i]; ++f) { Ps1Put(mesh, 152 + 14 * f + 2, 1, 2); Ps1Put(mesh, 152 + 14 * f + 4, 2, 2); }
+        Ps1Put(mesh, trailer, 3); Ps1Put(mesh, trailer + 4, uint32_t(i));
+    }
+    auto& ids = entries[10];
+    ids.resize(4 + 16 * 4);
+    Ps1Put(ids, 0, 16);
+    for (size_t i = 0; i < 16; ++i) {
+        Ps1Put(ids, 4 + 4 * i, uint32_t(ids.size()));
+        std::string s = i < 10 ? std::string("STR_GRAPHICS_") + names[i] : "STR_TEST_" + std::to_string(i);
+        ids.insert(ids.end(), s.begin(), s.end()); ids.push_back(0);
+    }
+    std::vector<uint8_t> atlas(16 + 8192);
+    Ps1Put(atlas, 6, 1, 2); Ps1Put(atlas, 8, 1, 2);
+    for (size_t k = 0; k < 3; ++k) {
+        atlas.push_back(0); atlas.push_back(0);
+        size_t left = 8191;
+        while (left) { size_t n = std::min<size_t>(left, 255); atlas.push_back(255); atlas.push_back(uint8_t(n)); left -= n; }
+        atlas.push_back(128); atlas.push_back(0);
+    }
+    for (size_t i = 11; i < 23; ++i) entries[i] = atlas;
+    std::vector<uint8_t> folio(4096);
+    Ps1Put(folio, 0, 300);
+    for (size_t i = 0; i < entries.size(); ++i) {
+        Ps1Put(folio, 8 + 8 * i, uint32_t(folio.size()));
+        Ps1Put(folio, 12 + 8 * i, uint32_t(entries[i].size()));
+        folio.insert(folio.end(), entries[i].begin(), entries[i].end());
+        folio.resize((folio.size() + 2047) / 2048 * 2048);
+    }
+    return folio;
+}
+
+std::vector<uint8_t> Ps1BinaryFixture() {
+    std::vector<uint32_t> w = {0x3c1c8001, 0x279c0000, 0x27bdff00};
+    for (uint32_t i = 0; i < 43; ++i) w.push_back(0xafa00000 | (16 + 4 * i));
+    auto field = [&](uint32_t slot, uint32_t value) {
+        w.push_back(0x3c080000 | (value >> 16));
+        w.push_back(0x35080000 | (value & 65535));
+        w.push_back(0xafa80000 | (16 + 4 * slot));
+    };
+    const std::vector<uint32_t> lists[4][2] = {{{0, 1, 2}, {}}, {{4, 5}, {6}}, {{7}, {}}, {{9}, {8}}};
+    std::vector<uint8_t> b(8192);
+    for (uint32_t theme = 0; theme < 4; ++theme) {
+        for (uint32_t side = 0; side < 2; ++side) {
+            uint32_t at = 4096 + 128 * theme + 64 * side;
+            for (size_t i = 0; i < lists[theme][side].size(); ++i) Ps1Put(b, at + 4 * i, lists[theme][side][i]);
+        }
+        for (size_t duplicate = 0; duplicate < 2; ++duplicate) {
+            field(2, 0x80010000 + 4096 + 128 * theme); field(3, 0x80010000 + 4096 + 128 * theme + 64);
+            field(4, uint32_t(lists[theme][0].size())); field(5, uint32_t(lists[theme][1].size()));
+            for (uint32_t a = 0; a < 3; ++a) field(40 + a, 11 + 3 * theme + a);
+            w.push_back(0x8daf0000);
+        }
+    }
+    w.push_back(0x03e00008); w.push_back(0);
+    CHECK(w.size() * 4 < 4096);
+    for (size_t i = 0; i < w.size(); ++i) Ps1Put(b, i * 4, w[i]);
+    return b;
+}
+
+std::vector<uint8_t> Ps1ImageFixture(const std::string& boot = "SLUS_010.69") {
+    struct File { std::string name; std::vector<uint8_t> bytes; uint32_t sector; };
+    std::string cnf = "BOOT=cdrom:\\" + boot + ";1\r\n";
+    std::vector<File> files = {{"SYSTEM.CNF", {cnf.begin(), cnf.end()}, 0},
+        {boot, {'P', 'S', '-', 'X', ' ', 'E', 'X', 'E'}, 0}, {"FOLIO.GAZ", Ps1FolioFixture(), 0},
+        {"TPW.BIN", Ps1BinaryFixture(), 0}, {"TPW.OVL", {0}, 0}};
+    uint32_t sector = 21;
+    for (auto& f : files) { f.sector = sector; sector += uint32_t((f.bytes.size() + 2047) / 2048); }
+    std::vector<uint8_t> image(size_t(sector) * 2048);
+    size_t pvd = 16 * 2048;
+    image[pvd] = 1; std::memcpy(image.data() + pvd + 1, "CD001", 5);
+    std::fill(image.begin() + pvd + 8, image.begin() + pvd + 40, ' ');
+    std::memcpy(image.data() + pvd + 8, "PLAYSTATION", 11);
+    Ps1Put(image, pvd + 80, sector); Ps1Put(image, pvd + 128, 2048, 2);
+    auto record = [&](size_t p, const std::string& name, uint32_t at, uint32_t bytes, uint8_t flags) {
+        size_t n = 33 + name.size() + (name.size() % 2 == 0);
+        image[p] = uint8_t(n); Ps1Put(image, p + 2, at); Ps1Put(image, p + 10, bytes);
+        image[p + 25] = flags; image[p + 32] = uint8_t(name.size()); std::memcpy(image.data() + p + 33, name.data(), name.size());
+        return n;
+    };
+    record(pvd + 156, std::string(1, '\0'), 20, 2048, 2);
+    size_t pos = 20 * 2048;
+    pos += record(pos, std::string(1, '\0'), 20, 2048, 2);
+    pos += record(pos, std::string(1, '\1'), 20, 2048, 2);
+    for (const auto& f : files) {
+        pos += record(pos, f.name + ";1", f.sector, uint32_t(f.bytes.size()), 0);
+        std::copy(f.bytes.begin(), f.bytes.end(), image.begin() + size_t(f.sector) * 2048);
+    }
+    return image;
+}
+
+std::vector<uint8_t> Ps1RawFixture(const std::vector<uint8_t>& cooked, size_t stride) {
+    std::vector<uint8_t> raw(cooked.size() / 2048 * stride);
+    auto bcd = [](size_t x) { return uint8_t((x / 10) * 16 + x % 10); };
+    for (size_t sector = 0; sector < cooked.size() / 2048; ++sector) {
+        size_t p = sector * stride, address = sector + 150;
+        for (size_t k = 1; k < 11; ++k) raw[p + k] = 255;
+        raw[p + 12] = bcd(address / (60 * 75)); raw[p + 13] = bcd(address / 75 % 60);
+        raw[p + 14] = bcd(address % 75); raw[p + 15] = 2;
+        std::copy(cooked.begin() + sector * 2048, cooked.begin() + (sector + 1) * 2048, raw.begin() + p + 24);
+        uint32_t edc = 0;
+        for (size_t k = p + 16; k < p + 2072; ++k) {
+            edc ^= raw[k];
+            for (size_t bit = 0; bit < 8; ++bit) edc = (edc >> 1) ^ ((edc & 1) ? 0xd8018001u : 0);
+        }
+        Ps1Put(raw, p + 2072, edc);
+    }
+    return raw;
+}
+
+void TestPlayStation(const std::string& scratch) {
+    std::printf("PlayStation recognition and refusals\n");
+    Ps1Disc disc;
+    std::string why;
+    auto image = Ps1ImageFixture();
+    CHECK(RecognisePs1(MakeMemoryBlob(image), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "USA" && disc.boot == "SLUS_010.69");
+    CHECK_EQ(disc.entries.size(), 300); CHECK_EQ(disc.rides.size(), 10); CHECK_EQ(disc.themes.size(), 4);
+    CHECK_EQ(disc.rides.at("HALLOW/OBVER").entry, 3);
+    CHECK_EQ(disc.rides.at("HALLOW/OBVER").rideAtlas, 13);
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("SLES_026.88")), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "Europe");
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("SLPS_026.43")), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "Japan");
+    auto raw = Ps1RawFixture(image, 2352);
+    CHECK(RecognisePs1(MakeMemoryBlob(raw), disc, why) == Ps1Status::Supported);
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1RawFixture(image, 2448)), disc, why) == Ps1Status::Supported);
+    raw[23 * 2352 + 24 + 500] ^= 1;
+    CHECK(RecognisePs1(MakeMemoryBlob(raw), disc, why) == Ps1Status::Rejected);
+    CHECK(why.find("EDC mismatch") != std::string::npos);
+    raw = Ps1RawFixture(image, 2352); raw[23 * 2352 + 12] ^= 1;
+    CHECK(RecognisePs1(MakeMemoryBlob(raw), disc, why) == Ps1Status::Rejected);
+    CHECK(why.find("wrong address") != std::string::npos);
+    raw = Ps1RawFixture(image, 2352); raw[23 * 2352] = 1;
+    CHECK(RecognisePs1(MakeMemoryBlob(raw), disc, why) == Ps1Status::Rejected);
+    CHECK(why.find("no sync") != std::string::npos);
+    raw = Ps1RawFixture(image, 2352); raw[23 * 2352 + 16] = 1;
+    CHECK(RecognisePs1(MakeMemoryBlob(raw), disc, why) == Ps1Status::Rejected);
+    CHECK(why.find("sub-header copies differ") != std::string::npos);
+    raw = Ps1RawFixture(image, 2352); raw[23 * 2352 + 18] = raw[23 * 2352 + 22] = 0x20;
+    CHECK(RecognisePs1(MakeMemoryBlob(raw), disc, why) == Ps1Status::Rejected);
+    CHECK(why.find("Form 2") != std::string::npos);
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("SLUS_999.99")), disc, why) == Ps1Status::Rejected);
+    CHECK(why.find("supported PlayStation") != std::string::npos);
+    CHECK(RecognisePs1(MakeMemoryBlob({1, 2, 3}), disc, why) == Ps1Status::NotPlayStation);
+    image[16 * 2048 + 8] = 'X';
+    CHECK(RecognisePs1(MakeMemoryBlob(image), disc, why) == Ps1Status::NotPlayStation);
+    image = Ps1ImageFixture(); image.resize(image.size() - 2048);
+    CHECK(RecognisePs1(MakeMemoryBlob(image), disc, why) == Ps1Status::Rejected);
+    CHECK(why.find("truncated") != std::string::npos);
+    image = Ps1ImageFixture(); image[22 * 2048] = 0;
+    CHECK(RecognisePs1(MakeMemoryBlob(image), disc, why) == Ps1Status::Rejected);
+    CHECK(why.find("not a PS1 executable") != std::string::npos);
+    image = Ps1ImageFixture(); Ps1Put(image, 23 * 2048 + 8, 1);
+    CHECK(RecognisePs1(MakeMemoryBlob(image), disc, why) == Ps1Status::Rejected);
+    CHECK(why.find("directory entry") != std::string::npos);
+    auto folio = Ps1FolioFixture();
+    std::vector<std::vector<uint8_t>> entries;
+    CHECK(ReadPs1Folio(folio, entries, why)); CHECK_EQ(entries.size(), 300);
+    Ps1Put(folio, 16, 0);
+    CHECK(!ReadPs1Folio(folio, entries, why)); CHECK(entries.empty());
+    CHECK(!ReadPs1Folio({}, entries, why));
+    folio = Ps1FolioFixture(); Ps1Put(folio, 4, 1000);
+    CHECK(!ReadPs1Folio(folio, entries, why));
+    folio = Ps1FolioFixture(); Ps1Put(folio, 12, uint32_t(folio.size()));
+    CHECK(!ReadPs1Folio(folio, entries, why));
+
+    std::string root = scratch + "/ps1-data", drop = scratch + "/ps1-drop";
+    ImporterConfig cfg; cfg.dataRoot = root;
+    Importer imp(cfg); CHECK(imp.Open(why));
+    std::string imagePath = drop + "/disc.iso";
+    auto good = Ps1ImageFixture();
+    WriteFile(imagePath, std::string(good.begin(), good.end()));
+    auto missingDonors = imp.Import({imagePath});
+    CHECK(!missingDonors.playStationConverted);
+    CHECK_EQ(missingDonors.playStation.size(), 1);
+    CHECK(missingDonors.playStation[0].find("drop your US or European PC disc") != std::string::npos);
+    CHECK(!Exists(root + "/assets/ps1"));
+    good.resize(good.size() - 2048);
+    WriteFile(imagePath, std::string(good.begin(), good.end()));
+    auto refused = imp.Import({imagePath});
+    CHECK_EQ(refused.errors.size(), 1);
+    CHECK(refused.errors[0].find("truncated") != std::string::npos);
+    CHECK(!refused.playStationConverted && !Exists(root + "/assets/ps1"));
+    WriteFile(root + "/assets/ps1/data/levels/hallow/rides/_test_201/_test.sam", "preserved");
+    for (Edition edition : {kEditionUs, kEditionEur, kEditionGold, kEditionLanguages}) imp.VerifyEdition(edition, why);
+    CHECK(ReadText(root + "/assets/ps1/data/levels/hallow/rides/_test_201/_test.sam") == "preserved");
+    for (const std::string ext : {"chd", "ecm", "pbp"}) {
+        std::string file = drop + "/unsupported." + ext;
+        WriteFile(file, "unsupported");
+        auto report = imp.Import({file});
+        CHECK_EQ(report.errors.size(), 1);
+        CHECK(report.errors[0].find(".cue/.bin") != std::string::npos);
+    }
+    std::string staged = root + "/assets/.staging/ps1-atomic", destination = root + "/assets/ps1/atomic";
+    WriteFile(staged + "/first", "first complete file"); WriteFile(staged + "/second", "second complete file");
+    CHECK(InstallPs1Ride(staged, destination, why));
+    CHECK(!Exists(staged));
+    CHECK(ReadText(destination + "/first") == "first complete file" && ReadText(destination + "/second") == "second complete file");
+    CHECK(!InstallPs1Ride(staged, destination, why));
+    CHECK(ReadText(destination + "/first") == "first complete file");
+    WriteFile(staged + "/replacement", "complete replacement");
+    CHECK(InstallPs1Ride(staged, destination, why));
+    CHECK(!Exists(destination + "/first") && ReadText(destination + "/replacement") == "complete replacement");
+    std::string backup = root + "/assets/ps1/.ps1-previous-atomic";
+    CHECK(!Exists(backup));
+    // An interruption after moving the old ride aside: the next import restores it before replacing it.
+    fs::rename(destination, backup);
+    WriteFile(staged + "/recovered", "complete recovered replacement");
+    CHECK(InstallPs1Ride(staged, destination, why));
+    CHECK(!Exists(backup) && ReadText(destination + "/recovered") == "complete recovered replacement");
+    // An interruption after publishing the new ride: a stale old backup must not prevent another drop.
+    WriteFile(backup + "/old", "old complete ride");
+    WriteFile(staged + "/latest", "latest complete replacement");
+    CHECK(InstallPs1Ride(staged, destination, why));
+    CHECK(!Exists(backup) && ReadText(destination + "/latest") == "latest complete replacement");
+    CHECK(!InstallPs1Ride(staged, destination, why));
+    CHECK(ReadText(destination + "/latest") == "latest complete replacement");
+    RemoveTree(root); RemoveTree(drop);
+}
 
 void TestSynthetic(const std::string& scratch) {
     std::printf("synthetic drops\n");
@@ -1907,6 +2150,7 @@ int main() {
     fs::create_directories(scratch);
 
     TestSynthetic(scratch);
+    TestPlayStation(scratch);
     TestIcon(scratch);
     TestStartupCheck(scratch);
     TestEditedSettings(scratch);

@@ -16,6 +16,8 @@
 #include <unordered_map>
 
 #include "icon.h"
+#include "ps1_disc.h"
+#include "ps1_convert.h"
 #include "sam_check.h"
 #include "sha256.h"
 #include "sniff.h"
@@ -87,6 +89,13 @@ bool ContainerExtension(const std::string& ext) {
         if (ext == e) return true;
     }
     return false;
+}
+
+std::string UnsupportedDiscFormat(const std::string& path) {
+    const std::string ext = Extension(path);
+    if (ext == "chd" || ext == "ecm" || ext == "pbp")
+        return "." + ext + " disc images cannot be read. Drop a .cue/.bin or .iso image instead.";
+    return {};
 }
 
 // The path the evidence check compares with destinations: a resource fork is the "<path>.rsrc" side file.
@@ -478,7 +487,9 @@ std::string ImportReport::Summary() const {
     std::ostringstream ss;
     if (aborted) ss << "Stopped by an error. ";
     else if (cancelled) ss << "Stopped. ";
-    if (written == 0 && !cancelled && !aborted) {
+    if (written == 0 && !cancelled && !aborted && !playStation.empty()) {
+        ss << playStation.front();
+    } else if (written == 0 && !cancelled && !aborted) {
         ss << "Nothing new: ";
         if (alreadyThere) ss << alreadyThere << " files were already in place.";
         else ss << "no file of the game was found.";
@@ -503,6 +514,7 @@ struct Importer::Run {
     ImportReport report;
     SniffOptions sniff;
     std::vector<Work> work;
+    std::vector<Ps1Disc> playStation;  // converted after ordinary files, so a combined PC/PS1 drop finds its donors
     uint64_t totalBytes = 0, doneBytes = 0;
     std::set<std::string> different;             // destinations a file of the drop has another version of
     std::set<std::string> matchedDests;          // destinations a file of the drop matched
@@ -1138,6 +1150,20 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
                 run.doneBytes += run.work[i].entry.size;
                 run.work[i].source.reset();  // a spilled image goes as soon as nothing needs it
             }
+            for (const Ps1Disc& disc : run.playStation) {
+                if (cancel_ || run.stop) break;
+                std::string reason;
+                const bool converted = ConvertPs1(disc, fs::u8path(config_.dataRoot), reason);
+                const std::string line = converted
+                    ? "PlayStation rides: 7 rides and the Tower converted from the " + disc.region + " disc (" + disc.boot + ")."
+                    : "PlayStation disc recognised (" + disc.region + ", " + disc.boot + "); " + OneLine(reason);
+                run.report.playStation.push_back(line);
+                run.report.playStationConverted = run.report.playStationConverted || converted;
+                ImportProgress ev;
+                ev.kind = ImportProgress::Kind::Content;
+                ev.message = line;
+                progress_.Push(ev);
+            }
             run.report.cancelled = cancel_ && !run.stop;
         }
     } catch (...) {
@@ -1241,6 +1267,12 @@ void Importer::EnumeratePath(Run& run, const std::string& path) {
         fail(err);
         return;
     }
+    if (PlayStationImage(run, blob, BaseName(key))) return;
+    const std::string format = UnsupportedDiscFormat(key);
+    if (!format.empty()) {
+        fail(format);
+        return;
+    }
     std::string sniffErr;
     SniffStatus sniffStatus = SniffStatus::NotContainer;
     std::shared_ptr<Source> source = OpenSniffed(blob, run.sniff, 0, sniffStatus, sniffErr);
@@ -1264,6 +1296,9 @@ void Importer::EnumeratePath(Run& run, const std::string& path) {
 
 void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const std::string& display,
                          const std::string& folderRoot, int depth) {
+    if (const auto blob = source->ImageBlob()) {
+        if (PlayStationImage(run, blob, display)) return;
+    }
     // a drop that holds the data folder does not read it back
     std::string skip;
     if (!folderRoot.empty() && Under(assetsCanon_, folderRoot) && assetsCanon_ != folderRoot) {
@@ -1274,6 +1309,16 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
         if (cancel_ || run.stop) return;
         if (!skip.empty() && Under(e.path, skip)) continue;
         std::string name = display.empty() ? e.path : display + "/" + e.path;
+        const std::string format = UnsupportedDiscFormat(e.path);
+        if (e.kind == EntryKind::Data && !format.empty()) {
+            run.report.errors.push_back(name + ": " + format);
+            ImportProgress ev;
+            ev.kind = ImportProgress::Kind::Error;
+            ev.path = name;
+            ev.message = name + ": " + format;
+            progress_.Push(ev);
+            continue;
+        }
         if (e.unreadable) {   // no game file is in such a cab folder: an installer's own files, ignored
             ++run.report.entries;
             ++run.report.unknownFiles;
@@ -1368,6 +1413,26 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
             Unmatched(run, e);
         }
     }
+}
+
+bool Importer::PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display) {
+    Ps1Disc disc;
+    std::string reason;
+    const Ps1Status status = RecognisePs1(blob, disc, reason);
+    if (status == Ps1Status::NotPlayStation) return false;
+    ++run.report.containers;
+    if (status == Ps1Status::Supported) {
+        run.playStation.push_back(std::move(disc));
+    } else {
+        const std::string line = display + ": PlayStation disc refused: " + OneLine(reason);
+        run.report.errors.push_back(line);
+        ImportProgress ev;
+        ev.kind = ImportProgress::Kind::Error;
+        ev.path = display;
+        ev.message = line;
+        progress_.Push(ev);
+    }
+    return true;
 }
 
 void Importer::Unmatched(Run& run, const Entry& entry) {

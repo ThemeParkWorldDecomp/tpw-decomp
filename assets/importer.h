@@ -3,7 +3,7 @@
 // by content: size first, then SHA-256 only when the size is one the manifest holds. A match is written to every
 // destination that accepts it (a content can belong in several places and in more than one edition), each by staging
 // and an atomic rename, so the data folder only ever holds verified files. Nothing is downloaded and nothing that is not
-// in the manifest is written.
+// in the manifest is written, except the supported PlayStation disc's converted content (ps1_disc.h, ps1_convert.h).
 //
 // Data folder (the SDL pref path in the launcher, any folder in a test):
 //   assets/us/Theme Park Data/<dest>    the US edition's game folder
@@ -11,6 +11,7 @@
 //   assets/us-pc/Theme Park Data/<dest>, assets/eur-pc/Theme Park Data/<dest>   the Windows discs' editions
 //   assets/gold/<name>                  the Gold rides (manifest destinations "gold/<name>")
 //   assets/lang/<Name>/<game path>      the language packs (destinations "lang/<Name>/<game path>"; Languages())
+//   assets/ps1/data/levels/<theme>/...   converted PlayStation content, outside manifest verification
 //   assets/.staging/                    files being written and big images being unpacked; emptied on every start
 //   assets/verified.tsv                 size and modification time of every verified file (the startup check)
 //   launcher.ini                        data folder, edition states, last choice (LauncherIni)
@@ -136,6 +137,7 @@ struct ImportProgress {
         AlreadyThere,      // path: a destination that already held the verified file
         DifferentVersion,  // path: a known destination whose content in the drop differs (not used); sent at the end
         Error,             // message: something could not be read or written (the import goes on unless it says so)
+        Content,           // message: a content conversion's result, such as the PlayStation rides
         Finished,          // the last event of an import; message: ImportReport::Summary()
     };
     Kind kind = Kind::Scanning;
@@ -176,13 +178,15 @@ struct ImportReport {
     std::vector<std::string> differentVersions;  // destinations ("data/..."), sorted, whose file in the drop has other content
     uint64_t unknownFiles = 0, unknownBytes = 0; // counted, never listed
     std::vector<std::string> errors;
+    std::vector<std::string> playStation;  // recognised discs and their conversion result, one plain line per disc
+    bool playStationConverted = false;
     // The game's icon (icon.h) when this drop wrote <data folder>/icon.png: where it came from ("TP.ico, 64x64, 8-bit");
     // empty when the drop held none, or none better than the one already there.
     std::string icon;
     // us, eur, gold, (3: unused, the language packs are `languages`), us-pc, eur-pc after the drop: EditionIndex order
     EditionStatus status[6];
     std::vector<LanguageStatus> languages;  // every language pack after the drop, in the manifest's order
-    bool ChangedNothing() const { return written == 0; }
+    bool ChangedNothing() const { return written == 0 && !playStationConverted; }
     // One plain line for the log and the Finished event, e.g. "Nothing new: 1683 files were already in place."
     std::string Summary() const;
 };
@@ -294,6 +298,7 @@ private:
     void Enumerate(Run& run, const std::shared_ptr<Source>& source, const std::string& display,
                    const std::string& folderRoot, int depth);
     void EnumeratePath(Run& run, const std::string& path);
+    bool PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display);
     void Process(Run& run, Work& work);
     void Unmatched(Run& run, const Entry& entry);
     bool Install(Run& run, std::string staged, const std::vector<std::pair<Edition, uint32_t>>& targets);
