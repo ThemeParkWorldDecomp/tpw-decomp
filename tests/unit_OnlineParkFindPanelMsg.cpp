@@ -316,7 +316,8 @@ int32_t tpw_opfp_units(int32_t width, int32_t height) {
 
 void tpw_opfp_create() { CreateOnlinePanel(); }
 // The windows CreateOnlinePanel had hear the whole screen since the last call: 1 for the two button underlays (gOnlineWindowE90, then
-// gOnlineWindowE8c), 0 for none, -1 for anything else. A library built without the port fixes has none.
+// gOnlineWindowE8c), after the panel's root (gOnlinePanel, onlineedge) when it built the panel, 0 for none, -1 for anything else. A
+// library built without the port fixes has none.
 int32_t tpw_opfp_heard() {
     return 0;
 }
