@@ -1168,8 +1168,9 @@ void HandleCamera() {
             if (gCameraF68 < gCameraWideZoomMin) gCameraF68 = gCameraWideZoomMin;
             else if (gCameraF68 > gCameraWideZoomMax) gCameraF68 = gCameraWideZoomMax;
         } else {
+            const float farthest = Bits(0x43020000u);
             if (gCameraF68 < Bits(0x428c0000u)) gCameraF68 = Bits(0x428c0000u);
-            else if (gCameraF68 > Bits(0x43020000u)) gCameraF68 = Bits(0x43020000u);
+            else if (gCameraF68 > farthest) gCameraF68 = farthest;
         }
     }
     std::memcpy(gCameraTarget, gCameraPosition, sizeof gCameraTarget);

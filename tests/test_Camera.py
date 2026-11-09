@@ -530,5 +530,64 @@ class HandleCameraTest(FnTest):
         return FnTest.run_case(self, runner, case)
 
 
+# ------------------------------------------------------------------ the far zoom (farzoom, a port setting)
+
+# The launcher's "Zoom out further" (gPortFarZoom, include/TPCamera.h) keeps the park view's zoom within 70 and kPortFarZoomOut
+# (300) where the Mac keeps it within 70 and 130. The original has those sums already: its hidden full zoom out (bit 0x200 of
+# gCameraModeA) clamps to gCameraWideZoomMin and gCameraWideZoomMax. So the port with the setting on is compared with the
+# original in that mode with its limits made 70 and 300, and with the hidden mode itself left as the original's (40 to 300).
+# The bit and the two limits are the only words that differ: words 1 and 2 (the modes) are compared without 0x200 and words 22
+# to 25 (the limits and their once flags) not at all, apart from a case in the hidden mode, which is compared whole. A build
+# without the port's fixes has no setting and runs no case.
+FAR = fb(f32(300.0))
+WIDE_WORDS = range(22, 26)
+
+
+def far_edges():
+    r = random.Random(2468)
+    for f68 in (20.0, 40.0, 69.0, 70.0, 110.0, 130.0, 130.5, 131.0, 188.0, 250.0, 299.0, 300.0, 300.5, 301.0, 380.0):
+        for mode in (0x80, 0x280, 0x00, 0x200, 0x180):
+            for keys in (0, 1, 2):
+                yield make(r, f68=fb(f32(f68)), modeA=mode, modeB=mode, keys=keys, flags=0, wideOnce=0, wideMaxOnce=0)
+    for c in edges():
+        yield c
+
+
+def far_view(words, case):
+    out = list(words)
+    if (case["modeA"] & 0x200) == 0:
+        out[1] &= ~0x200
+        out[2] &= ~0x200
+        for i in WIDE_WORDS:
+            out[i] = 0
+    return out
+
+
+def ppc_far(e, case):
+    wide = case
+    if (case["modeA"] & 0x200) == 0:
+        wide = dict(case, modeA=case["modeA"] | 0x200, wideOnce=1, wideMin=fb(f32(70.0)), wideMaxOnce=1, wideMax=FAR)
+    words, log = ppc(e, wide)
+    return far_view(words, case), log
+
+
+def host_far(lib, case):
+    lib.tpw_cam_far_zoom.argtypes = [C.c_int32]
+    lib.tpw_cam_far_zoom(1)
+    try:
+        words, log = host(lib, case)
+    finally:
+        lib.tpw_cam_far_zoom(0)
+    return far_view(words, case), log
+
+
+class FarZoomTest(HandleCameraTest):
+    def run_case(self, runner, case):
+        if not port_fix(runner.lib):
+            return []
+        return HandleCameraTest.run_case(self, runner, case)
+
+
 TESTS = [HandleCameraTest("HandleCamera", ppc, host, edge=edges, rnd=rnd), FnTest("SetLMatrixOrientationHi", ppc_orient, host_orient,
-                                                                                  edge=orient_edges, rnd=orient_rnd)]
+                                                                                  edge=orient_edges, rnd=orient_rnd),
+         FarZoomTest("HandleCamera far zoom", ppc_far, host_far, edge=far_edges, rnd=rnd)]
