@@ -197,7 +197,9 @@ void UpdateAvatarPos() {
     }
     gOnlineSavedFlags = gFirstPersonFlags;
     if (gOnlineFirstPersonCountdown != 0) gOnlineFirstPersonCountdown = gOnlineFirstPersonCountdown - 1;
-    if (gOnlineFirstPersonCountdown != 0 || gOnlineByte78 == 0) return;
+    if (gOnlineFirstPersonCountdown != 0 || gOnlineByte78 == 0) {
+        return;
+    }
 
     uint8_t x[2];
     uint8_t z[2];
