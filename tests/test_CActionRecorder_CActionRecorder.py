@@ -23,6 +23,10 @@ left (the size less the position, the queues PortSize and PortPos, which the ori
 (the queue Got): a size larger than what is left answers 1 right after the size is read, and a short read answers 1 right after
 LbFile_Read. The original's side is cut there (its answer 1, its log up to that event; nothing before it touches the object), and in
 the first case it runs with a recording size of 0 (only the port's cases ask for more than the file holds, up to 0xffffffff).
+With the port fixes (port_fix tag loopcode) a load also puts back the actions the Mac's recorder wrote as 0 in the recording it read
+(PortRepairOldPylonCodes, read with the table words): the original's Write of the recording is compared as the hash of the bytes
+repair() below gives (the model of that function; the host's table words past the 232 are 0). ser_edges adds loads of recordings
+built to hold such 0s.
 """
 import ctypes as C
 import random
@@ -64,6 +68,144 @@ def hsh(data):
 
 def pattern(n):
     return bytes(((i * 7) + n) & 0xFF for i in range(n))
+
+
+OLD = -1
+
+
+def repair(data, kinds):
+    """With the port fixes (loopcode): the recording as PortRepairOldPylonCodes leaves it, read with the operand kinds given (a line for
+    line model of it: the rules are in its comment)."""
+    d = bytearray(data)
+    n, ent, i = len(d), [], 0
+    fixed = {0: 2, 2: 4, 3: 3, 4: 6, 5: 10, 6: 4, 7: 6, 8: 0, 11: 128}
+    while i < n:
+        b, at = d[i], i
+        k = kinds[b] & MASK
+        i += 1
+        if k == 1:
+            if i + 2 <= n and b == 0 and (d[i] | d[i + 1] << 8) > 0xFF:
+                ent.append([at, OLD, -1, True])
+                continue
+            need = 2
+        elif k == 9:
+            need = 1 if i + 1 > n else 1 + 2 * d[i]
+        elif k == 10:
+            need = 3 if i + 3 > n else 3 + 2 * d[i + 2]
+        else:
+            need = fixed.get(k, 0)
+        if i + need > n:
+            break
+        ent.append([at, b, (d[i] | d[i + 1] << 8) if (b == 0 and need == 2) else -1, False])
+        i += need
+    m = len(ent)
+    code = [e[1] for e in ent]
+    mode = [e[2] for e in ent]
+    press, end = [False] * m, [False] * m
+
+    def c(j):
+        return code[j] if 0 <= j < m else -2
+
+    def click(j):
+        return c(j) in (0x14, 0x2D)
+
+    def after_click(j):
+        return click(j - 1) or (c(j - 1) == 0x44 and click(j - 2))
+
+    def is_press(j):
+        return press[j] or (c(j) in (0x37, 0x38) and c(j - 1) in (0x1E, 0x3F))
+
+    def is_end(j):
+        return end[j] or (c(j) == 0x37 and after_click(j))
+
+    def is_type(j):
+        return c(j) in (0x37, 0x38, 0x41)
+
+    def stops(k):
+        return is_type(k) or (c(k) == 0 and mode[k] != 0x15)
+
+    def resumes(j):
+        if c(j) != 0x41:
+            return False
+        undone = 1
+        for k in range(j - 1, -1, -1):
+            if click(k):
+                undone -= 1
+                if undone == 0:
+                    return False
+            elif c(k) == 0x41:
+                undone += 1
+            elif c(k) == 0x3F:
+                return False
+            elif undone == 1 and is_end(k):
+                return True
+        return False
+
+    def ends_loop(j):
+        clicks, stop, first, seen = 0, -1, -1, []
+        for k in range(j - 1, -1, -1):
+            if click(k):
+                if first >= 0:
+                    break
+                clicks += 1
+                if clicks > 2:
+                    return False
+            elif is_press(k):
+                seen.append(k)
+                if clicks == 2 and first < 0:
+                    first = k
+            elif stops(k):
+                stop = k
+                break
+        resumed = stop >= 0 and resumes(stop)
+        if clicks == 1 and resumed:
+            first = seen[-1] if seen else -1
+        elif not (clicks == 2 and not resumed and first >= 0):
+            return False
+        for k in seen:
+            if press[k]:
+                code[k] = 0x38
+            if k == first:
+                break
+        return True
+
+    def undid_loop_start(j):
+        placed = False
+        for k in range(j - 1, -1, -1):
+            if click(k):
+                if placed:
+                    return
+                placed = True
+            elif is_press(k):
+                if press[k]:
+                    code[k] = 0x38
+                if placed:
+                    return
+            elif stops(k):
+                return
+
+    j = 0
+    while j < m:
+        if code[j] == OLD:
+            p = c(j - 1)
+            if p in (0x1E, 0x3F):
+                code[j], press[j] = 0x37, True
+            elif c(j + 1) == OLD:
+                code[j] = 0x41
+                j += 1
+                code[j] = 0x37
+                undid_loop_start(j - 1)
+            elif p == 0x41:
+                code[j] = 0x37
+            elif after_click(j) and ends_loop(j):
+                code[j], end[j] = 0x37, True
+            else:
+                code[j] = 0x41
+        j += 1
+    for e, cd in zip(ent, code):
+        if e[3]:
+            d[e[0]] = cd
+    return bytes(d)
 
 
 def cbytes(e, addr):
@@ -401,6 +543,15 @@ def ppc(e, case):
     if stop is not None:
         at = max(i for i, ev in enumerate(out["log"]) if ev[0] == stop)
         out = dict(out, answer=1, log=out["log"][:at + 1])
+    elif PORT_FIX and case["op"] == "ser" and case["args"][0] == 0 and 0 <= s32(case["args"][1]) < 2:
+        # a load: the recording it keeps is the one read (pattern) with the old pylon codes put back (loopcode)
+        kinds = list(case["tail"]) + [0] * (256 - TAIL_WORDS)
+        log = []
+        for name, ints, texts in out["log"]:
+            if name == "Write":
+                ints = (ints[0], ints[1], hsh(repair(pattern(ints[1]), kinds)))
+            log.append((name, ints, texts))
+        out = dict(out, log=log)
     return out
 
 
@@ -511,6 +662,13 @@ def ser_edges():
                 continue   # the original would really allocate and copy it
             for got in {size, max(size - 1, 0), 0}:
                 yield ser_case(r, [0, 1, 0], LOADVAR_u_v=[size], PortPos=[pos & MASK], PortSize=[end & MASK], Got=[got & MASK], **ok)
+    # a load of a recording that holds 0s the Mac's recorder wrote for its actions without operands (what loopcode changes): each
+    # byte an action without operands but the 0 (a halfword, so the 0 before the pattern's next two bytes is such a 0)
+    for size in (1, 2, 3, 37, 130, 256, 600, 2000):
+        for kind0 in (1, 0, 8):
+            c = ser_case(r, [0, r.choice([0, 1]), 0], LOADVAR_u_v=[size], PortPos=[0], PortSize=[size], Got=[size], **ok)
+            c["tail"] = [kind0] + [r.choice([8, 8, 8, 12, 0xFFFFFFFF]) for _ in range(TAIL_WORDS - 1)]
+            yield c
 
 
 # ---- RecordAction

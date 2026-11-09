@@ -39,6 +39,7 @@
 #include <cstring>
 #include <new>
 #include <string>
+#include <vector>
 
 // ActionRecorder_CActionRecorder_CActionRecorder.cpp (main app): CActionRecorder constructor 0x10143658, destructor 0x10143880,
 // Serialise 0x101439dc and RecordAction 0x1014430c (unit v5075).
@@ -113,6 +114,7 @@ void CActionRecorder::Destruct() {
     reinterpret_cast<CMemFile*>(mTimingFile)->CMemFile::~CMemFile();
     reinterpret_cast<CMemFile*>(mActionFile)->CMemFile::~CMemFile();
 }
+
 
 int32_t CActionRecorder::Serialise(void* file, int32_t saving, int32_t version, uint32_t) {
     CFile* memory = FileOf(mActionFile);

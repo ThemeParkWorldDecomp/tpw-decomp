@@ -2,6 +2,7 @@
 # outside the unit are recording fakes in tests/unit_CActionRecorder_CActionRecorder.cpp.
 set(TPW_UNIT_CActionRecorder_CActionRecorder src/game/ActionRecorder.cpp platform/arena.cpp)
 set(TPW_UNIT_CActionRecorder_CActionRecorder_KEEP
+  __Z23PortRepairOldPylonCodesPhjPKj   # PortRepairOldPylonCodes(unsigned char*, unsigned int, unsigned int const*)
   __ZN15CActionRecorder12RecordActionE14RecordedActiontt   # CActionRecorder::RecordAction(RecordedAction, unsigned short, unsigned short)
   __ZN15CActionRecorder8DestructEv   # CActionRecorder::Destruct()
   __ZN15CActionRecorder9ConstructEv   # CActionRecorder::Construct()
