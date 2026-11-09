@@ -993,6 +993,15 @@ def typing_host(lib, c, st):
     return None
 
 
+def typing_host_run(lib, c):
+    out = run_host(typing_host)(lib, c)
+    if F(lib, "tpw_tpm_portfix", I32)() == 1:
+        # the port's typedletters fix: it passes a character past 0x7f to UI_KeyChar as its unsigned byte, where the Mac
+        # sign-extended it; compared as the Mac's value
+        out["log"] = [(e[0], e[1] - 0x100) + e[2:] if e[0] == "UI_KeyChar" and 0x80 <= e[1] <= 0xFF else e for e in out["log"]]
+    return out
+
+
 def mouse_case(r):
     return dict(h=r.randint(-3000, 3000), v=r.randint(-3000, 3000), mods=r.getrandbits(16), dx=r.randint(-200, 200),
                 dy=r.randint(-200, 200), button=r.choice([0, 1, 2, 0, 1, 2, 3, -1]), delta=T.rint(r),
@@ -1231,7 +1240,7 @@ TESTS = [
                 lambda e, c, w, win, ev: call(e, 0x100008F8, [w, win]) and None,
                 lambda lib, c, st: F(lib, "tpw_tpm_HandleUpdateWindow", None, VP, VP)(st["world"], C.addressof(st["window"])),
                 edge=lambda: [{}]),
-    simple_test("ThemeParkWorld::HandleTyping", typing_ppc, typing_host, edge=typing_edges, rnd=typing_case),
+    FnTest("ThemeParkWorld::HandleTyping", run_ppc(typing_ppc), typing_host_run, edge=typing_edges, rnd=typing_case),
     simple_test("ThemeParkWorld::GetUIMousePos", pos_ppc, pos_host, edge=mouse_edges, rnd=mouse_case),
     simple_test("ThemeParkWorld::HandleMouseMoved", *mouse_fn(0x10000CB0, "tpw_tpm_HandleMouseMoved", None),
                 edge=mouse_edges, rnd=mouse_case),

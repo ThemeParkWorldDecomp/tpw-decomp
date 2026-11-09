@@ -827,6 +827,10 @@ void tpw_tpm_sinit_texts(char* out) {
 }
 
 int32_t tpw_tpm_main() { return ThemeParkWorldMain(); }
+// 1 in a library built with the port's fixes (its typedletters fix changes what HandleTyping passes to UI_KeyChar)
+int32_t tpw_tpm_portfix() {
+    return 0;
+}
 int32_t tpw_tpm_Initialise(ThemeParkWorld* w) { return w->Initialise(); }
 void tpw_tpm_Shutdown(ThemeParkWorld* w) { w->Shutdown(); }
 int32_t tpw_tpm_Process(ThemeParkWorld* w) { return w->Process(); }
