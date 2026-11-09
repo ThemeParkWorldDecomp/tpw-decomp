@@ -34,9 +34,12 @@ One exception: an option the original game already had in its .sam data files be
 changes how a park plays, as long as it offers only the values the original accepts and its default is the original's.
 Players set it in the launcher or a game menu, never by editing a .sam file.
 
-One addition to the game's own screens: the online login panel has a "Create account" button, a sign-up popup and a
+Two additions to the game's own screens. The online login panel has a "Create account" button, a sign-up popup and a
 password reset ("Forgot password?"), drawn in the game's own style. The original made accounts and reset passwords on
-EA's website, which is gone. It belongs in tpw-port, and with the port's fixes off the panel is the original's.
+EA's website, which is gone. It belongs in tpw-port, and with the port's fixes off the panel is the original's. And
+Buy Ride's picture of a ride the Gold Edition added has a small "GOLD" badge, display only, so players can tell those
+rides apart. It belongs in tpw-port too, and the launcher's Settings switch "Show Ride Badges" (on by default) turns it
+off. The "PS1" badge on the PlayStation rides is the tpw-mods PlayStation rides mod's own and follows the same switch.
 
 This repository takes no pull requests and no changes of any kind; its CONTRIBUTING.md says where each kind of change
 goes.

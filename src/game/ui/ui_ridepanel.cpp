@@ -17,6 +17,7 @@
 #include "ParkTime.h"
 #include "platform/msl.h"
 #include "ppc_math.h"
+#include "RideBadges.h"
 #include "RideDB.h"
 #include "TbColour.h"
 #include "TbGraphicFile.h"
