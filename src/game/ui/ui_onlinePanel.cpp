@@ -20,6 +20,7 @@
 #include "Mouse.h"
 #include "online.h"
 #include "platform/samsutils.h"
+#include "port_wasd.h"
 #include "ppc_math.h"
 #include "RideDB.h"
 #include "TbDynamicStringTemplate.h"

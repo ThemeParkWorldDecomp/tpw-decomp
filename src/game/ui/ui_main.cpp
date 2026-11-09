@@ -36,6 +36,7 @@
 #include "platform/msl.h"
 #include "platform/samsutils.h"
 #include "platform/upixels.h"
+#include "port_wasd.h"
 #include "Quickload.h"
 #include "RideDB.h"
 #include "rsse.h"

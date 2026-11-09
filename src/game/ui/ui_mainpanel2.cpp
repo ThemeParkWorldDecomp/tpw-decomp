@@ -21,6 +21,7 @@
 #include "ParkTime.h"
 #include "platform/arena.h"
 #include "platform/msl.h"
+#include "port_wasd.h"
 #include "ppc_math.h"
 #include "std_deque_errorthingy.h"
 #include "TbGraphicFile.h"

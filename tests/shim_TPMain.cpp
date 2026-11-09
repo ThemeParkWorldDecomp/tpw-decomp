@@ -437,6 +437,7 @@ TPW_WEAK CGame::CGame() {}
 TPW_WEAK CGame::~CGame() {}
 TPW_WEAK CExitError gExitError;
 TPW_WEAK CKeyTable* gKeyTable;
+TPW_WEAK CKeyTable* gKeyTableCamera;   // HandleTyping's wasd-camera release (include/port_wasd.h); the setting is off in the tests
 TPW_WEAK int16_t gUIRealScreenWidth;
 TPW_WEAK int16_t gUIRealScreenHeight;
 TPW_WEAK CText gText;

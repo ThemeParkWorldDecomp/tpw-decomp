@@ -17,6 +17,7 @@
 #include "Mouse.h"
 #include "ParkTime.h"
 #include "platform/arena.h"
+#include "port_wasd.h"
 #include "ppc_math.h"
 #include "Ptr32.h"
 #include "RideDB.h"
