@@ -1,15 +1,20 @@
-// Opens a file or an entry of a Source as a nested Source by its leading bytes: zip, ISO 9660 (cooked or raw), Apple
-// partition map or bare HFS, MacBinary, and a Microsoft Cabinet inside an installer .exe (found by its signature). A
+// Opens a file or an entry of a Source as a nested Source by its leading bytes: zip, 7-Zip, RAR (4 and 5), ISO 9660
+// (cooked or raw), Apple partition map or bare HFS, MacBinary, and a Microsoft Cabinet inside an installer .exe (found by
+// its signature). A
 // container may hold another (a zip holds a toast that holds HFS, an exe holds a cab); the depth is limited to
 // kMaxNesting open containers, so a hostile archive cannot nest forever. Nothing is loaded whole.
 //
 // Big entries of zip and cab sources are inflated forward only, and the HFS, ISO, zip and cab readers need to read
 // behind themselves, so an entry over SniffOptions::spillOver bytes that sniffs as one of those is first copied to a
 // temporary file in spillDir (checked against the free space), which is deleted when the returned Source is released.
+// A 7-Zip or RAR archive is unpacked whole into a temporary folder in spillDir when it is opened (OpenArchive, source.h).
 #pragma once
 
+#include <atomic>
+#include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "source.h"
 
@@ -29,6 +34,10 @@ struct SniffOptions {
     uint64_t spillOver = 64ull << 20;
     // How much of an .exe is searched for a cabinet.
     uint64_t exeScan = 32ull << 20;
+    // For a 7-Zip or RAR archive, which is unpacked into spillDir when it opens (it needs one): a cancel flag checked as it
+    // unpacks, and a callback told what it is unpacking (ArchiveOptions, source.h).
+    const std::atomic<bool>* cancel = nullptr;
+    std::function<void(const std::string&)> progress;
 };
 
 // What an open attempt found. NotContainer is a plain file (no signature of any container matched, or only the
@@ -36,9 +45,9 @@ struct SniffOptions {
 // or unreadable container, a nesting that is too deep, a full disk and the like: the caller reports it as an error.
 enum class SniffStatus { Opened, NotContainer, Failed };
 
-enum class Container { None, Zip, Iso9660, Hfs, MacBinary, Cab };
+enum class Container { None, Zip, Iso9660, Hfs, MacBinary, Cab, SevenZip, Rar };
 
-// A name for logs: "zip", "iso9660", "hfs", "macbinary", "cab" or "none".
+// A name for logs: "zip", "iso9660", "hfs", "macbinary", "cab", "7z", "rar" or "none".
 const char* ContainerName(Container c);
 
 // What the leading bytes of the blob say it is (for an .exe: whether a cabinet is in it; cabOffset gets its offset).
@@ -63,5 +72,10 @@ std::shared_ptr<Source> OpenEntrySniffed(std::shared_ptr<Source> parent, const E
 std::shared_ptr<Source> OpenPathSniffed(const std::string& path, const SniffOptions& options, SniffStatus& status,
                                         std::string& err);
 std::shared_ptr<Source> OpenPathSniffed(const std::string& path, const SniffOptions& options, std::string& err);
+
+// The parts of a multi-volume RAR or split 7-Zip archive, in order, as one Source (the first part must sniff as 7-Zip or
+// RAR, else NotContainer). One part is the same as OpenSniffed.
+std::shared_ptr<Source> OpenVolumesSniffed(const std::vector<std::shared_ptr<Blob>>& volumes, const SniffOptions& options,
+                                           int depth, SniffStatus& status, std::string& err);
 
 }  // namespace tpw::assets

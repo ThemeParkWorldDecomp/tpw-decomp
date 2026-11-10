@@ -106,6 +106,10 @@ std::vector<Container> Classify(Blob& blob, const SniffOptions& options, uint64_
     int64_t got = blob.ReadAt(0, head.data(), head.size(), err);
     if (got < 0) return out;
     size_t n = static_cast<size_t>(got);
+    // 7-Zip's and RAR's signatures hold a zero byte, so they are compared by length (Has stops at the zero).
+    auto signature = [&](const char* s, size_t len) { return n >= len && std::memcmp(head.data(), s, len) == 0; };
+    if (signature("7z\xBC\xAF\x27\x1C", 6)) out.push_back(Container::SevenZip);
+    if (signature("Rar!\x1A\x07\x00", 7) || signature("Rar!\x1A\x07\x01\x00", 8)) out.push_back(Container::Rar);
     if (Has(head.data(), n, 0, "PK\x03\x04") || Has(head.data(), n, 0, "PK\x05\x06")) out.push_back(Container::Zip);
     if (Has(head.data(), n, 0, "MZ")) {
         int64_t at = FindCabinet(blob, options.exeScan, err);
@@ -133,8 +137,17 @@ std::vector<Container> Classify(Blob& blob, const SniffOptions& options, uint64_
 // Tries the candidates in order. A signature that matched but whose reader then failed is a damaged container (Failed,
 // with the last such reader's message). MacBinary has no signature, so its header failing to validate only means the
 // file is a plain file; it is Failed only when something with a real signature failed too.
+ArchiveOptions ArchiveOptionsOf(const SniffOptions& options) {
+    ArchiveOptions out;
+    out.tempDir = options.spillDir;
+    out.cancel = options.cancel;
+    out.progress = options.progress;
+    return out;
+}
+
 std::shared_ptr<Source> OpenCandidates(const std::shared_ptr<Blob>& blob, const std::vector<Container>& cands,
-                                       uint64_t cabOffset, SniffStatus& status, std::string& err) {
+                                       uint64_t cabOffset, const SniffOptions& options, SniffStatus& status,
+                                       std::string& err) {
     std::string last, lastSigned;
     bool signedFailed = false;
     for (Container c : cands) {
@@ -142,6 +155,8 @@ std::shared_ptr<Source> OpenCandidates(const std::shared_ptr<Blob>& blob, const 
         std::unique_ptr<Source> s;
         switch (c) {
             case Container::Zip: s = OpenZip(blob, e); break;
+            case Container::SevenZip:
+            case Container::Rar: s = OpenArchive({blob}, ArchiveOptionsOf(options), e); break;
             case Container::Iso9660: s = OpenIso9660(blob, e); break;
             case Container::Hfs: s = OpenHfs(blob, e); break;
             case Container::MacBinary: s = OpenMacBinary(blob, e); break;
@@ -188,6 +203,8 @@ const char* ContainerName(Container c) {
         case Container::Hfs: return "hfs";
         case Container::MacBinary: return "macbinary";
         case Container::Cab: return "cab";
+        case Container::SevenZip: return "7z";
+        case Container::Rar: return "rar";
         case Container::None: break;
     }
     return "none";
@@ -223,7 +240,7 @@ std::shared_ptr<Source> OpenSniffed(std::shared_ptr<Blob> blob, const SniffOptio
             return nullptr;
         }
         if (depth >= kMaxNesting) cands.clear();   // only a MacBinary guess: a plain file at this depth
-        return OpenCandidates(blob, cands, cabOffset, status, err);
+        return OpenCandidates(blob, cands, cabOffset, options, status, err);
     } catch (...) {
         status = SniffStatus::Failed;
         err = "out of memory";
@@ -265,7 +282,7 @@ std::shared_ptr<Source> OpenEntrySniffed(std::shared_ptr<Source> parent, const E
             blob = Spill(*parent, entry, options.spillDir, err);
             if (!blob) return nullptr;
         }
-        return OpenCandidates(blob, cands, cabOffset, status, err);
+        return OpenCandidates(blob, cands, cabOffset, options, status, err);
     } catch (...) {
         status = SniffStatus::Failed;
         err = "out of memory";
@@ -298,6 +315,42 @@ std::shared_ptr<Source> OpenPathSniffed(const std::string& path, const SniffOpti
 std::shared_ptr<Source> OpenPathSniffed(const std::string& path, const SniffOptions& options, std::string& err) {
     SniffStatus status;
     return OpenPathSniffed(path, options, status, err);
+}
+
+std::shared_ptr<Source> OpenVolumesSniffed(const std::vector<std::shared_ptr<Blob>>& volumes, const SniffOptions& options,
+                                           int depth, SniffStatus& status, std::string& err) {
+    status = SniffStatus::Failed;
+    if (volumes.empty() || !volumes.front()) {
+        err = "no blob";
+        return nullptr;
+    }
+    if (volumes.size() == 1) return OpenSniffed(volumes.front(), options, depth, status, err);
+    try {
+        uint64_t cabOffset = 0;
+        std::string readErr;
+        std::vector<Container> cands = Classify(*volumes.front(), options, cabOffset, readErr);
+        if (!readErr.empty()) {
+            err = readErr;
+            return nullptr;
+        }
+        if (cands.empty() || (cands.front() != Container::SevenZip && cands.front() != Container::Rar)) {
+            status = SniffStatus::NotContainer;
+            err = "the first part is not a 7-Zip or RAR archive";
+            return nullptr;
+        }
+        if (depth >= kMaxNesting) {
+            err = "containers are nested too deeply";
+            return nullptr;
+        }
+        std::unique_ptr<Source> s = OpenArchive(volumes, ArchiveOptionsOf(options), err);
+        if (!s) return nullptr;
+        status = SniffStatus::Opened;
+        return std::shared_ptr<Source>(std::move(s));
+    } catch (...) {
+        status = SniffStatus::Failed;
+        err = "out of memory";
+        return nullptr;
+    }
 }
 
 }  // namespace tpw::assets

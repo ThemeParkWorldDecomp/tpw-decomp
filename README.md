@@ -70,8 +70,9 @@ made with Ghidra from the game's own programs; the scripts that make them are no
 
 ## Building and testing
 
-Needs CMake 3.20, a C++17 compiler, Python 3 and, for the tests, the Python package unicorn (zlib is built from
-third_party/zlib).
+Needs CMake 3.20, a C++17 compiler, Python 3 and, for the tests, the Python package unicorn (zlib, and libarchive and
+liblzma for the asset readers' 7-Zip and RAR archives, are built from third_party/zlib, third_party/libarchive and
+third_party/xz).
 
     cmake -S tpw-decomp -B build
     cmake --build build -j8

@@ -3,6 +3,7 @@
 // With the player's own discs they import for real and compare the trees with devtools/import_originals.py's CHECKSUMS
 // (US), import_eur.py's EXPECTED (European) and the European folder under TPW_GDI_ROOT/game-eur; the discs are read in
 // place and the output trees are deleted at the end. A test whose input is absent is skipped with a message.
+// 7-Zip and RAR archives: synthetic fixtures (tests/archives) and RAR written in memory, always.
 // The language packs: synthetic drops always (an empty file matched by its language folder, the status lines); with a
 // language disc (TPW_TEST_LANGUAGE_DISC and TPW_TEST_LANGUAGE) a real import that must make that language available.
 //
@@ -11,6 +12,7 @@
 // TPW_TEST_SCRATCH (where the output trees go; the disc tests need about 3 GB there),
 // TPW_TEST_LANGUAGE_DISC (a disc, image or folder with a language on it) and TPW_TEST_LANGUAGE (that language, as
 // ManifestLanguages() spells it; several separated by commas)
+#include <algorithm>
 #include <cctype>
 #include <chrono>
 #include <cstdio>
@@ -32,6 +34,7 @@
 #include "../sniff.h"
 #include "../ps1_disc.h"
 #include "../ps1_convert.h"
+#include "test_archives.h"
 
 #ifndef TPW_DEVTOOLS_DIR
 #define TPW_DEVTOOLS_DIR "devtools"
@@ -1585,6 +1588,154 @@ void TestDamagedContainers(const std::string& scratch) {
 
 // ---- the discs
 
+// ---- 7-Zip and RAR archives (tests/archives, test_archives.h): opened like a zip, with their members going the same way
+
+std::string ArchiveFixture(const std::string& name) {
+    return tpw::assets::test::UuDecode(std::string(TPW_ARCHIVE_FIXTURES) + "/" + name + ".uu");
+}
+
+bool StagingEmpty(const std::string& root) { return Tree(root + "/assets/.staging", false).empty(); }
+
+void TestArchives(const std::string& scratch) {
+    std::printf("7-Zip and RAR archives\n");
+    using tpw::assets::test::RarMember;
+    using tpw::assets::test::RarOf;
+    std::string root = scratch + "/archive-data", drop = scratch + "/archive-drop";
+    RemoveTree(root);
+    RemoveTree(drop);
+    const std::string sevenZip = ArchiveFixture("ps1-pair.7z");
+    if (sevenZip.empty()) {
+        Skip(std::string("archives: no fixtures in ") + TPW_ARCHIVE_FIXTURES);
+        return;
+    }
+    auto raw = Ps1RawFixture(Ps1ImageFixture(), 2352);
+    const std::string bin(raw.begin(), raw.end());
+    const std::string cue = "FILE \"Synthetic Disc.bin\" BINARY\r\n  TRACK 01 MODE2/2352\r\n    INDEX 01 00:00:00\r\n";
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    Importer imp(cfg);
+    std::string err;
+    CHECK(imp.Open(err));
+
+    // The loose pair, then the same pair in a 7-Zip archive, a RAR archive and a RAR archive in two parts: the same result.
+    WriteFile(drop + "/loose/Synthetic Disc.bin", bin);
+    WriteFile(drop + "/loose/Synthetic Disc.cue", cue);
+    ImportReport loose = imp.Import({drop + "/loose/Synthetic Disc.cue"});
+    CHECK(loose.errors.empty());
+    CHECK_EQ(loose.playStation.size(), 1);
+    CHECK(!loose.playStation.empty() && loose.playStation[0].find("drop your US or European PC disc") != std::string::npos);
+    Events(imp);
+    const std::vector<RarMember> pair = {{"Synthetic Disc.bin", bin}, {"Synthetic Disc.cue", cue}};
+    WriteFile(drop + "/pair.7z", sevenZip);
+    WriteFile(drop + "/pair.rar", RarOf(pair)[0]);
+    std::vector<std::string> parts = RarOf(pair, 2);
+    WriteFile(drop + "/volumes/pair.part1.rar", parts[0]);
+    WriteFile(drop + "/volumes/pair.part2.rar", parts[1]);
+    for (const std::string& path : {drop + "/pair.7z", drop + "/pair.rar", drop + "/volumes/pair.part1.rar",
+                                    drop + "/volumes/pair.part2.rar", drop + "/volumes"}) {
+        ImportReport r = imp.Import({path});
+        CHECK(r.errors.empty());
+        CHECK_EQ(r.containers, loose.containers + 2);   // the archive and the image in it, as from a zip
+        CHECK(r.playStation == loose.playStation);
+        CHECK(r.unknownFiles == 1);   // the cue, as from a zip
+        CHECK(StagingEmpty(root));
+        std::vector<ImportProgress> ev = Events(imp);
+        CHECK(std::any_of(ev.begin(), ev.end(), [](const ImportProgress& e) {
+            return e.kind == ImportProgress::Kind::Scanning && e.path == "unpacking Synthetic Disc.bin";
+        }));
+        if (!r.errors.empty() || r.playStation != loose.playStation) {
+            std::printf("  %s: %s\n", path.c_str(), r.errors.empty() ? r.Summary().c_str() : r.errors[0].c_str());
+        }
+    }
+    // Both parts dropped together open the set once.
+    ImportReport both = imp.Import({drop + "/volumes/pair.part2.rar", drop + "/volumes/pair.part1.rar"});
+    CHECK(both.errors.empty() && both.containers == loose.containers + 2 && both.playStation.size() == 1);
+    if (!both.errors.empty() || both.playStation.size() != 1) std::printf("  both parts: %s\n", both.Summary().c_str());
+    // A part without the first: an error naming the first part, not an empty drop.
+    WriteFile(drop + "/alone/pair.part2.rar", parts[1]);
+    ImportReport alone = imp.Import({drop + "/alone/pair.part2.rar"});
+    CHECK_EQ(alone.errors.size(), 1);
+    CHECK(AnyContains(alone.errors, "pair.part2.rar") && AnyContains(alone.errors, "pair.part1.rar"));
+    // The parts inside a zip.
+    {
+        std::string inner = ZipOf("pair.part1.rar", parts[0], false, 0);
+        WriteFile(drop + "/zipped/one.zip", inner);
+        ImportReport partial = imp.Import({drop + "/zipped/one.zip"});
+        CHECK_EQ(partial.errors.size(), 1);   // the second part is missing: the volume set is incomplete
+        CHECK(AnyContains(partial.errors, "pair.part1.rar"));
+    }
+    Events(imp);
+
+    // A nested folder in a 7-Zip archive, with the pair zipped in it: the disc is found.
+    WriteFile(drop + "/nested.7z", ArchiveFixture("nested.7z"));
+    ImportReport nested = imp.Import({drop + "/nested.7z"});
+    CHECK(nested.errors.empty());
+    CHECK_EQ(nested.containers, loose.containers + 3);   // the 7z, the zip in it and the image in that
+    CHECK(nested.playStation == loose.playStation);
+    // An archive inside a folder is opened like a zip there (the 7z is under the 2 KB below which no container is looked
+    // for, so the stored RAR stands in).
+    WriteFile(drop + "/folder/sub/pair.rar", RarOf(pair)[0]);
+    ImportReport inFolder = imp.Import({drop + "/folder"});
+    CHECK(inFolder.errors.empty() && inFolder.playStation == loose.playStation);
+    if (!inFolder.errors.empty() || inFolder.playStation != loose.playStation) {
+        std::printf("  in a folder: %s %s\n", inFolder.Summary().c_str(), inFolder.errors.empty() ? "" : inFolder.errors[0].c_str());
+    }
+
+    // Password-protected, an unsupported method, cut short: one error naming the file, saying why.
+    struct Bad {
+        std::string name, bytes, says;
+    };
+    const std::vector<Bad> bad = {
+        {"locked.7z", ArchiveFixture("encrypted-data.7z"), "password"},
+        {"locked-names.7z", ArchiveFixture("encrypted-names.7z"), "password"},
+        {"locked.rar", ArchiveFixture("test_read_format_rar4_encrypted.rar"), "password"},
+        {"locked5.rar", ArchiveFixture("test_read_format_rar5_encrypted.rar"), "password"},
+        {"bzip2.7z", ArchiveFixture("method-bzip2.7z"), "compression method"},
+        {"cut.7z", sevenZip.substr(0, sevenZip.size() / 2), "damaged or incomplete"},
+        {"cut.rar", RarOf(pair)[0].substr(0, 100000), "damaged or incomplete"},
+    };
+    for (const Bad& b : bad) {
+        WriteFile(drop + "/bad/" + b.name, b.bytes);
+        ImportReport r = imp.Import({drop + "/bad/" + b.name});
+        CHECK_EQ(r.errors.size(), 1);
+        CHECK(AnyContains(r.errors, b.name + ": this archive") && AnyContains(r.errors, b.says));
+        CHECK(r.Summary().find("1 errors") != std::string::npos);
+        CHECK(StagingEmpty(root));
+        if (r.errors.size() != 1 || !AnyContains(r.errors, b.says)) {
+            std::printf("  %s: %s\n", b.name.c_str(), r.errors.empty() ? r.Summary().c_str() : r.errors[0].c_str());
+        }
+    }
+    Events(imp);
+
+    // Cancel while a big member is unpacking: stopped, no error, nothing left in the staging folder.
+    {
+        WriteFile(drop + "/big/big.rar", RarOf({{"big.bin", std::string(96u << 20, 'b')}})[0]);
+        std::string startErr;
+        CHECK(imp.Start({drop + "/big/big.rar"}, startErr));
+        bool cancelled = false;
+        size_t hashing = 0;
+        while (imp.Running()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            for (ImportProgress& e : imp.Progress().Drain()) {
+                if (!cancelled && e.kind == ImportProgress::Kind::Scanning && e.path.rfind("unpacking ", 0) == 0) {
+                    imp.Cancel();
+                    cancelled = true;
+                }
+                if (e.kind == ImportProgress::Kind::Hashing) hashing++;
+            }
+        }
+        ImportReport r = imp.Wait();
+        for (const ImportProgress& e : Events(imp)) hashing += e.kind == ImportProgress::Kind::Hashing;
+        // Timing decides whether the cancel lands while unpacking (the usual case) or after; both must leave nothing.
+        std::printf("  cancel landed %s\n", hashing == 0 ? "while unpacking" : "after unpacking");
+        CHECK(cancelled && r.cancelled);
+        CHECK(r.errors.empty());
+        CHECK(StagingEmpty(root));
+    }
+    RemoveTree(root);
+    RemoveTree(drop);
+}
+
 struct Discs {
     std::string toast, eurImg, eurFirst, goldZip, goldRides, allitems, gameEur, pcUs, pcUsFirst, pcEur;
 };
@@ -2158,6 +2309,7 @@ int main() {
     TestOriginals(scratch);
     TestFilms(scratch);
     TestDamagedContainers(scratch);
+    TestArchives(scratch);
     TestLanguageLines();
     TestLanguageSynthetic(scratch);
     const std::string languageDisc = Env("TPW_TEST_LANGUAGE_DISC"), languages = Env("TPW_TEST_LANGUAGE");

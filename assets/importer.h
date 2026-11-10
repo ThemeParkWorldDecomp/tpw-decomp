@@ -298,6 +298,7 @@ private:
     void Enumerate(Run& run, const std::shared_ptr<Source>& source, const std::string& display,
                    const std::string& folderRoot, int depth);
     void EnumeratePath(Run& run, const std::string& path);
+    bool OpenVolumes(Run& run, const std::vector<std::shared_ptr<Blob>>& volumes, const std::string& display, int depth);
     bool PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display);
     void Process(Run& run, Work& work);
     void Unmatched(Run& run, const Entry& entry);

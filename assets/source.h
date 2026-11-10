@@ -1,6 +1,6 @@
 // The asset launcher's container readers share one interface: a Source lists entries (path, size, kind) and opens an
-// entry as a stream of bytes. Folders, zip archives and ISO 9660 images implement it (folder.cpp, zip.cpp,
-// iso9660.cpp). Nothing here throws across the interface: failures come back as a null result or a negative count with a
+// entry as a stream of bytes. Folders, zip archives, 7-Zip and RAR archives and ISO 9660 images implement it (folder.cpp,
+// zip.cpp, archive_source.cpp, iso9660.cpp). Nothing here throws across the interface: failures come back as a null result or a negative count with a
 // message in the err argument. Nothing loads a whole image; every reader streams.
 //
 // Nesting: a Source reads from a Blob (random access bytes). A file is a Blob (OpenFileBlob), and so is an entry of
@@ -10,8 +10,10 @@
 // spill it to a file first (the nested-source sniffer, a later unit).
 #pragma once
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -62,7 +64,7 @@ public:
 class Source {
 public:
     virtual ~Source() {}
-    // "folder", "zip" or "iso9660".
+    // "folder", "zip", "7z", "rar", "iso9660" and the others below.
     virtual const char* Kind() const = 0;
     // Every file of the source, sorted by path (a path with both kinds lists Data first).
     virtual const std::vector<Entry>& Entries() const = 0;
@@ -71,6 +73,10 @@ public:
     // The original image bytes when this is an ISO source, including raw sector checks when present. Nested images
     // keep their spilled Blob alive too, so content importers can inspect the disc without unpacking it again.
     virtual std::shared_ptr<Blob> ImageBlob() const { return nullptr; }
+    // The entry's bytes with random access when the source has them at hand (an unpacked 7-Zip or RAR entry is a
+    // temporary file): OpenEntryBlob then uses this rather than reading the entry as a stream. Null with an empty err
+    // when it does not (the default); null with a message when the entry cannot be read.
+    virtual std::shared_ptr<Blob> OpenBlob(const Entry&, std::string&) { return nullptr; }
 };
 
 // ---- Blobs (source.cpp)
@@ -85,6 +91,19 @@ std::shared_ptr<Blob> OpenEntryBlob(std::shared_ptr<Source> source, const Entry&
 std::unique_ptr<Source> OpenFolder(const std::string& path, std::string& err);
 // A zip archive (stored and deflate entries, zip64, data descriptors).
 std::unique_ptr<Source> OpenZip(std::shared_ptr<Blob> blob, std::string& err);
+// A 7-Zip, RAR (2.9 to 4) or RAR 5 archive (archive_source.cpp), given as its volumes in order (one for an archive in
+// one file; the parts of a multi-volume RAR or a split 7-Zip archive otherwise). Both formats are solid as a rule, so the
+// whole archive is unpacked when it is opened, file by file, into a new folder in tempDir that is deleted when the
+// Source and everything opened from it are released (or at once on a failure). Kind() is "7z" or "rar". Only regular
+// files are listed. A password, a compression method libarchive cannot read (BZip2 in a 7-Zip archive), a damaged or
+// incomplete archive, too little free space and a cancel ("cancelled") each give null and a message for the player.
+struct ArchiveOptions {
+    std::string tempDir;                                   // required (the importer's assets/.staging)
+    const std::atomic<bool>* cancel = nullptr;             // checked between and during files
+    std::function<void(const std::string&)> progress;      // "unpacking <path>", then every 8 MB "(n of m MB)"
+};
+std::unique_ptr<Source> OpenArchive(const std::vector<std::shared_ptr<Blob>>& volumes, const ArchiveOptions& options,
+                                    std::string& err);
 // An ISO 9660 image (Joliet names when there is a Joliet volume): cooked 2048-byte sectors or raw 2352-byte sectors,
 // MODE1 or MODE2 form 1, also with 96 sub-channel bytes after each raw sector (2448 bytes, as some .mdf files have).
 std::unique_ptr<Source> OpenIso9660(std::shared_ptr<Blob> blob, std::string& err);

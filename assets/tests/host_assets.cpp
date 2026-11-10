@@ -1,6 +1,7 @@
 // Host tests of the asset launcher's container readers (assets/): SHA-256 known answers, a zip built in memory (stored,
 // deflate, data descriptor, zip64), ISO 9660 images built in memory (cooked, raw, raw with the sub-channel), a folder,
-// the US Mac disc's zip, three PC disc images and the Gold disc's zip.
+// the US Mac disc's zip, three PC disc images and the Gold disc's zip, and 7-Zip and RAR archives (tests/archives, synthetic
+// and libarchive's own).
 // The inputs are the player's own files, read in place and never copied. A test whose input is absent is skipped with a
 // message. Expected hashes of the PC images come from JSON lists of path, size and SHA-256 made by hashing the images with a script (TPW_TEST_EXPECT).
 //
@@ -9,6 +10,7 @@
 // TPW_TEST_SCRATCH (a folder with room for the Mac disc's 670 MB image, which is unpacked there and deleted)
 #include <zlib.h>
 
+#include <atomic>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -20,6 +22,7 @@
 #include "../macroman.h"
 #include "../sniff.h"
 #include "../source.h"
+#include "test_archives.h"
 
 using namespace tpw::assets;
 
@@ -1378,6 +1381,215 @@ void TestGoldCab(const std::string& transfer, const std::string& expectDir) {
     CHECK(bad == 0 && missing == 0 && wadsSeen == 35);
 }
 
+// ---- 7-Zip and RAR (archive_source.cpp): the fixtures in tests/archives (README.md there) and RAR written in memory
+
+std::shared_ptr<Blob> BlobOf(const std::string& bytes) { return MakeMemoryBlob(std::vector<uint8_t>(bytes.begin(), bytes.end())); }
+
+std::string Fixture(const std::string& name) { return test::UuDecode(std::string(TPW_ARCHIVE_FIXTURES) + "/" + name + ".uu"); }
+
+std::string ReadEntry(Source& s, const Entry& e) {
+    std::string err;
+    std::vector<uint8_t> out;
+    auto st = s.Open(e, err);
+    if (!st || !ReadAll(*st, 1ull << 30, out, err)) return "read failed: " + err;
+    return std::string(out.begin(), out.end());
+}
+
+// pattern.bin of the 7-Zip method fixtures: byte i = (i * 7 + i / 13) & 255.
+std::string ArchivePattern() {
+    std::string s(4096, '\0');
+    for (size_t i = 0; i < s.size(); i++) s[i] = char((i * 7 + i / 13) & 255);
+    return s;
+}
+
+size_t CountArchiveDirs(const std::string& dir) {
+    size_t n = 0;
+    std::error_code ec;
+    for (auto it = std::filesystem::directory_iterator(dir, ec); !ec && it != std::filesystem::directory_iterator(); it.increment(ec)) {
+        if (it->path().filename().string().rfind("tpw-archive-", 0) == 0) n++;
+    }
+    return n;
+}
+
+void TestArchives() {
+    namespace fs = std::filesystem;
+    std::error_code ec;
+    const std::string temp = (fs::temp_directory_path(ec) / "tpw_assets_archives").generic_string();
+    fs::remove_all(temp, ec);
+    fs::create_directories(temp, ec);
+    SniffOptions opts;
+    opts.spillDir = temp;
+    const std::string pattern = ArchivePattern();
+    const std::string pair = Fixture("ps1-pair.7z");
+    if (pair.empty()) {
+        Skip(std::string("archives: no fixtures in ") + TPW_ARCHIVE_FIXTURES);
+        return;
+    }
+    std::string err;
+    SniffStatus status = SniffStatus::Opened;
+
+    // Every filter the launcher builds decodes pattern.bin.
+    for (const char* method : {"ppmd", "bcj", "bcj2", "deflate", "delta", "arm64"}) {
+        std::shared_ptr<Source> s = OpenSniffed(BlobOf(Fixture(std::string("method-") + method + ".7z")), opts, 0, status, err);
+        CHECK(s && std::string(s->Kind()) == "7z" && s->Entries().size() == 1);
+        if (!s || s->Entries().empty()) {
+            std::printf("  method %s: %s\n", method, err.c_str());
+            continue;
+        }
+        CHECK_EQ_STR(s->Entries()[0].path, "pattern.bin");
+        CHECK(ReadEntry(*s, s->Entries()[0]) == pattern);
+    }
+    // The bin/cue pair: its names, sizes and the cue's text; an entry blob reads at any offset.
+    {
+        std::shared_ptr<Source> s = OpenSniffed(BlobOf(pair), opts, 0, status, err);
+        CHECK(s && status == SniffStatus::Opened && s->Entries().size() == 2);
+        if (s && s->Entries().size() == 2) {
+            CHECK_EQ_STR(s->Entries()[0].path, "Synthetic Disc.bin");
+            CHECK(s->Entries()[0].size == 275184);
+            CHECK_EQ_STR(s->Entries()[1].path, "Synthetic Disc.cue");
+            CHECK_EQ_STR(ReadEntry(*s, s->Entries()[1]),
+                         "FILE \"Synthetic Disc.bin\" BINARY\r\n  TRACK 01 MODE2/2352\r\n    INDEX 01 00:00:00\r\n");
+            std::shared_ptr<Blob> bin = OpenEntryBlob(s, s->Entries()[0], err);
+            std::string whole = ReadEntry(*s, s->Entries()[0]);
+            char tail[16] = {};
+            CHECK(bin && bin->Size() == 275184 && bin->ReadAt(275184 - 16, tail, 16, err) == 16 &&
+                  whole.compare(275184 - 16, 16, tail, 16) == 0);
+            CHECK(CountArchiveDirs(temp) == 1);
+        }
+        // A 7-Zip archive split in three (name.7z.001 to .003, as 7-Zip's -v writes them) is the same archive.
+        std::vector<std::shared_ptr<Blob>> parts;
+        const size_t third = pair.size() / 3;
+        parts.push_back(BlobOf(pair.substr(0, third)));
+        parts.push_back(BlobOf(pair.substr(third, third)));
+        parts.push_back(BlobOf(pair.substr(2 * third)));
+        std::shared_ptr<Source> split = OpenVolumesSniffed(parts, opts, 0, status, err);
+        CHECK(split && split->Entries().size() == 2 && s && ReadEntry(*split, split->Entries()[0]) == ReadEntry(*s, s->Entries()[0]));
+        if (!split) std::printf("  split 7z: %s\n", err.c_str());
+    }
+    CHECK(CountArchiveDirs(temp) == 0);   // released with their sources
+    // A nested folder, and a zip in it that opens from the archive.
+    {
+        std::shared_ptr<Source> s = OpenSniffed(BlobOf(Fixture("nested.7z")), opts, 0, status, err);
+        CHECK(s && s->Entries().size() == 2);
+        if (s && s->Entries().size() == 2) {
+            CHECK_EQ_STR(s->Entries()[0].path, "Outer Folder/Inner/disc.zip");
+            CHECK_EQ_STR(s->Entries()[1].path, "Outer Folder/readme.txt");
+            std::shared_ptr<Source> zip = OpenEntrySniffed(s, s->Entries()[0], opts, 1, status, err);
+            CHECK(zip && std::string(zip->Kind()) == "zip" && zip->Entries().size() == 2);
+        }
+    }
+    // libarchive's RAR 4 file: two files and no links or folders listed.
+    {
+        std::shared_ptr<Source> s = OpenSniffed(BlobOf(Fixture("test_read_format_rar.rar")), opts, 0, status, err);
+        CHECK(s && std::string(s->Kind()) == "rar" && s->Entries().size() == 2);
+        if (s && s->Entries().size() == 2) {
+            CHECK_EQ_STR(s->Entries()[0].path, "test.txt");
+            CHECK_EQ_STR(s->Entries()[1].path, "testdir/test.txt");
+            CHECK(s->Entries()[0].size == 20 && ReadEntry(*s, s->Entries()[0]) == ReadEntry(*s, s->Entries()[1]));
+        }
+        if (!s) std::printf("  rar: %s\n", err.c_str());
+    }
+    // RAR 5, compressed.
+    {
+        std::shared_ptr<Source> s = OpenSniffed(BlobOf(Fixture("test_read_format_rar5_compressed.rar")), opts, 0, status, err);
+        CHECK(s && s->Entries().size() == 1);
+        if (s && s->Entries().size() == 1) {
+            std::string data = ReadEntry(*s, s->Entries()[0]);
+            bool ok = data.size() == 1200;
+            for (size_t i = 0; ok && i < 300; i++) {
+                long long k = (long long)i + 1, want = std::max(0LL, k * k - 3 * k + 1);
+                uint32_t got = uint32_t(uint8_t(data[4 * i])) | uint32_t(uint8_t(data[4 * i + 1])) << 8 |
+                               uint32_t(uint8_t(data[4 * i + 2])) << 16 | uint32_t(uint8_t(data[4 * i + 3])) << 24;
+                ok = got == uint32_t(want);
+            }
+            CHECK(ok);
+        }
+        if (!s) std::printf("  rar5: %s\n", err.c_str());
+    }
+    // libarchive's RAR 4 in three volumes; and the same with the last volume missing.
+    {
+        std::vector<std::shared_ptr<Blob>> parts;
+        for (int i = 1; i <= 3; i++) parts.push_back(BlobOf(Fixture("test_rar_multivolume_single_file.part" + std::to_string(i) + ".rar")));
+        std::shared_ptr<Source> s = OpenVolumesSniffed(parts, opts, 0, status, err);
+        CHECK(s && s->Entries().size() == 1);
+        if (s && s->Entries().size() == 1) {
+            CHECK_EQ_STR(s->Entries()[0].path, "LibarchiveAddingTest.html");
+            CHECK(s->Entries()[0].size == 20111);
+            CHECK_EQ_STR(HashEntry(*s, s->Entries()[0]), "ee16390e87152d7dec632ae2b37566da6135966e46b5166e6f40a1c827fa61ad");
+        }
+        if (!s) std::printf("  rar volumes: %s\n", err.c_str());
+        parts.pop_back();
+        s = OpenVolumesSniffed(parts, opts, 0, status, err);
+        CHECK(!s && status == SniffStatus::Failed && err.find("damaged or incomplete") != std::string::npos);
+    }
+    // RAR written here (test_archives.h): one volume, and two volumes with a member cut across them.
+    {
+        std::vector<test::RarMember> members = {{"Disc\\a.bin", std::string(5000, 'a') + pattern}, {"b.txt", "bee\n"}};
+        for (size_t volumes : {size_t(1), size_t(2)}) {
+            std::vector<std::shared_ptr<Blob>> parts;
+            for (const std::string& v : test::RarOf(members, volumes)) parts.push_back(BlobOf(v));
+            std::shared_ptr<Source> s = OpenVolumesSniffed(parts, opts, 0, status, err);
+            CHECK(s && s->Entries().size() == 2);
+            if (s && s->Entries().size() == 2) {
+                CHECK_EQ_STR(s->Entries()[0].path, "Disc/a.bin");
+                CHECK(ReadEntry(*s, s->Entries()[0]) == members[0].data);
+                CHECK_EQ_STR(ReadEntry(*s, s->Entries()[1]), "bee\n");
+            }
+            if (!s) std::printf("  RarOf(%zu): %s\n", volumes, err.c_str());
+        }
+    }
+    // Password-protected archives (data only, names too): a message saying so, never "no game files".
+    for (const char* name : {"encrypted-data.7z", "encrypted-names.7z", "test_read_format_rar4_encrypted.rar",
+                             "test_read_format_rar_encryption_header.rar", "test_read_format_rar5_encrypted.rar"}) {
+        std::shared_ptr<Source> s = OpenSniffed(BlobOf(Fixture(name)), opts, 0, status, err);
+        CHECK(!s && status == SniffStatus::Failed && err.find("password") != std::string::npos);
+        if (s || err.find("password") == std::string::npos) std::printf("  %s: %s\n", name, err.c_str());
+    }
+    // A method the launcher does not build (BZip2), and archives cut short.
+    {
+        std::shared_ptr<Source> s = OpenSniffed(BlobOf(Fixture("method-bzip2.7z")), opts, 0, status, err);
+        CHECK(!s && status == SniffStatus::Failed && err.find("compression method") != std::string::npos);
+        if (s || err.find("compression method") == std::string::npos) std::printf("  bzip2: %s\n", err.c_str());
+        for (size_t keep : {pair.size() / 2, pair.size() - 40, size_t(32)}) {
+            s = OpenSniffed(BlobOf(pair.substr(0, keep)), opts, 0, status, err);
+            CHECK(!s && status == SniffStatus::Failed && err.find("damaged or incomplete") != std::string::npos);
+            if (s || err.find("damaged") == std::string::npos) std::printf("  cut to %zu: %s\n", keep, err.c_str());
+        }
+        std::string rar = test::RarOf({{"big.bin", std::string(100000, 'x')}})[0];
+        s = OpenSniffed(BlobOf(rar.substr(0, rar.size() / 2)), opts, 0, status, err);
+        CHECK(!s && status == SniffStatus::Failed && err.find("damaged or incomplete") != std::string::npos);
+    }
+    // Parts whose first is not an archive are no archive; one part is the same as OpenSniffed.
+    {
+        std::shared_ptr<Source> s = OpenVolumesSniffed({BlobOf(std::string(4096, 'z')), BlobOf(pair)}, opts, 0, status, err);
+        CHECK(!s && status == SniffStatus::NotContainer);
+        s = OpenVolumesSniffed({BlobOf(pair)}, opts, 0, status, err);
+        CHECK(s && s->Entries().size() == 2);
+    }
+    // Progress is told what is unpacked, and cancel stops it with nothing left behind.
+    {
+        std::atomic<bool> cancel{false};
+        std::vector<std::string> said;
+        SniffOptions o = opts;
+        o.cancel = &cancel;
+        o.progress = [&](const std::string& what) { said.push_back(what); };
+        std::shared_ptr<Source> s = OpenSniffed(BlobOf(pair), o, 0, status, err);
+        CHECK(s && said.size() == 2 && said[0] == "unpacking Synthetic Disc.bin");
+        s.reset();
+        o.progress = [&](const std::string&) { cancel = true; };
+        s = OpenSniffed(BlobOf(pair), o, 0, status, err);
+        CHECK(!s && status == SniffStatus::Failed && err == "cancelled");
+    }
+    // No folder to unpack into is an error, not a crash.
+    {
+        SniffOptions o;
+        std::shared_ptr<Source> s = OpenSniffed(BlobOf(pair), o, 0, status, err);
+        CHECK(!s && status == SniffStatus::Failed && !err.empty());
+    }
+    CHECK(CountArchiveDirs(temp) == 0);   // after success, every failure and the cancel
+    fs::remove_all(temp, ec);
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -1398,6 +1610,7 @@ int main(int argc, char** argv) {
     TestSniffDepth();
     TestRefPack();
     TestWadInMemory();
+    TestArchives();
     if (root.empty()) Skip("folder source: TPW_GDI_ROOT is not set"); else TestFolder(root);
     if (transfer.empty()) {
         Skip("zip and iso sources: TPW_TEST_TRANSFER is not set");

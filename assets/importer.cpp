@@ -10,6 +10,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <set>
 #include <sstream>
 #include <system_error>
@@ -84,7 +85,7 @@ std::string Extension(const std::string& path) {
 // Files inside a drop that are opened as containers (a dropped file is always sniffed, whatever its name).
 bool ContainerExtension(const std::string& ext) {
     static const char* const kExts[] = {"zip", "toast", "iso", "img", "bin", "mdf", "exe", "cab",
-                                        "hfs", "dsk", "cdr", "image", "macbin"};
+                                        "hfs", "dsk", "cdr", "image", "macbin", "7z", "rar"};
     for (const char* e : kExts) {
         if (ext == e) return true;
     }
@@ -96,6 +97,89 @@ std::string UnsupportedDiscFormat(const std::string& path) {
     if (ext == "chd" || ext == "ecm" || ext == "pbp")
         return "." + ext + " disc images cannot be read. Drop a .cue/.bin or .iso image instead.";
     return {};
+}
+
+// A part of a multi-volume archive, by its name: "x.part1.rar", "x.part2.rar", ... (any count of digits); "x.rar", "x.r00",
+// "x.r01", ... (the older RAR naming); "x.7z.001", "x.7z.002", ... (7-Zip's split files).
+struct VolumeName {
+    enum Style { Part, OldRar, Split7z } style = Part;
+    std::string stem, suffix;   // the name before and after the number, in the name's own case
+    size_t width = 0;
+    bool upper = false;         // OldRar: "X.RAR", "X.R00"
+    int index = 0;              // which part the name is, from 0
+};
+
+bool AllDigits(const std::string& s) {
+    return !s.empty() && s.size() <= 4 && std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; });
+}
+
+bool ParseVolume(const std::string& name, VolumeName& v) {
+    const std::string low = Lower(name);
+    const size_t n = low.size();
+    if (n > 4 && low.compare(n - 4, 4, ".rar") == 0) {
+        const size_t part = low.rfind(".part");
+        if (part != std::string::npos && part + 5 < n - 4 && AllDigits(low.substr(part + 5, n - 4 - part - 5))) {
+            v.style = VolumeName::Part;
+            v.stem = name.substr(0, part + 5);
+            v.suffix = name.substr(n - 4);
+            v.width = n - 4 - part - 5;
+            v.index = std::stoi(low.substr(part + 5, v.width)) - 1;
+            return v.index >= 0;
+        }
+        v.style = VolumeName::OldRar;
+        v.stem = name.substr(0, n - 3);
+        v.upper = name[n - 3] == 'R';
+        v.index = 0;
+        return true;
+    }
+    if (n > 4 && low[n - 4] == '.' && low[n - 3] == 'r' && AllDigits(low.substr(n - 2))) {
+        v.style = VolumeName::OldRar;
+        v.stem = name.substr(0, n - 3);
+        v.upper = name[n - 3] == 'R';
+        v.index = std::stoi(low.substr(n - 2)) + 1;
+        return true;
+    }
+    if (n > 7 && low.compare(n - 7, 4, ".7z.") == 0 && AllDigits(low.substr(n - 3))) {
+        v.style = VolumeName::Split7z;
+        v.stem = name.substr(0, n - 3);
+        v.width = 3;
+        v.index = std::stoi(low.substr(n - 3)) - 1;
+        return v.index >= 0;
+    }
+    return false;
+}
+
+std::string VolumePart(const VolumeName& v, int i) {
+    auto padded = [](int number, size_t width) {
+        std::string digits = std::to_string(number);
+        return std::string(width > digits.size() ? width - digits.size() : 0, '0') + digits;
+    };
+    switch (v.style) {
+        case VolumeName::Part: return v.stem + padded(i + 1, v.width) + v.suffix;
+        case VolumeName::Split7z: return v.stem + padded(i + 1, v.width);
+        case VolumeName::OldRar: break;
+    }
+    if (i == 0) return v.stem + (v.upper ? "RAR" : "rar");
+    return v.stem + (v.upper ? "R" : "r") + padded(i - 1, 2);
+}
+
+// The set of parts `name` belongs to, by name, in order from the first, as far as `exists` finds them one after the other
+// (parts is empty when the first is missing; `first` names it). False when the name is no part's (a plain archive, or
+// "x.rar" with no "x.r00" beside it).
+bool VolumeSet(const std::string& name, const std::function<bool(const std::string&)>& exists,
+               std::vector<std::string>& parts, std::string& first) {
+    VolumeName v;
+    if (!ParseVolume(name, v)) return false;
+    if (v.style == VolumeName::OldRar && v.index == 0 && !exists(VolumePart(v, 1))) return false;
+    first = VolumePart(v, 0);
+    parts.clear();
+    for (int i = 0; i < 1000 && exists(VolumePart(v, i)); ++i) parts.push_back(VolumePart(v, i));
+    return true;
+}
+
+std::string MissingFirstPart(const std::string& first) {
+    return "this is a part of an archive in several parts, and its first part (" + first +
+           ") is not beside it. Drop all the parts together, from one folder.";
 }
 
 // The path the evidence check compares with destinations: a resource fork is the "<path>.rsrc" side file.
@@ -1132,6 +1216,15 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
         } else {
             run.sniff.spillDir = stagingDir_;
             run.sniff.spillOver = config_.spillOver;
+            // A 7-Zip or RAR archive is unpacked as it opens: the cancel button stops it, and the counter says what it is doing.
+            run.sniff.cancel = &cancel_;
+            run.sniff.progress = [this, &run](const std::string& what) {
+                ImportProgress ev;
+                ev.kind = ImportProgress::Kind::Scanning;
+                ev.total = run.work.size();
+                ev.path = what;
+                progress_.Push(ev);
+            };
             for (const std::string& p : paths) {
                 if (cancel_) break;
                 EnumeratePath(run, p);
@@ -1262,6 +1355,33 @@ void Importer::EnumeratePath(Run& run, const std::string& path) {
         for (const std::string& f : files) EnumeratePath(run, f);
         return;
     }
+    // A part of a multi-volume archive opens the whole set, once, whichever part comes first.
+    {
+        const std::string dir = key.substr(0, key.find_last_of('/') + 1);
+        std::vector<std::string> parts;
+        std::string first;
+        auto exists = [&](const std::string& name) { return fs::is_regular_file(fs::path(dir + name), ec); };
+        if (VolumeSet(BaseName(key), exists, parts, first)) {
+            if (parts.empty()) {
+                fail(BaseName(key) + ": " + MissingFirstPart(first));
+                return;
+            }
+            bool done = false;
+            for (const std::string& part : parts) {
+                if (dir + part != key && !run.opened.insert(dir + part).second) done = true;
+            }
+            if (done) return;
+            std::vector<std::shared_ptr<Blob>> volumes;
+            for (const std::string& part : parts) {
+                volumes.push_back(OpenFileBlob(dir + part, err));
+                if (!volumes.back()) {
+                    fail(err);
+                    return;
+                }
+            }
+            if (OpenVolumes(run, volumes, first, 0)) return;
+        }
+    }
     std::shared_ptr<Blob> blob = OpenFileBlob(key, err);
     if (!blob) {
         fail(err);
@@ -1283,7 +1403,7 @@ void Importer::EnumeratePath(Run& run, const std::string& path) {
         return;
     }
     if (sniffStatus == SniffStatus::Failed) {   // a damaged container is an error, never a file with nothing in it
-        fail(BaseName(key) + ": " + sniffErr);
+        if (!cancel_) fail(BaseName(key) + ": " + sniffErr);   // a cancelled unpacking says nothing
         return;
     }
     auto single = std::make_shared<SingleFileSource>();
@@ -1292,6 +1412,33 @@ void Importer::EnumeratePath(Run& run, const std::string& path) {
         return;
     }
     Enumerate(run, single, std::string(), std::string(), 0);
+}
+
+bool Importer::OpenVolumes(Run& run, const std::vector<std::shared_ptr<Blob>>& volumes, const std::string& display,
+                           int depth) {
+    std::string err;
+    SniffStatus status = SniffStatus::NotContainer;
+    std::shared_ptr<Source> source = OpenVolumesSniffed(volumes, run.sniff, depth, status, err);
+    if (source) {
+        ++run.report.containers;
+        ImportProgress ev;
+        ev.kind = ImportProgress::Kind::Scanning;
+        ev.total = run.work.size();
+        ev.path = display;
+        progress_.Push(ev);
+        Enumerate(run, source, display, std::string(), depth + 1);
+        return true;
+    }
+    // A lone "x.part1.rar" that is no archive is a plain file; the parts of a set whose first is none are an error.
+    if (status == SniffStatus::NotContainer && volumes.size() == 1) return false;
+    if (cancel_) return true;
+    run.report.errors.push_back(display + ": " + err);
+    ImportProgress ev;
+    ev.kind = ImportProgress::Kind::Error;
+    ev.path = display;
+    ev.message = display + ": " + err;
+    progress_.Push(ev);
+    return true;
 }
 
 void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const std::string& display,
@@ -1305,10 +1452,73 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
         skip = assetsCanon_.substr(folderRoot.size() + 1);
     }
     const std::vector<Entry>& entries = source->Entries();
+    std::map<std::string, const Entry*> byPath;   // for the parts of a multi-volume archive inside a container
+    std::set<std::string> setsDone;               // the first parts of the sets opened from inside a container
     for (const Entry& e : entries) {
         if (cancel_ || run.stop) return;
         if (!skip.empty() && Under(e.path, skip)) continue;
         std::string name = display.empty() ? e.path : display + "/" + e.path;
+        // A part of a multi-volume archive opens the whole set, once, whichever part comes first; the others are skipped.
+        if (e.kind == EntryKind::Data && depth < kMaxNesting) {
+            const std::string dir = e.path.substr(0, e.path.find_last_of('/') + 1);
+            std::string diskDir;
+            if (!folderRoot.empty()) {
+                std::error_code ec;
+                fs::path canon = fs::weakly_canonical(fs::path(folderRoot + "/" + e.path), ec);
+                std::string key = ec ? folderRoot + "/" + e.path : tpw::GenericPathText(canon);
+                diskDir = key.substr(0, key.find_last_of('/') + 1);
+            } else if (byPath.empty()) {
+                for (const Entry& x : entries) {
+                    if (x.kind == EntryKind::Data) byPath.emplace(x.path, &x);
+                }
+            }
+            std::vector<std::string> parts;
+            std::string first;
+            auto exists = [&](const std::string& part) {
+                std::error_code ec;
+                return folderRoot.empty() ? byPath.count(dir + part) != 0 : fs::is_regular_file(fs::path(diskDir + part), ec);
+            };
+            if (VolumeSet(BaseName(e.path), exists, parts, first)) {
+                const std::string firstName = display.empty() ? dir + first : display + "/" + dir + first;
+                if (parts.empty()) {
+                    const std::string message = name + ": " + MissingFirstPart(first);
+                    run.report.errors.push_back(message);
+                    ImportProgress ev;
+                    ev.kind = ImportProgress::Kind::Error;
+                    ev.path = name;
+                    ev.message = message;
+                    progress_.Push(ev);
+                    continue;
+                }
+                bool done = false;
+                if (folderRoot.empty()) {
+                    done = !setsDone.insert(dir + first).second;
+                } else {
+                    for (const std::string& part : parts) {
+                        if (!run.opened.insert(diskDir + part).second) done = true;
+                    }
+                }
+                if (done) continue;
+                std::vector<std::shared_ptr<Blob>> volumes;
+                std::string err;
+                for (const std::string& part : parts) {
+                    volumes.push_back(folderRoot.empty() ? OpenEntryBlob(source, *byPath[dir + part], err)
+                                                         : OpenFileBlob(diskDir + part, err));
+                    if (!volumes.back()) break;
+                }
+                if (!volumes.back()) {
+                    const std::string message = firstName + ": " + err;
+                    run.report.errors.push_back(message);
+                    ImportProgress ev;
+                    ev.kind = ImportProgress::Kind::Error;
+                    ev.path = firstName;
+                    ev.message = message;
+                    progress_.Push(ev);
+                    continue;
+                }
+                if (OpenVolumes(run, volumes, firstName, depth)) continue;
+            }
+        }
         const std::string format = UnsupportedDiscFormat(e.path);
         if (e.kind == EntryKind::Data && !format.empty()) {
             run.report.errors.push_back(name + ": " + format);
@@ -1377,12 +1587,12 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
             }
             // A plain file with a container's name stays silent (it is counted among the other files below); every
             // container that failed to open is an error with its path and the reader's message.
-            if (childStatus == SniffStatus::Failed) {
+            if (childStatus == SniffStatus::Failed && !cancel_) {   // a cancelled unpacking says nothing
                 run.report.errors.push_back(name + ": " + err);
                 ImportProgress ev;
                 ev.kind = ImportProgress::Kind::Error;
                 ev.path = name;
-                ev.message = err;
+                ev.message = name + ": " + err;   // the log shows the message alone, so it names the file
                 progress_.Push(ev);
             }
         }

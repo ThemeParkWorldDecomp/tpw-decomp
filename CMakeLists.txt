@@ -16,6 +16,11 @@ add_compile_options(-Wall -Wextra -Wno-unused-parameter -ffp-contract=off -fwrap
 # The bullfrog library's zlib unpacker (src/bullfrog/LbZLib.cpp) inflates with zlib, built from source here
 # (third_party/zlib, static); no copy on the host is ever looked for.
 add_subdirectory(third_party/zlib)
+# The launcher's importer opens 7-Zip and RAR archives (assets/archive_source.cpp) with libarchive's readers of those two
+# formats only, on liblzma's decoders, both built from source here as well (third_party/libarchive and third_party/xz,
+# static, with a config.h written by hand; their NOTE.md files say what was kept).
+add_subdirectory(third_party/xz)
+add_subdirectory(third_party/libarchive)
 
 # The differential tests' libraries (tests/, cmake/units/); tpw-port turns them off when it builds this tree as a subproject.
 option(TPW_BUILD_TESTS "Build the differential tests' libraries" ON)
@@ -44,8 +49,8 @@ tpw_slice(TARGET tpw NAME tpw SOURCES sound/CSprocketsModule.cpp DROP
 
 # The launcher's asset library (assets/): the compiled-in manifest of the files a game folder must hold, found by content
 # (devtools/make_manifest.py writes assets/manifest_data.inc by hand; no Python runs at build time).
-# It also holds the container readers (folders, zip archives, ISO 9660 and HFS images, MacBinary, cabinets, SHA-256); they need
-# only zlib, so the library builds without SDL3. Their host tests read the player's own discs when TPW_GDI_ROOT,
+# It also holds the container readers (folders, zip archives, 7-Zip and RAR archives, ISO 9660 and HFS images, MacBinary,
+# cabinets, SHA-256); they need only zlib, liblzma and libarchive, so the library builds without SDL3. Their host tests read the player's own discs when TPW_GDI_ROOT,
 # TPW_TEST_TRANSFER and TPW_TEST_EXPECT name them (TPW_TEST_SOURCES, or sources.txt in TPW_TEST_TRANSFER, says which file is
 # which disc; TPW_TEST_SCRATCH for the Mac toast) and skip with a message otherwise.
 # The importer (assets/importer.cpp) runs a drop on a worker thread.
@@ -53,18 +58,21 @@ find_package(Threads REQUIRED)
 file(GLOB TPW_ASSETS_SOURCES CONFIGURE_DEPENDS assets/*.cpp)
 add_library(tpw_assets STATIC ${TPW_ASSETS_SOURCES})
 target_include_directories(tpw_assets PUBLIC assets)
-target_link_libraries(tpw_assets PUBLIC ZLIB::ZLIB Threads::Threads)
+target_link_libraries(tpw_assets PUBLIC ZLIB::ZLIB Threads::Threads PRIVATE LibArchive::LibArchive)
 option(TPW_BUILD_ASSETS_TESTS "Build the asset readers' host tests" ON)
 if(TPW_BUILD_ASSETS_TESTS)
   enable_testing()
   add_executable(tpw_assets_tests assets/tests/host_assets.cpp)
   target_link_libraries(tpw_assets_tests PRIVATE tpw_assets)
+  # The archive fixtures (assets/tests/archives, uuencoded; README.md there says where each comes from).
+  target_compile_definitions(tpw_assets_tests PRIVATE TPW_ARCHIVE_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/assets/tests/archives")
   add_test(NAME assets COMMAND tpw_assets_tests)
   # The importer's host test: synthetic drops always; with the discs (the variables above, TPW_TEST_SCRATCH for the
   # output trees) the US, European and Gold trees against devtools/import_originals.py and import_eur.py.
   add_executable(tpw_importer_tests assets/tests/host_importer.cpp)
   target_link_libraries(tpw_importer_tests PRIVATE tpw_assets)
-  target_compile_definitions(tpw_importer_tests PRIVATE TPW_DEVTOOLS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/devtools")
+  target_compile_definitions(tpw_importer_tests PRIVATE TPW_DEVTOOLS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/devtools"
+                             TPW_ARCHIVE_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/assets/tests/archives")
   add_test(NAME importer COMMAND tpw_importer_tests)
 endif()
 

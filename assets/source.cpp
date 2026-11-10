@@ -149,6 +149,12 @@ std::shared_ptr<Blob> OpenEntryBlob(std::shared_ptr<Source> source, const Entry&
         err = "no source";
         return nullptr;
     }
+    std::string direct;
+    if (std::shared_ptr<Blob> blob = source->OpenBlob(entry, direct)) return blob;
+    if (!direct.empty()) {
+        err = direct;
+        return nullptr;
+    }
     try {
         return std::make_shared<EntryBlob>(std::move(source), entry);
     } catch (...) {
