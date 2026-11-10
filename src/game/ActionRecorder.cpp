@@ -25,6 +25,7 @@
 #include "TbTList.h"
 #include "ThingReceivers.h"
 #include "TPCoaster.h"
+#include "TPEngine.h"
 #include "TPSound.h"
 #include "TPString.h"
 #include "UI_Base.h"
