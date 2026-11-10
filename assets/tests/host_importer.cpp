@@ -562,6 +562,30 @@ void TestPs1Cameras(const std::string& disc, const std::string& donors, const st
     RemoveTree(root);
 }
 
+void TestPs1Grass() {
+    std::printf("PlayStation ride ground grass key\n");
+    // A row of the Diplo-Dip ground's own palette colours: water, sand, seven grass, a rock; then Space's green pad and
+    // a Halloween hedge, which are not grass.
+    using Texel = std::array<uint8_t, 4>;
+    const Texel water{24, 156, 197, 255}, sand{164, 123, 57, 255}, grass{24, 139, 41, 255}, rock{131, 98, 57, 255};
+    std::vector<Texel> row{water, sand, grass, grass, grass, grass, grass, grass, grass, rock};
+    KeyPs1Grass(row, 10, 1);
+    CHECK(row[0] == water && row[1] == sand && row[9] == rock);
+    CHECK(row[4][3] == 0 && row[5][3] == 0 && row[6][3] == 0);
+    // Further in it keeps its own colour, for a ground drawn without blending.
+    CHECK((row[5] == Texel{24, 139, 41, 0}));
+    // Next to the rest, grass fades in the nearest texel's colour rather than its own green.
+    CHECK((row[2] == Texel{164, 123, 57, 170}) && (row[3] == Texel{164, 123, 57, 85}));
+    CHECK((row[8] == Texel{131, 98, 57, 170}) && (row[7] == Texel{131, 98, 57, 85}));
+    std::vector<Texel> other{{0, 230, 0, 255}, {41, 82, 32, 255}, {123, 123, 49, 255}};
+    auto kept = other;
+    KeyPs1Grass(other, 3, 1);
+    CHECK(other == kept);
+    std::vector<Texel> lawn(16, grass);
+    KeyPs1Grass(lawn, 4, 4);
+    CHECK(std::all_of(lawn.begin(), lawn.end(), [](const Texel& t) { return t[3] == 0; }));
+}
+
 void TestSynthetic(const std::string& scratch) {
     std::printf("synthetic drops\n");
     std::string root = scratch + "/synthetic-data", drop = scratch + "/synthetic-drop";
@@ -2422,6 +2446,7 @@ int main() {
 
     TestSynthetic(scratch);
     TestPlayStation(scratch);
+    TestPs1Grass();
     TestIcon(scratch);
     TestStartupCheck(scratch);
     TestEditedSettings(scratch);

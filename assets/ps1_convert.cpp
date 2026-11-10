@@ -26,7 +26,17 @@ using Vec = std::array<double, 3>;
 using Quat = std::array<double, 4>;
 using Matrix = std::array<double, 16>;
 using Transform = std::pair<Quat, Vec>;
+// A texture: its VRAM page (low five bits) and its palette; a cell of the ride's own ground has a texture of its own,
+// keyed -1 - its cell number (GroundTiles).
 using Key = std::pair<int, int>;
+// The ride's own ground: a cell's texture key to its theme atlas tile (page, palette, corner u and v, width, height).
+using GroundTiles = std::map<Key, std::array<int, 6>>;
+// The size of a ground cell's texture: at least the largest procedural ground tile (Ground blending 64), so the engine
+// can lay it over the park's ground under the cell.
+constexpr int kGroundTexture = 64;
+// The mesh header flag (+0x30) the port reads as "the base is a PlayStation ride's ground: blend every cell of it into
+// the park's ground" (TPW_MOD_HOOK ps1_ground, src/game/park/SkirtDeform.cpp). No PC mesh has it.
+constexpr uint32_t kPs1GroundHeader = 0x40000000;
 constexpr double S = 10.0 / 256.0;
 const Matrix ident = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 // The output formats store little-endian words and IEEE single precision, regardless of the host's byte order.
@@ -678,16 +688,20 @@ void writeFile(const fs::path &path, const Bytes &b) {
 void writeText(const fs::path &path, const std::string &s) {
     writeFile(path, Bytes(s.begin(), s.end()));
 }
-void texture(const fs::path &path, const Pages &pages, Key key, const std::set<std::array<int, 4>> &rects) {
-    using Pixel = std::array<int, 4>;
-    std::vector<Pixel> px(65536, Pixel{-1, -1, -1, -1});
-    bool alpha = false;
+using Pixel = std::array<int, 4>;
+std::array<Pixel, 16> palette(const Pages &pages, int clut) {
     std::array<Pixel, 16> pal;
     for (int i = 0; i < 16; i++) {
-        uint16_t w = vram(pages, (key.second & 63) * 16 + i, (key.second >> 6) & 511);
+        uint16_t w = vram(pages, (clut & 63) * 16 + i, (clut >> 6) & 511);
         pal[i] = w ? Pixel{(w & 31) * 255 / 31, ((w >> 5) & 31) * 255 / 31, ((w >> 10) & 31) * 255 / 31, 255}
                    : Pixel{0, 0, 0, 0};
     }
+    return pal;
+}
+void texture(const fs::path &path, const Pages &pages, Key key, const std::set<std::array<int, 4>> &rects) {
+    std::vector<Pixel> px(65536, Pixel{-1, -1, -1, -1});
+    bool alpha = false;
+    std::array<Pixel, 16> pal = palette(pages, key.second);
     auto pg = pages.find(key.first & 31);
     for (auto r : rects)
         for (int v = r[1]; v <= r[3]; v++)
@@ -741,8 +755,39 @@ void texture(const fs::path &path, const Pages &pages, Key key, const std::set<s
     }
     writeFile(path, out);
 }
+// A ground cell's texture: its atlas tile with the grass keyed out (KeyPs1Grass), each texel repeated to
+// kGroundTexture square, always with alpha.
+void groundTexture(const fs::path &path, const Pages &pages, const std::array<int, 6> &tile) {
+    auto [page, clut, u0, v0, w, h] = tile;
+    std::array<Pixel, 16> pal = palette(pages, clut);
+    auto pg = pages.find(page & 31);
+    std::vector<std::array<uint8_t, 4>> px(w * h, {0, 0, 0, 0});
+    if (pg != pages.end())
+        for (int v = 0; v < h; v++)
+            for (int u = 0; u < w; u++) {
+                int bb = pg->second[((v0 + v) & 255) * 128 + (((u0 + u) & 255) >> 1)];
+                Pixel p = pal[((u0 + u) & 1) ? bb >> 4 : bb & 15];
+                px[v * w + u] = {uint8_t(p[0]), uint8_t(p[1]), uint8_t(p[2]), uint8_t(p[3])};
+            }
+    KeyPs1Grass(px, w, h);
+    Bytes out(18);
+    out[2] = 2;
+    put(out, 12, kGroundTexture, 2);
+    put(out, 14, kGroundTexture, 2);
+    out[16] = 32;
+    out[17] = 0x28;
+    for (int y = 0; y < kGroundTexture; y++)
+        for (int x = 0; x < kGroundTexture; x++) {
+            auto p = px[(y * h / kGroundTexture) * w + x * w / kGroundTexture];
+            out.push_back(p[2]);
+            out.push_back(p[1]);
+            out.push_back(p[0]);
+            out.push_back(p[3]);
+        }
+    writeFile(path, out);
+}
 Textures writeTextures(const MeshEntry &e, const Pages &pages, const fs::path &out, const std::vector<Tri> &tris,
-                       std::map<Key, int> &index) {
+                       const GroundTiles &ground, std::map<Key, int> &index) {
     std::map<Key, std::set<std::array<int, 4>>> keys;
     for (auto &t : tris) {
         int u0 = 256, v0 = 256, u1 = 0, v1 = 0;
@@ -758,18 +803,25 @@ Textures writeTextures(const MeshEntry &e, const Pages &pages, const fs::path &o
     for (auto &k : keys) {
         std::ostringstream fn;
         fn << std::string(e.spec.key).substr(0, 4) << std::setw(2) << std::setfill('0') << textures.size() << ".tga";
-        texture(out / "textures" / fn.str(), pages, k.first, k.second);
-        texture(out / "stexture" / fn.str(), pages, k.first, k.second);
+        for (auto dir : {"textures", "stexture"})
+            if (ground.count(k.first))
+                groundTexture(out / dir / fn.str(), pages, ground.at(k.first));
+            else
+                texture(out / dir / fn.str(), pages, k.first, k.second);
         index[k.first] = textures.size();
         textures.push_back({1, fn.str()});
     }
     return textures;
 }
-std::vector<Tri> floorTris(const MeshEntry &e, const Bytes &atlas) {
+std::vector<Tri> floorTris(const MeshEntry &e, const Bytes &atlas, GroundTiles &ground) {
     // The ride's own ground, after the trailer's 188 bytes and a 4-byte head: per cell, rows from the exit's side, a
     // tile of the theme atlas (12-byte records after its 16-byte header: page, palette, size, corner) and its turn,
-    // quarter turns in the low two bits and a mirror in bit 3. The park's own ground is drawn under the ride too, so
-    // this sits half a unit above it to keep the two from fighting for the same pixels.
+    // quarter turns in the low two bits and a mirror in bit 3. It lies at the ride's own height, as a PC ride's base
+    // does: the game hides the park's ground under a placed ride, and the engine takes the ground's edge corners as
+    // the skirt it moves onto the park's ground, so its edge meets the park's cells with no gap (raised above them,
+    // the sky showed through a line along the edges that face the camera). Each cell has a texture of its own, the
+    // whole of it on the cell, as a PC ride's procedural base has, so the engine can blend it into the park's ground
+    // cell by cell; its key sorts before the rest, so the cell's own faces come first in their node.
     size_t map = u32(e.raw, 20) + 192;
     std::vector<Tri> out;
     for (int z = 0; z < e.d; z++)
@@ -781,9 +833,11 @@ std::vector<Tri> floorTris(const MeshEntry &e, const Bytes &atlas) {
             int page = u16(atlas, rec), size = u16(atlas, rec + 6), corner = u16(atlas, rec + 8);
             int w = size & 255, h = size >> 8, u = corner & 255, v = corner >> 8;
             need((page >> 7 & 3) == 0 && w > 0 && h > 0 && u + w <= 256 && v + h <= 256, "invalid PS1 ground tile");
+            Key key = {-1 - (z * e.w + x), 0};
+            ground[key] = {page & 31, u16(atlas, rec + 2), u, v, w, h};
             for (auto corners : std::array<std::array<int, 3>, 2>{{{0, 2, 1}, {3, 1, 2}}}) {
                 Tri t;
-                t.key = {page & 31, u16(atlas, rec + 2)};
+                t.key = key;
                 for (int i = 0; i < 3; i++) {
                     int dx = corners[i] & 1, dz = corners[i] >> 1;
                     // The corner in the tile's picture, whose rows run against z and columns against x: turned back,
@@ -797,8 +851,8 @@ std::vector<Tri> floorTris(const MeshEntry &e, const Bytes &atlas) {
                     if (turn & 8)
                         c = 1 - c;
                     t.vi[i] = -1 - ((z + dz) * (e.w + 1) + x + dx);
-                    t.uv[i] = {u + c * (w - 1), v + (1 - r) * (h - 1)};
-                    t.p[i] = {(x + dx) * 10., .5, (z + dz) * 10.};
+                    t.uv[i] = {c * 256, (1 - r) * 256};
+                    t.p[i] = {(x + dx) * 10., 0., (z + dz) * 10.};
                 }
                 out.push_back(t);
             }
@@ -818,6 +872,7 @@ Bytes mesh(const std::string &stem, const Bytes &head, std::vector<Node> &nodes,
     Bytes out(head.begin(), head.begin() + 0xb8);
     std::fill(out.begin() + 0x18, out.begin() + 0x2c, 0);
     std::copy_n(stem.begin(), std::min(stem.size(), size_t(19)), out.begin() + 0x18);
+    put(out, 0x30, u32(out, 0x30) | kPs1GroundHeader);
     size_t texoff = out.size();
     for (auto &t : textures) {
         word(out, t.first, 2);
@@ -1596,7 +1651,8 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, con
     need(feature || u16(e.raw, trailer + 14) == 0, "PS1 exit is not on first row");
     need(feature || (ez == 0 && ex != xx) || ez == e.d - 1, "PS1 entrance is not on first or last row");
     need(ex < e.w && xx < e.w, "invalid PS1 entrance or exit");
-    auto floor = floorTris(e, atlas);
+    GroundTiles ground;
+    auto floor = floorTris(e, atlas, ground);
     std::vector<Tri> all = still;
     for (auto &r : rigidT)
         all.insert(all.end(), r.second.begin(), r.second.end());
@@ -1604,7 +1660,7 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, con
         all.insert(all.end(), m.second.begin(), m.second.end());
     all.insert(all.end(), floor.begin(), floor.end());
     std::map<Key, int> texindex;
-    Textures textures = writeTextures(e, pages, dir, all, texindex);
+    Textures textures = writeTextures(e, pages, dir, all, ground, texindex);
     std::vector<Node> nodes;
     std::map<int, int> pcidx;
     std::vector<std::pair<int, std::set<int>>> morphNodes;
@@ -1873,6 +1929,48 @@ void clearStaging(const fs::path &path) {
     fs::remove(path, ec);
 }
 } // namespace
+
+void KeyPs1Grass(std::vector<std::array<uint8_t, 4>> &tile, int w, int h) {
+    // Grass is a mid green, with red under seven tenths and blue under four tenths of it: the jungle's grass and its
+    // blends into the shore are, its water, sand, rocks and olive edges are not, nor Halloween's dark hedges or Space's
+    // bright green pad.
+    auto grass = [](const std::array<uint8_t, 4> &p) {
+        return p[3] == 255 && p[1] >= 96 && p[1] <= 184 && p[0] * 10 <= p[1] * 7 && p[2] * 10 <= p[1] * 4;
+    };
+    // A grass texel next to the rest, counting diagonal steps as one, takes the colour of the nearest other texel and
+    // alpha 170, two away 85, so the shore fades into the park's grass instead of ending in a green fringe; from three
+    // away it keeps its own colour with alpha 0 (drawn without blending, as with Ground blending off, it is the disc's
+    // grass). The palette's own transparent texels stay as they are and colour nothing.
+    std::vector<int> dist(tile.size(), -1);
+    std::vector<size_t> front;
+    for (size_t i = 0; i < tile.size(); i++)
+        if (!grass(tile[i])) {
+            dist[i] = 0;
+            if (tile[i][3] == 255)
+                front.push_back(i);
+        }
+    for (int d = 1; !front.empty(); d++) {
+        std::vector<size_t> next;
+        for (size_t i : front)
+            for (int dy = -1; dy <= 1; dy++)
+                for (int dx = -1; dx <= 1; dx++) {
+                    int x = int(i % w) + dx, y = int(i / w) + dy;
+                    if (x < 0 || x >= w || y < 0 || y >= h || dist[y * w + x] >= 0)
+                        continue;
+                    size_t j = y * w + x;
+                    dist[j] = d;
+                    if (d < 3)
+                        tile[j] = {tile[i][0], tile[i][1], tile[i][2], uint8_t(255 - 85 * d)};
+                    else
+                        tile[j][3] = 0;
+                    next.push_back(j);
+                }
+        front = std::move(next);
+    }
+    for (size_t i = 0; i < tile.size(); i++)
+        if (dist[i] < 0)
+            tile[i][3] = 0;
+}
 
 bool InstallPs1Ride(const fs::path &staged, const fs::path &destination, std::string &reason) {
     try {

@@ -20,6 +20,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <vector>
 
 // gameplay_leaves.cpp (main, unit v5L07): small leaves a park run reaches, from different Mac files: CellIsRide 0x1006d718
 // (the inventory's Debug.cpp range), LocatorByeByeKid 0x101bf98c (ui_staffPanel.cpp), CObject::IsCoaster 0x10110cd8 (Object.cpp) and CAdvisor::FinalDestroy 0x1000a0ec (Advisor.cpp).
@@ -670,6 +671,7 @@ void StoreNodeList(tag_sNode* node, int32_t count, const uint16_t* list) {
     block[0] = static_cast<uint32_t>(count);
     if (data != nullptr && count != 0) std::memcpy(data, list, static_cast<size_t>(count) * 2);
 }
+
 
 }  // namespace
 
