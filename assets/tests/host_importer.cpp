@@ -586,6 +586,42 @@ void TestPs1Grass() {
     CHECK(std::all_of(lawn.begin(), lawn.end(), [](const Texel& t) { return t[3] == 0; }));
 }
 
+void TestPs1PlainGround() {
+    std::printf("PlayStation ride ground plain ground key\n");
+    // Colours from the disc's palettes: Halloween's flagstone (tile 145) and the Clown's olive lawn and orange ring,
+    // an Eye Slide hedge; Space's purple ground and the Romper's brown pad and green light; the jungle's grass.
+    using Texel = std::array<uint8_t, 4>;
+    const Texel stone{98, 90, 123, 255}, stone2{115, 98, 131, 255}, lawn{98, 82, 0, 255}, ring{172, 115, 0, 255},
+        hedge{32, 41, 24, 255}, purple{90, 32, 115, 255}, pad{115, 41, 16, 255}, light{0, 230, 0, 255},
+        grass{24, 139, 41, 255};
+    CHECK(Ps1PlainGround("hallow", stone) && Ps1PlainGround("hallow", stone2) && Ps1PlainGround("hallow", lawn));
+    CHECK(!Ps1PlainGround("hallow", ring) && !Ps1PlainGround("hallow", hedge) && !Ps1PlainGround("hallow", purple));
+    CHECK(Ps1PlainGround("space", purple));
+    CHECK(!Ps1PlainGround("space", pad) && !Ps1PlainGround("space", light) && !Ps1PlainGround("space", stone));
+    CHECK(!Ps1PlainGround("jungle", grass) && !Ps1PlainGround("jungle", stone));
+    // A 15 x 15 patch of flagstone with a hedge outline round its middle 3 x 3, a lone fleck in a corner and a blob of
+    // five texels: the stone the edge reaches is keyed, fading in next to the hedge; the enclosed stone, the blob and
+    // the hedge stay; the fleck is keyed with the stone.
+    const Texel fleck{60, 50, 60, 255};
+    std::vector<Texel> patch(15 * 15, stone);
+    for (int i = 5; i <= 9; i++)
+        patch[5 * 15 + i] = patch[9 * 15 + i] = patch[i * 15 + 5] = patch[i * 15 + 9] = hedge;
+    patch[1 * 15 + 1] = fleck;
+    for (int at : {12 * 15 + 1, 12 * 15 + 2, 12 * 15 + 3, 13 * 15 + 1, 13 * 15 + 2})
+        patch[at] = fleck;
+    KeyPs1Patch(patch, 15, 15, "hallow");
+    CHECK(patch[7 * 15 + 7] == stone && patch[5 * 15 + 7] == hedge);
+    CHECK(patch[12 * 15 + 1] == fleck && patch[13 * 15 + 2] == fleck);
+    CHECK((patch[7 * 15 + 0] == Texel{98, 90, 123, 0}) && (patch[1 * 15 + 1] == Texel{60, 50, 60, 0}));
+    CHECK((patch[7 * 15 + 4] == Texel{32, 41, 24, 170}) && (patch[7 * 15 + 3] == Texel{32, 41, 24, 85}));
+    // Space's purple keyed round the pad, the pad and its light kept (five texels, more than a fleck).
+    std::vector<Texel> romper{purple, purple, purple, pad, pad, pad, pad, light, purple, purple, purple};
+    KeyPs1Patch(romper, 11, 1, "space");
+    CHECK(romper[3] == pad && romper[6] == pad && romper[7] == light);
+    CHECK((romper[2] == Texel{115, 41, 16, 170}) && (romper[1] == Texel{115, 41, 16, 85}) && romper[0][3] == 0);
+    CHECK((romper[8] == Texel{0, 230, 0, 170}) && romper[10][3] == 0);
+}
+
 void TestSynthetic(const std::string& scratch) {
     std::printf("synthetic drops\n");
     std::string root = scratch + "/synthetic-data", drop = scratch + "/synthetic-drop";
@@ -2447,6 +2483,7 @@ int main() {
     TestSynthetic(scratch);
     TestPlayStation(scratch);
     TestPs1Grass();
+    TestPs1PlainGround();
     TestIcon(scratch);
     TestStartupCheck(scratch);
     TestEditedSettings(scratch);

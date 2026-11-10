@@ -16,4 +16,11 @@ bool InstallPs1Ride(const std::filesystem::path &staged, const std::filesystem::
 // A ride's own ground keeps its water, shore, rocks and paths but lets the park's grass show through its own: in a w x h
 // tile of RGBA texels its grass gets alpha 0, except next to the rest, which it fades from over two texels.
 void KeyPs1Grass(std::vector<std::array<uint8_t, 4>> &tile, int w, int h);
+// Halloween's and Space's rides (theme "hallow" or "space") key their world's plain ground instead, over the whole
+// patch of their cells at once: the plain ground the patch's edge reaches through plain texels, so enclosed art stays.
+void KeyPs1Patch(std::vector<std::array<uint8_t, 4>> &tile, int w, int h, const std::string &theme);
+// Whether a texel is the plain ground of a theme's world (none for other themes).
+bool Ps1PlainGround(const std::string &theme, const std::array<uint8_t, 4> &p);
+// The keying itself: the texels `ground` marks get alpha 0, faded from over two texels next to the rest.
+void KeyPs1Ground(std::vector<std::array<uint8_t, 4>> &tile, int w, int h, const std::vector<bool> &ground);
 } // namespace tpw::assets

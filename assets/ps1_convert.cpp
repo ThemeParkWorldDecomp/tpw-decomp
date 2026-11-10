@@ -755,9 +755,8 @@ void texture(const fs::path &path, const Pages &pages, Key key, const std::set<s
     }
     writeFile(path, out);
 }
-// A ground cell's texture: its atlas tile with the grass keyed out (KeyPs1Grass), each texel repeated to
-// kGroundTexture square, always with alpha.
-void groundTexture(const fs::path &path, const Pages &pages, const std::array<int, 6> &tile) {
+// A ground cell's atlas tile, w by h texels.
+std::vector<std::array<uint8_t, 4>> tileTexels(const Pages &pages, const std::array<int, 6> &tile) {
     auto [page, clut, u0, v0, w, h] = tile;
     std::array<Pixel, 16> pal = palette(pages, clut);
     auto pg = pages.find(page & 31);
@@ -769,7 +768,61 @@ void groundTexture(const fs::path &path, const Pages &pages, const std::array<in
                 Pixel p = pal[((u0 + u) & 1) ? bb >> 4 : bb & 15];
                 px[v * w + u] = {uint8_t(p[0]), uint8_t(p[1]), uint8_t(p[2]), uint8_t(p[3])};
             }
-    KeyPs1Grass(px, w, h);
+    return px;
+}
+// The ride's own ground cells' texels with the park's ground keyed out. The jungle's grass is keyed cell by cell
+// (KeyPs1Grass); Halloween's and Space's plain ground over the whole patch, laid out as floorTris lays the cells, so
+// that only the plain ground the patch's edge reaches is keyed and art it encloses keeps its plain colour (the Skulls'
+// stone circles, which run over four cells).
+std::map<Key, std::vector<std::array<uint8_t, 4>>> groundTexels(const MeshEntry &e, const Pages &pages,
+                                                                const GroundTiles &ground) {
+    std::map<Key, std::vector<std::array<uint8_t, 4>>> out;
+    for (auto &g : ground)
+        out[g.first] = tileTexels(pages, g.second);
+    std::string theme = e.spec.theme;
+    int n = ground.empty() ? 0 : ground.begin()->second[4];
+    bool square = true;
+    for (auto &g : ground)
+        square = square && g.second[4] == n && g.second[5] == n;
+    if ((theme != "hallow" && theme != "space") || !square || int(ground.size()) != e.w * e.d) {
+        for (auto &g : ground)
+            KeyPs1Grass(out[g.first], g.second[4], g.second[5]);
+        return out;
+    }
+    // Each world texel's cell and tile texel: its centre turned back and mirrored as floorTris turns the corners, in
+    // half texels.
+    int W = e.w * n, H = e.d * n;
+    std::vector<std::array<uint8_t, 4>> patch(size_t(W) * H);
+    std::vector<std::pair<Key, int>> from(patch.size());
+    size_t map = u32(e.raw, 20) + 192;
+    for (int z = 0; z < e.d; z++)
+        for (int x = 0; x < e.w; x++) {
+            Key key = {-1 - (z * e.w + x), 0};
+            int turn = u16(e.raw, map + 4 * size_t((e.d - 1 - z) * e.w + (e.w - 1 - x)) + 2);
+            for (int j = 0; j < n; j++)
+                for (int i = 0; i < n; i++) {
+                    int r = 2 * j + 1, c = 2 * n - 2 * i - 1;
+                    for (int k = 0; k < (4 - (turn & 3)) % 4; k++) {
+                        int was = r;
+                        r = 2 * n - c;
+                        c = was;
+                    }
+                    if (turn & 8)
+                        c = 2 * n - c;
+                    int t = (2 * n - r - 1) / 2 * n + (c - 1) / 2;
+                    size_t at = size_t(z * n + j) * W + x * n + i;
+                    patch[at] = out[key][t];
+                    from[at] = {key, t};
+                }
+        }
+    KeyPs1Patch(patch, W, H, theme);
+    for (size_t i = 0; i < patch.size(); i++)
+        out[from[i].first][from[i].second] = patch[i];
+    return out;
+}
+// A ground cell's texture: its keyed texels (groundTexels), each texel repeated to kGroundTexture square, always with
+// alpha.
+void groundTexture(const fs::path &path, const std::vector<std::array<uint8_t, 4>> &px, int w, int h) {
     Bytes out(18);
     out[2] = 2;
     put(out, 12, kGroundTexture, 2);
@@ -788,6 +841,7 @@ void groundTexture(const fs::path &path, const Pages &pages, const std::array<in
 }
 Textures writeTextures(const MeshEntry &e, const Pages &pages, const fs::path &out, const std::vector<Tri> &tris,
                        const GroundTiles &ground, std::map<Key, int> &index) {
+    std::map<Key, std::vector<std::array<uint8_t, 4>>> keyed = groundTexels(e, pages, ground);
     std::map<Key, std::set<std::array<int, 4>>> keys;
     for (auto &t : tris) {
         int u0 = 256, v0 = 256, u1 = 0, v1 = 0;
@@ -805,7 +859,7 @@ Textures writeTextures(const MeshEntry &e, const Pages &pages, const fs::path &o
         fn << std::string(e.spec.key).substr(0, 4) << std::setw(2) << std::setfill('0') << textures.size() << ".tga";
         for (auto dir : {"textures", "stexture"})
             if (ground.count(k.first))
-                groundTexture(out / dir / fn.str(), pages, ground.at(k.first));
+                groundTexture(out / dir / fn.str(), keyed.at(k.first), ground.at(k.first)[4], ground.at(k.first)[5]);
             else
                 texture(out / dir / fn.str(), pages, k.first, k.second);
         index[k.first] = textures.size();
@@ -1937,14 +1991,94 @@ void KeyPs1Grass(std::vector<std::array<uint8_t, 4>> &tile, int w, int h) {
     auto grass = [](const std::array<uint8_t, 4> &p) {
         return p[3] == 255 && p[1] >= 96 && p[1] <= 184 && p[0] * 10 <= p[1] * 7 && p[2] * 10 <= p[1] * 4;
     };
-    // A grass texel next to the rest, counting diagonal steps as one, takes the colour of the nearest other texel and
-    // alpha 170, two away 85, so the shore fades into the park's grass instead of ending in a green fringe; from three
-    // away it keeps its own colour with alpha 0 (drawn without blending, as with Ground blending off, it is the disc's
-    // grass). The palette's own transparent texels stay as they are and colour nothing.
+    std::vector<bool> ground(tile.size());
+    for (size_t i = 0; i < tile.size(); i++)
+        ground[i] = grass(tile[i]);
+    KeyPs1Ground(tile, w, h, ground);
+}
+
+bool Ps1PlainGround(const std::string &theme, const std::array<uint8_t, 4> &p) {
+    int r = p[0], g = p[1], b = p[2];
+    if (theme == "hallow")
+        // Halloween's flagstones (tile 145, the Skulls' whole corner cells, and the margins of every Halloween ride's
+        // cells) are a mid grey, green 70 to 110, red up to 20 over it and blue from 10 under it to 40 over it; the
+        // Clown's lawn (its corners, outside the ring's dark outline) is a dark olive with no blue, red from green up
+        // to 131, green 57 to 90. The Clown's orange ring and outlines, the hedges, planks, bricks, moss and
+        // gravestones are none of these.
+        return (g >= 70 && g <= 110 && r >= g && r - g <= 20 && b + 10 >= g && b - g <= 40) ||
+               (b <= 8 && g >= 57 && g <= 90 && r >= g && r <= 131);
+    if (theme == "space")
+        // Space's ground is purple, blue over twice green and red over one and a half times it; the Romper's brown
+        // crater pad and its red and green lights are not.
+        return b > 2 * g && 2 * r > 3 * g;
+    return false;
+}
+
+void KeyPs1Patch(std::vector<std::array<uint8_t, 4>> &tile, int w, int h, const std::string &theme) {
+    // The plain ground is what the edge reaches through plain texels, side by side only (a diagonal step through a
+    // thin outline does not count).
+    std::vector<bool> ground(tile.size());
+    std::vector<size_t> todo;
+    auto reach = [&](int x, int y) {
+        size_t i = size_t(y) * w + x;
+        if (x >= 0 && x < w && y >= 0 && y < h && !ground[i] && tile[i][3] == 255 && Ps1PlainGround(theme, tile[i])) {
+            ground[i] = true;
+            todo.push_back(i);
+        }
+    };
+    for (int x = 0; x < w; x++) {
+        reach(x, 0);
+        reach(x, h - 1);
+    }
+    for (int y = 0; y < h; y++) {
+        reach(0, y);
+        reach(w - 1, y);
+    }
+    while (!todo.empty()) {
+        size_t i = todo.back();
+        todo.pop_back();
+        int x = int(i % w), y = int(i / w);
+        reach(x - 1, y);
+        reach(x + 1, y);
+        reach(x, y - 1);
+        reach(x, y + 1);
+    }
+    // A fleck of up to four other texels with plain ground or the patch's edge all round it is part of the ground (the
+    // flagstones' and the lawn's own flecks), not art.
+    std::vector<bool> seen(tile.size());
+    for (size_t s = 0; s < tile.size(); s++) {
+        if (ground[s] || seen[s])
+            continue;
+        std::vector<size_t> fleck = {s};
+        seen[s] = true;
+        for (size_t k = 0; k < fleck.size(); k++)
+            for (int dy = -1; dy <= 1; dy++)
+                for (int dx = -1; dx <= 1; dx++) {
+                    int x = int(fleck[k] % w) + dx, y = int(fleck[k] / w) + dy;
+                    if (x < 0 || x >= w || y < 0 || y >= h)
+                        continue;
+                    size_t j = size_t(y) * w + x;
+                    if (!ground[j] && !seen[j]) {
+                        seen[j] = true;
+                        fleck.push_back(j);
+                    }
+                }
+        if (fleck.size() <= 4)
+            for (size_t i : fleck)
+                ground[i] = tile[i][3] == 255;
+    }
+    KeyPs1Ground(tile, w, h, ground);
+}
+
+void KeyPs1Ground(std::vector<std::array<uint8_t, 4>> &tile, int w, int h, const std::vector<bool> &ground) {
+    // A ground texel next to the rest, counting diagonal steps as one, takes the colour of the nearest other texel and
+    // alpha 170, two away 85, so the ride's ground fades into the park's instead of ending in a fringe; from three away
+    // it keeps its own colour with alpha 0 (drawn without blending, as with Ground blending off, it is the disc's
+    // ground). The palette's own transparent texels stay as they are and colour nothing.
     std::vector<int> dist(tile.size(), -1);
     std::vector<size_t> front;
     for (size_t i = 0; i < tile.size(); i++)
-        if (!grass(tile[i])) {
+        if (!ground[i]) {
             dist[i] = 0;
             if (tile[i][3] == 255)
                 front.push_back(i);
