@@ -279,6 +279,13 @@ KeyRepeatTiming WindowsKeyRepeat(uint32_t delaySetting, uint32_t speedSetting); 
 // key that goes down first releases the one that was down (0x100054c4), so the game sees one key at a time.
 inline bool gPortSeveralKeys = false;
 
+// The launcher's "W A S D move the camera" (include/port_wasd.h, gamework.cpp), both set before the game starts. The
+// first: one key at a time, a remembered A (Mac key code 0, which 0x100054c4 takes for no key) is released before the
+// next key goes down, as every other key is. The second runs at the key-up of a key that releases no key of its own
+// (with its Mac key code), so the game can let go of what that key still holds. Off and none, the original's way.
+inline bool gPortReleaseKeyA = false;
+inline void (*gPortStrayKeyUp)(uint8_t macKeyCode) = nullptr;
+
 // What runs when the pointer leaves the game's window (gamework.cpp, SDL_EVENT_WINDOW_MOUSE_LEAVE): the launcher's is
 // UI_DevicePointerOut (UI_Base.h, pointerleave), set before the game starts. None: the pointer keeps its last place, as
 // on the Mac, where the game filled the screen.
