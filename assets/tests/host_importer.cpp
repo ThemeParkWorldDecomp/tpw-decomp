@@ -501,7 +501,11 @@ void TestPlayStation(const std::string& scratch) {
 }
 
 // Every converted PlayStation ride has a ride camera (flags 0x1031, id 1; TPCamera.cpp finds no camera without one) whose
-// rows, taken through its part's matrix, are a proper rotation with Y up at rest, as the PC ride cameras are.
+// rows, taken through its part's matrix, are a proper rotation with Y up at rest, as the PC ride cameras are. Every
+// rider's head in the Clown's bells and the Skulls' skulls sits down in the part carrying it and keeps its
+// sprite's reach (a head's rise across, turned to the camera: its corners are 0.5 times the square root of 2 world units
+// from its middle) from every wall of that part (its faces steeper than 45 degrees), so its face never shows through
+// them; only its top shows, through the part's top.
 void TestPs1Cameras(const std::string& disc, const std::string& donors, const std::string& scratch) {
     std::printf("PlayStation ride cameras\n");
     std::string root = scratch + "/ps1-cameras", why;
@@ -551,11 +555,139 @@ void TestPs1Cameras(const std::string& disc, const std::string& donors, const st
                 double det = w[0][0] * (w[1][1] * w[2][2] - w[1][2] * w[2][1]) -
                              w[0][1] * (w[1][0] * w[2][2] - w[1][2] * w[2][0]) +
                              w[0][2] * (w[1][0] * w[2][1] - w[1][1] * w[2][0]);
-                std::printf("  %s: camera up %.2f, determinant %.3f\n", dir.c_str(), w[1][1], det);
+                // No rider's head on the camera's part sits just in front of it to fill the view (it looks along
+                // its Z): those ahead of it are at least two head rises away, as on a car behind another.
+                auto at = [&](size_t j) { return rows(md2, mo + 0x58 * j + 0x20)[2]; };
+                int heads = 0;
+                double nearest = 1e9;
+                for (size_t j = 0; j < minis; j++) {
+                    if (u32(md2, eo + 20 * j) != 0xb1 || u32(md2, mo + 0x58 * j + 4) != u32(md2, mo + 0x58 * i + 4))
+                        continue;
+                    ++heads;
+                    double along = 0, far = 0;
+                    for (int c = 0; c < 3; c++) {
+                        along += (at(j)[c] - at(i)[c]) * cam[2][c];
+                        far += (at(j)[c] - at(i)[c]) * (at(j)[c] - at(i)[c]);
+                    }
+                    if (along > 0) nearest = std::min(nearest, std::sqrt(far));
+                }
+                std::printf("  %s: camera up %.2f, determinant %.3f, %d heads on its part", dir.c_str(), w[1][1], det,
+                            heads);
+                if (nearest < 1e9) std::printf(", the nearest ahead %.2f away", nearest);
+                std::printf("\n");
                 CHECK(std::abs(det - 1) < 1e-3);
                 CHECK(w[1][1] > 0.7);
+                CHECK(nearest > 2);
             }
             CHECK_EQ(cameras, 1);
+            // A part's sides at height y in its own frame: the convex hull (anticlockwise in x, z) of where the lines
+            // between its vertices cross y. Its vertices are stored four at a time, x x x x y y y y z z z z.
+            auto vertex = [&](size_t node, size_t k) {
+                std::array<double, 3> v;
+                for (int c = 0; c < 3; c++) {
+                    uint32_t w = u32(md2, u32(md2, node + 0x60) + 48 * (k / 4) + 16 * c + 4 * (k % 4));
+                    float f;
+                    std::memcpy(&f, &w, 4);
+                    v[c] = f;
+                }
+                return v;
+            };
+            auto inside = [&](size_t node, std::array<double, 3> h) {
+                size_t count = u32(md2, node + 0x58) & 0xffff;
+                std::vector<std::array<double, 2>> p, hull;
+                for (size_t a = 0; a < count; a++)
+                    for (size_t b = a + 1; b < count; b++) {
+                        auto va = vertex(node, a), vb = vertex(node, b);
+                        if (va[1] == vb[1] || (va[1] - h[1]) * (vb[1] - h[1]) > 0) continue;
+                        double s = (h[1] - va[1]) / (vb[1] - va[1]);
+                        p.push_back({va[0] + s * (vb[0] - va[0]), va[2] + s * (vb[2] - va[2])});
+                    }
+                std::sort(p.begin(), p.end());
+                auto turn = [](auto& o, auto& a, auto& b) {
+                    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+                };
+                for (int pass = 0; pass < 2 && !p.empty(); pass++) {
+                    size_t start = hull.size();
+                    for (auto& q : p) {
+                        while (hull.size() >= start + 2 && turn(hull[hull.size() - 2], hull.back(), q) <= 0) hull.pop_back();
+                        hull.push_back(q);
+                    }
+                    hull.pop_back();
+                    std::reverse(p.begin(), p.end());
+                }
+                if (hull.size() < 3) return -1e9;
+                double d = 1e9;
+                for (size_t i = 0; i < hull.size(); i++) {
+                    auto &a = hull[i], &b = hull[(i + 1) % hull.size()];
+                    double ex = b[0] - a[0], ez = b[1] - a[1];
+                    d = std::min(d, (ex * (h[2] - a[1]) - ez * (h[0] - a[0])) / std::sqrt(ex * ex + ez * ez));
+                }
+                return d;
+            };
+            // How far h is from the part's nearest wall. Its faces are four words each (face normal, then three
+            // corners), and each corner's word at the node's +0x94 is the vertex it is at.
+            auto sub = [](std::array<double, 3> a, std::array<double, 3> b) {
+                return std::array<double, 3>{a[0] - b[0], a[1] - b[1], a[2] - b[2]};
+            };
+            auto dot = [](std::array<double, 3> a, std::array<double, 3> b) {
+                return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+            };
+            auto clear = [&](size_t node, std::array<double, 3> h) {
+                size_t faces = u32(md2, node + 0x5c) & 0xffff;
+                double d = 1e9;
+                for (size_t i = 0; i < faces; i++) {
+                    std::array<std::array<double, 3>, 3> f;
+                    for (int c = 0; c < 3; c++) {
+                        size_t corner = u32(md2, u32(md2, node + 0x70) + 8 * i + 2 * (c + 1)) & 0xffff;
+                        f[c] = vertex(node, u32(md2, u32(md2, node + 0x94) + 2 * corner) & 0xffff);
+                    }
+                    auto ab = sub(f[1], f[0]), ac = sub(f[2], f[0]);
+                    std::array<double, 3> n = {ab[1] * ac[2] - ab[2] * ac[1], ab[2] * ac[0] - ab[0] * ac[2],
+                                               ab[0] * ac[1] - ab[1] * ac[0]};
+                    if (dot(n, n) < 1e-18 || std::abs(n[1]) >= std::sqrt(dot(n, n) / 2)) continue;
+                    // The nearest point of the triangle to h: inside it, or else on its nearest edge.
+                    auto ap = sub(h, f[0]);
+                    double nn = dot(n, n), u = dot(ap, n) / nn;
+                    std::array<double, 3> q = {h[0] - u * n[0], h[1] - u * n[1], h[2] - u * n[2]};
+                    bool in = true;
+                    for (int c = 0; c < 3; c++) {
+                        auto e = sub(f[(c + 1) % 3], f[c]), r = sub(q, f[c]);
+                        std::array<double, 3> x = {e[1] * r[2] - e[2] * r[1], e[2] * r[0] - e[0] * r[2],
+                                                   e[0] * r[1] - e[1] * r[0]};
+                        if (dot(x, n) < 0) in = false;
+                    }
+                    if (in) {
+                        d = std::min(d, std::abs(u) * std::sqrt(nn));
+                        continue;
+                    }
+                    for (int c = 0; c < 3; c++) {
+                        auto e = sub(f[(c + 1) % 3], f[c]), r = sub(h, f[c]);
+                        double t = std::clamp(dot(r, e) / dot(e, e), 0.0, 1.0);
+                        auto g = sub(r, {t * e[0], t * e[1], t * e[2]});
+                        d = std::min(d, std::sqrt(dot(g, g)));
+                    }
+                }
+                return d;
+            };
+            size_t stand = u32(md2, 0x70);
+            int carried = 0, down = 0;
+            bool shell = dir.rfind("_jack", 0) == 0 || dir.rfind("_skulls", 0) == 0;
+            for (size_t j = 0; shell && j < minis; j++) {
+                size_t node = u32(md2, mo + 0x58 * j + 4);
+                if (u32(md2, eo + 20 * j) != 0xb1 || node == stand) continue;
+                ++carried;
+                auto h = rows(md2, mo + 0x58 * j + 0x20)[2];
+                float top;
+                uint32_t w = u32(md2, node + 0x78 + 16);
+                std::memcpy(&top, &w, 4);
+                if (h[1] >= top || inside(node, h) <= 0) continue;
+                ++down;
+                double wall = clear(node, h);
+                std::printf("  %s: head %zu sits %.2f under its part's top, %.2f from its walls\n", dir.c_str(), j + 1,
+                            top - h[1], wall);
+                CHECK(wall > 0.5 * std::sqrt(2.0) - 1e-3);
+            }
+            if (shell) CHECK(carried > 0 && down == carried);
         }
     }
     CHECK_EQ(rides, 7);

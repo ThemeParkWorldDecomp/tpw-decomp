@@ -205,11 +205,18 @@ struct Spec {
     // Where a rider on the carrier faces, in its frame, for the camera a ride without one gets (see riderView); zero
     // for the way the carrier travels.
     Vec ahead{};
+    // The PS1 seats are on a closed shell (the Clown's bells, the Skulls' skulls), a sprite's hip 28 units over its
+    // top. The PC rider sits in the shell instead, with only the top of the head showing (see shellHead).
+    bool shell = false;
+    // The riders ride inside the carrier's closed body (Romper Stomper's capsule): their heads stay out of sight in its
+    // middle, and its camera looks ahead from the front of the body (see riderView).
+    bool enclosed = false;
 };
 // The Halloween IDs are free alongside the base game and Gold's coaster types. The reference converter's 2130 to
 // 2133 overlap the Devil coaster and its pylon/car types; its geometry and scripts are otherwise preserved byte for byte.
-const Spec specs[] = {{"jack", "HALLOW/JACK", 140, 672, "hallow", 201, 2134, "Crazy Clown", "Crazy", "Clown"},
-                      {"skulls", "HALLOW/JUMPER", 141, 260, "hallow", 202, 2135, "Jumping Skulls", "Jumping", "Skulls"},
+const Spec specs[] = {{"jack", "HALLOW/JACK", 140, 672, "hallow", 201, 2134, "Crazy Clown", "Crazy", "Clown", -1, {}, true},
+                      {"skulls", "HALLOW/JUMPER", 141, 260, "hallow", 202, 2135, "Jumping Skulls", "Jumping", "Skulls", -1,
+                       {}, true},
                       {"eyesld", "HALLOW/SLIDE", 147, 275, "hallow", 204, 2136, "Eye Slide", "Eye", "Slide", 3},
                       {"aztec", "JUNGLE/BUNGIE", 218, 352, "jungle", 205, 1187, "Aztec Bounce", "Aztec", "Bounce"},
                       {"diplo", "JUNGLE/DIPLODIP", 221, 286, "jungle", 206, 1130, "Diplo-Dip", "Diplo", "Dip"},
@@ -217,7 +224,7 @@ const Spec specs[] = {{"jack", "HALLOW/JACK", 140, 672, "hallow", 201, 2134, "Cr
                       // Romper Stomper faces its body's +Z: its reverse-jointed legs' knees point to -Z, and the +Z end
                       // lifts as it leaps.
                       {"romper", "SPACE/JUMPER", 369, 276, "space", 208, 3130, "Romper Stomper", "Romper", "Stomper", 2,
-                       {0, 0, 1}},
+                       {0, 0, 1}, false, true},
                       {"obver", "HALLOW/OBVER", 142, 202, "hallow", 203, 2450, "Tower", "Tower", ""}};
 // reference is only the entry number printed in the reference converter's output comments. Disc reads always use
 // the recognised disc's ID table and located entries, including on the European and Japanese releases.
@@ -1616,11 +1623,174 @@ std::vector<Vec> riderRing(const MeshEntry &e, int carrier, int count) {
 }
 // A seated rider's head is this far above the seat (world units); a PC car's heads are about as far above its rim.
 constexpr double kHeadRise = 1.0;
+// The middle of the carrier's own mesh in its frame (PS1 units), and how far that mesh reaches from it along `dir`.
+std::pair<Vec, double> body(const MeshEntry &e, int carrier, Vec dir) {
+    Vec lo{1e9, 1e9, 1e9}, hi{-1e9, -1e9, -1e9};
+    for (auto &v : e.skin)
+        if (v.second.first == carrier)
+            for (int k = 0; k < 3; k++) {
+                lo[k] = std::min(lo[k], v.second.second[k]);
+                hi[k] = std::max(hi[k], v.second.second[k]);
+            }
+    need(lo[0] <= hi[0], "PS1 rider carrier has no body");
+    Vec mid = scaled(add(lo, hi), 0.5);
+    double reach = 0;
+    for (auto &v : e.skin)
+        if (v.second.first == carrier)
+            reach = std::max(reach, dot(sub(v.second.second, mid), dir));
+    return {mid, reach};
+}
+// A rider's head is a sprite that turns to face the camera, a head's rise across: its top is half that over its
+// middle, and its corners reach half that times the square root of 2 from it whichever way it turns (PS1 units).
+constexpr double kHeadRadius = kHeadRise / S / 2;
+constexpr double kHeadReach = kHeadRadius * 1.4142135623730951;
+// Where a rider's head goes in the closed shell that carries its seat, in the shell's frame (PS1 units), the shell
+// upright: under the seat, its top level with the shell's top there, and at least its reach from every one of the
+// shell's walls (its faces steeper than 45 degrees), so only its top shows, through the shell's top. A head that would
+// come closer to a wall (the walls lean in towards the top, and a seat may be near the shell's edge) moves straight
+// towards the middle of the shell's outline at its height until it does not.
+Vec shellHead(const MeshEntry &e, int shell, Vec seat) {
+    std::vector<std::array<Vec, 3>> faces;
+    for (auto &t : e.faces) {
+        std::array<Vec, 3> f;
+        int n = 0;
+        for (int i = 0; i < 3; i++) {
+            auto v = e.skin.find(t.vi[i]);
+            if (v != e.skin.end() && v->second.first == shell)
+                f[n++] = v->second.second;
+        }
+        if (n == 3)
+            faces.push_back(f);
+    }
+    need(!faces.empty(), "PS1 rider shell has no faces");
+    std::vector<std::array<Vec, 3>> walls;
+    for (auto &f : faces) {
+        Vec n = cross(sub(f[1], f[0]), sub(f[2], f[0]));
+        double l = std::sqrt(dot(n, n));
+        if (l > 1e-9 && std::abs(n[1]) < l * std::sqrt(0.5))
+            walls.push_back(f);
+    }
+    // The height of the shell's highest face over (x, z), or -1e9 off the shell.
+    auto top = [&](double x, double z) {
+        double y = -1e9;
+        for (auto &f : faces) {
+            auto &a = f[0], &b = f[1], &c = f[2];
+            double d = (b[2] - c[2]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[2] - c[2]);
+            if (std::abs(d) < 1e-9)
+                continue;
+            double u = ((b[2] - c[2]) * (x - c[0]) + (c[0] - b[0]) * (z - c[2])) / d;
+            double v = ((c[2] - a[2]) * (x - c[0]) + (a[0] - c[0]) * (z - c[2])) / d;
+            if (std::min({u, v, 1 - u - v}) >= -1e-9)
+                y = std::max(y, u * a[1] + v * b[1] + (1 - u - v) * c[1]);
+        }
+        return y;
+    };
+    // The shell's outline at height y: the convex hull (anticlockwise in x, z) of where its edges cross y.
+    auto outline = [&](double y) {
+        std::vector<std::array<double, 2>> p, hull;
+        for (auto &f : faces)
+            for (int i = 0; i < 3; i++) {
+                auto &a = f[i], &b = f[(i + 1) % 3];
+                if (a[1] != b[1] && (a[1] - y) * (b[1] - y) <= 0) {
+                    double t = (y - a[1]) / (b[1] - a[1]);
+                    p.push_back({a[0] + t * (b[0] - a[0]), a[2] + t * (b[2] - a[2])});
+                }
+            }
+        std::sort(p.begin(), p.end());
+        auto turn = [](auto &o, auto &a, auto &b) {
+            return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+        };
+        for (int pass = 0; pass < 2; pass++) {
+            size_t start = hull.size();
+            for (auto &q : p) {
+                while (hull.size() >= start + 2 && turn(hull[hull.size() - 2], hull.back(), q) <= 0)
+                    hull.pop_back();
+                hull.push_back(q);
+            }
+            hull.pop_back();
+            std::reverse(p.begin(), p.end());
+        }
+        return hull;
+    };
+    // The distance from p to the triangle f.
+    auto distance = [](Vec p, const std::array<Vec, 3> &f) {
+        Vec ab = sub(f[1], f[0]), ac = sub(f[2], f[0]), ap = sub(p, f[0]);
+        double d1 = dot(ab, ap), d2 = dot(ac, ap);
+        Vec q;
+        if (d1 <= 0 && d2 <= 0)
+            q = f[0];
+        else {
+            Vec bp = sub(p, f[1]), cp = sub(p, f[2]);
+            double d3 = dot(ab, bp), d4 = dot(ac, bp), d5 = dot(ab, cp), d6 = dot(ac, cp);
+            double va = d3 * d6 - d5 * d4, vb = d5 * d2 - d1 * d6, vc = d1 * d4 - d3 * d2;
+            if (d3 >= 0 && d4 <= d3)
+                q = f[1];
+            else if (d6 >= 0 && d5 <= d6)
+                q = f[2];
+            else if (vc <= 0 && d1 >= 0 && d3 <= 0)
+                q = add(f[0], scaled(ab, d1 / (d1 - d3)));
+            else if (vb <= 0 && d2 >= 0 && d6 <= 0)
+                q = add(f[0], scaled(ac, d2 / (d2 - d6)));
+            else if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0)
+                q = add(f[1], scaled(sub(f[2], f[1]), (d4 - d3) / ((d4 - d3) + (d5 - d6))));
+            else
+                q = add(f[0], add(scaled(ab, vb / (va + vb + vc)), scaled(ac, vc / (va + vb + vc))));
+        }
+        Vec g = sub(p, q);
+        return std::sqrt(dot(g, g));
+    };
+    // The head under (x, z), and how far it is from the walls (negative when outside them).
+    auto at = [&](double x, double z) { return Vec{x, top(x, z) - kHeadRadius, z}; };
+    auto inside = [&](Vec h) {
+        auto o = outline(h[1]);
+        if (o.size() < 3)
+            return -1e9;
+        double d = 1e9;
+        for (size_t i = 0; i < o.size(); i++) {
+            auto &a = o[i], &b = o[(i + 1) % o.size()];
+            double ex = b[0] - a[0], ez = b[1] - a[1];
+            d = std::min(d, (ex * (h[2] - a[1]) - ez * (h[0] - a[0])) / std::sqrt(ex * ex + ez * ez));
+        }
+        if (d <= 0)
+            return d;
+        for (auto &w : walls)
+            d = std::min(d, distance(h, w));
+        return d;
+    };
+    Vec h = at(seat[0], seat[2]);
+    if (inside(h) >= kHeadReach)
+        return h;
+    auto o = outline(std::max(h[1], -1e8));
+    need(o.size() >= 3, "PS1 rider seat is off its shell");
+    // The middle of the outline: its area's centroid.
+    double area = 0, mx = 0, mz = 0;
+    for (size_t i = 0; i < o.size(); i++) {
+        auto &a = o[i], &b = o[(i + 1) % o.size()];
+        double c = a[0] * b[1] - b[0] * a[1];
+        area += c;
+        mx += (a[0] + b[0]) * c;
+        mz += (a[1] + b[1]) * c;
+    }
+    mx /= 3 * area;
+    mz /= 3 * area;
+    // A shell too narrow for a head's reach (a car on another disc) keeps it at the middle, the best place there is:
+    // where a head sits only shows, so it is no reason to fail the import.
+    if (inside(at(mx, mz)) < kHeadReach)
+        return at(mx, mz);
+    double lo = 0, hi = 1;
+    for (int i = 0; i < 40; i++) {
+        double t = (lo + hi) / 2;
+        (inside(at(seat[0] + t * (mx - seat[0]), seat[2] + t * (mz - seat[2]))) >= kHeadReach ? hi : lo) = t;
+    }
+    return at(seat[0] + hi * (mx - seat[0]), seat[2] + hi * (mz - seat[2]));
+}
 // The ride camera of a ride whose PS1 data has none, placed as the PS1 rides that have one place theirs: on the part
-// that carries the riders, at a rider's eye (the middle of their ring, at their heads' height), upright and looking
-// `ahead`, or where the carrier travels across its up when that is zero, so it takes every leap, tilt and turn of the
-// ride. It is returned as a PS1 camera dummy in the carrier's frame (local Z up, looking along -Y).
-Transform riderView(const MeshEntry &e, int carrier, Vec ahead) {
+// that carries the riders, at a front rider's eye (at their heads' height, a head's rise ahead of their ring, so no
+// rider's head fills the view), upright and looking `ahead`, or where the carrier travels across its up when that is
+// zero, so it takes every leap, tilt and turn of the ride. Riders enclosed in the carrier look out from just ahead of
+// its body, level with its middle. It is returned as a PS1 camera dummy in the carrier's frame (local Z up, looking
+// along -Y).
+Transform riderView(const MeshEntry &e, int carrier, Vec ahead, bool enclosed) {
     Vec up = rot(conj(e.world(carrier, 0).first), {0, 1, 0});
     if (dot(ahead, ahead) == 0)
         for (int f = 0; f < e.last; f++) {
@@ -1630,13 +1800,19 @@ Transform riderView(const MeshEntry &e, int carrier, Vec ahead) {
     ahead = sub(ahead, scaled(up, dot(ahead, up)));
     need(dot(ahead, ahead) > 1e-6, "PS1 rider carrier has no way ahead");
     auto ring = riderRing(e, carrier, 4);
-    Vec eye = scaled(add(add(ring[0], ring[1]), add(ring[2], ring[3])), 0.25);
+    Vec centre = scaled(add(add(ring[0], ring[1]), add(ring[2], ring[3])), 0.25), dir = norm(ahead);
+    Vec gap = sub(ring[0], centre);
+    Vec eye = add(add(centre, scaled(up, kHeadRise / S)), scaled(dir, std::sqrt(dot(gap, gap)) + kHeadRise / S));
+    if (enclosed) {
+        auto [mid, reach] = body(e, carrier, dir);
+        eye = add(mid, scaled(dir, reach + kHeadRise / S));
+    }
     // Upright, then turned about up to face ahead, then the dummy's axes: its Z up and its -Y ahead.
     Quat u = upright(up);
     Vec a = rot(conj(u), ahead);
     double half = std::atan2(a[0], a[2]) / 2;
     Quat q = mul(mul(u, {0, std::sin(half), 0, std::cos(half)}), {-std::sqrt(0.5), 0, 0, std::sqrt(0.5)});
-    return {qnorm(q), add(eye, scaled(up, kHeadRise / S))};
+    return {qnorm(q), eye};
 }
 void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, const Donors &donors,
                  const fs::path &dir) {
@@ -1783,13 +1959,33 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, con
             int id = minis.size() + 1;
             minis.push_back({"head" + std::to_string(id), parent, m, 0xb1, uint32_t(id)});
         };
+        // A rider's head in the shell the PS1 seat node `seat` is on (see shellHead), upright in the shell.
+        auto shellRider = [&](int seat) {
+            auto [parent, m, rel] = attach(seat);
+            int shell = -1;
+            for (auto &c : pcidx)
+                if (c.second == parent)
+                    shell = c.first;
+            need(parent && shell >= 0, "PS1 rider seat is on no moving shell");
+            int id = minis.size() + 1;
+            minis.push_back({"head" + std::to_string(id), parent,
+                             matrix(halfTurn({0, 0, 0, 1}), halfTurnv(shellHead(e, shell, rel.second))), 0xb1,
+                             uint32_t(id)});
+        };
         // A seat beyond the PS1 seats repeats one of them, moved sideways along it.
         if (!e.seats.empty())
             for (int k = 0; k < std::max(capacity, int(e.seats.size())); k++) {
                 int group = k / int(e.seats.size());
-                head(e.seats[k % e.seats.size()], {40. * ((group + 1) / 2) * (group % 2 ? 1 : -1), 0, 0});
+                if (s.shell)
+                    shellRider(e.seats[k % e.seats.size()]);
+                else
+                    head(e.seats[k % e.seats.size()], {40. * ((group + 1) / 2) * (group % 2 ? 1 : -1), 0, 0});
             }
-        else if (s.carrier >= 0)
+        else if (s.enclosed) {
+            Vec up = rot(conj(e.world(s.carrier, 0).first), {0, 1, 0});
+            for (int k = 0; k < capacity; k++)
+                head(s.carrier, sub(body(e, s.carrier, up).first, scaled(up, kHeadRise / S)));
+        } else if (s.carrier >= 0)
             for (auto &p : riderRing(e, s.carrier, capacity))
                 head(s.carrier, p);
         need(int(minis.size()) >= capacity, "PS1 ride has no places for its riders");
@@ -1801,7 +1997,7 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, con
             if (e.camera >= 0)
                 std::tie(parent, m, std::ignore) = attach(e.camera);
             else
-                std::tie(parent, m) = place(s.carrier, riderView(e, s.carrier, s.ahead));
+                std::tie(parent, m) = place(s.carrier, riderView(e, s.carrier, s.ahead, s.enclosed));
             // After the half turn about Y the PS1 camera dummy has local -Z up and looks along -Y; PC ride cameras
             // have Y up and look along Z. Its rows become (-X, -Z, -Y), which keeps a proper rotation.
             for (int c = 0; c < 3; c++) {
