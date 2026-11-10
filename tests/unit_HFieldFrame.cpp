@@ -21,6 +21,7 @@
 #include "tb_resource_texture.h"
 #include "tb_texturecache.h"
 #include "tb_textureentry.h"
+#include "TPCamera.h"
 
 #include <cstddef>
 #include <cstring>
@@ -365,6 +366,13 @@ int32_t tpw_hf_state(int32_t* out, int32_t* smallCount) {
         out[n++] = cellBlock[i].mF02;
     }
     return n;
+}
+
+// Sets the port's far zoom switch (gPortFarZoom, include/TPCamera.h) and answers 1; -1 when the library was built
+// without the port fixes, which have no such switch.
+int32_t tpw_hf_far_zoom(int32_t on) {
+    (void)on;
+    return -1;
 }
 
 }  // extern "C"

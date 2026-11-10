@@ -919,6 +919,67 @@ def execute_random(r):
     return tc_random_case(r, 2)
 
 
+# ----------------------------------------------------------------- the port's far zoom
+
+# The port's fix farzoom: with gPortFarZoom on and fog off, DivideAndConquer tests every cell of the map. That is what
+# the original does when the view distance covers the whole map, so the PowerPC side runs the case with fog on and
+# such a distance. The procedural textures' window (small state 518..521: mF928, mF92C, mF930, mF934) keeps the
+# original's distance and, as no box is wholly outside the map now, is always written: it comes from the PowerPC
+# side's run of the case with kTestWholeMap, which writes it the same way. With fog on, or the whole map tested
+# already (kTestWholeMap), the switch changes nothing. Only cases whose cell sizes and camera are
+# finite and whose inverses are 1 / cell size: the whole map cannot be named by a distance otherwise.
+WHOLE_MAP_DISTANCE = 1e12
+WINDOW = slice(518, 522)
+
+
+def far_zoom_sane(c):
+    c["inv"] = [fb(1.0 / bf(c["cell"][0])), fb(1.0 / bf(c["cell"][1]))]
+    return c
+
+
+def far_zoom_edges():
+    for display in (0, 0x2000, 0x20, 0x2020):
+        yield divide_case(display=display)
+        for x, z in ((40.0, 30.0), (0.0, 0.0), (79.99, 59.99), (-60.0, 30.0), (40.0, -45.0), (110.01, 30.0), (1e6, 0.0)):
+            yield with_view(divide_case(display=display), x, z, 0.3, 0.8)
+    for w, h in ((1, 1), (1, 30), (40, 1), (127, 30), (30, 124), (96, 85), (3, 3)):
+        yield with_view(divide_case(w=w, h=h), 20.0, 20.0, 0.5, 0.5)
+
+
+def far_zoom_random(r):
+    return far_zoom_sane(divide_random(r))
+
+
+class FarZoomTest:
+    name = "CHField::DivideAndConquer, port far zoom"
+
+    def edge_cases(self):
+        return list(far_zoom_edges())
+
+    def random_case(self, r):
+        return far_zoom_random(r)
+
+    def run_case(self, runner, case):
+        switch = runner.lib.tpw_hf_far_zoom
+        switch.argtypes, switch.restype = [C.c_int32], C.c_int32
+        if switch(0) != 1:
+            return []   # built without the port fixes: there is no switch
+        runner.emu.reset_scratch()
+        expected = hf_ppc(runner.emu, case)
+        if case["display"] & 0x2020 == 0:
+            runner.emu.reset_scratch()
+            window = hf_ppc(runner.emu, dict(case, display=case["display"] | 0x20))["state"]["small"][WINDOW]
+            runner.emu.reset_scratch()
+            expected = hf_ppc(runner.emu, dict(case, display=case["display"] | 0x2000, distance=fb(WHOLE_MAP_DISTANCE)))
+            expected["state"]["small"][WINDOW] = window
+        switch(1)
+        try:
+            got = hf_host(runner.lib, case)
+        finally:
+            switch(0)
+        return T.same_values(expected, got, "", False)
+
+
 # ----------------------------------------------------------------- the tests
 
 
@@ -928,6 +989,7 @@ def setup(runner):
 
 TESTS = [FnTest("CHField::Prepare", hf_ppc, hf_host, edge=prepare_edges, rnd=prepare_random),
          FnTest("CHField::DivideAndConquer", hf_ppc, hf_host, edge=divide_edges, rnd=divide_random),
+         FarZoomTest(),
          FnTest("CGamut::GetVertices", hf_ppc, hf_host, edge=vertices_edges, rnd=vertices_random),
          FnTest("CTextureCache::Refresh", tc_ppc, tc_host, edge=refresh_edges, rnd=refresh_random),
          FnTest("CTextureCache::Execute", tc_ppc, tc_host, edge=execute_edges, rnd=execute_random)]
