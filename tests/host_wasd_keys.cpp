@@ -116,6 +116,7 @@ int main() {
     gPortWasdCamera = true;
     tpw::gPortReleaseKeyA = true;
     tpw::gPortStrayKeyUp = PortWasdStrayKeyUp;
+    tpw::gPortKeyTogether = PortWasdPlace;
 
     {
         const std::vector<std::string> alone = Run({{SDL_SCANCODE_A, 1, 30}}, 40);
@@ -174,6 +175,103 @@ int main() {
         gDown.clear();
         for (int16_t& held : gPortWasdHeld) held = 0;
         SDL_QuitKeyboard();
+    }
+
+    // The diagonals (the port's fix wasd-diagonal, platform/gamework.cpp): two of the four held together are both down,
+    // with "Several keys at once" off, each until its own key-up; a key that is not one of the four releases them.
+    for (const bool several : {false, true}) {
+        tpw::gPortSeveralKeys = several;
+        const std::string mode = several ? " (several keys at once)" : " (one key at a time)";
+        {
+            // W held through, A from 10 to 20: up and left together, then up alone.
+            const std::vector<std::string> camera = Run({{SDL_SCANCODE_W, 1, 30}, {SDL_SCANCODE_A, 10, 20}}, 40);
+            Check(camera[4] == "104" && camera[14] == "100 104" && camera[24] == "104" && camera[34] == "none" && gDown.empty(),
+                  "W held, A held with it: keypad 8 and 4 together, then 8 alone" + mode + ", got " + camera[14] + " / " + camera[24]);
+            gDown.clear();
+            for (int16_t& held : gPortWasdHeld) held = 0;
+        }
+        {
+            // The other pairs: S with D, W with D, S with A.
+            const std::vector<std::string> camera = Run({{SDL_SCANCODE_S, 1, 30}, {SDL_SCANCODE_D, 10, 20}}, 40);
+            Check(camera[14] == "98 102" && camera[24] == "98" && camera[34] == "none" && gDown.empty(),
+                  "S held, D held with it: keypad 2 and 6 together" + mode + ", got " + camera[14]);
+            gDown.clear();
+            for (int16_t& held : gPortWasdHeld) held = 0;
+            const std::vector<std::string> camera2 = Run({{SDL_SCANCODE_D, 1, 30}, {SDL_SCANCODE_W, 10, 20}}, 40);
+            Check(camera2[14] == "102 104" && camera2[24] == "102" && camera2[34] == "none" && gDown.empty(),
+                  "D held, W held with it: keypad 6 and 8 together" + mode + ", got " + camera2[14]);
+            gDown.clear();
+            for (int16_t& held : gPortWasdHeld) held = 0;
+            const std::vector<std::string> camera3 = Run({{SDL_SCANCODE_A, 1, 30}, {SDL_SCANCODE_S, 10, 20}}, 40);
+            Check(camera3[14] == "98 100" && camera3[24] == "100" && camera3[34] == "none" && gDown.empty(),
+                  "A held, S held with it: keypad 4 and 2 together" + mode + ", got " + camera3[14]);
+            gDown.clear();
+            for (int16_t& held : gPortWasdHeld) held = 0;
+        }
+        {
+            // The first key let go first: W from 1 to 15, A from 10 to 30: together, then left alone.
+            const std::vector<std::string> camera = Run({{SDL_SCANCODE_W, 1, 15}, {SDL_SCANCODE_A, 10, 30}}, 40);
+            Check(camera[12] == "100 104" && camera[19] == "100" && camera[34] == "none" && gDown.empty(),
+                  "W held then let go while A is held: keypad 4 stays down alone" + mode + ", got " + camera[19]);
+            gDown.clear();
+            for (int16_t& held : gPortWasdHeld) held = 0;
+        }
+        {
+            // Three of the four: W and A held, then D on top (A with D: the camera table has both).
+            const std::vector<std::string> camera = Run({{SDL_SCANCODE_W, 1, 30}, {SDL_SCANCODE_A, 5, 30}, {SDL_SCANCODE_D, 10, 20}}, 40);
+            Check(camera[14] == "100 102 104" && camera[24] == "100 104" && camera[34] == "none" && gDown.empty(),
+                  "W, A and D held: all three down, then W and A" + mode + ", got " + camera[14] + " / " + camera[24]);
+            gDown.clear();
+            for (int16_t& held : gPortWasdHeld) held = 0;
+        }
+        {
+            // In first person: W with A walks and turns at once (the up and left arrows).
+            gFirstPersonFlags = kFirstPersonAny;
+            const std::vector<std::string> camera = Run({{SDL_SCANCODE_W, 1, 30}, {SDL_SCANCODE_A, 10, 20}}, 40);
+            const std::string both = std::to_string(0x2500) + " " + std::to_string(0x2600);
+            Check(camera[14] == both && camera[24] == std::to_string(0x2600) && camera[34] == "none" && gDown.empty(),
+                  "first person: W held, A held with it: up and left arrows together" + mode + ", got " + camera[14]);
+            gDown.clear();
+            for (int16_t& held : gPortWasdHeld) held = 0;
+            gFirstPersonFlags = 0;
+        }
+        if (!several) {
+            // One key at a time: Escape going down while W and A are held releases both (the original's way for any
+            // other key), and nothing stays down after.
+            const std::vector<std::string> camera = Run({{SDL_SCANCODE_W, 1, 30}, {SDL_SCANCODE_A, 5, 30}, {SDL_SCANCODE_ESCAPE, 10, 12}}, 40);
+            Check(camera[8] == "100 104" && camera[14] == "none" && camera[34] == "none" && gDown.empty(),
+                  "W and A held, Escape tapped: both let go at Escape, nothing stays down" + mode + ", got " + camera[14]);
+            gDown.clear();
+            for (int16_t& held : gPortWasdHeld) held = 0;
+        }
+        {
+            // The host's key events, one pass: W down, A down, A up, W up: both down together in the pass, nothing after.
+            Check(SDL_InitSubSystem(SDL_INIT_EVENTS), "SDL events");
+            const SDL_Scancode order[4] = {SDL_SCANCODE_W, SDL_SCANCODE_A, SDL_SCANCODE_A, SDL_SCANCODE_W};
+            for (int i = 0; i < 4; ++i) {
+                SDL_Event key{};
+                key.type = i < 2 ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
+                key.key.scancode = order[i];
+                key.key.down = i < 2;
+                SDL_PushEvent(&key);
+            }
+            Run({}, 2);
+            Check(gDown.empty(), "key events W down, A down, A up, W up: nothing stays down" + mode + ", got " + Down());
+            gDown.clear();
+            for (int16_t& held : gPortWasdHeld) held = 0;
+            SDL_QuitSubSystem(SDL_INIT_EVENTS);
+        }
+    }
+    tpw::gPortSeveralKeys = false;
+    {
+        // With the setting off (no key stays down with another), W then A is A alone, as before.
+        tpw::gPortKeyTogether = nullptr;
+        const std::vector<std::string> camera = Run({{SDL_SCANCODE_W, 1, 30}, {SDL_SCANCODE_A, 10, 20}}, 40);
+        Check(camera[14] == "100" && camera[24] == "none" && camera[34] == "none" && gDown.empty(),
+              "without the diagonals: A going down lets go of W, got " + camera[14] + " / " + camera[24]);
+        gDown.clear();
+        for (int16_t& held : gPortWasdHeld) held = 0;
+        tpw::gPortKeyTogether = PortWasdPlace;
     }
 
     // The safety nets (include/port_wasd.h): the focus lost or the park's window gone lets go of all four; a key-up the run

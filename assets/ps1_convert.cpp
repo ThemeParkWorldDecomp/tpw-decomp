@@ -2337,6 +2337,49 @@ bool InstallPs1Ride(const fs::path &staged, const fs::path &destination, std::st
     }
 }
 
+fs::path Ps1ConverterStampPath(const fs::path &dataRoot) { return dataRoot / "assets" / "ps1" / "converter.txt"; }
+
+int ReadPs1ConverterStamp(const fs::path &dataRoot) {
+    std::ifstream in(Ps1ConverterStampPath(dataRoot));
+    std::string line;
+    if (!in || !std::getline(in, line))
+        return 1;
+    size_t end = line.find_first_not_of("0123456789");
+    if (end == 0 || (end != std::string::npos && line.find_first_not_of(" \t\r", end) != std::string::npos))
+        return 1;
+    if (end == std::string::npos)
+        end = line.size();
+    if (end > 9)
+        return 1;
+    return std::stoi(line.substr(0, end));
+}
+
+bool WritePs1ConverterStamp(const fs::path &dataRoot, std::string &reason) {
+    try {
+        fs::path path = Ps1ConverterStampPath(dataRoot);
+        if (fs::is_symlink(fs::symlink_status(path))) {
+            reason = "PlayStation converter stamp is a symbolic link";
+            return false;
+        }
+        fs::create_directories(path.parent_path());
+        fs::path part = path;
+        part += ".part";
+        {
+            std::ofstream out(part, std::ios::binary | std::ios::trunc);
+            out << kPs1ConverterVersion << "\n";
+            if (!out) {
+                reason = "cannot write the PlayStation converter stamp";
+                return false;
+            }
+        }
+        fs::rename(part, path);
+        return true;
+    } catch (const std::exception &e) {
+        reason = std::string("cannot write the PlayStation converter stamp: ") + e.what();
+        return false;
+    }
+}
+
 bool ConvertPs1(const Ps1Disc &disc, const fs::path &dataRoot, std::string &reason) {
     fs::path staging;
     try {
@@ -2388,6 +2431,8 @@ bool ConvertPs1(const Ps1Disc &disc, const fs::path &dataRoot, std::string &reas
         for (auto &p : pending)
             if (!InstallPs1Ride(p.first, p.second, reason))
                 throw std::runtime_error(reason);
+        if (!WritePs1ConverterStamp(dataRoot, reason))
+            throw std::runtime_error(reason);
         clearStaging(staging);
         return true;
     } catch (const std::exception &e) {

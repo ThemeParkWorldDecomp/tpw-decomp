@@ -285,6 +285,11 @@ inline bool gPortSeveralKeys = false;
 // (with its Mac key code), so the game can let go of what that key still holds. Off and none, the original's way.
 inline bool gPortReleaseKeyA = false;
 inline void (*gPortStrayKeyUp)(uint8_t macKeyCode) = nullptr;
+// The same setting's third (gamework.cpp, set before the game starts): whether a key, by its Mac key code, is one of
+// the four (the places of W, A, S and D on a US keyboard). Two of the four stay down together whatever "Several keys
+// at once" says, so W with A scrolls the park diagonally; any other key going down releases them, the original's way.
+// None: no key does.
+inline bool (*gPortKeyTogether)(uint8_t macKeyCode) = nullptr;
 
 // What runs when the pointer leaves the game's window (gamework.cpp, SDL_EVENT_WINDOW_MOUSE_LEAVE): the launcher's is
 // UI_DevicePointerOut (UI_Base.h, pointerleave), set before the game starts. None: the pointer keeps its last place, as

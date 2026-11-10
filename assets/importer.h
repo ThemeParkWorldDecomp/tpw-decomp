@@ -221,6 +221,11 @@ struct OpenCheck {
     std::string Kept() const;
 };
 
+// launcher.ini's record of the last PlayStation disc converted from a file of its own (LauncherIni::extra): its path
+// and SHA-256, so the launcher can convert it again when the converter changes (ps1_convert.h kPs1ConverterVersion).
+inline constexpr const char* kPs1DiscPathKey = "ps1_disc_path";
+inline constexpr const char* kPs1DiscSha256Key = "ps1_disc_sha256";
+
 struct ImporterConfig {
     std::string dataRoot;           // the data folder (assets/ is created in it)
     std::string iniPath;            // empty: dataRoot/launcher.ini
@@ -299,7 +304,8 @@ private:
                    const std::string& folderRoot, int depth);
     void EnumeratePath(Run& run, const std::string& path);
     bool OpenVolumes(Run& run, const std::vector<std::shared_ptr<Blob>>& volumes, const std::string& display, int depth);
-    bool PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display);
+    bool PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display,
+                          const std::string& path = std::string());
     void Process(Run& run, Work& work);
     void Unmatched(Run& run, const Entry& entry);
     bool Install(Run& run, std::string staged, const std::vector<std::pair<Edition, uint32_t>>& targets);
@@ -312,6 +318,8 @@ private:
     std::vector<uint32_t> RecordsByPath(const std::string& path) const;
     std::string NewStagingPath();
     bool SaveIniLocked(std::string& err);
+    // Keeps a converted PlayStation disc's path and hash in launcher.ini (kPs1DiscPathKey, kPs1DiscSha256Key).
+    void RememberPs1Disc(const std::string& path, const std::string& sha256);
     EditionStatus StatusLocked(Edition edition) const;
     std::vector<LanguageStatus> LanguagesLocked() const;
 

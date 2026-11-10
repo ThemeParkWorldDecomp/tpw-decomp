@@ -389,6 +389,31 @@ std::vector<uint8_t> Ps1RawFixture(const std::vector<uint8_t>& cooked, size_t st
     return raw;
 }
 
+// The converter's stamp beside its rides (ps1_convert.h): none reads as 1 (0.4.0's output), a written one reads as the
+// converter's version, and a damaged one as 1.
+void TestPs1Stamp(const std::string& scratch) {
+    std::printf("PlayStation converter stamp\n");
+    std::string root = scratch + "/ps1-stamp", why;
+    RemoveTree(root);
+    fs::create_directories(root + "/assets");
+    CHECK_EQ(ReadPs1ConverterStamp(root), 1);
+    CHECK(WritePs1ConverterStamp(root, why));
+    CHECK_EQ(ReadPs1ConverterStamp(root), kPs1ConverterVersion);
+    CHECK(ReadText(root + "/assets/ps1/converter.txt") == std::to_string(kPs1ConverterVersion) + "\n");
+    CHECK(!Exists(root + "/assets/ps1/converter.txt.part"));
+    WriteFile(root + "/assets/ps1/converter.txt", "7\r\n");
+    CHECK_EQ(ReadPs1ConverterStamp(root), 7);
+    WriteFile(root + "/assets/ps1/converter.txt", "two\n");
+    CHECK_EQ(ReadPs1ConverterStamp(root), 1);
+    WriteFile(root + "/assets/ps1/converter.txt", "");
+    CHECK_EQ(ReadPs1ConverterStamp(root), 1);
+    WriteFile(root + "/assets/ps1/converter.txt", "12345678901\n");
+    CHECK_EQ(ReadPs1ConverterStamp(root), 1);
+    CHECK(WritePs1ConverterStamp(root, why));
+    CHECK_EQ(ReadPs1ConverterStamp(root), kPs1ConverterVersion);
+    RemoveTree(root);
+}
+
 void TestPlayStation(const std::string& scratch) {
     std::printf("PlayStation recognition and refusals\n");
     Ps1Disc disc;
@@ -517,6 +542,7 @@ void TestPs1Cameras(const std::string& disc, const std::string& donors, const st
     auto blob = OpenFileBlob(disc, why);
     CHECK(blob && RecognisePs1(blob, ps1, why) == Ps1Status::Supported);
     CHECK(ConvertPs1(ps1, root, why));
+    CHECK_EQ(ReadPs1ConverterStamp(root), kPs1ConverterVersion);
     auto u32 = [](const std::string& b, size_t p) {
         uint32_t v = 0;
         for (int k = 3; k >= 0; k--) v = v << 8 | uint8_t(b.at(p + k));
@@ -2574,6 +2600,37 @@ void TestPlayStationRides(const Discs& d, const std::string& scratch) {
     ImportReport r = imp.Import({d.ps1});
     for (const std::string& line : r.playStation) std::printf("    %s\n", line.c_str());
     CHECK(r.playStationConverted);
+    // The converter's stamp beside the rides, and the disc remembered in launcher.ini (ps1_convert.h, importer.h).
+    CHECK_EQ(ReadPs1ConverterStamp(root), kPs1ConverterVersion);
+    {
+        std::string path, hash;
+        for (const auto& kv : imp.Ini().extra) {
+            if (kv.first == kPs1DiscPathKey) path = kv.second;
+            if (kv.first == kPs1DiscSha256Key) hash = kv.second;
+        }
+        // the importer remembers the drop's canonical path (EnumeratePath), '/' separated
+        std::error_code ec;
+        CHECK(fs::path(path) == fs::weakly_canonical(fs::path(d.ps1), ec));
+        std::string err;
+        Sha256Digest digest;
+        auto blob = OpenFileBlob(d.ps1, err);
+        std::vector<uint8_t> all;
+        Sha256 sha;
+        std::vector<uint8_t> buf(1 << 20);
+        for (uint64_t at = 0; blob && at < blob->Size();) {
+            const int64_t n = blob->ReadAt(at, buf.data(), buf.size(), err);
+            CHECK(n > 0);
+            if (n <= 0) break;
+            sha.Update(buf.data(), static_cast<size_t>(n));
+            at += static_cast<uint64_t>(n);
+        }
+        CHECK(hash == sha.Final().Hex());
+        LauncherIni ini;
+        CHECK(LoadLauncherIni(root + "/launcher.ini", ini, err));
+        bool kept = false;
+        for (const auto& kv : ini.extra) kept = kept || (kv.first == kPs1DiscSha256Key && kv.second == hash);
+        CHECK(kept);
+    }
     struct Ride {
         const char* sam;
         int width, depth, entranceColumn, entranceRow;
@@ -2613,6 +2670,7 @@ int main() {
     fs::create_directories(scratch);
 
     TestSynthetic(scratch);
+    TestPs1Stamp(scratch);
     TestPlayStation(scratch);
     TestPs1Grass();
     TestPs1PlainGround();

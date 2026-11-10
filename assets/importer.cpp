@@ -1157,6 +1157,23 @@ bool Importer::SetLastChoice(const std::string& choice, std::string& err) {
     return SaveIniLocked(err);
 }
 
+void Importer::RememberPs1Disc(const std::string& path, const std::string& sha256) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& kv : {std::make_pair(std::string(kPs1DiscPathKey), path), std::make_pair(std::string(kPs1DiscSha256Key), sha256)}) {
+        bool found = false;
+        for (auto& e : ini_.extra)
+            if (e.first == kv.first) { e.second = kv.second; found = true; }
+        if (!found) ini_.extra.emplace_back(kv.first, kv.second);
+    }
+    std::string err;
+    if (!SaveIniLocked(err)) progress_.Push([&] {
+        ImportProgress ev;
+        ev.kind = ImportProgress::Kind::Content;
+        ev.message = "PlayStation disc not remembered: " + err;
+        return ev;
+    }());
+}
+
 bool Importer::SaveIniLocked(std::string& err) {
     ini_.dataFolder = config_.dataRoot;
     for (Edition e : kAllEditions) ini_.editions[EditionName(e)] = StatusLocked(e).StateWord();
@@ -1252,6 +1269,7 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
                     : "PlayStation disc recognised (" + disc.region + ", " + disc.boot + "); " + OneLine(reason);
                 run.report.playStation.push_back(line);
                 run.report.playStationConverted = run.report.playStationConverted || converted;
+                if (converted && !disc.path.empty()) RememberPs1Disc(disc.path, disc.sha256);
                 ImportProgress ev;
                 ev.kind = ImportProgress::Kind::Content;
                 ev.message = line;
@@ -1387,7 +1405,7 @@ void Importer::EnumeratePath(Run& run, const std::string& path) {
         fail(err);
         return;
     }
-    if (PlayStationImage(run, blob, BaseName(key))) return;
+    if (PlayStationImage(run, blob, BaseName(key), key)) return;
     const std::string format = UnsupportedDiscFormat(key);
     if (!format.empty()) {
         fail(format);
@@ -1625,13 +1643,32 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
     }
 }
 
-bool Importer::PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display) {
+bool Importer::PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display,
+                                const std::string& path) {
     Ps1Disc disc;
     std::string reason;
     const Ps1Status status = RecognisePs1(blob, disc, reason);
     if (status == Ps1Status::NotPlayStation) return false;
     ++run.report.containers;
     if (status == Ps1Status::Supported) {
+        // A disc file of its own is remembered with its hash (ps1_disc.h), for the launcher's converter check.
+        if (!path.empty()) {
+            Sha256 sha;
+            std::vector<uint8_t> buf(1 << 20);
+            uint64_t at = 0, size = blob->Size();
+            std::string err;
+            bool ok = true;
+            while (at < size) {
+                const int64_t n = blob->ReadAt(at, buf.data(), buf.size(), err);
+                if (n <= 0) { ok = false; break; }
+                sha.Update(buf.data(), static_cast<size_t>(n));
+                at += static_cast<uint64_t>(n);
+            }
+            if (ok) {
+                disc.path = path;
+                disc.sha256 = sha.Final().Hex();
+            }
+        }
         run.playStation.push_back(std::move(disc));
     } else {
         const std::string line = display + ": PlayStation disc refused: " + OneLine(reason);
