@@ -6,15 +6,20 @@
 // 7-Zip and RAR archives: synthetic fixtures (tests/archives) and RAR written in memory, always.
 // The language packs: synthetic drops always (an empty file matched by its language folder, the status lines); with a
 // language disc (TPW_TEST_LANGUAGE_DISC and TPW_TEST_LANGUAGE) a real import that must make that language available.
+// With a PlayStation disc and an imported PC tree (TPW_TEST_PS1 and TPW_TEST_PS1_DONORS) the rides are converted and
+// every ride must have a ride camera that is upright and a proper rotation.
 //
 // environment: TPW_GDI_ROOT (the ROOT folder), TPW_TEST_TRANSFER (the disc archive folder), TPW_TEST_EXPECT (the folder
 // with allitems.exe), TPW_TEST_SOURCES (the file naming the discs under TPW_TEST_TRANSFER; sources.txt there by default),
 // TPW_TEST_SCRATCH (where the output trees go; the disc tests need about 3 GB there),
 // TPW_TEST_LANGUAGE_DISC (a disc, image or folder with a language on it) and TPW_TEST_LANGUAGE (that language, as
-// ManifestLanguages() spells it; several separated by commas)
+// ManifestLanguages() spells it; several separated by commas), TPW_TEST_PS1 (the PlayStation disc's .bin or .iso) and
+// TPW_TEST_PS1_DONORS (a data root with the US or European tree imported; its edition folders are linked, not written)
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -34,6 +39,7 @@
 #include "../sniff.h"
 #include "../ps1_disc.h"
 #include "../ps1_convert.h"
+#include "../source.h"
 #include "test_archives.h"
 
 #ifndef TPW_DEVTOOLS_DIR
@@ -492,6 +498,68 @@ void TestPlayStation(const std::string& scratch) {
     CHECK(!InstallPs1Ride(staged, destination, why));
     CHECK(ReadText(destination + "/latest") == "latest complete replacement");
     RemoveTree(root); RemoveTree(drop);
+}
+
+// Every converted PlayStation ride has a ride camera (flags 0x1031, id 1; TPCamera.cpp finds no camera without one) whose
+// rows, taken through its part's matrix, are a proper rotation with Y up at rest, as the PC ride cameras are.
+void TestPs1Cameras(const std::string& disc, const std::string& donors, const std::string& scratch) {
+    std::printf("PlayStation ride cameras\n");
+    std::string root = scratch + "/ps1-cameras", why;
+    RemoveTree(root);
+    fs::create_directories(root + "/assets");
+    for (const char* edition : {"us", "eur", "us-pc", "eur-pc"})
+        if (Exists(donors + "/assets/" + edition)) fs::create_directory_symlink(donors + "/assets/" + edition, root + "/assets/" + edition);
+    Ps1Disc ps1;
+    auto blob = OpenFileBlob(disc, why);
+    CHECK(blob && RecognisePs1(blob, ps1, why) == Ps1Status::Supported);
+    CHECK(ConvertPs1(ps1, root, why));
+    auto u32 = [](const std::string& b, size_t p) {
+        uint32_t v = 0;
+        for (int k = 3; k >= 0; k--) v = v << 8 | uint8_t(b.at(p + k));
+        return v;
+    };
+    auto rows = [&](const std::string& b, size_t p) {
+        std::array<std::array<double, 3>, 3> m;
+        for (int r = 0; r < 3; r++)
+            for (int c = 0; c < 3; c++) {
+                uint32_t v = u32(b, p + 16 * r + 4 * c);
+                float f;
+                std::memcpy(&f, &v, 4);
+                m[r][c] = f;
+            }
+        return m;
+    };
+    int rides = 0;
+    for (auto& theme : fs::directory_iterator(root + "/assets/ps1/data/levels")) {
+        if (!fs::is_directory(theme.path() / "rides")) continue;
+        for (auto& ride : fs::directory_iterator(theme.path() / "rides")) {
+            std::string dir = ride.path().filename().string();
+            std::string md2 = ReadText((ride.path() / (dir.substr(0, dir.rfind('_')) + ".md2")).string());
+            if (dir.rfind("_obver", 0) == 0) continue;  // the Tower is a feature, not a ride
+            ++rides;
+            int cameras = 0;
+            size_t minis = u32(md2, 0x48) & 0xffff, mo = u32(md2, 0x74), eo = u32(md2, 0x7c);
+            for (size_t i = 0; i < minis; i++) {
+                if (u32(md2, eo + 20 * i) != 0x1031) continue;
+                ++cameras;
+                CHECK_EQ(u32(md2, eo + 20 * i + 4), 1);
+                auto cam = rows(md2, mo + 0x58 * i + 0x10), part = rows(md2, u32(md2, mo + 0x58 * i + 4) + 0x10);
+                std::array<std::array<double, 3>, 3> w{};
+                for (int r = 0; r < 3; r++)
+                    for (int c = 0; c < 3; c++)
+                        for (int k = 0; k < 3; k++) w[r][c] += cam[r][k] * part[k][c];
+                double det = w[0][0] * (w[1][1] * w[2][2] - w[1][2] * w[2][1]) -
+                             w[0][1] * (w[1][0] * w[2][2] - w[1][2] * w[2][0]) +
+                             w[0][2] * (w[1][0] * w[2][1] - w[1][1] * w[2][0]);
+                std::printf("  %s: camera up %.2f, determinant %.3f\n", dir.c_str(), w[1][1], det);
+                CHECK(std::abs(det - 1) < 1e-3);
+                CHECK(w[1][1] > 0.7);
+            }
+            CHECK_EQ(cameras, 1);
+        }
+    }
+    CHECK_EQ(rides, 7);
+    RemoveTree(root);
 }
 
 void TestSynthetic(const std::string& scratch) {
@@ -2367,6 +2435,9 @@ int main() {
     const std::string languageDisc = Env("TPW_TEST_LANGUAGE_DISC"), languages = Env("TPW_TEST_LANGUAGE");
     if (languageDisc.empty() || languages.empty()) Skip("the language disc: TPW_TEST_LANGUAGE_DISC or TPW_TEST_LANGUAGE is not set");
     else TestLanguageDisc(languageDisc, languages, scratch);
+    const std::string ps1 = Env("TPW_TEST_PS1"), ps1Donors = Env("TPW_TEST_PS1_DONORS");
+    if (ps1.empty() || ps1Donors.empty()) Skip("the PlayStation ride cameras: TPW_TEST_PS1 or TPW_TEST_PS1_DONORS is not set");
+    else TestPs1Cameras(ps1, ps1Donors, scratch);
 
     std::string transfer = Env("TPW_TEST_TRANSFER"), expect = Env("TPW_TEST_EXPECT"), gdi = Env("TPW_GDI_ROOT");
     Discs d;

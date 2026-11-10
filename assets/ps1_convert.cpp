@@ -190,16 +190,24 @@ struct Spec {
     const char *title;
     const char *a;
     const char *b;
+    // A ride without PS1 seat nodes carries its riders on this node (see riderRing); -1 when it has seats.
+    int carrier = -1;
+    // Where a rider on the carrier faces, in its frame, for the camera a ride without one gets (see riderView); zero
+    // for the way the carrier travels.
+    Vec ahead{};
 };
 // The Halloween IDs are free alongside the base game and Gold's coaster types. The reference converter's 2130 to
 // 2133 overlap the Devil coaster and its pylon/car types; its geometry and scripts are otherwise preserved byte for byte.
 const Spec specs[] = {{"jack", "HALLOW/JACK", 140, 672, "hallow", 201, 2134, "Crazy Clown", "Crazy", "Clown"},
                       {"skulls", "HALLOW/JUMPER", 141, 260, "hallow", 202, 2135, "Jumping Skulls", "Jumping", "Skulls"},
-                      {"eyesld", "HALLOW/SLIDE", 147, 275, "hallow", 204, 2136, "Eye Slide", "Eye", "Slide"},
+                      {"eyesld", "HALLOW/SLIDE", 147, 275, "hallow", 204, 2136, "Eye Slide", "Eye", "Slide", 3},
                       {"aztec", "JUNGLE/BUNGIE", 218, 352, "jungle", 205, 1187, "Aztec Bounce", "Aztec", "Bounce"},
                       {"diplo", "JUNGLE/DIPLODIP", 221, 286, "jungle", 206, 1130, "Diplo-Dip", "Diplo", "Dip"},
                       {"incapot", "JUNGLE/INCAPOT", 224, 268, "jungle", 207, 1189, "Inca Pot", "Inca", "Pot"},
-                      {"romper", "SPACE/JUMPER", 369, 276, "space", 208, 3130, "Romper Stomper", "Romper", "Stomper"},
+                      // Romper Stomper faces its body's +Z: its reverse-jointed legs' knees point to -Z, and the +Z end
+                      // lifts as it leaps.
+                      {"romper", "SPACE/JUMPER", 369, 276, "space", 208, 3130, "Romper Stomper", "Romper", "Stomper", 2,
+                       {0, 0, 1}},
                       {"obver", "HALLOW/OBVER", 142, 202, "hallow", 203, 2450, "Tower", "Tower", ""}};
 // reference is only the entry number printed in the reference converter's output comments. Disc reads always use
 // the recognised disc's ID table and located entries, including on the European and Japanese releases.
@@ -1126,131 +1134,15 @@ constexpr uint32_t variable(int n) {
 }
 constexpr uint32_t LETMEON = variable(0), LETMEOFF = variable(1), CAPACITY = variable(2), DURATION = variable(3),
                    BREAKSTAT = variable(4), ONRIDE = variable(5), CLOSED = variable(6), BROKEN = variable(7),
-                   WORN = variable(8), RUNNING = variable(9), PAD = variable(10), TEMP = variable(12),
-                   SCREAMING = variable(13), P_LEFT = variable(13), P_DEADLINE = variable(14), P_NOW = variable(15);
+                   WORN = variable(8), RUNNING = variable(9), TEMP = variable(12), P_LEFT = variable(13),
+                   P_DEADLINE = variable(14), P_NOW = variable(15);
 constexpr int HOLD = 1, YIELD = 2, SET = 3, DIFF = 5, ZEROCOUNT = 6, CLOCK = 7, EVENT = 13, FLUSH = 15, PLAY = 16,
-              PLAYWAIT = 17, LOOP = 18, RAND = 28, CALL = 29, RET = 30, JMP = 31, JZ = 32, JNZ = 33, JNEG = 34,
-              JPOS = 35, NAME = 37, TEST = 38, CMP = 39, HPUSH = 42, HPOP = 43, WAIT = 44, ADD = 47, HEADON = 56,
-              HEADOFF = 57, BHEIGHT = 71, BPUT = 72, BGET = 73, BFORCE = 74, BUSED = 75, SSTART = 86, SSTOP = 87,
-              SCREAM = 88, REPAIR = 93;
+              PLAYWAIT = 17, LOOP = 18, JMP = 31, JZ = 32, JNZ = 33, JNEG = 34, JPOS = 35, NAME = 37, TEST = 38,
+              HPUSH = 42, HPOP = 43, ADD = 47, HEADON = 56, HEADOFF = 57, SSTART = 86, SSTOP = 87, REPAIR = 93;
 constexpr uint32_t minus1 = 65535;
-std::vector<uint32_t> seatedScript() {
-    Assembler a;
-    a.op(NAME, {0x10000000});
-    a.op(BHEIGHT, {65436});
-    a.op(PLAYWAIT, {0, 0});
-    a.op(ZEROCOUNT);
-    a.label("closed");
-    a.op(TEST, {CLOSED});
-    a.jump(JNZ, "closed");
-    a.op(LOOP, {2, 0});
-    a.op(WAIT, {500});
-    a.op(SET, {SCREAMING, minus1});
-    a.label("main");
-    a.op(BUSED, {RUNNING});
-    a.jump(CALL, "screams");
-    a.op(BUSED, {ONRIDE});
-    a.jump(JZ, "rest");
-    a.op(TEST, {CLOSED});
-    a.jump(JNZ, "close");
-    a.op(TEST, {BREAKSTAT});
-    a.jump(JNZ, "break");
-    a.op(PLAYWAIT, {5, 0});
-    a.op(WAIT, {700});
-    a.label("rest");
-    a.op(LOOP, {2, 0});
-    a.op(SET, {PAD, 24});
-    a.label("window");
-    a.op(WAIT, {250});
-    a.op(TEST, {CLOSED});
-    a.jump(JNZ, "close");
-    a.op(TEST, {BREAKSTAT});
-    a.jump(JNZ, "break");
-    a.op(TEST, {ONRIDE});
-    a.jump(JZ, "nowear");
-    a.op(TEST, {WORN});
-    a.jump(JZ, "nowear");
-    a.op(RAND, {TEMP, 2});
-    a.jump(JNZ, "nowear");
-    a.op(RAND, {TEMP, 2});
-    a.op(ADD, {TEMP, 1});
-    a.op(EVENT, {2, TEMP, 27});
-    a.label("nowear");
-    a.op(BUSED, {TEMP});
-    a.op(CMP, {CAPACITY, TEMP});
-    a.jump(JPOS, "room");
-    a.jump(JMP, "full");
-    a.label("room");
-    a.op(HOLD);
-    a.op(TEST, {LETMEON});
-    a.jump(JZ, "full");
-    a.op(BPUT, {LETMEON, DURATION});
-    a.op(SET, {LETMEON, 0});
-    a.label("full");
-    a.op(YIELD);
-    a.op(TEST, {LETMEOFF});
-    a.jump(JNZ, "noget");
-    a.op(BGET, {LETMEOFF});
-    a.label("noget");
-    a.op(BUSED, {RUNNING});
-    a.op(BUSED, {ONRIDE});
-    a.jump(CALL, "screams");
-    a.op(DIFF, {PAD, PAD, 1});
-    a.jump(JNZ, "window");
-    a.jump(JMP, "main");
-    a.label("close");
-    a.op(FLUSH);
-    a.op(SET, {RUNNING, 0});
-    a.op(PLAY, {2, 0, 0});
-    a.label("closing");
-    a.jump(CALL, "screams");
-    a.op(BUSED, {ONRIDE});
-    a.op(TEST, {LETMEOFF});
-    a.jump(JNZ, "closed2");
-    a.op(BFORCE, {LETMEOFF});
-    a.label("closed2");
-    a.op(TEST, {CLOSED});
-    a.jump(JZ, "main");
-    a.jump(JMP, "closing");
-    a.label("break");
-    a.op(EVENT, {2, 1, 26});
-    a.op(EVENT, {2, 2, 26});
-    a.op(EVENT, {2, 3, 26});
-    a.op(SET, {RUNNING, 0});
-    a.op(FLUSH);
-    a.op(EVENT, {5, minus1, 43});
-    a.op(PLAY, {9, 0, 0});
-    a.op(SET, {BROKEN, 1});
-    a.op(SSTOP);
-    a.op(WAIT, {800});
-    a.op(SCREAM, {ONRIDE, minus1});
-    a.op(SET, {SCREAMING, 0});
-    a.label("broken");
-    a.op(BUSED, {ONRIDE});
-    a.op(TEST, {LETMEOFF});
-    a.jump(JNZ, "broken2");
-    a.op(BFORCE, {LETMEOFF});
-    a.label("broken2");
-    a.op(TEST, {BREAKSTAT});
-    a.jump(JNZ, "broken");
-    a.op(FLUSH);
-    a.op(REPAIR, {1});
-    a.op(PLAYWAIT, {10, 0});
-    a.op(REPAIR, {0});
-    a.op(SET, {BROKEN, 0});
-    a.jump(JMP, "main");
-    a.label("screams");
-    a.op(BUSED, {TEMP});
-    a.op(CMP, {SCREAMING, TEMP});
-    a.jump(JZ, "screamsame");
-    a.op(SSTOP);
-    a.op(SSTART, {TEMP, 20});
-    a.op(SET, {SCREAMING, TEMP});
-    a.label("screamsame");
-    a.op(RET);
-    return a.done();
-}
-std::vector<uint32_t> seatlessScript() {
+// Guests board in a batch and ride as heads on the mesh's 0x80 nodes (HEADON), as the PC car rides do. A timed ride
+// (one that had PS1 seats) turns its animation until the player's duration has passed; the others turn it once.
+std::vector<uint32_t> riderScript(bool timed) {
     Assembler a;
     a.op(NAME, {0x10000000});
     a.op(PLAYWAIT, {0, 0});
@@ -1296,7 +1188,20 @@ std::vector<uint32_t> seatlessScript() {
     a.jump(JZ, "nowear");
     a.op(EVENT, {2, 1, 22});
     a.label("nowear");
-    a.op(PLAYWAIT, {5, 0});
+    if (timed) {
+        a.op(CLOCK, {P_DEADLINE});
+        a.op(SET, {TEMP, DURATION});
+        a.label("seconds");
+        a.op(ADD, {P_DEADLINE, 1000});
+        a.op(DIFF, {TEMP, TEMP, 1});
+        a.jump(JPOS, "seconds");
+        a.label("turn");
+        a.op(PLAYWAIT, {5, 0});
+        a.op(CLOCK, {P_NOW});
+        a.op(DIFF, {P_NOW, P_DEADLINE, P_NOW});
+        a.jump(JPOS, "turn");
+    } else
+        a.op(PLAYWAIT, {5, 0});
     a.op(SSTOP);
     a.op(SET, {RUNNING, 0});
     a.op(LOOP, {2, 0});
@@ -1413,7 +1318,7 @@ bool loadDonors(const fs::path &data, Donors &out) {
         std::vector<std::string> files;
     };
     const Wad wads[] = {
-        {"data/levels/jungle/rides/bouncy.wad", "bouncy", {"bouncy.md2", "bouncym1.md2", "bouncy.rse", "bouncy.sgn"}},
+        {"data/levels/jungle/rides/bouncy.wad", "bouncy", {"bouncy.md2", "bouncym1.md2", "bouncy.sgn"}},
         {"data/levels/hallow/rides/pumpkin.wad", "pumpkin", {"pumpkin.rse", "pumpkin.sgn"}},
         {"data/levels/space/rides/bouncy.wad", "spbouncy", {"bouncy.sgn"}},
         {"data/levels/hallow/features/5x5rck.wad", "rock", {"5x5rck.rse"}}};
@@ -1453,7 +1358,7 @@ bool loadDonors(const fs::path &data, Donors &out) {
 }
 void rideSam(const MeshEntry &e, const fs::path &dir, const std::string &stem, int seats) {
     const auto &s = e.spec;
-    bool seated = !e.seats.empty();
+    bool timed = !e.seats.empty();
     int cap = seats;
     for (auto &u : e.upgrades)
         cap = std::max(cap, int(u[4]));
@@ -1484,9 +1389,7 @@ void rideSam(const MeshEntry &e, const fs::path &dir, const std::string &stem, i
                         : r == e.d - 1 ? "L" + std::string(e.w - 2, '.') + "J"
                                        : "[" + std::string(e.w - 2, '.') + "]");
     lines.insert(lines.end(), {"---", "", "Info.DownloadedRideNumber\t" + std::to_string(s.number),
-                               "Info.RideTypeStringIndex " + std::to_string(seated ? 7 : 15)});
-    if (seated)
-        lines.insert(lines.end(), {"Info.RunsContinuously\t1", "", "UsageInfo.RideHandlesSprite\t1"});
+                               "Info.RideTypeStringIndex " + std::to_string(timed ? 7 : 15)});
     lines.insert(lines.end(), {"", "UsageInfo.RequiresTeleport\t1", "UsageInfo.MinCapacity\t1",
                                "UsageInfo.MaxCapacity\t" + std::to_string(cap), "UsageInfo.MinDuration\t10",
                                "UsageInfo.MaxDuration\t60", ""});
@@ -1495,7 +1398,7 @@ void rideSam(const MeshEntry &e, const fs::path &dir, const std::string &stem, i
         auto &u = e.upgrades[i];
         lines.push_back(p + "InitCapacity\t" + std::to_string(u[4]));
         lines.push_back(p + "RedLineCapacity\t" + std::to_string(u[4]));
-        if (seated)
+        if (timed)
             lines.insert(lines.end(), {p + "InitDuration\t30", p + "RedLineDuration\t" + std::to_string(45 + 5 * i),
                                        p + "QueueWaitTimeConstant\t" + std::to_string(130 + 5 * i)});
         else
@@ -1504,7 +1407,7 @@ void rideSam(const MeshEntry &e, const fs::path &dir, const std::string &stem, i
                                    p + "CostOfResearch\t" + std::to_string(i ? u[11] : 0), ""});
     }
     lines.insert(lines.end(),
-                 {"Info.DurationUnit\t" + std::to_string(seated ? 1 : 3), "", "Info.AttractionValue\t25", "",
+                 {"Info.DurationUnit\t" + std::to_string(timed ? 1 : 3), "", "Info.AttractionValue\t25", "",
                   "Attraction[0].NewBonus\t10", "Attraction[1].NewBonus\t7", "Attraction[2].NewBonus\t4", "",
                   "UsageInfo.ExcitementLevel\t" + std::to_string(e.excitement), ""});
     writeText(dir / (stem + ".sam"), crlf(lines));
@@ -1552,6 +1455,79 @@ std::vector<int> refine(const MeshEntry &e, int node, std::vector<int> frames) {
             return frames;
         fr.insert(added.begin(), added.end());
     }
+}
+Vec scaled(Vec v, double k) {
+    return {v[0] * k, v[1] * k, v[2] * k};
+}
+// The turn that takes local Y to `up`, so a rider's head stands upright however its node is turned.
+Quat upright(Vec up) {
+    up = norm(up);
+    if (up[1] < -0.9999)
+        return {1, 0, 0, 0};
+    return qnorm({up[2], 0, -up[0], 1 + up[1]});
+}
+// Where the riders go on a ride the PS1 data gives no seats, in the carrier's frame (PS1 units): a ring about the
+// upright axis (world up at frame 0) through the highest point of the parts it carries, three fifths of their mean
+// distance from that axis out, as high as their surface reaches at and beyond three quarters of that radius.
+std::vector<Vec> riderRing(const MeshEntry &e, int carrier, int count) {
+    auto w = e.world(carrier, 0);
+    Quat back = conj(w.first);
+    Vec up = rot(back, {0, 1, 0});
+    std::vector<Vec> pts;
+    for (auto &v : e.skin) {
+        auto chain = e.chain(v.second.first);
+        if (std::find(chain.begin(), chain.end(), carrier) != chain.end())
+            pts.push_back(rot(back, sub(e.vertex(v.first, 0), w.second)));
+    }
+    need(!pts.empty(), "PS1 rider carrier carries nothing");
+    Vec axis = pts[0];
+    for (auto &p : pts)
+        if (dot(p, up) > dot(axis, up))
+            axis = p;
+    auto height = [&](Vec p) { return dot(sub(p, axis), up); };
+    auto across = [&](Vec p) {
+        Vec d = sub(sub(p, axis), scaled(up, height(p)));
+        return std::sqrt(dot(d, d));
+    };
+    double mean = 0;
+    for (auto &p : pts)
+        mean += across(p) / pts.size();
+    double radius = 0.6 * mean, top = -1e9;
+    for (auto &p : pts)
+        if (across(p) >= 0.75 * radius)
+            top = std::max(top, height(p));
+    Vec side = norm(cross(up, std::abs(up[0]) < 0.9 ? Vec{1, 0, 0} : Vec{0, 0, 1})), ahead = cross(up, side);
+    std::vector<Vec> out;
+    for (int i = 0; i < count; i++) {
+        double a = 2 * std::acos(-1.) * i / count;
+        out.push_back(add(add(axis, scaled(up, top)),
+                          add(scaled(side, radius * std::cos(a)), scaled(ahead, radius * std::sin(a)))));
+    }
+    return out;
+}
+// A seated rider's head is this far above the seat (world units); a PC car's heads are about as far above its rim.
+constexpr double kHeadRise = 1.0;
+// The ride camera of a ride whose PS1 data has none, placed as the PS1 rides that have one place theirs: on the part
+// that carries the riders, at a rider's eye (the middle of their ring, at their heads' height), upright and looking
+// `ahead`, or where the carrier travels across its up when that is zero, so it takes every leap, tilt and turn of the
+// ride. It is returned as a PS1 camera dummy in the carrier's frame (local Z up, looking along -Y).
+Transform riderView(const MeshEntry &e, int carrier, Vec ahead) {
+    Vec up = rot(conj(e.world(carrier, 0).first), {0, 1, 0});
+    if (dot(ahead, ahead) == 0)
+        for (int f = 0; f < e.last; f++) {
+            auto a = e.world(carrier, f), b = e.world(carrier, f + 1);
+            ahead = add(ahead, rot(conj(a.first), sub(b.second, a.second)));
+        }
+    ahead = sub(ahead, scaled(up, dot(ahead, up)));
+    need(dot(ahead, ahead) > 1e-6, "PS1 rider carrier has no way ahead");
+    auto ring = riderRing(e, carrier, 4);
+    Vec eye = scaled(add(add(ring[0], ring[1]), add(ring[2], ring[3])), 0.25);
+    // Upright, then turned about up to face ahead, then the dummy's axes: its Z up and its -Y ahead.
+    Quat u = upright(up);
+    Vec a = rot(conj(u), ahead);
+    double half = std::atan2(a[0], a[2]) / 2;
+    Quat q = mul(mul(u, {0, std::sin(half), 0, std::cos(half)}), {-std::sqrt(0.5), 0, 0, std::sqrt(0.5)});
+    return {qnorm(q), add(eye, scaled(up, kHeadRise / S))};
 }
 void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, const Donors &donors,
                  const fs::path &dir) {
@@ -1605,6 +1581,16 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, con
         twoSided(list);
         morphT.push_back({m.first, std::move(list)});
     }
+    // A carrier with no faces of its own (Eye Slide's node that takes the eye down the slide without rolling it) gets a
+    // speck of a triangle at its origin, inside the part it carries, so that its riders have a mesh node to move with.
+    if (s.carrier >= 0 && !rigidT.count(s.carrier)) {
+        need(e.moving(s.carrier) && !rigidT.empty(), "PS1 rider carrier does not move");
+        Tri t = rigidT.begin()->second.front();
+        t.vi = {-1, -2, -3};
+        t.mode = 0;
+        t.p = {Vec{0, 0, 0}, Vec{0.01, 0, 0}, Vec{0, 0, 0.01}};
+        rigidT[s.carrier] = {t};
+    }
     size_t trailer = u32(e.raw, 20);
     int xx = u16(e.raw, trailer + 12), ex = u16(e.raw, trailer + 16), ez = u16(e.raw, trailer + 18);
     need(feature || u16(e.raw, trailer + 14) == 0, "PS1 exit is not on first row");
@@ -1642,7 +1628,7 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, con
         }
     }
     std::vector<Mini> minis;
-    int seatCount = 0;
+    int heads = 0;
     if (!feature) {
         auto attach = [&](int node) -> std::tuple<int, Matrix, Transform> {
             auto fr = e.keyframes(node).first;
@@ -1669,22 +1655,51 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, con
         int capacity = 0;
         for (auto &u : e.upgrades)
             capacity = std::max(capacity, int(u[4]));
-        for (size_t k = 0; k < e.seats.size(); k++) {
-            auto [parent, m, rel] = attach(e.seats[k]);
-            minis.push_back({"seat" + std::to_string(k + 1), parent, m, 0x811, uint32_t(k + 1)});
-        }
+        // The PS1 node `bone`'s mesh part and the matrix of h (in that node's frame) in that part's frame.
+        auto place = [&](int bone, Transform h) {
+            auto w = e.world(bone, 0);
+            auto [parent, m, rel] = attach(bone);
+            if (parent)
+                m = matrix(halfTurn(qnorm(mul(rel.first, h.first))),
+                           halfTurnv(add(rel.second, rot(rel.first, h.second))));
+            else
+                m = matrix(halfTurn(qnorm(mul(w.first, h.first))), e.halfTurnp(add(w.second, rot(w.first, h.second))));
+            return std::pair<int, Matrix>{parent, m};
+        };
+        // A rider's head on the PS1 node `bone`, at p in its frame (PS1 units) raised kHeadRise, upright at rest.
+        auto head = [&](int bone, Vec p) {
+            Vec up = rot(conj(e.world(bone, 0).first), {0, 1, 0});
+            auto [parent, m] = place(bone, {upright(up), add(p, scaled(up, kHeadRise / S))});
+            int id = minis.size() + 1;
+            minis.push_back({"head" + std::to_string(id), parent, m, 0xb1, uint32_t(id)});
+        };
+        // A seat beyond the PS1 seats repeats one of them, moved sideways along it.
         if (!e.seats.empty())
-            for (int k = e.seats.size(); k < capacity; k++) {
-                auto [parent, m, rel] = attach(e.seats[k % e.seats.size()]);
+            for (int k = 0; k < std::max(capacity, int(e.seats.size())); k++) {
                 int group = k / int(e.seats.size());
-                double dx = 40. * ((group + 1) / 2) * (group % 2 ? 1 : -1);
-                Vec p = add(rel.second, rot(rel.first, {dx, 0, 0}));
-                minis.push_back({"seat" + std::to_string(k + 1), parent, matrix(halfTurn(rel.first), halfTurnv(p)), 0x811,
-                                 uint32_t(k + 1)});
+                head(e.seats[k % e.seats.size()], {40. * ((group + 1) / 2) * (group % 2 ? 1 : -1), 0, 0});
             }
-        seatCount = minis.size();
-        if (e.camera >= 0) {
-            auto [parent, m, rel] = attach(e.camera);
+        else if (s.carrier >= 0)
+            for (auto &p : riderRing(e, s.carrier, capacity))
+                head(s.carrier, p);
+        need(int(minis.size()) >= capacity, "PS1 ride has no places for its riders");
+        heads = minis.size();
+        need(e.camera >= 0 || s.carrier >= 0, "PS1 ride has neither a camera nor a rider carrier");
+        {
+            int parent;
+            Matrix m;
+            if (e.camera >= 0)
+                std::tie(parent, m, std::ignore) = attach(e.camera);
+            else
+                std::tie(parent, m) = place(s.carrier, riderView(e, s.carrier, s.ahead));
+            // After the half turn about Y the PS1 camera dummy has local -Z up and looks along -Y; PC ride cameras
+            // have Y up and look along Z. Its rows become (-X, -Z, -Y), which keeps a proper rotation.
+            for (int c = 0; c < 3; c++) {
+                double x = m[c], y = m[4 + c], z = m[8 + c];
+                m[c] = -x;
+                m[4 + c] = -z;
+                m[8 + c] = -y;
+            }
             minis.push_back({"camera", parent, m, 0x1031, 1});
         }
         double top = nodes[0].positions[0][1];
@@ -1837,13 +1852,13 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, con
         writeFile(dir / (stem + suffix.first + ".md2"),
                   animation(stem, suffix.first, animhead, main, suffix.second, rr, mm));
     }
-    writeFile(dir / (stem + ".RSE"), script(donors.at(e.seats.empty() ? "pumpkin/pumpkin.rse" : "bouncy/bouncy.rse"),
-                                            s.title, e.seats.empty() ? seatlessScript() : seatedScript(), seatCount));
+    writeFile(dir / (stem + ".RSE"),
+              script(donors.at("pumpkin/pumpkin.rse"), s.title, riderScript(!e.seats.empty()), 0));
     std::string theme = s.theme;
     writeFile(dir / (stem + ".sgn"), donors.at(theme == "hallow"  ? "pumpkin/pumpkin.sgn"
                                                : theme == "space" ? "spbouncy/bouncy.sgn"
                                                                   : "bouncy/bouncy.sgn"));
-    rideSam(e, dir, stem, seatCount);
+    rideSam(e, dir, stem, heads);
     names(dir, s);
 }
 // Only directories created by this converter are removed. Iterating avoids following a symlink outside staging.
