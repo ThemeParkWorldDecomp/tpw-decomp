@@ -106,11 +106,13 @@ Quat qnorm(Quat a) {
 Quat conj(Quat q) {
     return {-q[0], -q[1], -q[2], q[3]};
 }
-Quat mirror(Quat q) {
-    return {-q[0], -q[1], q[2], q[3]};
+// The PC's ground runs the other way round from the PlayStation's: a half turn about the up axis (x and z both
+// reversed), never a mirror, which would show every ride the wrong way round.
+Quat halfTurn(Quat q) {
+    return {-q[0], q[1], -q[2], q[3]};
 }
-Vec mirrorv(Vec v) {
-    return {v[0] * S, v[1] * S, -v[2] * S};
+Vec halfTurnv(Vec v) {
+    return {-v[0] * S, v[1] * S, -v[2] * S};
 }
 Quat mul(Quat a, Quat b) {
     auto [x, y, z, w] = a;
@@ -422,8 +424,8 @@ struct MeshEntry {
         auto t = world(s->second.first, f);
         return add(t.second, rot(t.first, s->second.second));
     }
-    Vec mirrorp(Vec p) const {
-        return {p[0] * S, p[1] * S, (d * 256 - p[2]) * S};
+    Vec halfTurnp(Vec p) const {
+        return {(w * 256 - p[0]) * S, p[1] * S, (d * 256 - p[2]) * S};
     }
 };
 struct Parts {
@@ -755,35 +757,40 @@ Textures writeTextures(const MeshEntry &e, const Pages &pages, const fs::path &o
     }
     return textures;
 }
-std::vector<Tri> floorTris(const MeshEntry &e, Textures &textures, std::map<Key, int> &index, int ex, int xx,
-                           bool feature) {
-    std::string theme = e.spec.theme;
-    std::string grass = theme == "jungle"   ? "m_grass1.TGA"
-                        : theme == "hallow" ? "hp_base.TGA"
-                                            : "sfl_bas2.TGA",
-                path = theme == "jungle"   ? "ss_PATH.TGA"
-                       : theme == "hallow" ? "hp_path1.TGA"
-                                           : "newbase.TGA";
-    Key g = {1000, 0}, p = {1001, 0};
-    index[g] = textures.size();
-    textures.push_back({1, grass});
-    if (!feature) {
-        index[p] = textures.size();
-        textures.push_back({1, path});
-    }
+std::vector<Tri> floorTris(const MeshEntry &e, const Bytes &atlas) {
+    // The ride's own ground, after the trailer's 188 bytes and a 4-byte head: per cell, rows from the exit's side, a
+    // tile of the theme atlas (12-byte records after its 16-byte header: page, palette, size, corner) and its turn,
+    // quarter turns in the low two bits and a mirror in bit 3. The park's own ground is drawn under the ride too, so
+    // this sits half a unit above it to keep the two from fighting for the same pixels.
+    size_t map = u32(e.raw, 20) + 192;
     std::vector<Tri> out;
     for (int z = 0; z < e.d; z++)
         for (int x = 0; x < e.w; x++) {
-            int row = e.d - 1 - z;
-            Key key = !feature && ((row == 0 && x == ex) || (row == e.d - 1 && x == xx)) ? p : g;
+            size_t cell = map + 4 * size_t((e.d - 1 - z) * e.w + (e.w - 1 - x));
+            int tile = u16(e.raw, cell), turn = u16(e.raw, cell + 2);
+            need(tile < u16(atlas, 0), "PS1 ground tile is not in the theme atlas");
+            size_t rec = 16 + 12 * size_t(tile);
+            int page = u16(atlas, rec), size = u16(atlas, rec + 6), corner = u16(atlas, rec + 8);
+            int w = size & 255, h = size >> 8, u = corner & 255, v = corner >> 8;
+            need((page >> 7 & 3) == 0 && w > 0 && h > 0 && u + w <= 256 && v + h <= 256, "invalid PS1 ground tile");
             for (auto corners : std::array<std::array<int, 3>, 2>{{{0, 2, 1}, {3, 1, 2}}}) {
                 Tri t;
-                t.key = key;
+                t.key = {page & 31, u16(atlas, rec + 2)};
                 for (int i = 0; i < 3; i++) {
                     int dx = corners[i] & 1, dz = corners[i] >> 1;
+                    // The corner in the tile's picture, whose rows run against z and columns against x: turned back,
+                    // then mirrored.
+                    int r = dz, c = 1 - dx;
+                    for (int k = 0; k < (4 - (turn & 3)) % 4; k++) {
+                        int was = r;
+                        r = 1 - c;
+                        c = was;
+                    }
+                    if (turn & 8)
+                        c = 1 - c;
                     t.vi[i] = -1 - ((z + dz) * (e.w + 1) + x + dx);
-                    t.uv[i] = {dx ? 0 : 256, dz ? 0 : 256};
-                    t.p[i] = {(x + dx) * 10., 0., (z + dz) * 10.};
+                    t.uv[i] = {u + c * (w - 1), v + (1 - r) * (h - 1)};
+                    t.p[i] = {(x + dx) * 10., .5, (z + dz) * 10.};
                 }
                 out.push_back(t);
             }
@@ -1451,7 +1458,7 @@ void rideSam(const MeshEntry &e, const fs::path &dir, const std::string &stem, i
     for (auto &u : e.upgrades)
         cap = std::max(cap, int(u[4]));
     size_t trailer = u32(e.raw, 20);
-    int ex = u16(e.raw, trailer + 12), xx = u16(e.raw, trailer + 16);
+    int xx = u16(e.raw, trailer + 12), ex = u16(e.raw, trailer + 16), ez = u16(e.raw, trailer + 18);
     std::vector<std::string> lines = {"#",
                                       "# Converted from PS1 ride entry " + std::to_string(s.reference) +
                                           " by ps1conv.py",
@@ -1462,10 +1469,13 @@ void rideSam(const MeshEntry &e, const fs::path &dir, const std::string &stem, i
                                       "---"};
     for (int r = 0; r < e.d; r++) {
         std::string row(e.w, '*');
+        // The trailer's first door is the exit, always on the first row, and its second the entrance, on the first or
+        // the last row. The PC's doors are the way the guests walk: an entrance by its letter ('S' in from the first
+        // row's side, 'N' from the last row's) and an exit by its arrow ('8' out past the first row).
         if (r == 0)
-            row.at(ex) = 'S';
-        if (r == e.d - 1)
-            row.at(xx) = '2';
+            row.at(e.w - 1 - xx) = '8';
+        if (r == ez)
+            row.at(e.w - 1 - ex) = r ? 'N' : 'S';
         lines.push_back(row);
     }
     lines.insert(lines.end(), {"---", "", "Info.Hoarding", "---"});
@@ -1543,7 +1553,8 @@ std::vector<int> refine(const MeshEntry &e, int node, std::vector<int> frames) {
         fr.insert(added.begin(), added.end());
     }
 }
-void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, const fs::path &dir) {
+void convertRide(const MeshEntry &e, const Pages &pages, const Bytes &atlas, const Donors &donors,
+                 const fs::path &dir) {
     const Spec &s = e.spec;
     std::string stem = "_" + std::string(s.key);
     bool feature = s.number == 203;
@@ -1552,7 +1563,7 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, c
     Parts part = partition(e);
     std::vector<Vec> at0;
     for (size_t i = 0; i < e.verts.size(); i++)
-        at0.push_back(e.mirrorp(e.vertex(i, 0)));
+        at0.push_back(e.halfTurnp(e.vertex(i, 0)));
     std::vector<Tri> tris = e.faces;
     double volume = 0;
     for (auto &t : tris)
@@ -1577,7 +1588,7 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, c
         for (int k : r.second) {
             auto t = tris[k];
             for (int i = 0; i < 3; i++)
-                t.p[i] = mirrorv(e.skin.at(t.vi[i]).second);
+                t.p[i] = halfTurnv(e.skin.at(t.vi[i]).second);
             list.push_back(t);
         }
         twoSided(list);
@@ -1594,18 +1605,20 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, c
         twoSided(list);
         morphT.push_back({m.first, std::move(list)});
     }
+    size_t trailer = u32(e.raw, 20);
+    int xx = u16(e.raw, trailer + 12), ex = u16(e.raw, trailer + 16), ez = u16(e.raw, trailer + 18);
+    need(feature || u16(e.raw, trailer + 14) == 0, "PS1 exit is not on first row");
+    need(feature || (ez == 0 && ex != xx) || ez == e.d - 1, "PS1 entrance is not on first or last row");
+    need(ex < e.w && xx < e.w, "invalid PS1 entrance or exit");
+    auto floor = floorTris(e, atlas);
     std::vector<Tri> all = still;
     for (auto &r : rigidT)
         all.insert(all.end(), r.second.begin(), r.second.end());
     for (auto &m : morphT)
         all.insert(all.end(), m.second.begin(), m.second.end());
+    all.insert(all.end(), floor.begin(), floor.end());
     std::map<Key, int> texindex;
     Textures textures = writeTextures(e, pages, dir, all, texindex);
-    size_t trailer = u32(e.raw, 20);
-    int ex = u16(e.raw, trailer + 12), xx = u16(e.raw, trailer + 16);
-    need(feature || u16(e.raw, trailer + 14) == 0, "PS1 entrance is not on first row");
-    need(ex < e.w && xx < e.w, "invalid PS1 entrance or exit");
-    auto floor = floorTris(e, textures, texindex, ex, xx, feature);
     std::vector<Node> nodes;
     std::map<int, int> pcidx;
     std::vector<std::pair<int, std::set<int>>> morphNodes;
@@ -1619,7 +1632,7 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, c
         for (auto &r : rigidT) {
             Node n = buildNode(r.second, texindex, "part" + std::to_string(r.first));
             auto w = e.world(r.first, 0);
-            n.matrix = matrix(mirror(w.first), e.mirrorp(w.second));
+            n.matrix = matrix(halfTurn(w.first), e.halfTurnp(w.second));
             pcidx[r.first] = nodes.size();
             nodes.push_back(std::move(n));
         }
@@ -1645,11 +1658,11 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, c
                             break;
                         }
                     if (ok)
-                        return {pcidx.at(a), matrix(mirror(rel.first), mirrorv(rel.second)), rel};
+                        return {pcidx.at(a), matrix(halfTurn(rel.first), halfTurnv(rel.second)), rel};
                 }
             if (!e.moving(node)) {
                 auto w = e.world(node, 0);
-                return {0, matrix(mirror(w.first), e.mirrorp(w.second)), Transform{}};
+                return {0, matrix(halfTurn(w.first), e.halfTurnp(w.second)), Transform{}};
             }
             throw std::runtime_error("PS1 attachment moves apart from every mesh part");
         };
@@ -1666,7 +1679,7 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, c
                 int group = k / int(e.seats.size());
                 double dx = 40. * ((group + 1) / 2) * (group % 2 ? 1 : -1);
                 Vec p = add(rel.second, rot(rel.first, {dx, 0, 0}));
-                minis.push_back({"seat" + std::to_string(k + 1), parent, matrix(mirror(rel.first), mirrorv(p)), 0x811,
+                minis.push_back({"seat" + std::to_string(k + 1), parent, matrix(halfTurn(rel.first), halfTurnv(p)), 0x811,
                                  uint32_t(k + 1)});
             }
         seatCount = minis.size();
@@ -1694,7 +1707,7 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, c
         sample.insert(e.last);
         for (int f : sample)
             for (auto &v : e.skin)
-                allv.push_back(e.mirrorp(e.vertex(v.first, f)));
+                allv.push_back(e.halfTurnp(e.vertex(v.first, f)));
         allv.insert(allv.end(), at0.begin(), at0.end());
     }
     auto box = bounds(allv);
@@ -1743,13 +1756,13 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, c
         bool hasPrev = false;
         for (int f : fr) {
             auto w = e.world(r.first, f);
-            Quat q = mirror(w.first);
+            Quat q = halfTurn(w.first);
             if (hasPrev && dot(prev, q) < 0)
                 for (double &c : q)
                     c = -c;
             prev = q;
             hasPrev = true;
-            out.keys.push_back({f, e.mirrorp(w.second), q});
+            out.keys.push_back({f, e.halfTurnp(w.second), q});
         }
         rigid.push_back(std::move(out));
     }
@@ -1771,7 +1784,7 @@ void convertRide(const MeshEntry &e, const Pages &pages, const Donors &donors, c
         for (int f = 0; f <= e.last; f++) {
             std::vector<Vec> row;
             for (int v : order)
-                row.push_back(e.mirrorp(e.vertex(v, f)));
+                row.push_back(e.halfTurnp(e.vertex(v, f)));
             allrows.push_back(std::move(row));
         }
         for (;;) {
@@ -1924,7 +1937,7 @@ bool ConvertPs1(const Ps1Disc &disc, const fs::path &dataRoot, std::string &reas
             atlas(disc.entries.at(entry.themeAtlas), pages);
             std::string folder = "_" + std::string(s.key) + "_" + std::to_string(s.number);
             fs::path dir = staging / folder;
-            convertRide(e, pages, donors, dir);
+            convertRide(e, pages, disc.entries.at(entry.themeAtlas), donors, dir);
             fs::path target =
                 assets / "ps1" / "data" / "levels" / s.theme / (s.number == 203 ? "features" : "rides") / folder;
             pending.push_back({dir, target});

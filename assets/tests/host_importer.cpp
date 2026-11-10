@@ -81,8 +81,8 @@ std::string Env(const char* name) {
 // The player's own discs are named in a file of theirs, not here: TPW_TEST_SOURCES, or sources.txt in TPW_TEST_TRANSFER, one
 // "key = path under TPW_TEST_TRANSFER" per line (keys: mac-zip, eur-a, eur-first, gold-zip, gold-rides (a download of the 35 Gold rides without RideConfig.txt), and for the Windows-disc
 // editions pc-us, the US 2.0 Windows CD, pc-us-first, the US first release 1.0, and pc-eur, a European Windows-only CD, such as
-// the English one sold as Sim Theme Park, volume SIM_THEME_PARK: its files are the European edition's). A missing key skips
-// its test.
+// the English one sold as Sim Theme Park, volume SIM_THEME_PARK: its files are the European edition's; ps1, the US
+// PlayStation disc's .bin, converted after one of the PC sources). A missing key skips its test.
 std::string SourceFor(const std::string& transfer, const std::string& key) {
     std::string file = Env("TPW_TEST_SOURCES");
     if (file.empty()) file = transfer + "/sources.txt";
@@ -1737,7 +1737,7 @@ void TestArchives(const std::string& scratch) {
 }
 
 struct Discs {
-    std::string toast, eurImg, eurFirst, goldZip, goldRides, allitems, gameEur, pcUs, pcUsFirst, pcEur;
+    std::string toast, eurImg, eurFirst, goldZip, goldRides, allitems, gameEur, pcUs, pcUsFirst, pcEur, ps1;
 };
 
 bool CompareUs(const std::string& folder) {
@@ -2293,6 +2293,58 @@ void TestIcon(const std::string& scratch) {
 
 }  // namespace
 
+// The PlayStation disc's own entrance and exit cells, from each ride's trailer and the pads and planks painted on its
+// ground, as the .sam's shape holds them after the half turn onto the PC's ground: column counted from the disc's far
+// side, then row counted from the entrance side, which the shape lists first. The Tower is scenery.
+void TestPlayStationRides(const Discs& d, const std::string& scratch) {
+    std::string pc = !d.pcUs.empty() ? d.pcUs : !d.eurImg.empty() ? d.eurImg : d.toast;
+    if (d.ps1.empty() || pc.empty()) {
+        Skip("PlayStation ride conversion: the ps1 disc or a PC source is not under TPW_TEST_TRANSFER");
+        return;
+    }
+    std::printf("a PC source, then the PlayStation disc\n");
+    std::string root = scratch + "/ps1-rides";
+    RemoveTree(root);
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    Importer imp(cfg);
+    std::string err;
+    CHECK(imp.Open(err));
+    CHECK(imp.Import({pc}).errors.empty());
+    ImportReport r = imp.Import({d.ps1});
+    for (const std::string& line : r.playStation) std::printf("    %s\n", line.c_str());
+    CHECK(r.playStationConverted);
+    struct Ride {
+        const char* sam;
+        int width, depth, entranceColumn, entranceRow;
+        char entrance;
+        int exit;
+    } rides[] = {{"hallow/rides/_jack_201/_jack.sam", 4, 4, 1, 3, 'N', 2},
+                 {"hallow/rides/_skulls_202/_skulls.sam", 4, 4, 1, 3, 'N', 1},
+                 {"hallow/rides/_eyesld_204/_eyesld.sam", 4, 4, 0, 3, 'N', 2},
+                 {"jungle/rides/_aztec_205/_aztec.sam", 6, 3, 2, 2, 'N', 3},
+                 {"jungle/rides/_diplo_206/_diplo.sam", 5, 5, 2, 0, 'S', 3},
+                 {"jungle/rides/_incapot_207/_incapot.sam", 4, 4, 0, 3, 'N', 3},
+                 {"space/rides/_romper_208/_romper.sam", 5, 5, 2, 4, 'N', 2},
+                 {"hallow/features/_obver_203/_obver.sam", 3, 3, -1, -1, 0, -1}};
+    for (const Ride& ride : rides) {
+        std::string text = ReadText(root + "/assets/ps1/data/levels/" + ride.sam);
+        text.erase(std::remove(text.begin(), text.end(), '\r'), text.end());
+        std::istringstream in(text);
+        std::string line;
+        while (std::getline(in, line) && line != "Info.Shape") {}
+        std::getline(in, line);
+        std::vector<std::string> want(ride.depth, std::string(ride.width, '*')), got;
+        // The exit is always on the first row, its arrow out past it.
+        if (ride.exit >= 0) want[0][ride.exit] = '8';
+        if (ride.entranceRow >= 0) want[ride.entranceRow][ride.entranceColumn] = ride.entrance;
+        while (std::getline(in, line) && line != "---") got.push_back(line);
+        if (got != want) std::printf("    %s: the entrance or exit is not on the PlayStation disc's cell\n", ride.sam);
+        CHECK(got == want);
+    }
+    RemoveTree(root);
+}
+
 int main() {
     std::string scratch = Env("TPW_TEST_SCRATCH");
     bool haveScratch = !scratch.empty();
@@ -2332,6 +2384,7 @@ int main() {
         d.pcUs = source("pc-us");
         d.pcUsFirst = source("pc-us-first");
         d.pcEur = source("pc-eur");
+        d.ps1 = source("ps1");
     }
     if (!expect.empty()) d.allitems = pick(expect + "/allitems.exe");
     if (!gdi.empty()) d.gameEur = pick(gdi + "/game-eur/tpw-eur/Theme Park Data");
@@ -2345,6 +2398,7 @@ int main() {
         TestFirstPressing(d, scratch);
         TestGold(d, scratch);
         TestWindowsDiscs(d, scratch);
+        TestPlayStationRides(d, scratch);
     }
     RemoveTree(scratch);
 
