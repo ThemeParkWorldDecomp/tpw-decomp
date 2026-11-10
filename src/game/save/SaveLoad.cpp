@@ -31,7 +31,9 @@
 #include "platform/msl.h"
 #include "platform/samsutils.h"
 #include "ppc_math.h"
+#include "Ps1SaveRepair.h"
 #include "Ptr32.h"
+#include "RideBadges.h"
 #include "RideDB.h"
 #include "rsse.h"
 #include "SaveLegalText.inc"
@@ -55,6 +57,7 @@
 #include "UIInterface.h"
 #include "VanillaTime.h"
 #include "World.h"
+#include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -534,6 +537,7 @@ void CSaveLoad::PreLoadOperations() {
     ADV_Kill(0);
     gUIInterface.PreLevelLoad();
 }
+
 
 
 
