@@ -11,6 +11,7 @@
 #include "calllog.h"
 #include "platform/arena.h"
 #include "InterfaceWindow.h"
+#include "LLCellSystem.h"
 #include "Mouse.h"
 #include "ObjectControl.h"
 #include "ObjectParts.h"
