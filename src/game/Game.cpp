@@ -31,6 +31,7 @@
 #include "TPConfig.h"
 #include "TPEngine.h"
 #include "TPGlobals.h"
+#include "TpiWorlds.h"
 #include "TPMain.h"
 #include "TPResource.h"
 #include "TPSound.h"
@@ -644,6 +645,7 @@ TbDynamicStringTemplate<char16_t> gGameThemeFantasy(u"fantasy");   // 0x1037f10c
 TbDynamicStringTemplate<char16_t> gGameThemeHallow(u"hallow");     // 0x1037f0ec
 TbDynamicStringTemplate<char16_t> gGameThemeJungle(u"jungle");     // 0x1037f0cc
 TbDynamicStringTemplate<char16_t> gGameThemeSpace(u"space");       // 0x1037f0ac
+
 
 // The two gate signs of a theme. The theme's gate ride type (fantasy 4601, hallow 2601, jungle 1601, space 3601) gives the sign
 // texts through the ride database into two buffers of 32 characters, which are NOT cleared first: a theme that is none of the

@@ -68,6 +68,14 @@ std::shared_ptr<Source> OpenEntrySniffed(std::shared_ptr<Source> parent, const E
 std::shared_ptr<Source> OpenEntrySniffed(std::shared_ptr<Source> parent, const Entry& entry, const SniffOptions& options,
                                          int depth, std::string& err);
 
+// An entry's bytes with random access for a reader that seeks in them (the InstallShield cabinet volumes of a Theme Park
+// Inc disc, tpi_disc.h): the parent's own blob when it has one (a folder's file, a file of an image, an unpacked
+// archive's file); for a parent that inflates forward only (zip, cab) an entry over options.spillOver bytes is copied
+// to a temporary file in options.spillDir first (deleted with the Blob), as the images above are; anything else reads
+// the entry again from its start on every seek back (OpenEntryBlob, source.h). Null with a message.
+std::shared_ptr<Blob> OpenEntryBlobSpilled(std::shared_ptr<Source> parent, const Entry& entry, const SniffOptions& options,
+                                           std::string& err);
+
 // A path the user dropped: a folder opens as a folder, a file as the container it looks like (depth 0).
 std::shared_ptr<Source> OpenPathSniffed(const std::string& path, const SniffOptions& options, SniffStatus& status,
                                         std::string& err);

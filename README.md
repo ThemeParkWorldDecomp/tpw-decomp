@@ -1,5 +1,9 @@
 # tpw-decomp
 
+[![Join the Discord](https://img.shields.io/badge/Discord-Join_the_server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/QSvugmgCwW)
+
+**Join the Discord: [discord.gg/QSvugmgCwW](https://discord.gg/QSvugmgCwW)**
+
 A decompilation of Sim Theme Park (AKA Theme Park World) as released for the Mac in 1999 (the 2.04b3 patch, PowerPC), into C++.
 
 The game's own functions are here, each translated to behave exactly as the Mac build does, bugs included. The aim is a

@@ -64,13 +64,20 @@ public:
             stride_ = kUser;
         }
         total_ = blob_->Size() / stride_;
-        uint8_t d[8];
-        if (!Read(16, 1, d, 8, err)) return false;
-        if (std::memcmp(d + 1, "CD001", 5) != 0) {
-            err = "iso: no volume descriptor at sector 16";
-            return false;
+        // Some raw dumps (BlindWrite's .b6i) keep the 150-sector pregap before the track, so the disc's sector 16 is
+        // the file's sector 166; `base_` is that lead.
+        for (uint64_t lead : {uint64_t(0), uint64_t(150)}) {
+            base_ = lead;
+            uint8_t d[8];
+            std::string e;
+            if (lead + 17 <= total_ && Read(16, 1, d, 8, e) && std::memcmp(d + 1, "CD001", 5) == 0) {
+                total_ -= base_;
+                return true;
+            }
         }
-        return true;
+        base_ = 0;
+        err = "iso: no volume descriptor at sector 16";
+        return false;
     }
 
     // Reads up to `limit` bytes of the user data of `count` sectors starting at `first` into out.
@@ -80,6 +87,7 @@ public:
             err = "iso: sector " + std::to_string(first + count - 1) + " is past the end of the image";
             return false;
         }
+        first += base_;
         if (!raw_) {
             size_t want = std::min<size_t>(limit, size_t(count) * kUser);
             int64_t got = blob_->ReadAt(first * kUser, out, want, err);
@@ -119,6 +127,7 @@ private:
     uint32_t offset_ = 0;
     uint32_t stride_ = kUser;
     uint64_t total_ = 0;
+    uint64_t base_ = 0;     // the sectors before the disc's sector 0 in the file
     std::vector<uint8_t> tmp_;
 };
 
@@ -173,6 +182,50 @@ private:
     std::vector<uint8_t> buffer_;
     size_t have_ = 0;
     size_t used_ = 0;
+};
+
+// A file of the image with random access (Source::OpenBlob), for a reader that seeks, such as a cabinet volume read
+// file by file: the extents map an offset to its sector and the sectors are read at that place.
+class IsoBlob : public Blob {
+public:
+    IsoBlob(std::shared_ptr<Sectors> sectors, std::shared_ptr<std::mutex> lock, std::vector<Extent> extents, uint64_t size)
+        : sectors_(std::move(sectors)), lock_(std::move(lock)), extents_(std::move(extents)), size_(size) {}
+    uint64_t Size() const override { return size_; }
+    int64_t ReadAt(uint64_t offset, void* buf, size_t n, std::string& err) override {
+        if (offset >= size_ || n == 0) return 0;
+        if (n > size_ - offset) n = size_t(size_ - offset);
+        // the extent holding the offset
+        uint64_t start = 0;
+        size_t i = 0;
+        while (i < extents_.size() && offset >= start + extents_[i].bytes) {
+            start += extents_[i].bytes;
+            ++i;
+        }
+        if (i >= extents_.size()) {
+            err = "iso: the file ended early";
+            return -1;
+        }
+        const Extent& e = extents_[i];
+        const uint64_t in = offset - start;                     // into the extent
+        const uint64_t sector = e.sector + in / kUser;
+        const size_t skip = size_t(in % kUser);
+        uint64_t left = e.bytes - in;                           // bytes of the extent from the offset on
+        if (n > left) n = size_t(left);                         // the next read goes on in the next extent
+        const uint32_t count = uint32_t((skip + n + kUser - 1) / kUser);
+        std::vector<uint8_t> tmp(size_t(count) * kUser);
+        {
+            std::lock_guard<std::mutex> g(*lock_);
+            if (!sectors_->Read(sector, count, tmp.data(), tmp.size(), err)) return -1;
+        }
+        std::memcpy(buf, tmp.data() + skip, n);
+        return static_cast<int64_t>(n);
+    }
+
+private:
+    std::shared_ptr<Sectors> sectors_;
+    std::shared_ptr<std::mutex> lock_;
+    std::vector<Extent> extents_;
+    uint64_t size_;
 };
 
 void AppendUtf8(std::string& s, uint32_t c) {
@@ -231,6 +284,15 @@ public:
         }
         try {
             return std::make_unique<IsoStream>(sectors_, lock_, files_[size_t(entry.id)].extents, entry.size);
+        } catch (...) {
+            err = "out of memory";
+            return nullptr;
+        }
+    }
+    std::shared_ptr<Blob> OpenBlob(const Entry& entry, std::string& err) override {
+        if (entry.id >= files_.size()) return nullptr;
+        try {
+            return std::make_shared<IsoBlob>(sectors_, lock_, files_[size_t(entry.id)].extents, entry.size);
         } catch (...) {
             err = "out of memory";
             return nullptr;

@@ -12,6 +12,7 @@
 //   assets/gold/<name>                  the Gold rides (manifest destinations "gold/<name>")
 //   assets/lang/<Name>/<game path>      the language packs (destinations "lang/<Name>/<game path>"; Languages())
 //   assets/ps1/data/levels/<theme>/...   converted PlayStation content, outside manifest verification
+//   assets/tpi/data/...                  converted Theme Park Inc content (tpi_convert.h), outside manifest verification
 //   assets/.staging/                    files being written and big images being unpacked; emptied on every start
 //   assets/verified.tsv                 size and modification time of every verified file (the startup check)
 //   launcher.ini                        data folder, edition states, last choice (LauncherIni)
@@ -180,13 +181,15 @@ struct ImportReport {
     std::vector<std::string> errors;
     std::vector<std::string> playStation;  // recognised discs and their conversion result, one plain line per disc
     bool playStationConverted = false;
+    std::vector<std::string> themeParkInc;  // recognised Theme Park Inc copies and their conversion result, one plain line each
+    bool themeParkIncConverted = false;
     // The game's icon (icon.h) when this drop wrote <data folder>/icon.png: where it came from ("TP.ico, 64x64, 8-bit");
     // empty when the drop held none, or none better than the one already there.
     std::string icon;
     // us, eur, gold, (3: unused, the language packs are `languages`), us-pc, eur-pc after the drop: EditionIndex order
     EditionStatus status[6];
     std::vector<LanguageStatus> languages;  // every language pack after the drop, in the manifest's order
-    bool ChangedNothing() const { return written == 0 && !playStationConverted; }
+    bool ChangedNothing() const { return written == 0 && !playStationConverted && !themeParkIncConverted; }
     // One plain line for the log and the Finished event, e.g. "Nothing new: 1683 files were already in place."
     std::string Summary() const;
 };
@@ -225,6 +228,10 @@ struct OpenCheck {
 // and SHA-256, so the launcher can convert it again when the converter changes (ps1_convert.h kPs1ConverterVersion).
 inline constexpr const char* kPs1DiscPathKey = "ps1_disc_path";
 inline constexpr const char* kPs1DiscSha256Key = "ps1_disc_sha256";
+// The same for the last Theme Park Inc copy converted (tpi_disc.h TpiDisc::path and sha256; the hash is empty for a
+// folder), for tpi_convert.h kTpiConverterVersion.
+inline constexpr const char* kTpiDiscPathKey = "tpi_disc_path";
+inline constexpr const char* kTpiDiscSha256Key = "tpi_disc_sha256";
 
 struct ImporterConfig {
     std::string dataRoot;           // the data folder (assets/ is created in it)
@@ -300,8 +307,9 @@ private:
     void CheckChanged(std::vector<Stamp>& found);
     bool RecordStamps(const std::vector<Stamp>* found);
     ImportReport DoImport(const std::vector<std::string>& paths);
+    // filePath: the dropped file this source was opened from (for a Theme Park Inc copy's remembered path), else "".
     void Enumerate(Run& run, const std::shared_ptr<Source>& source, const std::string& display,
-                   const std::string& folderRoot, int depth);
+                   const std::string& folderRoot, int depth, const std::string& filePath = std::string());
     void EnumeratePath(Run& run, const std::string& path);
     bool OpenVolumes(Run& run, const std::vector<std::shared_ptr<Blob>>& volumes, const std::string& display, int depth);
     bool PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display,
@@ -320,6 +328,8 @@ private:
     bool SaveIniLocked(std::string& err);
     // Keeps a converted PlayStation disc's path and hash in launcher.ini (kPs1DiscPathKey, kPs1DiscSha256Key).
     void RememberPs1Disc(const std::string& path, const std::string& sha256);
+    // Keeps a converted Theme Park Inc copy's path and hash in launcher.ini (kTpiDiscPathKey, kTpiDiscSha256Key).
+    void RememberTpiDisc(const std::string& path, const std::string& sha256);
     EditionStatus StatusLocked(Edition edition) const;
     std::vector<LanguageStatus> LanguagesLocked() const;
 

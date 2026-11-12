@@ -25,6 +25,7 @@
 #include "TbTList.h"
 #include "Text.h"
 #include "TPGlobals.h"
+#include "TpiWorlds.h"
 #include "TPMain.h"
 #include "TPString.h"
 #include "ui_ErrorDisplay.h"

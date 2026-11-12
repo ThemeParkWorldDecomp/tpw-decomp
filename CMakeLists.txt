@@ -74,6 +74,19 @@ if(TPW_BUILD_ASSETS_TESTS)
   target_compile_definitions(tpw_importer_tests PRIVATE TPW_DEVTOOLS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/devtools"
                              TPW_ARCHIVE_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/assets/tests/archives")
   add_test(NAME importer COMMAND tpw_importer_tests)
+  # The Theme Park Inc converter's host test (fixtures built in code; TPW_TPI_DATA + TPW_TPI_TABLES run the real
+  # conversion too). Its scratch tree goes into the build folder unless TPW_TEST_SCRATCH says otherwise.
+  add_executable(tpw_tpi_convert_tests assets/tests/host_tpi_convert.cpp)
+  target_link_libraries(tpw_tpi_convert_tests PRIVATE tpw_assets)
+  target_compile_definitions(tpw_tpi_convert_tests PRIVATE TPW_TEST_BUILD_SCRATCH="${CMAKE_BINARY_DIR}/tpi-convert-test-scratch")
+  add_test(NAME tpi_convert COMMAND tpw_tpi_convert_tests)
+  # The Theme Park Inc island builder (assets/tpi_island.h): synthetic meshes, textures and wads, no game data; and the
+  # tool that builds the islands from a Theme Park Inc folder for looking at them.
+  add_executable(tpw_tpi_island_tests assets/tests/host_tpi_island.cpp)
+  target_link_libraries(tpw_tpi_island_tests PRIVATE tpw_assets)
+  add_test(NAME tpi_island COMMAND tpw_tpi_island_tests)
+  add_executable(tpw_tpi_island_tool assets/tpi_island_tool.cpp)
+  target_link_libraries(tpw_tpi_island_tool PRIVATE tpw_assets)
 endif()
 
 if(TPW_BUILD_TESTS)

@@ -32,6 +32,7 @@
 #include "ThingReceivers.h"
 #include "TPEngine.h"
 #include "TPGlobals.h"
+#include "TpiWorlds.h"
 #include "TPMain.h"
 #include "TPSettings.h"
 #include "TPString.h"
@@ -514,6 +515,7 @@ char16_t gParkSignNameScratch[0x21];
 // empty text (written with the caller's size, unlike GetFullName's). With sign names it is the player's first line (an empty text
 // when it is empty); a name of two or more characters that ends in two hyphens loses its last character (cut in the work area
 // from a copy of at most 31 characters).
+
 void CFSGlobalParkData::GetSignNameA(char16_t* buffer, uint32_t size) {
     if (mHasSignNames == 0) {
         if (CheckBalanceFile()) gRideDatabase.GetSignNameA(static_cast<uint16_t>(mBalance->mValues[4].mInteger), buffer, size);

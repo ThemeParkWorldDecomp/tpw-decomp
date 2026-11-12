@@ -171,6 +171,9 @@ std::FILE* OpenHostFile(const std::filesystem::path& path, const char* mode);
 // exists. A film (".mov") no folder holds is looked for again as the PC CD's ".tgq" of the
 // same name.
 std::filesystem::path FindHostPath(const std::string& gamePath);
+// The host file or folder at `parts` (a game path split by SplitGamePath, or any names) under `root`, each name matched
+// ignoring case the way FindHostPath matches them; empty if there is none.
+std::filesystem::path FindHostPathUnder(const std::filesystem::path& root, const std::vector<std::string>& parts);
 // The host file an FSSpec made by FSMakeFSSpec stands for (the spec itself keeps only the
 // name); empty when there is none.
 std::filesystem::path HostPathOfSpec(const FSSpec* spec);

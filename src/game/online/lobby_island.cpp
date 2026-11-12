@@ -313,6 +313,7 @@ float Pick(CLBLobby& lobby, float centre, float size) {
     return centre + ppc_fmsubs(size, draw, half);
 }
 
+
 // GotoNextIsland and GotoPreviousIsland: when the screen is idle (state 0) and has islands, the
 // island after (before) the current one, wrapping round, becomes the current one and its two
 // sounds replace the old island's.
@@ -328,7 +329,8 @@ void GotoIsland(CLBScreenComponentIslands& screen, bool forwards) {
     CLBIsland* island = screen.mCurrent;
     if (island == nullptr) {
         screen.SetCurrentIsland(forwards ? list->mHead->mData : list->mTail->mData);
-    } else if (island == (forwards ? list->mTail->mData : list->mHead->mData)) {
+    }
+    else if (island == (forwards ? list->mTail->mData : list->mHead->mData)) {
         screen.SetCurrentIsland(forwards ? list->mHead->mData : list->mTail->mData);
     } else {
         auto* node = static_cast<TbPtrList<CLBIsland>::CNode*>(list->Find(island));
@@ -340,6 +342,7 @@ void GotoIsland(CLBScreenComponentIslands& screen, bool forwards) {
     island->mSound2 = SOUND_SendEvent(island->mSound2, gLobbyIslandSounds[(island->mSoundSet) * 2], 2, 0, 0, 0);
     SOUND_Tick();
 }
+
 }  // namespace
 
 // ---- CLBScreenComponentIslands

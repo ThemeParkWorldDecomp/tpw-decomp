@@ -22,6 +22,8 @@
 #include "sam_check.h"
 #include "sha256.h"
 #include "sniff.h"
+#include "tpi_convert.h"
+#include "tpi_disc.h"
 #include "../platform/path_text.h"
 
 #ifdef __APPLE__
@@ -85,7 +87,7 @@ std::string Extension(const std::string& path) {
 // Files inside a drop that are opened as containers (a dropped file is always sniffed, whatever its name).
 bool ContainerExtension(const std::string& ext) {
     static const char* const kExts[] = {"zip", "toast", "iso", "img", "bin", "mdf", "exe", "cab",
-                                        "hfs", "dsk", "cdr", "image", "macbin", "7z", "rar"};
+                                        "hfs", "dsk", "cdr", "image", "macbin", "7z", "rar", "b6i", "nrg"};
     for (const char* e : kExts) {
         if (ext == e) return true;
     }
@@ -403,6 +405,25 @@ std::string OneLine(std::string s) {
     return s;
 }
 
+// The SHA-256 (lower-case hex) of a file on disk, read whole; false when it cannot be read.
+bool HashPath(const std::string& path, std::string& hex) {
+    std::string err;
+    std::shared_ptr<Blob> blob = OpenFileBlob(path, err);
+    if (!blob) return false;
+    Sha256 sha;
+    std::vector<uint8_t> buf(1 << 20);
+    uint64_t at = 0;
+    const uint64_t size = blob->Size();
+    while (at < size) {
+        const int64_t n = blob->ReadAt(at, buf.data(), buf.size(), err);
+        if (n <= 0) return false;
+        sha.Update(buf.data(), static_cast<size_t>(n));
+        at += static_cast<uint64_t>(n);
+    }
+    hex = sha.Final().Hex();
+    return true;
+}
+
 }  // namespace
 
 // ---- launcher.ini
@@ -573,6 +594,8 @@ std::string ImportReport::Summary() const {
     else if (cancelled) ss << "Stopped. ";
     if (written == 0 && !cancelled && !aborted && !playStation.empty()) {
         ss << playStation.front();
+    } else if (written == 0 && !cancelled && !aborted && !themeParkInc.empty()) {
+        ss << themeParkInc.front();
     } else if (written == 0 && !cancelled && !aborted) {
         ss << "Nothing new: ";
         if (alreadyThere) ss << alreadyThere << " files were already in place.";
@@ -599,6 +622,7 @@ struct Importer::Run {
     SniffOptions sniff;
     std::vector<Work> work;
     std::vector<Ps1Disc> playStation;  // converted after ordinary files, so a combined PC/PS1 drop finds its donors
+    std::vector<TpiDisc> themeParkInc; // the same for Theme Park Inc copies (tpi_disc.h), converted by tpi_convert.h
     uint64_t totalBytes = 0, doneBytes = 0;
     std::set<std::string> different;             // destinations a file of the drop has another version of
     std::set<std::string> matchedDests;          // destinations a file of the drop matched
@@ -1174,6 +1198,23 @@ void Importer::RememberPs1Disc(const std::string& path, const std::string& sha25
     }());
 }
 
+void Importer::RememberTpiDisc(const std::string& path, const std::string& sha256) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& kv : {std::make_pair(std::string(kTpiDiscPathKey), path), std::make_pair(std::string(kTpiDiscSha256Key), sha256)}) {
+        bool found = false;
+        for (auto& e : ini_.extra)
+            if (e.first == kv.first) { e.second = kv.second; found = true; }
+        if (!found) ini_.extra.emplace_back(kv.first, kv.second);
+    }
+    std::string err;
+    if (!SaveIniLocked(err)) progress_.Push([&] {
+        ImportProgress ev;
+        ev.kind = ImportProgress::Kind::Content;
+        ev.message = "Theme Park Inc copy not remembered: " + err;
+        return ev;
+    }());
+}
+
 bool Importer::SaveIniLocked(std::string& err) {
     ini_.dataFolder = config_.dataRoot;
     for (Edition e : kAllEditions) ini_.editions[EditionName(e)] = StatusLocked(e).StateWord();
@@ -1270,6 +1311,21 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
                 run.report.playStation.push_back(line);
                 run.report.playStationConverted = run.report.playStationConverted || converted;
                 if (converted && !disc.path.empty()) RememberPs1Disc(disc.path, disc.sha256);
+                ImportProgress ev;
+                ev.kind = ImportProgress::Kind::Content;
+                ev.message = line;
+                progress_.Push(ev);
+            }
+            for (const TpiDisc& disc : run.themeParkInc) {
+                if (cancel_ || run.stop) break;
+                std::string reason;
+                const bool converted = ConvertTpi(disc, fs::u8path(config_.dataRoot), reason);
+                const std::string line = converted
+                    ? "Theme Park Inc: 3 worlds converted from the " + disc.edition + " copy."
+                    : "Theme Park Inc copy recognised (" + disc.edition + "); " + OneLine(reason);
+                run.report.themeParkInc.push_back(line);
+                run.report.themeParkIncConverted = run.report.themeParkIncConverted || converted;
+                if (converted && !disc.path.empty()) RememberTpiDisc(disc.path, disc.sha256);
                 ImportProgress ev;
                 ev.kind = ImportProgress::Kind::Content;
                 ev.message = line;
@@ -1417,7 +1473,7 @@ void Importer::EnumeratePath(Run& run, const std::string& path) {
     blob.reset();
     if (source) {
         ++run.report.containers;
-        Enumerate(run, source, BaseName(key), std::string(), 1);
+        Enumerate(run, source, BaseName(key), std::string(), 1, key);
         return;
     }
     if (sniffStatus == SniffStatus::Failed) {   // a damaged container is an error, never a file with nothing in it
@@ -1460,9 +1516,45 @@ bool Importer::OpenVolumes(Run& run, const std::vector<std::shared_ptr<Blob>>& v
 }
 
 void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const std::string& display,
-                         const std::string& folderRoot, int depth) {
+                         const std::string& folderRoot, int depth, const std::string& filePath) {
     if (const auto blob = source->ImageBlob()) {
         if (PlayStationImage(run, blob, display)) return;
+    }
+    // A Theme Park Inc copy (tpi_disc.h) is converted (tpi_convert.h), after the ordinary files; its own files are
+    // never imported as Theme Park World's. A folder or file dropped is remembered for the launcher's converter check.
+    std::string tpiClaimed;   // the copy's folder inside this source, without the trailing '/', when it is not the whole
+    bool tpiWhole = false;
+    {
+        TpiDisc disc;
+        std::string reason;
+        const TpiStatus status = RecogniseTpi(source, run.sniff, disc, reason);
+        if (status != TpiStatus::NotThemeParkInc) {
+            ++run.report.containers;
+            tpiWhole = disc.claimed.empty();
+            if (!tpiWhole) tpiClaimed = disc.claimed.substr(0, disc.claimed.size() - 1);
+            if (status == TpiStatus::Supported) {
+                if (!folderRoot.empty()) {
+                    disc.path = folderRoot;
+                } else if (!filePath.empty()) {
+                    std::string hash;
+                    if (HashPath(filePath, hash)) {
+                        disc.path = filePath;
+                        disc.sha256 = hash;
+                    }
+                }
+                run.themeParkInc.push_back(std::move(disc));
+            } else {
+                const std::string line = (display.empty() ? std::string("Theme Park Inc copy refused: ")
+                                                          : display + ": Theme Park Inc copy refused: ") + OneLine(reason);
+                run.report.errors.push_back(line);
+                ImportProgress ev;
+                ev.kind = ImportProgress::Kind::Error;
+                ev.path = display;
+                ev.message = line;
+                progress_.Push(ev);
+            }
+            if (tpiWhole) return;
+        }
     }
     // a drop that holds the data folder does not read it back
     std::string skip;
@@ -1475,6 +1567,7 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
     for (const Entry& e : entries) {
         if (cancel_ || run.stop) return;
         if (!skip.empty() && Under(e.path, skip)) continue;
+        if (!tpiClaimed.empty() && Under(e.path, tpiClaimed)) continue;
         std::string name = display.empty() ? e.path : display + "/" + e.path;
         // A part of a multi-volume archive opens the whole set, once, whichever part comes first; the others are skipped.
         if (e.kind == EntryKind::Data && depth < kMaxNesting) {

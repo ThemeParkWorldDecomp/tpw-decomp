@@ -23,6 +23,7 @@
 #include "tb_sky.h"
 #include "TbDynamicStringTemplate.h"
 #include "TbITable.h"
+#include "TpiWorlds.h"
 #include "Text.h"
 #include "TPEngine.h"
 #include "TPGlobals.h"

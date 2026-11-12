@@ -274,6 +274,7 @@ static void SetThemes(const char* themes) {
     }
 }
 
+
 extern "C" {
 // The world. world: the view's position and target (six words), the view's and the description's
 // field of view, 1 when the online system exists, the sound table's eight words. Labels: see above.

@@ -41,6 +41,8 @@
 #include "../ps1_convert.h"
 #include "../source.h"
 #include "test_archives.h"
+#include "test_installshield.h"
+#include "../tpi_disc.h"
 
 #ifndef TPW_DEVTOOLS_DIR
 #define TPW_DEVTOOLS_DIR "devtools"
@@ -1006,7 +1008,8 @@ void TestLanguageSynthetic(const std::string& scratch) {
     {
         Importer again(cfg);
         CHECK(again.Open(err));
-        const LanguageStatus* back = FindStatus(again.Languages(), first);
+        const std::vector<LanguageStatus> backList = again.Languages();   // kept alive while `back` points into it
+        const LanguageStatus* back = FindStatus(backList, first);
         CHECK(back != nullptr && back->optionalPresent == 1);
     }
     CHECK_EQ(imp.VerifyEdition(kEditionLanguages, err), 0);
@@ -1015,7 +1018,8 @@ void TestLanguageSynthetic(const std::string& scratch) {
     CHECK(!Exists(lang + "/" + second + "/data/Language/" + second + "/alloweds.txt"));
     CHECK(imp.RemoveEdition(kEditionLanguages, err));
     CHECK(!Exists(lang));
-    const LanguageStatus* gone = FindStatus(imp.Languages(), first);
+    const std::vector<LanguageStatus> goneList = imp.Languages();   // kept alive while `gone` points into it
+    const LanguageStatus* gone = FindStatus(goneList, first);
     CHECK(gone != nullptr && gone->optionalPresent == 0);
 
     // a drop that may not write the language packs leaves them alone
@@ -2662,12 +2666,439 @@ void TestPlayStationRides(const Discs& d, const std::string& scratch) {
     RemoveTree(root);
 }
 
+// ---- Theme Park Inc copies (tpi_disc.h), on synthetic fixtures only (test_installshield.h): a tiny fake installed
+// tree and a tiny InstallShield cabinet set the test writes itself, wrapped as a folder, a zip, a RAR archive, an ISO
+// image, a raw .bin with a .cue and a pregap dump; split volumes; damaged, demo, add-on and not-this-game cases; and the
+// importer's handling of a dropped copy. No game data.
+namespace {
+
+using tpwtest::FakeFile;
+using tpwtest::IsFile;
+using tpwtest::IsGroup;
+using tpwtest::IsOptions;
+
+std::string TpiReadEntry(Source& source, const Entry& e, std::string& err) {
+    std::unique_ptr<Stream> s = source.Open(e, err);
+    if (!s) return "<unopened>";
+    std::string out;
+    std::vector<char> buf(4096);
+    for (;;) {
+        int64_t n = s->Read(buf.data(), buf.size(), err);
+        if (n < 0) return "<read error>";
+        if (n == 0) break;
+        out.append(buf.data(), size_t(n));
+    }
+    return out;
+}
+
+// Every Data file of the fake game is in the copy's source, byte for byte, and nothing else is.
+void TpiCheckFiles(const char* what, const TpiDisc& disc, const std::vector<FakeFile>& files) {
+    if (!disc.source) {
+        CHECK(disc.source != nullptr);
+        return;
+    }
+    size_t expected = 0, bad = 0;
+    for (const FakeFile& f : files) {
+        if (f.path.compare(0, 5, "Data/") != 0) continue;
+        ++expected;
+        const Entry* e = FindTpiEntry(*disc.source, f.path);
+        if (!e) {
+            std::printf("  %s: %s is not in the copy\n", what, f.path.c_str());
+            ++bad;
+            continue;
+        }
+        std::string err;
+        const std::string got = TpiReadEntry(*disc.source, *e, err);
+        if (e->size != f.data.size() || got != f.data) {
+            std::printf("  %s: %s differs (%s)\n", what, f.path.c_str(), err.c_str());
+            ++bad;
+        }
+    }
+    CHECK_EQ(bad, 0);
+    CHECK_EQ(disc.source->Entries().size(), expected);
+    CHECK(disc.root.empty());
+}
+
+void TpiWriteFiles(const std::string& dir, const std::vector<FakeFile>& files) {
+    for (const FakeFile& f : files) WriteFile(dir + "/" + f.path, f.data);
+}
+
+// data1.hdr, data1.cab, data2.cab, ... in a folder.
+void TpiWriteCabinets(const std::string& dir, const std::vector<std::string>& cabs) {
+    for (size_t i = 0; i < cabs.size(); ++i) {
+        WriteFile(dir + "/" + (i == 0 ? std::string("data1.hdr") : "data" + std::to_string(i) + ".cab"), cabs[i]);
+    }
+}
+
+std::vector<tpwtest::ZipMember> TpiZipMembers(const std::string& prefix, const std::vector<std::string>& cabs) {
+    std::vector<tpwtest::ZipMember> out;
+    for (size_t i = 0; i < cabs.size(); ++i) {
+        out.push_back({prefix + (i == 0 ? std::string("data1.hdr") : "data" + std::to_string(i) + ".cab"), cabs[i]});
+    }
+    return out;
+}
+
+std::vector<tpwtest::IsoFile> TpiIsoFiles(const std::vector<std::string>& cabs) {
+    std::vector<tpwtest::IsoFile> out;
+    for (size_t i = 0; i < cabs.size(); ++i) {
+        out.push_back({i == 0 ? std::string("DATA1.HDR") : "DATA" + std::to_string(i) + ".CAB", cabs[i]});
+    }
+    return out;
+}
+
+std::string TpiBytes(const std::vector<uint8_t>& v) { return std::string(v.begin(), v.end()); }
+
+// Recognises a path and reports a wrong outcome with its reason.
+TpiStatus TpiRecognise(const char* what, const std::string& path, const SniffOptions& options, TpiDisc& disc,
+                       TpiStatus expected) {
+    std::string reason;
+    disc = TpiDisc();
+    const TpiStatus status = RecogniseTpiPath(path, options, disc, reason);
+    CHECK(status == expected);
+    if (status != expected) std::printf("  %s: %s (%s)\n", what, path.c_str(), reason.c_str());
+    return status;
+}
+
+const std::vector<std::string> kTpiWorlds = {"arabian", "water", "science"};
+
+}  // namespace
+
+void TestThemeParkInc(const std::string& scratch) {
+    std::printf("Theme Park Inc copies\n");
+    const std::string drop = scratch + "/tpi-drop", root = scratch + "/tpi-data";
+    RemoveTree(drop);
+    RemoveTree(root);
+    SniffOptions options;
+    options.spillDir = drop + "/spill";
+    fs::create_directories(options.spillDir);
+    TpiDisc disc;
+    std::string reason;
+
+    // An installed game in a folder, at the root and nested.
+    const std::vector<FakeFile> european = tpwtest::FakeTpiFiles({"English", "French", "German"});
+    TpiWriteFiles(drop + "/installed", european);
+    if (TpiRecognise("installed", drop + "/installed", options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+        CHECK(disc.edition == "Theme Park Inc");
+        CHECK_EQ(disc.cabinetVersion, 0);
+        CHECK(disc.claimed.empty());
+        CHECK(disc.worlds == kTpiWorlds);
+        TpiCheckFiles("installed", disc, european);
+    }
+    TpiWriteFiles(drop + "/installed-nested/Theme Park Inc/Game Files", european);
+    WriteFile(drop + "/installed-nested/readme.txt", "notes\r\n");
+    if (TpiRecognise("installed nested", drop + "/installed-nested", options, disc, TpiStatus::Supported) ==
+        TpiStatus::Supported) {
+        CHECK(disc.claimed == "Theme Park Inc/Game Files/");
+        TpiCheckFiles("installed nested", disc, european);
+    }
+    // The same tree zipped.
+    {
+        std::vector<tpwtest::ZipMember> members;
+        for (const FakeFile& f : european) members.push_back({"Game Files/" + f.path, f.data});
+        WriteFile(drop + "/installed.zip", tpwtest::ZipArchiveOf(members));
+        if (TpiRecognise("installed zip", drop + "/installed.zip", options, disc, TpiStatus::Supported) ==
+            TpiStatus::Supported) {
+            CHECK(disc.claimed == "Game Files/");
+            CHECK(disc.edition == "Theme Park Inc");
+            TpiCheckFiles("installed zip", disc, european);
+        }
+    }
+
+    // A version 6 cabinet set (compressed and obfuscated files with their checksums), as the discs hold the game.
+    const std::vector<std::string> cabs = tpwtest::IsCabinetOf(tpwtest::FakeTpiGroups(european));
+    CHECK_EQ(cabs.size(), 2);
+    TpiWriteCabinets(drop + "/disc", cabs);
+    if (TpiRecognise("cabinets", drop + "/disc", options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+        CHECK(disc.edition == "Theme Park Inc");
+        CHECK_EQ(disc.cabinetVersion, 6);
+        CHECK(disc.claimed.empty());
+        CHECK(disc.worlds == kTpiWorlds);
+        TpiCheckFiles("cabinets", disc, european);
+    }
+    // The set opened as a Source directly, and the files stored plainly, or compressed with a zlib header.
+    {
+        std::string err;
+        std::shared_ptr<Source> folder = OpenFolder(drop + "/disc", err);
+        CHECK(folder != nullptr);
+        if (folder) {
+            disc = TpiDisc();
+            CHECK(RecogniseTpi(folder, disc, reason) == TpiStatus::Supported);
+            TpiCheckFiles("cabinets source", disc, european);
+        }
+        TpiWriteCabinets(drop + "/disc-stored", tpwtest::IsCabinetOf(tpwtest::FakeTpiGroups(european, false)));
+        if (TpiRecognise("stored", drop + "/disc-stored", options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+            TpiCheckFiles("stored", disc, european);
+        }
+        IsOptions zlib;
+        zlib.zlibWrapped = true;
+        TpiWriteCabinets(drop + "/disc-zlib", tpwtest::IsCabinetOf(tpwtest::FakeTpiGroups(european), zlib));
+        if (TpiRecognise("zlib chunks", drop + "/disc-zlib", options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+            TpiCheckFiles("zlib chunks", disc, european);
+        }
+    }
+    // A version 5 set (the Russian release's format): no checksums, 32-bit tables.
+    {
+        IsOptions five;
+        five.version = 5;
+        TpiWriteCabinets(drop + "/disc-v5", tpwtest::IsCabinetOf(tpwtest::FakeTpiGroups(european), five));
+        if (TpiRecognise("version 5", drop + "/disc-v5", options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+            CHECK_EQ(disc.cabinetVersion, 5);
+            TpiCheckFiles("version 5", disc, european);
+        }
+    }
+    // Split volumes (version 6 and 5): files that go on in the next volume read whole; a missing volume is refused.
+    for (int version : {6, 5}) {
+        IsOptions split;
+        split.version = version;
+        split.volumeBytes = 6000;
+        const std::vector<std::string> volumes = tpwtest::IsCabinetOf(tpwtest::FakeTpiGroups(european), split);
+        CHECK(volumes.size() >= 4);
+        const std::string dir = drop + "/disc-split" + std::to_string(version);
+        TpiWriteCabinets(dir, volumes);
+        if (TpiRecognise("split volumes", dir, options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+            CHECK_EQ(disc.cabinetVersion, version);
+            TpiCheckFiles("split volumes", disc, european);
+        }
+        std::vector<std::string> incomplete(volumes.begin(), volumes.end() - 1);
+        TpiWriteCabinets(dir + "-short", incomplete);
+        disc = TpiDisc();
+        CHECK(RecogniseTpiPath(dir + "-short", options, disc, reason) == TpiStatus::Rejected);
+        const std::string last = "data" + std::to_string(volumes.size() - 1) + ".cab";
+        CHECK(reason.find(last) != std::string::npos && reason.find("missing") != std::string::npos);
+        if (reason.find(last) == std::string::npos) std::printf("  short set: %s\n", reason.c_str());
+    }
+    // A damaged file: its checksum does not match. Recognition does not read everything, so the copy is still
+    // Supported; reading that file fails with a plain message and the others read.
+    {
+        std::vector<IsGroup> groups = tpwtest::FakeTpiGroups(european);
+        for (IsFile& f : groups[1].files) {
+            if (f.name == "rides.wad") f.wrongMd5 = true;
+        }
+        TpiWriteCabinets(drop + "/disc-damaged", tpwtest::IsCabinetOf(groups));
+        if (TpiRecognise("damaged", drop + "/disc-damaged", options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+            const Entry* bad = FindTpiEntry(*disc.source, "Data/global/rides.wad");
+            const Entry* good = FindTpiEntry(*disc.source, "Data/levels/water/terrain.wad");
+            CHECK(bad && good);
+            if (bad && good) {
+                std::string err;
+                CHECK(TpiReadEntry(*disc.source, *bad, err) == "<read error>");
+                CHECK(err.find("checksum") != std::string::npos);
+                CHECK(TpiReadEntry(*disc.source, *good, err) == european[4].data ||
+                      TpiReadEntry(*disc.source, *good, err).find("WAD-fake-water") == 0);
+            }
+        }
+    }
+
+    // The same set as a disc image: an ISO image, a raw .bin with its .cue, the same image dumped with its pregap,
+    // a zip, a zip holding the image, a zip in a zip, a RAR archive, and a zip with the cabinets in a folder.
+    const std::vector<uint8_t> image = tpwtest::IsoImageOf(TpiIsoFiles(cabs));
+    WriteFile(drop + "/disc.iso", TpiBytes(image));
+    WriteFile(drop + "/raw/Disc.bin", TpiBytes(Ps1RawFixture(image, 2352)));
+    WriteFile(drop + "/raw/Disc.cue", "FILE \"Disc.bin\" BINARY\r\n  TRACK 01 MODE2/2352\r\n    INDEX 01 00:00:00\r\n");
+    {
+        std::vector<uint8_t> pregap(150 * 2048, 0);
+        pregap.insert(pregap.end(), image.begin(), image.end());
+        WriteFile(drop + "/pregap.bin", TpiBytes(Ps1RawFixture(pregap, 2352)));
+    }
+    WriteFile(drop + "/disc.zip", tpwtest::ZipArchiveOf(TpiZipMembers("", cabs)));
+    WriteFile(drop + "/image.zip", tpwtest::ZipArchiveOf({{"Disc/Theme Park Inc.iso", TpiBytes(image)}}));
+    WriteFile(drop + "/nested.zip", tpwtest::ZipArchiveOf({{"inner/disc.zip", ReadText(drop + "/disc.zip")}}));
+    {
+        std::vector<tpw::assets::test::RarMember> members;
+        for (const tpwtest::ZipMember& m : TpiZipMembers("", cabs)) members.push_back({m.name, m.data});
+        WriteFile(drop + "/disc.rar", tpw::assets::test::RarOf(members)[0]);
+    }
+    WriteFile(drop + "/folder.zip", tpwtest::ZipArchiveOf(TpiZipMembers("THEME PARK/", cabs)));
+    for (const char* name : {"disc.iso", "raw/Disc.bin", "pregap.bin", "disc.zip", "image.zip", "nested.zip", "disc.rar"}) {
+        if (TpiRecognise(name, drop + "/" + name, options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+            CHECK(disc.edition == "Theme Park Inc");
+            CHECK_EQ(disc.cabinetVersion, 6);
+            CHECK(disc.claimed.empty());
+            TpiCheckFiles(name, disc, european);
+        }
+    }
+    if (TpiRecognise("folder.zip", drop + "/folder.zip", options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+        CHECK(disc.claimed == "THEME PARK/");
+        TpiCheckFiles("folder.zip", disc, european);
+    }
+    // A .cue is not the image: the importer resolves it to the .bin; here it is not a copy.
+    CHECK(RecogniseTpiPath(drop + "/raw/Disc.cue", options, disc, reason) == TpiStatus::NotThemeParkInc);
+
+    // Editions, from the languages (and the group names) a copy ships: the headings in the files all say Theme Park Inc.
+    const std::string cyrillic = "\xc0\xf0\xe0\xe1\xf1\xea\xe8\xe5 \xed\xee\xf7\xe8\r\n";
+    struct EditionCase {
+        const char* what;
+        std::vector<std::string> languages;
+        std::string themeNames;
+        const char* edition;
+    };
+    const EditionCase editions[] = {
+        {"american", {"American"}, "Arabian Nights\r\n", "SimCoaster"},
+        {"american and english", {"American", "English"}, "Arabian Nights\r\n", "Theme Park Inc"},
+        {"russian text", {"American"}, cyrillic, "SimCoaster (Russian)"},
+        {"simplified chinese", {"SimplifiedChinese"}, "Arabian Nights\r\n", "Theme Park Inc (Chinese)"},
+        {"traditional chinese", {"TraditionalChinese"}, "Arabian Nights\r\n", "SimCoaster (Taiwan)"},
+    };
+    for (const EditionCase& c : editions) {
+        const std::string dir = drop + "/edition-" + c.what;
+        TpiWriteFiles(dir, tpwtest::FakeTpiFiles(c.languages, kTpiWorlds, c.themeNames));
+        if (TpiRecognise(c.what, dir, options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+            CHECK(disc.edition == c.edition);
+            if (disc.edition != c.edition) std::printf("  %s: edition %s\n", c.what, disc.edition.c_str());
+        }
+    }
+    {
+        // the Russian release: version 5 cabinets with a "Rus" group
+        IsOptions five;
+        five.version = 5;
+        const std::vector<FakeFile> american = tpwtest::FakeTpiFiles({"American"});
+        TpiWriteCabinets(drop + "/disc-rus", tpwtest::IsCabinetOf(tpwtest::FakeTpiGroups(american, true, "Rus"), five));
+        if (TpiRecognise("rus group", drop + "/disc-rus", options, disc, TpiStatus::Supported) == TpiStatus::Supported) {
+            CHECK(disc.edition == "SimCoaster (Russian)");
+            CHECK_EQ(disc.cabinetVersion, 5);
+            TpiCheckFiles("rus group", disc, american);
+        }
+    }
+
+    // Refused copies: a demo with one world (installed and as cabinets), and the Bonus Disk's add-on (rides without
+    // the game).
+    TpiWriteFiles(drop + "/demo", tpwtest::FakeTpiFiles({"English"}, {"arabian"}));
+    disc = TpiDisc();
+    CHECK(RecogniseTpiPath(drop + "/demo", options, disc, reason) == TpiStatus::Rejected);
+    CHECK(reason.find("water") != std::string::npos && reason.find("science") != std::string::npos &&
+          reason.find("demo") != std::string::npos);
+    CHECK(disc.worlds.size() == 3 && disc.worlds[0] == "arabian" && disc.worlds[1].empty() && disc.worlds[2].empty());
+    TpiWriteCabinets(drop + "/demo-disc",
+                     tpwtest::IsCabinetOf(tpwtest::FakeTpiGroups(tpwtest::FakeTpiFiles({"English"}, {"arabian", "water"}))));
+    disc = TpiDisc();
+    CHECK(RecogniseTpiPath(drop + "/demo-disc", options, disc, reason) == TpiStatus::Rejected);
+    CHECK(reason.find("science") != std::string::npos && reason.find("water") == std::string::npos);
+    {
+        std::vector<IsGroup> bonus = {
+            {"Program Executable Files", {{"", "Setup.exe", "MZ bonus setup", false, false}}},
+            {"Data", {{"Data\\levels\\water\\rides", "bonus.wad", std::string(3000, 'b'), true, true},
+                      {"Data\\levels\\arabian\\rides", "bonus2.wad", std::string(3000, 'c'), true, false}}}};
+        TpiWriteCabinets(drop + "/bonus", tpwtest::IsCabinetOf(bonus));
+        disc = TpiDisc();
+        CHECK(RecogniseTpiPath(drop + "/bonus", options, disc, reason) == TpiStatus::Rejected);
+        CHECK(reason.find("add-on") != std::string::npos);
+        // as a plain tree too
+        WriteFile(drop + "/bonus-tree/Data/levels/water/rides/bonus.wad", std::string(3000, 'b'));
+        disc = TpiDisc();
+        CHECK(RecogniseTpiPath(drop + "/bonus-tree", options, disc, reason) == TpiStatus::Rejected);
+        CHECK(reason.find("add-on") != std::string::npos);
+    }
+
+    // Not this game: random files, a Theme Park World-like tree, a cabinet set of another program.
+    WriteFile(drop + "/other/notes.txt", "hello\r\n");
+    WriteFile(drop + "/other/Data/levels/readme.txt", "nothing here\r\n");
+    CHECK(RecogniseTpiPath(drop + "/other", options, disc, reason) == TpiStatus::NotThemeParkInc);
+    WriteFile(drop + "/tpw/data/levels/lostkingdom/standard.sam", "// Theme Park World\r\n");
+    WriteFile(drop + "/tpw/data/levels/lostkingdom/terrain.wad", std::string(500, 'w'));
+    CHECK(RecogniseTpiPath(drop + "/tpw", options, disc, reason) == TpiStatus::NotThemeParkInc);
+    {
+        std::vector<IsGroup> other = {{"Program Executable Files", {{"", "Other.exe", "MZ other program", true, true}}},
+                                      {"Help Files", {{"Help", "Other.hlp", std::string(2000, 'h'), true, false}}}};
+        TpiWriteCabinets(drop + "/other-cabs", tpwtest::IsCabinetOf(other));
+        CHECK(RecogniseTpiPath(drop + "/other-cabs", options, disc, reason) == TpiStatus::NotThemeParkInc);
+    }
+    WriteFile(drop + "/empty.zip", tpwtest::ZipArchiveOf({}));
+    CHECK(RecogniseTpiPath(drop + "/empty.zip", options, disc, reason) == TpiStatus::NotThemeParkInc);
+    CHECK(RecogniseTpiPath(drop + "/no-such-path", options, disc, reason) == TpiStatus::NotThemeParkInc);
+
+    // The importer: a dropped copy is recognised and handed to the converter (one line per copy, nothing of it imported
+    // as Theme Park World files), a refused copy gives one error, and the files beside a copy are still counted.
+    {
+        ImporterConfig cfg;
+        cfg.dataRoot = root;
+        Importer imp(cfg);
+        std::string err;
+        CHECK(imp.Open(err));
+        ImportReport r = imp.Import({drop + "/disc"});
+        CHECK(r.errors.empty());
+        CHECK_EQ(r.themeParkInc.size(), 1);
+        const std::string prefix = "Theme Park Inc copy recognised (Theme Park Inc); ";
+        CHECK(!r.themeParkInc.empty() && r.themeParkInc[0].compare(0, prefix.size(), prefix) == 0);
+        CHECK(!r.themeParkIncConverted);
+        CHECK_EQ(r.written, 0);
+        CHECK_EQ(r.unknownFiles, 0);
+        CHECK(r.ChangedNothing());
+        CHECK(!r.themeParkInc.empty() && r.Summary() == r.themeParkInc[0]);
+        CHECK(r.containers >= 1);
+        if (!r.themeParkInc.empty()) std::printf("  %s\n", r.themeParkInc[0].c_str());
+        std::vector<ImportProgress> ev = Events(imp);
+        CHECK(std::any_of(ev.begin(), ev.end(), [](const ImportProgress& e) {
+            return e.kind == ImportProgress::Kind::Content && e.message.find("Theme Park Inc copy recognised") == 0;
+        }));
+        // not converted: nothing remembered
+        LauncherIni ini;
+        CHECK(LoadLauncherIni(root + "/launcher.ini", ini, err));
+        CHECK(std::none_of(ini.extra.begin(), ini.extra.end(),
+                           [](const std::pair<std::string, std::string>& kv) { return kv.first == kTpiDiscPathKey; }));
+        // the image, the raw pair (through the .cue), the installed tree, the nested zip: the same line
+        for (const std::string& path : {drop + "/disc.iso", drop + "/raw/Disc.cue", drop + "/raw", drop + "/installed",
+                                        drop + "/nested.zip", drop + "/disc.rar"}) {
+            ImportReport again = imp.Import({path});
+            CHECK(again.errors.empty());
+            CHECK(again.themeParkInc == r.themeParkInc);
+            CHECK_EQ(again.written, 0);
+            if (!again.errors.empty() || again.themeParkInc != r.themeParkInc) {
+                std::printf("  %s: %s\n", path.c_str(), again.errors.empty() ? again.Summary().c_str() : again.errors[0].c_str());
+            }
+            Events(imp);
+        }
+        // a folder with the copy in a subfolder and a note beside it: the note is the only unknown file
+        ImportReport beside = imp.Import({drop + "/installed-nested"});
+        CHECK(beside.errors.empty());
+        CHECK_EQ(beside.themeParkInc.size(), 1);
+        CHECK_EQ(beside.unknownFiles, 1);
+        CHECK_EQ(beside.written, 0);
+        // a Russian copy names its edition
+        ImportReport rus = imp.Import({drop + "/disc-rus"});
+        CHECK(!rus.themeParkInc.empty() && rus.themeParkInc[0].find("(SimCoaster (Russian))") != std::string::npos);
+        // a demo: one error, no copy, nothing imported from it
+        WriteFile(drop + "/demo.zip", tpwtest::ZipArchiveOf({{"Demo/Data/levels/arabian/Standard.sam", "// demo\r\n"},
+                                                            {"Demo/Data/levels/arabian/terrain.wad", std::string(900, 'd')},
+                                                            {"Demo/Data/Online.sam", "Theme Park Inc Online Settings\r\n"}}));
+        ImportReport demo = imp.Import({drop + "/demo.zip"});
+        CHECK_EQ(demo.errors.size(), 1);
+        CHECK(AnyContains(demo.errors, "Theme Park Inc copy refused") && AnyContains(demo.errors, "demo.zip"));
+        CHECK(demo.themeParkInc.empty());
+        CHECK_EQ(demo.written, 0);
+        CHECK_EQ(demo.unknownFiles, 0);
+        // the add-on: refused with its own reason
+        ImportReport bonus = imp.Import({drop + "/bonus"});
+        CHECK_EQ(bonus.errors.size(), 1);
+        CHECK(AnyContains(bonus.errors, "add-on"));
+        // two copies dropped together: two lines
+        ImportReport two = imp.Import({drop + "/disc.iso", drop + "/installed"});
+        CHECK(two.errors.empty());
+        CHECK_EQ(two.themeParkInc.size(), 2);
+        // not this game: the ordinary importer's verdict, no Theme Park Inc line
+        ImportReport other = imp.Import({drop + "/other"});
+        CHECK(other.themeParkInc.empty());
+        CHECK_EQ(other.unknownFiles, 2);
+        CHECK(StagingEmpty(root));
+        Events(imp);
+    }
+    RemoveTree(drop);
+    RemoveTree(root);
+}
+
 int main() {
     std::string scratch = Env("TPW_TEST_SCRATCH");
     bool haveScratch = !scratch.empty();
     if (!haveScratch) scratch = (fs::temp_directory_path() / "tpw-importer-test").string();
     scratch += "/importer";
     fs::create_directories(scratch);
+
+    // TPW_TEST_ONLY=tpi runs the Theme Park Inc test alone (to run it many times by itself).
+    if (Env("TPW_TEST_ONLY") == "tpi") {
+        TestThemeParkInc(scratch);
+        RemoveTree(scratch);
+        std::printf("importer: %d passed, %d failed, %d skipped\n", g_pass, g_fail, g_skip);
+        return g_fail == 0 ? 0 : 1;
+    }
 
     TestSynthetic(scratch);
     TestPs1Stamp(scratch);
@@ -2684,6 +3115,7 @@ int main() {
     TestArchives(scratch);
     TestLanguageLines();
     TestLanguageSynthetic(scratch);
+    TestThemeParkInc(scratch);
     const std::string languageDisc = Env("TPW_TEST_LANGUAGE_DISC"), languages = Env("TPW_TEST_LANGUAGE");
     if (languageDisc.empty() || languages.empty()) Skip("the language disc: TPW_TEST_LANGUAGE_DISC or TPW_TEST_LANGUAGE is not set");
     else TestLanguageDisc(languageDisc, languages, scratch);

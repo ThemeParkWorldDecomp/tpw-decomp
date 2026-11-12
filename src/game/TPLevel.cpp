@@ -29,6 +29,7 @@
 #include "TPConfig.h"
 #include "TPDialog.h"
 #include "TPEngine.h"
+#include "TpiWorlds.h"
 #include "TPMain.h"
 #include "ui_ErrorDisplay.h"
 #include "ui_main.h"

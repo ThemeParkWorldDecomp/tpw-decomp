@@ -127,6 +127,19 @@ std::vector<Container> Classify(Blob& blob, const SniffOptions& options, uint64_
                                             Has(head.data(), n, 16 * 2352 + 25, "CD001") ||
                                             Has(head.data(), n, 16 * 2448 + 17, "CD001") ||
                                             Has(head.data(), n, 16 * 2448 + 25, "CD001")));
+    if (!iso && out.empty() && RawSync(head.data(), n)) {
+        // A raw dump that keeps the 150-sector pregap (BlindWrite .b6i): the descriptor is at sector 166.
+        for (uint64_t stride : {uint64_t(2352), uint64_t(2448)}) {
+            uint8_t sector[32];
+            std::string e;
+            if (blob.ReadAt(166 * stride, sector, sizeof sector, e) != int64_t(sizeof sector)) continue;
+            if (std::memcmp(sector, head.data(), 12) == 0 &&
+                (std::memcmp(sector + 17, "CD001", 5) == 0 || std::memcmp(sector + 25, "CD001", 5) == 0)) {
+                iso = true;
+                break;
+            }
+        }
+    }
     if (hfs) out.push_back(Container::Hfs);
     if (iso) out.push_back(Container::Iso9660);
     // MacBinary has no signature; its header is validated when it is opened, and it is the last resort.
@@ -294,6 +307,25 @@ std::shared_ptr<Source> OpenEntrySniffed(std::shared_ptr<Source> parent, const E
                                          int depth, std::string& err) {
     SniffStatus status;
     return OpenEntrySniffed(std::move(parent), entry, options, depth, status, err);
+}
+
+std::shared_ptr<Blob> OpenEntryBlobSpilled(std::shared_ptr<Source> parent, const Entry& entry, const SniffOptions& options,
+                                           std::string& err) {
+    if (!parent) {
+        err = "no source";
+        return nullptr;
+    }
+    std::string direct;
+    if (std::shared_ptr<Blob> blob = parent->OpenBlob(entry, direct)) return blob;
+    if (!direct.empty()) {
+        err = direct;
+        return nullptr;
+    }
+    const bool forwardOnly = std::strcmp(parent->Kind(), "zip") == 0 || std::strcmp(parent->Kind(), "cab") == 0;
+    if (forwardOnly && !options.spillDir.empty() && entry.size > options.spillOver) {
+        return Spill(*parent, entry, options.spillDir, err);
+    }
+    return OpenEntryBlob(std::move(parent), entry, err);
 }
 
 std::shared_ptr<Source> OpenPathSniffed(const std::string& path, const SniffOptions& options, SniffStatus& status,

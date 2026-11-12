@@ -68,6 +68,11 @@ public:
             return nullptr;
         }
     }
+    // The file itself, for a reader that seeks (a cabinet volume read file by file).
+    std::shared_ptr<Blob> OpenBlob(const Entry& entry, std::string& err) override {
+        if (entry.id >= items_.size() || entry.kind != EntryKind::Data) return nullptr;
+        return OpenFileBlob(items_[static_cast<size_t>(entry.id)].disk, err);
+    }
 
     bool Scan(const std::string& root, std::string& err) {
         std::error_code ec;
