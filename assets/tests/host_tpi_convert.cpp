@@ -705,7 +705,8 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(gates.find("Info.Name\t\t\t\"Arabian Nights\"") != std::string::npos && gates.find("\"Gates\"") == std::string::npos);
     CHECK(S(ReadFile(out / "water" / "features" / "Gates" / "Gates.sam")).find("\"Polar Zone\"") != std::string::npos);
     CHECK(S(ReadFile(out / "science" / "features" / "Gates" / "Gates.sam")).find("\"Land of Invention\"") != std::string::npos);
-    CHECK(S(ReadFile(a / "rides" / "babylon" / "babylon.sam")).find("\"babylon\"") != std::string::npos);
+    // No object names bank in this copy: an item is named by its working name in title case (tpi_names.h).
+    CHECK(S(ReadFile(a / "rides" / "babylon" / "babylon.sam")).find("Info.Name\t\t\t\"Babylon\"") != std::string::npos);
     CHECK(TpiSamInteger(S(ReadFile(a / "features" / "bus" / "bus.sam")), "Info", "Id", id) && id == 1600);
     CHECK(TpiSamInteger(S(ReadFile(a / "features" / "end" / "end.sam")), "Info", "Id", id) && id == 1605);
     const std::string fotobth = S(ReadFile(a / "upgrades" / "fotobth" / "fotobth.sam"));
@@ -793,7 +794,9 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(record.find("left out: facilities/Facilities.sam") != std::string::npos);
     // The golden ticket ride is listed with its ticket cost; no cash price is invented for it.
     CHECK(record.find("rides/carpet (Info.Id 3112 -> ") != std::string::npos);
-    CHECK(record.find(" files, costs 1 golden ticket, no price per use (was 25))") != std::string::npos);
+    CHECK(record.find(" files, costs 1 golden ticket, no price per use (was 25), named \"Carpet\" (was \"carpet\", in title case))") !=
+          std::string::npos);
+    CHECK(record.find("names: the items' own working names in title case (") != std::string::npos);
     CHECK(record.find("rides/Rides.sam: no price per use (was 20)") != std::string::npos);
     CHECK(record.find("shops/burger (Info.Id 3300 -> 5030, ") != std::string::npos &&
           record.find("no price per use", record.find("shops/burger (")) > record.find("\n", record.find("shops/burger (")));

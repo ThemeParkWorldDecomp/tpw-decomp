@@ -8,7 +8,8 @@
 //  - items: each .wad is written as an unpacked folder (the game reads both) whose .sam keeps only the statements
 //    Theme Park World's ride table has (tpi_sam.h); its Info.Id is moved into the world's own block of ids so it never
 //    collides with a Theme Park World item, and every reference to it follows; rides lose their price per use, as
-//    Theme Park World's rides have none (the park charges at the gate);
+//    Theme Park World's rides have none (the park charges at the gate); its Info.Name becomes the name Theme Park Inc
+//    shows, from the copy's own object names bank (tpi_names.h), or its working name in title case;
 //  - the mystery item and the two ground items every Theme Park World world has (and the Buy Ride panel needs), and
 //    the advisor, are copied from the donor world in the player's own Theme Park World data under <dataRoot>/assets
 //    (kDonorItems); nothing of Theme Park Inc's advisor is used;
@@ -44,6 +45,7 @@
 #include "tpi_disc.h"
 #include "tpi_fsh.h"
 #include "tpi_island.h"
+#include "tpi_names.h"
 #include "tpi_sam.h"
 #include "tpi_wad.h"
 
@@ -870,8 +872,43 @@ void ConvertSprites(const TpiDisc &disc, const Levels &levels, const fs::path &s
     log.text << "    the generic groups and Theme Park World's own themes: the player's esprites.wad, untouched\n";
 }
 
+// The object names bank of the copy's English strings, or of its American ones (SimCoaster), with its character map;
+// false, with the reason in the record, when neither language has both files, they cannot be decoded, or the bank is
+// not the one the binding is for (tpi_names.h): every item then keeps its working name in title case.
+bool ReadObjectNames(const TpiDisc &disc, const Levels &levels, TpiStrings &names, Log &log) {
+    std::string why = "no Data/Language/English or American with OBJECT_NAMES.str and MBToUni.dat";
+    for (const char *language : {"english", "american"}) {
+        const std::string folder = Lower(disc.root) + "data/language/" + language + "/";
+        const Entry *bank = nullptr, *charMap = nullptr;
+        for (const Entry &e : disc.source->Entries()) {
+            if (e.kind != EntryKind::Data || e.unreadable)
+                continue;
+            const std::string lower = Lower(e.path);
+            if (lower == folder + "object_names.str")
+                bank = &e;
+            else if (lower == folder + "mbtouni.dat")
+                charMap = &e;
+        }
+        if (bank == nullptr || charMap == nullptr)
+            continue;
+        std::string err;
+        if (!DecodeTpiStrings(levels.read(*bank), levels.read(*charMap), names, err)) {
+            why = bank->path + ": " + err;
+            continue;
+        }
+        if (!IsTpiObjectNames(names, err)) {
+            why = bank->path + " is not the object names bank the converter knows: " + err;
+            continue;
+        }
+        log.text << "names: " << bank->path << " (" << names.text.size() << " strings)\n";
+        return true;
+    }
+    log.text << "names: the items' own working names in title case (" << why << ")\n";
+    return false;
+}
+
 void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &staging, const fs::path &assets,
-                  std::map<std::string, std::vector<SamRow>> &tables, Log &log) {
+                  std::map<std::string, std::vector<SamRow>> &tables, const TpiStrings *names, Log &log) {
     const std::string world = spec.folder;
     if (levels.under(world + "/").empty())
         Fail("the world " + world + " is missing from Data/levels");
@@ -907,6 +944,16 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
         const bool freeRide = ride && TpiSamInteger(samText, "UsageInfo", "InitPricePerUse", price);
         if (ride)
             options.drop.push_back(kPricePerUse);
+        // The name Theme Park Inc shows (tpi_names.h): the build menu and the ride's panels read Info.Name, as the
+        // game's own name table has no converted id (RideDB.cpp GetTypeName).
+        std::string infoName, shownName;
+        bool fromBank = false;
+        if (!gate && sam != nullptr) {
+            TpiSamString(samText, "Info", "Name", infoName);
+            shownName = TpiShownName(names, world, item.oldId, infoName, fromBank);
+            if (!shownName.empty() && shownName != infoName)
+                options.append.push_back("Info.Name\t\t\t\"" + shownName + "\"");
+        }
         Converted c = ConvertMembers(item.members, &rideTable, &options, &coasterTable, what, log);
         if (gate) {
             log.text << "    gate " << item.outFolder << "/" << item.name << " named \"" << spec.display << "\"\n";
@@ -920,6 +967,9 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             log.text << ", costs " << tickets << " golden ticket" << (tickets == 1 ? "" : "s");
         if (freeRide)
             log.text << ", no price per use (was " << price << ")";
+        if (!shownName.empty() && shownName != infoName)
+            log.text << ", named \"" << shownName << "\" (was \"" << infoName << "\", "
+                     << (fromBank ? "from the object names" : "in title case") << ")";
         log.text << ")\n";
         log.itemsConverted++;
     }
@@ -1095,8 +1145,10 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
 
         Log log;
         std::map<std::string, std::vector<SamRow>> tables;
+        TpiStrings names;
+        const bool named = ReadObjectNames(disc, levels, names, log);
         for (const WorldSpec &spec : kWorlds)
-            ConvertWorld(levels, spec, staging, assets, tables, log);
+            ConvertWorld(levels, spec, staging, assets, tables, named ? &names : nullptr, log);
         ConvertSprites(disc, levels, staging, assets, log);
         // The islands go into the staging folder too (its data/lobby/), so they reach assets/tpi/data in the same swap as the
         // worlds: the game never sees a world without its island or an island without its world.
