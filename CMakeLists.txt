@@ -84,6 +84,10 @@ if(TPW_BUILD_ASSETS_TESTS)
   add_executable(tpw_tpi_names_tests assets/tests/host_tpi_names.cpp)
   target_link_libraries(tpw_tpi_names_tests PRIVATE tpw_assets)
   add_test(NAME tpi_names COMMAND tpw_tpi_names_tests)
+  # The converter's terrain repair and obstacle merge (assets/tpi_terrain.h): synthetic meshes, TGAs and obstacle files, no game data.
+  add_executable(tpw_tpi_terrain_tests assets/tests/host_tpi_terrain.cpp)
+  target_link_libraries(tpw_tpi_terrain_tests PRIVATE tpw_assets)
+  add_test(NAME tpi_terrain COMMAND tpw_tpi_terrain_tests)
   # The Theme Park Inc island builder (assets/tpi_island.h): synthetic meshes, textures and wads, no game data; and the
   # tool that builds the islands from a Theme Park Inc folder for looking at them.
   add_executable(tpw_tpi_island_tests assets/tests/host_tpi_island.cpp)

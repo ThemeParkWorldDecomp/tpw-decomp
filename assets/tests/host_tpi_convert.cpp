@@ -519,6 +519,50 @@ Bytes GateMesh() {
     return md2::WriteMd2(gate);
 }
 
+// A terrain mesh with a 2 x 1 height field of shown quads, flat at height 0, and a lake obstacle whose mesh lies on
+// quad (1,0), which its shape blocks: the converter merges the lake into the terrain (tpi_terrain.h) and hides the quad.
+Bytes TerrainMesh() {
+    namespace md2 = tpw::assets::tpi_island;
+    md2::Md2Model t;
+    t.name = "base.MD2";
+    t.flags = 3;
+    md2::Md2Texture grass;
+    grass.frames.push_back("grass.tga");
+    t.textures.push_back(grass);
+    md2::NodeBuilder b;
+    b.Quad(md2::Vec3{0, 0, 0}, md2::Vec3{10, 0, 0}, md2::Vec3{10, 0, 10}, md2::Vec3{0, 0, 10}, 0, 0, 1, 0, 1, 1, 0, 1, 0);
+    t.nodes.push_back(b.Build("root"));
+    md2::RecomputeBoxes(t);
+    t.heightField.assign(0x30, 0);
+    Put32(t.heightField, 4, 6 | (2u << 16));
+    const float cell = 10.0f;
+    std::memcpy(t.heightField.data() + 0x10, &cell, 4);
+    std::memcpy(t.heightField.data() + 0x14, &cell, 4);
+    Put32(t.heightField, 0x18, 2);
+    Put32(t.heightField, 0x1c, 1);
+    t.heightField.resize(0x30 + 6 * 4, 0);
+    for (int q = 0; q < 2; ++q) t.heightField.insert(t.heightField.end(), {0x42, 0, 0, 0});
+    return md2::WriteMd2(t);
+}
+
+Bytes LakeObstacle() {
+    namespace md2 = tpw::assets::tpi_island;
+    md2::Md2Model lake;
+    lake.name = "lake.MD2";
+    md2::Md2Texture water;
+    water.frames.push_back("water.tga");
+    lake.textures.push_back(water);
+    md2::NodeBuilder b;
+    b.Quad(md2::Vec3{10, 0, 0}, md2::Vec3{20, 0, 0}, md2::Vec3{20, 0, 10}, md2::Vec3{10, 0, 10}, 0, 0, 1, 0, 1, 1, 0, 1, 0);
+    lake.nodes.push_back(b.Build("lake"));
+    md2::RecomputeBoxes(lake);
+    const Bytes fsh = MakeFsh(2, 2, {0, 1, 2, 3}, 0x2a, kPalette, true);
+    return BuildTpiWad({{"lake.sam", B("Info.Id 1700\r\nInfo.Shape\r\n---\r\nH\r\n---\r\nInfo.IsObstacle 1\r\n"
+                                       "Obstacle.ShapeOffsetX 1\r\nObstacle.ShapeOffsetY 0\r\n")},
+                        {"lake.MD2", md2::WriteMd2(lake)},
+                        {"textures/water.fsh", fsh}});
+}
+
 void MakeWorld(const fs::path& levels, const std::string& world, const std::string& tct) {
     const fs::path w = levels / world;
     WriteFile(w / "Standard.sam", B("MapInfo.HeightfieldWidth 96\nTicketBooth[0].PosX 40\nTicketBooth[1].PosY 41\nNumTicketBooths 2\n"));
@@ -528,9 +572,14 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     WriteFile(w / "cem_Hoardings.sam", B("HoardingClicks[0].X 4\n"));
     WriteFile(w / "Online_Standard.sam", B("Online.X 1\n"));
     const Bytes fsh = MakeFsh(2, 2, {3, 2, 1, 0}, 0x24, kPalette, false);
-    WriteFile(w / "terrain.wad", BuildTpiWad({{tct, B("tct")}, {"base.map", B("map")}, {"qickload.txt", B("pathtex\\p.fsh\n")},
-                                              {"pathtex/p.fsh", MakeFsh(2, 2, {0, 1, 2, 3}, 0x2a, kPalette, false)},
-                                              {"pathtex/q.fsh", kOpaqueFsh}}));
+    std::vector<TpiWadMember> terrain = {{tct, B("tct")}, {"base.map", B("map")}, {"qickload.txt", B("pathtex\\p.fsh\n")},
+                                         {"pathtex/p.fsh", MakeFsh(2, 2, {0, 1, 2, 3}, 0x2a, kPalette, false)},
+                                         {"pathtex/q.fsh", kOpaqueFsh}};
+    if (world == "water") {
+        terrain.push_back({"base.MD2", TerrainMesh()});
+        WriteFile(w / "obstacles" / "lake.wad", LakeObstacle());
+    }
+    WriteFile(w / "terrain.wad", BuildTpiWad(terrain));
     WriteFile(w / "Sharetex.wad", BuildTpiWad({{"black.tga", B("tga")}, {"s.fsh", fsh}}));
     WriteFile(w / "Queue.wad", BuildTpiWad({{"que.hmp", B("h")}}));
     // Theme Park Inc's advisor, left out: the donor world's Theme Park World advisor is copied instead.
@@ -899,6 +948,22 @@ void TestConvertTree(const fs::path& scratch) {
     }
     CHECK(ReadTpiWad(ReadFile(out / "water" / "terrain.wad"), members, err));
     CHECK(!members.empty() && members[0].name == "water.tct");
+    // The water world's lake obstacle is in its terrain: the mesh's second node, its quad hidden and drawn again under it
+    // with the shown one beside it (the last node), its texture added.
+    names.clear();
+    for (const auto& m : members) names += m.name + ";";
+    CHECK_EQ_STR(names, "water.tct;base.map;qickload.txt;base.MD2;pathtex/p.tga;pathtex/q.tga;textures/water.tga;");
+    {
+        namespace md2 = tpw::assets::tpi_island;
+        md2::Md2Model merged;
+        CHECK(members.size() == 7 && md2::ReadMd2(members[3].data, merged, err, true));
+        CHECK(merged.nodes.size() == 3 && merged.nodes[1].name == "lake" && merged.nodes[2].name == "tpi underground" &&
+              merged.nodes[2].faces.size() == 4);
+        CHECK(merged.heightField.size() == 0x30 + 6 * 4 + 2 * 4 && merged.heightField[0x30 + 6 * 4] == 0x42 &&
+              merged.heightField[0x30 + 6 * 4 + 4] == 0x43);
+        CHECK(members.size() == 7 && members[6].data.size() > 18 && members[6].data[2] == 2);
+    }
+    CHECK(!fs::exists(out / "water" / "obstacles"));
     CHECK(ReadTpiWad(ReadFile(a / "sharetex.wad"), members, err) && members.size() == 2 && members[1].name == "s.tga");
     CHECK(fs::exists(a / "queue.wad") && !fs::exists(a / "Queue.wad.tmp"));
     CHECK(!fs::exists(a / "dynamic.wad"));
@@ -933,7 +998,10 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(record.find("world arabian:") != std::string::npos);
     CHECK(record.find("Sound/cat_ambientSFX.map: event 224 volume 100 to 6\n") != std::string::npos);
     CHECK(record.find("left as it is") == std::string::npos);
-    CHECK(record.find("left out: obstacles/") != std::string::npos);
+    CHECK(record.find("left out: obstacles/ (terrain.wad has no base.MD2)") != std::string::npos);
+    CHECK(record.find("obstacle lake: before clearing, 1 nodes, 2 faces in the terrain; blocked cells: 1 made hidden, 0 hidden "
+                      "already, 0 left open") !=
+          std::string::npos);
     CHECK(record.find("left out: facilities/info") != std::string::npos);
     CHECK(record.find("features/noid") != std::string::npos);
     CHECK(record.find("rides/carpet: Info.WorkingLife") != std::string::npos);

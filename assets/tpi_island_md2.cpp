@@ -17,7 +17,7 @@ namespace {
 constexpr uint32_t kMagic = 0x1cd15d46;
 constexpr uint32_t kVersion = 0xdd;
 constexpr uint32_t kAnimVersion = 0xcb;
-constexpr size_t kHeader = 0xb8, kNode = 0xa0, kMini = 0x58, kName = 0x14;
+constexpr size_t kHeader = 0xb8, kNode = 0xa0, kMini = 0x58, kName = 0x14, kHField = 0x30;
 
 uint16_t L16(const std::vector<uint8_t>& d, size_t at) { return static_cast<uint16_t>(d[at] | (d[at + 1] << 8)); }
 uint32_t L32(const std::vector<uint8_t>& d, size_t at) {
@@ -109,7 +109,7 @@ Vec3 Transform(const Vec3& p, const Matrix& m) {
 
 // ---- reader ----------------------------------------------------------------------------------------------------------
 
-bool ReadMd2(const std::vector<uint8_t>& d, Md2Model& model, std::string& err) {
+bool ReadMd2(const std::vector<uint8_t>& d, Md2Model& model, std::string& err, bool keepTerrain) {
     model = Md2Model();
     if (d.size() < kHeader || L32(d, 0) != kMagic) {
         err = "not an M3D2 mesh";
@@ -261,6 +261,25 @@ bool ReadMd2(const std::vector<uint8_t>& d, Md2Model& model, std::string& err) {
         }
         model.nodes.push_back(std::move(n));
     }
+    if (keepTerrain) {
+        for (int i = 0; i < 3; ++i) model.f0c[static_cast<size_t>(i)] = L32(d, 0x0c + 4 * i);
+        model.f46 = L16(d, 0x46);
+        const uint32_t hf = L32(d, 0x6c);
+        if (hf != 0) {
+            if (!In(d, hf, kHField)) {
+                err = "mesh height field runs past the end of the file";
+                return false;
+            }
+            const uint32_t heights = L16(d, hf + 4), quads = L16(d, hf + 6), hp = L32(d, hf + 0x28), qp = L32(d, hf + 0x2c);
+            if (!In(d, hp, uint64_t(heights) * 4) || !In(d, qp, uint64_t(quads) * 4)) {
+                err = "mesh height field runs past the end of the file";
+                return false;
+            }
+            model.heightField.assign(d.begin() + hf, d.begin() + hf + kHField);
+            model.heightField.insert(model.heightField.end(), d.begin() + hp, d.begin() + hp + 4 * size_t(heights));
+            model.heightField.insert(model.heightField.end(), d.begin() + qp, d.begin() + qp + 4 * size_t(quads));
+        }
+    }
     return true;
 }
 
@@ -293,6 +312,16 @@ std::vector<uint8_t> WriteMd2(const Md2Model& model) {
         out[info + 16 * i + 9] = t.f08[1];
         Put16(out, info + 16 * i + 0xa, static_cast<uint32_t>(frames));
         Put32(out, info + 16 * i + 0xc, static_cast<uint32_t>(slot));
+    }
+    // A kept height field: its record, heights and quads, the two pointers moved to where they now are.
+    Align4(out);
+    const size_t ho = model.heightField.size() >= kHField ? out.size() : 0;
+    if (ho != 0) {
+        out.insert(out.end(), model.heightField.begin(), model.heightField.end());
+        const uint32_t heights = L16(model.heightField, 4);
+        Put32(out, ho + 0x28, static_cast<uint32_t>(ho + kHField));
+        Put32(out, ho + 0x2c, static_cast<uint32_t>(ho + kHField + 4 * size_t(heights)));
+        Align4(out);
     }
     std::vector<size_t> fulls, minis;
     for (size_t i = 0; i < model.nodes.size(); ++i) (model.nodes[i].mini ? minis : fulls).push_back(i);
@@ -428,11 +457,16 @@ std::vector<uint8_t> WriteMd2(const Md2Model& model) {
         nf += static_cast<uint32_t>(n.faces.size());
         np += static_cast<uint32_t>(n.points.size());
     }
+    // The point count (0x4a) is read only when the game copies a mesh to instance it (TPInstance.cpp); a terrain with
+    // its obstacles (tpi_terrain.cpp) can have more points than the word holds and is never instanced, so a larger count
+    // is written as 0xffff.
     const uint32_t counts[11] = {static_cast<uint32_t>(model.textures.size()), vsets, usets, nfs, nf, 0,
                                  static_cast<uint32_t>(model.nodes.size()), static_cast<uint32_t>(fulls.size()),
-                                 static_cast<uint32_t>(fulls.size()), 0, np};
+                                 static_cast<uint32_t>(fulls.size()), 0, std::min<uint32_t>(np, 0xffff)};
     for (int i = 0; i < 11; ++i) Put16(out, 0x36 + 2 * i, counts[i]);
-    const size_t offsets[13] = {0, texoff, info, vo, po, uo, fso, fo, 0, no, mo, model.nodes.empty() ? 0 : pos[0], eo};
+    if (model.f46 >= 0) Put16(out, 0x46, static_cast<uint32_t>(model.f46));
+    for (int i = 0; i < 3; ++i) Put32(out, 0x0c + 4 * i, model.f0c[static_cast<size_t>(i)]);
+    const size_t offsets[13] = {0, texoff, info, vo, po, uo, fso, fo, ho, no, mo, model.nodes.empty() ? 0 : pos[0], eo};
     for (int i = 0; i < 13; ++i) Put32(out, 0x4c + 4 * i, static_cast<uint32_t>(offsets[i]));
     for (int i = 0; i < 6; ++i) PutF(out, 0x80 + 4 * i, model.box[i]);
     Put32(out, 0x2c, static_cast<uint32_t>(out.size() - 4));

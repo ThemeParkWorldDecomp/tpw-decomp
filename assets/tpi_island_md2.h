@@ -2,7 +2,9 @@
 // island builder (tpi_island.h): a reader for the player's Theme Park Inc pieces, a writer that lays a file out the way
 // the originals are (the layout ps1_convert.cpp writes), and the edits the builder makes: a uniform scale baked into the
 // positions, a piece re-parented under another mesh's root, and generated geometry (the island slab and its fence).
-// Only the mesh tables are modelled; animation blocks are patched in place by tpi_island.cpp and never pass through here.
+// Only the mesh tables (and a terrain's height field, kept as it is) are modelled; animation blocks are patched in place
+// by tpi_island.cpp and never pass through here. The Theme Park Inc converter's terrain repair (tpi_terrain.h) uses the
+// same reader and writer to add the obstacles' meshes to a world's terrain.
 #pragma once
 
 #include <array>
@@ -68,10 +70,18 @@ struct Md2Model {
     std::vector<Md2Texture> textures;
     std::vector<Md2Node> nodes;   // node 0 is the root; the writer puts full nodes first, then minis
     std::array<float, 6> box = {0, 0, 0, 0, 0, 0};
+    // A terrain's height field (header 0x6c: the sHField record, its heights, then its quads, as in the file) and the
+    // header words the builder has no use for (0x0c, 0x10, 0x14 and 0x46). Only ReadMd2 with keepTerrain fills them,
+    // so that a terrain mesh (tpi_terrain.cpp) survives a rewrite; the island's meshes leave them empty, and the writer
+    // then writes no height field, zeros and the full node count, as before.
+    std::vector<uint8_t> heightField;
+    std::array<uint32_t, 3> f0c = {0, 0, 0};
+    int f46 = -1;
 };
 
 // Reads a mesh file's tables. False with a message for anything but a geometry mesh the engine would load.
-bool ReadMd2(const std::vector<uint8_t>& bytes, Md2Model& model, std::string& err);
+// keepTerrain also keeps the height field and the unused header words (Md2Model::heightField).
+bool ReadMd2(const std::vector<uint8_t>& bytes, Md2Model& model, std::string& err, bool keepTerrain = false);
 // Writes the model as a version 0xdd mesh without an animation block or embedded records.
 std::vector<uint8_t> WriteMd2(const Md2Model& model);
 

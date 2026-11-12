@@ -16,7 +16,11 @@
 //  - the world's own .sam files (Standard, global, Hoardings, EndHoardings) are filtered the same way, with the
 //    few renamed statements and the lobby settings the mod needs (free entry, tickets);
 //  - the world wads (terrain, sharetex, ssharete, dynamic, queue, miscmesh, hoarding) are rebuilt stored
-//    (tpi_wad.h), the terrain's .tct named after the world;
+//    (tpi_wad.h), the terrain's .tct named after the world; the world's obstacles (obstacles/*.wad: the lake, the
+//    bridges, the tunnels, the rocks, which a Theme Park Inc player paid to clear) become fixed scenery of the terrain,
+//    drawn as a player who cleared them sees them where their files tell that state, with the cells they block made
+//    cells nothing is built on (tpi_terrain.h), and
+//    the quads Theme Park Inc textured fully transparent under them are hidden;
 //  - sky, 2D map, scape, music and sounds are copied as they are, but for the few sounds tuned for the PC's 3D sound
 //    whose volume is lowered (kSfxPatches, tpi_sfx.h);
 //  - the worlds' entertainers, costumes and costume heads come out of Theme Park Inc's esprites.wad as loose files
@@ -24,9 +28,9 @@
 //    entertainers gets the first again under a new name, as the game takes three.
 //  - each world's lobby island (data/lobby/<world>.txt and data/lobby/<world>/) is composed from the world's own gate,
 //    terrain and textures (tpi_island.h), since Theme Park Inc has no island screen.
-// What Theme Park World has no use for is left out and listed in <dataRoot>/assets/tpi/converted.txt: the obstacles,
-// the facilities it does not know, the online files, the speech, the advisor. Everything is written into a staging folder first
-// and swapped into place at the end, the stamp (converter.txt) last of all.
+// What Theme Park World has no use for is left out and listed in <dataRoot>/assets/tpi/converted.txt: the facilities
+// it does not know, the online files, the speech, the advisor. Everything is written into a staging folder first and
+// swapped into place at the end, the stamp (converter.txt) last of all.
 #include "tpi_convert.h"
 
 #include <algorithm>
@@ -49,6 +53,7 @@
 #include "tpi_names.h"
 #include "tpi_sam.h"
 #include "tpi_sfx.h"
+#include "tpi_terrain.h"
 #include "tpi_wad.h"
 
 namespace fs = std::filesystem;
@@ -614,7 +619,7 @@ struct SfxPatch {
     TpiSfxVolumePatch patch;
 };
 const SfxPatch kSfxPatches[] = {{"science", "cat_ambientsfx.map", {224, 0x64, 0x06}}};
-const char *const kLeftOutFolders[] = {"obstacles", "speech"};
+const char *const kLeftOutFolders[] = {"speech"};
 const char *const kLeftOutFiles[] = {"online_standard.sam", "cem_hoardings.sam", "easymode.tpwi", "advisor.wad"};
 
 // The three items every Theme Park World world has and no Theme Park Inc world does, taken from the donor world in
@@ -1038,7 +1043,9 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
         w.text(name, filtered);
     }
 
-    // The world wads, rebuilt with TGA textures.
+    // The world wads, rebuilt with TGA textures, the terrain's height field repaired with the textures of all of them and
+    // the world's obstacles merged into it (tpi_terrain.h).
+    std::vector<std::pair<std::string, Converted>> wads;
     for (const WorldWad &wad : kWorldWads) {
         const Entry *entry = levels.find(world + "/" + wad.name);
         if (entry == nullptr) {
@@ -1055,8 +1062,98 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
                 if (Extension(m.name) == ".tct" && Dir(m.name).empty() && Lower(Stem(m.name)) != world)
                     m.name = world + ".tct";
         }
-        w.file(wad.name, BuildTpiWad(c.members));
-        log.text << "    wad " << wad.name << " (" << c.members.size() << " files)\n";
+        wads.emplace_back(wad.name, std::move(c));
+    }
+    std::map<std::string, const Bytes *> textures;   // lower-case file name: the first world wad's member of that name
+    std::map<std::string, const Bytes *> shared;     // "textures/<name>" from sharetex.wad, "stexture/<name>" from ssharete.wad
+    for (const auto &wad : wads)
+        for (const auto &m : wad.second.members) {
+            if (Extension(m.name) != ".tga")
+                continue;
+            textures.emplace(Lower(Base(m.name)), &m.data);
+            if (wad.first == "sharetex.wad" || wad.first == "ssharete.wad")
+                shared.emplace(std::string(wad.first == "sharetex.wad" ? "textures/" : "stexture/") + Lower(Base(m.name)),
+                               &m.data);
+        }
+    std::vector<TpiObstacle> obstacles;
+    for (const auto &[rel, entry] : levels.under(world + "/obstacles/")) {
+        if (rel.find('/') != std::string::npos || Extension(rel) != ".wad")
+            continue;
+        std::vector<TpiWadMember> members;
+        std::string err;
+        if (!ReadTpiWad(levels.read(*entry), members, err))
+            Fail(entry->path + ": " + err);
+        TpiObstacle obstacle;
+        obstacle.name = Stem(Base(entry->path));
+        obstacle.members = ConvertMembers(members, nullptr, nullptr, nullptr, "obstacles/" + Base(entry->path), log).members;
+        obstacles.push_back(std::move(obstacle));
+    }
+    for (auto &wad : wads) {
+        if (wad.first != "terrain.wad")
+            continue;
+        bool hasBase = false;
+        for (auto &m : wad.second.members) {
+            if (!Dir(m.name).empty() || Lower(m.name) != "base.md2")
+                continue;
+            hasBase = true;
+            TpiTerrainReport report;
+            std::string err;
+            const bool repaired = RepairTpiTerrain(
+                m.data,
+                [&](const std::string &name) {
+                    auto it = textures.find(Lower(Base(name)));
+                    return it == textures.end() ? nullptr : it->second;
+                },
+                report, err);
+            if (!repaired)
+                Fail(world + "/terrain.wad/" + m.name + ": " + err);
+            log.text << "    terrain " << m.name << ": " << report.madeHidden << " quads with a clear texture hidden";
+            for (const auto &t : report.clearTextures)
+                log.text << " (" << t << ")";
+            log.text << "\n";
+        }
+        if (!hasBase) {
+            if (!obstacles.empty())
+                log.text << "    left out: obstacles/ (terrain.wad has no base.MD2)\n";
+            continue;
+        }
+        TpiObstacleReport report;
+        std::string err;
+        // The shared wads are not changed by the merge, so their members stay where `shared` points.
+        const bool merged = MergeTpiObstacles(
+            wad.second.members, obstacles,
+            [&](const std::string &path) {
+                auto it = shared.find(Lower(path));
+                return it == shared.end() ? nullptr : it->second;
+            },
+            report, err);
+        if (!merged)
+            Fail(world + "/obstacles: " + err);
+        for (const auto &o : report.obstacles) {
+            log.text << "    obstacle " << o.name << ": ";
+            if (!o.skipped.empty()) {
+                log.text << "left out (" << o.skipped << ")\n";
+                continue;
+            }
+            log.text << o.state << ", " << o.nodes << " nodes, " << o.faces << " faces in the terrain; blocked cells: "
+                     << o.blocked << " made hidden, " << o.alreadyHidden << " hidden already, " << o.open << " left open";
+            if (!o.leftOut.empty()) {
+                log.text << "; left out:";
+                for (const auto &n : o.leftOut)
+                    log.text << " \"" << n << "\"";
+            }
+            log.text << "\n";
+        }
+        for (const auto &t : report.renamedTextures)
+            log.text << "    obstacle texture renamed: " << t << "\n";
+        for (const auto &t : report.missingTextures)
+            log.text << "    obstacle texture missing: " << t << "\n";
+        log.text << "    terrain: " << report.addedTextures.size() << " obstacle textures added, " << report.stillClear.size()
+                 << " hidden quads nothing covers\n";
+    }
+    for (const auto &wad : wads) {
+        w.file(wad.first, BuildTpiWad(wad.second.members));
+        log.text << "    wad " << wad.first << " (" << wad.second.members.size() << " files)\n";
     }
 
     // Files copied as they are.

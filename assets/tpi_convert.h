@@ -10,7 +10,7 @@ namespace tpw::assets {
 struct TpiDisc;
 // The converter's version: bumped with every change to what ConvertTpi writes, so the launcher knows worlds converted
 // by an older converter and converts the copy again (launcher/tpi_refresh.h).
-constexpr int kTpiConverterVersion = 11;
+constexpr int kTpiConverterVersion = 12;
 // The stamp ConvertTpi leaves with its worlds: <dataRoot>/assets/tpi/converter.txt, the version number on one line,
 // written last, so content without it is not complete (the mod stays locked: platform/tpi_content.h).
 std::filesystem::path TpiConverterStampPath(const std::filesystem::path &dataRoot);
