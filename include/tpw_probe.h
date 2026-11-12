@@ -48,8 +48,9 @@ enum Counter {
 
 inline uint32_t gCounters[kCount] = {};
 
-// --probe also makes the texture loader say what it loads (one line a file, at set-up):
-// the launcher installs the printer, the translated code only formats the line.
+// --probe also makes the texture loader say what it loads (one line a file, at set-up) and,
+// with the port's fixes, the advisor which line he says (ADV_Call, one line a call): the
+// launcher installs the printer, the translated code only formats the line.
 inline void (*gLog)(const char* text) = nullptr;
 
 inline void Hit(Counter counter, uint32_t n = 1) { gCounters[counter] += n; }
