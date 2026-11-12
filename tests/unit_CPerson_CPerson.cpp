@@ -117,6 +117,7 @@ tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t> CMap::GetCrossingBSSidePos(int32_
     return tag_IDX_TYPE<IDXTYPEUniqueNameMapId, uint16_t>{static_cast<uint16_t>(ret("GetCrossingBSSidePos"))};
 }
 
+
 void CThoughts::RecordEvent(EventType type, tag_IDX_TYPE<IDXTYPEUniqueNameThingId, uint16_t> thing) {
     ev("RecordEvent", {Off(this), static_cast<int32_t>(type), thing.mIndex});
 }

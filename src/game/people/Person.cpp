@@ -29,6 +29,7 @@
 #include "TPEmbed.h"
 #include "TPEngine.h"
 #include "TPGlobals.h"
+#include "TpiGateFlow.h"
 #include "TPSound.h"
 #include "VehicleSteer.h"
 #include "World.h"

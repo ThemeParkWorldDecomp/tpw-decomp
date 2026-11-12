@@ -43,6 +43,7 @@
 #include "TPCoaster.h"
 #include "TPEngine.h"
 #include "TPGlobals.h"
+#include "TpiGateFlow.h"
 #include "TPMain.h"
 #include "UIInterface.h"
 #include "World.h"
