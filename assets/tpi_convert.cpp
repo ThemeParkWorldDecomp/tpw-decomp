@@ -17,7 +17,8 @@
 //    few renamed statements and the lobby settings the mod needs (free entry, tickets);
 //  - the world wads (terrain, sharetex, ssharete, dynamic, queue, miscmesh, hoarding) are rebuilt stored
 //    (tpi_wad.h), the terrain's .tct named after the world;
-//  - sky, 2D map, scape, music and sounds are copied as they are;
+//  - sky, 2D map, scape, music and sounds are copied as they are, but for the few sounds tuned for the PC's 3D sound
+//    whose volume is lowered (kSfxPatches, tpi_sfx.h);
 //  - the worlds' entertainers, costumes and costume heads come out of Theme Park Inc's esprites.wad as loose files
 //    under data/esprites/<world>/ (kSpriteGroups), which the game finds before its own esprites.wad; a world with two
 //    entertainers gets the first again under a new name, as the game takes three.
@@ -47,6 +48,7 @@
 #include "tpi_island.h"
 #include "tpi_names.h"
 #include "tpi_sam.h"
+#include "tpi_sfx.h"
 #include "tpi_wad.h"
 
 namespace fs = std::filesystem;
@@ -600,6 +602,18 @@ struct CopiedFolder {
     const char *out;
 };
 const CopiedFolder kCopiedFolders[] = {{"sky", "sky"}, {"ssky", "ssky"}, {"music", "Music"}, {"sound", "Sound"}};
+// Sounds whose volume Theme Park Inc tuned for the PC's 3D sound (tpi_sfx.h). Land of Invention's gate crackle (event
+// 224 of Sound/cat_ambientSFX.map: a sentence of the samples gatel000 to gatel008 chained without end, started once by
+// the gate's script, Gates.RSE, and never stopped) is a loop at volume 100 of 127 that the PC's DirectSound3D faded
+// from its full level at 2 units to about 6% at the distance the park opens at (rolloff 63 * 2 / (100 - 2), about 28
+// units out); the port has no distance fade, so it played at 100 anywhere within its 100 units of the gate. Volume 6 is
+// the PC's level at that distance and the level of Theme Park Inc's other endless ambient loops (1 to 10).
+struct SfxPatch {
+    const char *world;
+    const char *file;   // in Sound/, any case
+    TpiSfxVolumePatch patch;
+};
+const SfxPatch kSfxPatches[] = {{"science", "cat_ambientsfx.map", {224, 0x64, 0x06}}};
 const char *const kLeftOutFolders[] = {"obstacles", "speech"};
 const char *const kLeftOutFiles[] = {"online_standard.sam", "cem_hoardings.sam", "easymode.tpwi", "advisor.wad"};
 
@@ -1057,7 +1071,18 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
     for (const CopiedFolder &folder : kCopiedFolders) {
         int count = 0;
         for (const auto &[rel, entry] : levels.under(world + "/" + folder.tpi + "/")) {
-            w.file(std::string(folder.out) + "/" + entry->path.substr(entry->path.size() - rel.size()), levels.read(*entry));
+            const std::string out = std::string(folder.out) + "/" + entry->path.substr(entry->path.size() - rel.size());
+            Bytes bytes = levels.read(*entry);
+            for (const SfxPatch &p : kSfxPatches)
+                if (world == p.world && Lower(out) == std::string("sound/") + p.file) {
+                    std::string reason;
+                    if (PatchTpiSfxVolume(bytes, p.patch, reason))
+                        log.text << "    " << out << ": event " << p.patch.event << " volume " << int(p.patch.fromVolume)
+                                 << " to " << int(p.patch.toVolume) << "\n";
+                    else
+                        log.text << "    " << out << ": event " << p.patch.event << " left as it is: " << reason << "\n";
+                }
+            w.file(out, bytes);
             ++count;
         }
         if (count)

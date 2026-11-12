@@ -1,4 +1,5 @@
-// Host tests of the Theme Park Inc converter (assets/tpi_convert.h and its helpers tpi_wad.h, tpi_fsh.h, tpi_sam.h).
+// Host tests of the Theme Park Inc converter (assets/tpi_convert.h and its helpers tpi_wad.h, tpi_fsh.h, tpi_sam.h,
+// tpi_sfx.h).
 // Every fixture is built here, in code: a wad, a SHPI texture, .sam texts with a made-up description table, and a small
 // Data tree with three worlds; no game data. With TPW_TPI_DATA (a folder holding a Theme Park Inc Data folder),
 // TPW_TPI_TABLES (a folder of <file>.bin description tables, 0x3c bytes a row), TPW_TPW_ASSETS (the assets/ folder of
@@ -24,6 +25,7 @@
 #include "../tpi_fsh.h"
 #include "../tpi_island_md2.h"
 #include "../tpi_sam.h"
+#include "../tpi_sfx.h"
 #include "../tpi_wad.h"
 
 using namespace tpw::assets;
@@ -565,6 +567,119 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     WriteFile(w / "sideshow" / "hoopla" / "textures" / "h.fsh", fsh);
 }
 
+// ---- sound event maps
+
+// A sound of a made-up map: `samples` samples, `branches` branches, the volume bytes, the rest made up.
+struct SfxSound {
+    uint32_t samples;
+    uint32_t branches;
+    uint8_t volMin, volMax;
+};
+struct SfxEvent {
+    uint32_t id;
+    std::vector<SfxSound> sounds;
+};
+// A map in the layout tpi_sfx.h describes (version 1, as Theme Park Inc's): the categories, then their events, then the
+// events' sounds, then each sound's samples and branches.
+Bytes SfxMap(const std::vector<std::vector<SfxEvent>>& categories) {
+    Bytes d(28, 0);
+    for (int i = 0; i < 16; ++i) d[i] = static_cast<uint8_t>(0xa0 + i);
+    Put32(d, 16, 1);
+    Put32(d, 24, static_cast<uint32_t>(categories.size()));
+    auto add = [&d](size_t n) { d.resize(d.size() + n, 0); return d.size() - n; };
+    for (const auto& events : categories) {
+        const size_t c = add(24);
+        Put32(d, c, static_cast<uint32_t>(events.size()));
+        d[c + 10] = 0x7f;
+    }
+    for (const auto& events : categories) {
+        for (const SfxEvent& e : events) {
+            const size_t at = add(20);
+            Put32(d, at, e.id);
+            Put32(d, at + 4, static_cast<uint32_t>(e.sounds.size()));
+            Put32(d, at + 12, 4500);
+            d[at + 16] = 6;
+        }
+        for (const SfxEvent& e : events) {
+            for (const SfxSound& s : e.sounds) {
+                const size_t at = add(42);
+                Put32(d, at, 0x10000 | s.samples);   // high bits are not part of the count
+                Put32(d, at + 4, s.branches);
+                d[at + 12] = s.volMin;
+                d[at + 13] = s.volMax;
+                d[at + 16] = 0x33;
+                Put32(d, at + 30, 65535);
+            }
+            for (const SfxSound& s : e.sounds) {
+                for (uint32_t i = 0; i < s.samples; ++i) {
+                    const size_t at = add(16);
+                    Put32(d, at, 489 + i);
+                    d[at + 12] = 10;
+                }
+                for (uint32_t i = 0; i < s.branches; ++i) Put32(d, add(8), i);
+            }
+        }
+    }
+    return d;
+}
+
+void TestSfxPatch() {
+    const std::vector<std::vector<SfxEvent>> layout = {
+        {{114, {{3, 1, 0x05, 0x05}}}, {224, {{9, 0, 0x64, 0x64}, {2, 2, 0x64, 0x64}}}},
+        {},
+        {{225, {{1, 0, 0x64, 0x64}}}, {226, {}}}};
+    const Bytes original = SfxMap(layout);
+    const TpiSfxVolumePatch patch{224, 0x64, 0x06};
+    std::string reason;
+    // The event's sounds, and only their two volume bytes, change.
+    Bytes map = original;
+    CHECK(PatchTpiSfxVolume(map, patch, reason));
+    CHECK(reason.empty());
+    std::vector<std::vector<SfxEvent>> want = layout;
+    for (SfxSound& s : want[0][1].sounds) s.volMin = s.volMax = 0x06;
+    CHECK(map == SfxMap(want));
+    size_t changed = 0;
+    for (size_t i = 0; i < map.size(); ++i) changed += map[i] != original[i];
+    CHECK(changed == 4);
+    // A second run finds the new volumes, not the expected ones, and leaves the map alone.
+    const Bytes once = map;
+    CHECK(!PatchTpiSfxVolume(map, patch, reason) && reason.find("volumes 6..6") != std::string::npos && map == once);
+    // An event that is not there, or has no sounds.
+    map = original;
+    CHECK(!PatchTpiSfxVolume(map, {999, 0x64, 0x06}, reason) && reason.find("not in the map") != std::string::npos);
+    CHECK(!PatchTpiSfxVolume(map, {226, 0x64, 0x06}, reason) && reason.find("no sounds") != std::string::npos);
+    CHECK(map == original);
+    // A copy whose volumes differ in one sound (or in one of the two bytes) is left whole.
+    std::vector<std::vector<SfxEvent>> other = layout;
+    other[0][1].sounds[1].volMax = 0x50;
+    map = SfxMap(other);
+    CHECK(!PatchTpiSfxVolume(map, patch, reason) && map == SfxMap(other));
+    // An event listed twice is not guessed at.
+    std::vector<std::vector<SfxEvent>> twice = layout;
+    twice[1].push_back({224, {{1, 0, 0x64, 0x64}}});
+    map = SfxMap(twice);
+    CHECK(!PatchTpiSfxVolume(map, patch, reason) && reason.find("2 times") != std::string::npos && map == SfxMap(twice));
+    // Every cut of the map, and a map with bytes after its end, fails cleanly and changes nothing.
+    for (size_t n = 0; n < original.size(); ++n) {
+        Bytes cut(original.begin(), original.begin() + static_cast<std::ptrdiff_t>(n));
+        const Bytes before = cut;
+        CHECK(!PatchTpiSfxVolume(cut, patch, reason) && cut == before);
+    }
+    map = original;
+    map.push_back(0);
+    CHECK(!PatchTpiSfxVolume(map, patch, reason) && reason.find("1 bytes follow") != std::string::npos);
+    // Counts too large for the file are refused, not wrapped: a category count, a sound count, a sample count.
+    map = original;
+    Put32(map, 24, 0xffffffffu);
+    CHECK(!PatchTpiSfxVolume(map, patch, reason));
+    map = original;
+    Put32(map, 28 + 3 * 24 + 4, 0x40000000u);   // the first event's sound count
+    CHECK(!PatchTpiSfxVolume(map, patch, reason));
+    map = original;
+    Put32(map, 28 + 3 * 24 + 2 * 20, 0xffffu);   // the first sound's sample count
+    CHECK(!PatchTpiSfxVolume(map, patch, reason));
+}
+
 void RegisterTestTables() {
     const std::vector<SamRow> main = {Row(0, ""), Row(5, "HeightfieldWidth"), Row(1, "MapInfo"), Row(0, ""),
                                       Row(5, "TicketBoothAPosX"), Row(5, "TicketBoothBPosY"), Row(1, "FixedItemInfo"), Row(12, "")};
@@ -641,6 +756,12 @@ void TestConvertTree(const fs::path& scratch) {
     MakeWorld(levels, "water", "polar.tct");
     MakeWorld(levels, "science", "science.tct");
     WriteFile(levels / "Standard.sam", B("MapInfo.HeightfieldWidth 1\n"));
+    // Land of Invention's ambient map with the gate's loop at volume 100 (lowered: tpi_convert.cpp kSfxPatches), the
+    // same map in Polar Zone (left as it is), and another of Invention's maps (copied as it is).
+    const Bytes ambient = SfxMap({{{114, {{3, 0, 0x05, 0x05}}}, {224, {{9, 0, 0x64, 0x64}}}}});
+    WriteFile(levels / "science" / "sound" / "cat_ambientSFX.map", ambient);
+    WriteFile(levels / "science" / "sound" / "cat_ridesSFX.map", ambient);
+    WriteFile(levels / "water" / "sound" / "cat_ambientSFX.map", ambient);
     RegisterTestTables();
     MakeDonorItems(dataRoot, "eur");
     // A second edition with the donor items spelt differently; the first game folder that has them is used.
@@ -787,6 +908,10 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK_EQ_STR(S(ReadFile(a / "ssky" / "sky.tga")), "ssky");
     CHECK_EQ_STR(S(ReadFile(a / "Music" / "MusicHD.sdt")), "m");
     CHECK_EQ_STR(S(ReadFile(a / "hoardings.map")), "hm");
+    CHECK(ReadFile(out / "science" / "Sound" / "cat_ambientSFX.map") ==
+          SfxMap({{{114, {{3, 0, 0x05, 0x05}}}, {224, {{9, 0, 0x06, 0x06}}}}}));
+    CHECK(ReadFile(out / "science" / "Sound" / "cat_ridesSFX.map") == ambient);
+    CHECK(ReadFile(out / "water" / "Sound" / "cat_ambientSFX.map") == ambient);
     // The world's .sam files.
     const std::string standard = S(ReadFile(a / "Standard.sam"));
     CHECK_EQ_STR(standard, "MapInfo.HeightfieldWidth 96\nFixedItemInfo.TicketBoothAPosX 40\nFixedItemInfo.TicketBoothBPosY 41\n");
@@ -806,6 +931,8 @@ void TestConvertTree(const fs::path& scratch) {
     // The record and the stamp; staging gone.
     const std::string record = S(ReadFile(dataRoot / "assets" / "tpi" / "converted.txt"));
     CHECK(record.find("world arabian:") != std::string::npos);
+    CHECK(record.find("Sound/cat_ambientSFX.map: event 224 volume 100 to 6\n") != std::string::npos);
+    CHECK(record.find("left as it is") == std::string::npos);
     CHECK(record.find("left out: obstacles/") != std::string::npos);
     CHECK(record.find("left out: facilities/info") != std::string::npos);
     CHECK(record.find("features/noid") != std::string::npos);
@@ -1188,6 +1315,7 @@ int main() {
     TestWadRoundTrip();
     TestFsh();
     TestSamFilter();
+    TestSfxPatch();
     std::string scratch = Env("TPW_TEST_SCRATCH");
 #ifdef TPW_TEST_BUILD_SCRATCH
     if (scratch.empty()) scratch = TPW_TEST_BUILD_SCRATCH;
