@@ -2,9 +2,9 @@
 // Data/levels/<world>/ in the same shape as Theme Park World's (the item folders hold one .wad per ride, shop,
 // sideshow, feature or upgrade; the terrain, shared textures, queues, hoardings and advisor are wads too), so the
 // converter walks that tree and writes a Theme Park World world from it:
-//  - textures: Theme Park Inc's .fsh become 32-bit TGAs with the same stem (tpi_fsh.h), inside wads and items alike,
-//    and the qickload.txt lists are rewritten to name them and only what their own folder holds; 8-bit grey TGAs
-//    become 32-bit ones too;
+//  - textures: Theme Park Inc's .fsh become TGAs with the same stem (tpi_fsh.h; 24-bit when every texel is opaque,
+//    32-bit otherwise), inside wads and items alike, and the qickload.txt lists are rewritten to name them and only
+//    what their own folder holds; 8-bit grey TGAs become 24-bit ones too;
 //  - items: each .wad is written as an unpacked folder (the game reads both) whose .sam keeps only the statements
 //    Theme Park World's ride table has (tpi_sam.h); its Info.Id is moved into the world's own block of ids so it never
 //    collides with a Theme Park World item, and every reference to it follows; rides lose their price per use, as
@@ -225,7 +225,8 @@ struct Converted {
     std::vector<TpiWadMember> members;
 };
 
-// Textures and texture lists: .fsh to .tga, a .tga beside a .fsh of the same stem dropped, qickload.txt rewritten.
+// Textures and texture lists: .fsh to .tga (24-bit when opaque, OpaqueTgaTo24), a .tga beside a .fsh of the same stem
+// dropped, qickload.txt rewritten.
 // An uncompressed 8-bit grey TGA (image type 3; TPI's heli has nine) as the 32-bit true colour TGA the game's texture
 // loader takes (TextureLoadManager.cpp: type 2 only): each grey level becomes B = G = R, alpha 255, the origin kept.
 // False when `in` is not such a TGA.
@@ -246,6 +247,33 @@ bool GreyTgaToTrueColour(const Bytes &in, Bytes &out) {
         out.insert(out.end(), {grey, grey, grey, 255});
     }
     return true;
+}
+
+// A 32-bit true colour TGA whose every alpha is 255 as a 24-bit one (the alpha bits dropped, the origin kept), so it
+// loads as Theme Park World's own opaque textures do, with no alpha (ps1_convert.cpp writes its opaque ones the same
+// way). The game's loader marks every 4-byte texel
+// texture as having alpha (TextureLoadManager.cpp UncompressedConvert: load flag 1, entry flag 0x100), and
+// TextureEntry.cpp GetBlendingMode then draws it alpha tested and blended (0x2756) rather than opaque (0x1256). Science's
+// road outside the gate (terrain.wad textures/cobbles03, every alpha 255) drawn that way left the guests walking on it
+// with a cyan edge and no shadow (0.5.1). Unchanged when `tga` is not such a TGA.
+void OpaqueTgaTo24(Bytes &tga) {
+    if (tga.size() < 18 || tga[1] != 0 || tga[2] != 2 || tga[16] != 32)
+        return;
+    const size_t width = tga[12] | tga[13] << 8, height = tga[14] | tga[15] << 8, start = 18 + size_t(tga[0]);
+    const size_t end = start + width * height * 4;
+    if (tga.size() < end)
+        return;
+    for (size_t i = start + 3; i < end; i += 4)
+        if (tga[i] != 255)
+            return;
+    Bytes out(tga.begin(), tga.begin() + static_cast<ptrdiff_t>(start));
+    out[16] = 24;
+    out[17] = static_cast<uint8_t>(tga[17] & 0x30);
+    out.reserve(tga.size() - width * height);
+    for (size_t i = start; i < end; i += 4)
+        out.insert(out.end(), {tga[i], tga[i + 1], tga[i + 2]});
+    out.insert(out.end(), tga.begin() + static_cast<ptrdiff_t>(end), tga.end());
+    tga = std::move(out);
 }
 
 // Sam files: filtered through `samTable` with `samOptions` when the member's extension is .sam (nullptr: copied).
@@ -272,11 +300,13 @@ Converted ConvertMembers(const std::vector<TpiWadMember> &in, const std::vector<
                 log.text << "    texture not converted: " << what << "/" << m.name << ": " << err << "\n";
                 continue;
             }
+            OpaqueTgaTo24(t.data);
             log.texturesConverted++;
             out.members.push_back(std::move(t));
         } else if (ext == ".tga" && fshStems.count(Lower(Stem(m.name)))) {
             log.text << "    texture left out: " << what << "/" << m.name << " (a .fsh of the same name wins)\n";
         } else if (TpiWadMember t{m.name, {}}; ext == ".tga" && GreyTgaToTrueColour(m.data, t.data)) {
+            OpaqueTgaTo24(t.data);
             log.texturesConverted++;
             out.members.push_back(std::move(t));
         } else if (Lower(base) == "qickload.txt") {

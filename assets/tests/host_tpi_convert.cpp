@@ -482,6 +482,9 @@ Bytes ReadFile(const fs::path& path) {
 // An uncompressed 8-bit grey TGA, 2 by 1, levels 10 and 200, top-left origin, with a one-byte id field.
 const Bytes kGreyTga = {1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 8, 0x20, 'i', 10, 200};
 
+// A 2 by 2 texture whose every texel is opaque (a 0x24 palette: R, G, B): it is written as a 24-bit TGA.
+const Bytes kOpaqueFsh = MakeFsh(2, 2, {0, 3, 3, 0}, 0x24, kPalette, false);
+
 Bytes Item(const std::string& name, int32_t id, const std::string& extra = "", const Bytes& mesh = B("mesh")) {
     const Bytes fsh = MakeFsh(2, 2, {0, 1, 2, 3}, 0x2a, kPalette, true);
     return BuildTpiWad({{name + ".sam", B("Info.Id\t" + std::to_string(id) + "\nInfo.Name\t\"" + name + "\"\nInfo.WorkingLife 3\n" + extra)},
@@ -524,7 +527,8 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     WriteFile(w / "Online_Standard.sam", B("Online.X 1\n"));
     const Bytes fsh = MakeFsh(2, 2, {3, 2, 1, 0}, 0x24, kPalette, false);
     WriteFile(w / "terrain.wad", BuildTpiWad({{tct, B("tct")}, {"base.map", B("map")}, {"qickload.txt", B("pathtex\\p.fsh\n")},
-                                              {"pathtex/p.fsh", fsh}, {"pathtex/q.fsh", fsh}}));
+                                              {"pathtex/p.fsh", MakeFsh(2, 2, {0, 1, 2, 3}, 0x2a, kPalette, false)},
+                                              {"pathtex/q.fsh", kOpaqueFsh}}));
     WriteFile(w / "Sharetex.wad", BuildTpiWad({{"black.tga", B("tga")}, {"s.fsh", fsh}}));
     WriteFile(w / "Queue.wad", BuildTpiWad({{"que.hmp", B("h")}}));
     // Theme Park Inc's advisor, left out: the donor world's Theme Park World advisor is copied instead.
@@ -744,9 +748,9 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(!fs::exists(a / "rides" / "carpet" / "textures" / "blink.ifl"));
     CHECK(!fs::exists(a / "rides" / "carpet" / "textures" / "carpetm.MD2"));
     CHECK(fs::exists(a / "rides" / "carpet" / "stexture" / "carpett.tga"));
-    // An 8-bit grey TGA becomes a 32-bit one: B = G = R, alpha 255, the top-left origin kept, the id field gone.
+    // An 8-bit grey TGA becomes a 24-bit one (it is opaque): B = G = R, the top-left origin kept, the id field gone.
     const Bytes grey = ReadFile(a / "rides" / "carpet" / "stexture" / "grey.tga");
-    const Bytes greyWant = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 32, 0x28, 10, 10, 10, 255, 200, 200, 200, 255};
+    const Bytes greyWant = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 24, 0x20, 10, 10, 10, 200, 200, 200};
     CHECK(grey == greyWant);
     CHECK(fs::exists(a / "sideshow" / "hoopla" / "textures" / "h.tga"));
     // World wads: rebuilt, textures converted, the terrain's .tct named after the world.
@@ -756,6 +760,22 @@ void TestConvertTree(const fs::path& scratch) {
     for (const auto& m : members) names += m.name + ";";
     CHECK_EQ_STR(names, "Arabian.tct;base.map;qickload.txt;pathtex/p.tga;pathtex/q.tga;");
     CHECK_EQ_STR(S(members[2].data), "pathtex\\p.tga\n");
+    // A texture with see-through texels stays 32-bit; an opaque one becomes 24-bit, the same texels without their alpha
+    // (the game's loader takes every 4-byte texel texture as one with alpha, TextureLoadManager.cpp UncompressedConvert).
+    if (members.size() == 5) {
+        CHECK(members[3].data.size() == 18 + 16 && members[3].data[16] == 32 && members[3].data[17] == 8);
+        Bytes opaque;
+        CHECK(TpiFshToTga(kOpaqueFsh, opaque, err) && opaque.size() == 18 + 16 && opaque[16] == 32);
+        Bytes want(opaque.begin(), opaque.begin() + 18);
+        want[16] = 24;
+        want[17] = 0;
+        for (size_t i = 18; i + 3 < opaque.size(); i += 4) {
+            CHECK(opaque[i + 3] == 255);
+            want.insert(want.end(), {opaque[i], opaque[i + 1], opaque[i + 2]});
+        }
+        CHECK(members[4].data == want);
+        CHECK(want.size() == 18 + 12 && want[18] == 100 && want[21] == 10);
+    }
     CHECK(ReadTpiWad(ReadFile(out / "water" / "terrain.wad"), members, err));
     CHECK(!members.empty() && members[0].name == "water.tct");
     CHECK(ReadTpiWad(ReadFile(a / "sharetex.wad"), members, err) && members.size() == 2 && members[1].name == "s.tga");
