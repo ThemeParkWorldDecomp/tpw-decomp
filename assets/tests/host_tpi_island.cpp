@@ -1,5 +1,6 @@
 // Host test of the Theme Park Inc island builder (assets/tpi_island.h, tpi_island_md2.h): synthetic meshes, textures
 // and wads built here, no game data. Runs alone and repeatedly.
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -203,8 +204,8 @@ std::vector<uint8_t> PieceWad(const std::string& piece, const Md2Model& model, c
 }
 
 // The synthetic copy: three zones with a gate, a landmark and one scenery piece each, a terrain.wad with the ground
-// textures and a Sharetex.wad with one shared texture.
-std::shared_ptr<MemorySource> MakeCopy(const std::string& root) {
+// textures and a Sharetex.wad with one shared texture. The landmark is `landmarkWidth` wide before scaling.
+std::shared_ptr<MemorySource> MakeCopy(const std::string& root, float landmarkWidth = 20) {
     auto src = std::make_shared<MemorySource>();
     const char* zones[3] = {"Arabian", "water", "SCIENCE"};
     const char* landmarks[3] = {"kingtut", "yeti", "tesla"};
@@ -235,7 +236,7 @@ std::shared_ptr<MemorySource> MakeCopy(const std::string& root) {
         // kingtut's, and a node of its own, as the tesla's "sign"), a shared texture, and an animating texture whose
         // last name is the group's name (no file of that name exists or gets written); and, as the tesla has, an
         // animating group named sign1/sign2 that is a picture of its own, not a sign.
-        Md2Model landmark = FirstSetLast(MakePiece(landmarks[z], 20, 40, 15, {"body.tga", "sign1.tga", "Sign2.TGA"}));
+        Md2Model landmark = FirstSetLast(MakePiece(landmarks[z], landmarkWidth, 40, 15, {"body.tga", "sign1.tga", "Sign2.TGA"}));
         NodeBuilder board;
         board.Box(Vec3{-5, 20, -7.5f}, Vec3{5, 26, -7.0f}, 4.0f, 2);
         Md2Node boardNode = board.Build("sign");
@@ -438,7 +439,8 @@ void TestBuild() {
         // The landmark stands this tall on the slab top (9) and the scenery too.
         std::array<float, 6> box{};
         CHECK(GeometryBox(isle, box));
-        CHECK(std::fabs(box[4] - (9.0f + (w == 2 ? 24.0f : 22.0f))) < 0.05f);
+        const float tall = 9.0f + (w == 2 ? 24.0f : 22.0f);
+        CHECK(box[4] > tall + 0.03f && box[4] < tall + 0.2f);   // lifted off the top a little (TestGroundLayers)
         CHECK(box[1] < 2.5f && box[1] > 1.5f);
         CHECK(box[0] < -22.0f && box[3] > 22.0f && box[2] < -38.0f && box[5] > 18.0f);   // the slab, waved coast included
         // The gate: at least 7 wide and 6 tall, standing on the top at z -14, root matrix identity, scaled shapes, sign textures kept.
@@ -500,12 +502,83 @@ void TestBuild() {
 
 }  // namespace
 
+// Bug H8: a piece's own ground (its lowest faces: every fixture piece is a box, so its bottom) must lie neither in the
+// slab top's plane nor in the plane of another piece's ground it overlaps, or the depth test picks a different face each
+// frame and the ground flashes. A landmark 200 wide (110 after scaling to 22 tall) overlaps every scenery piece.
+struct FlatFace {
+    int piece;   // the node under the slab root it belongs to (the slab itself: 0)
+    float y, x0, z0, x1, z1;
+};
+
+std::vector<FlatFace> FlatFaces(const Md2Model& isle) {
+    const std::vector<Matrix> world = WorldMatrices(isle);
+    std::vector<FlatFace> out;
+    for (size_t i = 0; i < isle.nodes.size(); ++i) {
+        const Md2Node& n = isle.nodes[i];
+        if (n.mini) continue;
+        int piece = static_cast<int>(i);
+        while (piece > 0 && isle.nodes[static_cast<size_t>(piece)].parent > 0) piece = isle.nodes[static_cast<size_t>(piece)].parent;
+        const Matrix w = i == 0 ? IdentityMatrix() : world[i];
+        for (const Md2Face& f : n.faces) {
+            Vec3 p[3];
+            for (int c = 0; c < 3; ++c) p[c] = Transform(n.vertices[n.cornerVertex[f.corner[c]]], w);
+            const float y0 = std::min({p[0].y, p[1].y, p[2].y}), y1 = std::max({p[0].y, p[1].y, p[2].y});
+            if (y1 - y0 > 1e-3f) continue;
+            out.push_back({piece, (y0 + y1) / 2, std::min({p[0].x, p[1].x, p[2].x}), std::min({p[0].z, p[1].z, p[2].z}),
+                           std::max({p[0].x, p[1].x, p[2].x}), std::max({p[0].z, p[1].z, p[2].z})});
+        }
+    }
+    return out;
+}
+
+bool Overlap(const FlatFace& a, const FlatFace& b) {
+    return a.x0 < b.x1 - 1e-3f && b.x0 < a.x1 - 1e-3f && a.z0 < b.z1 - 1e-3f && b.z0 < a.z1 - 1e-3f;
+}
+
+void TestGroundLayers() {
+    const std::string root = "Game/";
+    TpiDisc disc;
+    disc.source = MakeCopy(root, 200);
+    disc.root = root;
+    TpiIslandFiles out;
+    std::string reason, err;
+    CHECK(BuildTpiIslandFiles(disc, out, reason));
+    // One depth step of the lobby's 24-bit buffer (near plane 0.1) where the fog ends (250): no two grounds closer.
+    const float step = 250.0f * 250.0f / (0.1f * 16777216.0f);
+    for (const char* name : {"data/lobby/arabian/ara_isle.md2", "data/lobby/water/pol_isle.md2", "data/lobby/science/inv_isle.md2"}) {
+        Md2Model isle;
+        CHECK(ReadMd2(File(out, name), isle, err));
+        const std::vector<FlatFace> flat = FlatFaces(isle);
+        int bottoms = 0, overlapping = 0, fights = 0, onTop = 0;
+        for (const FlatFace& a : flat) {
+            if (a.piece == 0) continue;
+            if (std::fabs(a.y - 9.0f) < 0.02f) ++onTop;
+            if (a.y > 9.0f + 0.5f) continue;   // a piece's ground is its lowest faces, not its roof
+            ++bottoms;
+            for (const FlatFace& b : flat)
+                if (b.piece != a.piece && Overlap(a, b)) {
+                    ++overlapping;   // the fixture does make grounds overlap (a slab face, or another piece's bottom)
+                    if (std::fabs(a.y - b.y) < step) ++fights;
+                }
+        }
+        CHECK(bottoms > 0 && overlapping > 0);
+        CHECK(onTop == 0);
+        CHECK(fights == 0);
+        if (fights || onTop) std::printf("%s: %d faces on the top, %d overlapping pairs within %.3f\n", name, onTop, fights, static_cast<double>(step));
+    }
+    // The pieces overlapping the wide landmark stand one more step up than it does.
+    bool stepped = false;
+    for (const std::string& line : out.log) stepped = stepped || line.find(", 9.12, ") != std::string::npos;
+    CHECK(stepped);
+}
+
 int main() {
     TestMatrices();
     TestRoundTrip();
     TestAttachAndScale();
     TestChannelOrder();
     TestBuild();
+    TestGroundLayers();
     std::printf("tpi_island: %d checks passed, %d failed\n", g_pass, g_fail);
     return g_fail == 0 ? 0 : 1;
 }

@@ -31,6 +31,15 @@ constexpr float kTop = 9.0f, kLedge = 5.5f, kFoot = 2.0f, kCentreZ = -9.0f, kHal
 constexpr int kSegments = 16;
 // The gate stands at the front, at least this wide and this tall (the originals' gates are 5 to 6 units each way).
 constexpr float kGateWidth = 7.0f, kGateHeight = 6.0f, kGateZ = -14.0f;
+// Each piece stands this far above the slab top, and this far again above each earlier piece its footprint overlaps
+// (TPW_MOD_HOOK tpi_islands, PlacePiece). Theme Park Inc's pieces carry their own ground tiles at their lowest point
+// (the yeti's base4x5, the fir tree's snow square, the fountain's base), so a piece set right on the top lays them in
+// the slab's own plane, and two overlapping pieces in each other's: the depth test then picks a different face each
+// frame and the ground flashes (bug H8). The originals' islands never stack ground: their tiles lie side by side in
+// one plane. The lobby's projection has its near plane at 0.1 (LBLobbyView.cpp) and a 24-bit depth buffer, so one
+// depth step is about d * d / (0.1 * 2^24) units at distance d: 0.003 at the camera's orbit (70), 0.037 where the fog
+// ends (250). 0.06 clears that everywhere the island can be seen and is too small to see as a gap.
+constexpr float kGroundLift = 0.06f;
 
 struct Pick {
     const char* piece;   // the wad's name under features/ or rides/ (case does not matter); nullptr ends a list
@@ -138,6 +147,12 @@ struct Zone {
     // Stem (lower case, as the meshes will name it) to the bytes found for it (nullptr: not found).
     std::map<std::string, const std::vector<uint8_t>*> resolved;
     std::vector<std::string>* log = nullptr;
+    // The pieces placed so far: footprint (x0, z0, x1, z1) and how many kGroundLift steps above the slab top.
+    struct Footprint {
+        float x0, z0, x1, z1;
+        int layer;
+    };
+    std::vector<Footprint> placed;
 
     void Log(const std::string& line) const { log->push_back(std::string(recipe->world) + ": " + line); }
 
@@ -408,8 +423,21 @@ bool PlacePiece(Zone& zone, Md2Model& isle, const Pick& pick) {
     BakeScale(piece, s);
     GeometryBox(piece, box);
     const float cx = (box[0] + box[3]) / 2, cz = (box[2] + box[5]) / 2;
-    const Matrix placement = Multiply(Multiply(Translation(-cx, -box[1], -cz), RotationY(pick.facing * kPi / 180.0f)),
-                                      Translation(pick.x, kTop, pick.z));
+    const Matrix turn = Multiply(Translation(-cx, -box[1], -cz), RotationY(pick.facing * kPi / 180.0f));
+    // Its footprint on the slab, and the lowest layer above every earlier piece it overlaps (kGroundLift).
+    Zone::Footprint foot{1e30f, 1e30f, -1e30f, -1e30f, 1};
+    for (float x : {box[0], box[3]})
+        for (float z : {box[2], box[5]}) {
+            const Vec3 p = Transform(Vec3{x, 0, z}, turn);
+            foot.x0 = std::min(foot.x0, pick.x + p.x);
+            foot.x1 = std::max(foot.x1, pick.x + p.x);
+            foot.z0 = std::min(foot.z0, pick.z + p.z);
+            foot.z1 = std::max(foot.z1, pick.z + p.z);
+        }
+    for (const Zone::Footprint& f : zone.placed)
+        if (f.x0 < foot.x1 && foot.x0 < f.x1 && f.z0 < foot.z1 && foot.z0 < f.z1) foot.layer = std::max(foot.layer, f.layer + 1);
+    const float y = kTop + kGroundLift * static_cast<float>(foot.layer);
+    const Matrix placement = Multiply(turn, Translation(pick.x, y, pick.z));
     TextureLayers own;
     own.AddWad(*members);
     DropSignBoards(piece);
@@ -418,9 +446,10 @@ bool PlacePiece(Zone& zone, Md2Model& isle, const Pick& pick) {
         zone.Log("piece " + pieceLower + ": " + err + ", left out");
         return false;
     }
+    zone.placed.push_back(foot);
     char line[160];
-    std::snprintf(line, sizeof line, "%s placed at (%.0f, %.0f, %.0f), scale %.3f, %zu nodes, %zu textures", pieceLower.c_str(),
-                  static_cast<double>(pick.x), static_cast<double>(kTop), static_cast<double>(pick.z), static_cast<double>(s),
+    std::snprintf(line, sizeof line, "%s placed at (%.0f, %.2f, %.0f), scale %.3f, %zu nodes, %zu textures", pieceLower.c_str(),
+                  static_cast<double>(pick.x), static_cast<double>(y), static_cast<double>(pick.z), static_cast<double>(s),
                   piece.nodes.size(), piece.textures.size());
     zone.Log(line);
     zone.keep.push_back(std::move(keep));   // zone.resolved points into the members
