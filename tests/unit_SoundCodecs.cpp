@@ -573,6 +573,11 @@ enum Op {
 
 int32_t tpw_sc_op_count() { return OP_COUNT; }
 
+// 1 when the unit is built with the port's fixes (the WAV file codec's wavfileseek, src/sound/TbSoundSampleWAVFile.cpp).
+int32_t tpw_sc_portfix() {
+    return 0;
+}
+
 // A slot whose node was freed (it has no label, or it went to the pool) is emptied after every operation.
 static void Sweep() {
     for (int i = 0; i < kSlots; ++i) {

@@ -47,6 +47,7 @@ int32_t Sub32(int32_t a, int32_t b) {
     return static_cast<int32_t>(static_cast<uint32_t>(a) - static_cast<uint32_t>(b));
 }
 
+
 }  // namespace
 
 void _TbSoundSampleCallback::ClearCache() { PoolClearCache<SampleCallbackPool>(); }

@@ -1234,6 +1234,40 @@ def stores_host(lib, c):
     return dict(wav=WAV_VT, file=FILE_VT, loop=LOOP_VT, timer=TIMER_VT)
 
 
+def port_fix(lib):
+    if not hasattr(lib, "port_fix"):
+        lib.tpw_sc_portfix.restype, lib.tpw_sc_portfix.argtypes = C.c_int32, []
+        lib.port_fix = lib.tpw_sc_portfix() == 1
+    return lib.port_fix
+
+
+def has_file_codec(c):
+    return any(o[0] == OP_NEW and o[2] == K_FILE for o in c["ops"])
+
+
+class FileCodecTest(FnTest):
+    """FnTest, with the port's WAV file codec when the unit is built with the port's fixes (wavfileseek, the GetDataChunk
+    comment in src/sound/TbSoundSampleWAVFile.cpp): the codec counts the bytes it has asked for and moves the file back to the
+    start + that count when it finds it elsewhere, and its count is never negative. Where the file is where the codec left it
+    the two sides agree and the case is compared as usual; a case with a WAV file codec whose sides differ has no PowerPC side
+    to compare with, and is checked instead for what the fix promises: every read of the host's codecs asks for 0 to 0x1000
+    bytes (the Mac's asks for a negative count when the file is past the sample). tests/host_sound_wavfile.cpp checks the
+    fixed codec's bytes."""
+
+    def run_case(self, runner, c):
+        out = FnTest.run_case(self, runner, c)
+        if not out or not port_fix(runner.lib) or not has_file_codec(c):
+            return out
+        bad = []
+        for index, step in enumerate(self.host(runner.lib, c)["steps"]):
+            for name, ints, _ in step["log"]:
+                if name == "File.Read" and not 0 <= ints[0] <= BUF_BYTES:
+                    bad.append("steps.%d: the port's codec read %d bytes" % (index, ints[0]))
+                if name == "OVERFLOW":
+                    bad.append("steps.%d: %s" % (index, name))
+        return bad
+
+
 TESTS = [
     FnTest("pools: operator new, operator delete, TopUp, SetLevel and ClearCache of the four classes "
            "(0x10010ec4 0x10010f90 0x10011034 0x10011114 0x10010e34, 0x100115c8 0x10011698 0x10011740 0x10011824 0x10011534, "
@@ -1243,12 +1277,12 @@ TESTS = [
            ppc_case, host_case, edge=basic_edges, rnd=basic_script),
     FnTest("_TbSoundSampleWAV: GetDataChunk 0x10011154, Restart 0x100113cc, SetDataStart 0x1001140c",
            ppc_case, host_case, edge=wav_edges, rnd=wav_chunk_script),
-    FnTest("_TbSoundSampleWAVFile: GetDataChunk 0x10011934, Restart 0x10011ad8", ppc_case, host_case, edge=file_edges,
+    FileCodecTest("_TbSoundSampleWAVFile: GetDataChunk 0x10011934, Restart 0x10011ad8", ppc_case, host_case, edge=file_edges,
            rnd=file_chunk_script),
-    FnTest("_TbSoundCodecLoop: GetDataChunk 0x1000aee0", ppc_case, host_case, edge=loop_edges, rnd=loop_script),
+    FileCodecTest("_TbSoundCodecLoop: GetDataChunk 0x1000aee0", ppc_case, host_case, edge=loop_edges, rnd=loop_script),
     FnTest("TbTimerCodec: GetDataChunk 0x10013858, constructor 0x10013700", ppc_case, host_case, edge=timer_edges, rnd=timer_script),
     FnTest("CMemoryCopy::Copy 0x10011294", ppc_case, host_case, edge=copy_edges, rnd=copy_random),
-    FnTest("mixed scripts over all of them", ppc_case, host_case, edge=lambda: [], rnd=mixed_script),
+    FileCodecTest("mixed scripts over all of them", ppc_case, host_case, edge=lambda: [], rnd=mixed_script),
     FnTest("the vtables 0x1003c3f8 0x1003c4e4 0x1003c04c 0x1003c758", vtable_ppc, vtable_host, edge=vtable_cases,
            rnd=lambda r: dict(vt=r.choice(list(VTABLES)))),
     FnTest("the vptr stores of the constructors", stores_ppc, stores_host, edge=lambda: [dict()], rnd=lambda r: dict()),
