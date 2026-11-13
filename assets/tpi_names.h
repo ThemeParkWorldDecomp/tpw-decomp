@@ -6,7 +6,7 @@
 // program only; the converter (tpi_convert.h) keeps that binding as string numbers (tpi_names.cpp kTpiNameRows: world,
 // Info.Id, first and second string) and reads the strings themselves from the player's own copy at convert time, so no
 // name is held here. An item without a row, or a bank that is missing or not of that shape, gets its Info.Name in title
-// case instead (TpiTitleCase).
+// case instead (TpiTitleCase), except the fixed items, which get the port's own names (TpiFixtureName).
 #pragma once
 
 #include <cstdint>
@@ -52,10 +52,17 @@ std::string JoinTpiName(const std::string& first, const std::string& second);
 // and "Pick-a-card" keep their small letters after the apostrophe and the hyphens.
 std::string TpiTitleCase(const std::string& name);
 
+// The port's own name for a fixed item (Info.WhichUIType 4: the helipad, the ticket booth, the bunting...), by its item
+// folder in any case, or null. The bank has no string for them and most of their .sam files say "heli", so without
+// this they would all show as "Heli" when the pointer is over them. The names describe the item; they are not from
+// either game.
+const char* TpiFixtureName(const std::string& folder);
+
 // The name an item is converted with. `bank` (the decoded object names bank, or null) names the item when the binding
-// has its row and both strings are usable and the first is not empty; otherwise `infoName` in title case. `fromBank`
-// says which.
-std::string TpiShownName(const TpiStrings* bank, const std::string& world, int32_t id, const std::string& infoName,
-                         bool& fromBank);
+// has its row and both strings are usable and the first is not empty; otherwise, for an item without a row, its
+// fixture name (TpiFixtureName, from `folder`); otherwise `infoName` in title case. `fromBank` says whether the bank
+// named it.
+std::string TpiShownName(const TpiStrings* bank, const std::string& world, int32_t id, const std::string& folder,
+                         const std::string& infoName, bool& fromBank);
 
 }  // namespace tpw::assets

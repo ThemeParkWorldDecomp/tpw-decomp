@@ -805,6 +805,18 @@ void TestConvertTree(const fs::path& scratch) {
     MakeWorld(levels, "water", "polar.tct");
     MakeWorld(levels, "science", "science.tct");
     WriteFile(levels / "Standard.sam", B("MapInfo.HeightfieldWidth 1\n"));
+    // Build animations (an item's "c" mesh): Arabian's bus has one and no script, its end has one and a script of its
+    // own, and its carpet (a ride) has one and no script. Only the bus is given the feature script.
+    const auto addMembers = [&levels](const std::string& rel, const std::vector<TpiWadMember>& extra) {
+        std::vector<TpiWadMember> members;
+        std::string err;
+        CHECK(ReadTpiWad(ReadFile(levels / "arabian" / rel), members, err));
+        members.insert(members.end(), extra.begin(), extra.end());
+        WriteFile(levels / "arabian" / rel, BuildTpiWad(members));
+    };
+    addMembers("features/bus.wad", {{"busC.MD2", B("mesh")}, {"busm1.MD2", B("mesh")}});
+    addMembers("features/end.wad", {{"endc.MD2", B("mesh")}, {"end.RSE", B("its own")}});
+    addMembers("rides/carpet.wad", {{"carpetc.MD2", B("mesh")}});
     // Land of Invention's ambient map with the gate's loop at volume 100 (lowered: tpi_convert.cpp kSfxPatches), the
     // same map in Polar Zone (left as it is), and another of Invention's maps (copied as it is).
     const Bytes ambient = SfxMap({{{114, {{3, 0, 0x05, 0x05}}}, {224, {{9, 0, 0x64, 0x64}}}}});
@@ -883,6 +895,24 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(S(ReadFile(a / "rides" / "babylon" / "babylon.sam")).find("Info.Name\t\t\t\"Babylon\"") != std::string::npos);
     CHECK(TpiSamInteger(S(ReadFile(a / "features" / "bus" / "bus.sam")), "Info", "Id", id) && id == 1600);
     CHECK(TpiSamInteger(S(ReadFile(a / "features" / "end" / "end.sam")), "Info", "Id", id) && id == 1605);
+    // The feature script (tpi_convert.cpp FeatureScript): a feature with a build animation and no script gets the one
+    // that plays it once, word by word as RSSE_InitScript reads it, the item's name as its text.
+    {
+        const Bytes script = ReadFile(a / "features" / "bus" / "bus.RSE");
+        CHECK(script.size() == 0x58 + 4);
+        if (script.size() == 0x58 + 4) {
+            CHECK_EQ_STR(S(Bytes(script.begin(), script.begin() + 4)), "RSSE");
+            const uint32_t header[] = {0x45535352, 0x00010f51, 0, 0, 50, 0, 0, 0};
+            for (size_t i = 0; i < std::size(header); ++i) CHECK(Get32(script, i * 4) == header[i]);
+            CHECK_EQ_STR(S(Bytes(script.begin() + 0x20, script.begin() + 0x30)), "Pad Pad Pad Pad ");
+            const uint32_t program[] = {8, 0x80000025, 0x10000000, 0x80000011, 0, 0, 0x80000006, 0x8000001f, 0x20000005, 4};
+            for (size_t i = 0; i < std::size(program); ++i) CHECK(Get32(script, 0x30 + i * 4) == program[i]);
+            CHECK_EQ_STR(S(Bytes(script.begin() + 0x58, script.end())), std::string("bus", 4));
+        }
+    }
+    CHECK_EQ_STR(S(ReadFile(a / "features" / "end" / "end.RSE")), "its own");
+    CHECK(!fs::exists(a / "rides" / "carpet" / "carpet.RSE") && !fs::exists(a / "rides" / "carpet" / "carpet.rse"));
+    CHECK(!fs::exists(out / "water" / "features" / "bus" / "bus.RSE"));
     const std::string fotobth = S(ReadFile(a / "upgrades" / "fotobth" / "fotobth.sam"));
     CHECK(TpiSamInteger(fotobth, "Info", "Id", id) && id == 5060);
     CHECK(TpiSamInteger(fotobth, "AddOn", "UpgradesId", id) && id == 5010);
@@ -1006,6 +1036,10 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(record.find("features/noid") != std::string::npos);
     CHECK(record.find("rides/carpet: Info.WorkingLife") != std::string::npos);
     CHECK(record.find("items converted: 33, left out: 6") != std::string::npos);
+    CHECK(record.find("features/bus (Info.Id 1600 -> 1600, ") != std::string::npos &&
+          record.find(", given a script that plays its build animation once", record.find("features/bus (")) <
+              record.find("\n", record.find("features/bus (")));
+    CHECK(record.find("given a script", record.find("features/end (")) > record.find("\n", record.find("features/end (")));
     CHECK(record.find("left out: facilities/Facilities.sam") != std::string::npos);
     // The golden ticket ride is listed with its ticket cost; no cash price is invented for it.
     CHECK(record.find("rides/carpet (Info.Id 3112 -> ") != std::string::npos);

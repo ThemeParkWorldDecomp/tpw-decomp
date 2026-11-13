@@ -192,6 +192,46 @@ void TestBinding() {
     CHECK(TpiNameRows("science", 3417, a1, b1));
     CHECK(TpiNameRows("arabian", 3417, a2, b2));
     CHECK(a1 != a2);
+    // No two rows of one world name an item alike: each item shows its own name.
+    bool distinct = true;
+    for (const char* world : {"science", "water", "arabian"}) {
+        std::vector<std::pair<uint32_t, uint32_t>> seen;
+        for (int32_t id = 0; id < 10000; ++id) {
+            uint32_t f = 0, s = 0;
+            if (!TpiNameRows(world, id, f, s)) continue;
+            for (const auto& p : seen)
+                distinct = distinct && !(p.first == f && p.second == s);
+            seen.push_back({f, s});
+        }
+    }
+    CHECK(distinct);
+    // The science medium bush takes the Arabian medium bush's string, not string 109 ("Bush (small)" in the bank).
+    CHECK(TpiNameRows("science", 1407, a1, b1));
+    CHECK(TpiNameRows("arabian", 3403, a2, b2));
+    CHECK(a1 == a2 && b1 == 0 && b2 == 0);
+    CHECK(a1 != 109);
+}
+
+void TestFixtureName() {
+    CHECK_EQ_STR(TpiFixtureName("helipad"), "Helipad");
+    CHECK_EQ_STR(TpiFixtureName("tickbth"), "Ticket Booth");
+    CHECK_EQ_STR(TpiFixtureName("instal1"), "Installation 1");
+    CHECK_EQ_STR(TpiFixtureName("install1"), "Installation 1");   // the science world's spelling
+    CHECK_EQ_STR(TpiFixtureName("instal2"), "Installation 2");
+    CHECK_EQ_STR(TpiFixtureName("BUNTING"), "Bunting");
+    CHECK(TpiFixtureName("heli") == nullptr);   // the helicopter has a name of its own
+    CHECK(TpiFixtureName("sbush") == nullptr);
+    CHECK(TpiFixtureName("") == nullptr);
+    // Every fixture named "heli" in the .sam gets a name of its own.
+    std::vector<std::string> names;
+    for (const char* f : {"atmdesk", "bunting", "helipad", "instal1", "instal2", "penguins", "sealout", "tickbth", "water"})
+        if (const char* n = TpiFixtureName(f)) names.push_back(n);
+    CHECK(names.size() == 9);
+    bool distinct = true;
+    for (size_t i = 0; i < names.size(); ++i)
+        for (size_t j = i + 1; j < names.size(); ++j)
+            distinct = distinct && names[i] != names[j] && names[i] != "Heli";
+    CHECK(distinct);
 }
 
 void TestJoin() {
@@ -239,35 +279,45 @@ void TestShownName() {
     CHECK(DecodeTpiStrings(bank, CharMap(), names, err));
     CHECK(IsTpiObjectNames(names, why));
     bool fromBank = false;
-    CHECK_EQ_STR(TpiShownName(&names, "science", 1150, "made up name", fromBank), "Made Up Name");
+    CHECK_EQ_STR(TpiShownName(&names, "science", 1150, "item", "made up name", fromBank), "Made Up Name");
     CHECK(fromBank);
-    CHECK_EQ_STR(TpiShownName(&names, "science", 1108, "x", fromBank), "Solo");
+    CHECK_EQ_STR(TpiShownName(&names, "science", 1108, "item", "x", fromBank), "Solo");
     CHECK(fromBank);
-    CHECK_EQ_STR(TpiShownName(&names, "science", 1502, "x", fromBank), "SynthRide");
+    CHECK_EQ_STR(TpiShownName(&names, "science", 1502, "item", "x", fromBank), "SynthRide");
     CHECK(fromBank);
     // A string with a character above 0x7f: the working name in title case.
-    CHECK_EQ_STR(TpiShownName(&names, "science", 1100, "pumps", fromBank), "Pumps");
+    CHECK_EQ_STR(TpiShownName(&names, "science", 1100, "item", "pumps", fromBank), "Pumps");
     CHECK(!fromBank);
     // An empty first string, though the second has text.
-    CHECK_EQ_STR(TpiShownName(&names, "science", 1101, "metal swing", fromBank), "Metal Swing");
+    CHECK_EQ_STR(TpiShownName(&names, "science", 1101, "item", "metal swing", fromBank), "Metal Swing");
     CHECK(!fromBank);
     // A quote would end the .sam string early.
-    CHECK_EQ_STR(TpiShownName(&names, "science", 1104, "TV show", fromBank), "TV Show");
+    CHECK_EQ_STR(TpiShownName(&names, "science", 1104, "item", "TV show", fromBank), "TV Show");
     CHECK(!fromBank);
     // No row (the same id in another world, or an id the binding does not have).
-    CHECK_EQ_STR(TpiShownName(&names, "water", 1150, "crab laps", fromBank), "Crab Laps");
+    CHECK_EQ_STR(TpiShownName(&names, "water", 1150, "item", "crab laps", fromBank), "Crab Laps");
     CHECK(!fromBank);
-    CHECK_EQ_STR(TpiShownName(&names, "science", 9999, "TV show", fromBank), "TV Show");
+    CHECK_EQ_STR(TpiShownName(&names, "science", 9999, "item", "TV show", fromBank), "TV Show");
     CHECK(!fromBank);
     // No bank.
-    CHECK_EQ_STR(TpiShownName(nullptr, "science", 1150, "TV show", fromBank), "TV Show");
+    CHECK_EQ_STR(TpiShownName(nullptr, "science", 1150, "item", "TV show", fromBank), "TV Show");
     CHECK(!fromBank);
     // A bank shorter than the row: the working name.
     const Bytes small = Bank(kTpiObjectNamesId, 10, {{4, Words("Made Up")}, {5, Words("Name")}});
     TpiStrings few;
     CHECK(DecodeTpiStrings(small, CharMap(), few, err));
     CHECK(!IsTpiObjectNames(few, why));
-    CHECK_EQ_STR(TpiShownName(&few, "science", 1185, "space coaster", fromBank), "Space Coaster");
+    CHECK_EQ_STR(TpiShownName(&few, "science", 1185, "item", "space coaster", fromBank), "Space Coaster");
+    CHECK(!fromBank);
+    // A fixed item without a row: its fixture name, not the "heli" its .sam carries, with or without a bank.
+    CHECK_EQ_STR(TpiShownName(&names, "arabian", 3705, "helipad", "heli", fromBank), "Helipad");
+    CHECK(!fromBank);
+    CHECK_EQ_STR(TpiShownName(nullptr, "water", 2707, "tickbth", "heli", fromBank), "Ticket Booth");
+    CHECK(!fromBank);
+    // A row wins over the folder: the bank's name, or the working name when the bank's strings are unusable.
+    CHECK_EQ_STR(TpiShownName(&names, "science", 1150, "helipad", "x", fromBank), "Made Up Name");
+    CHECK(fromBank);
+    CHECK_EQ_STR(TpiShownName(&names, "science", 1104, "helipad", "TV show", fromBank), "TV Show");
     CHECK(!fromBank);
 }
 
@@ -277,6 +327,7 @@ int main() {
     TestDecode();
     TestShape();
     TestBinding();
+    TestFixtureName();
     TestJoin();
     TestTitleCase();
     TestShownName();

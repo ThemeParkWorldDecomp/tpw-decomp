@@ -1,7 +1,7 @@
 // host_tpi_worlds.cpp: the TPI Worlds and Rides mod's hook helpers (include/TpiWorlds.h, TPW_MOD_HOOK tpi_worlds) on the
-// host, without game data: the world table and its lookups, the gate words of each title, the settings file's theme
-// numbers, and the wide-text helpers the hooks in Game.cpp, RideDB.cpp and FS_MasterSave.cpp answer with. Exits nonzero
-// on the first failed check's count.
+// host, without game data: the world table and its lookups, the files of a world (TpiWorldFile), the gate words of each
+// title, the settings file's theme numbers, and the wide-text helpers the hooks in Game.cpp, RideDB.cpp and
+// FS_MasterSave.cpp answer with. Exits nonzero on the first failed check's count.
 #include <cstdio>
 #include <string>
 #include <cstring>
@@ -47,6 +47,19 @@ int main() {
     Check(TpiWorldOf("arabian") == &kTpiWorlds[0] && TpiWorldOf("WATER") == &kTpiWorlds[1] && TpiWorldOf(std::string("Science")) == &kTpiWorlds[2], "lookup by folder");
     for (const char* original : {"fantasy", "hallow", "jungle", "space", "", "arabian2", "polar"}) Check(TpiWorldOf(original) == nullptr, std::string("no world for ") + original);
     Check(TpiWorldOf(static_cast<const char*>(nullptr)) == nullptr, "no world for a null name");
+
+    // A file of one of the mod's worlds (the textures TGALoadAndConvert blends): under data/levels/<world>/ or
+    // data/lobby/<world>/, the engine's ':' names, '/' and '\' paths, any case.
+    for (const char* name : {"data:levels:arabian:Features:parasol:textures:parasol.tga", "Data:Levels:arabian:Dynamic:Textures:orange.tga",
+                             "data:levels:arabian:sharetex:watr01.tga", "DATA:LEVELS:WATER:rides:lake:textures:watr01.tga",
+                             "data/levels/science/shops/balloon/textures/balloon.tga", "data\\lobby\\science\\textures\\cog1a.tga",
+                             "data:lobby:arabian:x"})
+        Check(TpiWorldFile(name), std::string("a mod world's file: ") + name);
+    for (const char* name : {"data:levels:jungle:Features:parasol:textures:parasol.tga", "Data:Generic:Weather:snow.tga", "data:ui:textures:ipan.tga",
+                             "data:levels:arabian", "data:levels:arabian:", "data:lobby:arabian.txt", "data:levels:arabian2:x.tga",
+                             "levels:arabian:x.tga", "x:levels:arabian:x.tga", "data:sky:arabian:x.tga", "data::arabian:x.tga", "", "arabian"})
+        Check(!TpiWorldFile(name), std::string("not a mod world's file: ") + name);
+    Check(!TpiWorldFile(nullptr), "not a mod world's file: null");
 
     // The wide lookup, as the game keeps the theme name.
     Check(TpiWorldOfWide(u"arabian") == &kTpiWorlds[0] && TpiWorldOfWide(u"SCIENCE") == &kTpiWorlds[2], "wide lookup");

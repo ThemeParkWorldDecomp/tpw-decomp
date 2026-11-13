@@ -9,7 +9,8 @@
 //    Theme Park World's ride table has (tpi_sam.h); its Info.Id is moved into the world's own block of ids so it never
 //    collides with a Theme Park World item, and every reference to it follows; rides lose their price per use, as
 //    Theme Park World's rides have none (the park charges at the gate); its Info.Name becomes the name Theme Park Inc
-//    shows, from the copy's own object names bank (tpi_names.h), or its working name in title case;
+//    shows, from the copy's own object names bank (tpi_names.h), the port's own name for a fixed item the bank does not
+//    name (the helipad, the ticket booth...), or its working name in title case;
 //  - the mystery item and the two ground items every Theme Park World world has (and the Buy Ride panel needs), and
 //    the advisor, are copied from the donor world in the player's own Theme Park World data under <dataRoot>/assets
 //    (kDonorItems); nothing of Theme Park Inc's advisor is used;
@@ -428,6 +429,60 @@ Converted ConvertMembers(const std::vector<TpiWadMember> &in, const std::vector<
         m.data.assign(kept.begin(), kept.end());
     }
     return out;
+}
+
+// ---- feature scripts
+
+// A placed item's build animation (its "<item>c" mesh, kind C) is started and held at its first frame when the instance
+// is made (TPRide.cpp), until the item's ride script, "<folder>:<item>.rse" (Object.cpp CreateRideScript), plays it.
+// Theme Park World's plants each carry the smallest such script: play C once, then idle. Their C meshes grow the plant
+// from the ground, so the first frame draws it flat. Theme Park Inc's plants and flower beds have a C mesh and no
+// script, so placed in a converted world they stayed flat and were not seen (0.5.1: Bush (small) and Palm Tree (small)
+// in Arabian Nights). A feature with a C mesh and no .rse is given that script, built from the format below.
+//
+// The file as RSSE_InitScript (rsse.cpp) reads it, little-endian words: "RSSE", the interpreter's version (the sum of
+// its op table's texts, RSSE_Init), the variable, stack, instructions-per-turn, limbo, bounce and walk counts, four words
+// it drops ("Pad "), the program's word count and words, then the text block's size and bytes. The program, as Theme
+// Park World's own plant scripts have it: op 37 with text 0 (the script's name, the text block's first text), op 17
+// with kind 0 and index 0 (play the C animation and wait for its end), op 6 (a countdown of 0) and op 31 to word 5
+// (back to the countdown: idle). After C ends the ride holds its last frame (RideAnim.cpp DoAnimateRideSet), the
+// grown plant.
+Bytes FeatureScript(const std::string &label) {
+    Bytes out;
+    const auto put = [&out](uint32_t v) {
+        for (int i = 0; i < 4; ++i)
+            out.push_back(static_cast<uint8_t>(v >> (8 * i)));
+    };
+    put(0x45535352u);   // "RSSE"
+    put(0x00010f51u);   // the version
+    put(0);             // variables
+    put(0);             // stack words
+    put(50);            // instructions per turn
+    put(0);             // limbo
+    put(0);             // bounce
+    put(0);             // walk
+    for (int i = 0; i < 4; ++i)
+        put(0x20646150u);   // "Pad "
+    const uint32_t program[] = {0x80000025u, 0x10000000u, 0x80000011u, 0, 0, 0x80000006u, 0x8000001fu, 0x20000005u};
+    put(static_cast<uint32_t>(std::size(program)));
+    for (const uint32_t word : program)
+        put(word);
+    put(static_cast<uint32_t>(label.size() + 1));
+    out.insert(out.end(), label.begin(), label.end());
+    out.push_back(0);
+    return out;
+}
+
+// True when `members` (an item's converted files) hold the item's C mesh and no script of its own.
+bool NeedsFeatureScript(const std::vector<TpiWadMember> &members, const std::string &item) {
+    bool build = false;
+    for (const auto &m : members) {
+        if (Lower(m.name) == Lower(item) + "c.md2")
+            build = true;
+        if (Dir(m.name).empty() && Extension(m.name) == ".rse")
+            return false;
+    }
+    return build;
 }
 
 // ---- items
@@ -999,11 +1054,14 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
         bool fromBank = false;
         if (!gate && sam != nullptr) {
             TpiSamString(samText, "Info", "Name", infoName);
-            shownName = TpiShownName(names, world, item.oldId, infoName, fromBank);
+            shownName = TpiShownName(names, world, item.oldId, item.name, infoName, fromBank);
             if (!shownName.empty() && shownName != infoName)
                 options.append.push_back("Info.Name\t\t\t\"" + shownName + "\"");
         }
         Converted c = ConvertMembers(item.members, &rideTable, &options, &coasterTable, what, log);
+        const bool script = item.outFolder == "features" && NeedsFeatureScript(c.members, item.name);
+        if (script)
+            c.members.push_back({item.name + ".RSE", FeatureScript(item.name)});
         if (gate) {
             log.text << "    gate " << item.outFolder << "/" << item.name << " named \"" << spec.display << "\"\n";
             gateNamed = true;
@@ -1016,9 +1074,14 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             log.text << ", costs " << tickets << " golden ticket" << (tickets == 1 ? "" : "s");
         if (freeRide)
             log.text << ", no price per use (was " << price << ")";
+        if (script)
+            log.text << ", given a script that plays its build animation once";
         if (!shownName.empty() && shownName != infoName)
             log.text << ", named \"" << shownName << "\" (was \"" << infoName << "\", "
-                     << (fromBank ? "from the object names" : "in title case") << ")";
+                     << (fromBank                                ? "from the object names"
+                         : TpiFixtureName(item.name) != nullptr ? "the port's name for a fixed item"
+                                                                : "in title case")
+                     << ")";
         log.text << ")\n";
         log.itemsConverted++;
     }

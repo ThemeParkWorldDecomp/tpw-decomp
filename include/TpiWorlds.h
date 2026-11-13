@@ -55,6 +55,23 @@ inline const TpiWorld* TpiWorldOf(const char* folder) {
 }
 inline const TpiWorld* TpiWorldOf(const std::string& folder) { return TpiWorldOf(folder.c_str()); }
 
+// Whether a game file name is a file of one of the mod's worlds: one under data/levels/<world>/ or data/lobby/<world>/,
+// the world a mod world (TpiWorldOf), the parts parted by ':' as the engine's names are
+// ("data:levels:arabian:Features:parasol:textures:parasol.tga") or by '/' or '\', in any case. Those are the content
+// folder's (platform/tpi_content.h), but for the few a world takes from its donor (its Advisor, sky and sound folders).
+// False for a null name, the original four, a file directly in data/levels or data/lobby and any other name.
+inline bool TpiWorldFile(const char* name) {
+    if (name == nullptr) return false;
+    std::string parts[3];
+    for (std::string& part : parts) {
+        for (; *name != 0 && *name != ':' && *name != '/' && *name != '\\'; ++name) part += *name;
+        if (*name++ == 0) return false;   // the file's own name came before the world's folder
+    }
+    return TpiEqualNoCase(parts[0].c_str(), "data") &&
+           (TpiEqualNoCase(parts[1].c_str(), "levels") || TpiEqualNoCase(parts[1].c_str(), "lobby")) &&
+           TpiWorldOf(parts[2]) != nullptr && *name != 0;
+}
+
 // The two words on a world's gate, for the island screen and the gate signs: its title split at its last space ("Land
 // of" and "Invention"; a one-word title is the first word, with an empty second).
 inline void TpiGateNames(const TpiWorld& world, std::string& first, std::string& second) {

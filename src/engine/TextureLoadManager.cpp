@@ -11,6 +11,7 @@
 #include "tb_loadmanager.h"
 #include "tb_resource_texture.h"
 #include "tb_textureentry.h"
+#include "TpiWorlds.h"
 #include "tpw_probe.h"
 #include "Wavelet.h"
 #include <cstdio>

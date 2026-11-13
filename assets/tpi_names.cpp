@@ -20,7 +20,10 @@ uint16_t Get16(const std::vector<uint8_t>& d, size_t at) { return static_cast<ui
 // Info.Id. The information kiosks, the research labs, the training rooms, the science world's staff room and the
 // obstacles are not converted (tpi_convert.cpp), so they have no row; nor have the fixed items the build menu does not
 // show (Info.WhichUIType 4: the bus, the monorail, the helicopter and the like) or the entrance gate, which the
-// converter names after its world. The photo kiosk upgrade has one string for all three worlds.
+// converter names after its world. The photo kiosk upgrade has one string for all three worlds. One row departs from
+// the bank's own order: the science world's medium bush (1407) has string 109, whose text is "Bush (small)" though its
+// working name is "Medium Bush" (the same slip as string 114, "Bush (small)" for a working name "Tiny Rock"), so it
+// takes string 481 instead, the same "Bush (medium)" the Arabian Nights medium bush has.
 struct NameRow {
     const char* world;
     int32_t id;
@@ -42,7 +45,7 @@ const NameRow kTpiNameRows[] = {
     {"science", 1401, 86, 0},    {"science", 1418, 87, 0},    {"science", 1425, 88, 89},   {"science", 1419, 93, 0},
     {"science", 1406, 94, 95},   {"science", 1417, 96, 0},    {"science", 3417, 98, 0},    {"science", 1439, 100, 0},
     {"science", 1411, 102, 0},   {"science", 1403, 103, 0},   {"science", 1421, 105, 106}, {"science", 1405, 107, 108},
-    {"science", 1407, 109, 0},   {"science", 1414, 110, 0},   {"science", 1413, 111, 0},   {"science", 1420, 113, 0},
+    {"science", 1407, 481, 0},  {"science", 1414, 110, 0},   {"science", 1413, 111, 0},   {"science", 1420, 113, 0},
     {"science", 1424, 116, 117}, {"science", 1423, 118, 0},   {"science", 1422, 120, 121}, {"science", 4150, 307, 0},
     {"science", 4109, 317, 0},   {"science", 4500, 347, 0},   {"science", 4208, 350, 0},   {"science", 4422, 367, 0},
     {"science", 4427, 392, 0},   {"science", 4428, 393, 0},   {"science", 4429, 394, 0},
@@ -80,6 +83,20 @@ const NameRow kTpiNameRows[] = {
     {"arabian", 3410, 491, 0},   {"arabian", 3411, 493, 0},   {"arabian", 3417, 495, 0},   {"arabian", 3418, 497, 0},
     {"arabian", 3413, 498, 0},   {"arabian", 3401, 500, 0},   {"arabian", 3406, 502, 0},   {"arabian", 3407, 504, 0},
     {"arabian", 3421, 507, 0},   {"arabian", 3423, 511, 0},   {"arabian", 3424, 513, 514}, {"arabian", 3503, 523, 0},
+};
+
+// The port's own names for the fixed items (tpi_names.h TpiFixtureName), by item folder: the copy names them nowhere,
+// and most of their .sam files carry the working name "heli", copied from the helicopter's.
+struct FixtureName {
+    const char* folder;
+    const char* name;
+};
+
+const FixtureName kTpiFixtureNames[] = {
+    {"atmdesk", "Lobby Desk"},     {"bunting", "Bunting"},        {"helipad", "Helipad"},
+    {"instal1", "Installation 1"}, {"install1", "Installation 1"}, {"instal2", "Installation 2"},
+    {"penguins", "Penguins"},      {"sealout", "Seals"},          {"tickbth", "Ticket Booth"},
+    {"water", "Water"},
 };
 
 bool IsUpper(char c) { return c >= 'A' && c <= 'Z'; }
@@ -222,18 +239,32 @@ std::string TpiTitleCase(const std::string& name) {
     return out;
 }
 
-std::string TpiShownName(const TpiStrings* bank, const std::string& world, int32_t id, const std::string& infoName,
-                         bool& fromBank) {
+const char* TpiFixtureName(const std::string& folder) {
+    std::string lower = folder;
+    for (char& c : lower)
+        if (IsUpper(c))
+            c = static_cast<char>(c - 'A' + 'a');
+    for (const FixtureName& f : kTpiFixtureNames)
+        if (lower == f.folder)
+            return f.name;
+    return nullptr;
+}
+
+std::string TpiShownName(const TpiStrings* bank, const std::string& world, int32_t id, const std::string& folder,
+                         const std::string& infoName, bool& fromBank) {
     fromBank = false;
     uint32_t first = 0, second = 0;
-    if (bank != nullptr && TpiNameRows(world, id, first, second) && first < bank->text.size() &&
-        second < bank->text.size() && bank->usable[first] && bank->usable[second] && !bank->text[first].empty()) {
+    const bool row = TpiNameRows(world, id, first, second);
+    if (bank != nullptr && row && first < bank->text.size() && second < bank->text.size() && bank->usable[first] &&
+        bank->usable[second] && !bank->text[first].empty()) {
         const std::string name = JoinTpiName(bank->text[first], second == 0 ? std::string() : bank->text[second]);
         if (name.find('"') == std::string::npos && name.size() < 0x40) {
             fromBank = true;
             return name;
         }
     }
+    if (const char* fixture = TpiFixtureName(folder); !row && fixture != nullptr)
+        return fixture;
     return TpiTitleCase(infoName);
 }
 
