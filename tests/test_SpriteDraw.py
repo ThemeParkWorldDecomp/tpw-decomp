@@ -1154,13 +1154,15 @@ def run_host(lib, case):
     return dict(states=[raw[4 * STATE_WORDS * i:4 * STATE_WORDS * (i + 1)] for i in range(n)], log=log)
 
 
-def compare(case, ppc, host):
+def compare(case, ppc, host, skip=()):
     problems = []
     for i, (p, h) in enumerate(zip(ppc["states"], host["states"])):
         if p == h:
             continue
         a, b = sections(p), sections(h)
-        names = [name for name, _ in SECTIONS if a[name] != b[name]]
+        names = [name for name, _ in SECTIONS if a[name] != b[name] and name not in skip]
+        if not names:
+            continue
         detail = []
         for name in names[:3]:
             x = struct.unpack("<%dI" % (len(a[name]) // 4), a[name])
@@ -1196,7 +1198,18 @@ class WorldTest:
         except ppcemu.ImportCalled as ex:
             return [f"PPC side called unstubbed import {ex}"]
         host = run_host(lib, case)
-        return compare(case, ppc, host)
+        return compare(case, ppc, host, skip=wide_skip(lib, case))
+
+
+def wide_skip(lib, case):
+    """The sections left out of the comparison: with the port fixes on (tpw_sd_portfix), the hot sprite on a display wider than
+    4:3 (aspect, its height over width, between 0 and 0.75). There the port measures the hot sprite test across in a 4:3 view's
+    units (the port fix widepick, src/engine/SpriteData.cpp), so it picks a sprite from less far to its side than the Mac did; at
+    4:3 and narrower the two are the same and everything is compared."""
+    if not hasattr(lib, "port_fix"):
+        lib.tpw_sd_portfix.restype, lib.tpw_sd_portfix.argtypes = C.c_int32, []
+        lib.port_fix = lib.tpw_sd_portfix() == 1
+    return ("hot",) if lib.port_fix and 0.0 < bf(case["aspect"]) < 0.75 else ()
 
 
 # ----------------------------------------------------------------- generators

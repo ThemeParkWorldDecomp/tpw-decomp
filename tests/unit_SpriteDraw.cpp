@@ -760,6 +760,12 @@ extern "C" {
 
 int32_t tpw_sd_state_words() { return kStateWords; }
 
+// 1 when the unit is built with the port fixes on (widepick, SSpriteGameData::SetupVertices): test_SpriteDraw.py then leaves the
+// hot sprite out of the comparison on a display wider than 4:3, where the port's test differs from the Mac's on purpose.
+int32_t tpw_sd_portfix() {
+    return 0;
+}
+
 // The description, in order (tests/test_SpriteDraw.py, `flat`):
 //   the number of operations and, for each, eight words (code, seven arguments);
 //   the display's flags, aspect, +0x938, hot x, hot y, the hot sprite's number and the system's renderer; the view angle; the light
