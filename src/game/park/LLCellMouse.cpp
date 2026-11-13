@@ -34,6 +34,7 @@
 #include "tb_rain.h"
 #include "tb_resource_display.h"
 #include "ThingReceivers.h"
+#include "TpiGateFlow.h"
 #include "TPCoaster.h"
 #include "TPEngine.h"
 #include "TPSound.h"

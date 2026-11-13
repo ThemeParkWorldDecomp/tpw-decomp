@@ -6,8 +6,8 @@
 // CDynamicMesh::DC_CreateSquareFace and DC_SetVertex (both advance the mesh's counters by the amounts the case's queues say), HDZ_RotatePointZ
 // (rewrites the corner rows and may touch the two scroll lags), DC_AnimateWater, DC_DrawWater (may move the water's start position),
 // DC_AnimateFlag, DC_DrawFlag, DC_ResetSquareFaceListPtr, sort (may replace the keys), CWorld::GetWeather (answers one of eight case-made
-// blocks), InstanceRide, RestoreRideInstance, SetCurRideAnim and CTRACE. Floats are recorded as bit patterns with every NaN made one
-// value. A pointer into a registered region is recorded as (label << 32) + offset, any other object by its label.
+// blocks), InstanceRide, RestoreRideInstance, DestroyRideInstance, SetCurRideAnim and CTRACE. Floats are recorded as bit patterns with
+// every NaN made one value. A pointer into a registered region is recorded as (label << 32) + offset, any other object by its label.
 //
 // The test module (Python) builds every world on both sides from one description, so this file holds the fakes, the globals the unit reads
 // (their owners are not in the library), raw memory for the module, the offsets of the mesh object, and one entry point per function.
@@ -203,6 +203,8 @@ uint32_t RestoreRideInstance(uint32_t instance, uint32_t type, uint32_t flags, s
     RecordParams(params);
     return static_cast<uint32_t>(ret("restore", 0));
 }
+
+void DestroyRideInstance(uint32_t instance) { ev("DestroyRideInstance", {instance}); }
 
 void SetCurRideAnim(tag_sRideAnimSet* set, uint32_t a, uint32_t anim, uint32_t loop, float speed, uint32_t b) {
     ev("SetCurRideAnim", {lab(set), a, anim, loop, Fb(speed), b});
