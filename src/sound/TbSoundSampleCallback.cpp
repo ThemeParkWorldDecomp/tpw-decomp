@@ -48,6 +48,7 @@ int32_t Sub32(int32_t a, int32_t b) {
 }
 
 
+
 }  // namespace
 
 void _TbSoundSampleCallback::ClearCache() { PoolClearCache<SampleCallbackPool>(); }
@@ -120,6 +121,7 @@ void _TbSoundSampleCallback::GetNextSample(uint32_t position) {
         mNext = timer;
     }
 }
+
 
 // AudioPlaceHolder.cpp: CAudioPlaceHolder, the base of every sound the game is playing (unit w79g2, "sound symbols shared", file
 // AudioPlaceHolder.cpp of the library). See include/AudioPlaceHolder.h for the layout, the vtable and the flag bits.

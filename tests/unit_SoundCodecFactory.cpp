@@ -521,6 +521,7 @@ void _TbSoundSampleCallback::operator delete(void* object, std::size_t) {
     ::operator delete(object);
 }
 
+
 _TbSoundSampleCompletedCallback::~_TbSoundSampleCompletedCallback() {}
 
 int32_t _TbSoundSampleCompletedCallback::GetDataChunk(void* buffer, int32_t size, int32_t& done, bool flag) {

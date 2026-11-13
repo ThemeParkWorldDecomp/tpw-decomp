@@ -34,6 +34,8 @@
 #include "TPCamera.h"
 #include "TPCoaster.h"
 #include "TPEngine.h"
+#include "TpiGateFlow.h"
+#include "TpiRideCamera.h"
 #include "TPMain.h"
 #include "TPSettings.h"
 #include "TPSound.h"

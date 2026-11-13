@@ -21,6 +21,8 @@
 #include "ThingReceivers.h"
 #include "TPCoaster.h"
 #include "TPEngine.h"
+#include "TpiBumperKind.h"
+#include "TpiGateFlow.h"
 #include "TPSound.h"
 #include "TrackCell.h"
 #include "ui_main.h"
