@@ -46,6 +46,7 @@ FACTORY_CTOR, GENERATE, CBANK_CTOR, CBANK_FILE, CBANK_RETRIEVE = 0x10027820, 0x1
 GET_BANK_PATH, SET_BANK, WATCHER, CVT = 0x1001E720, 0x1000DF50, 0x10014354, 0x1002E988
 INFO_CTORS = {0: 0x100099D8, 1: 0x10009A1C, 2: 0x10009A58, 3: 0x100277C4}
 INFO_GET_FILE, INFO_GET_SIZE, INFO_GET_PATH = 0x10014150, 0x10014188, 0x100143B0
+BANKCACHE_CMP = 0x10009354    # TbMMFileBank::RegisterBank's cap of a sample's cache: cmpwi r0,0x2000
 # imports (by name, as the glue stubs resolve them)
 IMP_NEW, IMP_NEWA, IMP_DEL, IMP_DELA = "__nw__FUl", "__nwa__FUl", "__dl__FPv", "__dla__FPv"
 IMP_REF_CTOR, IMP_REF_DTOR, IMP_ADDREF, IMP_RELEASE = "__ct__12TbRefReleaseFv", "__dt__12TbRefReleaseFv", "AddRef__12TbRefReleaseFv", "Release__12TbRefReleaseFv"
@@ -327,6 +328,14 @@ def setup(runner):
     lib = runner.lib
     lib.tpw_sb_header_size.restype = C.c_int64
     HOST_HEADER = lib.tpw_sb_header_size()
+    lib.tpw_sb_portfix.restype, lib.tpw_sb_portfix.argtypes = C.c_int32, []
+    if lib.tpw_sb_portfix() == 1:
+        # The port's fix bankcache (src/sound/TbMMFileBank.cpp) caps a sample's cache at 0x2000 bytes with an unsigned compare
+        # where the Mac's is signed, so that a negative size no longer asks new[] for 2 to 4 GB: with the unit built with the
+        # port's fixes, the original runs with that one instruction made unsigned (cmpwi r0,0x2000 to cmplwi r0,0x2000), and
+        # the sides compare as usual.
+        assert e.u32(BANKCACHE_CMP) == 0x2C002000
+        e.write(BANKCACHE_CMP, struct.pack(">I", 0x28002000))
 
     def vtable_copy(address, size, patches):
         base = T.persist_alloc(e, size, e.read(address, size))

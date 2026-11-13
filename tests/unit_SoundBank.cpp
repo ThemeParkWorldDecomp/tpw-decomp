@@ -344,6 +344,11 @@ int64_t tpw_sb_header_size() {
     return sizeof(TbSampleHeader);
 }
 
+// 1 when the unit is built with the port's fixes (TbMMFileBank::RegisterBank's bankcache, src/sound/TbMMFileBank.cpp).
+int32_t tpw_sb_portfix() {
+    return 0;
+}
+
 // One operation: a = the bank slot, b, c and d depend on the operation.
 int64_t tpw_sb_op(int32_t op, int64_t a, int64_t b, int64_t c, int64_t d) {
     for (auto& value : gAux) value = 0;
