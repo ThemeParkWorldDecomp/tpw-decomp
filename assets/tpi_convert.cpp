@@ -10,7 +10,9 @@
 //    collides with a Theme Park World item, and every reference to it follows; rides lose their price per use, as
 //    Theme Park World's rides have none (the park charges at the gate); its Info.Name becomes the name Theme Park Inc
 //    shows, from the copy's own object names bank (tpi_names.h), the port's own name for a fixed item the bank does not
-//    name (the helipad, the ticket booth...), or its working name in title case;
+//    name (the helipad, the ticket booth...), or its working name in title case; shops keep their prices and get the
+//    RipOffOK that gives them Theme Park World's room between price and worth (ShopRipOffOK), and the photo booth, a
+//    shop its upgrades folder marks unchoosable, is made one visitors use (MakeShopChoosable);
 //  - the mystery item and the two ground items every Theme Park World world has (and the Buy Ride panel needs), and
 //    the advisor, are copied from the donor world in the player's own Theme Park World data under <dataRoot>/assets
 //    (kDonorItems); nothing of Theme Park Inc's advisor is used;
@@ -747,6 +749,79 @@ int32_t UiType(const std::string &samText, int32_t fallback) {
     return TpiSamInteger(samText, "Info", "WhichUIType", type) ? type : fallback;
 }
 
+// A visitor at the head of a shop's queue buys only when its price is at most what the shop is worth to them
+// (CPerson::TooPricey): its cost of goods times 1.15, raised by the visitor's hunger, thirst and mood, then by RipOffOK
+// percent. Theme Park World's shops start at one and a half times their cost of goods, with RipOffOK 100 in every
+// world's Shops.sam. Theme Park Inc's start at up to six times it, and Polar Zone comments RipOffOK out (so the game's
+// default 0 applies) and Land of Invention gives 0, so nearly every visitor walks away and the shop serves no one. The converter keeps Theme Park Inc's prices and gives the shops Theme Park World's room between price and worth:
+// a shops folder .sam gets RipOffOK 100 where it has none or less, and a shop whose price is more than one and a half
+// times its cost of goods gets RipOffOK (100 + 100) x (price / cost) / 1.5 - 100 in its own .sam, so a visitor values it
+// against its price as a Theme Park World visitor values a Theme Park World shop. A higher RipOffOK is never lowered.
+const char *const kRipOffOK = "UsageInfo.RipOffOK";
+constexpr int32_t kShopRipOffOK = 100;
+
+// The RipOffOK a shop with this price and cost of goods needs (at least Theme Park World's 100).
+int32_t ShopRipOffOK(int32_t price, int32_t cost) {
+    if (price <= 0 || cost <= 0)
+        return kShopRipOffOK;
+    const int64_t need = (int64_t{400} * price + 3 * cost - 1) / (3 * cost) - 100;   // rounded up
+    return need > kShopRipOffOK ? static_cast<int32_t>(need) : kShopRipOffOK;
+}
+
+// Raises a shops folder .sam's RipOffOK to Theme Park World's 100 through `options`. The value it had, -1 for none, or
+// kShopRipOffOK when it is left.
+int32_t RaiseFolderRipOffOK(const std::string &samText, TpiSamOptions &options) {
+    int32_t ripOff = -1;
+    if (!TpiSamInteger(samText, "UsageInfo", "RipOffOK", ripOff))
+        ripOff = -1;
+    if (ripOff >= kShopRipOffOK)
+        return kShopRipOffOK;
+    options.append.push_back(std::string(kRipOffOK) + "\t\t\t" + std::to_string(kShopRipOffOK));
+    return ripOff;
+}
+
+// Raises a shop's own RipOffOK through `options` when its price needs more than it has (its own, else its folder's
+// after RaiseFolderRipOffOK); a shop without a price or cost of goods needs Theme Park World's 100. `folderText`: its
+// folder .sam, for what the shop's own leaves out. Returns the value it had, `raised` set to the new one; -1 when it is
+// left.
+int32_t RaiseShopRipOffOK(const std::string &samText, const std::string &folderText, TpiSamOptions &options,
+                          int32_t &raised) {
+    const auto value = [&](const char *field, int32_t &v) {
+        return TpiSamInteger(samText, "UsageInfo", field, v) || TpiSamInteger(folderText, "UsageInfo", field, v);
+    };
+    int32_t price = 0, cost = 0, had = 0;
+    raised = value("InitPricePerUse", price) && value("InitCostOfGoods", cost) ? ShopRipOffOK(price, cost) : kShopRipOffOK;
+    if (!TpiSamInteger(samText, "UsageInfo", "RipOffOK", had) &&
+        (!TpiSamInteger(folderText, "UsageInfo", "RipOffOK", had) || had < kShopRipOffOK))
+        had = kShopRipOffOK;
+    if (raised <= had)
+        return -1;
+    options.append.push_back(std::string(kRipOffOK) + "\t\t\t" + std::to_string(raised));
+    return had;
+}
+
+// A visitor picks only an object its record marks Info.IsChoosable (the object's flag 4, CObject::IsAvailableToChoose).
+// Theme Park Inc's shops folders say 1, but its photo booth (fotobth, a shop by its own Info.WhichUIType 1) sits in the
+// upgrades folder, whose Upgrades.sam says 0 for the track add-ons beside it, and names none of its own, so no visitor
+// ever uses it. A shop that takes Info.IsChoosable 0 from its folder .sam gets Info.IsChoosable 1 in its own. Like Theme
+// Park World's shops it has no queue (Info.HasQueue 0): a visitor walks to the shop itself. Returns whether it did.
+bool MakeShopChoosable(const std::string &samText, const std::string &folderText, TpiSamOptions &options) {
+    int32_t choosable = 0;
+    if (TpiSamInteger(samText, "Info", "IsChoosable", choosable) ||
+        !TpiSamInteger(folderText, "Info", "IsChoosable", choosable) || choosable != 0)
+        return false;
+    options.append.push_back("Info.IsChoosable\t\t\t1");
+    return true;
+}
+
+// The text of the first folder .sam under `outFolder`, empty when it has none.
+std::string FolderSamText(const std::map<std::string, Bytes> &folderSams, const std::string &outFolder) {
+    for (const auto &[name, bytes] : folderSams)
+        if (name.compare(0, outFolder.size() + 1, outFolder + "/") == 0)
+            return std::string(bytes.begin(), bytes.end());
+    return std::string();
+}
+
 // The UI type of the folder .sam files under `outFolder` (the first that names one), 0 when none does.
 int32_t FolderUiType(const std::map<std::string, Bytes> &folderSams, const std::string &outFolder) {
     for (const auto &[name, bytes] : folderSams) {
@@ -1044,11 +1119,17 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
         TpiSamOptions options = gate ? gateOptions : itemOptions;
         const TpiWadMember *sam = ItemSam(item);
         const std::string samText = sam != nullptr ? std::string(sam->data.begin(), sam->data.end()) : std::string();
-        const bool ride = UiType(samText, FolderUiType(folderSams, item.outFolder)) == 0;
+        const int32_t uiType = UiType(samText, FolderUiType(folderSams, item.outFolder));
+        const bool ride = uiType == 0;
         int32_t price = 0;
         const bool freeRide = ride && TpiSamInteger(samText, "UsageInfo", "InitPricePerUse", price);
         if (ride)
             options.drop.push_back(kPricePerUse);
+        int32_t ripOff = 0;
+        const int32_t ripOffWas =
+            uiType == 1 ? RaiseShopRipOffOK(samText, FolderSamText(folderSams, item.outFolder), options, ripOff) : -1;
+        const bool madeChoosable =
+            uiType == 1 && MakeShopChoosable(samText, FolderSamText(folderSams, item.outFolder), options);
         // The name Theme Park Inc shows (tpi_names.h): the build menu and the ride's panels read Info.Name, as the
         // game's own name table has no converted id (RideDB.cpp GetTypeName).
         std::string infoName, shownName;
@@ -1077,6 +1158,10 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             log.text << ", no price per use (was " << price << ")";
         if (script)
             log.text << ", given a script that plays its build animation once";
+        if (ripOffWas >= 0)
+            log.text << ", RipOffOK " << ripOff << " (was " << ripOffWas << ")";
+        if (madeChoosable)
+            log.text << ", visitors can use it (its folder's Info.IsChoosable was 0)";
         if (!shownName.empty() && shownName != infoName)
             log.text << ", named \"" << shownName << "\" (was \"" << infoName << "\", "
                      << (fromBank                                ? "from the object names"
@@ -1099,6 +1184,11 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             folderOptions.drop.push_back(kPricePerUse);
             if (TpiSamInteger(text, "UsageInfo", "InitPricePerUse", price))
                 log.text << "    " << name << ": no price per use (was " << price << ")\n";
+        } else if (UiType(text, 0) == 1) {
+            const int32_t ripOff = RaiseFolderRipOffOK(text, folderOptions);
+            if (ripOff < kShopRipOffOK)
+                log.text << "    " << name << ": RipOffOK " << kShopRipOffOK << " (was "
+                         << (ripOff < 0 ? std::string("none") : std::to_string(ripOff)) << ")\n";
         }
         if (!FilterTpiSam(rideTable, text, folderOptions, filtered, report, err))
             Fail(name + ": " + err);

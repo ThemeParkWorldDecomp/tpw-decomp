@@ -1,7 +1,8 @@
 // host_tpi_save_repair.cpp: the TPI Worlds and Rides mod's repair of parks saved before a converter showed more of a
 // world's ground (include/TpiSaveRepair.h, TPW_MOD_HOOK tpi_worlds) on the host, without game data: which saved map and
 // track cells are reset on loading. The cells are made up here, with the modes and flags CMapCell::Reset and
-// CTrackCell::Reset give them. Exits nonzero on the first failed check's count.
+// CTrackCell::Reset give them. Then the repair of the shops of parks saved before converter 15: which saved RipOffOK
+// values rise and which placed shops become choosable, with made-up records. Exits nonzero on the failed checks' count.
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -65,6 +66,37 @@ int main() {
     // A second load: a reset cell (mode 0, outside the park) no longer matches.
     Check(!TpiStaleHiddenMapCell(0, 0, 0, 0x40, true), "after the reset: kept");
     Check(!TpiStaleHiddenTrackCell(0, 0, true), "track cell after the reset: kept");
+
+    // Shops (converter 15). A shop type's control saved with converter 14's RipOffOK: 0 where the shops folder named none,
+    // 100 for most, 250 for the photo booth; its record now says more.
+    Check(TpiRepairedRipOffOK(0, 100, 1) == 100, "a shop saved with RipOffOK 0: the record's 100");
+    Check(TpiRepairedRipOffOK(100, 434, 1) == 434, "a shop saved with 100: the record's 434");
+    Check(TpiRepairedRipOffOK(250, 345, 1) == 345, "the photo booth saved with 250: the record's 345");
+    // Already right, or the record says less: kept.
+    Check(TpiRepairedRipOffOK(434, 434, 1) == 434, "a shop saved after converter 15: kept");
+    Check(TpiRepairedRipOffOK(300, 100, 1) == 300, "a record below the saved value: kept, nothing falls");
+    // Not a shop (rides 0, the other kinds): kept, whatever the record says.
+    Check(TpiRepairedRipOffOK(0, 100, 0) == 0, "a ride: kept");
+    Check(TpiRepairedRipOffOK(0, 100, 2) == 0, "another kind: kept");
+    Check(TpiRepairedRipOffOK(10, 50, 3) == 10, "a third kind: kept");
+
+    // A photo booth built before converter 15: no flag 4, its record now says Info.IsChoosable 1.
+    Check(TpiShopToMakeChoosable(0x40, 1, 1), "booth built without flag 4: made choosable");
+    Check(TpiShopToMakeChoosable(0, 1, 1), "booth with no flags at all: made choosable");
+    // Already choosable, a record that still says 0, or not a shop: kept.
+    Check(!TpiShopToMakeChoosable(0x44, 1, 1), "a shop built choosable: kept");
+    Check(!TpiShopToMakeChoosable(0x40, 0, 1), "a shop whose record says 0: kept");
+    Check(!TpiShopToMakeChoosable(0x08, 1, 0), "a ride: kept");
+    Check(!TpiShopToMakeChoosable(0, 0, 2), "an unchoosable add-on: kept");
+    // Its state: 3 (built unchoosable) becomes the normal 0; broken down, wanting an upgrade or condemned stays.
+    Check(TpiRepairedShopState(3) == 0, "state 3: normal");
+    Check(TpiRepairedShopState(0) == 0, "normal: kept");
+    Check(TpiRepairedShopState(1) == 1, "broken down: kept");
+    Check(TpiRepairedShopState(2) == 2, "wants an upgrade: kept");
+    Check(TpiRepairedShopState(4) == 4, "condemned: kept");
+    // A second load: the flag is set and the state normal, so nothing changes again.
+    Check(!TpiShopToMakeChoosable(0x40 | 4, 1, 1), "after the repair: kept");
+    Check(TpiRepairedRipOffOK(100, 100, 1) == 100, "RipOffOK after the repair: kept");
 
     if (gFailures == 0) std::printf("tpi save repair: all checks passed\n");
     return gFailures;

@@ -360,11 +360,11 @@ SamRow Row(int32_t type, const char* name, int32_t minI = 0, int32_t maxI = 0, i
 // type 3 row (name: the group, arrayCount: its capacity), blank rows between groups, type 12 at the end.
 const std::vector<SamRow> kItemTable = {
     Row(0, ""),      Row(5, "Id"),       Row(10, "Name"),        Row(11, "Shape", 0, 0, 0, 1), Row(6, "WhichUIType", 0, 4),
-    Row(7, "Price"), Row(1, "Info"),     Row(0, ""),             Row(2, ""),                   Row(4, "NewBonus"),
+    Row(7, "Price"), Row(6, "IsChoosable", 0, 1), Row(1, "Info"), Row(0, ""),             Row(2, ""),                   Row(4, "NewBonus"),
     Row(3, "Attraction", 0, 0, 3), Row(0, ""), Row(5, "UpgradesId"), Row(1, "AddOn"),        Row(0, ""),
     Row(5, "CostToEnter"), Row(1, "Keys"), Row(0, ""), Row(5, "GateObjectId"), Row(1, "ParkName"), Row(0, ""),
     Row(5, "TicketBoothAPosX"), Row(5, "TicketBoothBPosY"), Row(1, "FixedItemInfo"), Row(0, ""),
-    Row(5, "Size"), Row(1, "StaffPoolInfo"), Row(0, ""), Row(5, "GoldenTicketCost"), Row(5, "InitPricePerUse"), Row(1, "UsageInfo"), Row(0, ""),
+    Row(5, "Size"), Row(1, "StaffPoolInfo"), Row(0, ""), Row(5, "GoldenTicketCost"), Row(5, "InitPricePerUse"), Row(5, "RipOffOK"), Row(1, "UsageInfo"), Row(0, ""),
     Row(2, ""), Row(5, "CostOfUpgrade"), Row(3, "Upgrades", 0, 0, 3), Row(12, "")};
 
 void TestSamFilter() {
@@ -599,12 +599,23 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     WriteFile(w / "rides" / "loop.wad",
               BuildTpiWad({{"loop.sam", B("Info.Id 3114\n")}, {"coaster.sam", B("Info.Id 7\nTrack.pcTextureFilename \"t\"\nTrack.fScrollRate 0.5\nTrack.Bogus 1\n")}}));
     WriteFile(w / "rides" / "babylon.wad", Item("babylon", 3113));
-    WriteFile(w / "shops" / "Shops.sam", B("Info.WhichUIType 1\n"));
-    WriteFile(w / "shops" / "burger.wad", Item("burger", 3300, "UsageInfo.InitPricePerUse 30\n"));
+    // The shops' RipOffOK as the three worlds have it: Arabian Nights 100 (Theme Park World's), Polar Zone none (commented
+    // out), Land of Invention 0. The burger costs 10 (Invention: its folder's) and sells for 30, three times that, with
+    // a RipOffOK of its own of 500 (Arabian), none (Polar, which sells it at 15, one and a half times) or 20 (Invention).
+    const std::string shops = world == "arabian" ? "UsageInfo.RipOffOK\t\t\t100\n"
+                              : world == "water" ? "# UsageInfo.RipOffOK\t\t\t100\n"
+                                                 : "UsageInfo.RipOffOK\t\t\t0\nUsageInfo.InitCostOfGoods 10\n";
+    WriteFile(w / "shops" / "Shops.sam", B("Info.WhichUIType 1\n" + shops));
+    const std::string burger = world == "arabian" ? "UsageInfo.InitPricePerUse 30\nUsageInfo.InitCostOfGoods 10\nUsageInfo.RipOffOK 500\n"
+                               : world == "water" ? "UsageInfo.InitPricePerUse 15\nUsageInfo.InitCostOfGoods 10\n"
+                                                  : "UsageInfo.InitPricePerUse 30\nUsageInfo.RipOffOK 20\n";
+    WriteFile(w / "shops" / "burger.wad", Item("burger", 3300, burger));
     WriteFile(w / "features" / "Gates.wad", Item("Gates", 3601, "", GateMesh()));
     WriteFile(w / "features" / "bus.wad", Item("bus", 1600));
     WriteFile(w / "features" / "end.wad", Item("end", 1605));
     WriteFile(w / "features" / "noid.wad", BuildTpiWad({{"noid.sam", B("Info.Name \"x\"\n")}}));
+    // The photo booth: a shop by its own UI type, in the upgrades folder, whose .sam marks the track add-ons unchoosable.
+    WriteFile(w / "upgrades" / "Upgrades.sam", B("Info.WhichUIType 0\nInfo.IsChoosable 0\n"));
     WriteFile(w / "upgrades" / "fotobth.wad", Item("fotobth", 3700, "AddOn.UpgradesId 3112\nInfo.WhichUIType 1\nUsageInfo.InitPricePerUse 40\n"));
     WriteFile(w / "facilities" / "ftoilet.wad", Item("ftoilet", 3800));
     WriteFile(w / "facilities" / "info.wad", Item("info", 3801));
@@ -877,6 +888,27 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(ridesFolderSam.find("InitPricePerUse") == std::string::npos && TpiSamInteger(ridesFolderSam, "Info", "WhichUIType", id) && id == 0);
     CHECK(TpiSamInteger(S(ReadFile(a / "shops" / "burger" / "burger.sam")), "UsageInfo", "InitPricePerUse", id) && id == 30);
     CHECK(TpiSamInteger(S(ReadFile(a / "upgrades" / "fotobth" / "fotobth.sam")), "UsageInfo", "InitPricePerUse", id) && id == 40);
+    // Shops keep their prices and get Theme Park World's room between price and worth (else Theme Park Inc's prices send
+    // every visitor away): the shops folder .sam RipOffOK 100 where it has none or less, and a shop sold at more than one
+    // and a half times its cost of goods (100 + 100) x 3 / 1.5 - 100 = 300 in its own; a higher one stays, and so does
+    // a shop at one and a half times (it takes its folder's 100), and a shop without a cost of goods (the photo booth).
+    for (const char* world : {"arabian", "water", "science"}) {
+        const std::string shops = S(ReadFile(out / world / "shops" / "Shops.sam"));
+        CHECK(TpiSamInteger(shops, "UsageInfo", "RipOffOK", id) && id == 100);
+        CHECK(TpiSamInteger(shops, "Info", "WhichUIType", id) && id == 1);
+        const std::string burger = S(ReadFile(out / world / "shops" / "burger" / "burger.sam"));
+        CHECK(TpiSamInteger(burger, "UsageInfo", "InitPricePerUse", id) && id == (std::string(world) == "water" ? 15 : 30));
+        CHECK(S(ReadFile(out / world / "upgrades" / "fotobth" / "fotobth.sam")).find("RipOffOK") == std::string::npos);
+        // The photo booth takes Info.IsChoosable 0 from Upgrades.sam (no visitor would use it): its own says 1; the
+        // folder .sam and the other shops are left.
+        CHECK(TpiSamInteger(S(ReadFile(out / world / "upgrades" / "fotobth" / "fotobth.sam")), "Info", "IsChoosable", id) && id == 1);
+        CHECK(TpiSamInteger(S(ReadFile(out / world / "upgrades" / "Upgrades.sam")), "Info", "IsChoosable", id) && id == 0);
+        CHECK(burger.find("IsChoosable") == std::string::npos);
+    }
+    CHECK(TpiSamInteger(S(ReadFile(out / "arabian" / "shops" / "burger" / "burger.sam")), "UsageInfo", "RipOffOK", id) && id == 500);
+    CHECK(S(ReadFile(out / "water" / "shops" / "burger" / "burger.sam")).find("RipOffOK") == std::string::npos);
+    CHECK(TpiSamInteger(S(ReadFile(out / "science" / "shops" / "burger" / "burger.sam")), "UsageInfo", "RipOffOK", id) && id == 300);
+    CHECK(S(ReadFile(out / "arabian" / "shops" / "Shops.sam")).find("converter") == std::string::npos);
     // The donor items, copied whole from the player's game data: the donor world's own wads, bytes as they are.
     for (const auto& [world, donor] : {std::pair{"arabian", "jungle"}, std::pair{"water", "hallow"}, std::pair{"science", "space"}}) {
         CHECK(ReadFile(out / world / "rides" / "mystery.wad") == DonorWad(donor, "mystery"));
@@ -1052,6 +1084,13 @@ void TestConvertTree(const fs::path& scratch) {
           std::string::npos);
     CHECK(record.find("names: the items' own working names in title case (") != std::string::npos);
     CHECK(record.find("rides/Rides.sam: no price per use (was 20)") != std::string::npos);
+    CHECK(record.find("shops/Shops.sam: RipOffOK 100 (was none)") != std::string::npos);
+    CHECK(record.find("shops/Shops.sam: RipOffOK 100 (was 0)") != std::string::npos);
+    CHECK(record.find(", RipOffOK 300 (was 20)") != std::string::npos && record.find(", RipOffOK 300 (was 500)") == std::string::npos);
+    CHECK(record.find("upgrades/fotobth (Info.Id 3700 -> ") != std::string::npos &&
+          record.find(", visitors can use it (its folder's Info.IsChoosable was 0)", record.find("upgrades/fotobth (")) <
+              record.find("\n", record.find("upgrades/fotobth (")));
+    CHECK(record.find("visitors can use it", record.find("shops/burger (")) > record.find("\n", record.find("shops/burger (")));
     CHECK(record.find("shops/burger (Info.Id 3300 -> 5030, ") != std::string::npos &&
           record.find("no price per use", record.find("shops/burger (")) > record.find("\n", record.find("shops/burger (")));
     CHECK(record.find("gate features/Gates named \"Arabian Nights\"") != std::string::npos);
