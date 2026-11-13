@@ -114,6 +114,8 @@ constexpr int kMainBalanceStaffHappinessRecuperationRate = 188;   // +0x2f8  (FL
 // The FixedItemInfo rows: the entrance A position is 12 slots before StrikeAreaStartX, counted back through the Crossing and Entrance rows.
 constexpr int kMainBalanceEntranceAPosX = 349;                    // +0x57c
 constexpr int kMainBalanceEntranceAPosY = 350;                    // +0x580
+constexpr int kMainBalanceEntranceBPosX = 351;                    // +0x584
+constexpr int kMainBalanceEntranceBPosY = 352;                    // +0x588
 constexpr int kMainBalanceStrikeAreaStartX = 361;                 // +0x5ac
 constexpr int kMainBalanceStrikeAreaStartY = 362;                 // +0x5b0
 constexpr int kMainBalanceStrikeAreaSizeX = 363;                  // +0x5b4

@@ -502,10 +502,11 @@ struct ItemFolder {
 };
 const ItemFolder kItemFolders[] = {{"rides", "rides"},       {"shops", "shops"},       {"sideshow", "sideshow"},
                                    {"features", "features"}, {"upgrades", "upgrades"}, {"facilities", "features"}};
-// The facilities Theme Park World knows (its features): both toilets (unisex ones there), the staff room, the
-// security camera, the litter bin (two spellings). The information desk, the research lab, the training room and the
-// science world's "nstaff" have no feature, so they are left out.
-const char *const kFacilitiesTaken[] = {"ftoilet", "mtoilet", "staffrm", "seccam", "littbin", "litbin"};
+// The facilities Theme Park World knows (its features): both toilets (unisex ones there), the staff room (two names:
+// the science world's is "nstaff", a "Staff Room" that rests staff as the others do), the security camera, the litter
+// bin (two spellings). The information desk, the research lab and the training room have no feature, so they are left
+// out.
+const char *const kFacilitiesTaken[] = {"ftoilet", "mtoilet", "staffrm", "nstaff", "seccam", "littbin", "litbin"};
 
 const TpiWadMember *ItemSam(const Item &item) {
     const std::string want = Lower(item.name) + ".sam";
@@ -1200,6 +1201,10 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             }
             log.text << o.state << ", " << o.nodes << " nodes, " << o.faces << " faces in the terrain; blocked cells: "
                      << o.blocked << " made hidden, " << o.alreadyHidden << " hidden already, " << o.open << " left open";
+            if (o.walkway != 0)
+                log.text << "; walkway cells shown: " << o.walkway;
+            if (o.leaves != 0)
+                log.text << "; gate leaves: " << o.leaves;
             if (!o.leftOut.empty()) {
                 log.text << "; left out:";
                 for (const auto &n : o.leftOut)

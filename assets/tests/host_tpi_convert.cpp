@@ -609,6 +609,8 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     WriteFile(w / "facilities" / "ftoilet.wad", Item("ftoilet", 3800));
     WriteFile(w / "facilities" / "info.wad", Item("info", 3801));
     WriteFile(w / "facilities" / "litbin.wad", Item("litbin", 3802));
+    // The science world's staff room is "nstaff" (Arabian Nights' and Polar Zone's are "staffrm").
+    WriteFile(w / "facilities" / "nstaff.wad", Item("nstaff", 3803));
     WriteFile(w / "facilities" / "Facilities.sam", B("Info.WhichUIType 5\n"));
     WriteFile(w / "obstacles" / "Rock.wad", Item("Rock", 3900));
     // An unpacked item folder is taken like a wad.
@@ -918,6 +920,8 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(TpiSamInteger(fotobth, "AddOn", "UpgradesId", id) && id == 5010);
     CHECK(TpiSamInteger(S(ReadFile(a / "features" / "ftoilet" / "ftoilet.sam")), "Info", "Id", id) && id == 5070);
     CHECK(TpiSamInteger(S(ReadFile(a / "features" / "litbin" / "litbin.sam")), "Info", "Id", id) && id == 5080);
+    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 5090);
+    CHECK(TpiSamInteger(S(ReadFile(out / "science" / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 7090);
     CHECK(TpiSamInteger(S(ReadFile(a / "rides" / "loop" / "loop.sam")), "Info", "Id", id) && id == 5020);
     const std::string track = S(ReadFile(a / "rides" / "loop" / "coaster.sam"));
     CHECK(track.find("Track.fScrollRate 0.5") != std::string::npos && track.find("Track.pcTextureFilename") != std::string::npos);
@@ -1033,9 +1037,10 @@ void TestConvertTree(const fs::path& scratch) {
                       "already, 0 left open") !=
           std::string::npos);
     CHECK(record.find("left out: facilities/info") != std::string::npos);
+    CHECK(record.find("left out: facilities/nstaff (") == std::string::npos);
     CHECK(record.find("features/noid") != std::string::npos);
     CHECK(record.find("rides/carpet: Info.WorkingLife") != std::string::npos);
-    CHECK(record.find("items converted: 33, left out: 6") != std::string::npos);
+    CHECK(record.find("items converted: 36, left out: 6") != std::string::npos);
     CHECK(record.find("features/bus (Info.Id 1600 -> 1600, ") != std::string::npos &&
           record.find(", given a script that plays its build animation once", record.find("features/bus (")) <
               record.find("\n", record.find("features/bus (")));

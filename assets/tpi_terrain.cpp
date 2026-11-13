@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <map>
 
@@ -43,6 +45,9 @@ constexpr float kGroundAbove = 1.5f;
 // and the terrain around it, and no part of a cell it leaves uncovered, shows the clear colour. A seam is looked through
 // at a slant, so the ring of shown quads catches what passes under the terrain beside it.
 constexpr float kUnderGround = kGroundBelow + 0.1f;
+// A bridge's walkway quads (Theme Park Inc gave them the deck's walking height) are shown again this far below it, where
+// no shown ground quad shares their corners, so that the deck, and not the quad or a path on it, is what is drawn there.
+constexpr float kUnderDeck = 0.3f;
 constexpr size_t kMaxName = 19;            // a texture name's characters (the mesh's 20-byte names)
 constexpr uint32_t kRecord = 0xa0, kMiniRecord = 0x58;
 
@@ -60,6 +65,7 @@ void Put16(Bytes& d, size_t at, uint32_t v) {
     d[at] = static_cast<uint8_t>(v);
     d[at + 1] = static_cast<uint8_t>(v >> 8);
 }
+void PutF(Bytes& d, size_t at, float f) { std::memcpy(d.data() + at, &f, 4); }
 bool In(const Bytes& d, uint64_t at, uint64_t n) { return at + n <= d.size() && at + n >= at; }
 
 std::string Lower(std::string s) {
@@ -382,6 +388,41 @@ bool PoseAtEnd(const Bytes& mesh, const Bytes& d, Md2Model& model) {
     return posed;
 }
 
+// A turn an animation gives a node: its first rotation key's quaternion and its last's (x y z w).
+struct Turn {
+    float first[4], last[4];
+};
+
+// The nodes (ReadMd2's order) that the animation `d` only turns (rotation keys, flag 8, and no place, shape, path or
+// morph) from one orientation to another (its first and last keys differ), with that turn.
+std::map<size_t, Turn> Turns(const Bytes& mesh, const Bytes& d) {
+    std::map<size_t, Turn> turns;
+    std::vector<size_t> node;
+    std::string ignored;
+    if (!RecordNodes(mesh, node, ignored) || !In(d, 0x98, 4) || L32(d, 0x98) == 0 || !In(d, L32(d, 0x98), 0x48))
+        return turns;
+    const uint32_t a = L32(d, 0x98), count = L16(d, a + 0x12), at = L32(d, a + 0x2c);
+    if (!In(d, at, uint64_t(count) * 0x40))
+        return turns;
+    for (uint32_t k = 0; k < count; ++k) {
+        const uint32_t o = at + 0x40 * k, record = L16(d, o + 0x14), flags = L32(d, o + 4);
+        const uint32_t quats = L16(d, o + 0x10), quatAt = L32(d, o + 0x1c);
+        if (record >= node.size() || (flags & 8) == 0 || (flags & (1 | 0x200 | 0x1000)) != 0 || L32(d, o + 0x18) != 0 ||
+            L32(d, o + 0x28) != 0 || quats < 2 || !In(d, quatAt, uint64_t(quats) * 0x14))
+            continue;
+        Turn t;
+        float dot = 0;
+        for (int c = 0; c < 4; ++c) {
+            t.first[c] = LF(d, quatAt + 4 + 4 * c);
+            t.last[c] = LF(d, quatAt + 0x14 * (quats - 1) + 4 + 4 * c);
+            dot += t.first[c] * t.last[c];
+        }
+        if (std::fabs(dot) < 0.9999f)
+            turns[node[record]] = t;
+    }
+    return turns;
+}
+
 // For each node of the mesh as ReadMd2 orders them (the root first, then the other records in file order): shown at the
 // animation's first frame (its last with `atEnd`). All are shown without an animation.
 bool ShownAtStart(const Bytes& mesh, const Bytes* anim, std::vector<bool>& shown, std::string& err, bool atEnd = false) {
@@ -475,6 +516,21 @@ bool SameTexture(const Md2Texture& a, const Md2Texture& b) {
 
 }  // namespace
 
+std::string TpiGateLeafName(int x, int y, int w, int h, const float closed[4], const float open[4]) {
+    std::string name = "tpigate " + std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(w) + " " +
+                       std::to_string(h);
+    for (int k = 0; k < 8; ++k) {
+        char number[32];
+        std::snprintf(number, sizeof number, "%.4f", static_cast<double>(k < 4 ? closed[k] : open[k - 4]));
+        std::string n = number;
+        while (n.back() == '0') n.pop_back();
+        if (n.back() == '.') n.pop_back();
+        if (n == "-0") n = "0";
+        name += " " + n;
+    }
+    return name.size() <= 63 ? name : std::string();
+}
+
 bool TpiTgaFullyTransparent(const std::vector<uint8_t>& t) {
     if (t.size() < 18 || t[1] != 0 || t[2] != 2 || t[16] != 32)
         return false;
@@ -561,6 +617,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
     std::vector<bool> madeHidden(quadFlags.size());
     std::vector<uint16_t> quadTexture(quadFlags.size());
     for (size_t q = 0; q < quadTexture.size(); ++q) quadTexture[q] = L16(out[baseAt].data, g.quads + 4 * q + 2);
+    std::vector<std::pair<size_t, size_t>> walkways;   // (walkway quad, the ground quad it takes its texture from)
 
     // The terrain's texture folders as they grow, and the names their lists gain.
     Folders folders = TextureFolders(out);
@@ -574,6 +631,13 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
     auto terrainSees = [&](int k, const std::string& lower) -> const Bytes* {
         const Bytes* own = terrainTexture(k, lower);
         return own != nullptr ? own : shared(std::string(kFolders[k]) + "/" + lower);
+    };
+    // A terrain texture whose picture is fully transparent (RepairTpiTerrain hid its quads).
+    auto clearTexture = [&](size_t t) {
+        if (t >= terrainTextures || base.textures[t].frames.empty())
+            return false;
+        const Bytes* bytes = terrainSees(0, Lower(Base(base.textures[t].frames[0])));
+        return bytes != nullptr && TpiTgaFullyTransparent(*bytes);
     };
     auto nameTaken = [&](const std::string& lower) {
         for (int k = 0; k < 2; ++k)
@@ -723,10 +787,38 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         if (!cleared)
             result.state = "before clearing";
 
+        // One that opens by itself once its objective is met (Obstacle.OpenedAutomaticly 1: Land of Invention's gate) is
+        // drawn closed but closes only its cleared shape's closed cells (the posts), and its leaves (the shown nodes under
+        // its root that its first animation only turns) are named for the game to swing open (TpiGateLeafName) with its
+        // footprint, the cleared shape's rows. It needs a passage (an open cell of the cleared shape with a closed cell on
+        // each side in its row); without one it stays as it is before clearing.
+        int32_t opensItself = 0;
+        int64_t passage[4] = {INT64_MAX, INT64_MAX, -1, -1};   // first x, first y, last x, last y (shape cells)
+        size_t footprintW = 0;
+        std::vector<std::string> openRows;
+        if (!cleared && !anims.empty() && TpiSamInteger(text, "Obstacle", "OpenedAutomaticly", opensItself) &&
+            opensItself == 1 && ShapeRows(text, "Obstacle.AfterShape", openRows))
+            for (size_t j = 0; j < openRows.size(); ++j) {
+                const std::string& row = openRows[j];
+                footprintW = std::max(footprintW, row.size());
+                const size_t firstClosed = row.find_first_of("XH"), lastClosed = row.find_last_of("XH");
+                for (size_t i = 0; i < row.size(); ++i) {
+                    if (row[i] != '.' || firstClosed == std::string::npos || i < firstClosed || i > lastClosed)
+                        continue;
+                    passage[0] = std::min<int64_t>(passage[0], int64_t(i));
+                    passage[1] = std::min<int64_t>(passage[1], int64_t(j));
+                    passage[2] = std::max<int64_t>(passage[2], int64_t(i));
+                    passage[3] = std::max<int64_t>(passage[3], int64_t(j));
+                }
+            }
+        const bool opens = passage[2] >= 0;
+        if (opens)
+            result.state = "before clearing, opens";
+
         // The cells it closes: once cleared, its Obstacle.AfterShape ('X' and 'H' closed; '.' open; ',' and '@' the
         // paths it leaves, the bridges' and tunnels' walkways); before, its Info.Shape.
         std::vector<std::string> after;
-        const bool useAfter = ShapeRows(text, "Obstacle.AfterShape", after) && cleared;
+        const bool useAfter = ShapeRows(text, "Obstacle.AfterShape", after) && (cleared || opens);
         if (useAfter)
             rows = after;
 
@@ -740,6 +832,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         if (posedAtEnd)
             for (const TpiWadMember* a : anims) PoseAtEnd(drawn->data, a->data, model);
         leaveMoved.resize(model.nodes.size(), false);
+        const std::map<size_t, Turn> turns = opens ? Turns(drawn->data, anims.front()->data) : std::map<size_t, Turn>();
 
         // Each texture as Theme Park Inc gave it to the obstacle (its own folders first, then the shared ones), under a
         // name that gives the terrain the same picture: its own when the terrain sees no other picture by it, else a
@@ -815,6 +908,15 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
             Md2Node copy = node;
             copy.parent = 0;
             copy.matrix = world[n];
+            const auto turn = turns.find(n);
+            if (turn != turns.end() && node.parent == 0) {
+                const std::string leaf = TpiGateLeafName(int(ox), int(oy), int(footprintW), int(openRows.size()),
+                                                         turn->second.first, turn->second.last);
+                if (!leaf.empty()) {
+                    copy.name = leaf;
+                    ++result.leaves;
+                }
+            }
             for (Md2FaceSet& fs : copy.faceSets)
                 if (fs.texture >= 0) fs.texture = fs.texture < static_cast<int>(slot.size()) ? slot[fs.texture] : -1;
             result.faces += static_cast<int>(copy.faces.size());
@@ -822,7 +924,8 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
             placed.nodes.push_back(std::move(copy));
         }
 
-        // Its blocked cells become hidden quads where its geometry takes the ground's place.
+        // Its blocked cells become hidden quads where its geometry takes the ground's place (an opening gate's posts
+        // whatever covers them, as its marker, which did, is left out).
         const std::vector<int> atGround = Coverage(placed, g, &heights);
         for (size_t j = 0; j < rows.size(); ++j)
             for (size_t i = 0; i < rows[j].size(); ++i) {
@@ -834,12 +937,75 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                 const size_t q = static_cast<size_t>(y) * g.w + static_cast<size_t>(x);
                 if ((quadFlags[q] & kQuadHidden) != 0) {
                     ++result.alreadyHidden;
-                } else if (atGround[q] >= kCoveredSamples) {
+                } else if (atGround[q] >= kCoveredSamples || opens) {
                     quadFlags[q] |= kQuadHidden;
                     madeHidden[q] = true;
                     ++result.blocked;
                 } else {
                     ++result.open;
+                }
+            }
+
+        // Its walkways (the ',' and '@' cells of a bridge's cleared shape): Theme Park Inc gave them quads at the deck's
+        // walking height with a fully transparent texture, so the river and the deck showed and its guests walked
+        // there. They are shown again with the texture of the nearest shown ground, so the map takes them as land
+        // (CMapCell::Reset) and a path can be built across, which guests walk at the deck's height; their corners that
+        // no shown ground quad shares go a little under the deck (kUnderDeck), which hides the quad and the path. An
+        // open cell ('.') beside a walkway cell is taken with them when its quad is such a quad too: the ramp from the
+        // deck down to the ground at a walkway's end, which a shape may leave open (Polar Zone's bridge does).
+        auto walkwayCell = [&](int64_t i, int64_t j) {
+            return j >= 0 && j < int64_t(rows.size()) && i >= 0 && i < int64_t(rows[size_t(j)].size()) &&
+                   (rows[size_t(j)][size_t(i)] == ',' || rows[size_t(j)][size_t(i)] == '@');
+        };
+        std::vector<size_t> ownWalkways;
+        for (size_t j = 0; j < rows.size() && posedAtEnd; ++j)
+            for (size_t i = 0; i < rows[j].size(); ++i) {
+                const int64_t si = static_cast<int64_t>(i), sj = static_cast<int64_t>(j);
+                const bool ramp = rows[j][i] == '.' && (walkwayCell(si - 1, sj) || walkwayCell(si + 1, sj) ||
+                                                        walkwayCell(si, sj - 1) || walkwayCell(si, sj + 1));
+                if (!walkwayCell(si, sj) && !ramp)
+                    continue;
+                const int64_t x = ox + static_cast<int64_t>(i), y = oy + static_cast<int64_t>(j);
+                if (x < 0 || y < 0 || x >= int64_t(g.w) || y >= int64_t(g.h))
+                    continue;
+                const size_t q = static_cast<size_t>(y) * g.w + static_cast<size_t>(x);
+                if ((quadFlags[q] & kQuadHidden) == 0 || madeHidden[q] || !clearTexture(quadTexture[q]))
+                    continue;
+                int64_t best = -1, bestDistance = 0;
+                for (int64_t ny = std::max<int64_t>(y - 8, 0); ny <= std::min<int64_t>(y + 8, int64_t(g.h) - 1); ++ny)
+                    for (int64_t nx = std::max<int64_t>(x - 8, 0); nx <= std::min<int64_t>(x + 8, int64_t(g.w) - 1); ++nx) {
+                        const size_t n = static_cast<size_t>(ny) * g.w + static_cast<size_t>(nx);
+                        const int64_t distance = (nx - x) * (nx - x) + (ny - y) * (ny - y);
+                        if ((quadFlags[n] & kQuadHidden) != 0 || quadTexture[n] >= terrainTextures ||
+                            clearTexture(quadTexture[n]) || (best >= 0 && distance >= bestDistance))
+                            continue;
+                        best = static_cast<int64_t>(n);
+                        bestDistance = distance;
+                    }
+                if (best < 0)
+                    continue;
+                quadTexture[q] = quadTexture[static_cast<size_t>(best)];
+                walkways.emplace_back(q, static_cast<size_t>(best));
+                ownWalkways.push_back(q);
+                ++result.walkway;
+            }
+        for (size_t q : ownWalkways) quadFlags[q] &= static_cast<uint16_t>(~kQuadHidden);
+        std::vector<bool> lowered(heights.size());
+        for (size_t q : ownWalkways)
+            for (size_t c = 0; c < 4; ++c) {
+                const size_t cx = q % g.w + (c & 1), cz = q / g.w + (c >> 1), v = cz * (g.w + 1) + cx;
+                bool underDeck = true;
+                for (size_t k = 0; k < 4 && underDeck; ++k) {
+                    if ((cx == 0 && (k & 1) == 0) || (cz == 0 && (k >> 1) == 0) || (cx == g.w && (k & 1) != 0) ||
+                        (cz == g.h && (k >> 1) != 0))
+                        continue;
+                    const size_t n = (cz - 1 + (k >> 1)) * g.w + (cx - 1 + (k & 1));
+                    underDeck = (quadFlags[n] & kQuadHidden) != 0 ||
+                                std::find(ownWalkways.begin(), ownWalkways.end(), n) != ownWalkways.end();
+                }
+                if (underDeck && !lowered[v]) {
+                    heights[v] -= kUnderDeck;
+                    lowered[v] = true;
                 }
             }
 
@@ -878,7 +1044,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
     // Nothing merged (no obstacles, or none that shows or blocks anything): the terrain stays as it is.
     bool changed = !report.addedTextures.empty();
     for (const TpiObstacleResult& r : report.obstacles)
-        changed = changed || r.nodes != 0 || r.blocked != 0;
+        changed = changed || r.nodes != 0 || r.blocked != 0 || r.walkway != 0;
     if (!changed) {
         report.stillClear = StillClear(base, g, quadFlags);
         return true;
@@ -910,8 +1076,41 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         Put16(merged, mg.quads + 4 * q, quadFlags[q]);
         Put16(merged, mg.quads + 4 * q + 2, quadTexture[q]);
     }
+    for (size_t i = 0; i < heights.size(); ++i) PutF(merged, mg.heights + 4 * i, heights[i]);
 
     report.stillClear = StillClear(base, g, quadFlags);
+
+    // Near the camera the height field draws a quad with a texture made from base.lnd's control map
+    // (src/engine/landscape.cpp Landscape::generate_tile), which fills the quad with white when the map's channel 0 is
+    // not 0xff at its four corners: so it is where Theme Park Inc's river runs under a bridge. A walkway quad there takes
+    // the control texels of the ground quad it took its texture from, so it is drawn as that ground.
+    for (size_t i = 0; i < out.size() && !walkways.empty(); ++i) {
+        if (!Dir(out[i].name).empty() || Lower(out[i].name) != "base.lnd")
+            continue;
+        Bytes& lnd = out[i].data;
+        if (!In(lnd, 11, 12) || lnd[0] != 3)
+            break;
+        const uint64_t cw = L32(lnd, 11), ch = L32(lnd, 15), at = 23;
+        if (L32(lnd, 19) != 4 || cw < 5 || ch < 5 || !In(lnd, at, cw * ch * 4))
+            break;
+        const uint64_t tilesHigh = (ch - 1) >> 2, tilesWide = (cw - 1) >> 2;
+        auto texel = [&](size_t q, uint64_t col, uint64_t row) {
+            const uint64_t x = q % g.w, y = q / g.w;
+            return at + (((tilesHigh - y - 1) * 4 + row) * cw + x * 4 + col) * 4;
+        };
+        for (const auto& [q, from] : walkways) {
+            if (q % g.w >= tilesWide || q / g.w >= tilesHigh || from % g.w >= tilesWide || from / g.w >= tilesHigh)
+                continue;
+            if ((lnd[texel(q, 1, 1)] & lnd[texel(q, 2, 1)] & lnd[texel(q, 1, 2)] & lnd[texel(q, 2, 2)]) == 0xff)
+                continue;
+            for (uint64_t row = 0; row < 4; ++row)
+                for (uint64_t col = 0; col < 4; ++col)
+                    for (uint64_t k = 0; k < 4; ++k) lnd[texel(q, col, row) + k] = lnd[texel(from, col, row) + k];
+            for (uint64_t row = 1; row < 3; ++row)
+                for (uint64_t col = 1; col < 3; ++col) lnd[texel(q, col, row)] = 0xff;
+        }
+        break;
+    }
 
     // The texture lists gain the added files, as the loader looks a texture up there before it opens the folder.
     for (int k = 0; k < 2; ++k) {

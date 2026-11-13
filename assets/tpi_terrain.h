@@ -23,8 +23,18 @@
 //    hidden quads, which the map takes as cells nothing goes on (src/game/park/TPHField.cpp HFieldCellStatus answers
 //    0 for them, and src/game/park/MapCell.cpp CMapCell::Reset makes such a cell mode 7), as it does Theme Park
 //    World's own scenery. Those quads are drawn again as geometry a little below the obstacle (Theme Park Inc drew the
-//    ground under it), so the seams at the obstacle's edge show ground, not the clear colour. A bridge's walkway
-//    cells over the river keep their hidden quads: the deck is drawn, but no path can be built across it.
+//    ground under it), so the seams at the obstacle's edge show ground, not the clear colour. A bridge's walkway cells
+//    over the river (its cleared shape's ',' and '@' cells, whose quads Theme Park Inc gave the deck's walking height
+//    and a fully transparent texture, and an open '.' cell beside one whose quad is such a quad too: the ramp down at a
+//    walkway's end) are shown again with the nearest ground's texture and its base.lnd control texels, a little under
+//    the deck: the map takes them as land, a path can be built across and guests walk it at the deck's height, while
+//    the deck is what is drawn there.
+// An obstacle drawn before clearing that opens by itself once its objective is met (Obstacle.OpenedAutomaticly 1: Land
+// of Invention's gate) is drawn closed and closes only its cleared shape's closed cells (the posts), which become hidden
+// quads whatever covers them; the marker is left out, so the passage between the posts is ground. Each leaf (a shown
+// node its first animation turns, under its root) is named so that the game can swing it open (TpiGateLeafName): the
+// game's hook (TPW_MOD_HOOK tpi_worlds, include/TpiObstacleGate.h) turns it from its closed to its open orientation
+// once the park owns a cell of the gate's footprint or a cell next to it.
 #pragma once
 
 #include <cstdint>
@@ -62,11 +72,14 @@ struct TpiObstacleResult {
     std::string name;
     std::string skipped;                  // why it is not merged ("not an obstacle", ...), empty when it is
     std::string state;                    // how it is drawn: "cleared", "cleared, posed", "replaced by <obstacle>",
-                                          // "before clearing"
+                                          // "before clearing", "before clearing, opens"
     int nodes = 0, faces = 0;             // the nodes and faces added to the terrain
     int blocked = 0;                      // blocked shape cells made hidden quads
     int alreadyHidden = 0;                // blocked shape cells whose quads were hidden already
     int open = 0;                         // blocked shape cells the mesh does not cover: left as they are
+    int walkway = 0;                      // walkway (and ramp) cells whose quads are shown again (a bridge's, under its
+                                          // deck)
+    int leaves = 0;                       // leaves named for the game to swing open (an opening gate's)
     std::vector<std::string> leftOut;     // the shown nodes left out (the crew, the props, the markers, moved nodes)
 };
 
@@ -86,6 +99,12 @@ struct TpiObstacleReport {
 // "stexture/x.tga": its ssharete.wad), nullptr when there is none. An obstacle wad without Info.IsObstacle 1, a mesh
 // or a shape is skipped and reported. False with a message when the terrain or an obstacle's mesh cannot be read or the
 // merged mesh would not fit the mesh format's 16-bit counts; the members are then left as they were.
+// The name an opening gate's leaf takes in the terrain: "tpigate X Y W H" (the gate's footprint: its first cell and its
+// size in cells; the gate opens once the park owns one of them or a cell next to them), then the leaf's closed and open
+// orientations as two quaternions (x y z w), each number as short as "%.4f" gives it without trailing zeros. Empty when
+// it would not fit the 63 characters a node name has in the converter's own reader.
+std::string TpiGateLeafName(int x, int y, int w, int h, const float closed[4], const float open[4]);
+
 bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<TpiObstacle>& obstacles,
                        const std::function<const std::vector<uint8_t>*(const std::string& path)>& shared,
                        TpiObstacleReport& report, std::string& err);

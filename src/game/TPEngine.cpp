@@ -506,6 +506,7 @@ void AnimateRides(uint32_t mode) {
 }
 
 // 0x1005b4d4
+
 void EngineTick1() {
     g3DRefreshFlags = 0;
     if (gHeightfieldRideSet != nullptr) AnimateRideSet(gHeightfieldRideSet, 1, 4);

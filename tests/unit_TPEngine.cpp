@@ -13,6 +13,8 @@
 #include "FS_System.h"
 #include "Game.h"
 #include "GameSys.h"
+#include "HoardingsBalance.h"
+#include "MainBalance.h"
 #include "MapWho.h"
 #include "OptionsBalance.h"
 #include "TPCamera.h"

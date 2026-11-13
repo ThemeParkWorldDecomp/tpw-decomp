@@ -483,8 +483,8 @@ md2::Md2Node Grid(const std::string& name, float size, int n, float y, uint16_t 
 }
 
 // Obstacles drawn as they are once cleared: from the last clearing animation, swapped for another object, or (when the
-// animations move too much of them) as before; their cells from Obstacle.AfterShape. A bridge's walkway cells (',') keep
-// their hidden quads and base.lnd is left as it was: no ground is drawn across the river.
+// animations move too much of them) as before; their cells from Obstacle.AfterShape. Walkway cells (',') of an obstacle
+// that is not posed keep their hidden quads and base.lnd is left as it was (only a posed bridge's are shown: TestPosed).
 void TestCleared() {
     // Row 0: shown grass, two hidden quads with the clear texture (a bridge's walkway under the deck: (1,0) is a ','
     // cell, (2,0) a '.' one), shown rock. Row 1: shown grass, shown grass, shown grass, shown rock.
@@ -614,14 +614,44 @@ void TestCleared() {
     CHECK(landscape != nullptr && landscape->data == lnd);
 }
 
-// A bridge its animations move all of, with walkway cells (','): drawn posed at its animations' last frame, the deck
-// where the last one's shape track puts it (sunk 20 below the ground before), and its walkway quads left hidden.
+// The height of the height field's corner (x, z): (kW + 1) x (kH + 1) of them, row by row.
+float Height(const Bytes& d, uint32_t x, uint32_t z) {
+    float f;
+    std::memcpy(&f, d.data() + L32(d, L32(d, 0x6c) + 0x28) + 4 * (x + z * (kW + 1)), 4);
+    return f;
+}
+
+// A bridge its animations move all of, with a walkway cell (','): drawn posed at its animations' last frame, the deck
+// where the last one's shape track puts it (sunk 20 below the ground before). Its walkway quad and the ramp beside it
+// (an open '.' cell next to the walkway, hidden with the clear texture) are shown again with the nearest ground's
+// texture and base.lnd control texels, their corners under the deck a little lower; an open cell further on stays hidden.
 void TestPosed() {
+    // Row 0: shown grass, then three quads hidden with the clear texture: the walkway (1,0), the ramp (2,0) and an open
+    // cell (3,0) no walkway touches. Row 1: shown grass.
     const std::vector<std::pair<uint16_t, uint16_t>> quads = {
-        {0x0042, kTexGrass}, {0x0043, kTexClear}, {0x0042, kTexGrass}, {0x0042, kTexGrass},
+        {0x0042, kTexGrass}, {0x0043, kTexClear}, {0x0043, kTexClear}, {0x0043, kTexClear},
         {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0042, kTexGrass}};
     const Bytes grass = Tga(2, 2, 255), clear = Tga(2, 2, 0);
+    // base.lnd's control map, as in TestCleared: channel 0 is 0xff but under the bridge (row 0, quads 1 to 3) and on the
+    // ground quad (2,1), which blends (0x80); channels 1 to 3 hold the quad's index.
+    const uint32_t cw = 17, ch = 9;
+    Bytes lnd(23 + cw * ch * 4 + 4, 0);
+    lnd[0] = 3;
+    const uint32_t header[3] = {cw, ch, 4};
+    std::memcpy(lnd.data() + 11, header, 12);
+    auto texel = [&](uint32_t x, uint32_t y, uint32_t col, uint32_t row) {
+        return 23 + (((2 - y - 1) * 4 + row) * cw + x * 4 + col) * 4;
+    };
+    for (uint32_t y = 0; y < 2; ++y)
+        for (uint32_t x = 0; x < 4; ++x)
+            for (uint32_t row = 0; row < 4; ++row)
+                for (uint32_t col = 0; col < 4; ++col) {
+                    const uint32_t at = texel(x, y, col, row);
+                    lnd[at] = y == 0 && x >= 1 ? 0x18 : y == 1 && x == 2 ? 0x80 : 0xff;
+                    lnd[at + 1] = lnd[at + 2] = lnd[at + 3] = static_cast<uint8_t>(y * 4 + x);
+                }
     std::vector<TpiWadMember> members = {{"base.MD2", Terrain(quads)},
+                                         {"base.lnd", lnd},
                                          {"textures/grass.tga", grass},
                                          {"textures/trans01.tga", clear},
                                          {"textures/qickload.txt", Text("grass.tga\n")}};
@@ -645,7 +675,7 @@ void TestPosed() {
     for (float f : {10.0f, -20.0f, 0.0f, 10.0f, 0.0f, 0.0f}) AddF(last, f);
     for (uint16_t f : {0, 0, 20, 0}) Add16(last, f);
     const TpiObstacle bridgeObstacle = {"bridge",
-                                        {{"bridge.sam", Sam(1, {"H"}, 1, 0, {","}, 2800)},
+                                        {{"bridge.sam", Sam(1, {"HHH"}, 1, 0, {",.."}, 2800)},
                                          {"bridge.MD2", md2::WriteMd2(bridge)},
                                          {"bridgem1.MD2", Anim(0, {}, {{1, {}, true}})},
                                          {"bridgem2.MD2", last},
@@ -664,7 +694,180 @@ void TestPosed() {
     for (const md2::Md2Node& n : merged.nodes)
         if (n.name == "deck") atGround = n.matrix[13] == 0.0f && n.matrix[12] == 10.0f;
     CHECK(atGround);
-    CHECK(base != nullptr && Quad(base->data, 1, 0) == quads[1]);
+    CHECK(report.obstacles[0].walkway == 2);
+    if (base == nullptr) return;
+    // The walkway takes the texture of the nearest shown ground, (0,0); the ramp that of (2,1); both are shown. The open
+    // cell no walkway touches keeps its hidden clear quad.
+    CHECK(Quad(base->data, 1, 0) == std::make_pair(uint16_t(0x0042), kTexGrass));
+    CHECK(Quad(base->data, 2, 0) == std::make_pair(uint16_t(0x0042), kTexGrass));
+    CHECK(Quad(base->data, 3, 0) == quads[3]);
+    // Only the corners no shown ground quad shares go under the deck: (2,0) between the walkway and the ramp, and (3,0)
+    // between the ramp and the hidden quad. The ones the ground shares stay at its height.
+    CHECK(Height(base->data, 2, 0) == -0.3f && Height(base->data, 3, 0) == -0.3f);
+    CHECK(Height(base->data, 1, 0) == 0.0f && Height(base->data, 4, 0) == 0.0f);
+    CHECK(Height(base->data, 1, 1) == 0.0f && Height(base->data, 2, 1) == 0.0f && Height(base->data, 3, 1) == 0.0f);
+    // base.lnd: the walkway and the ramp take the control texels of the ground they took their texture from, their four
+    // middle ones 0xff (so the quad is drawn as ground near the camera, not white); the hidden quad keeps its own.
+    const TpiWadMember* landscape = Member(members, "base.lnd");
+    CHECK(landscape != nullptr);
+    if (landscape == nullptr) return;
+    bool walkwayAsGround = true, rampAsGround = true, hiddenKept = true;
+    for (uint32_t row = 0; row < 4; ++row)
+        for (uint32_t col = 0; col < 4; ++col) {
+            const uint8_t* w = landscape->data.data() + texel(1, 0, col, row);
+            const uint8_t* r = landscape->data.data() + texel(2, 0, col, row);
+            const uint8_t* h = landscape->data.data() + texel(3, 0, col, row);
+            walkwayAsGround = walkwayAsGround && w[0] == 0xff && w[1] == 0 && w[2] == 0 && w[3] == 0;
+            const bool middle = row >= 1 && row <= 2 && col >= 1 && col <= 2;
+            rampAsGround = rampAsGround && r[0] == (middle ? 0xff : 0x80) && r[1] == 6 && r[2] == 6 && r[3] == 6;
+            hiddenKept = hiddenKept && h[0] == 0x18 && h[1] == 3 && h[2] == 3 && h[3] == 3;
+        }
+    CHECK(walkwayAsGround);
+    CHECK(rampAsGround);
+    CHECK(hiddenKept);
+}
+
+// A walkway whose quad is not hidden with the clear texture (Theme Park Inc drew ground there), or a bridge that is not
+// posed (a cleared tunnel's ',' cells): nothing is shown again or lowered.
+void TestWalkwayLeftAlone() {
+    const std::vector<std::pair<uint16_t, uint16_t>> quads = {
+        {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0043, kTexRock}, {0x0042, kTexGrass},
+        {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0042, kTexGrass}};
+    const Bytes grass = Tga(2, 2, 255), clear = Tga(2, 2, 0), rock = Tga(2, 2, 200);
+    std::vector<TpiWadMember> members = {{"base.MD2", Terrain(quads)},
+                                         {"textures/grass.tga", grass},
+                                         {"textures/rock.tga", rock},
+                                         {"textures/trans01.tga", clear},
+                                         {"textures/qickload.txt", Text("grass.tga\n")}};
+    // Posed (its last animation has a shape track), but its walkway (1,0) is shown ground and its ramp cell (2,0) is
+    // hidden with an opaque texture.
+    md2::Md2Model bridge = Model("bridge.MD2", {"grass.tga"});
+    AddNode(bridge, Square("deck", 10, 0, 0), 0, md2::Translation(10, 0, 0));
+    md2::RecomputeBoxes(bridge);
+    const TpiObstacle bridgeObstacle = {"bridge",
+                                        {{"bridge.sam", Sam(1, {"HH"}, 1, 0, {",."}, 2800)},
+                                         {"bridge.MD2", md2::WriteMd2(bridge)},
+                                         {"bridgem1.MD2", Anim(0, {}, {{1, {}, true}})},
+                                         {"bridgem2.MD2", Anim(0, {}, {{1, {}, true}})},
+                                         {"textures/grass.tga", grass}}};
+    auto shared = [](const std::string&) -> const Bytes* { return nullptr; };
+    TpiObstacleReport report;
+    std::string err;
+    CHECK(MergeTpiObstacles(members, {bridgeObstacle}, shared, report, err));
+    CHECK(report.obstacles.size() == 1 && report.obstacles[0].walkway == 0);
+    const TpiWadMember* base = Member(members, "base.MD2");
+    CHECK(base != nullptr);
+    if (base == nullptr) return;
+    CHECK(Quad(base->data, 1, 0) == quads[1] && Quad(base->data, 2, 0) == quads[2]);
+    for (uint32_t z = 0; z <= kH; ++z)
+        for (uint32_t x = 0; x <= kW; ++x) CHECK(Height(base->data, x, z) == 0.0f);
+}
+
+// A gate that opens by itself (Obstacle.OpenedAutomaticly 1) once its objective is met: drawn closed, but only its
+// cleared shape's closed cells (the posts, 'X') are closed, as hidden quads although nothing covers them at ground level
+// once the marker is left out; the passage between them stays ground. Its leaf (under its root, only turned by its first
+// animation) is named for the game with the gate's footprint (its cleared shape at its offset) and the turn's first and
+// last keys; a turned node under another node, a node its animation also moves along a shape, and a gate without the
+// flag are left as they were.
+void TestOpeningGate() {
+    const std::vector<std::pair<uint16_t, uint16_t>> quads = {
+        {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0042, kTexGrass},
+        {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0042, kTexGrass}};
+    const Bytes grass = Tga(2, 2, 255), clear = Tga(2, 2, 0);
+    md2::Md2Model gate = Model("gates.MD2", {"grass.tga"});
+    AddNode(gate, Square("leaf", 2, 5, 0), 0, md2::Translation(10, 0, 9));     // node 1, turned
+    AddNode(gate, Square("post", 1, 0, 0), 0, md2::Translation(4, 0, 4));      // node 2
+    AddNode(gate, Grid("unbuildable01", 40, 8, 0, 0), 0, md2::IdentityMatrix());   // node 3, covers every cell
+    AddNode(gate, Square("knob", 1, 6, 0), 2, md2::Translation(0, 6, 0));      // node 4, turned under the post
+    AddNode(gate, Square("slider", 1, 7, 0), 0, md2::Translation(20, 0, 9));   // node 5, turned and moved along a shape
+    md2::RecomputeBoxes(gate);
+    // Its first animation: rotation keys (flag 8) for nodes 1, 4 and 5, from no turn to a half turn and more about y;
+    // node 5 also has a shape track (flag 1).
+    Bytes first = Anim(0, {}, {{1, {}, false}, {4, {}, false}, {5, {}, false}});
+    Put32(first, 0xa0 + 8, 550);
+    uint32_t tracks = 0;
+    std::memcpy(&tracks, first.data() + 0xa0 + 0x2c, 4);
+    for (uint32_t k = 0; k < 3; ++k) {
+        const uint32_t o = tracks + 0x40 * k;
+        Put32(first, o + 4, k == 2 ? 0x20009 : 0x20008);
+        first[o + 0x10] = 3;
+        Put32(first, o + 0x1c, static_cast<uint32_t>(first.size()));
+        if (k == 2) Put32(first, o + 0x18, static_cast<uint32_t>(first.size()));
+        const float keys[3][4] = {{0, 0, 0, 1}, {0, 0.5f, 0, 0.866f}, {0, 0.9304f, -0.0f, 0.3665f}};
+        const uint16_t frames[3] = {15, 80, 550};
+        for (int key = 0; key < 3; ++key) {
+            Add16(first, frames[key]);
+            Add16(first, 0xffff);
+            for (float f : keys[key]) AddF(first, f);
+        }
+    }
+    const std::string opens = "Obstacle.OpenedAutomaticly\t\t1\r\n";
+    auto merge = [&](const Bytes& sam, TpiObstacleResult& result, std::vector<TpiWadMember>& members) {
+        members = {{"base.MD2", Terrain(quads)},
+                   {"textures/grass.tga", grass},
+                   {"textures/trans01.tga", clear},
+                   {"textures/qickload.txt", Text("grass.tga\n")}};
+        const TpiObstacle obstacle = {"gates",
+                                      {{"gates.sam", sam},
+                                       {"gates.MD2", md2::WriteMd2(gate)},
+                                       {"gatesm1.MD2", first},
+                                       {"gatesm2.MD2", Anim(0, {}, {})},
+                                       {"textures/grass.tga", grass}}};
+        auto shared = [](const std::string&) -> const Bytes* { return nullptr; };
+        TpiObstacleReport report;
+        std::string err;
+        const bool ok = MergeTpiObstacles(members, {obstacle}, shared, report, err);
+        CHECK(ok && report.obstacles.size() == 1);
+        if (report.obstacles.size() == 1) result = report.obstacles[0];
+    };
+    TpiObstacleResult r;
+    std::vector<TpiWadMember> members;
+    merge(Sam(1, {"HHHH", "HHHH"}, 0, 0, {"X..X", "...."}, 1700, opens), r, members);
+    CHECK(r.state == "before clearing, opens");
+    CHECK(r.leaves == 1);
+    CHECK(r.blocked == 2 && r.open == 0 && r.alreadyHidden == 0);
+    CHECK(r.leftOut == std::vector<std::string>{"unbuildable01"});
+    const TpiWadMember* base = Member(members, "base.MD2");
+    md2::Md2Model merged;
+    std::string err;
+    CHECK(base != nullptr && md2::ReadMd2(base->data, merged, err, true));
+    if (base == nullptr) return;
+    std::vector<std::string> names;
+    for (const md2::Md2Node& n : merged.nodes) names.push_back(n.name);
+    CHECK(std::count(names.begin(), names.end(), "tpigate 0 0 4 2 0 0 0 1 0 0.9304 0 0.3665") == 1);
+    CHECK(std::count(names.begin(), names.end(), "knob") == 1 && std::count(names.begin(), names.end(), "slider") == 1);
+    CHECK(std::count(names.begin(), names.end(), "leaf") == 0 && std::count(names.begin(), names.end(), "post") == 1);
+    // The posts' cells (0,0) and (3,0) are hidden; the passage (1,0), (2,0) and the open row below are ground.
+    CHECK(Quad(base->data, 0, 0).first == 0x0043 && Quad(base->data, 3, 0).first == 0x0043);
+    for (uint32_t x = 1; x < 3; ++x) CHECK(Quad(base->data, x, 0) == quads[x]);
+    for (uint32_t x = 0; x < 4; ++x) CHECK(Quad(base->data, x, 1) == quads[4 + x]);
+
+    // Placed elsewhere, its footprint follows its offset and its cleared shape's size: three cells from (1,1).
+    merge(Sam(1, {"HHH"}, 1, 1, {"X.X"}, 1700, opens), r, members);
+    CHECK(r.state == "before clearing, opens" && r.leaves == 1 && r.blocked == 2);
+    base = Member(members, "base.MD2");
+    CHECK(base != nullptr && md2::ReadMd2(base->data, merged, err, true));
+    names.clear();
+    for (const md2::Md2Node& n : merged.nodes) names.push_back(n.name);
+    CHECK(std::count(names.begin(), names.end(), "tpigate 1 1 3 1 0 0 0 1 0 0.9304 0 0.3665") == 1);
+    if (base != nullptr) CHECK(Quad(base->data, 1, 1).first == 0x0043 && Quad(base->data, 3, 1).first == 0x0043);
+
+    // Without the flag it is as it was before clearing: its whole shape closed where the marker covers it, no leaves.
+    merge(Sam(1, {"HHHH", "HHHH"}, 0, 0, {"X..X", "...."}, 1700, ""), r, members);
+    CHECK(r.state == "before clearing" && r.leaves == 0 && r.blocked == 8 && r.leftOut.empty());
+    base = Member(members, "base.MD2");
+    CHECK(base != nullptr && md2::ReadMd2(base->data, merged, err, true));
+    bool named = false;
+    for (const md2::Md2Node& n : merged.nodes) named = named || n.name.compare(0, 8, "tpigate ") == 0;
+    CHECK(!named);
+}
+
+// The leaf's name: each number as "%.4f" without trailing zeros (a negative zero as 0); none past 63 characters.
+void TestGateLeafName() {
+    const float closed[4] = {0, -0.0f, 0.5f, 1}, open[4] = {-0.25f, 0.12345f, 0, -1};
+    CHECK(TpiGateLeafName(42, 49, 2, 2, closed, open) == "tpigate 42 49 2 2 0 0 0.5 1 -0.25 0.1235 0 -1");
+    const float longer[4] = {-0.1234f, -0.1234f, -0.1234f, -0.1234f};
+    CHECK(TpiGateLeafName(100, 100, 10, 10, longer, longer).empty());
 }
 
 }  // namespace
@@ -675,6 +878,9 @@ int main() {
     TestMerge();
     TestCleared();
     TestPosed();
+    TestWalkwayLeftAlone();
+    TestOpeningGate();
+    TestGateLeafName();
     std::printf("tpi_terrain: %d passed, %d failed\n", g_pass, g_fail);
     return g_fail == 0 ? 0 : 1;
 }

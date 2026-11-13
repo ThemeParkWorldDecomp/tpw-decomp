@@ -28,6 +28,7 @@
 #include "TbDynamicStringTemplate.h"
 #include "TbError.h"
 #include "ThingReceivers.h"
+#include "TpiGateFlow.h"
 #include "TPConfig.h"
 #include "TPDialog.h"
 #include "TPEngine.h"
@@ -1073,7 +1074,8 @@ struct SideTally {
 // and 0x44 on a column.
 void TallySideCell(CTrackCell* cell, Side side, SideTally* tally, bool atEnd, uint8_t straightBytes, int32_t* corners, bool* bad) {
     CMapCell* map = cell->GetMapCellEquiv();
-    if (map->IsFreeform() == 0 || map->IsWater() != 0) {
+    const bool freeformCounts = true;
+    if (!freeformCounts || map->IsFreeform() == 0 || map->IsWater() != 0) {
         tally->mRun = 0;
     } else {
         tally->mRun = tally->mRun + 1;
