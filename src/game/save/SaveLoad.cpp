@@ -20,10 +20,12 @@
 #include "Debug.h"
 #include "FS_MasterSave.h"
 #include "GameSys.h"
+#include "HFieldTextures.h"
 #include "HLSprite.h"
 #include "InterfaceFontWrapper.h"
 #include "LbFile.h"
 #include "LbTime.h"
+#include "LevelSystems.h"
 #include "LLCellSystem.h"
 #include "MsgCheatMode.h"
 #include "OptionsBalance.h"
@@ -52,6 +54,8 @@
 #include "TPOptions.h"
 #include "TPSettings.h"
 #include "TPSound.h"
+#include "TpiGateFlow.h"
+#include "TpiSaveRepair.h"
 #include "UI_Base.h"
 #include "ui_main.h"
 #include "UIInterface.h"
@@ -537,6 +541,7 @@ void CSaveLoad::PreLoadOperations() {
     ADV_Kill(0);
     gUIInterface.PreLevelLoad();
 }
+
 
 
 
