@@ -880,12 +880,15 @@ void PutVertex(SFVF_TLCTEX& out, const Corner& corner, bool shaded, const Textur
 }
 
 // The cell's four vertices from vertices[0] on: corners 0, 1, 2, 3 with quad flag 2, else
-// 1, 2, 3, 0 (the diagonal between the two triangles changes).
-void PutCell(SFVF_TLCTEX* vertices, const Corner (&corners)[4], const sHFieldQuad& quad, const TexturePlace& place) {
+// 1, 2, 3, 0 (the diagonal between the two triangles changes). `darkCorners` has bit k set for
+// each corner k to darken: all four for a cell with quad flag 0x400 in the original, none without.
+void PutCell(SFVF_TLCTEX* vertices, const Corner (&corners)[4], const sHFieldQuad& quad, const TexturePlace& place,
+             uint32_t darkCorners) {
     const int32_t start = (quad.mF00 & 2) != 0 ? 0 : 1;
     for (int32_t k = 0; k < 4; ++k) {
-        const bool shaded = (gei_Display.mFlags & CDisplay::kFlag800) == 0 && (quad.mF00 & 0x400) != 0;
-        PutVertex(vertices[k], corners[(start + k) & 3], shaded, place);
+        const int32_t corner = (start + k) & 3;
+        const bool shaded = (gei_Display.mFlags & CDisplay::kFlag800) == 0 && ((darkCorners >> corner) & 1) != 0;
+        PutVertex(vertices[k], corners[corner], shaded, place);
     }
 }
 
@@ -981,6 +984,7 @@ int32_t CHField::Execute() {
                     place = {entry->mUSize, entry->mVSize, entry->mUOffset, entry->mVOffset};
                 }
                 const int32_t outside = codes[0][cell] | codes[0][cell + 1] | codes[1][cell + 1] | codes[1][cell];
+                uint32_t darkCorners = (quad->mF00 & 0x400) != 0 ? 0xfu : 0u;
                 const Corner corners[4] = {
                     {vertices[0][cell], mVertexColours[row][cell], order[0]},
                     {vertices[1][cell], mVertexColours[row + 1][cell], order[1]},
@@ -990,7 +994,7 @@ int32_t CHField::Execute() {
                 if (outside == 0) {
                     // All in view: the four vertices go straight into the primitive.
                     SFVF_TLCTEX* cell4 = reinterpret_cast<SFVF_TLCTEX*>(primitive->mVertexData) + used;
-                    PutCell(cell4, corners, *quad, place);
+                    PutCell(cell4, corners, *quad, place, darkCorners);
                     const SFVF_TLCTEX* base = reinterpret_cast<SFVF_TLCTEX*>(primitive->mVertexData);
                     const bool front1 = SFVF_FacesViewer(base[used], base[used + 1], base[used + 2]);
                     const bool front2 = SFVF_FacesViewer(base[used], base[used + 2], base[used + 3]);
@@ -1011,7 +1015,7 @@ int32_t CHField::Execute() {
                     SFVF_TLCTEX clip[21];   // ClipPoly's second work buffer (0x2a0 bytes, as the original's)
                     int32_t count1 = 0;
                     int32_t count2 = 0;
-                    PutCell(staged, corners, *quad, place);
+                    PutCell(staged, corners, *quad, place, darkCorners);
                     if (SFVF_FacesViewer(staged[0], staged[1], staged[2])) {
                         std::memcpy(&clip[0], &staged[0], kVertexSize);
                         std::memcpy(&clip[1], &staged[1], kVertexSize);
