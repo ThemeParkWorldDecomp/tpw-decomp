@@ -5,6 +5,8 @@
 // the table and the first car launched found no car mesh: the game crashed as soon as the ride took a rider. In the mod's
 // worlds a kind outside Theme Park World's range is built as Theme Park World's bumper cars (kind -6): the same record
 // as its other bumper cars (-11, -14), the largest arena ring, steered like every arena bumper ride, and the kind Theme
-// Park Inc's own Science zone bumper cars give. Header only and pure, so the host test sees what the game does.
+// Park Inc's own Science zone bumper cars give. A park saved before 0.5.2 keeps The Scorpions' id with the stray word's kind;
+// loading it, the ride gets the stand-in's kind too (TpiBumperLoadId). Header only and pure, so the host tests see what the
+// game does.
 #pragma once
 
