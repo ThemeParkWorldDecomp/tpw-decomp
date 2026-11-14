@@ -38,7 +38,13 @@
 // available as SetupProject makes it in a new park, keeping the park's count and first build turn; a project (not a
 // statistics upgrade) whose type's record now has no research cost goes to the type it was made for (of its category,
 // with its score as research cost and no project of its own), keeping its progress, and a finished one makes that type
-// available; and each type with a research cost, no project and no availability gets a new one.
+// available; and each type with a research cost, no project and no availability gets a new one. A camera such a park
+// placed is saved under 7730 (CObject::Serialise's mId) with the camera's object flags (0x10, ProvidesSecurity, and not
+// the staff room's 2), so it loads as a staff room's building that is no staff room; before the engine objects are
+// restored, a placed object of a type whose project goes to another type is given that type when its saved flags say
+// what that type's record makes and not what its saved type's record now makes, its building (the ride instance the save
+// kept, which is the staff room's mesh) made again as that type's, and the park's counts of the two types
+// (ObjectControl::mNumberInPark) are those of their placed objects.
 // Header only and pure, so the host test sees the rule the game uses (src/game/save/SaveLoad.cpp).
 #pragma once
 

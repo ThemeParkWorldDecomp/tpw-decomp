@@ -152,6 +152,16 @@ int main() {
     // A park started on converter 14 or later: its free types are available and its projects have costs, so nothing changes.
     Check(!TpiFreeTypeControlToRemake(0, 1, false) && !TpiStaleResearchProject(0, 75) && !TpiResearchTypeToAdd(true, 0),
           "a new park: nothing to repair");
+    // A placed object saved under 7730, whose project goes to 7740: the staff room's record (7730) now makes flag 2, the
+    // camera's (7740) 0x10. The flags saved are the record's it was built from, with others (4 choosable, 8 queue, 0x20).
+    Check(TpiPlacedObjectToRetype(true, 0x10, 0x2, 0x10), "a camera placed before converter 14: the camera's id");
+    Check(TpiPlacedObjectToRetype(true, 0x10 | 0x20, 0x2, 0x10), "with flags that say nothing of its kind: the camera's id");
+    Check(!TpiPlacedObjectToRetype(true, 0x2 | 0x4, 0x2, 0x10), "a staff room built under 7730: kept");
+    Check(!TpiPlacedObjectToRetype(false, 0x10, 0x2, 0x10), "a type whose project stays: kept");
+    Check(!TpiPlacedObjectToRetype(true, 0x10, 0x10, 0x10), "flags its own record still makes: kept");
+    Check(!TpiPlacedObjectToRetype(true, 0x4, 0x2, 0x10), "flags of neither record: kept");
+    Check(!TpiPlacedObjectToRetype(true, 0x10 | 0x2, 0x2, 0x10), "flags of both: kept");
+    Check(!TpiPlacedObjectToRetype(true, 0x4 | 0x8, 0x0, 0x0), "two shops' records of the same kind: kept");
 
     if (gFailures == 0) std::printf("tpi save repair: all checks passed\n");
     return gFailures;
