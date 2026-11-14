@@ -28,6 +28,7 @@
 #include "TPCamera.h"
 #include "TPEngine.h"
 #include "TpiGateFlow.h"
+#include "TpiGenerations.h"
 #include "TPSound.h"
 #include "TpiGuests.h"
 #include "VehicleSteer.h"

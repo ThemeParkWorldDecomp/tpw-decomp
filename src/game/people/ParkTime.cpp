@@ -16,6 +16,7 @@
 #include "Serialise.h"
 #include "TbDynamicStringTemplate.h"
 #include "TbTimeDiff.h"
+#include "TpiGenerations.h"
 #include "ThingReceivers.h"
 #include "TPSound.h"
 #include "TPString.h"

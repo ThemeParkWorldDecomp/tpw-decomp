@@ -711,6 +711,50 @@ std::string FilterWorldSam(const Levels &levels, const std::string &world, const
     return filtered;
 }
 
+// The lines of Theme Park Inc's .sam text `text` that start with one of `prefixes`, each as it is (without its line end),
+// one to a line.
+std::string SamLinesStarting(const std::string &text, const std::vector<std::string> &prefixes, int &count) {
+    std::string out;
+    std::istringstream in(text);
+    std::string line;
+    while (std::getline(in, line)) {
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+        const size_t start = line.find_first_not_of(" \t");
+        if (start == std::string::npos)
+            continue;
+        for (const auto &prefix : prefixes)
+            if (line.compare(start, prefix.size(), prefix) == 0) {
+                out += line.substr(start) + "\n";
+                ++count;
+                break;
+            }
+    }
+    return out;
+}
+
+// The world's TpiPeeps.sam (include/TpiGenerations.h, read by the game in the mod's worlds only, never as a settings
+// table): Theme Park Inc's visitor types, starting cash spread and per-generation weather effects from its
+// levels/Standard.sam, and the world's heatwave quality from the world's Standard.sam. Copied as they are: the game
+// reads what it knows and leaves the visitors as Theme Park World's when the types are not complete.
+std::string TpiPeepsSam(const Levels &levels, const std::string &world, Log &log) {
+    std::string out = "# TPI Worlds and Rides: Theme Park Inc's visitor types and weather effects, from the player's copy\n";
+    int count = 0;
+    if (const Entry *global = levels.find("standard.sam")) {
+        const Bytes bytes = levels.read(*global);
+        out += SamLinesStarting(std::string(bytes.begin(), bytes.end()),
+                                {"PeepInfo.StartingCashVarPc", "PeepInfo.WeatherModifierFrequency", "PeepTypes[",
+                                 "PeepHappinessWeatherEffects[", "PeepThirstWeatherEffects[", "PeepHungerWeatherEffects["},
+                                count);
+    }
+    if (const Entry *own = levels.find(world + "/standard.sam")) {
+        const Bytes bytes = levels.read(*own);
+        out += SamLinesStarting(std::string(bytes.begin(), bytes.end()), {"WeatherEffects.QualityForHeatWaveLow"}, count);
+    }
+    log.text << "    TpiPeeps.sam: " << count << " lines\n";
+    return out;
+}
+
 // ---- one world
 
 struct WorldWad {
@@ -1497,6 +1541,7 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
                        {"TicketBooth[1].PosX", "FixedItemInfo.TicketBoothBPosX"},
                        {"TicketBooth[1].PosY", "FixedItemInfo.TicketBoothBPosY"}};
     w.text("Standard.sam", FilterWorldSam(levels, world, "Standard.sam", TableFor("standard.sam", tables), standard, log));
+    w.text("TpiPeeps.sam", TpiPeepsSam(levels, world, log));
     TpiSamOptions global;
     global.drop = {"StaffPoolInfo.*", "ParkInfo.AvailableFromStart"};
     global.idFields = {"ParkName.GateObjectId"};

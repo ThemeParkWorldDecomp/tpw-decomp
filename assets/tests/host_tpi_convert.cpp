@@ -875,7 +875,16 @@ void TestConvertTree(const fs::path& scratch) {
     MakeWorld(levels, "arabian", "Arabian.tct");
     MakeWorld(levels, "water", "polar.tct");
     MakeWorld(levels, "science", "science.tct");
-    WriteFile(levels / "Standard.sam", B("MapInfo.HeightfieldWidth 1\n"));
+    // Theme Park Inc's own Standard.sam (made-up values in its form): the visitor types, the starting cash spread and
+    // the weather effects go into each world's TpiPeeps.sam, the rest does not; Arabian Nights' heatwave quality too.
+    WriteFile(levels / "Standard.sam",
+              B("MapInfo.HeightfieldWidth 1\r\nPeepInfo.ExitLevel\t400\r\nPeepInfo.StartingCashVarPc\t\t12\t\t% varience\r\n"
+                "PeepInfo.WeatherModifierFrequency\t3\r\n  PeepTypes[0].PreferredExcitement.StartingCash.BoredomThreshold.Generation\t9\t8\t7\t0\r\n"
+                "PeepTypes[0].SpeedMultiplier 0.5\r\n#PeepTypes[1].SpeedMultiplier 0.4\r\nPeepThirstWeatherEffects[2].Heatwave \t 2.0\r\n"
+                "PeepHungerWeatherEffects[0].Snow 1.0\r\nPeepHappinessWeatherEffects[1].Rain -1.5\r\nUmbrellaModifier 1\r\n"));
+    WriteFile(levels / "arabian" / "Standard.sam",
+              B("MapInfo.HeightfieldWidth 96\nTicketBooth[0].PosX 40\nTicketBooth[1].PosY 41\nNumTicketBooths 2\n"
+                "WeatherEffects.QualityForHeatWaveHigh\t100\r\nWeatherEffects.QualityForHeatWaveLow\t\t95\r\n"));
     // Build animations (an item's "c" mesh): Arabian's bus has one and no script, its end has one and a script of its
     // own, and its carpet (a ride) has one and no script. Only the bus is given the feature script.
     const auto addMembers = [&levels](const std::string& rel, const std::vector<TpiWadMember>& extra) {
@@ -1149,6 +1158,14 @@ void TestConvertTree(const fs::path& scratch) {
     // The world's .sam files.
     const std::string standard = S(ReadFile(a / "Standard.sam"));
     CHECK_EQ_STR(standard, "MapInfo.HeightfieldWidth 96\nFixedItemInfo.TicketBoothAPosX 40\nFixedItemInfo.TicketBoothBPosY 41\n");
+    // Theme Park Inc's visitor types and weather effects, for the mod's generations (include/TpiGenerations.h), as they are.
+    const std::string peepsHeader =
+        "# TPI Worlds and Rides: Theme Park Inc's visitor types and weather effects, from the player's copy\n"
+        "PeepInfo.StartingCashVarPc\t\t12\t\t% varience\nPeepInfo.WeatherModifierFrequency\t3\n"
+        "PeepTypes[0].PreferredExcitement.StartingCash.BoredomThreshold.Generation\t9\t8\t7\t0\nPeepTypes[0].SpeedMultiplier 0.5\n"
+        "PeepThirstWeatherEffects[2].Heatwave \t 2.0\nPeepHungerWeatherEffects[0].Snow 1.0\nPeepHappinessWeatherEffects[1].Rain -1.5\n";
+    CHECK_EQ_STR(S(ReadFile(a / "TpiPeeps.sam")), peepsHeader + "WeatherEffects.QualityForHeatWaveLow\t\t95\n");
+    CHECK_EQ_STR(S(ReadFile(out / "water" / "TpiPeeps.sam")), peepsHeader);
     const std::string global = S(ReadFile(a / "global.sam"));
     CHECK(TpiSamInteger(global, "ParkName", "GateObjectId", id) && id == 5050);
     // Key costs in Theme Park Inc's own order (its missions open Land of Invention, then Polar Zone, then Arabian Nights):

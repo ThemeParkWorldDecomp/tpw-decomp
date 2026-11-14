@@ -30,6 +30,7 @@
 #include "TPEngine.h"
 #include "TPGlobals.h"
 #include "TpiGateFlow.h"
+#include "TpiGenerations.h"
 #include "TpiGuests.h"
 #include "TPSound.h"
 #include "VehicleSteer.h"

@@ -30,6 +30,7 @@
 #include "ObjectControl.h"
 #include "ObjectParts.h"
 #include "ParkMessages.h"
+#include "ParkTime.h"
 #include "platform/arena.h"
 #include "platform/macdoze.h"
 #include "ppc_math.h"
@@ -44,6 +45,7 @@
 #include "TPEngine.h"
 #include "TPGlobals.h"
 #include "TpiGateFlow.h"
+#include "TpiGenerations.h"
 #include "TPMain.h"
 #include "UIInterface.h"
 #include "World.h"
@@ -56,6 +58,7 @@
 #include <cstring>
 #include <ctime>
 #include <new>
+#include <string>
 
 // The world's load (main app of SimTheme Park 2.04b3, World.cpp; unit w207): CWorld::Load, the two LOADVAR instances it needs for its own
 // enums (CWorld::WorldState 0x101415b4 and CThing::ThingModel 0x101416f0) and CThing::ForceThingId (Thing.cpp). The matching save is
@@ -312,6 +315,7 @@ uint16_t MakeFeatureObject(const RideInfo* ride) {
 }
 
 }  // namespace
+
 
 // The set-up of a new level, in the Mac's order. The answer starts true and is cleared by a failed first or second balance file (the easy
 // mode file's failure only asserts). The control manager's address comes from the global gGameWorld, not from `this`. The game type word is
