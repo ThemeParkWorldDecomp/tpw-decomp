@@ -27,6 +27,18 @@
 // keeps the object flags its record gave it then (CObject::mFlags, saved): without flag 4 (Info.IsChoosable) no visitor
 // chooses it, and the state it was built in (kStateThree, which ModelState skips); a placed shop whose record now says
 // Info.IsChoosable gets flag 4, and state 3 becomes the normal state a new booth gets.
+// And the same mod's repair of the research of parks saved before converter 14: converter 14 added Land of Invention's
+// staff room (features/nstaff) in the id its security camera had (7730), moving the camera to the next one (7740). A
+// park keeps each type's control (mAvailable, made from the record when the type is first seen) and the research
+// projects its lab made when it started (CResearchLab::SetupProjects, new parks only), so in a park started before it
+// the staff room keeps the camera's control (unresearched, mAvailable 0, so no build list shows it, and the camera's
+// price, CostOfUpgrade) and the camera's project, while the camera's new id has no project and can never be researched.
+// On loading, the control of a type whose record has no research cost, saved unavailable or named by a stale project
+// (both mean it was made from another record; a statistics upgrade, upgrade level 1 or more, is not stale), is made again from its record as CheckAllControlsInitialised makes it,
+// available as SetupProject makes it in a new park, keeping the park's count and first build turn; a project (not a
+// statistics upgrade) whose type's record now has no research cost goes to the type it was made for (of its category,
+// with its score as research cost and no project of its own), keeping its progress, and a finished one makes that type
+// available; and each type with a research cost, no project and no availability gets a new one.
 // Header only and pure, so the host test sees the rule the game uses (src/game/save/SaveLoad.cpp).
 #pragma once
 

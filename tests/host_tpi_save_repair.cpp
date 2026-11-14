@@ -2,7 +2,9 @@
 // world's ground (include/TpiSaveRepair.h, TPW_MOD_HOOK tpi_worlds) on the host, without game data: which saved map and
 // track cells are reset on loading. The cells are made up here, with the modes and flags CMapCell::Reset and
 // CTrackCell::Reset give them. Then the repair of the shops of parks saved before converter 15: which saved RipOffOK
-// values rise and which placed shops become choosable, with made-up records. Exits nonzero on the failed checks' count.
+// values rise and which placed shops become choosable, with made-up records; and the repair of the research of parks
+// started before converter 14: which controls are made again and where stale projects go. Exits nonzero on the failed
+// checks' count.
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -112,6 +114,44 @@ int main() {
     Check(!TpiWalkwayToFootbridge(0, 0x80, 0, false), "a quad the level shows: kept");
     // A second load: the cell is a footbridge (mode 0x1e), so nothing changes again.
     Check(!TpiWalkwayToFootbridge(0x1e, 0x80, 0, true), "after the repair: kept");
+
+    // Research (converter 14). Land of Invention's staff room (no research cost) took the security camera's id 7730; a park
+    // started before it saved 7730's control unresearched (mAvailable 0), so no build list showed the staff room.
+    // Its control is made again from the staff room's record (it holds the camera's price too).
+    Check(TpiFreeTypeControlToRemake(0, 0, false), "staff room saved unavailable, no research cost now: made again");
+    Check(TpiFreeTypeControlToRemake(0, 1, true), "a free type a stale project names (the camera researched): made again");
+    Check(TpiFreeTypeControlToRemake(0, 0, true), "saved unavailable and named: made again");
+    Check(!TpiFreeTypeControlToRemake(0, 1, false), "a free type saved available, no stale project: kept");
+    Check(!TpiFreeTypeControlToRemake(75, 0, false), "a type still to research: kept");
+    Check(!TpiFreeTypeControlToRemake(75, 1, true), "a researched type: kept");
+    // The camera's project (upgrade level 0), saved for 7730, whose record now has no research cost: stale. A statistics
+    // upgrade (level 1 or more, on a type with no research cost) never is.
+    Check(TpiStaleResearchProject(0, 0), "the camera's project on the staff room's id: stale");
+    Check(!TpiStaleResearchProject(0, 75), "a project whose record has its cost: kept");
+    Check(!TpiStaleResearchProject(0, 50), "a category 4 type's own project with its cost: kept");
+    Check(!TpiStaleResearchProject(1, 0), "a statistics upgrade, level 1: kept");
+    Check(!TpiStaleResearchProject(2, 0), "a statistics upgrade, level 2: kept");
+    // The types with a research cost the lab could have projects for: the camera now at 7740, with none, and others.
+    TpiResearchType types[] = {
+        {7720, 75, 3, true},    // another feature of the same cost, with its project
+        {7740, 75, 3, false},   // the security camera's new id: no project
+        {7750, 120, 3, false},  // a feature of another cost with no project
+        {7100, 75, 0, false},   // a ride of the camera's cost: another category
+    };
+    Check(TpiStaleProjectOwner(types, 4, 3, 75.0f) == 1, "the camera's project goes to the camera's new id");
+    Check(TpiStaleProjectOwner(types, 4, 0, 75.0f) == 3, "a ride's stale project goes to the ride of its cost");
+    Check(TpiStaleProjectOwner(types, 4, 3, 50.0f) == -1, "no type of that cost: none");
+    Check(TpiStaleProjectOwner(types, 4, 1, 75.0f) == -1, "no type of that category: none");
+    Check(TpiStaleProjectOwner(types, 0, 3, 75.0f) == -1, "no types: none");
+    types[1].hasProject = true;
+    Check(TpiStaleProjectOwner(types, 4, 3, 75.0f) == -1, "a second stale project of the same cost: none left");
+    // A type with a research cost gets a new project only with no project and no availability.
+    Check(TpiResearchTypeToAdd(false, 0), "a researchable type with no project, unresearched: a project");
+    Check(!TpiResearchTypeToAdd(false, 1), "with no project but researched: kept");
+    Check(!TpiResearchTypeToAdd(true, 0), "with its project: kept");
+    // A park started on converter 14 or later: its free types are available and its projects have costs, so nothing changes.
+    Check(!TpiFreeTypeControlToRemake(0, 1, false) && !TpiStaleResearchProject(0, 75) && !TpiResearchTypeToAdd(true, 0),
+          "a new park: nothing to repair");
 
     if (gFailures == 0) std::printf("tpi save repair: all checks passed\n");
     return gFailures;
