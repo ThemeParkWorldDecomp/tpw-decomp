@@ -95,6 +95,10 @@ using TransportMaker = std::function<std::unique_ptr<Transport>()>;
 std::unique_ptr<Transport> MakeSocketTransport();
 void SetTransportMaker(TransportMaker maker);   // the tests' transport; an empty one is the sockets again
 std::unique_ptr<Transport> MakeTransport();     // the tests' transport when set, else MakeSocketTransport
+// The tests' stand-in for the socket connection's name lookup, so a name that is never found does not wait on the machine's DNS:
+// it answers why `host` was not found, or an empty text to look the name up as usual. An empty stand-in is the resolver alone.
+using NameLookup = std::function<std::string(const std::string& host)>;
+void SetNameLookup(NameLookup lookup);
 
 // ---- The setting ------------------------------------------------------------------------------------------------------------
 
