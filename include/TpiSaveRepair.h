@@ -10,6 +10,16 @@
 // quad (gHeightfieldCopy, kept as the level was read) is shown, gets that quad back and is reset as a new park resets it
 // (CMapCell::Reset), keeping whether it was inside the park (flag 0x40); its track cell is reset too when it has the hidden
 // quad's mode 7. A cell the park has built on never matches, and a second load changes nothing.
+// Converter 16 makes the walkways footbridge cells like Lost Kingdom's instead (their quads hidden again, base.map
+// attribute 0x80 alone: CMapCell::Reset's mode 0x1e, which guests cross on their way to something and nothing is built
+// on), since a path built under the deck is hidden by it and parks were left with gaps no guest could cross (the maintainer's Land
+// of Invention park, 0.5.3: no path on the two cells over mid-river), and the shown quads fought the deck. A park keeps
+// the attribute byte and mode of every cell it saved, so on loading, each walkway cell (the level's attribute 0x80 alone
+// over a quad the level hides) that belongs to nothing and holds land, a path or a hidden quad's mode 2, 5 or 7 is made a
+// footbridge as a new park makes it: a path loses its links both ways first (CMapCell::Delete), the quad is the level's
+// again and the cell takes the level's attribute and is reset (mode 0x1e), keeping its saved flag 0x40
+// (TpiRepairedFlags), with its track cell when that belongs to nothing (mode 7). A cell something is built on stays as
+// it is, and a second load changes nothing.
 // The same mod's repair of the shops of parks saved before converter 15: a park keeps each object type's control
 // (CControlManager, made once from the record when the type is first seen), so its shops keep the RipOffOK converter 14
 // gave them (0 where the shops folder named none) and visitors still walk away from their prices; on loading, a shop

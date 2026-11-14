@@ -484,7 +484,7 @@ md2::Md2Node Grid(const std::string& name, float size, int n, float y, uint16_t 
 
 // Obstacles drawn as they are once cleared: from the last clearing animation, swapped for another object, or (when the
 // animations move too much of them) as before; their cells from Obstacle.AfterShape. Walkway cells (',') of an obstacle
-// that is not posed keep their hidden quads and base.lnd is left as it was (only a posed bridge's are shown: TestPosed).
+// that is not posed keep their hidden quads and attributes, and base.lnd is left as it was (TestPosed: a posed bridge).
 void TestCleared() {
     // Row 0: shown grass, two hidden quads with the clear texture (a bridge's walkway under the deck: (1,0) is a ','
     // cell, (2,0) a '.' one), shown rock. Row 1: shown grass, shown grass, shown grass, shown rock.
@@ -621,11 +621,29 @@ float Height(const Bytes& d, uint32_t x, uint32_t z) {
     return f;
 }
 
+// base.map with a "MAP " chunk of kW x kH cells, x-major, every attribute byte `attribute`, then END.
+Bytes BaseMap(uint8_t attribute) {
+    Bytes d(0x24, 0);
+    Add32(d, 0x2050414d);
+    Add32(d, 0x1c + kW * kH);
+    Add32(d, kH);
+    Add32(d, kW);
+    d.resize(d.size() + 0x14, 0);
+    d.resize(d.size() + kW * kH, attribute);
+    Add32(d, 0x20444e45);
+    Add32(d, 0);
+    return d;
+}
+
+// A map cell's attribute byte in BaseMap's layout.
+uint8_t Attribute(const Bytes& d, uint32_t x, uint32_t y) { return d[0x24 + 8 + 0x1c + x * kH + y]; }
+
 // A bridge its animations move all of, with a walkway cell (','): drawn posed at its animations' last frame, the deck
-// where the last one's shape track puts it (sunk 20 below the ground before). Its walkway quad and the ramp beside it
-// (an open '.' cell next to the walkway, hidden with the clear texture) are shown again with the nearest ground's
-// texture and base.lnd control texels, their corners under the deck a little lower; an open cell further on stays hidden.
-void TestPosed() {
+// where the last one's shape track puts it (sunk 20 below the ground before, `deckY` from the ground after). Its walkway
+// quad and the ramp beside it (an open '.' cell next to the walkway, hidden with the clear texture) keep their hidden
+// quads and heights, and base.map gives both cells attribute 0x80 alone, Lost Kingdom's footbridge cells (an open cell
+// further on keeps its attribute); base.lnd is left as it was.
+void TestPosed(float deckY) {
     // Row 0: shown grass, then three quads hidden with the clear texture: the walkway (1,0), the ramp (2,0) and an open
     // cell (3,0) no walkway touches. Row 1: shown grass.
     const std::vector<std::pair<uint16_t, uint16_t>> quads = {
@@ -652,6 +670,7 @@ void TestPosed() {
                 }
     std::vector<TpiWadMember> members = {{"base.MD2", Terrain(quads)},
                                          {"base.lnd", lnd},
+                                         {"base.map", BaseMap(0x01)},
                                          {"textures/grass.tga", grass},
                                          {"textures/trans01.tga", clear},
                                          {"textures/qickload.txt", Text("grass.tga\n")}};
@@ -659,7 +678,7 @@ void TestPosed() {
     AddNode(bridge, Square("deck", 10, 0, 0), 0, md2::Translation(10, -20, 0));
     md2::RecomputeBoxes(bridge);
     // The last animation, frames 0 to 30: its track moves the deck and has a shape track (flag 1) whose last key, at
-    // frame 20, puts it at ground level.
+    // frame 20, puts it at `deckY`.
     Bytes last = Anim(0, {}, {{1, {}, true}});
     Put32(last, 0xa0 + 8, 30);
     uint32_t track = 0;
@@ -672,7 +691,7 @@ void TestPosed() {
     Add16(last, 2);
     Add32(last, shape + 0x10);
     Add32(last, shape + 0x28);
-    for (float f : {10.0f, -20.0f, 0.0f, 10.0f, 0.0f, 0.0f}) AddF(last, f);
+    for (float f : {10.0f, -20.0f, 0.0f, 10.0f, deckY, 0.0f}) AddF(last, f);
     for (uint16_t f : {0, 0, 20, 0}) Add16(last, f);
     const TpiObstacle bridgeObstacle = {"bridge",
                                         {{"bridge.sam", Sam(1, {"HHH"}, 1, 0, {",.."}, 2800)},
@@ -692,43 +711,29 @@ void TestPosed() {
     CHECK(base != nullptr && md2::ReadMd2(base->data, merged, err, true));
     bool atGround = false;
     for (const md2::Md2Node& n : merged.nodes)
-        if (n.name == "deck") atGround = n.matrix[13] == 0.0f && n.matrix[12] == 10.0f;
+        if (n.name == "deck") atGround = n.matrix[13] == deckY && n.matrix[12] == 10.0f;
     CHECK(atGround);
     CHECK(report.obstacles[0].walkway == 2);
     if (base == nullptr) return;
-    // The walkway takes the texture of the nearest shown ground, (0,0); the ramp that of (2,1); both are shown. The open
-    // cell no walkway touches keeps its hidden clear quad.
-    CHECK(Quad(base->data, 1, 0) == std::make_pair(uint16_t(0x0042), kTexGrass));
-    CHECK(Quad(base->data, 2, 0) == std::make_pair(uint16_t(0x0042), kTexGrass));
-    CHECK(Quad(base->data, 3, 0) == quads[3]);
-    // Only the corners no shown ground quad shares go under the deck: (2,0) between the walkway and the ramp, and (3,0)
-    // between the ramp and the hidden quad. The ones the ground shares stay at its height.
-    CHECK(Height(base->data, 2, 0) == -0.3f && Height(base->data, 3, 0) == -0.3f);
-    CHECK(Height(base->data, 1, 0) == 0.0f && Height(base->data, 4, 0) == 0.0f);
-    CHECK(Height(base->data, 1, 1) == 0.0f && Height(base->data, 2, 1) == 0.0f && Height(base->data, 3, 1) == 0.0f);
-    // base.lnd: the walkway and the ramp take the control texels of the ground they took their texture from, their four
-    // middle ones 0xff (so the quad is drawn as ground near the camera, not white); the hidden quad keeps its own.
+    // Every quad and height is as it was: the walkway and the ramp stay hidden with their clear texture, and nothing is
+    // lowered, whatever the deck's height.
+    for (uint32_t y = 0; y < 2; ++y)
+        for (uint32_t x = 0; x < 4; ++x) CHECK(Quad(base->data, x, y) == quads[y * 4 + x]);
+    for (uint32_t y = 0; y <= 2; ++y)
+        for (uint32_t x = 0; x <= 4; ++x) CHECK(Height(base->data, x, y) == 0.0f);
+    // base.map: the walkway and the ramp become 0x80 alone, Theme Park Inc's attribute there gone; no other cell changes.
+    const TpiWadMember* map = Member(members, "base.map");
+    CHECK(map != nullptr);
+    if (map == nullptr) return;
+    for (uint32_t y = 0; y < kH; ++y)
+        for (uint32_t x = 0; x < kW; ++x) CHECK(Attribute(map->data, x, y) == (y == 0 && (x == 1 || x == 2) ? 0x80 : 0x01));
+    // base.lnd: untouched.
     const TpiWadMember* landscape = Member(members, "base.lnd");
-    CHECK(landscape != nullptr);
-    if (landscape == nullptr) return;
-    bool walkwayAsGround = true, rampAsGround = true, hiddenKept = true;
-    for (uint32_t row = 0; row < 4; ++row)
-        for (uint32_t col = 0; col < 4; ++col) {
-            const uint8_t* w = landscape->data.data() + texel(1, 0, col, row);
-            const uint8_t* r = landscape->data.data() + texel(2, 0, col, row);
-            const uint8_t* h = landscape->data.data() + texel(3, 0, col, row);
-            walkwayAsGround = walkwayAsGround && w[0] == 0xff && w[1] == 0 && w[2] == 0 && w[3] == 0;
-            const bool middle = row >= 1 && row <= 2 && col >= 1 && col <= 2;
-            rampAsGround = rampAsGround && r[0] == (middle ? 0xff : 0x80) && r[1] == 6 && r[2] == 6 && r[3] == 6;
-            hiddenKept = hiddenKept && h[0] == 0x18 && h[1] == 3 && h[2] == 3 && h[3] == 3;
-        }
-    CHECK(walkwayAsGround);
-    CHECK(rampAsGround);
-    CHECK(hiddenKept);
+    CHECK(landscape != nullptr && landscape->data == lnd);
 }
 
 // A walkway whose quad is not hidden with the clear texture (Theme Park Inc drew ground there), or a bridge that is not
-// posed (a cleared tunnel's ',' cells): nothing is shown again or lowered.
+// posed (a cleared tunnel's ',' cells): no footbridge cell is made and nothing changes.
 void TestWalkwayLeftAlone() {
     const std::vector<std::pair<uint16_t, uint16_t>> quads = {
         {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0043, kTexRock}, {0x0042, kTexGrass},
@@ -877,7 +882,8 @@ int main() {
     TestRepair();
     TestMerge();
     TestCleared();
-    TestPosed();
+    TestPosed(0.0f);
+    TestPosed(-0.5f);
     TestWalkwayLeftAlone();
     TestOpeningGate();
     TestGateLeafName();

@@ -26,9 +26,9 @@
 //    ground under it), so the seams at the obstacle's edge show ground, not the clear colour. A bridge's walkway cells
 //    over the river (its cleared shape's ',' and '@' cells, whose quads Theme Park Inc gave the deck's walking height
 //    and a fully transparent texture, and an open '.' cell beside one whose quad is such a quad too: the ramp down at a
-//    walkway's end) are shown again with the nearest ground's texture and its base.lnd control texels, a little under
-//    the deck: the map takes them as land, a path can be built across and guests walk it at the deck's height, while
-//    the deck is what is drawn there.
+//    walkway's end) keep their hidden quads, so the deck alone is drawn there, and base.map gives them attribute 0x80
+//    alone, as Lost Kingdom's footbridge has: the map takes them as footbridge cells (CMapCell::Reset, mode 0x1e), which
+//    guests cross at the deck's height on their way to something and nothing is built on.
 // An obstacle drawn before clearing that opens by itself once its objective is met (Obstacle.OpenedAutomaticly 1: Land
 // of Invention's gate) is drawn closed and closes only its cleared shape's closed cells (the posts), which become hidden
 // quads whatever covers them; the marker is left out, so the passage between the posts is ground. Each leaf (a shown

@@ -27,6 +27,7 @@
 #include "ThingReceivers.h"
 #include "TPCamera.h"
 #include "TPEngine.h"
+#include "TpiGateFlow.h"
 #include "TPSound.h"
 #include "VehicleSteer.h"
 #include "World.h"

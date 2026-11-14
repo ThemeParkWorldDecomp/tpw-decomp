@@ -45,9 +45,6 @@ constexpr float kGroundAbove = 1.5f;
 // and the terrain around it, and no part of a cell it leaves uncovered, shows the clear colour. A seam is looked through
 // at a slant, so the ring of shown quads catches what passes under the terrain beside it.
 constexpr float kUnderGround = kGroundBelow + 0.1f;
-// A bridge's walkway quads (Theme Park Inc gave them the deck's walking height) are shown again this far below it, where
-// no shown ground quad shares their corners, so that the deck, and not the quad or a path on it, is what is drawn there.
-constexpr float kUnderDeck = 0.3f;
 constexpr size_t kMaxName = 19;            // a texture name's characters (the mesh's 20-byte names)
 constexpr uint32_t kRecord = 0xa0, kMiniRecord = 0x58;
 
@@ -617,7 +614,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
     std::vector<bool> madeHidden(quadFlags.size());
     std::vector<uint16_t> quadTexture(quadFlags.size());
     for (size_t q = 0; q < quadTexture.size(); ++q) quadTexture[q] = L16(out[baseAt].data, g.quads + 4 * q + 2);
-    std::vector<std::pair<size_t, size_t>> walkways;   // (walkway quad, the ground quad it takes its texture from)
+    std::vector<size_t> walkways;   // the bridges' walkway quads: footbridge cells in base.map
 
     // The terrain's texture folders as they grow, and the names their lists gain.
     Folders folders = TextureFolders(out);
@@ -948,16 +945,14 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
 
         // Its walkways (the ',' and '@' cells of a bridge's cleared shape): Theme Park Inc gave them quads at the deck's
         // walking height with a fully transparent texture, so the river and the deck showed and its guests walked
-        // there. They are shown again with the texture of the nearest shown ground, so the map takes them as land
-        // (CMapCell::Reset) and a path can be built across, which guests walk at the deck's height; their corners that
-        // no shown ground quad shares go a little under the deck (kUnderDeck), which hides the quad and the path. An
-        // open cell ('.') beside a walkway cell is taken with them when its quad is such a quad too: the ramp from the
-        // deck down to the ground at a walkway's end, which a shape may leave open (Polar Zone's bridge does).
+        // there. Their quads stay hidden, so the deck alone is drawn there, and base.map makes them footbridge cells like
+        // Lost Kingdom's (below). An open cell ('.') beside a walkway cell is taken with them when its quad is such a quad
+        // too: the ramp from the deck down to the ground at a walkway's end, which a shape may leave open (Polar Zone's
+        // bridge does).
         auto walkwayCell = [&](int64_t i, int64_t j) {
             return j >= 0 && j < int64_t(rows.size()) && i >= 0 && i < int64_t(rows[size_t(j)].size()) &&
                    (rows[size_t(j)][size_t(i)] == ',' || rows[size_t(j)][size_t(i)] == '@');
         };
-        std::vector<size_t> ownWalkways;
         for (size_t j = 0; j < rows.size() && posedAtEnd; ++j)
             for (size_t i = 0; i < rows[j].size(); ++i) {
                 const int64_t si = static_cast<int64_t>(i), sj = static_cast<int64_t>(j);
@@ -971,42 +966,8 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                 const size_t q = static_cast<size_t>(y) * g.w + static_cast<size_t>(x);
                 if ((quadFlags[q] & kQuadHidden) == 0 || madeHidden[q] || !clearTexture(quadTexture[q]))
                     continue;
-                int64_t best = -1, bestDistance = 0;
-                for (int64_t ny = std::max<int64_t>(y - 8, 0); ny <= std::min<int64_t>(y + 8, int64_t(g.h) - 1); ++ny)
-                    for (int64_t nx = std::max<int64_t>(x - 8, 0); nx <= std::min<int64_t>(x + 8, int64_t(g.w) - 1); ++nx) {
-                        const size_t n = static_cast<size_t>(ny) * g.w + static_cast<size_t>(nx);
-                        const int64_t distance = (nx - x) * (nx - x) + (ny - y) * (ny - y);
-                        if ((quadFlags[n] & kQuadHidden) != 0 || quadTexture[n] >= terrainTextures ||
-                            clearTexture(quadTexture[n]) || (best >= 0 && distance >= bestDistance))
-                            continue;
-                        best = static_cast<int64_t>(n);
-                        bestDistance = distance;
-                    }
-                if (best < 0)
-                    continue;
-                quadTexture[q] = quadTexture[static_cast<size_t>(best)];
-                walkways.emplace_back(q, static_cast<size_t>(best));
-                ownWalkways.push_back(q);
+                walkways.push_back(q);
                 ++result.walkway;
-            }
-        for (size_t q : ownWalkways) quadFlags[q] &= static_cast<uint16_t>(~kQuadHidden);
-        std::vector<bool> lowered(heights.size());
-        for (size_t q : ownWalkways)
-            for (size_t c = 0; c < 4; ++c) {
-                const size_t cx = q % g.w + (c & 1), cz = q / g.w + (c >> 1), v = cz * (g.w + 1) + cx;
-                bool underDeck = true;
-                for (size_t k = 0; k < 4 && underDeck; ++k) {
-                    if ((cx == 0 && (k & 1) == 0) || (cz == 0 && (k >> 1) == 0) || (cx == g.w && (k & 1) != 0) ||
-                        (cz == g.h && (k >> 1) != 0))
-                        continue;
-                    const size_t n = (cz - 1 + (k >> 1)) * g.w + (cx - 1 + (k & 1));
-                    underDeck = (quadFlags[n] & kQuadHidden) != 0 ||
-                                std::find(ownWalkways.begin(), ownWalkways.end(), n) != ownWalkways.end();
-                }
-                if (underDeck && !lowered[v]) {
-                    heights[v] -= kUnderDeck;
-                    lowered[v] = true;
-                }
             }
 
         for (size_t n = 1; n < placed.nodes.size(); ++n) base.nodes.push_back(std::move(placed.nodes[n]));
@@ -1080,34 +1041,31 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
 
     report.stillClear = StillClear(base, g, quadFlags);
 
-    // Near the camera the height field draws a quad with a texture made from base.lnd's control map
-    // (src/engine/landscape.cpp Landscape::generate_tile), which fills the quad with white when the map's channel 0 is
-    // not 0xff at its four corners: so it is where Theme Park Inc's river runs under a bridge. A walkway quad there takes
-    // the control texels of the ground quad it took its texture from, so it is drawn as that ground.
+    // The walkways, with their ramps, become footbridge cells as Lost Kingdom's are: attribute 0x80 alone (jungle's
+    // base.map gives its footbridge's four cells over the river 0x80 and hidden quads at the deck's height, and the
+    // ground at either end is plain land). CMapCell::Reset gives such a cell over a hidden quad mode 0x1e
+    // (CMapCell::IsWalkable) without flag 0x80 (attribute 0x10's): a guest crosses on its way to something
+    // (MAP_wall_in_way), the player lays path up to each end and builds nothing on the bridge. Theme Park Inc's river
+    // attribute there (3, whose 2 would make the cell mode 2) goes. The "MAP " chunk's bytes (from +0x1c of its data)
+    // run x-major (CMapChunkHandler::ParseChunk).
     for (size_t i = 0; i < out.size() && !walkways.empty(); ++i) {
-        if (!Dir(out[i].name).empty() || Lower(out[i].name) != "base.lnd")
+        if (!Dir(out[i].name).empty() || Lower(out[i].name) != "base.map")
             continue;
-        Bytes& lnd = out[i].data;
-        if (!In(lnd, 11, 12) || lnd[0] != 3)
-            break;
-        const uint64_t cw = L32(lnd, 11), ch = L32(lnd, 15), at = 23;
-        if (L32(lnd, 19) != 4 || cw < 5 || ch < 5 || !In(lnd, at, cw * ch * 4))
-            break;
-        const uint64_t tilesHigh = (ch - 1) >> 2, tilesWide = (cw - 1) >> 2;
-        auto texel = [&](size_t q, uint64_t col, uint64_t row) {
-            const uint64_t x = q % g.w, y = q / g.w;
-            return at + (((tilesHigh - y - 1) * 4 + row) * cw + x * 4 + col) * 4;
-        };
-        for (const auto& [q, from] : walkways) {
-            if (q % g.w >= tilesWide || q / g.w >= tilesHigh || from % g.w >= tilesWide || from / g.w >= tilesHigh)
-                continue;
-            if ((lnd[texel(q, 1, 1)] & lnd[texel(q, 2, 1)] & lnd[texel(q, 1, 2)] & lnd[texel(q, 2, 2)]) == 0xff)
-                continue;
-            for (uint64_t row = 0; row < 4; ++row)
-                for (uint64_t col = 0; col < 4; ++col)
-                    for (uint64_t k = 0; k < 4; ++k) lnd[texel(q, col, row) + k] = lnd[texel(from, col, row) + k];
-            for (uint64_t row = 1; row < 3; ++row)
-                for (uint64_t col = 1; col < 3; ++col) lnd[texel(q, col, row)] = 0xff;
+        Bytes& map = out[i].data;
+        for (uint64_t at = 0x24; In(map, at, 8);) {
+            const uint32_t id = L32(map, at), length = L32(map, at + 4);
+            if (id == 0x2050414d && In(map, at + 8, 0x1c)) {
+                const uint64_t extent0 = L32(map, at + 8), extent1 = L32(map, at + 12);
+                for (size_t q : walkways) {
+                    const uint64_t x = q % g.w, y = q / g.w, cell = at + 8 + 0x1c + x * extent0 + y;
+                    if (x < extent1 && y < extent0 && In(map, cell, 1) && cell < at + 8 + length)
+                        map[cell] = 0x80;
+                }
+                break;
+            }
+            if (id == 0x20444e45 || length == 0)
+                break;
+            at += 8 + uint64_t(length);
         }
         break;
     }

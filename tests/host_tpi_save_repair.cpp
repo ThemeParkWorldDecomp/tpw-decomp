@@ -98,6 +98,21 @@ int main() {
     Check(!TpiShopToMakeChoosable(0x40 | 4, 1, 1), "after the repair: kept");
     Check(TpiRepairedRipOffOK(100, 100, 1) == 100, "RipOffOK after the repair: kept");
 
+    // Walkways (converter 16): base.map now gives a walkway cell attribute 0x80 alone over a quad the level hides, a
+    // footbridge like Lost Kingdom's (mode 0x1e). A park saved before holds land, a path or a hidden quad's mode there.
+    Check(TpiWalkwayToFootbridge(0, 0x80, 0, true), "walkway saved as land (converters 14, 15): footbridge");
+    Check(TpiWalkwayToFootbridge(1, 0x80, 0, true), "a path on the walkway, the player's or the start path: footbridge");
+    Check(TpiWalkwayToFootbridge(7, 0x80, 0, true), "walkway saved hidden over land (converter 12): footbridge");
+    Check(TpiWalkwayToFootbridge(2, 0x80, 0, true), "walkway saved hidden over the river (attribute 3): footbridge");
+    Check(TpiWalkwayToFootbridge(5, 0x80, 0, true), "walkway saved as shown land of attribute 1: footbridge");
+    // Anything built there, a cell the level does not make a footbridge, or a quad the level shows: kept.
+    Check(!TpiWalkwayToFootbridge(1, 0x80, 12, true), "a walkway cell that belongs to something: kept");
+    Check(!TpiWalkwayToFootbridge(0, 0x01, 0, true), "a cell that is no walkway: kept");
+    Check(!TpiWalkwayToFootbridge(0, 0x90, 0, true), "gate pavement (0x80 with 0x10): kept");
+    Check(!TpiWalkwayToFootbridge(0, 0x80, 0, false), "a quad the level shows: kept");
+    // A second load: the cell is a footbridge (mode 0x1e), so nothing changes again.
+    Check(!TpiWalkwayToFootbridge(0x1e, 0x80, 0, true), "after the repair: kept");
+
     if (gFailures == 0) std::printf("tpi save repair: all checks passed\n");
     return gFailures;
 }
