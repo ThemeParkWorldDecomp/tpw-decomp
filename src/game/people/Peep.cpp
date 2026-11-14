@@ -29,6 +29,7 @@
 #include "TPEngine.h"
 #include "TpiGateFlow.h"
 #include "TPSound.h"
+#include "TpiGuests.h"
 #include "VehicleSteer.h"
 #include "World.h"
 #include "WorldSavvy.h"

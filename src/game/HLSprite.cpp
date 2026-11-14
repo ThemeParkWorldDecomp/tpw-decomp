@@ -49,6 +49,7 @@
 #include "TPCoaster.h"
 #include "TPEngine.h"
 #include "TPGlobals.h"
+#include "TpiGuests.h"
 #include "TPMain.h"
 #include "TPOptions.h"
 #include "TPResource.h"
@@ -676,6 +677,7 @@ int32_t ESP_FindESPFiles(CTPSpriteResource& resource, const TbDynamicStringTempl
     FreeFileList();
     return made;
 }
+
 
 bool ESP_LoadSprites(bool particlesOnly) {
     CTPBaseResource* found = nullptr;

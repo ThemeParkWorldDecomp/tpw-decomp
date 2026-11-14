@@ -19,6 +19,7 @@
 #include "ThingReceivers.h"
 #include "TPCoaster.h"
 #include "TpiGateFlow.h"
+#include "TpiGuests.h"
 #include "TPSound.h"
 #include "VehicleSteer.h"
 #include "World.h"

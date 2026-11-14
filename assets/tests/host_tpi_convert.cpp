@@ -816,6 +816,21 @@ Bytes Esp(const std::string& tag, bool firstPerson) {
     return d;
 }
 
+// A description with Theme Park Inc's grandparents' actions (first frame, frames, views): 0 standing, 1 walking, 4, 6,
+// 12 and 15, but no 2 (running), 11 or 14.
+Bytes GuestEsp(const std::string& tag, bool firstPerson) {
+    Bytes d = Esp(tag, firstPerson);
+    const int actions[][4] = {{0, 40, 1, 5}, {1, 85, 8, 5}, {4, 45, 4, 5}, {6, 65, 4, 5}, {12, 20, 4, 5}, {15, 0, 4, 5}};
+    for (const auto& a : actions) {
+        uint8_t* at = d.data() + 12 + 0x100 + 2 + 4 * a[0];
+        at[0] = static_cast<uint8_t>(a[1]);
+        at[1] = 0;
+        at[2] = static_cast<uint8_t>(a[2]);
+        at[3] = static_cast<uint8_t>(a[3]);
+    }
+    return d;
+}
+
 // One sprite of a group: the description, its .TPC, and its .FPC when it has a first person view.
 void AddSprite(std::vector<TpiWadMember>& wad, const std::string& folder, const std::string& stem, bool firstPerson = true) {
     wad.push_back({folder + "\\" + stem + ".ESP", Esp(folder + stem, firstPerson)});
@@ -1253,6 +1268,13 @@ Bytes TpiSpriteWad() {
     AddSprite(wad, "Arabian\\Entertainers", "SPR_PH");
     AddSprite(wad, "Arabian\\Entertainers", "Spr_ge");
     AddSprite(wad, "Generic\\Kids", "SPR_TK");
+    for (const char* stem : {"SPR_GM", "SPR_GR"}) {
+        const std::string body = std::string("Generic\\Grandparents\\") + stem;
+        wad.push_back({body + ".ESP", GuestEsp(std::string("Generic\\Grandparents") + stem, true)});
+        wad.push_back({body + ".FPC", B("fpc " + body)});
+        wad.push_back({body + ".TPC", B("tpc " + body)});
+        AddSprite(wad, "Generic\\Grandparentsheads", stem, false);
+    }
     AddSprite(wad, "Science\\Costumes", "SPR_GK");
     wad.push_back({"Science\\Costumeheads\\SPR_GK.ESP", Esp("headless", false)});
     AddSprite(wad, "Science\\Entertainers", "SPR_BU");
@@ -1342,6 +1364,24 @@ void TestSprites(const fs::path& scratch) {
           waterEntertainers.count("SPR_EH3.FPC") && S(waterEntertainers.at("SPR_EH3.FPC")) == "fpc Hallow\\EntertainersSPR_EH");
     const auto scienceHeads = GroupFiles(sprites / "science" / "Costumeheads");
     CHECK(scienceHeads.size() == 2 && scienceHeads.count("SPR_HS.ESP") && !scienceHeads.count("SPR_GK.ESP"));
+    // Theme Park Inc's grandparents in every world as its own kids and kidsheads, the extra visitors of the mod's worlds;
+    // the bodies' descriptions with running, 11 and 14 filled from walking and 15, nothing else of them changed.
+    for (const char* world : {"arabian", "water", "science"}) {
+        const auto kids = GroupFiles(sprites / world / "Kids");
+        CHECK(kids.size() == 6 && kids.count("SPR_GM.FPC") && kids.count("SPR_GR.TPC") &&
+              S(kids.at("SPR_GR.TPC")) == "tpc Generic\\Grandparents\\SPR_GR");
+        const auto kidsheads = GroupFiles(sprites / world / "Kidsheads");
+        CHECK(kidsheads.size() == 4 && kidsheads.count("SPR_GM.ESP") && !kidsheads.count("SPR_GM.FPC") &&
+              kidsheads.at("SPR_GM.ESP") == Esp("Generic\\GrandparentsheadsSPR_GM", false));
+        if (!kids.count("SPR_GM.ESP")) continue;
+        Bytes want = GuestEsp("Generic\\GrandparentsSPR_GM", true);
+        const size_t actions = 12 + 0x100 + 2;
+        std::memcpy(want.data() + actions + 4 * 2, want.data() + actions + 4 * 1, 4);
+        std::memcpy(want.data() + actions + 4 * 11, want.data() + actions + 4 * 15, 4);
+        std::memcpy(want.data() + actions + 4 * 14, want.data() + actions + 4 * 15, 4);
+        CHECK(kids.at("SPR_GM.ESP") == want);
+        CHECK(want[actions + 4 * 2 + 2] == 8 && want[actions + 4 * 14 + 2] == 4);
+    }
     // Nothing of the generic groups, the intro or the stock themes, and no esprites.wad: the stock groups the game
     // loads are the player's esprites.wad's, byte for byte.
     std::vector<std::string> top;
@@ -1354,6 +1394,11 @@ void TestSprites(const fs::path& scratch) {
     CHECK(record.find("    arabian/Entertainers: 3 sprites, 9 files, from Theme Park Inc's esprites.wad; written again: Spr_ge "
                       "as Spr_ge2, as the game takes 3 entertainers\n") != std::string::npos);
     CHECK(record.find("    arabian/Costumes: 1 sprite, 3 files, from Theme Park Inc's esprites.wad\n") != std::string::npos);
+    CHECK(record.find("    water/Kids: 2 sprites, 6 files, Theme Park Inc's Generic/Grandparents, extra visitors in the mod's "
+                      "worlds; actions filled: SPR_GM 2 from 1, 11 from 15, 14 from 15; SPR_GR 2 from 1, 11 from 15, 14 from 15\n") !=
+          std::string::npos);
+    CHECK(record.find("    science/Kidsheads: 2 sprites, 4 files, Theme Park Inc's Generic/Grandparentsheads, extra visitors in "
+                      "the mod's worlds\n") != std::string::npos);
     CHECK(record.find("    water/Costumes: 1 sprite, 3 files, from the hallow world's in ") != std::string::npos &&
           record.find("(Theme Park Inc's: no sprite)") != std::string::npos);
     CHECK(record.find("science/Costumeheads: 1 sprite, 2 files, from the space world's in ") != std::string::npos &&
@@ -1368,6 +1413,10 @@ void TestSprites(const fs::path& scratch) {
     CHECK(ConvertTpi(disc, dataRoot, reason));
     CHECK(GroupFiles(sprites / "arabian" / "Entertainers").count("SPR_EJ.ESP"));
     CHECK(!fs::exists(sprites / "water" / "Costumeheads"));
+    CHECK(!fs::exists(sprites / "arabian" / "Kids") && !fs::exists(sprites / "water" / "Kidsheads"));
+    CHECK(S(ReadFile(dataRoot / "assets" / "tpi" / "converted.txt"))
+              .find("extra visitors (Theme Park Inc's grandparents): none (Theme Park Inc's copy has no Data/esprites.wad)") !=
+          std::string::npos);
     CHECK(S(ReadFile(dataRoot / "assets" / "tpi" / "converted.txt"))
               .find("water/Costumeheads: none (Theme Park Inc's copy has no Data/esprites.wad; the hallow world has none either") !=
           std::string::npos);

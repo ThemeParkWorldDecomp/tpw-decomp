@@ -1040,6 +1040,82 @@ std::vector<TpiWadMember> TpwSprites(const fs::path &assets, std::string &where)
     return {};
 }
 
+// ---- extra visitors: Theme Park Inc's grandparents among the kids
+//
+// Theme Park Inc's esprites.wad has generic visitors Theme Park World has not: grandparents (Generic\Grandparents,
+// SPR_GM and SPR_GR, with their heads for the rides in Generic\Grandparentsheads), in the kids' format. Each of the
+// three worlds gets them as its own "Kids" and "Kidsheads" groups, which no Theme Park World world has: in the mod's
+// worlds the game loads them after Theme Park World's kids, outside the group's count, and some visitors wear them
+// (TPW_MOD_HOOK tpi_worlds, include/TpiGuests.h), a look only. Both groups whole or none: heads that are not the bodies'
+// would not match on the rides. Taken only from the player's own Theme Park Inc copy; without it a world has none.
+// A visitor's scripts play actions the grandparents do not have (2, running; 11; 14, cross). The scripts give the frame
+// numbers, so a missing action changes nothing a visitor does, but shows the wrong picture; each such action of the
+// bodies' descriptions takes the place of one they have with as many frames as the scripts play of it (kGuestStandIns):
+// running is walking, 11 and 14 the grandparents' action 15 (four frames, a gesture in place).
+struct GuestGroup {
+    const char *tpi;   // Theme Park Inc's generic group
+    const char *as;    // the world group it is written as (Theme Park World's spelling)
+};
+const GuestGroup kGuestGroups[] = {{"Grandparents", "Kids"}, {"Grandparentsheads", "Kidsheads"}};
+struct GuestStandIn {
+    int action;   // an action the visitors' scripts play
+    int from;     // the action that stands in for it when the sprite has none
+};
+const GuestStandIn kGuestStandIns[] = {{2, 1}, {11, 15}, {14, 15}};
+constexpr size_t kEspActions = kEspFirstPerson + 2;   // 16 actions: first frame (16 bits), frames, views (a byte each)
+
+// Fills each action of the description `esp` that kGuestStandIns names and that has no frames with its stand-in, when
+// that has frames; the filled ones are named in `filled` ("2 from 1").
+void FillGuestActions(Bytes &esp, std::string &filled) {
+    if (esp.size() < kEspActions + 16 * 4)
+        return;
+    for (const GuestStandIn &s : kGuestStandIns) {
+        uint8_t *to = esp.data() + kEspActions + 4 * s.action;
+        const uint8_t *from = esp.data() + kEspActions + 4 * s.from;
+        if (to[2] != 0 || from[2] == 0)
+            continue;
+        std::memcpy(to, from, 4);
+        filled += (filled.empty() ? "" : ", ") + std::to_string(s.action) + " from " + std::to_string(s.from);
+    }
+}
+
+void ConvertGuests(const std::vector<TpiWadMember> &tpi, const std::string &tpiWhy, Writer &w, Log &log) {
+    std::string why = tpiWhy;
+    std::vector<std::vector<TpiWadMember>> groups;
+    for (const GuestGroup &group : kGuestGroups) {
+        if (!why.empty())
+            break;
+        groups.push_back(SpriteGroupFiles(tpi, "Generic", group.tpi, why));
+        if (!why.empty())
+            why = std::string("Generic/") + group.tpi + ": " + why;
+    }
+    if (!why.empty()) {
+        log.text << "    extra visitors (Theme Park Inc's grandparents): none (" << why << ")\n";
+        return;
+    }
+    std::string filled;
+    for (auto &f : groups[0]) {
+        if (Extension(f.name) != ".esp")
+            continue;
+        std::string these;
+        FillGuestActions(f.data, these);
+        if (!these.empty())
+            filled += (filled.empty() ? "" : "; ") + Stem(f.name) + " " + these;
+    }
+    for (const WorldSpec &spec : kWorlds)
+        for (size_t g = 0; g < groups.size(); g++) {
+            const std::string out = std::string(spec.folder) + "/" + kGuestGroups[g].as;
+            int sprites = 0;
+            for (const auto &f : groups[g]) {
+                w.file(out + "/" + f.name, f.data);
+                sprites += Extension(f.name) == ".esp";
+            }
+            log.text << "    " << out << ": " << sprites << (sprites == 1 ? " sprite, " : " sprites, ") << groups[g].size()
+                     << " files, Theme Park Inc's Generic/" << kGuestGroups[g].tpi << ", extra visitors in the mod's worlds"
+                     << (g == 0 && !filled.empty() ? "; actions filled: " + filled : std::string()) << "\n";
+        }
+}
+
 void ConvertSprites(const TpiDisc &disc, const Levels &levels, const fs::path &staging, const fs::path &assets, Log &log) {
     log.text << "sprites (data/esprites):\n";
     std::vector<TpiWadMember> tpi;
@@ -1100,6 +1176,7 @@ void ConvertSprites(const TpiDisc &disc, const Levels &levels, const fs::path &s
                      << " files, from " << from << "\n";
         }
     }
+    ConvertGuests(tpi, tpiWhy, w, log);
     log.text << "    the generic groups and Theme Park World's own themes: the player's esprites.wad, untouched\n";
 }
 
