@@ -53,6 +53,7 @@
 #include "tpi_disc.h"
 #include "tpi_fsh.h"
 #include "tpi_island.h"
+#include "tpi_island_md2.h"
 #include "tpi_names.h"
 #include "tpi_sam.h"
 #include "tpi_sfx.h"
@@ -286,8 +287,66 @@ void OpaqueTgaTo24(Bytes &tga) {
     tga = std::move(out);
 }
 
+// Meshes: a boat's wake. The Great Lake's boat (science's rides/vict_hs, vict_bt.MD2) has a flat "wake" node at its
+// waterline, a soft cyan patch of water (wake.tga) that Theme Park Inc draws on its lake. The converted ride stands on
+// land (the lake obstacle is drained, tpi_terrain.h), so the patch lay on the grass at the ground's own height and came
+// and went as the camera moved, the two fighting over the depth test (0.5.3). A "wake" node with no nodes below it
+// loses its faces and becomes a mini node, as DropSignBoards (tpi_island.cpp) leaves a node it empties, and a texture
+// no other face set uses goes with it. False, `out` untouched, when the mesh has no such node.
+bool DropWake(const Bytes &in, Bytes &out) {
+    tpi_island::Md2Model model;
+    std::string err;
+    if (!tpi_island::ReadMd2(in, model, err))
+        return false;
+    std::set<int> freed;   // textures of the dropped faces
+    bool dropped = false;
+    for (size_t i = 0; i < model.nodes.size(); ++i) {
+        tpi_island::Md2Node &n = model.nodes[i];
+        bool parent = false;
+        for (const auto &c : model.nodes)
+            parent = parent || c.parent == static_cast<int>(i);
+        if (n.mini || parent || Lower(n.name) != "wake")
+            continue;
+        for (const auto &s : n.faceSets)
+            if (s.texture >= 0)
+                freed.insert(s.texture);
+        n.mini = true;
+        n.flags = 0x200;
+        n.vertices.clear();
+        n.points.clear();
+        n.u.clear();
+        n.v.clear();
+        n.cornerVertex.clear();
+        n.faceSets.clear();
+        n.faces.clear();
+        n.box = {0, 0, 0, 0, 0, 0};
+        dropped = true;
+    }
+    if (!dropped)
+        return false;
+    for (const auto &n : model.nodes)
+        for (const auto &s : n.faceSets)
+            freed.erase(s.texture);
+    std::vector<int> newTexture(model.textures.size(), -1);
+    std::vector<tpi_island::Md2Texture> textures;
+    for (size_t t = 0; t < model.textures.size(); ++t) {
+        if (freed.count(static_cast<int>(t)))
+            continue;
+        newTexture[t] = static_cast<int>(textures.size());
+        textures.push_back(model.textures[t]);
+    }
+    for (auto &n : model.nodes)
+        for (auto &s : n.faceSets)
+            if (s.texture >= 0)
+                s.texture = newTexture[static_cast<size_t>(s.texture)];
+    model.textures = std::move(textures);
+    out = tpi_island::WriteMd2(model);
+    return true;
+}
+
 // Sam files: filtered through `samTable` with `samOptions` when the member's extension is .sam (nullptr: copied).
 // Online_*.sam members are left out, and so are meshes kept among the textures (TPI's gokarts has copies there).
+// A boat's wake node is left out of its mesh (DropWake).
 // An animated texture list (.ifl; TPI's penguins and seals blink with one) becomes a .tga of its most used frame, as
 // Theme Park World has no animated textures and the mesh asks for "<stem>.tga".
 Converted ConvertMembers(const std::vector<TpiWadMember> &in, const std::vector<SamRow> *samTable,
@@ -341,6 +400,9 @@ Converted ConvertMembers(const std::vector<TpiWadMember> &in, const std::vector<
             ifls.push_back(&m);
         } else if (ext == ".md2" && (Lower(Base(Dir(m.name))) == "textures" || Lower(Base(Dir(m.name))) == "stexture")) {
             log.text << "    left out: " << what << "/" << m.name << " (a mesh among the textures)\n";
+        } else if (TpiWadMember t{m.name, {}}; ext == ".md2" && DropWake(m.data, t.data)) {
+            log.text << "    wake left out: " << what << "/" << m.name << " (Theme Park Inc draws it on its lake)\n";
+            out.members.push_back(std::move(t));
         } else if (ext == ".sam" && Lower(base).compare(0, 7, "online_") == 0) {
             log.text << "    left out: " << what << "/" << m.name << " (online)\n";
         } else if (ext == ".sam" && samTable != nullptr) {

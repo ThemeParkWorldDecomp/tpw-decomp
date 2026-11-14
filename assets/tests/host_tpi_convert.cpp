@@ -563,6 +563,30 @@ Bytes LakeObstacle() {
                         {"textures/water.fsh", fsh}});
 }
 
+// A boat in the shape of The Great Lake's (science's vict_bt.MD2): a hull, a flat "wake" patch under it at the waterline
+// and a deck, each with its own texture. The converter leaves the wake out (DropWake in tpi_convert.cpp).
+Bytes BoatMesh() {
+    namespace md2 = tpw::assets::tpi_island;
+    md2::Md2Model boat;
+    boat.name = "babylon.MD2";
+    for (const char* name : {"hull.tga", "wake.tga", "deck.tga"}) {
+        md2::Md2Texture t;
+        t.frames.push_back(name);
+        boat.textures.push_back(t);
+    }
+    md2::NodeBuilder hull, wake, deck;
+    hull.Box(md2::Vec3{-4, 0, -9}, md2::Vec3{4, 3, 9}, 4.0f, 0);
+    wake.Quad(md2::Vec3{-4, 0, -9}, md2::Vec3{4, 0, -9}, md2::Vec3{4, 0, 9}, md2::Vec3{-4, 0, 9}, 0, 0, 1, 0, 1, 1, 0, 1, 1);
+    deck.Box(md2::Vec3{-3, 3, -8}, md2::Vec3{3, 4, 8}, 4.0f, 2);
+    boat.nodes.push_back(hull.Build("hull"));
+    boat.nodes.push_back(wake.Build("wake"));
+    boat.nodes.back().parent = 0;
+    boat.nodes.push_back(deck.Build("deck"));
+    boat.nodes.back().parent = 0;
+    md2::RecomputeBoxes(boat);
+    return md2::WriteMd2(boat);
+}
+
 void MakeWorld(const fs::path& levels, const std::string& world, const std::string& tct) {
     const fs::path w = levels / world;
     WriteFile(w / "Standard.sam", B("MapInfo.HeightfieldWidth 96\nTicketBooth[0].PosX 40\nTicketBooth[1].PosY 41\nNumTicketBooths 2\n"));
@@ -598,7 +622,7 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     // A coaster: its coaster.sam is read with the coaster table (Info.Id would be dropped from it; Track.* kept).
     WriteFile(w / "rides" / "loop.wad",
               BuildTpiWad({{"loop.sam", B("Info.Id 3114\n")}, {"coaster.sam", B("Info.Id 7\nTrack.pcTextureFilename \"t\"\nTrack.fScrollRate 0.5\nTrack.Bogus 1\n")}}));
-    WriteFile(w / "rides" / "babylon.wad", Item("babylon", 3113));
+    WriteFile(w / "rides" / "babylon.wad", Item("babylon", 3113, "", BoatMesh()));
     // The shops' RipOffOK as the three worlds have it: Arabian Nights 100 (Theme Park World's), Polar Zone none (commented
     // out), Land of Invention 0. The burger costs 10 (Invention: its folder's) and sells for 30, three times that, with
     // a RipOffOK of its own of 500 (Arabian), none (Polar, which sells it at 15, one and a half times) or 20 (Invention).
@@ -927,6 +951,29 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(S(ReadFile(out / "science" / "features" / "Gates" / "Gates.sam")).find("\"Land of Invention\"") != std::string::npos);
     // No object names bank in this copy: an item is named by its working name in title case (tpi_names.h).
     CHECK(S(ReadFile(a / "rides" / "babylon" / "babylon.sam")).find("Info.Name\t\t\t\"Babylon\"") != std::string::npos);
+    // The boat's wake is left out: its node keeps its place as a mini node, its texture goes and the deck's follows it
+    // down a slot; the hull and the deck are as they were.
+    {
+        namespace md2 = tpw::assets::tpi_island;
+        md2::Md2Model before, after;
+        std::string meshErr;
+        CHECK(md2::ReadMd2(BoatMesh(), before, meshErr));
+        CHECK(md2::ReadMd2(ReadFile(a / "rides" / "babylon" / "babylon.MD2"), after, meshErr));
+        std::string nodes, textures;
+        for (const auto& n : after.nodes) nodes += n.name + (n.mini ? "(mini);" : ";");
+        for (const auto& t : after.textures) textures += (t.frames.empty() ? std::string() : t.frames[0]) + ";";
+        CHECK_EQ_STR(nodes, "hull;deck;wake(mini);");
+        CHECK_EQ_STR(textures, "hull.tga;deck.tga;");
+        CHECK(before.nodes.size() == 3 && after.nodes.size() == 3);
+        if (before.nodes.size() == 3 && after.nodes.size() == 3) {
+            CHECK(after.nodes[0].faces.size() == before.nodes[0].faces.size() &&
+                  after.nodes[0].vertices.size() == before.nodes[0].vertices.size() && after.nodes[0].faceSets.size() == 1 &&
+                  after.nodes[0].faceSets[0].texture == 0);
+            CHECK(after.nodes[1].faces.size() == before.nodes[2].faces.size() && after.nodes[1].faceSets.size() == 1 &&
+                  after.nodes[1].faceSets[0].texture == 1);
+            CHECK(after.nodes[2].faces.empty() && after.nodes[2].vertices.empty() && after.nodes[2].parent == 0);
+        }
+    }
     CHECK(TpiSamInteger(S(ReadFile(a / "features" / "bus" / "bus.sam")), "Info", "Id", id) && id == 1600);
     CHECK(TpiSamInteger(S(ReadFile(a / "features" / "end" / "end.sam")), "Info", "Id", id) && id == 1605);
     // The feature script (tpi_convert.cpp FeatureScript): a feature with a build animation and no script gets the one
@@ -1073,6 +1120,8 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(record.find("features/noid") != std::string::npos);
     CHECK(record.find("rides/carpet: Info.WorkingLife") != std::string::npos);
     CHECK(record.find("items converted: 36, left out: 6") != std::string::npos);
+    CHECK(record.find("wake left out: rides/babylon/babylon.MD2") != std::string::npos);
+    CHECK(record.find("wake left out: rides/carpet") == std::string::npos);
     CHECK(record.find("features/bus (Info.Id 1600 -> 1600, ") != std::string::npos &&
           record.find(", given a script that plays its build animation once", record.find("features/bus (")) <
               record.find("\n", record.find("features/bus (")));
