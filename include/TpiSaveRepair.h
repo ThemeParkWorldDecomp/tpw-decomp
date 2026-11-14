@@ -45,6 +45,11 @@
 // what that type's record makes and not what its saved type's record now makes, its building (the ride instance the save
 // kept, which is the staff room's mesh) made again as that type's, and the park's counts of the two types
 // (ObjectControl::mNumberInPark) are those of their placed objects.
+// And the same mod's repair of the rides placed before 0.5.2: a park keeps each placed ride's script whole (RSSE_Save, its
+// variables with it), so a Golden Ticket ride placed before CObject::CreateRideScript set SPECIAL (include/TpiRideScript.h)
+// still loops its O animation waiting on it: parts hidden, no riders, the queue only growing. On loading, a placed ride
+// that would start with SPECIAL set (tpw::TpiRideScriptStartsSpecial) but whose saved SPECIAL is 0 gets it, as at
+// placement; the script reads it on its next tick and carries on as a new ride does. A ride placed since already has it.
 // Header only and pure, so the host test sees the rule the game uses (src/game/save/SaveLoad.cpp).
 #pragma once
 

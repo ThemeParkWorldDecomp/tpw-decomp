@@ -2,9 +2,10 @@
 // world's ground (include/TpiSaveRepair.h, TPW_MOD_HOOK tpi_worlds) on the host, without game data: which saved map and
 // track cells are reset on loading. The cells are made up here, with the modes and flags CMapCell::Reset and
 // CTrackCell::Reset give them. Then the repair of the shops of parks saved before converter 15: which saved RipOffOK
-// values rise and which placed shops become choosable, with made-up records; and the repair of the research of parks
-// started before converter 14: which controls are made again and where stale projects go. Exits nonzero on the failed
-// checks' count.
+// values rise and which placed shops become choosable, with made-up records; the repair of the research of parks
+// started before converter 14: which controls are made again and where stale projects go; and the repair of rides placed
+// before 0.5.2: which saved ride scripts get SPECIAL, with made-up O group flags and variables. Exits nonzero on the
+// failed checks' count.
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -162,6 +163,22 @@ int main() {
     Check(!TpiPlacedObjectToRetype(true, 0x4, 0x2, 0x10), "flags of neither record: kept");
     Check(!TpiPlacedObjectToRetype(true, 0x10 | 0x2, 0x2, 0x10), "flags of both: kept");
     Check(!TpiPlacedObjectToRetype(true, 0x4 | 0x8, 0x0, 0x0), "two shops' records of the same kind: kept");
+    // Rides placed before 0.5.2 (CObject::CreateRideScript set no SPECIAL): the Diving Bell Drop's script, 19 variables, an
+    // O group (flags 1), SPECIAL saved as 0.
+    Check(TpiRideScriptToStart(1, 19, 0), "Diving Bell Drop saved waiting on SPECIAL: started");
+    Check(TpiRideScriptToStart(2, 11, 0), "O group flag 2, the fewest variables with SPECIAL: started");
+    Check(TpiRideScriptToStart(3, 14, 0), "O group flags 3: started");
+    // Placed since 0.5.2: SPECIAL already 1, nothing to do.
+    Check(!TpiRideScriptToStart(1, 19, 1), "placed with SPECIAL set: kept");
+    // No O group (Theme Park World's rides, the litter bins), or no variable SPECIAL: kept, whatever the variable holds.
+    Check(!TpiRideScriptToStart(0, 19, 0), "no O group: kept");
+    Check(!TpiRideScriptToStart(4, 19, 0), "a group flag other than 1 or 2: kept");
+    Check(!TpiRideScriptToStart(1, 10, 0), "no variable SPECIAL (10 variables): kept");
+    Check(!TpiRideScriptToStart(1, 0, 0), "no variables: kept");
+    // A value SPECIAL holds for something else (not 0): kept.
+    Check(!TpiRideScriptToStart(1, 19, 31), "SPECIAL holding another value: kept");
+    // A second load: SPECIAL is 1, so nothing changes again.
+    Check(!TpiRideScriptToStart(1, 19, 1), "after the repair: kept");
 
     if (gFailures == 0) std::printf("tpi save repair: all checks passed\n");
     return gFailures;
