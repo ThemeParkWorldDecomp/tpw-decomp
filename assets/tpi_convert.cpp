@@ -141,6 +141,13 @@ std::string Lower(std::string s) {
     return s;
 }
 
+std::string Upper(std::string s) {
+    for (char &c : s)
+        if (c >= 'a' && c <= 'z')
+            c = static_cast<char>(c - 'a' + 'A');
+    return s;
+}
+
 bool EndsWith(const std::string &s, const std::string &suffix) {
     return s.size() >= suffix.size() && s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
@@ -1040,23 +1047,29 @@ std::vector<TpiWadMember> TpwSprites(const fs::path &assets, std::string &where)
     return {};
 }
 
-// ---- extra visitors: Theme Park Inc's grandparents among the kids
+// ---- extra visitors: Theme Park Inc's kids, parents and grandparents among Theme Park World's kids
 //
-// Theme Park Inc's esprites.wad has generic visitors Theme Park World has not: grandparents (Generic\Grandparents,
-// SPR_GM and SPR_GR, with their heads for the rides in Generic\Grandparentsheads), in the kids' format. Each of the
-// three worlds gets them as its own "Kids" and "Kidsheads" groups, which no Theme Park World world has: in the mod's
-// worlds the game loads them after Theme Park World's kids, outside the group's count, and some visitors wear them
-// (TPW_MOD_HOOK tpi_worlds, include/TpiGuests.h), a look only. Both groups whole or none: heads that are not the bodies'
-// would not match on the rides. Taken only from the player's own Theme Park Inc copy; without it a world has none.
-// A visitor's scripts play actions the grandparents do not have (2, running; 11; 14, cross). The scripts give the frame
-// numbers, so a missing action changes nothing a visitor does, but shows the wrong picture; each such action of the
-// bodies' descriptions takes the place of one they have with as many frames as the scripts play of it (kGuestStandIns):
-// running is walking, 11 and 14 the grandparents' action 15 (four frames, a gesture in place).
+// Theme Park Inc's esprites.wad has generic visitors Theme Park World has not, in the kids' format: four kids of its own
+// (Generic\Kids, SPR_BD, SPR_GB, SPR_GK and SPR_KB), parents (Generic\Parents, SPR_FA and SPR_MO) and grandparents
+// (Generic\Grandparents, SPR_GM and SPR_GR), each with its heads for the rides (the groups' "heads" twins). Each of the
+// three worlds gets them all as its own "Kids" and "Kidsheads" groups, which no Theme Park World world has: in the mod's
+// worlds the game loads them after Theme Park World's kids, outside the group's count, and visitors wear them by Theme
+// Park Inc's spread of generations (TPW_MOD_HOOK tpi_worlds, include/TpiGuests.h), a look only. All six groups whole or
+// none: heads that are not the bodies' would not match on the rides, and a spread without a generation is not Theme
+// Park Inc's. File names in upper case, as Theme Park World's own (one of Theme Park Inc's heads is "Spr_bd.esp").
+// Taken only from the player's own Theme Park Inc copy; without it a world has none.
+// A visitor's scripts play actions these do not all have (2, running, which the parents and grandparents lack; 11 and
+// 14, cross, which all lack). The scripts give the frame numbers, so a missing action changes nothing a visitor does,
+// but shows the wrong picture; each such action of the bodies' descriptions takes the place of one they have with as
+// many frames as the scripts play of it (kGuestStandIns): running is walking, 11 and 14 their action 15 (four frames, a
+// gesture in place).
 struct GuestGroup {
     const char *tpi;   // Theme Park Inc's generic group
     const char *as;    // the world group it is written as (Theme Park World's spelling)
 };
-const GuestGroup kGuestGroups[] = {{"Grandparents", "Kids"}, {"Grandparentsheads", "Kidsheads"}};
+const GuestGroup kGuestGroups[] = {{"Kids", "Kids"},         {"Kidsheads", "Kidsheads"},
+                                   {"Parents", "Kids"},      {"Parentsheads", "Kidsheads"},
+                                   {"Grandparents", "Kids"}, {"Grandparentsheads", "Kidsheads"}};
 struct GuestStandIn {
     int action;   // an action the visitors' scripts play
     int from;     // the action that stands in for it when the sprite has none
@@ -1090,18 +1103,20 @@ void ConvertGuests(const std::vector<TpiWadMember> &tpi, const std::string &tpiW
             why = std::string("Generic/") + group.tpi + ": " + why;
     }
     if (!why.empty()) {
-        log.text << "    extra visitors (Theme Park Inc's grandparents): none (" << why << ")\n";
+        log.text << "    extra visitors (Theme Park Inc's kids, parents and grandparents): none (" << why << ")\n";
         return;
     }
-    std::string filled;
-    for (auto &f : groups[0]) {
-        if (Extension(f.name) != ".esp")
-            continue;
-        std::string these;
-        FillGuestActions(f.data, these);
-        if (!these.empty())
-            filled += (filled.empty() ? "" : "; ") + Stem(f.name) + " " + these;
-    }
+    std::vector<std::string> filled(groups.size());
+    for (size_t g = 0; g < groups.size(); g++)
+        for (auto &f : groups[g]) {
+            f.name = Upper(f.name);
+            if (std::strcmp(kGuestGroups[g].as, "Kids") != 0 || Extension(f.name) != ".esp")
+                continue;
+            std::string these;
+            FillGuestActions(f.data, these);
+            if (!these.empty())
+                filled[g] += (filled[g].empty() ? "" : "; ") + Stem(f.name) + " " + these;
+        }
     for (const WorldSpec &spec : kWorlds)
         for (size_t g = 0; g < groups.size(); g++) {
             const std::string out = std::string(spec.folder) + "/" + kGuestGroups[g].as;
@@ -1112,7 +1127,7 @@ void ConvertGuests(const std::vector<TpiWadMember> &tpi, const std::string &tpiW
             }
             log.text << "    " << out << ": " << sprites << (sprites == 1 ? " sprite, " : " sprites, ") << groups[g].size()
                      << " files, Theme Park Inc's Generic/" << kGuestGroups[g].tpi << ", extra visitors in the mod's worlds"
-                     << (g == 0 && !filled.empty() ? "; actions filled: " + filled : std::string()) << "\n";
+                     << (!filled[g].empty() ? "; actions filled: " + filled[g] : std::string()) << "\n";
         }
 }
 

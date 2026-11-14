@@ -816,12 +816,14 @@ Bytes Esp(const std::string& tag, bool firstPerson) {
     return d;
 }
 
-// A description with Theme Park Inc's grandparents' actions (first frame, frames, views): 0 standing, 1 walking, 4, 6,
-// 12 and 15, but no 2 (running), 11 or 14.
-Bytes GuestEsp(const std::string& tag, bool firstPerson) {
+// A description with Theme Park Inc's parents' and grandparents' actions (first frame, frames, views): 0 standing, 1
+// walking, 4, 6, 12 and 15, but no 2 (running), 11 or 14; with `running`, a kid's, which has 2 (eight frames).
+Bytes GuestEsp(const std::string& tag, bool firstPerson, bool running = false) {
     Bytes d = Esp(tag, firstPerson);
-    const int actions[][4] = {{0, 40, 1, 5}, {1, 85, 8, 5}, {4, 45, 4, 5}, {6, 65, 4, 5}, {12, 20, 4, 5}, {15, 0, 4, 5}};
+    const int actions[][4] = {{0, 40, 1, 5}, {1, 85, 8, 5}, {4, 45, 4, 5}, {6, 65, 4, 5}, {12, 20, 4, 5}, {15, 0, 4, 5},
+                              {2, 125, 8, 5}};
     for (const auto& a : actions) {
+        if (a[0] == 2 && !running) continue;
         uint8_t* at = d.data() + 12 + 0x100 + 2 + 4 * a[0];
         at[0] = static_cast<uint8_t>(a[1]);
         at[1] = 0;
@@ -1259,21 +1261,25 @@ void TestConvertTree(const fs::path& scratch) {
 // Theme Park Inc's esprites.wad for the sprite test: Arabian whole (one sprite spelt in lower case, its costume heads
 // with no first person view), Polar Zone without costumes, with an entertainer whose first person picture is missing
 // and with its costume heads in a lower-case folder, Land of Invention with a costume head whose picture is missing and
-// a second entertainer whose name is the first's with a 2 (in lower case); generic and intro groups the converter
-// leaves alone.
+// a second entertainer whose name is the first's with a 2 (in lower case); the generic visitors it takes; generic
+// (the gardeners) and intro groups it leaves alone.
 Bytes TpiSpriteWad() {
     std::vector<TpiWadMember> wad;
     AddSprite(wad, "Arabian\\Costumeheads", "SPR_AK", false);
     AddSprite(wad, "Arabian\\Costumes", "SPR_AK");
     AddSprite(wad, "Arabian\\Entertainers", "SPR_PH");
     AddSprite(wad, "Arabian\\Entertainers", "Spr_ge");
-    AddSprite(wad, "Generic\\Kids", "SPR_TK");
-    for (const char* stem : {"SPR_GM", "SPR_GR"}) {
-        const std::string body = std::string("Generic\\Grandparents\\") + stem;
-        wad.push_back({body + ".ESP", GuestEsp(std::string("Generic\\Grandparents") + stem, true)});
+    // Theme Park Inc's generic visitors: a kid (its head spelt in lower case), two parents and two grandparents.
+    const char* const guests[][3] = {{"Kids", "SPR_TK", "SPR_TK"}, {"Parents", "SPR_FA", "SPR_FA"},
+                                     {"Parents", "SPR_MO", "SPR_MO"}, {"Grandparents", "SPR_GM", "SPR_GM"},
+                                     {"Grandparents", "SPR_GR", "SPR_GR"}};
+    for (const auto& g : guests) {
+        const std::string group = std::string("Generic\\") + g[0];
+        const std::string body = group + "\\" + g[1];
+        wad.push_back({body + ".ESP", GuestEsp(group + g[1], true, std::string(g[0]) == "Kids")});
         wad.push_back({body + ".FPC", B("fpc " + body)});
         wad.push_back({body + ".TPC", B("tpc " + body)});
-        AddSprite(wad, "Generic\\Grandparentsheads", stem, false);
+        AddSprite(wad, group + "heads", std::string(g[0]) == "Kids" ? "Spr_tk" : g[2], false);
     }
     AddSprite(wad, "Science\\Costumes", "SPR_GK");
     wad.push_back({"Science\\Costumeheads\\SPR_GK.ESP", Esp("headless", false)});
@@ -1283,6 +1289,7 @@ Bytes TpiSpriteWad() {
     wad.push_back({"Water\\Entertainers\\SPR_PG.ESP", Esp("first person, no FPC", true)});
     wad.push_back({"Water\\Entertainers\\SPR_PG.TPC", B("tpc Water\\EntertainersSPR_PG")});
     AddSprite(wad, "Water\\costumeheads", "SPR_ES", false);
+    AddSprite(wad, "Generic\\Gardeners", "SPR_GA");
     AddSprite(wad, "wIntro\\Entertainers", "SPR_IN");
     return BuildTpiWad(wad);
 }
@@ -1364,23 +1371,31 @@ void TestSprites(const fs::path& scratch) {
           waterEntertainers.count("SPR_EH3.FPC") && S(waterEntertainers.at("SPR_EH3.FPC")) == "fpc Hallow\\EntertainersSPR_EH");
     const auto scienceHeads = GroupFiles(sprites / "science" / "Costumeheads");
     CHECK(scienceHeads.size() == 2 && scienceHeads.count("SPR_HS.ESP") && !scienceHeads.count("SPR_GK.ESP"));
-    // Theme Park Inc's grandparents in every world as its own kids and kidsheads, the extra visitors of the mod's worlds;
-    // the bodies' descriptions with running, 11 and 14 filled from walking and 15, nothing else of them changed.
+    // Theme Park Inc's kids, parents and grandparents in every world as its own kids and kidsheads, the extra visitors of
+    // the mod's worlds, every name in upper case; the bodies' descriptions with running (where they lack it), 11 and 14
+    // filled from walking and 15, nothing else of them changed.
     for (const char* world : {"arabian", "water", "science"}) {
         const auto kids = GroupFiles(sprites / world / "Kids");
-        CHECK(kids.size() == 6 && kids.count("SPR_GM.FPC") && kids.count("SPR_GR.TPC") &&
-              S(kids.at("SPR_GR.TPC")) == "tpc Generic\\Grandparents\\SPR_GR");
+        CHECK(kids.size() == 15 && kids.count("SPR_GM.FPC") && kids.count("SPR_GR.TPC") && kids.count("SPR_TK.ESP") &&
+              kids.count("SPR_MO.FPC") && S(kids.at("SPR_GR.TPC")) == "tpc Generic\\Grandparents\\SPR_GR" &&
+              S(kids.at("SPR_FA.TPC")) == "tpc Generic\\Parents\\SPR_FA");
         const auto kidsheads = GroupFiles(sprites / world / "Kidsheads");
-        CHECK(kidsheads.size() == 4 && kidsheads.count("SPR_GM.ESP") && !kidsheads.count("SPR_GM.FPC") &&
+        CHECK(kidsheads.size() == 10 && kidsheads.count("SPR_GM.ESP") && !kidsheads.count("SPR_GM.FPC") &&
+              kidsheads.count("SPR_TK.TPC") && !kidsheads.count("Spr_tk.tpc") && kidsheads.count("SPR_MO.ESP") &&
               kidsheads.at("SPR_GM.ESP") == Esp("Generic\\GrandparentsheadsSPR_GM", false));
-        if (!kids.count("SPR_GM.ESP")) continue;
-        Bytes want = GuestEsp("Generic\\GrandparentsSPR_GM", true);
         const size_t actions = 12 + 0x100 + 2;
-        std::memcpy(want.data() + actions + 4 * 2, want.data() + actions + 4 * 1, 4);
-        std::memcpy(want.data() + actions + 4 * 11, want.data() + actions + 4 * 15, 4);
-        std::memcpy(want.data() + actions + 4 * 14, want.data() + actions + 4 * 15, 4);
-        CHECK(kids.at("SPR_GM.ESP") == want);
-        CHECK(want[actions + 4 * 2 + 2] == 8 && want[actions + 4 * 14 + 2] == 4);
+        for (const char* guest : {"GrandparentsSPR_GM", "ParentsSPR_FA", "KidsSPR_TK"}) {
+            const std::string stem = std::string(guest).substr(std::string(guest).size() - 6);
+            if (!kids.count(stem + ".ESP")) continue;
+            const bool kid = stem == "SPR_TK";
+            Bytes want = GuestEsp(std::string("Generic\\") + guest, true, kid);
+            if (!kid) std::memcpy(want.data() + actions + 4 * 2, want.data() + actions + 4 * 1, 4);
+            std::memcpy(want.data() + actions + 4 * 11, want.data() + actions + 4 * 15, 4);
+            std::memcpy(want.data() + actions + 4 * 14, want.data() + actions + 4 * 15, 4);
+            CHECK(kids.at(stem + ".ESP") == want);
+            CHECK(want[actions + 4 * 2 + 2] == 8 && want[actions + 4 * 14 + 2] == 4 &&
+                  want[actions + 4 * 2] == (kid ? 125 : 85));
+        }
     }
     // Nothing of the generic groups, the intro or the stock themes, and no esprites.wad: the stock groups the game
     // loads are the player's esprites.wad's, byte for byte.
@@ -1397,6 +1412,11 @@ void TestSprites(const fs::path& scratch) {
     CHECK(record.find("    water/Kids: 2 sprites, 6 files, Theme Park Inc's Generic/Grandparents, extra visitors in the mod's "
                       "worlds; actions filled: SPR_GM 2 from 1, 11 from 15, 14 from 15; SPR_GR 2 from 1, 11 from 15, 14 from 15\n") !=
           std::string::npos);
+    CHECK(record.find("    arabian/Kids: 2 sprites, 6 files, Theme Park Inc's Generic/Parents, extra visitors in the mod's "
+                      "worlds; actions filled: SPR_FA 2 from 1, 11 from 15, 14 from 15; SPR_MO 2 from 1, 11 from 15, 14 from 15\n") !=
+          std::string::npos);
+    CHECK(record.find("    science/Kids: 1 sprite, 3 files, Theme Park Inc's Generic/Kids, extra visitors in the mod's "
+                      "worlds; actions filled: SPR_TK 11 from 15, 14 from 15\n") != std::string::npos);
     CHECK(record.find("    science/Kidsheads: 2 sprites, 4 files, Theme Park Inc's Generic/Grandparentsheads, extra visitors in "
                       "the mod's worlds\n") != std::string::npos);
     CHECK(record.find("    water/Costumes: 1 sprite, 3 files, from the hallow world's in ") != std::string::npos &&
@@ -1415,7 +1435,8 @@ void TestSprites(const fs::path& scratch) {
     CHECK(!fs::exists(sprites / "water" / "Costumeheads"));
     CHECK(!fs::exists(sprites / "arabian" / "Kids") && !fs::exists(sprites / "water" / "Kidsheads"));
     CHECK(S(ReadFile(dataRoot / "assets" / "tpi" / "converted.txt"))
-              .find("extra visitors (Theme Park Inc's grandparents): none (Theme Park Inc's copy has no Data/esprites.wad)") !=
+              .find("extra visitors (Theme Park Inc's kids, parents and grandparents): none (Theme Park Inc's copy has no "
+                    "Data/esprites.wad)") !=
           std::string::npos);
     CHECK(S(ReadFile(dataRoot / "assets" / "tpi" / "converted.txt"))
               .find("water/Costumeheads: none (Theme Park Inc's copy has no Data/esprites.wad; the hallow world has none either") !=
