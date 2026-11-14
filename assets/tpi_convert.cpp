@@ -290,63 +290,52 @@ void OpaqueTgaTo24(Bytes &tga) {
 // Meshes: a boat's wake. The Great Lake's boat (science's rides/vict_hs, vict_bt.MD2) has a flat "wake" node at its
 // waterline, a soft cyan patch of water (wake.tga) that Theme Park Inc draws on its lake. The converted ride stands on
 // land (the lake obstacle is drained, tpi_terrain.h), so the patch lay on the grass at the ground's own height and came
-// and went as the camera moved, the two fighting over the depth test (0.5.3). A "wake" node with no nodes below it
-// loses its faces and becomes a mini node, as DropSignBoards (tpi_island.cpp) leaves a node it empties, and a texture
-// no other face set uses goes with it. False, `out` untouched, when the mesh has no such node.
-bool DropWake(const Bytes &in, Bytes &out) {
+// and went as the camera moved, the two fighting over the depth test (0.5.3). A "wake" geometry node with no nodes
+// below it has its vertices drawn together into its first one, so its faces cover no pixel. The file is patched in
+// place, not rewritten (WriteMd2 writes no embedded records): a saved park keeps each ride's node and embedded counts
+// and a word per node and per embedded record (SaveRides, LoadRides in src/game/rides/TPRide.cpp), and the boat's
+// embedded records are its heads (Head01, the guests' seats), so the node tables, their order, the textures and the
+// embedded records stay exactly as Theme Park Inc's. False, `out` untouched, when the mesh has no such node.
+bool HideWake(const Bytes &in, Bytes &out) {
     tpi_island::Md2Model model;
     std::string err;
-    if (!tpi_island::ReadMd2(in, model, err))
+    if (!tpi_island::ReadMd2(in, model, err))   // also checks that every table below lies inside the file
         return false;
-    std::set<int> freed;   // textures of the dropped faces
-    bool dropped = false;
-    for (size_t i = 0; i < model.nodes.size(); ++i) {
-        tpi_island::Md2Node &n = model.nodes[i];
+    auto u16 = [&](size_t at) { return static_cast<uint32_t>(in[at] | in[at + 1] << 8); };
+    auto u32 = [&](size_t at) { return u16(at) | u16(at + 2) << 16; };
+    constexpr size_t kNode = 0xa0, kMini = 0x58;
+    const uint32_t allNodes = u16(0x42), nodeCount = u16(0x44), nodeOff = u32(0x70), miniOff = u32(0x74);
+    std::vector<size_t> records;   // every node record, full then mini: the parents are their offsets
+    for (uint32_t i = 0; i < allNodes; ++i)
+        records.push_back(i < nodeCount ? nodeOff + kNode * i : miniOff + kMini * (i - nodeCount));
+    Bytes patched = in;
+    bool hidden = false;
+    for (uint32_t i = 0; i < nodeCount; ++i) {
+        const size_t at = records[i];
+        const uint32_t nameOff = u32(at + 0x54), vertexCount = u16(at + 0x58), sets = u32(at + 0x60);
+        std::string name;
+        for (size_t k = nameOff; nameOff != 0 && k < in.size() && in[k] != 0; ++k)
+            name += static_cast<char>(in[k]);
         bool parent = false;
-        for (const auto &c : model.nodes)
-            parent = parent || c.parent == static_cast<int>(i);
-        if (n.mini || parent || Lower(n.name) != "wake")
+        for (size_t r : records)
+            parent = parent || u32(r + 4) == at;
+        if (Lower(name) != "wake" || parent || vertexCount < 2)
             continue;
-        for (const auto &s : n.faceSets)
-            if (s.texture >= 0)
-                freed.insert(s.texture);
-        n.mini = true;
-        n.flags = 0x200;
-        n.vertices.clear();
-        n.points.clear();
-        n.u.clear();
-        n.v.clear();
-        n.cornerVertex.clear();
-        n.faceSets.clear();
-        n.faces.clear();
-        n.box = {0, 0, 0, 0, 0, 0};
-        dropped = true;
+        // Positions come in sets of four: x0..x3, y0..y3, z0..z3.
+        for (uint32_t v = 1; v < vertexCount; ++v)
+            for (size_t axis = 0; axis < 3; ++axis)
+                std::memcpy(&patched[sets + (v / 4) * 0x30 + axis * 0x10 + (v % 4) * 4], &in[sets + axis * 0x10], 4);
+        hidden = true;
     }
-    if (!dropped)
+    if (!hidden || patched == in)
         return false;
-    for (const auto &n : model.nodes)
-        for (const auto &s : n.faceSets)
-            freed.erase(s.texture);
-    std::vector<int> newTexture(model.textures.size(), -1);
-    std::vector<tpi_island::Md2Texture> textures;
-    for (size_t t = 0; t < model.textures.size(); ++t) {
-        if (freed.count(static_cast<int>(t)))
-            continue;
-        newTexture[t] = static_cast<int>(textures.size());
-        textures.push_back(model.textures[t]);
-    }
-    for (auto &n : model.nodes)
-        for (auto &s : n.faceSets)
-            if (s.texture >= 0)
-                s.texture = newTexture[static_cast<size_t>(s.texture)];
-    model.textures = std::move(textures);
-    out = tpi_island::WriteMd2(model);
+    out = std::move(patched);
     return true;
 }
 
 // Sam files: filtered through `samTable` with `samOptions` when the member's extension is .sam (nullptr: copied).
 // Online_*.sam members are left out, and so are meshes kept among the textures (TPI's gokarts has copies there).
-// A boat's wake node is left out of its mesh (DropWake).
+// A boat's wake node is drawn as a point (HideWake).
 // An animated texture list (.ifl; TPI's penguins and seals blink with one) becomes a .tga of its most used frame, as
 // Theme Park World has no animated textures and the mesh asks for "<stem>.tga".
 Converted ConvertMembers(const std::vector<TpiWadMember> &in, const std::vector<SamRow> *samTable,
@@ -400,8 +389,8 @@ Converted ConvertMembers(const std::vector<TpiWadMember> &in, const std::vector<
             ifls.push_back(&m);
         } else if (ext == ".md2" && (Lower(Base(Dir(m.name))) == "textures" || Lower(Base(Dir(m.name))) == "stexture")) {
             log.text << "    left out: " << what << "/" << m.name << " (a mesh among the textures)\n";
-        } else if (TpiWadMember t{m.name, {}}; ext == ".md2" && DropWake(m.data, t.data)) {
-            log.text << "    wake left out: " << what << "/" << m.name << " (Theme Park Inc draws it on its lake)\n";
+        } else if (TpiWadMember t{m.name, {}}; ext == ".md2" && HideWake(m.data, t.data)) {
+            log.text << "    wake hidden: " << what << "/" << m.name << " (Theme Park Inc draws it on its lake)\n";
             out.members.push_back(std::move(t));
         } else if (ext == ".sam" && Lower(base).compare(0, 7, "online_") == 0) {
             log.text << "    left out: " << what << "/" << m.name << " (online)\n";

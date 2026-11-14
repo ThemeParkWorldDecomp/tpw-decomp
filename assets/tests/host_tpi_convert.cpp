@@ -564,7 +564,8 @@ Bytes LakeObstacle() {
 }
 
 // A boat in the shape of The Great Lake's (science's vict_bt.MD2): a hull, a flat "wake" patch under it at the waterline
-// and a deck, each with its own texture. The converter leaves the wake out (DropWake in tpi_convert.cpp).
+// (a child of the hull), a deck, each with its own texture, and a mini node "Head01" with an embedded record (the boat's
+// head, where its guests sit). The converter hides the wake in place (HideWake in tpi_convert.cpp).
 Bytes BoatMesh() {
     namespace md2 = tpw::assets::tpi_island;
     md2::Md2Model boat;
@@ -583,8 +584,24 @@ Bytes BoatMesh() {
     boat.nodes.back().parent = 0;
     boat.nodes.push_back(deck.Build("deck"));
     boat.nodes.back().parent = 0;
+    md2::Md2Node head;
+    head.name = "Head01";
+    head.mini = true;
+    head.flags = 0x200;
+    head.parent = 0;
+    boat.nodes.push_back(head);
     md2::RecomputeBoxes(boat);
-    return md2::WriteMd2(boat);
+    Bytes d = md2::WriteMd2(boat);
+    // One embedded record (sEmbeddedData, 0x14 bytes) for node 3, Head01 (the header's mF46 and mEmbeddedCount).
+    const size_t embedded = d.size();
+    d.resize(d.size() + 0x14, 0);
+    Put32(d, embedded, 2);
+    d[0x46] = 3;
+    d[0x47] = 0;
+    d[0x48] = 1;
+    d[0x49] = 0;
+    Put32(d, 0x7c, static_cast<uint32_t>(embedded));
+    return d;
 }
 
 void MakeWorld(const fs::path& levels, const std::string& world, const std::string& tct) {
@@ -951,27 +968,49 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(S(ReadFile(out / "science" / "features" / "Gates" / "Gates.sam")).find("\"Land of Invention\"") != std::string::npos);
     // No object names bank in this copy: an item is named by its working name in title case (tpi_names.h).
     CHECK(S(ReadFile(a / "rides" / "babylon" / "babylon.sam")).find("Info.Name\t\t\t\"Babylon\"") != std::string::npos);
-    // The boat's wake is left out: its node keeps its place as a mini node, its texture goes and the deck's follows it
-    // down a slot; the hull and the deck are as they were.
+    // The boat's wake is hidden in place: every byte but the wake's vertex positions is the original's (a saved park
+    // keys its rides on the node and embedded counts and a word per node and per embedded record: TPRide.cpp
+    // LoadRides), so the nodes keep their order, names and kinds, the textures and the embedded record stay, and the
+    // wake's vertices all stand on its first one (its faces cover no pixel).
     {
         namespace md2 = tpw::assets::tpi_island;
+        const Bytes in = BoatMesh(), got = ReadFile(a / "rides" / "babylon" / "babylon.MD2");
         md2::Md2Model before, after;
         std::string meshErr;
-        CHECK(md2::ReadMd2(BoatMesh(), before, meshErr));
-        CHECK(md2::ReadMd2(ReadFile(a / "rides" / "babylon" / "babylon.MD2"), after, meshErr));
+        CHECK(md2::ReadMd2(in, before, meshErr));
+        CHECK(md2::ReadMd2(got, after, meshErr));
         std::string nodes, textures;
         for (const auto& n : after.nodes) nodes += n.name + (n.mini ? "(mini);" : ";");
         for (const auto& t : after.textures) textures += (t.frames.empty() ? std::string() : t.frames[0]) + ";";
-        CHECK_EQ_STR(nodes, "hull;deck;wake(mini);");
-        CHECK_EQ_STR(textures, "hull.tga;deck.tga;");
-        CHECK(before.nodes.size() == 3 && after.nodes.size() == 3);
-        if (before.nodes.size() == 3 && after.nodes.size() == 3) {
-            CHECK(after.nodes[0].faces.size() == before.nodes[0].faces.size() &&
-                  after.nodes[0].vertices.size() == before.nodes[0].vertices.size() && after.nodes[0].faceSets.size() == 1 &&
-                  after.nodes[0].faceSets[0].texture == 0);
-            CHECK(after.nodes[1].faces.size() == before.nodes[2].faces.size() && after.nodes[1].faceSets.size() == 1 &&
-                  after.nodes[1].faceSets[0].texture == 1);
-            CHECK(after.nodes[2].faces.empty() && after.nodes[2].vertices.empty() && after.nodes[2].parent == 0);
+        CHECK_EQ_STR(nodes, "hull;wake;deck;Head01(mini);");
+        CHECK_EQ_STR(textures, "hull.tga;wake.tga;deck.tga;");
+        CHECK(got.size() == in.size());
+        if (got.size() == in.size() && in.size() > 0xb8) {
+            CHECK(std::equal(in.begin(), in.begin() + 0xb8, got.begin()));   // the header: counts, mF46, offsets
+            const size_t wakeRecord = Get32(in, 0x70) + 0xa0;                    // the second full node
+            const size_t sets = Get32(in, wakeRecord + 0x60);
+            const size_t setBytes = (static_cast<size_t>(in[wakeRecord + 0x58] | in[wakeRecord + 0x59] << 8) + 3) / 4 * 0x30;
+            size_t outside = 0;
+            for (size_t i = 0; i < in.size(); ++i)
+                if ((i < sets || i >= sets + setBytes) && in[i] != got[i]) ++outside;
+            CHECK(outside == 0);
+            const size_t embedded = Get32(in, 0x7c);
+            CHECK(embedded + 0x14 <= got.size() && Get32(got, embedded) == 2 && got[0x48] == 1 && got[0x46] == 3);
+        }
+        CHECK(before.nodes.size() == 4 && after.nodes.size() == 4);
+        if (before.nodes.size() == 4 && after.nodes.size() == 4) {
+            CHECK(after.nodes[0].vertices.size() == before.nodes[0].vertices.size() &&
+                  std::equal(after.nodes[0].vertices.begin(), after.nodes[0].vertices.end(), before.nodes[0].vertices.begin(),
+                             [](const md2::Vec3& p, const md2::Vec3& q) { return p.x == q.x && p.y == q.y && p.z == q.z; }));
+            CHECK(after.nodes[1].faces.size() == before.nodes[1].faces.size() &&
+                  after.nodes[1].vertices.size() == before.nodes[1].vertices.size() && after.nodes[1].vertices.size() >= 3);
+            bool point = true, wasFlat = false;
+            for (size_t v = 0; v < after.nodes[1].vertices.size(); ++v) {
+                const md2::Vec3 &p = after.nodes[1].vertices[v], &q = after.nodes[1].vertices[0];
+                point = point && p.x == q.x && p.y == q.y && p.z == q.z;
+                wasFlat = wasFlat || before.nodes[1].vertices[v].x != q.x || before.nodes[1].vertices[v].z != q.z;
+            }
+            CHECK(point && wasFlat);
         }
     }
     CHECK(TpiSamInteger(S(ReadFile(a / "features" / "bus" / "bus.sam")), "Info", "Id", id) && id == 1600);
@@ -1120,8 +1159,8 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(record.find("features/noid") != std::string::npos);
     CHECK(record.find("rides/carpet: Info.WorkingLife") != std::string::npos);
     CHECK(record.find("items converted: 36, left out: 6") != std::string::npos);
-    CHECK(record.find("wake left out: rides/babylon/babylon.MD2") != std::string::npos);
-    CHECK(record.find("wake left out: rides/carpet") == std::string::npos);
+    CHECK(record.find("wake hidden: rides/babylon/babylon.MD2") != std::string::npos);
+    CHECK(record.find("wake hidden: rides/carpet") == std::string::npos);
     CHECK(record.find("features/bus (Info.Id 1600 -> 1600, ") != std::string::npos &&
           record.find(", given a script that plays its build animation once", record.find("features/bus (")) <
               record.find("\n", record.find("features/bus (")));
