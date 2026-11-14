@@ -64,8 +64,10 @@ import json
 import os
 import pathlib
 import re
+import secrets
 import subprocess
 import sys
+import time
 
 
 # ---- libclang, the parts the slicer uses (clang-c/Index.h)
@@ -1220,6 +1222,27 @@ def sha1(text):
     return hashlib.sha1(text.encode("utf-8", errors="surrogateescape")).hexdigest()
 
 
+def write_replace(path, text, **kwargs):
+    """Writes text to path through a temporary file of this process's own beside it. The Makefile generator runs a
+    custom command once for each target that needs its output, so several slicers can write one index at once: none
+    shares another's temporary file, and a reader finds the old file or a new one whole, never a part of one."""
+    path = pathlib.Path(path)
+    tmp = path.with_name(f"{path.name}.{os.getpid()}.{secrets.token_hex(4)}.tmp")
+    try:
+        tmp.write_text(text, **kwargs)
+        for attempt in range(100):
+            try:
+                os.replace(tmp, path)
+                return
+            except PermissionError:
+                # Windows refuses to replace a file that another process has open or is replacing at that moment.
+                if os.name != "nt" or attempt == 99:
+                    raise
+                time.sleep(0.05)
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
 def cmd_index(args):
     parser = Parser(args.compiler[0])
     try:
@@ -1230,13 +1253,11 @@ def cmd_index(args):
         sys.exit(f"slicer: {args.src}: definitions the slicer cannot cut exactly:\n  " + "\n  ".join(problems))
     out = {"src": str(args.src), "sha1": sha1(text), "flags": args.compiler[1:], "items": items}
     pathlib.Path(args.out).parent.mkdir(parents=True, exist_ok=True)
-    tmp = pathlib.Path(str(args.out) + ".tmp")
-    tmp.write_text(json.dumps(out, indent=0) + "\n")
-    os.replace(tmp, args.out)
+    write_replace(args.out, json.dumps(out, indent=0) + "\n")
     if args.depfile:
         deps = [args.src] + parser.includes(tu)
         esc = lambda p: p.replace(" ", "\\ ")
-        pathlib.Path(args.depfile).write_text(esc(str(args.out)) + ": " + " \\\n  ".join(esc(d) for d in deps) + "\n")
+        write_replace(args.depfile, esc(str(args.out)) + ": " + " \\\n  ".join(esc(d) for d in deps) + "\n")
 
 
 def for_file(names, src):
@@ -1265,9 +1286,7 @@ def cmd_slice(args):
     out = pathlib.Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     if not out.exists() or out.read_text(encoding="utf-8", errors="surrogateescape") != result:
-        tmp = pathlib.Path(str(out) + ".tmp")
-        tmp.write_text(result, encoding="utf-8", errors="surrogateescape")
-        os.replace(tmp, out)
+        write_replace(out, result, encoding="utf-8", errors="surrogateescape")
 
 
 def cmd_defs(args):
