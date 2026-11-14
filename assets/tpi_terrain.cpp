@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <iterator>
 #include <map>
 
 #include "tpi_island_md2.h"
@@ -46,6 +47,11 @@ constexpr float kGroundAbove = 1.5f;
 // at a slant, so the ring of shown quads catches what passes under the terrain beside it.
 constexpr float kUnderGround = kGroundBelow + 0.1f;
 constexpr size_t kMaxName = 19;            // a texture name's characters (the mesh's 20-byte names)
+// The obstacles that clear once the park owns their land (their Info.Id): Arabian Nights' rock and cliff and Polar
+// Zone's swamp (the maintainer, 0.5.4: each the original clears at all). Theme Park Inc cleared each with a mission (golden
+// tickets and skilled staff, which Theme Park World has neither of; the rock's and the cliff's then opened the land
+// beyond them).
+constexpr int32_t kTpiClearsOnLand[] = {3700, 3702, 2700};
 constexpr uint32_t kRecord = 0xa0, kMiniRecord = 0x58;
 
 uint16_t L16(const Bytes& d, size_t at) { return static_cast<uint16_t>(d[at] | (d[at + 1] << 8)); }
@@ -528,6 +534,21 @@ std::string TpiGateLeafName(int x, int y, int w, int h, const float closed[4], c
     return name.size() <= 63 ? name : std::string();
 }
 
+std::string TpiShutName(int x, int y, int w, int h, const std::vector<bool>* hid) {
+    std::string name = "tpishut " + std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(w) + " " +
+                       std::to_string(h);
+    if (hid != nullptr) {
+        name += ' ';
+        for (size_t at = 0; at < hid->size(); at += 4) {
+            int digit = 0;
+            for (size_t k = 0; k < 4 && at + k < hid->size(); ++k)
+                if ((*hid)[at + k]) digit |= 1 << k;
+            name += "0123456789abcdef"[digit];
+        }
+    }
+    return name.size() <= 63 ? name : std::string();
+}
+
 bool TpiTgaFullyTransparent(const std::vector<uint8_t>& t) {
     if (t.size() < 18 || t[1] != 0 || t[2] != 2 || t[16] != 32)
         return false;
@@ -612,9 +633,10 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
     for (size_t i = 0; i < heights.size(); ++i) heights[i] = LF(out[baseAt].data, g.heights + 4 * i);
     const size_t terrainTextures = base.textures.size();
     std::vector<bool> madeHidden(quadFlags.size());
+    std::vector<bool> floorQuad(quadFlags.size());   // the tunnels' walkway quads, hidden and drawn at their own height
     std::vector<uint16_t> quadTexture(quadFlags.size());
     for (size_t q = 0; q < quadTexture.size(); ++q) quadTexture[q] = L16(out[baseAt].data, g.quads + 4 * q + 2);
-    std::vector<size_t> walkways;   // the bridges' walkway quads: footbridge cells in base.map
+    std::vector<size_t> walkways;   // the bridges' and tunnels' walkway quads: footbridge cells in base.map
 
     // The terrain's texture folders as they grow, and the names their lists gain.
     Folders folders = TextureFolders(out);
@@ -818,6 +840,20 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         const bool useAfter = ShapeRows(text, "Obstacle.AfterShape", after) && (cleared || opens);
         if (useAfter)
             rows = after;
+        // The footprint: the shape's first map cell (its rows run from the highest y down, so its last row's) and size.
+        size_t shapeW = 0;
+        for (const std::string& row : rows) shapeW = std::max(shapeW, row.size());
+        auto mapY = [&](size_t j) { return int64_t(oy) + int64_t(rows.size() - 1 - j); };
+
+        // A cleared tunnel (drawn without what moves, its cleared shape with walkways) and an obstacle that clears once
+        // its land is bought (kTpiClearsOnLand) have nodes named for the game (TpiShutName).
+        bool tunnel = false;
+        if (cleared && !posedAtEnd && source == &obstacle && useAfter && anims.size() >= 2)
+            for (const std::string& row : rows) tunnel = tunnel || row.find_first_of(",@") != std::string::npos;
+        int32_t id = 0;
+        const bool clearsOnLand = !cleared && !opens && TpiSamInteger(text, "Info", "Id", id) &&
+                                  std::find(std::begin(kTpiClearsOnLand), std::end(kTpiClearsOnLand), id) !=
+                                      std::end(kTpiClearsOnLand);
 
         Md2Model model;
         std::vector<bool> shown;
@@ -829,6 +865,13 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         if (posedAtEnd)
             for (const TpiWadMember* a : anims) PoseAtEnd(drawn->data, a->data, model);
         leaveMoved.resize(model.nodes.size(), false);
+        // A cleared tunnel's nodes as it shows before it is cleared (its first animation's first frame).
+        std::vector<bool> shownBefore;
+        if (tunnel && !ShownAtStart(drawn->data, &anims.front()->data, shownBefore, err)) {
+            err = source->name + "/" + drawn->name + ": " + err;
+            return false;
+        }
+        shownBefore.resize(model.nodes.size(), false);
         const std::map<size_t, Turn> turns = opens ? Turns(drawn->data, anims.front()->data) : std::map<size_t, Turn>();
 
         // Each texture as Theme Park Inc gave it to the obstacle (its own folders first, then the shared ones), under a
@@ -887,15 +930,36 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
             }
         }
 
-        // The shown nodes with geometry, each under the terrain's root at its place in the world.
-        Md2Model placed;
+        // The shown nodes with geometry, each under the terrain's root at its place in the world. A cleared tunnel's
+        // nodes that show before it is cleared and not once it is (its rubble, its wreckage), but its crew, props and
+        // markers, are added too, named for the game to show only until its land is bought ("tpishut X Y W H"); they
+        // close no cell.
+        Md2Model placed, shut;
         placed.nodes.push_back(Md2Node());
         Md2Model unrooted = model;
         unrooted.nodes[0].matrix = IdentityMatrix();
         const std::vector<Matrix> world = WorldMatrices(unrooted);
+        const std::string shutName = tunnel ? TpiShutName(int(ox), int(oy), int(shapeW), int(rows.size()), nullptr)
+                                            : std::string();
         for (size_t n = 0; n < model.nodes.size(); ++n) {
             const Md2Node& node = model.nodes[n];
-            if (node.mini || !shown[n] || node.faces.empty())
+            if (node.mini || node.faces.empty())
+                continue;
+            if (!shutName.empty() && shownBefore[n] && (!shown[n] || leaveMoved[n]) && !IsCrew(node.name) &&
+                !IsSiteProp(node.name) && !IsMarker(node.name)) {
+                Md2Node copy = node;
+                copy.parent = 0;
+                copy.matrix = world[n];
+                copy.name = shutName;
+                for (Md2FaceSet& fs : copy.faceSets)
+                    if (fs.texture >= 0) fs.texture = fs.texture < static_cast<int>(slot.size()) ? slot[fs.texture] : -1;
+                result.faces += static_cast<int>(copy.faces.size());
+                ++result.nodes;
+                ++result.shut;
+                shut.nodes.push_back(std::move(copy));
+                continue;
+            }
+            if (!shown[n])
                 continue;
             if (IsCrew(node.name) || (cleared && (IsSiteProp(node.name) || leaveMoved[n])) ||
                 (useAfter && IsMarker(node.name))) {
@@ -924,11 +988,12 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         // Its blocked cells become hidden quads where its geometry takes the ground's place (an opening gate's posts
         // whatever covers them, as its marker, which did, is left out).
         const std::vector<int> atGround = Coverage(placed, g, &heights);
+        std::vector<bool> hid(shapeW * rows.size(), false);   // the footprint's cells it hid, row by row from its first
         for (size_t j = 0; j < rows.size(); ++j)
             for (size_t i = 0; i < rows[j].size(); ++i) {
                 if (rows[j][i] != 'H' && rows[j][i] != 'X')
                     continue;
-                const int64_t x = ox + static_cast<int64_t>(i), y = oy + static_cast<int64_t>(j);
+                const int64_t x = ox + static_cast<int64_t>(i), y = mapY(j);
                 if (x < 0 || y < 0 || x >= int64_t(g.w) || y >= int64_t(g.h))
                     continue;
                 const size_t q = static_cast<size_t>(y) * g.w + static_cast<size_t>(x);
@@ -937,11 +1002,25 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                 } else if (atGround[q] >= kCoveredSamples || opens) {
                     quadFlags[q] |= kQuadHidden;
                     madeHidden[q] = true;
+                    hid[size_t(y - oy) * shapeW + i] = true;
                     ++result.blocked;
                 } else {
                     ++result.open;
                 }
             }
+
+        // One that clears once its land is bought: each of its nodes is named with its footprint and the cells it hid
+        // ("tpishut X Y W H M"), for the game to hide and show those quads again; one that hid none (the swamp, whose
+        // cells stay open) with its footprint alone.
+        if (clearsOnLand) {
+            const bool hidAny = std::find(hid.begin(), hid.end(), true) != hid.end();
+            const std::string name =
+                TpiShutName(int(ox), int(oy), int(shapeW), int(rows.size()), hidAny ? &hid : nullptr);
+            for (size_t n = 1; n < placed.nodes.size() && !name.empty(); ++n) {
+                placed.nodes[n].name = name;
+                ++result.shut;
+            }
+        }
 
         // Its walkways (the ',' and '@' cells of a bridge's cleared shape): Theme Park Inc gave them quads at the deck's
         // walking height with a fully transparent texture, so the river and the deck showed and its guests walked
@@ -960,7 +1039,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                                                         walkwayCell(si, sj - 1) || walkwayCell(si, sj + 1));
                 if (!walkwayCell(si, sj) && !ramp)
                     continue;
-                const int64_t x = ox + static_cast<int64_t>(i), y = oy + static_cast<int64_t>(j);
+                const int64_t x = ox + static_cast<int64_t>(i), y = mapY(j);
                 if (x < 0 || y < 0 || x >= int64_t(g.w) || y >= int64_t(g.h))
                     continue;
                 const size_t q = static_cast<size_t>(y) * g.w + static_cast<size_t>(x);
@@ -970,13 +1049,35 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                 ++result.walkway;
             }
 
+        // A cleared tunnel's walkways (its cleared shape's ',' and '@' cells over shown quads: the passage's floor, which
+        // Theme Park Inc's guests walked along) become footbridge cells as a bridge's do: their quads are hidden, drawn
+        // again at their own height (below), and base.map gives them attribute 0x80 alone. Shown, a player could build
+        // there and nothing would take guests through.
+        for (size_t j = 0; j < rows.size() && tunnel; ++j)
+            for (size_t i = 0; i < rows[j].size(); ++i) {
+                if (rows[j][i] != ',' && rows[j][i] != '@')
+                    continue;
+                const int64_t x = ox + static_cast<int64_t>(i), y = mapY(j);
+                if (x < 0 || y < 0 || x >= int64_t(g.w) || y >= int64_t(g.h))
+                    continue;
+                const size_t q = static_cast<size_t>(y) * g.w + static_cast<size_t>(x);
+                if ((quadFlags[q] & kQuadHidden) != 0 || quadTexture[q] >= terrainTextures)
+                    continue;
+                quadFlags[q] |= kQuadHidden;
+                floorQuad[q] = true;
+                walkways.push_back(q);
+                ++result.walkway;
+            }
+
         for (size_t n = 1; n < placed.nodes.size(); ++n) base.nodes.push_back(std::move(placed.nodes[n]));
+        for (size_t n = 0; n < shut.nodes.size(); ++n) base.nodes.push_back(std::move(shut.nodes[n]));
         report.obstacles.push_back(result);
     }
 
     // The quads the obstacles hid, and the shown ones beside them, lowered under the obstacles, each with its own texture
     // (the one the height field draws it with from afar; its turn, quad flags 0x78, is left out). Quads hidden before
-    // (the river's, the transparent ones) are left out: their texture is not the ground's.
+    // (the river's, the transparent ones) are left out: their texture is not the ground's. The tunnels' walkway quads
+    // are drawn at their own height, as the height field drew them.
     NodeBuilder underGround;
     for (int64_t y = 0; y < int64_t(g.h); ++y)
         for (int64_t x = 0; x < int64_t(g.w); ++x) {
@@ -985,14 +1086,14 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
             for (int64_t ny = std::max<int64_t>(y - 1, 0); ny <= std::min<int64_t>(y + 1, int64_t(g.h) - 1) && !near; ++ny)
                 for (int64_t nx = std::max<int64_t>(x - 1, 0); nx <= std::min<int64_t>(x + 1, int64_t(g.w) - 1) && !near; ++nx)
                     near = madeHidden[static_cast<size_t>(ny) * g.w + static_cast<size_t>(nx)];
-            if (!near || ((quadFlags[q] & kQuadHidden) != 0 && !madeHidden[q]))
+            if (!floorQuad[q] && (!near || ((quadFlags[q] & kQuadHidden) != 0 && !madeHidden[q])))
                 continue;
             const uint16_t texture = quadTexture[q];
             if (texture >= terrainTextures)
                 continue;
+            const float below = floorQuad[q] ? 0.0f : kUnderGround;
             auto corner = [&](int64_t cx, int64_t cz) {
-                return Vec3{g.ox + cx * g.cx, heights[size_t(cz) * (g.w + 1) + size_t(cx)] - kUnderGround,
-                            g.oz + cz * g.cz};
+                return Vec3{g.ox + cx * g.cx, heights[size_t(cz) * (g.w + 1) + size_t(cx)] - below, g.oz + cz * g.cz};
             };
             underGround.Quad(corner(x, y), corner(x, y + 1), corner(x + 1, y + 1), corner(x + 1, y), 0, 0, 0, 1, 1, 1, 1,
                              0, texture);
@@ -1005,7 +1106,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
     // Nothing merged (no obstacles, or none that shows or blocks anything): the terrain stays as it is.
     bool changed = !report.addedTextures.empty();
     for (const TpiObstacleResult& r : report.obstacles)
-        changed = changed || r.nodes != 0 || r.blocked != 0 || r.walkway != 0;
+        changed = changed || r.nodes != 0 || r.blocked != 0 || r.walkway != 0 || r.shut != 0;
     if (!changed) {
         report.stillClear = StillClear(base, g, quadFlags);
         return true;
@@ -1041,9 +1142,9 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
 
     report.stillClear = StillClear(base, g, quadFlags);
 
-    // The walkways, with their ramps, become footbridge cells as Lost Kingdom's are: attribute 0x80 alone (jungle's
-    // base.map gives its footbridge's four cells over the river 0x80 and hidden quads at the deck's height, and the
-    // ground at either end is plain land). CMapCell::Reset gives such a cell over a hidden quad mode 0x1e
+    // The walkways (a bridge's with its ramps, a tunnel's floor) become footbridge cells as Lost Kingdom's are: attribute
+    // 0x80 alone (jungle's base.map gives its footbridge's four cells over the river 0x80 and hidden quads at the deck's
+    // height, and the ground at either end is plain land). CMapCell::Reset gives such a cell over a hidden quad mode 0x1e
     // (CMapCell::IsWalkable) without flag 0x80 (attribute 0x10's): a guest crosses on its way to something
     // (MAP_wall_in_way), the player lays path up to each end and builds nothing on the bridge. Theme Park Inc's river
     // attribute there (3, whose 2 would make the cell mode 2) goes. The "MAP " chunk's bytes (from +0x1c of its data)

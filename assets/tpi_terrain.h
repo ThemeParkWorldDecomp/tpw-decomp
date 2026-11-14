@@ -28,7 +28,21 @@
 //    and a fully transparent texture, and an open '.' cell beside one whose quad is such a quad too: the ramp down at a
 //    walkway's end) keep their hidden quads, so the deck alone is drawn there, and base.map gives them attribute 0x80
 //    alone, as Lost Kingdom's footbridge has: the map takes them as footbridge cells (CMapCell::Reset, mode 0x1e), which
-//    guests cross at the deck's height on their way to something and nothing is built on.
+//    guests cross at the deck's height on their way to something and nothing is built on. A cleared tunnel's walkway
+//    cells (drawn without what moves, its cleared shape's ',' and '@' cells over shown quads: the passage's floor) are
+//    made footbridge cells the same way: their quads are hidden and drawn again as geometry at their own height (no
+//    lower), with their own texture, and base.map gives them attribute 0x80 alone.
+// A shape's rows run from the highest map y down: the first row is at Obstacle.ShapeOffsetY plus the row count less one,
+// the last at Obstacle.ShapeOffsetY (Polar Zone's tunnel's walkway cells lie on the floor of its cutting only so; checked
+// against every obstacle of the three worlds, notes/tpi-worlds.md).
+// A cleared tunnel's nodes that show before it is cleared and not once it is (the rubble and wreckage at its mouth) are
+// added too, each named "tpishut X Y W H" (TpiShutName: the obstacle's footprint), and the game's hook (TPW_MOD_HOOK
+// tpi_worlds, include/TpiObstacleShut.h) shows them only while the park owns no cell of the footprint or next to it
+// that a new park does not start with, as an opening gate's rule: the tunnel looks closed until its land is bought.
+// An obstacle that clears once its land is bought (kTpiClearsOnLand: Arabian Nights' rock and cliff, Polar Zone's
+// swamp) is drawn before clearing as any other, and each of its nodes is named "tpishut X Y W H M", M the cells whose
+// quads it hid (TpiShutName's mask), or "tpishut X Y W H" when it hid none; the game's hook hides its nodes and shows
+// those quads again once the park owns such a cell.
 // An obstacle drawn before clearing that opens by itself once its objective is met (Obstacle.OpenedAutomaticly 1: Land
 // of Invention's gate) is drawn closed and closes only its cleared shape's closed cells (the posts), which become hidden
 // quads whatever covers them; the marker is left out, so the passage between the posts is ground. Each leaf (a shown
@@ -77,9 +91,10 @@ struct TpiObstacleResult {
     int blocked = 0;                      // blocked shape cells made hidden quads
     int alreadyHidden = 0;                // blocked shape cells whose quads were hidden already
     int open = 0;                         // blocked shape cells the mesh does not cover: left as they are
-    int walkway = 0;                      // walkway (and ramp) cells whose quads are shown again (a bridge's, under its
-                                          // deck)
+    int walkway = 0;                      // walkway (and ramp) cells made footbridge cells (a bridge's, under its deck;
+                                          // a cleared tunnel's floor)
     int leaves = 0;                       // leaves named for the game to swing open (an opening gate's)
+    int shut = 0;                         // nodes named "tpishut ..." (shown until its land is bought)
     std::vector<std::string> leftOut;     // the shown nodes left out (the crew, the props, the markers, moved nodes)
 };
 
@@ -104,6 +119,12 @@ struct TpiObstacleReport {
 // orientations as two quaternions (x y z w), each number as short as "%.4f" gives it without trailing zeros. Empty when
 // it would not fit the 63 characters a node name has in the converter's own reader.
 std::string TpiGateLeafName(int x, int y, int w, int h, const float closed[4], const float open[4]);
+
+// The name a node shown only until an obstacle's land is bought takes in the terrain: "tpishut X Y W H" (the obstacle's
+// footprint, as a gate's), then, for an obstacle that clears, a space and the footprint's cells whose quads it hid, row
+// by row from (X, Y), four to a hexadecimal digit, the first cell of the four its lowest bit (`hid`, W x H of them, or
+// nullptr for none). Empty when it would not fit the 63 characters a node name has in the converter's own reader.
+std::string TpiShutName(int x, int y, int w, int h, const std::vector<bool>* hid);
 
 bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<TpiObstacle>& obstacles,
                        const std::function<const std::vector<uint8_t>*(const std::string& path)>& shared,

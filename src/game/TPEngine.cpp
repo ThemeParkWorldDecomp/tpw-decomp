@@ -513,7 +513,9 @@ void EngineTick1() {
 }
 
 // 0x1005b540
-void EngineTick2() { gei_MapWho->Render(); }
+void EngineTick2() {
+    gei_MapWho->Render();
+}
 
 // 0x1005b590
 void EngineTick3() { RenderSystem_FlipScreen(); }

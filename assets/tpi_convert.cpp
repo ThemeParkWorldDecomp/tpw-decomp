@@ -1346,6 +1346,8 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
                 log.text << "; walkway cells shown: " << o.walkway;
             if (o.leaves != 0)
                 log.text << "; gate leaves: " << o.leaves;
+            if (o.shut != 0)
+                log.text << "; shown until its land is bought: " << o.shut << " nodes";
             if (!o.leftOut.empty()) {
                 log.text << "; left out:";
                 for (const auto &n : o.leftOut)

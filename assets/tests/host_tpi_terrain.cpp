@@ -328,7 +328,7 @@ void TestMerge() {
     md2::RecomputeBoxes(bridge);
     const TpiObstacle bridgeObstacle = {
         "Bridge",
-        {{"bridge.sam", Sam(1, {"HHHH", ".X.."}, 1, 0)},
+        {{"bridge.sam", Sam(1, {".X..", "HHHH"}, 1, 0)},
          {"bridge.MD2", md2::WriteMd2(bridge)},
          {"bridgem1.MD2", Anim(10, {3}, {{4, {1, -5, 20}}})},
          {"bridgem.MD2", Anim(0, {1, 2}, {})},
@@ -522,7 +522,9 @@ void TestCleared() {
 
     // The tunnel: a passage at ground level over (2,1) (18 faces), a gate its last animation disables, a ship piece the
     // animations move (2 faces, a tenth), a marker decal, a crew member and a plank. Before clearing it closes all four
-    // of its cells; once cleared (1,0) is a walkway, (2,0) and (1,1) are open and (2,1) is closed.
+    // of its cells; once cleared (1,0) is a walkway, (2,0) and (1,1) are open and (2,1) is closed (its cleared shape's
+    // rows run from the highest y down). The gate and the ship, shown before it is cleared, are drawn too, named with
+    // its footprint for the game to show until its land is bought.
     md2::Md2Model tunnel = Model("tunnel.MD2", {"grass.tga"});
     AddNode(tunnel, Grid("passage", 10, 3, 0, 0), 0, md2::Translation(20, 0, 10));     // 1
     AddNode(tunnel, Square("gate", 10, 0, 0), 0, md2::Translation(10, 0, 0));           // 2
@@ -532,7 +534,7 @@ void TestCleared() {
     AddNode(tunnel, Square("plank 01", 5, 0, 0), 0, md2::Translation(10, 0, 0));        // 6
     md2::RecomputeBoxes(tunnel);
     const TpiObstacle tunnelObstacle = {"tunnel",
-                                        {{"tunnel.sam", Sam(1, {"HH", "HH"}, 1, 0, {",.", ".X"}, 2703)},
+                                        {{"tunnel.sam", Sam(1, {"HH", "HH"}, 1, 0, {".X", ",."}, 2703)},
                                          {"tunnel.MD2", md2::WriteMd2(tunnel)},
                                          {"tunnelm1.MD2", Anim(0, {}, {})},
                                          {"tunnelm2.MD2", Anim(0, {2}, {{3, {1}, true}})},
@@ -559,7 +561,8 @@ void TestCleared() {
                                         {"dlakem.MD2", Anim(0, {}, {})},
                                         {"textures/pond.tga", pond}}};
 
-    // The rock: its animations move all of it, so it stays as it is before clearing, closing its Info.Shape (3,1).
+    // The rock: its animations move all of it, so it stays as it is before clearing, closing its Info.Shape (3,1). It
+    // clears once its land is bought (Info.Id 3700), so its node is named with its footprint and the cell it hid.
     md2::Md2Model rockMesh = Model("rock.MD2", {"rock.tga"});
     AddNode(rockMesh, Square("boulder", 10, 0, 0), 0, md2::Translation(30, 0, 10));
     md2::RecomputeBoxes(rockMesh);
@@ -569,25 +572,40 @@ void TestCleared() {
                                        {"rockm1.MD2", Anim(0, {}, {{1, {1}, true}})},
                                        {"rockm2.MD2", Anim(0, {}, {})},
                                        {"textures/rock.tga", rock}}};
+    // The swamp: the same, but its mesh stands above the ground, so it closes nothing; it clears once its land is
+    // bought too (Info.Id 2700), so its node is named with its footprint alone.
+    md2::Md2Model swampMesh = Model("swamp.MD2", {"rock.tga"});
+    AddNode(swampMesh, Square("mud", 10, 3, 0), 0, md2::Translation(30, 0, 0));
+    md2::RecomputeBoxes(swampMesh);
+    const TpiObstacle swampObstacle = {"swamp",
+                                       {{"swamp.sam", Sam(1, {"H"}, 3, 0, {"."}, 2700)},
+                                        {"swamp.MD2", md2::WriteMd2(swampMesh)},
+                                        {"swampm1.MD2", Anim(0, {}, {{1, {1}, true}})},
+                                        {"swampm2.MD2", Anim(0, {}, {})},
+                                        {"textures/rock.tga", rock}}};
 
     std::vector<TpiWadMember> members = terrain;
     TpiObstacleReport report;
     std::string err;
-    CHECK(MergeTpiObstacles(members, {tunnelObstacle, lakeObstacle, dlakeObstacle, rockObstacle}, shared, report, err));
+    CHECK(MergeTpiObstacles(members, {tunnelObstacle, lakeObstacle, dlakeObstacle, rockObstacle, swampObstacle}, shared,
+                            report, err));
     CHECK(err.empty());
-    CHECK(report.obstacles.size() == 4);
-    if (report.obstacles.size() != 4) return;
+    CHECK(report.obstacles.size() == 5);
+    if (report.obstacles.size() != 5) return;
     const TpiObstacleResult& t = report.obstacles[0];
     CHECK(t.name == "tunnel" && t.skipped.empty() && t.state == "cleared");
-    CHECK(t.nodes == 1 && t.faces == 18);
-    CHECK(t.blocked == 1 && t.alreadyHidden == 0 && t.open == 0);
-    CHECK((t.leftOut == std::vector<std::string>{"ship", "unbuildable01", "boy 01", "plank 01"}));
+    CHECK(t.nodes == 3 && t.faces == 22 && t.shut == 2);
+    CHECK(t.blocked == 1 && t.alreadyHidden == 0 && t.open == 0 && t.walkway == 0);
+    CHECK((t.leftOut == std::vector<std::string>{"unbuildable01", "boy 01", "plank 01"}));
     const TpiObstacleResult& l = report.obstacles[1];
     CHECK(l.name == "lake" && l.skipped.empty() && l.state == "replaced by dlake");
     CHECK(l.nodes == 1 && l.faces == 2 && l.blocked == 1);
     CHECK(report.obstacles[2].name == "dlake" && report.obstacles[2].skipped == "not an obstacle");
     const TpiObstacleResult& r = report.obstacles[3];
-    CHECK(r.name == "Rock" && r.state == "before clearing" && r.nodes == 1 && r.blocked == 1);
+    CHECK(r.name == "Rock" && r.state == "before clearing" && r.nodes == 1 && r.blocked == 1 && r.shut == 1);
+    const TpiObstacleResult& s = report.obstacles[4];
+    CHECK(s.name == "swamp" && s.state == "before clearing" && s.nodes == 1 && s.blocked == 0 && s.open == 1 &&
+          s.shut == 1);
     CHECK(report.addedTextures == std::vector<std::string>{"textures/pond.tga"});
     CHECK(report.missingTextures.empty());
 
@@ -598,7 +616,8 @@ void TestCleared() {
     CHECK(md2::ReadMd2(base->data, merged, err, true));
     std::vector<std::string> names;
     for (const md2::Md2Node& n : merged.nodes) names.push_back(n.name);
-    CHECK((names == std::vector<std::string>{"root", "passage", "pond", "boulder", "tpi underground"}));
+    CHECK((names == std::vector<std::string>{"root", "passage", "tpishut 1 0 2 2", "tpishut 1 0 2 2", "pond",
+                                             "tpishut 3 1 1 1 1", "tpishut 3 0 1 1", "tpi underground"}));
     // The walkway's clear quad and the '.' cell's both stay hidden: no grass is painted over the river.
     CHECK(Quad(base->data, 1, 0) == quads[1]);
     CHECK(Quad(base->data, 2, 0) == quads[2]);
@@ -732,8 +751,8 @@ void TestPosed(float deckY) {
     CHECK(landscape != nullptr && landscape->data == lnd);
 }
 
-// A walkway whose quad is not hidden with the clear texture (Theme Park Inc drew ground there), or a bridge that is not
-// posed (a cleared tunnel's ',' cells): no footbridge cell is made and nothing changes.
+// A posed bridge's walkway whose quad is not hidden with the clear texture (Theme Park Inc drew ground there): no
+// footbridge cell is made and nothing changes (a tunnel's walkways, TestTunnel, are its shown quads).
 void TestWalkwayLeftAlone() {
     const std::vector<std::pair<uint16_t, uint16_t>> quads = {
         {0x0042, kTexGrass}, {0x0042, kTexGrass}, {0x0043, kTexRock}, {0x0042, kTexGrass},
@@ -827,7 +846,7 @@ void TestOpeningGate() {
     };
     TpiObstacleResult r;
     std::vector<TpiWadMember> members;
-    merge(Sam(1, {"HHHH", "HHHH"}, 0, 0, {"X..X", "...."}, 1700, opens), r, members);
+    merge(Sam(1, {"HHHH", "HHHH"}, 0, 0, {"....", "X..X"}, 1700, opens), r, members);
     CHECK(r.state == "before clearing, opens");
     CHECK(r.leaves == 1);
     CHECK(r.blocked == 2 && r.open == 0 && r.alreadyHidden == 0);
@@ -858,13 +877,90 @@ void TestOpeningGate() {
     if (base != nullptr) CHECK(Quad(base->data, 1, 1).first == 0x0043 && Quad(base->data, 3, 1).first == 0x0043);
 
     // Without the flag it is as it was before clearing: its whole shape closed where the marker covers it, no leaves.
-    merge(Sam(1, {"HHHH", "HHHH"}, 0, 0, {"X..X", "...."}, 1700, ""), r, members);
+    merge(Sam(1, {"HHHH", "HHHH"}, 0, 0, {"....", "X..X"}, 1700, ""), r, members);
     CHECK(r.state == "before clearing" && r.leaves == 0 && r.blocked == 8 && r.leftOut.empty());
     base = Member(members, "base.MD2");
     CHECK(base != nullptr && md2::ReadMd2(base->data, merged, err, true));
     bool named = false;
     for (const md2::Md2Node& n : merged.nodes) named = named || n.name.compare(0, 8, "tpigate ") == 0;
     CHECK(!named);
+}
+
+// A cleared tunnel (not posed: its animations move none of what stays) with walkways in its cleared shape, whose rows
+// run from the highest y down: its ',' cells over shown ground, (1,0) and (1,1), become hidden quads with their own
+// texture, drawn in "tpi underground" at their own height, and footbridge cells in base.map (0x80 alone); its closed
+// cell (2,1) is hidden under its wall, the quads beside it lowered as ever; its open cell (2,0) is left as it was. Its
+// rubble, which its last animation disables, is drawn named "tpishut 1 0 2 2" (its footprint) and closes nothing; its
+// crew is left out.
+void TestTunnel() {
+    std::vector<std::pair<uint16_t, uint16_t>> quads(kW * kH, {0x0042, kTexGrass});
+    const Bytes grass = Tga(2, 2, 255), clear = Tga(2, 2, 0);
+    std::vector<TpiWadMember> members = {{"base.MD2", Terrain(quads)},
+                                         {"base.map", BaseMap(0x01)},
+                                         {"textures/grass.tga", grass},
+                                         {"textures/trans01.tga", clear},
+                                         {"textures/qickload.txt", Text("grass.tga\n")}};
+    md2::Md2Model tunnel = Model("tunnel.MD2", {"grass.tga"});
+    AddNode(tunnel, Square("wall", 10, 0, 0), 0, md2::Translation(20, 0, 10));     // 1, over (2,1)
+    AddNode(tunnel, Square("rubble", 10, 3, 0), 0, md2::Translation(10, 0, 0));    // 2
+    AddNode(tunnel, Square("boy 01", 5, 0, 0), 0, md2::Translation(10, 0, 0));     // 3
+    md2::RecomputeBoxes(tunnel);
+    const TpiObstacle tunnelObstacle = {"tunnel",
+                                        {{"tunnel.sam", Sam(1, {"HH", "HH"}, 1, 0, {",X", ",."}, 2703)},
+                                         {"tunnel.MD2", md2::WriteMd2(tunnel)},
+                                         {"tunnelm1.MD2", Anim(0, {}, {})},
+                                         {"tunnelm2.MD2", Anim(0, {2}, {})},
+                                         {"textures/grass.tga", grass}}};
+    auto shared = [](const std::string&) -> const Bytes* { return nullptr; };
+    TpiObstacleReport report;
+    std::string err;
+    CHECK(MergeTpiObstacles(members, {tunnelObstacle}, shared, report, err));
+    CHECK(report.obstacles.size() == 1);
+    if (report.obstacles.size() != 1) return;
+    const TpiObstacleResult& t = report.obstacles[0];
+    CHECK(t.state == "cleared" && t.nodes == 2 && t.faces == 4 && t.shut == 1);
+    CHECK(t.blocked == 1 && t.open == 0 && t.walkway == 2);
+    CHECK(t.leftOut == std::vector<std::string>{"boy 01"});
+    const TpiWadMember* base = Member(members, "base.MD2");
+    md2::Md2Model merged;
+    CHECK(base != nullptr && md2::ReadMd2(base->data, merged, err, true));
+    if (base == nullptr) return;
+    std::vector<std::string> names;
+    for (const md2::Md2Node& n : merged.nodes) names.push_back(n.name);
+    CHECK((names == std::vector<std::string>{"root", "wall", "tpishut 1 0 2 2", "tpi underground"}));
+    for (uint32_t y = 0; y < kH; ++y)
+        for (uint32_t x = 0; x < kW; ++x) {
+            const bool hidden = x == 1 || (x == 2 && y == 1);
+            CHECK(Quad(base->data, x, y) == std::make_pair(uint16_t(hidden ? 0x0043 : 0x0042), kTexGrass));
+        }
+    // "tpi underground": six quads, the walkways' two at the ground's height and the four others around (2,1), (2,1)
+    // itself among them, 0.6 below it.
+    if (merged.nodes.size() == 4) {
+        const md2::Md2Node& under = merged.nodes[3];
+        CHECK(under.faces.size() == 12);
+        bool walkwayTop = false;
+        for (const md2::Vec3& v : under.vertices) {
+            CHECK(v.y == 0.0f || v.y == -0.6f);
+            if (v.y == 0.0f) CHECK(v.x >= 10 && v.x <= 20);
+            walkwayTop = walkwayTop || (v.y == 0.0f && v.z == 20);
+        }
+        CHECK(walkwayTop);
+    }
+    const TpiWadMember* map = Member(members, "base.map");
+    CHECK(map != nullptr);
+    if (map == nullptr) return;
+    for (uint32_t y = 0; y < kH; ++y)
+        for (uint32_t x = 0; x < kW; ++x) CHECK(Attribute(map->data, x, y) == (x == 1 ? 0x80 : 0x01));
+}
+
+// The name of what shows until its land is bought: its footprint, then, when given, the cells it hid, four to a hex
+// digit with the first cell the lowest bit; none past 63 characters.
+void TestShutName() {
+    CHECK(TpiShutName(43, 29, 12, 24, nullptr) == "tpishut 43 29 12 24");
+    const std::vector<bool> hid = {true, false, true, true, false, true};
+    CHECK(TpiShutName(28, 64, 2, 3, &hid) == "tpishut 28 64 2 3 d2");
+    const std::vector<bool> big(200, true);
+    CHECK(TpiShutName(100, 100, 10, 20, &big).empty());
 }
 
 // The leaf's name: each number as "%.4f" without trailing zeros (a negative zero as 0); none past 63 characters.
@@ -886,6 +982,8 @@ int main() {
     TestPosed(-0.5f);
     TestWalkwayLeftAlone();
     TestOpeningGate();
+    TestTunnel();
+    TestShutName();
     TestGateLeafName();
     std::printf("tpi_terrain: %d passed, %d failed\n", g_pass, g_fail);
     return g_fail == 0 ? 0 : 1;

@@ -56,6 +56,7 @@
 #include "TPSound.h"
 #include "TpiBumperKind.h"
 #include "TpiGateFlow.h"
+#include "TpiObstacleShut.h"
 #include "TpiSaveRepair.h"
 #include "UI_Base.h"
 #include "ui_main.h"
@@ -525,6 +526,7 @@ int32_t CSaveLoad::Load(const char* path, CSaveLoadHeader* header, LoadType type
 
 // SaveLoad.cpp (main app), unit v51006: CSaveLoad::SaveHeader (0x10159a08), PostLoadOperations (0x101588c4) and PreLoadOperations
 // (0x101587e4).
+
 
 // Clears the world before a park is read: the height field, the map, the cell system, the engine objects, the things, the ride in
 // first person, the bitmaps, the coasters, the particle system, the advisor (0) and the user interface.
