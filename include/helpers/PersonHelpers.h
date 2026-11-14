@@ -21,3 +21,4 @@ static inline void CellPair(uint16_t id, uint8_t offX, uint8_t offY, MapPos& x, 
 
 // Fld_2: renamed from Fld, which is defined differently above (the files that used this one now call it so).
 template <class T> static inline T& Fld_2(uint8_t* base, uint32_t offset) { return *reinterpret_cast<T*>(base + offset); }
+

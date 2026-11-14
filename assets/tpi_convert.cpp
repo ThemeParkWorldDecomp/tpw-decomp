@@ -562,7 +562,8 @@ struct ItemFolder {
 };
 const ItemFolder kItemFolders[] = {{"rides", "rides"},       {"shops", "shops"},       {"sideshow", "sideshow"},
                                    {"features", "features"}, {"upgrades", "upgrades"}, {"facilities", "features"}};
-// The facilities Theme Park World knows (its features): both toilets (unisex ones there), the staff room (two names:
+// The facilities Theme Park World knows (its features): both toilets (everyone's there; in the mod's worlds the game
+// keeps men and women apart while a park has both, by their folders, include/TpiToilets.h), the staff room (two names:
 // the science world's is "nstaff", a "Staff Room" that rests staff as the others do), the security camera, the litter
 // bin (two spellings). The information desk, the research lab and the training room have no feature, so they are left
 // out.
