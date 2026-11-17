@@ -6,6 +6,7 @@
 // map's farthest corner:
 //   - the normal camera, fog on and off: only the cells near the camera, against 1000, as in the original (both builds);
 //   - the free camera low over Land of Invention: the cells out to the map's far corner are in view, the far plane 1300;
+//   - the free camera zoomed all the way out (500), the eye outside the map: the far plane reaches the far corner (1800);
 //   - the free camera on a small map: the original's 1000; far from the map: never past the fog's start (1e6).
 // The program runs the real CHField::DivideAndConquer and TestConQuad, and the real clipper's outside codes; the math
 // unit is a stand-in that projects with the camera of the view matrix and the far plane of the last AdjustProjection.
@@ -15,6 +16,9 @@
 //   - the normal camera tilted 35 degrees over Land of Invention: the footprint stops near 230, as in the original;
 //   - the free camera there: the far corner's cell is in view, and the far plane reaches past 1000;
 //   - the free camera from 96 places, headings and tilts: every cell the normal camera draws is drawn too.
+// The launcher's Draw distance (drawdist, include/TPCamera.h PortDrawSpaceFor, src/engine/tb_hfield.cpp): Original by
+// default, the original's view distances and fog spaces bit for bit and the far plane 1000; Farther half as far again
+// and Whole world out to the map's far corner, with the far plane past it.
 // The program runs the real CalculateGamut, GetHFieldIntersection and the footprint polygon; the view matrix's turn
 // of a corner ray is a stand-in.
 // Made in both builds: without the port's fixes it checks only the normal camera. Exits nonzero on a failure.
@@ -31,6 +35,7 @@
 #include "tb_printf_opengl.h"
 #include "tb_resource_display.h"
 #ifdef TPW_TEST_PORT_FIX
+#include "PortFreeCamera.h"   // kPortFreeZoomOut
 #include "TPCamera.h"
 #endif
 
@@ -308,6 +313,18 @@ int main() {
         Check(r.testFar == 1300.0f, "free camera, whole map: far plane", r.testFar);
         Check(r.cornerInView, "free camera, whole map: the far corner is in view");
     }
+    // The free camera zoomed all the way out (kPortFreeZoomOut, 500) from a target over the near corner, 10 degrees down:
+    // the eye is outside the map, at about -354, 86, -311, and the far plane still reaches the far corner (1756 and a
+    // cell, rounded up to 1800), which is in view.
+    {
+        const float pitch = 10.0f * kPi / 180.0f;
+        const float back = kPortFreeZoomOut * std::cos(pitch);
+        SetCamera(15.0f - back * std::sin(heading), kPortFreeZoomOut * std::sin(pitch), 15.0f - back * std::cos(heading),
+                  heading, -pitch);
+        const Result r = Run(CDisplay::kEnableFog, 700.0f);
+        Check(r.testFar == 1800.0f, "free camera, farthest zoom: far plane", r.testFar);
+        Check(r.cornerInView, "free camera, farthest zoom: the far corner is in view");
+    }
     // A small map all within 1000: the original's far plane.
     MakeMap(40, 30, 10.0f, -10.0f, 10.0f);
     SetCamera(15.0f, 25.0f, 15.0f, std::atan2(385.0f, 285.0f), -5.0f * kPi / 180.0f);
@@ -378,6 +395,60 @@ int main() {
                   std::memcmp(&r.cells, &normalLow.cells, sizeof r.cells) == 0,
               "normal camera again, park view: the original's cells and far plane");
     }
+
+    // Draw distance (drawdist, include/TPCamera.h): Original unless the launcher sets it (the launcher's own default is
+    // Farther), and at Original every View distance's view distance and fog space are the original's, bit for bit.
+    Check(gPortDrawDistance == kPortDrawOriginal, "draw distance: Original unless the launcher sets it");
+    const float viewSettings[5][3] = {{200.0f, 50.0f, 60.0f}, {325.0f, 100.0f, 110.0f}, {450.0f, 135.0f, 150.0f},
+                                      {700.0f, 230.0f, 250.0f}, {400.0f, 100.0f, 130.0f}};
+    for (const auto& v : viewSettings) {
+        for (const float reach : {700.0f, 1300.0f, 1e6f}) {
+            const PortDrawSpace o = PortDrawSpaceFor(kPortDrawOriginal, v[0], v[1], v[2], reach);
+            Check(std::memcmp(&o.viewDistance, &v[0], 4) == 0 && std::memcmp(&o.fogNear, &v[1], 4) == 0 &&
+                      std::memcmp(&o.fogFar, &v[2], 4) == 0,
+                  "draw distance, Original: the View distance's own", v[0]);
+            const PortDrawSpace f = PortDrawSpaceFor(kPortDrawFarther, v[0], v[1], v[2], reach);
+            Check(f.viewDistance == v[0] * 1.5f && f.fogNear == v[1] * 1.5f && f.fogFar == v[2] * 1.5f,
+                  "draw distance, Farther: half as far again", v[0]);
+            const PortDrawSpace w = PortDrawSpaceFor(kPortDrawWhole, v[0], v[1], v[2], reach);
+            Check(w.viewDistance >= 2.0f * reach && w.fogFar == reach && w.fogNear < reach && w.fogNear >= v[1],
+                  "draw distance, Whole world: the fog only at the reach", v[0]);
+        }
+    }
+    {   // nothing nearer than the original's: a fog already past the reach, or none, stays
+        const PortDrawSpace w = PortDrawSpaceFor(kPortDrawWhole, 700.0f, 900.0f, 1000.0f, 800.0f);
+        Check(w.viewDistance == 700.0f && w.fogNear == 900.0f && w.fogFar == 1000.0f, "draw distance, Whole world: no nearer");
+        const PortDrawSpace z = PortDrawSpaceFor(kPortDrawWhole, 700.0f, 0.0f, 0.0f, 1300.0f);
+        Check(z.viewDistance == 700.0f && z.fogFar == 0.0f, "draw distance, Whole world: no fog space, kept");
+    }
+    // DivideAndConquer in first person: at Original even a view distance past the original's longest keeps the far
+    // plane 1000; above Original, the far plane reaches the map (1300 from this corner), Farther at Max (700 * 1.5) tests
+    // further than Max, and Whole world (the map's diagonal 1281, rounded up to 1300, both ways) reaches the far corner.
+    SetFree(false);
+    SetCamera(15.0f, 25.0f, 15.0f, heading, -5.0f * kPi / 180.0f);
+    const Result maxRun = Run(CDisplay::kEnableFog, 700.0f);
+    {
+        const Result r = Run(CDisplay::kEnableFog, 1050.0f);
+        Check(r.testFar == 1000.0f, "draw distance, Original: the original's far plane",
+              r.testFar);
+    }
+    gPortDrawDistance = kPortDrawFarther;
+    {
+        const Result same = Run(CDisplay::kEnableFog, 700.0f);
+        Check(same.testFar == 1000.0f && same.farthestRow == maxRun.farthestRow,
+              "draw distance, Farther: a view distance the original has keeps its far plane", same.testFar);
+        const Result r = Run(CDisplay::kEnableFog, 700.0f * kPortDrawFartherScale);
+        Check(r.testFar == 1300.0f, "draw distance, Farther at Max: far plane", r.testFar);
+        Check(r.farthestRow > maxRun.farthestRow, "draw distance, Farther at Max: further than Max", r.farthestRow);
+    }
+    gPortDrawDistance = kPortDrawWhole;
+    {
+        const PortDrawSpace w = PortDrawSpaceFor(kPortDrawWhole, 700.0f, 230.0f, 250.0f, 1300.0f);
+        const Result r = Run(CDisplay::kEnableFog, w.viewDistance);
+        Check(r.testFar == 1300.0f && r.cornerInView && r.farthestRow == 84, "draw distance, Whole world: the far corner",
+              r.farthestRow);
+    }
+    gPortDrawDistance = kPortDrawOriginal;
 #else
     std::printf("without the port's fixes only the normal camera is checked\n");
 #endif

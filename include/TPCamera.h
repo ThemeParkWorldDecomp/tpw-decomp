@@ -2,6 +2,7 @@
 // Will_HandleCameraMessages in src/game/TPCamera.cpp).
 // The globals are in this file's part of the BSS (0x102b59f8..0x102b5c08); their names are invented.
 #pragma once
+#include <cmath>
 #include <cstdint>
 
 #include "tb_matrix.h"

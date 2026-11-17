@@ -16,6 +16,7 @@
 
 #include "Light.h"
 #include "MapWho.h"
+#include "Wavelet.h"
 #include "calllog.h"
 #include "m3d2.h"
 #include "platform/arena.h"
@@ -130,6 +131,7 @@ CClipping* gei_Clipping = &gClipping;
 CRenderList* gei_RenderList = reinterpret_cast<CRenderList*>(gListStore);
 CTextureCache* gei_TCache = reinterpret_cast<CTextureCache*>(gCacheStore);
 CLightManager* gei_LightManager = reinterpret_cast<CLightManager*>(gLightStore);
+TbIsFirstPersonFn gIsFirstPerson = nullptr;  // the game's first-person hook (the port's CMesh::Preprocess asks it)
 
 // ---- the mesh object (only what the vtable needs)
 CMapLinkBase::~CMapLinkBase() {}
@@ -347,6 +349,18 @@ int32_t tpw_mf_state(int64_t* out) {
     std::memcpy(w, &gei_LightMatrix, 64);
     for (uint32_t v : w) out[n++] = v;
     return n;
+}
+
+// The port's switches CMesh::Preprocess reads (freecam): which one (0 none, 1 gPortFreeCamera, 2 gPortFarZoom) and
+// whether the game is in its own first person (the gIsFirstPerson hook then answers 1; otherwise there is none). Answers
+// 1; -1 when the library was built without the port fixes, which have no such switches.
+namespace {
+int32_t FirstPersonYes() { return 1; }
+}  // namespace
+int32_t tpw_mf_port(int32_t which, int32_t firstPerson) {
+    gIsFirstPerson = firstPerson != 0 ? FirstPersonYes : nullptr;
+    (void)which;
+    return -1;
 }
 
 // ColorVertices over a buffer; DotProduct (the vectors as float bits); both direct.

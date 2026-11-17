@@ -1011,9 +1011,49 @@ def lights_edges():
         yield lights_case(lights=lights)
 
 
+# -- CMesh::Preprocess with the port's free camera or "Zoom out further" (freecam): a node that takes its area from the
+# display's rectangle is never left out by it, so the host with the case's rectangle must be the original's run with a
+# rectangle around every cell. In the game's own first person (the gIsFirstPerson hook answering 1) the rectangle counts
+# as in the original, and so it does without the port's fixes (tpw_mf_port gives -1).
+
+WHOLE_RECTANGLE = dict(f928=-1000, f92c=1000, f930=-1000, f934=1000)
+
+
+class FreeCameraPreprocessTest:
+    name = "CMesh::Preprocess, port free camera and far zoom"
+
+    def __init__(self):
+        self.n = 0
+
+    def edge_cases(self):
+        return list(preprocess_edges())
+
+    def random_case(self, r):
+        return rcase(r, "preprocess")
+
+    def run_case(self, runner, c):
+        port = runner.lib.tpw_mf_port
+        port.argtypes, port.restype = [C.c_int32, C.c_int32], C.c_int32
+        self.n += 1
+        which, first_person = 1 + self.n % 2, self.n % 5 == 0
+        fixed = port(which, first_person) == 1
+        try:
+            want = {**c, "display": {**c["display"], **WHOLE_RECTANGLE}} if fixed and not first_person else c
+            runner.emu.reset_scratch()
+            try:
+                p = ppc(runner.emu, want)
+            except ppcemu.ImportCalled as ex:
+                return [f"PPC side called unstubbed import {ex}"]
+            h = host(runner.lib, c)
+        finally:
+            port(0, 0)
+        return T.same_values(p, h)
+
+
 TESTS = [
     FnTest("CMesh::Prepare", ppc, host, edge=prepare_edges, rnd=lambda r: rcase(r, "prepare")),
     FnTest("CMesh::Preprocess", ppc, host, edge=preprocess_edges, rnd=lambda r: rcase(r, "preprocess")),
+    FreeCameraPreprocessTest(),
     FnTest("CMesh::PreprocessTextures", ppc, host, edge=textures_edges, rnd=lambda r: rcase(r, "textures")),
     FnTest("CMesh::StaticCalculateLights", ppc, host, edge=lights_edges, rnd=lambda r: rcase(r, "lights")),
     FnTest("ColorVertices", cv_ppc, cv_host, edge=cv_edges, rnd=cv_random),

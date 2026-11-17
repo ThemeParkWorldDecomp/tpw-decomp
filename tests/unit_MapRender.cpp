@@ -350,9 +350,11 @@ void CDisplay::SetFogSpace(float nearDistance, float farDistance) {
     mFogFar = farDistance;
 }
 
-// The height field and the gamut.
+// The height field and the gamut. The view distance DivideAndConquer last saw is kept (tpw_mr_view_distance), not logged.
+float gSeenViewDistance = 0.0f;
 int32_t CHField::DivideAndConquer() {
     ev("DivideAndConquer", {lab(this)});
+    gSeenViewDistance = gei_Display.mFirstPersonViewDistance;
     return 1;
 }
 int32_t CHField::Prepare() {
@@ -660,6 +662,23 @@ int32_t tpw_mr_run(int32_t op, int32_t arg) {
 int32_t tpw_mr_free_low(int32_t on) {
     (void)on;
     return -1;
+}
+
+// Sets the port's Draw distance (gPortDrawDistance, include/TPCamera.h) to `step` and first person's view distance to the
+// single `viewDistance`, and answers 1; -1 when the library was built without the port fixes, which have no such setting.
+int32_t tpw_mr_draw_distance(int32_t step, uint32_t viewDistance) {
+    float distance;
+    std::memcpy(&distance, &viewDistance, sizeof distance);
+    gei_Display.mFirstPersonViewDistance = distance;
+    gSeenViewDistance = 0.0f;
+    (void)step;
+    return -1;
+}
+
+// First person's view distance now and the one DivideAndConquer last saw, as bit patterns.
+void tpw_mr_view_distance(uint32_t* out) {
+    out[0] = fbits(gei_Display.mFirstPersonViewDistance);
+    out[1] = fbits(gSeenViewDistance);
 }
 
 // The display's fog space (mFogNear, mFogFar) as bit patterns.

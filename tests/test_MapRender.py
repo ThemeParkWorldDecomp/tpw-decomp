@@ -913,9 +913,114 @@ class FreeLowViewTest:
         return out + T.same_values(p, h)
 
 
+# -- Render in first person with the port's Draw distance (drawdist): the original's first person, but first person's view
+# distance and fog space set to PortDrawSpaceFor's (include/TPCamera.h) while it draws and put back at the end. The unit's
+# height field has no record, so Whole world reaches DRAW_REACH.
+
+DRAW_ORIGINAL, DRAW_FARTHER, DRAW_WHOLE = 0, 1, 2
+DRAW_REACH = 700.0
+DRAW_VIEW_DISTANCES = (200.0, 325.0, 450.0, 700.0, 400.0)
+
+
+def bf(bits):
+    return struct.unpack(">f", struct.pack(">I", bits & 0xFFFFFFFF))[0]
+
+
+def single(x):
+    """x rounded to a single, as its bits (a product or quotient of two singles done in double rounds the same)."""
+    try:
+        return fb(x)
+    except OverflowError:
+        return fb(math.copysign(float("inf"), x))
+
+
+def draw_space(step, distance, near, far):
+    """PortDrawSpaceFor (include/TPCamera.h) as the bits of three singles."""
+    if step == DRAW_FARTHER:
+        return single(bf(distance) * 1.5), single(bf(near) * 1.5), single(bf(far) * 1.5)
+    if step == DRAW_WHOLE and bf(far) > 0.0 and DRAW_REACH > bf(far):
+        whole = 2.0 * DRAW_REACH
+        d = bf(distance)
+        kept = whole if d != d else max(d, whole)
+        return single(kept), single(DRAW_REACH * bf(single(bf(near) / bf(far)))), fb(DRAW_REACH)
+    return distance, near, far
+
+
+class DrawDistanceTest:
+    """Each case runs with fog on and IsFirstPerson answering 1 on both sides, at a View distance and a Draw distance step
+    (Original, Farther or Whole world) of its own. At Original the host's run is the original's, event for event. At
+    the others the host asks IsFirstPerson once more before it draws, moves the fog space to PortDrawSpaceFor's and back
+    at the end, draws the fog with it, and DivideAndConquer sees its view distance; the view distance and the fog space
+    are the case's again after. When Render returns before it draws, and without the port's fixes (tpw_mr_draw_distance
+    gives -1), the host must be the original's run of the case."""
+    name = "CMapWho::Render, port Draw distance"
+
+    def __init__(self):
+        self.n = 0
+
+    def edge_cases(self):
+        return list(render_edges())
+
+    def random_case(self, r):
+        return render_random(r)
+
+    def run_case(self, runner, c):
+        draw, seen, fog_space = runner.lib.tpw_mr_draw_distance, runner.lib.tpw_mr_view_distance, runner.lib.tpw_mr_fog_space
+        draw.argtypes, draw.restype = [C.c_int32, C.c_uint32], C.c_int32
+        seen.argtypes, seen.restype = [C.POINTER(C.c_uint32)], None
+        fog_space.argtypes, fog_space.restype = [C.POINTER(C.c_uint32)], None
+        self.n += 1
+        step = (DRAW_ORIGINAL, DRAW_FARTHER, DRAW_WHOLE)[self.n % 3]
+        distance = fb(DRAW_VIEW_DISTANCES[self.n % len(DRAW_VIEW_DISTANCES)])
+        d = {**c["display"], "flags": c["display"]["flags"] | FOG_FLAG}
+        c = {**c, "display": d}
+        runner.emu.reset_scratch()
+        p = ppc(runner.emu, {**c, "queues": {**c["queues"], "IsFirstPerson": [1] * 8}})
+        draws = any(e[0] == "ResetWindow" for e in p["log"])
+        fixed = draw(step, distance) == 1
+        try:
+            asked = fixed and draws and step != DRAW_ORIGINAL
+            h = host(runner.lib, {**c, "queues": {**c["queues"], "IsFirstPerson": [1] * (9 if asked else 8)}})
+            space = (C.c_uint32 * 2)()
+            fog_space(space)
+            distances = (C.c_uint32 * 2)()
+            seen(distances)
+        finally:
+            draw(DRAW_ORIGINAL, 0)
+        out = []
+        if asked:
+            want = draw_space(step, distance, d["fog_near"], d["fog_far"])
+            moves = [e for e in h["log"] if e[0] == "FogSpace"]
+            if moves != [("FogSpace", (L_DISPLAY, want[1], want[2]), ()),
+                         ("FogSpace", (L_DISPLAY, d["fog_near"], d["fog_far"]), ())]:
+                out.append(f"fog space moves {moves}, want {want[1:]}")
+            asks = [i for i, e in enumerate(h["log"]) if e[0] == "IsFirstPerson"]
+            reset = next(i for i, e in enumerate(h["log"]) if e[0] == "ResetWindow")
+            if not asks or asks[0] > reset:
+                out.append("IsFirstPerson not asked before it draws")
+            log = []
+            for i, e in enumerate(h["log"]):
+                if e[0] == "FogSpace" or (asks and i == asks[0]):
+                    continue
+                if e[0] == "Fog":
+                    if e[1][1:3] != want[1:]:
+                        out.append(f"fog drawn with {e}")
+                    e = (e[0], (e[1][0], d["fog_near"], d["fog_far"]) + e[1][3:], e[2])
+                log.append(e)
+            h = {**h, "log": log}
+            if any(e[0] == "DivideAndConquer" for e in log) and distances[1] != want[0]:
+                out.append(f"DivideAndConquer saw {distances[1]:#x}, want {want[0]:#x}")
+        if list(space) != [d["fog_near"], d["fog_far"]]:
+            out.append(f"fog space after {list(space)}")
+        if distances[0] != distance:
+            out.append(f"view distance after {distances[0]:#x}")
+        return out + T.same_values(p, h)
+
+
 TESTS = [FnTest("CMapWho::RenderWindow", ppc, host, edge=window_edges, rnd=window_random),
          FnTest("CMapWho::Render", ppc, host, edge=render_edges, rnd=render_random),
          FreeLowViewTest(),
+         DrawDistanceTest(),
          FnTest("CMapWho::PrepareWorldspace", ppc, host, edge=worldspace_edges, rnd=worldspace_random),
          FnTest("CMapWho::ALTTAB_RestoreState", ppc, host, edge=alttab_edges, rnd=alttab_random),
          FnTest("options, GetQuads, CMeshDelay, CLoadSurface::Display, FPU", ppc, host, edge=small_edges,

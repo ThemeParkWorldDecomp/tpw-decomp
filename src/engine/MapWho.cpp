@@ -33,6 +33,7 @@
 #include <cstring>
 #include <new>
 
+
 // tb_lightmanager_frame.cpp (engine library of SimTheme Park 2.04b3): the light manager's
 // per-frame lighting. The inventory files the range under tb_mapzoom.cpp (the construction and
 // Init/Close are in src/tb_mapzoom.cpp); the function after the light manager in the binary,

@@ -533,19 +533,19 @@ class HandleCameraTest(FnTest):
 # ------------------------------------------------------------------ the far zoom (farzoom, a port setting)
 
 # The launcher's "Zoom out further" (gPortFarZoom, include/TPCamera.h) keeps the park view's zoom within 70 and kPortFarZoomOut
-# (300) where the Mac keeps it within 70 and 130. The original has those sums already: its hidden full zoom out (bit 0x200 of
+# (800) where the Mac keeps it within 70 and 130. The original has those sums already: its hidden full zoom out (bit 0x200 of
 # gCameraModeA) clamps to gCameraWideZoomMin and gCameraWideZoomMax. So the port with the setting on is compared with the
-# original in that mode with its limits made 70 and 300, and with the hidden mode itself left as the original's (40 to 300).
+# original in that mode with its limits made 70 and 800, and with the hidden mode itself left as the original's (40 to 300).
 # The bit and the two limits are the only words that differ: words 1 and 2 (the modes) are compared without 0x200 and words 22
 # to 25 (the limits and their once flags) not at all, apart from a case in the hidden mode, which is compared whole. A build
 # without the port's fixes has no setting and runs no case.
-FAR = fb(f32(300.0))
+FAR = fb(f32(800.0))
 WIDE_WORDS = range(22, 26)
 
 
 def far_edges():
     r = random.Random(2468)
-    for f68 in (20.0, 40.0, 69.0, 70.0, 110.0, 130.0, 130.5, 131.0, 188.0, 250.0, 299.0, 300.0, 300.5, 301.0, 380.0):
+    for f68 in (20.0, 40.0, 69.0, 70.0, 110.0, 130.0, 130.5, 131.0, 188.0, 250.0, 299.0, 300.0, 300.5, 301.0, 380.0, 500.0, 799.0, 800.0, 800.5, 801.0, 950.0):
         for mode in (0x80, 0x280, 0x00, 0x200, 0x180):
             for keys in (0, 1, 2):
                 yield make(r, f68=fb(f32(f68)), modeA=mode, modeB=mode, keys=keys, flags=0, wideOnce=0, wideMaxOnce=0)
