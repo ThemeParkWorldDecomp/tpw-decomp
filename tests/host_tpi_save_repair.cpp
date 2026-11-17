@@ -4,8 +4,9 @@
 // CTrackCell::Reset give them. Then the repair of the shops of parks saved before converter 15: which saved RipOffOK
 // values rise and which placed shops become choosable, with made-up records; the repair of the research of parks
 // started before converter 14: which controls are made again and where stale projects go; and the repair of rides placed
-// before 0.5.2: which saved ride scripts get SPECIAL, with made-up O group flags and variables. Exits nonzero on the
-// failed checks' count.
+// before 0.5.2: which saved ride scripts get SPECIAL, with made-up O group flags and variables; and the repair of the
+// special rides of parks saved before converter 28: which saved rides get their remaining life back, with made-up wear
+// rates, states and lives. Exits nonzero on the failed checks' count.
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -179,6 +180,17 @@ int main() {
     Check(!TpiRideScriptToStart(1, 19, 31), "SPECIAL holding another value: kept");
     // A second load: SPECIAL is 1, so nothing changes again.
     Check(!TpiRideScriptToStart(1, 19, 1), "after the repair: kept");
+    // Special rides (converter 28 gives Theme Park Inc's Info.IsSpecial rides WearRate 0): a park saved before it kept
+    // their worn life, life 0 condemning the ride at its next breakdown.
+    Check(TpiSpecialRideLifeToRestore(0, 0, 0.0f), "a special ride saved with no life left: restored");
+    Check(TpiSpecialRideLifeToRestore(0, 1, 37.5f), "a special ride saved broken down at 37: restored");
+    Check(TpiSpecialRideLifeToRestore(0, 2, 99.9f), "a special ride waiting for an upgrade at 99.9: restored");
+    Check(!TpiSpecialRideLifeToRestore(0, kTpiObjectCondemned, 0.0f), "a condemned special ride: kept condemned");
+    Check(!TpiSpecialRideLifeToRestore(7, 0, 12.0f), "a ride that wears (WearRate 7): kept");
+    Check(!TpiSpecialRideLifeToRestore(-1, 0, 12.0f), "a WearRate not 0: kept");
+    Check(!TpiSpecialRideLifeToRestore(0, 0, 100.0f), "full life: kept");
+    // A second load: the life is 100, so nothing changes again.
+    Check(!TpiSpecialRideLifeToRestore(0, 1, 100.0f), "after the repair: kept");
 
     if (gFailures == 0) std::printf("tpi save repair: all checks passed\n");
     return gFailures;

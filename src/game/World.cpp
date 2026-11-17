@@ -48,6 +48,8 @@
 #include "TpiGateFlow.h"
 #include "TpiGenerations.h"
 #include "TpiGreatLake.h"
+#include "TpiOutside.h"
+#include "platform/samsutils.h"
 #include "TPMain.h"
 #include "UIInterface.h"
 #include "World.h"
@@ -317,6 +319,7 @@ uint16_t MakeFeatureObject(const RideInfo* ride) {
 }
 
 }  // namespace
+
 
 
 // The set-up of a new level, in the Mac's order. The answer starts true and is cleared by a failed first or second balance file (the easy

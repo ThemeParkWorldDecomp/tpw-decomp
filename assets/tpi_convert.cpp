@@ -853,6 +853,25 @@ std::string TpiPeepsSam(const Levels &levels, const std::string &world, Log &log
     return out;
 }
 
+// An outside feature of the world (Info.IsOutsideFeature 1): its converted Info.Id and "features/<name>".
+struct OutsideFeature {
+    int32_t id = -1;
+    std::string name;
+};
+
+// The world's TpiOutside.sam (include/TpiOutside.h, read by the game in the mod's worlds only): one line for each outside
+// feature, "Outside <id>", its folder after it for the reader.
+std::string TpiOutsideSam(const std::vector<OutsideFeature> &outside, Log &log) {
+    std::string out = "# TPI Worlds and Rides: Theme Park Inc's outside features, placed when a park starts\n";
+    log.text << "    TpiOutside.sam: " << outside.size() << " outside features (";
+    for (size_t i = 0; i < outside.size(); ++i) {
+        out += "Outside\t" + std::to_string(outside[i].id) + "\t\t# " + outside[i].name + "\n";
+        log.text << (i == 0 ? "" : ", ") << outside[i].name << " " << outside[i].id;
+    }
+    log.text << ")\n";
+    return out;
+}
+
 // The lake ride: a bumper ride of Theme Park Inc's boat kind (Bumper.BumperType -11, The Great Lake) whose own
 // bumper.sam gives the circles and buoys its boats sail between (ColObjects, Buoys; the ride table has neither, so
 // FilterTpiSam leaves them out of the converted ride).
@@ -1085,6 +1104,8 @@ int32_t GoldenTicketCost(const std::vector<TpiWadMember> &members, const std::st
 // of every ride's .sam and of the rides' folder .sam. A ride is what the game shows as one: Info.WhichUIType 0, the
 // item's own, else its folder .sam's, else the game's default 0. Shops and sideshows keep their prices; they sell.
 const char *const kPricePerUse = "UsageInfo.InitPricePerUse";
+// A ride's upgrade levels (Upgrades[0] to Upgrades[2]).
+constexpr int kUpgradeLevels = 3;
 
 int32_t UiType(const std::string &samText, int32_t fallback) {
     int32_t type = 0;
@@ -1615,6 +1636,7 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
     gateOptions.append = {std::string("Info.Name\t\t\t\"") + spec.display + "\""};
     bool gateNamed = false;
     LakeRide lake;
+    std::vector<OutsideFeature> outside;
     for (const auto &item : items) {
         const std::string what = item.tpiFolder + "/" + item.name;
         const bool gate = item.oldId == gateId;
@@ -1627,6 +1649,19 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
         const bool freeRide = ride && TpiSamInteger(samText, "UsageInfo", "InitPricePerUse", price);
         if (ride)
             options.drop.push_back(kPricePerUse);
+        // Theme Park Inc's special rides never wear out (Info.IsSpecial: "they can't be rebuilt"); Theme Park World has no
+        // such key, and a ride whose wear rate is 0 at its level takes no wear (CObject::AddWearAndTear).
+        int32_t special = 0;
+        const bool neverWears = ride && TpiSamInteger(samText, "Info", "IsSpecial", special) && special != 0;
+        if (neverWears)
+            for (int level = 0; level < kUpgradeLevels; ++level)
+                options.append.push_back("Upgrades[" + std::to_string(level) + "].WearRate\t\t\t0");
+        // An outside feature (Info.IsOutsideFeature: the scenery round the park, modelled where it stands) is placed when
+        // a park starts, which Theme Park World does only for its gates and lights: TpiOutside.sam names them.
+        int32_t outsideFlag = 0;
+        const bool outsideFeature = TpiSamInteger(samText, "Info", "IsOutsideFeature", outsideFlag) && outsideFlag != 0;
+        if (outsideFeature)
+            outside.push_back({item.newId, item.outFolder + "/" + item.name});
         int32_t ripOff = 0;
         const int32_t ripOffWas =
             uiType == 1 ? RaiseShopRipOffOK(samText, FolderSamText(folderSams, item.outFolder), options, ripOff) : -1;
@@ -1665,6 +1700,10 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             log.text << ", RipOffOK " << ripOff << " (was " << ripOffWas << ")";
         if (madeChoosable)
             log.text << ", visitors can use it (its folder's Info.IsChoosable was 0)";
+        if (neverWears)
+            log.text << ", never wears out (Info.IsSpecial)";
+        if (outsideFeature)
+            log.text << ", placed when a park starts (Info.IsOutsideFeature)";
         if (!shownName.empty() && shownName != infoName)
             log.text << ", named \"" << shownName << "\" (was \"" << infoName << "\", "
                      << (fromBank                                ? "from the object names"
@@ -1890,6 +1929,8 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
     w.text("TpiPeeps.sam", TpiPeepsSam(levels, world, log));
     if (!lakeSam.empty())
         w.text("TpiLake.sam", lakeSam);
+    if (!outside.empty())
+        w.text("TpiOutside.sam", TpiOutsideSam(outside, log));
     TpiSamOptions global;
     global.drop = {"StaffPoolInfo.*", "ParkInfo.AvailableFromStart"};
     global.idFields = {"ParkName.GateObjectId"};

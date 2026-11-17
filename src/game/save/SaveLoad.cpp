@@ -57,6 +57,7 @@
 #include "TpiBumperKind.h"
 #include "TpiGateFlow.h"
 #include "TpiObstacleShut.h"
+#include "TpiOutside.h"
 #include "TpiSaveRepair.h"
 #include "UI_Base.h"
 #include "ui_main.h"

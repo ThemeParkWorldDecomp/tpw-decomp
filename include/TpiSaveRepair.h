@@ -56,6 +56,12 @@
 // still loops its O animation waiting on it: parts hidden, no riders, the queue only growing. On loading, a placed ride
 // that would start with SPECIAL set (tpw::TpiRideScriptStartsSpecial) but whose saved SPECIAL is 0 gets it, as at
 // placement; the script reads it on its next tick and carries on as a new ride does. A ride placed since already has it.
+// And the same mod's repair of the special rides of parks saved before converter 28: Theme Park Inc's special rides
+// (Info.IsSpecial: "they can't be rebuilt") never wear out, and converter 28 gives them Theme Park World's no wear, a wear
+// rate of 0 at every upgrade level (CObject::AddWearAndTear takes nothing off then), but a park keeps each ride's remaining
+// life (CObject::mF44) as it was worn, and a ride whose life is worn to nothing breaks down after every repair until it is
+// condemned. On loading, a placed ride that no longer wears (its record's wear rate at its upgrade level is 0), is not
+// condemned and has less than all its life gets all of it back, as a new ride has it; a second load changes nothing.
 // Header only and pure, so the host test sees the rule the game uses (src/game/save/SaveLoad.cpp).
 #pragma once
 

@@ -365,7 +365,7 @@ const std::vector<SamRow> kItemTable = {
     Row(5, "CostToEnter"), Row(1, "Keys"), Row(0, ""), Row(5, "GateObjectId"), Row(1, "ParkName"), Row(0, ""),
     Row(5, "TicketBoothAPosX"), Row(5, "TicketBoothBPosY"), Row(1, "FixedItemInfo"), Row(0, ""),
     Row(5, "Size"), Row(1, "StaffPoolInfo"), Row(0, ""), Row(5, "GoldenTicketCost"), Row(5, "InitPricePerUse"), Row(5, "RipOffOK"), Row(1, "UsageInfo"), Row(0, ""),
-    Row(2, ""), Row(5, "CostOfUpgrade"), Row(3, "Upgrades", 0, 0, 3), Row(12, "")};
+    Row(2, ""), Row(5, "CostOfUpgrade"), Row(5, "WearRate"), Row(3, "Upgrades", 0, 0, 3), Row(12, "")};
 
 void TestSamFilter() {
     const std::string text =
@@ -710,7 +710,12 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     WriteFile(w / "Music" / "MusicHD.sdt", B("m"));
     WriteFile(w / "rides" / "Rides.sam", B("Info.WhichUIType 0\nInfo.ExpectedPrice 3\nUsageInfo.InitPricePerUse 20\n"));
     WriteFile(w / "rides" / "Online_Rides.sam", B("Info.WhichUIType 0\n"));
-    WriteFile(w / "rides" / "carpet.wad", Item("carpet", 3112, "UsageInfo.GoldenTicketCost 1\nUpgrades[0].CostOfUpgrade 0\nUsageInfo.InitPricePerUse 25\n"));
+    // Arabian's carpet is a special ride (Info.IsSpecial 1: never wears out); its wear rates are replaced by 0.
+    WriteFile(w / "rides" / "carpet.wad",
+              Item("carpet", 3112,
+                   "UsageInfo.GoldenTicketCost 1\nUpgrades[0].CostOfUpgrade 0\nUsageInfo.InitPricePerUse 25\nUpgrades[0].WearRate 7\n"
+                   "Upgrades[2].WearRate\t\t4\n" +
+                       std::string(world == "arabian" ? "Info.IsSpecial 1\n" : "Info.IsSpecial 0\n")));
     // A coaster: its coaster.sam is read with the coaster table (Info.Id would be dropped from it; Track.* kept). Its
     // speed limits are left out (the game's own apply), the other sCoasterType statements kept: arabian's sets both,
     // water's (a flume) one, science's none. The cross section selects: arabian's track names a lift cross section and
@@ -746,6 +751,11 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     WriteFile(w / "features" / "Gates.wad", Item("Gates", 3601, "", GateMesh()));
     WriteFile(w / "features" / "bus.wad", Item("bus", 1600));
     WriteFile(w / "features" / "end.wad", Item("end", 1605));
+    // Outside features (Info.IsOutsideFeature 1): placed when a park starts, listed in TpiOutside.sam. Polar Zone's ticket
+    // booth says 0, so it is not.
+    WriteFile(w / "features" / "tickbth.wad",
+              Item("tickbth", 3602, "Info.IsOutsideFeature " + std::string(world == "water" ? "0" : "1") + "\nInfo.WhichUIType 4\n"));
+    WriteFile(w / "features" / "water.wad", Item("water", 3603, "Info.IsOutsideFeature\t1\nInfo.WhichUIType 4\n"));
     WriteFile(w / "features" / "noid.wad", BuildTpiWad({{"noid.sam", B("Info.Name \"x\"\n")}}));
     // The photo booth: a shop by its own UI type, in the upgrades folder, whose .sam marks the track add-ons unchoosable.
     WriteFile(w / "upgrades" / "Upgrades.sam", B("Info.WhichUIType 0\nInfo.IsChoosable 0\n"));
@@ -1268,12 +1278,12 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(!fs::exists(a / "rides" / "carpet" / "carpet.RSE") && !fs::exists(a / "rides" / "carpet" / "carpet.rse"));
     CHECK(!fs::exists(out / "water" / "features" / "bus" / "bus.RSE"));
     const std::string fotobth = S(ReadFile(a / "upgrades" / "fotobth" / "fotobth.sam"));
-    CHECK(TpiSamInteger(fotobth, "Info", "Id", id) && id == 5070);
+    CHECK(TpiSamInteger(fotobth, "Info", "Id", id) && id == 5090);
     CHECK(TpiSamInteger(fotobth, "AddOn", "UpgradesId", id) && id == 5010);
-    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "ftoilet" / "ftoilet.sam")), "Info", "Id", id) && id == 5080);
-    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "litbin" / "litbin.sam")), "Info", "Id", id) && id == 5090);
-    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 5100);
-    CHECK(TpiSamInteger(S(ReadFile(out / "science" / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 7100);
+    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "ftoilet" / "ftoilet.sam")), "Info", "Id", id) && id == 5100);
+    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "litbin" / "litbin.sam")), "Info", "Id", id) && id == 5110);
+    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 5120);
+    CHECK(TpiSamInteger(S(ReadFile(out / "science" / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 7120);
     CHECK(TpiSamInteger(S(ReadFile(a / "rides" / "loop" / "loop.sam")), "Info", "Id", id) && id == 5020);
     const std::string track = S(ReadFile(a / "rides" / "loop" / "coaster.sam"));
     CHECK(track.find("Track.fScrollRate 0.5") != std::string::npos && track.find("Track.pcTextureFilename") != std::string::npos);
@@ -1490,7 +1500,44 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(record.find(belt) != std::string::npos && record.find("trough belt: ", record.find(belt) + belt.size()) == std::string::npos);
     CHECK(record.find(": asCrossSectionSelects") == std::string::npos && record.find(": sCoasterType.uiWinch") == std::string::npos);
     CHECK(record.find("rides/loop: Track.Bogus") != std::string::npos);
-    CHECK(record.find("items converted: 39, left out: 6") != std::string::npos);
+    CHECK(record.find("items converted: 45, left out: 6") != std::string::npos);
+    // The special ride (Info.IsSpecial 1, Arabian Nights' carpet) never wears out: every upgrade level's WearRate 0, in
+    // place of its own; the other worlds' carpet (Info.IsSpecial 0) keeps its own. The key itself is Theme Park Inc's only.
+    {
+        const std::string special = S(ReadFile(a / "rides" / "carpet" / "carpet.sam"));
+        CHECK(special.find("IsSpecial") == std::string::npos);
+        CHECK(special.find("Upgrades[0].WearRate\t\t\t0\nUpgrades[1].WearRate\t\t\t0\nUpgrades[2].WearRate\t\t\t0\n") !=
+              std::string::npos);
+        CHECK(special.find("WearRate 7") == std::string::npos && special.find("WearRate\t\t4") == std::string::npos);
+        for (const char* world : {"water", "science"}) {
+            const std::string plain = S(ReadFile(out / world / "rides" / "carpet" / "carpet.sam"));
+            CHECK(plain.find("Upgrades[0].WearRate 7") != std::string::npos);
+            CHECK(plain.find("WearRate\t\t\t0") == std::string::npos);
+        }
+        const size_t line = record.find("rides/carpet (Info.Id 3112 -> 5010, ");
+        CHECK(line != std::string::npos && record.find(", never wears out (Info.IsSpecial)", line) < record.find("\n", line));
+        size_t notes = 0;
+        for (size_t at = record.find("never wears out"); at != std::string::npos; at = record.find("never wears out", at + 1)) ++notes;
+        CHECK(notes == 1);
+    }
+    // The outside features (Info.IsOutsideFeature 1): TpiOutside.sam lists each by its converted id (include/TpiOutside.h
+    // reads it), in id order; Polar Zone's ticket booth says 0 and is left out.
+    CHECK_EQ_STR(S(ReadFile(a / "TpiOutside.sam")),
+                 "# TPI Worlds and Rides: Theme Park Inc's outside features, placed when a park starts\n"
+                 "Outside\t5070\t\t# features/tickbth\nOutside\t5080\t\t# features/water\n");
+    CHECK_EQ_STR(S(ReadFile(out / "water" / "TpiOutside.sam")),
+                 "# TPI Worlds and Rides: Theme Park Inc's outside features, placed when a park starts\n"
+                 "Outside\t6080\t\t# features/water\n");
+    CHECK(TpiSamInteger(S(ReadFile(out / "science" / "features" / "water" / "water.sam")), "Info", "Id", id) && id == 7080);
+    CHECK(S(ReadFile(a / "features" / "water" / "water.sam")).find("IsOutsideFeature") == std::string::npos);
+    CHECK(record.find("    TpiOutside.sam: 2 outside features (features/tickbth 5070, features/water 5080)\n") != std::string::npos);
+    CHECK(record.find("    TpiOutside.sam: 1 outside features (features/water 6080)\n") != std::string::npos);
+    CHECK(record.find("    TpiOutside.sam: 2 outside features (features/tickbth 7070, features/water 7080)\n") != std::string::npos);
+    {
+        const size_t line = record.find("features/water (Info.Id 3603 -> 5080, ");
+        CHECK(line != std::string::npos &&
+              record.find(", placed when a park starts (Info.IsOutsideFeature)", line) < record.find("\n", line));
+    }
     CHECK(record.find("wake hidden: rides/babylon/babylon.MD2") != std::string::npos);
     CHECK(record.find("wake hidden: rides/carpet") == std::string::npos);
     // The lake ride (include/TpiGreatLake.h): science's TpiLake.sam gives its id, the pond's water and level, its circles
