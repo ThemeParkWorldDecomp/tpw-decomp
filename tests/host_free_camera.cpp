@@ -1,12 +1,13 @@
-// host_free_camera.cpp: the launcher's "Free camera" (the port's fix freecam, include/PortFreeCamera.h), its input side. Off,
-// no key, wheel, drag or pinch is taken. On: Q and E press the camera table's turn keys and Page Up and Page Down its zoom
-// keys, Z and X hold the tilt, by their place on the keyboard, and a key up lets go of what its key down took; a notched
-// wheel stays the original's while a trackpad's fractional deltas move, zoom, turn and tilt as the settings say, Control
-// with the wheel pinches, and only over the park and out of first person; the middle button and Option with the left start
-// a drag that turns and tilts by how far it moves, with the sensitivity and the inverted look, and stops in first person
-// or when a panel opens; and the camera's own math: the original's tilt for a zoom, the easing, the ground floor. The
-// camera table is a fake that records its calls. Fly mode (Tab): its keys are held bits, the wheel, a pinch and the
-// right button move, look and set the speed, the move eases; the low view's hysteresis; what a save holds.
+// host_free_camera.cpp: the launcher's "Free camera" (the port's fix freecam, include/PortFreeCamera.h), its input
+// side. Off, no key, wheel, drag or pinch is taken. On: Q and E press the camera table's turn keys and Page Up and Page
+// Down its zoom keys, Z and X hold the tilt, by their place on the keyboard, and a key up lets go of what its key down
+// took; a notched wheel stays the original's while a trackpad's fractional deltas zoom (by default the original's
+// zoom), move, turn and tilt as the settings say, Control with the wheel pinches, and only over the park and out of
+// first person; the middle button and Option with the left start a drag that turns and tilts by how far it moves, with
+// the sensitivity and the inverted look, and stops in first person or when a panel opens; and the camera's own math:
+// the original's tilt for a zoom, the easing, the ground floor. The camera table is a fake that records its calls. Fly
+// mode (Tab): its keys are held bits, the wheel, a pinch and the right button move, look and set the speed, the move
+// eases; the low view's hysteresis; what a save holds.
 // Run by ctest ("free_camera") in a build with the port's fixes, which alone has the functions. Exits nonzero on a failure.
 #include <cmath>
 #include <cstdio>
@@ -121,17 +122,23 @@ int main() {
     // ---- the wheel
     Reset();
     Check(!PortFreeWheel(0.0f, 1.0f, false, 0, 1000, true), "a notched wheel is the original's (10 a notch)");
+    // Zooms and rotates, the default: a swipe zooms as it does with the setting off (the original's whole steps, 10 each),
+    // also on the normal camera after Tab or Home (the maintainer's 0.5.6 test: with swipes that moved the camera, it had no
+    // two-finger zoom)
+    Check(gPortFreeSwipeZooms, "Two-finger swipe zooms and rotates unless the launcher keeps move");
+    Check(!PortFreeWheel(0.5f, 0.5f, true, 0, 1500, true) && Near(gPortFree.dYaw, 0.5f * kPortFreeSwipeTurn) &&
+              gPortFree.dZoom == 0.0f && gPortFree.dForward == 0.0f,
+          "Zooms and rotates: sideways turns, up and down is left to the original's zoom");
+    Check(!PortFreeWheel(0.0f, 1.0f, false, 0, 1600, true) && gPortFree.dForward == 0.0f,
+          "and a whole delta within 300 ms of a fractional one zooms so too");
+    Reset();
+    gPortFreeSwipeZooms = false;
     Check(PortFreeWheel(0.25f, 0.5f, true, 0, 2000, true) && Near(gPortFree.dForward, 0.5f * kPortFreeSwipeMove) &&
               Near(gPortFree.dRight, 0.25f * kPortFreeSwipeMove),
           "Moves the camera: a swipe moves forward and sideways");
     Check(PortFreeWheel(0.0f, 1.0f, false, 0, 2200, true), "a whole delta within 300 ms of a fractional one is the trackpad's");
     Check(!PortFreeWheel(0.0f, 1.0f, false, 0, 2600, true), "and one after 300 ms is a wheel's again");
-    Reset();
     gPortFreeSwipeZooms = true;
-    Check(PortFreeWheel(0.5f, 0.5f, true, 0, 3000, true) && Near(gPortFree.dZoom, -0.5f * kPortFreeSwipeZoom) &&
-              Near(gPortFree.dYaw, 0.5f * kPortFreeSwipeTurn) && gPortFree.dForward == 0.0f,
-          "Zooms and rotates: up and down zooms, sideways turns");
-    gPortFreeSwipeZooms = false;
     Reset();
     Check(PortFreeWheel(0.5f, 0.5f, true, 0x30, 4000, true) && Near(gPortFree.dYaw, 0.5f * kPortFreeSwipeTurn) &&
               Near(gPortFree.dPitch, -0.5f * kPortFreeSwipeTilt),
