@@ -5,13 +5,17 @@
 // (a byte per square, bit d = a wall in direction d) that the case loads; wallhug_trivial plans a walk (kind 0 to 2: a real walk of adjacent
 // squares, x first, y first or alternating; kind 3: the test's queues "wh_count", "wh_pt", "wh_ret") and answers 0x70000000 when a
 // planned walk is longer than the case's limit; UDebug records its format.
+// The queue "wh_pt" holds up to 734 values and a long wall hug logs up to 10617 events, so the call log holds 1024 per queue
+// and 16384 events: with the defaults (64 and 4096) the host repeated the 64th value and its log overflowed.
+#define TPW_CALLLOG_EVENTS 16384
+#define TPW_CALLLOG_QUEUE_VALUES 1024
+#include "calllog.cpp"
 #include <cstddef>
 #include <cstdint>
 #include <cstdarg>
 #include <cstring>
 
 #include "TPCamera.h"
-#include "calllog.h"
 #include "platform/arena.h"
 #include "platform/samsutils.h"
 

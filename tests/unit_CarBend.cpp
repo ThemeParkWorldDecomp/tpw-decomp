@@ -9,6 +9,10 @@
 // other files the unit reads (the engine's sine table in gTPGlobals, gActionRecorder, gRideAnimSets) are defined here, zero at start like
 // the Mac's bss. The module builds the world word by word at the Mac's offsets (every block from the arena, so the M3D2 pieces' Ptr32
 // fields fit; tpw_cbd_base is the offset those fields count from) and reads it back the same way.
+// The queue "Rot" holds up to 130 angles (a car of 69 or more vertices), so the call log holds 256 per queue: with the default 64
+// the host repeated the 64th angle where the Mac went on down its queue.
+#define TPW_CALLLOG_QUEUE_VALUES 256
+#include "calllog.cpp"
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -19,7 +23,6 @@
 #include "TPEngine.h"
 #include "TPGlobals.h"
 #include "TPSound.h"
-#include "calllog.h"
 #include "m3d2.h"
 #include "platform/arena.h"
 #include "rsse.h"

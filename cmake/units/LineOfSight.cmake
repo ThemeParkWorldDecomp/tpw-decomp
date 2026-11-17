@@ -16,3 +16,4 @@ set(TPW_UNIT_LineOfSight_KEEP
   _gWallhugNavMode
   _gWallhugStep
 )
+set(TPW_UNIT_LineOfSight_OWN_CALLLOG ON)

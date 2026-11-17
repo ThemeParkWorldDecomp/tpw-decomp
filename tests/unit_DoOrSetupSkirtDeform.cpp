@@ -5,11 +5,14 @@
 // CombineMatricesNoWDest2nd (records both matrices, changes nothing), InvertMatrix (records the source, copies it to the destination),
 // VectorThroughLMatrixNoW (records the matrix and the point, replaces the point by the queued x, y, z). modf and the float to unsigned
 // conversion are real on the host side. The globals of other files are defined here, zero at start like the Mac's bss.
+// The queues "vx", "vy" and "vz" hold up to 68 values, so the call log holds 128 per queue: with the default 64 the host
+// repeated the 64th value where the Mac went on down its queue.
+#define TPW_CALLLOG_QUEUE_VALUES 128
+#include "calllog.cpp"
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 
-#include "calllog.h"
 #include "platform/arena.h"
 #include "Debug.h"
 #include "TPEngine.h"

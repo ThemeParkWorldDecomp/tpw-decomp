@@ -69,3 +69,4 @@ set(TPW_UNIT_CarBend_KEEP
   tmpl_d809f9651e41@bullfrog/FileSystem.cpp   # operator+= (a template definition src/TbStringBuffer.cpp had before the regroup)
   tmpl_feba63a511e0@bullfrog/FileSystem.cpp   # operator= (a template definition src/TbString.cpp had before the regroup)
 )
+set(TPW_UNIT_CarBend_OWN_CALLLOG ON)
