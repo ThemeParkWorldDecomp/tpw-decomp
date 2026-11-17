@@ -20,6 +20,12 @@
 // again and the cell takes the level's attribute and is reset (mode 0x1e), keeping its saved flag 0x40
 // (TpiRepairedFlags), with its track cell when that belongs to nothing (mode 7). A cell something is built on stays as
 // it is, and a second load changes nothing.
+// A hoarding post (track type 0x19) belongs to nothing too, and 0.5.5 reset the posts of a fence that crossed a walkway
+// with the rest (a player's Arabian Nights park: the old east fence over the tunnel), leaving a hole the next land bought walked to
+// and never left (LLCC_BuildHoardingDB), and block cells naming a post that was gone. The walkway repair now keeps posts
+// (TpiWalkwayTrackToReset), and on loading, each post a park saved after such a reset (its footbridge cell's track
+// cell parentless and no post, its three block cells still naming it) is a post again, linked to its neighbours
+// (RepairTpiLostHoardingPosts); a second load changes nothing.
 // The same mod's repair of the shops of parks saved before converter 15: a park keeps each object type's control
 // (CControlManager, made once from the record when the type is first seen), so its shops keep the RipOffOK converter 14
 // gave them (0 where the shops folder named none) and visitors still walk away from their prices; on loading, a shop
