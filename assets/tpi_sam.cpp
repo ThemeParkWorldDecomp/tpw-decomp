@@ -373,7 +373,9 @@ bool FindStatement(const std::string& text, const std::string& group, const std:
         body = line.substr(p);
         s = Statement{};
         if (!ParseHead(body, s)) continue;
-        if (s.group == group && s.fields.size() == 1 && s.fields[0] == field) return true;
+        // "Group[n]" asks for one entry of an array group, "Group" for the first statement of any entry.
+        const bool named = s.group == group || (s.inArray && s.group + "[" + std::to_string(s.index) + "]" == group);
+        if (named && s.fields.size() == 1 && s.fields[0] == field) return true;
     }
     return false;
 }
@@ -400,6 +402,14 @@ bool TpiSamString(const std::string& text, const std::string& group, const std::
     if (close == std::string::npos) return false;
     value = body.substr(p + 1, close - p - 1);
     return true;
+}
+
+bool TpiSamFloat(const std::string& text, const std::string& group, const std::string& field, float& value) {
+    std::string body;
+    Statement s;
+    if (!FindStatement(text, group, field, body, s)) return false;
+    size_t end = 0;
+    return ParseFloat(body, s.valuesAt, value, end);
 }
 
 }  // namespace tpw::assets

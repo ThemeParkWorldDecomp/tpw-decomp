@@ -346,6 +346,83 @@ bool HideWake(const Bytes &in, Bytes &out) {
     return true;
 }
 
+// The two statements of a coaster's track file that cap its trains' speed, at the lowest and the highest speed setting
+// (CoasterSetSpeed blends them by the ride's setting). Theme Park Inc's files set them far below the game's own limits
+// (SetCoasterTypeDefaults), and no Theme Park World coaster sets them. The game carries the capped speed on along the
+// track (CalculateTrackGForcesSpeedAndExcitement, CoasterCarRideTrackTick), so with Theme Park Inc's caps a train stops
+// gaining speed part way down a drop, the next climb or loop runs out of speed and its brace gets a chain lift. They are
+// left out, so the game's own limits apply and the coaster rides by Theme Park World's physics.
+const char *const kCoasterSpeedLimits[] = {"fMaxSpeedAtMinSetting", "fMaxSpeedAtMaxSetting"};
+
+// Adds the speed-limit statements `text` has to `options.drop`; returns them with their values for the record ("" when
+// there are none).
+std::string DropCoasterSpeedLimits(const std::string &text, TpiSamOptions &options) {
+    std::string note;
+    for (const char *field : kCoasterSpeedLimits) {
+        float value = 0.0f;
+        if (!TpiSamFloat(text, "sCoasterType", field, value))
+            continue;
+        options.drop.push_back(std::string("sCoasterType.") + field);
+        std::ostringstream one;
+        one << field << " " << value;
+        note += (note.empty() ? "" : ", ") + one.str();
+    }
+    return note;
+}
+
+// A trough (a flume's track, bSpecialIsTrough) shows its lift belt on climbs and its water everywhere else: one select
+// with only a pitch range, a climb (the game's pitch is negative going up), answers the belt's cross section, and one
+// with no range at all answers the water's. Every Theme Park World and Theme Park Inc trough has them so, and names no
+// cross section for its lift braces (uiWinchCrossSection, which the game draws over the whole of a chain lift brace,
+// the part past the top going down too). The Bonus Disk's Depth Charge flume (lostsub) has its two cross sections the
+// other way round (the water first, then the belt) but the same selects, and names the belt for its lift braces: the
+// belt runs along every flat and every drop and over the tops of its lift hills, and the water shows only on climbs.
+// When a trough names its lift's cross section and only the select without a range answers it, the two selects' cross
+// sections are swapped (in `options.append`) and the lift's cross section is left out (in `options.drop`), so the
+// trough draws by pitch like every other.
+// Returns what was changed for the record ("" when nothing was).
+std::string FixTroughBelt(const std::string &text, TpiSamOptions &options) {
+    int32_t trough = 0, lift = 0;
+    if (!TpiSamInteger(text, "sCoasterType", "bSpecialIsTrough", trough) || trough != 1 ||
+        !TpiSamInteger(text, "sCoasterType", "uiWinchCrossSection", lift) || lift == 0)
+        return "";
+    static const char *const kRanges[] = {"fSpeedRangeMin", "fSpeedRangeMax", "fDirectionRangeMin", "fDirectionRangeMax",
+                                          "fPitchRangeMin", "fPitchRangeMax", "fBankRangeMin",      "fBankRangeMax"};
+    int climb = -1, rest = -1;
+    int32_t climbSection = 0, restSection = 0;
+    for (int i = 0; i < 20; ++i) {
+        const std::string group = "asCrossSectionSelects[" + std::to_string(i) + "]";
+        int32_t section = 0;
+        if (!TpiSamInteger(text, group, "usCrossSectionIndex", section))
+            continue;
+        int ranges = 0;
+        for (const char *field : kRanges) {
+            float value = 0.0f;
+            if (TpiSamFloat(text, group, field, value))
+                ++ranges;
+        }
+        float low = 0.0f, high = 0.0f;
+        const bool pitch = TpiSamFloat(text, group, "fPitchRangeMin", low) && TpiSamFloat(text, group, "fPitchRangeMax", high);
+        if (ranges == 0) {
+            rest = i;
+            restSection = section;
+        } else if (ranges == 2 && pitch && low < 0.0f && high <= 0.0f) {
+            climb = i;
+            climbSection = section;
+        } else {
+            return "";
+        }
+    }
+    if (climb < 0 || rest < 0 || climbSection == lift || restSection != lift)
+        return "";
+    const std::string head = "asCrossSectionSelects[";
+    options.append.push_back(head + std::to_string(climb) + "].usCrossSectionIndex " + std::to_string(lift));
+    options.append.push_back(head + std::to_string(rest) + "].usCrossSectionIndex " + std::to_string(climbSection));
+    options.drop.push_back("sCoasterType.uiWinchCrossSection");
+    return "climbs showed cross section " + std::to_string(climbSection) + " and the rest and the lift " +
+           std::to_string(lift);
+}
+
 // Sam files: filtered through `samTable` with `samOptions` when the member's extension is .sam (nullptr: copied).
 // Online_*.sam members are left out, and so are meshes kept among the textures (TPI's gokarts has copies there).
 // A boat's wake node is drawn as a point (HideWake), but with `keepWake` (the lake ride's boats, which the game sails on
@@ -411,13 +488,27 @@ Converted ConvertMembers(const std::vector<TpiWadMember> &in, const std::vector<
         } else if (ext == ".sam" && samTable != nullptr) {
             // A coaster's track file (coaster.sam, read with the coaster table) or the item's own file.
             const bool coaster = Lower(base) == "coaster.sam" && coasterTable != nullptr;
-            const TpiSamOptions options = coaster ? TpiSamOptions{} : *samOptions;
+            TpiSamOptions options = coaster ? TpiSamOptions{} : *samOptions;
             std::string text(m.data.begin(), m.data.end()), filtered, err;
+            const std::string limits = coaster ? DropCoasterSpeedLimits(text, options) : std::string();
+            const std::string belt = coaster ? FixTroughBelt(text, options) : std::string();
             TpiSamReport report;
             if (!FilterTpiSam(coaster ? *coasterTable : *samTable, text, options, filtered, report, err))
                 Fail(what + "/" + m.name + ": " + err);
+            // The statements left out or rewritten on purpose are in the record lines below, not among the dropped.
+            std::vector<std::string> meant = coaster ? options.drop : std::vector<std::string>();
+            if (coaster)
+                for (const auto &a : options.append)
+                    meant.push_back(a.substr(0, a.find(' ')));
             for (const auto &d : report.dropped)
-                log.droppedStatements.insert(what + ": " + d);
+                if (std::find(meant.begin(), meant.end(), d) == meant.end())
+                    log.droppedStatements.insert(what + ": " + d);
+            if (!limits.empty())
+                log.text << "    coaster speed: " << what << "/" << m.name << ": " << limits
+                         << " left out, the game's own speed limits apply\n";
+            if (!belt.empty())
+                log.text << "    trough belt: " << what << "/" << m.name << ": " << belt
+                         << "; swapped and the lift's left out, so the belt shows on climbs and the water on the rest\n";
             for (const auto &u : report.unmappedIds)
                 log.text << "    id not remapped: " << what << "/" << m.name << ": " << u << "\n";
             out.members.push_back({m.name, Bytes(filtered.begin(), filtered.end())});

@@ -39,9 +39,12 @@ struct TpiSamReport {
 bool FilterTpiSam(const std::vector<SamRow>& table, const std::string& text, const TpiSamOptions& options,
                   std::string& out, TpiSamReport& report, std::string& err);
 
-// The first integer value of the first "Group.Field" statement in `text`; false when there is none.
+// The first integer value of the first "Group.Field" statement in `text`; false when there is none. For an array group,
+// "Group" finds the first entry that has the field and "Group[n]" entry n only (the same in the two functions below).
 bool TpiSamInteger(const std::string& text, const std::string& group, const std::string& field, int32_t& value);
 // The first string value (between quotes) of the first "Group.Field" statement; false when there is none.
 bool TpiSamString(const std::string& text, const std::string& group, const std::string& field, std::string& value);
+// The first number value of the first "Group.Field" statement; false when there is none.
+bool TpiSamFloat(const std::string& text, const std::string& group, const std::string& field, float& value);
 
 }  // namespace tpw::assets

@@ -466,6 +466,22 @@ void TestSamFilter() {
     std::string s;
     CHECK(TpiSamString(text, "Info", "Name", s) && s == "Magic Carpet");
     CHECK(!TpiSamString(text, "Info", "Id", s));
+    float f = 0.0f;
+    CHECK(TpiSamFloat("# c\nsCoasterType.fMaxSpeedAtMaxSetting\t\t70.0\r\nsCoasterType.fWinchSpeed -2.5\n", "sCoasterType",
+                      "fMaxSpeedAtMaxSetting", f) && f == 70.0f);
+    CHECK(TpiSamFloat("sCoasterType.fWinchSpeed -2.5\n", "sCoasterType", "fWinchSpeed", f) && f == -2.5f);
+    CHECK(TpiSamFloat("Info.Id 3112\n", "Info", "Id", f) && f == 3112.0f);
+    CHECK(!TpiSamFloat("#sCoasterType.fMaxSpeedAtMinSetting 6.0\n", "sCoasterType", "fMaxSpeedAtMinSetting", f));
+    CHECK(!TpiSamFloat(text, "Info", "Name", f));
+    // An array group: "Group" finds the first entry with the field, "Group[n]" entry n only.
+    const std::string selects = "a[0].usIndex 1\na[0].fMin -90\na[1].usIndex 2\n#a[2].usIndex 3\n";
+    int32_t n = 0;
+    CHECK(TpiSamInteger(selects, "a", "usIndex", n) && n == 1);
+    CHECK(TpiSamInteger(selects, "a[1]", "usIndex", n) && n == 2);
+    CHECK(!TpiSamInteger(selects, "a[2]", "usIndex", n));
+    CHECK(TpiSamFloat(selects, "a[0]", "fMin", f) && f == -90.0f);
+    CHECK(!TpiSamFloat(selects, "a[1]", "fMin", f));
+    CHECK(!TpiSamInteger(selects, "a[", "usIndex", n));
 }
 
 // ---- a Data tree
@@ -695,9 +711,22 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     WriteFile(w / "rides" / "Rides.sam", B("Info.WhichUIType 0\nInfo.ExpectedPrice 3\nUsageInfo.InitPricePerUse 20\n"));
     WriteFile(w / "rides" / "Online_Rides.sam", B("Info.WhichUIType 0\n"));
     WriteFile(w / "rides" / "carpet.wad", Item("carpet", 3112, "UsageInfo.GoldenTicketCost 1\nUpgrades[0].CostOfUpgrade 0\nUsageInfo.InitPricePerUse 25\n"));
-    // A coaster: its coaster.sam is read with the coaster table (Info.Id would be dropped from it; Track.* kept).
+    // A coaster: its coaster.sam is read with the coaster table (Info.Id would be dropped from it; Track.* kept). Its
+    // speed limits are left out (the game's own apply), the other sCoasterType statements kept: arabian's sets both,
+    // water's (a flume) one, science's none. The cross section selects: arabian's track names a lift cross section and
+    // has one select (a coaster, kept); water's flume has the Bonus Disk's Depth Charge layout (its climb select answers
+    // the water, its other select the lift's belt: swapped); science's flume names no lift section (kept).
+    const std::string flumeSelects = "asCrossSectionSelects[0].usCrossSectionIndex\t1\nasCrossSectionSelects[0].fPitchRangeMin -90\n"
+                                     "asCrossSectionSelects[0].fPitchRangeMax\t\t\t-1\n\nasCrossSectionSelects[1].usCrossSectionIndex 2\n";
+    std::string speeds = "sCoasterType.fAccelerationPerHeight\t0.6\n#KF\nsCoasterType.fMaxSpeedAtMinSetting\t6.0\r\n"
+                         "sCoasterType.fMaxSpeedAtMaxSetting\t70.0\nsCoasterType.fFrictionMultiplier 0.9\n"
+                         "sCoasterType.uiWinchCrossSection 2\nasCrossSectionSelects[0].usCrossSectionIndex 1\n";
+    if (world == "water")
+        speeds = flumeSelects + "sCoasterType.bSpecialIsTrough 1\nsCoasterType.fMaxSpeedAtMinSetting 6.0\nsCoasterType.uiWinchCrossSection 2\n";
+    if (world == "science") speeds = "sCoasterType.fAccelerationPerHeight 1.5\nsCoasterType.bSpecialIsTrough 1\n" + flumeSelects;
     WriteFile(w / "rides" / "loop.wad",
-              BuildTpiWad({{"loop.sam", B("Info.Id 3114\n")}, {"coaster.sam", B("Info.Id 7\nTrack.pcTextureFilename \"t\"\nTrack.fScrollRate 0.5\nTrack.Bogus 1\n")}}));
+              BuildTpiWad({{"loop.sam", B("Info.Id 3114\n")},
+                           {"coaster.sam", B("Info.Id 7\nTrack.pcTextureFilename \"t\"\nTrack.fScrollRate 0.5\nTrack.Bogus 1\n" + speeds)}}));
     WriteFile(w / "rides" / "babylon.wad", Item("babylon", 3113, "", BoatMesh()));
     // In every world, though only science has a lake for it: water's lake obstacle has no water below its ground and
     // arabian's terrain has no height field.
@@ -880,7 +909,25 @@ void RegisterTestTables() {
                                         Row(5, "CanEarnTicketsInTheme"), Row(5, "CanSpendTicketsInTheme"), Row(1, "Tickets"), Row(0, ""),
                                         Row(5, "GateObjectId"), Row(1, "ParkName"), Row(12, "")};
     const std::vector<SamRow> hoardings = {Row(0, ""), Row(2, ""), Row(4, "X"), Row(4, "Y"), Row(3, "HoardingClicks", 0, 0, 20), Row(12, "")};
-    const std::vector<SamRow> coaster = {Row(0, ""), Row(10, "pcTextureFilename"), Row(7, "fScrollRate"), Row(1, "Track"), Row(12, "")};
+    const std::vector<SamRow> coaster = {Row(0, ""),
+                                         Row(10, "pcTextureFilename"),
+                                         Row(7, "fScrollRate"),
+                                         Row(1, "Track"),
+                                         Row(0, ""),
+                                         Row(6, "bSpecialIsTrough", 0, 2),
+                                         Row(7, "fAccelerationPerHeight"),
+                                         Row(7, "fFrictionMultiplier"),
+                                         Row(7, "fMaxSpeedAtMinSetting"),
+                                         Row(7, "fMaxSpeedAtMaxSetting"),
+                                         Row(6, "uiWinchCrossSection", 0, 21),
+                                         Row(1, "sCoasterType"),
+                                         Row(0, ""),
+                                         Row(2, ""),
+                                         Row(7, "fPitchRangeMin"),
+                                         Row(7, "fPitchRangeMax"),
+                                         Row(6, "usCrossSectionIndex", 0, 21),
+                                         Row(3, "asCrossSectionSelects", 0, 0, 20),
+                                         Row(12, "")};
     SetSamTable("rides.sam", kItemTable.data(), kItemTable.size());
     SetSamTable("coaster.sam", coaster.data(), coaster.size());
     SetSamTable("standard.sam", main.data(), main.size());
@@ -1231,6 +1278,27 @@ void TestConvertTree(const fs::path& scratch) {
     const std::string track = S(ReadFile(a / "rides" / "loop" / "coaster.sam"));
     CHECK(track.find("Track.fScrollRate 0.5") != std::string::npos && track.find("Track.pcTextureFilename") != std::string::npos);
     CHECK(track.find("Bogus") == std::string::npos && track.find("Info.Id") == std::string::npos);
+    float speed = 0.0f;
+    CHECK(TpiSamFloat(track, "sCoasterType", "fAccelerationPerHeight", speed) && speed == 0.6f);
+    CHECK(TpiSamFloat(track, "sCoasterType", "fFrictionMultiplier", speed) && speed == 0.9f);
+    CHECK(track.find("fMaxSpeedAt") == std::string::npos);
+    const std::string flume = S(ReadFile(out / "water" / "rides" / "loop" / "coaster.sam"));
+    CHECK(flume.find("bSpecialIsTrough 1") != std::string::npos && flume.find("fMaxSpeedAt") == std::string::npos);
+    const std::string flume2 = S(ReadFile(out / "science" / "rides" / "loop" / "coaster.sam"));
+    CHECK(flume2.find("fAccelerationPerHeight 1.5") != std::string::npos);
+    // The trough belt: water's flume climbs on its lift's cross section (2) now and runs on the other (1) elsewhere; its
+    // pitch range stays and its lift's cross section goes. Science's flume (no lift section named) and arabian's coaster
+    // keep their selects, and the coaster its lift's cross section.
+    int32_t section = 0;
+    CHECK(TpiSamInteger(flume, "asCrossSectionSelects[0]", "usCrossSectionIndex", section) && section == 2);
+    CHECK(TpiSamInteger(flume, "asCrossSectionSelects[1]", "usCrossSectionIndex", section) && section == 1);
+    CHECK(TpiSamFloat(flume, "asCrossSectionSelects[0]", "fPitchRangeMin", speed) && speed == -90.0f);
+    CHECK(TpiSamFloat(flume, "asCrossSectionSelects[0]", "fPitchRangeMax", speed) && speed == -1.0f);
+    CHECK(flume.find("uiWinchCrossSection") == std::string::npos && flume.find("bSpecialIsTrough 1") != std::string::npos);
+    CHECK(TpiSamInteger(flume2, "asCrossSectionSelects[0]", "usCrossSectionIndex", section) && section == 1);
+    CHECK(TpiSamInteger(flume2, "asCrossSectionSelects[1]", "usCrossSectionIndex", section) && section == 2);
+    CHECK(TpiSamInteger(track, "asCrossSectionSelects[0]", "usCrossSectionIndex", section) && section == 1);
+    CHECK(TpiSamInteger(track, "sCoasterType", "uiWinchCrossSection", section) && section == 2);
     CHECK(!fs::exists(a / "features" / "Facilities.sam"));
     CHECK(fs::exists(a / "shops" / "Shops.sam"));
     CHECK(!fs::exists(a / "features" / "info"));
@@ -1407,6 +1475,21 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(record.find("left out: facilities/nstaff (") == std::string::npos);
     CHECK(record.find("features/noid") != std::string::npos);
     CHECK(record.find("rides/carpet: Info.WorkingLife") != std::string::npos);
+    // The coasters' speed limits: one line per coaster that had them, with their values, and not among the statements
+    // Theme Park World has no setting for.
+    CHECK(record.find("    coaster speed: rides/loop/coaster.sam: fMaxSpeedAtMinSetting 6, fMaxSpeedAtMaxSetting 70 left out, the "
+                      "game's own speed limits apply\n") != std::string::npos);
+    CHECK(record.find("    coaster speed: rides/loop/coaster.sam: fMaxSpeedAtMinSetting 6 left out") != std::string::npos);
+    size_t speedLines = 0;
+    for (size_t at = record.find("coaster speed: "); at != std::string::npos; at = record.find("coaster speed: ", at + 1)) ++speedLines;
+    CHECK(speedLines == 2);   // science's coaster has no speed limits to leave out
+    CHECK(record.find(": sCoasterType.fMaxSpeedAt") == std::string::npos);
+    // The trough belt: one line, for water's flume, and the rewritten selects not among the dropped statements.
+    const std::string belt = "    trough belt: rides/loop/coaster.sam: climbs showed cross section 1 and the rest and the lift 2; swapped and "
+                             "the lift's left out, so the belt shows on climbs and the water on the rest\n";
+    CHECK(record.find(belt) != std::string::npos && record.find("trough belt: ", record.find(belt) + belt.size()) == std::string::npos);
+    CHECK(record.find(": asCrossSectionSelects") == std::string::npos && record.find(": sCoasterType.uiWinch") == std::string::npos);
+    CHECK(record.find("rides/loop: Track.Bogus") != std::string::npos);
     CHECK(record.find("items converted: 39, left out: 6") != std::string::npos);
     CHECK(record.find("wake hidden: rides/babylon/babylon.MD2") != std::string::npos);
     CHECK(record.find("wake hidden: rides/carpet") == std::string::npos);
