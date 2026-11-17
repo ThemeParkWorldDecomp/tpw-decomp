@@ -20,7 +20,7 @@
 // platform/tests/platform_tests.cpp sets a layout with no window.
 extern "C" {
 typedef struct SDL_Keymap SDL_Keymap;
-SDL_Keymap* SDL_CreateKeymap(void);
+SDL_Keymap* SDL_CreateKeymap(bool auto_release);   // SDL 3.4: true, as its keyboard and Mac driver make one: SDL_SetKeymap frees it
 void SDL_SetKeymapEntry(SDL_Keymap* keymap, SDL_Scancode scancode, SDL_Keymod modstate, SDL_Keycode keycode);
 void SDL_SetKeymap(SDL_Keymap* keymap, bool send_event);
 bool SDL_InitKeyboard(void);
@@ -164,7 +164,7 @@ int main() {
         // A layout with no Latin letters (Russian): A types no character the Mac has (0) and its key code is 0, so the run
         // loop remembers no key for it, but the tables still get A (its QWERTY key). A alone, down and up.
         Check(SDL_InitKeyboard(), "SDL keyboard");
-        SDL_Keymap* keymap = SDL_CreateKeymap();
+        SDL_Keymap* keymap = SDL_CreateKeymap(true);
         // SDL takes a layout for one with no Latin letters when A to D have none (as its video drivers set it).
         const SDL_Keycode russian[5][2] = {{SDL_SCANCODE_A, 0x444}, {SDL_SCANCODE_B, 0x438}, {SDL_SCANCODE_C, 0x441},
                                            {SDL_SCANCODE_D, 0x432}, {SDL_SCANCODE_W, 0x446}};
