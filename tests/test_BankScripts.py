@@ -828,7 +828,12 @@ def process_edges():
 
 
 def f32(x):
-    return struct.unpack(">f", struct.pack(">f", x))[0] if not (math.isnan(x) or math.isinf(x)) else x
+    if math.isnan(x) or math.isinf(x):
+        return x
+    try:
+        return struct.unpack(">f", struct.pack(">f", x))[0]
+    except OverflowError:   # beyond the single range: rounds to an infinity, as frsp does
+        return math.copysign(math.inf, x)
 
 
 RATES = [1.0, 62.0, 0.248, 0.24, 0.2480001, 0.2479999, 0.0, -0.0, -1.0, 1e-30, math.inf, -math.inf, math.nan, 1e30, -1e30, 0.5, 0.25, 0.1, 0.01, 2.0, 31.0, 62.5,

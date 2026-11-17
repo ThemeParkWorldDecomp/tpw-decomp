@@ -722,7 +722,7 @@ def queue_case(r, start_kind=None, end_kind=None, rot=None, g=None, pos_dirs=Non
         put(m, pos[i], nb=d)
         put(m, pos[i + 1], nb=OPP[d])
     sk = start_kind or r.choice(["entrance"] * 5 + ["queue", "nonqueue", "moved", "none", "multi", "same"])
-    if sk == "moved" and n < 2:
+    if sk in ("moved", "same") and n < 2:
         sk = "queue"
     if sk in ("none", "multi") and n < 1:
         sk = "queue"
@@ -898,7 +898,7 @@ def track_case(r, reverse, rot=None, block=None, g=None, nsegs=None, end=None):
         if roll < 0.10 and i > 0:
             t[p]["f23"] &= ~1
         elif roll < 0.18:
-            t[p]["nb"] |= r.choice(DIRS)
+            t[p]["nb"] = t[p].get("nb", 0) | r.choice(DIRS)
         elif roll < 0.22:
             t[p]["par"] = P2
         elif roll < 0.26:
