@@ -2,6 +2,7 @@
 
 #include "analyser.h"
 #include "CellBase.h"
+#include "CellIdLookup.h"
 #include "CMessageCentre.h"
 #include "CMsg.h"
 #include "Debug.h"

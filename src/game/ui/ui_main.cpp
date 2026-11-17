@@ -4,6 +4,7 @@
 #define TPW_V51039_STRONG
 #include "AdvisorQueue.h"
 #include "analyser.h"
+#include "CellIdLookup.h"
 #include "Cheat.h"
 #include "Debug.h"
 #include "FillLenderList.h"

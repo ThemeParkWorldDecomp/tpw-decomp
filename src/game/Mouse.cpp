@@ -3,6 +3,7 @@
 #include "AdvisorQueue.h"
 #include "AdvisorScoring.h"
 #include "analyser.h"
+#include "CellIdLookup.h"
 #include "Debug.h"
 #include "DynamicMesh.h"
 #include "ESP_sprites.h"

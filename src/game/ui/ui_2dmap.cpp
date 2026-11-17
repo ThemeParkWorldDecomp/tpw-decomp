@@ -4,6 +4,7 @@
 #include "AdvisorScoring.h"
 #include "analyser.h"
 #include "CellBase.h"
+#include "CellIdLookup.h"
 #include "Debug.h"
 #include "DrawRenderClasses.h"
 #include "DrawState.h"

@@ -3,6 +3,7 @@
 #include "AdvisorQueue.h"
 #include "analyser.h"
 #include "CellBase.h"
+#include "CellIdLookup.h"
 #include "CMessageCentre.h"
 #include "CMsgDeath.h"
 #include "Debug.h"

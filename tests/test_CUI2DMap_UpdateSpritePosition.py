@@ -639,6 +639,8 @@ def store_case(r, w=None, h=None, K=None, pr=None):
     for idx in range(-1, 41):
         if idx not in cells:
             cells[idx] = (r.randrange(0, 41), r.randrange(0, K + 1))
+    # map cell 0 (a parent id 0) is CWorld + 0x294: its thing list head is the high half of the year, 0 on the Mac, an empty list
+    cells[-1] = (cells[-1][0], 0)
     tracks = {idx: r.randrange(0, 41) for idx in range(-1, 41)}
     c = {"op": "store", "w": w, "h": h, "things": things, "cells": cells, "tracks": tracks, "e0": r.random() < 0.3}
     q = {}
