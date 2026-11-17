@@ -1292,6 +1292,28 @@ std::vector<TpiWadMember> TpwSprites(const fs::path &assets, std::string &where)
     return {};
 }
 
+// The members of the first edition's lobby.wad under <dataRoot>/assets (the island screen's files: the islands' waves and
+// the sea, tpi_island.h), and its path; none when there is none or it cannot be read (the islands are then built
+// without waves and the sea stays the original's).
+std::vector<TpiWadMember> TpwLobby(const fs::path &assets, std::string &where) {
+    for (const char *game : kGameFolders) {
+        const fs::path path = FindNoCase(assets / fs::u8path(game), "data/lobby.wad");
+        if (path.empty())
+            continue;
+        std::ifstream in(path, std::ios::binary);
+        const Bytes bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+        std::vector<TpiWadMember> members;
+        std::string err;
+        if (!ReadTpiWad(bytes, members, err)) {
+            where = tpw::PathText(path) + " (cannot be read: " + err + ")";
+            return {};
+        }
+        where = tpw::PathText(path);
+        return members;
+    }
+    return {};
+}
+
 // ---- extra visitors: Theme Park Inc's kids, parents and grandparents among Theme Park World's kids
 //
 // Theme Park Inc's esprites.wad has generic visitors Theme Park World has not, in the kids' format: four kids of its own
@@ -1888,7 +1910,12 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
         ConvertSprites(disc, levels, staging, assets, log);
         // The islands go into the staging folder too (its data/lobby/), so they reach assets/tpi/data in the same swap as the
         // worlds: the game never sees a world without its island or an island without its world.
-        if (!BuildTpiIslands(disc, tpw::PathText(staging), reason))
+        std::string lobbyWhere;
+        const std::vector<TpiWadMember> lobby = TpwLobby(assets, lobbyWhere);
+        log.text << "island screen: " << (lobby.empty() ? "no Theme Park World lobby.wad" + (lobbyWhere.empty() ? std::string() : " " + lobbyWhere) + ", no waves and the original sea"
+                                                         : "waves and sea from " + lobbyWhere)
+                 << "\n";
+        if (!BuildTpiIslands(disc, tpw::PathText(staging), reason, lobby.empty() ? nullptr : &lobby))
             Fail(reason);
 
         const fs::path destination = assets / "tpi" / "data";

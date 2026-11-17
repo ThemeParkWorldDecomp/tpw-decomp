@@ -16,6 +16,8 @@
 #include "../platform/path_text.h"
 #include "tpi_fsh.h"
 #include "tpi_island_md2.h"
+#include "tpi_lobby_sea.h"
+#include "tpi_ripple.h"
 #include "tpi_wad.h"
 
 namespace tpw::assets {
@@ -670,7 +672,130 @@ bool LooksLikeTga(const std::vector<uint8_t>& bytes) {
     return bytes.size() > 18 && (bytes[2] == 2 || bytes[2] == 10) && (bytes[16] == 24 || bytes[16] == 32);
 }
 
-void WriteTextures(Zone& zone, TpiIslandFiles& out, const std::string& folder) {
+// ---- the waves and the sea, from the player's lobby.wad (tpi_ripple.h, tpi_lobby_sea.h)
+
+// A member of the lobby.wad by its path ('/' separated, lower case); nullptr when it has none.
+const TpiWadMember* LobbyMember(const std::vector<TpiWadMember>& lobby, const std::string& pathLower) {
+    for (const TpiWadMember& m : lobby) {
+        std::string name = Lower(m.name);
+        std::replace(name.begin(), name.end(), '\\', '/');
+        if (name == pathLower) return &m;
+    }
+    return nullptr;
+}
+
+// The originals' waves: their look, measured from the Lost Kingdom island and its two animations, and the texture.
+struct Waves {
+    RippleStyle style;
+    const std::vector<uint8_t>* texture[2] = {nullptr, nullptr};   // textures/, stexture/
+};
+
+bool ReadWaves(const std::vector<TpiWadMember>& lobby, Waves& waves, std::string& err) {
+    const TpiWadMember* isle = LobbyMember(lobby, "terrain/jun_isle.md2");
+    const TpiWadMember* m1 = LobbyMember(lobby, "terrain/jun_islem1.md2");
+    const TpiWadMember* m2 = LobbyMember(lobby, "terrain/jun_islem2.md2");
+    if (!isle || !m1 || !m2) {
+        err = "lobby.wad has no terrain/Jun_isle.MD2 with its two animations";
+        return false;
+    }
+    if (!MeasureRipple(isle->data, m1->data, m2->data, waves.style, err)) return false;
+    const std::string stem = Lower(waves.style.texture.substr(0, waves.style.texture.rfind('.')));
+    const char* folders[2] = {"textures/", "stexture/"};
+    for (int k = 0; k < 2; ++k) {
+        const TpiWadMember* tex = LobbyMember(lobby, std::string("terrain/") + folders[k] + stem + ".wct");
+        if (!tex) {
+            err = std::string("lobby.wad has no terrain/") + folders[k] + stem + ".wct";
+            return false;
+        }
+        waves.texture[k] = &tex->data;
+    }
+    return true;
+}
+
+// Lays the waves round the slab's foot as a node of the island, and writes the island's two animations (they slide the
+// band's texture as the originals' do) and the texture. The texture goes into `list` (the textures' quickload list), the
+// island and its animations into `meshes` (the folder's: the game finds <stem>M<n>.md2 only through it).
+void AddWaves(const Waves& waves, Md2Model& isle, const Recipe& r, TpiIslandFiles& out, const std::string& folder, std::string& list,
+              std::string& meshes) {
+    std::vector<Vec3> outline;
+    for (int i = 0; i < kSegments; ++i) outline.push_back(Outline(i, 0.90f, kFoot));
+    const std::vector<RippleQuad> quads = RippleRing(outline, waves.style.width, waves.style.quadLength);
+    const std::string stem = Lower(waves.style.texture.substr(0, waves.style.texture.rfind('.')));
+    Md2Texture tex;
+    tex.material = 0x33;
+    tex.frames.push_back(stem + ".tga");
+    isle.textures.push_back(tex);
+    Md2Node node = RippleNode(quads, static_cast<uint16_t>(isle.textures.size() - 1), "Ripple");
+    node.parent = 0;
+    node.matrix = IdentityMatrix();
+    isle.nodes.push_back(std::move(node));
+    const size_t ripple = isle.nodes.size() - 1;
+    RecomputeBoxes(isle);
+    const std::vector<uint8_t> mesh = WriteMd2(isle);
+    out.files[folder + r.prefix + "_isle.md2"] = mesh;
+    const Md2Node& band = isle.nodes[ripple];
+    meshes += std::string(r.prefix) + "_isle.md2\r\n";
+    for (int k = 0; k < 2; ++k) {
+        UvAnim anim;
+        anim.f00 = waves.style.anim[k].f00;
+        anim.f04 = waves.style.anim[k].f04;
+        anim.frames = waves.style.anim[k].frames;
+        UvNodeAnim track;
+        track.record = waves.style.record[k];
+        track.SetNode(static_cast<uint16_t>(FileNodeIndex(isle, ripple)));
+        for (size_t c = 0; c < band.u.size(); ++c)
+            track.tracks.push_back({UvKey{0, band.u[c], band.v[c]},
+                                    UvKey{waves.style.frames[k], band.u[c] + waves.style.drift[k][0], band.v[c] + waves.style.drift[k][1]}});
+        anim.nodes.push_back(std::move(track));
+        const std::string name = std::string(r.prefix) + "_isleM" + std::to_string(k + 1) + ".md2";
+        out.files[folder + name] = WriteUvAnim(mesh, name, anim);
+        meshes += name + "\r\n";
+    }
+    out.files[folder + "textures/" + stem + ".wct"] = *waves.texture[0];
+    out.files[folder + "stexture/" + stem + ".wct"] = *waves.texture[1];
+    list += stem + ".wct\r\n";
+}
+
+// The larger sea (tpi_lobby_sea.h) in data/lobby/tpisea/, the original's terrain files with the discs carried on, and
+// their textures. False with a message (nothing written) when the wad lacks any of it or the files are not as expected.
+bool WriteSea(const std::vector<TpiWadMember>& lobby, TpiIslandFiles& out, std::string& err) {
+    const TpiWadMember* base = LobbyMember(lobby, "terrain/base.md2");
+    const TpiWadMember* anim = LobbyMember(lobby, "terrain/basem1.md2");
+    if (!base || !anim) {
+        err = "lobby.wad has no terrain/Base.MD2 with its animation";
+        return false;
+    }
+    Md2Model model;
+    if (!ReadMd2(base->data, model, err, true)) return false;
+    std::map<std::string, std::vector<uint8_t>> files;
+    std::string list;
+    for (const Md2Texture& tex : model.textures) {
+        if (tex.frames.empty()) continue;
+        const std::string stem = Lower(tex.frames[0].substr(0, tex.frames[0].rfind('.')));
+        for (const char* sub : {"textures/", "stexture/"}) {
+            const TpiWadMember* m = LobbyMember(lobby, std::string("terrain/") + sub + stem + ".wct");
+            if (!m) {
+                err = std::string("lobby.wad has no terrain/") + sub + stem + ".wct";
+                return false;
+            }
+            files[std::string("data/lobby/tpisea/") + sub + stem + ".wct"] = m->data;
+        }
+        list += stem + ".wct\r\n";
+    }
+    std::vector<uint8_t> outBase, outAnim;
+    if (!ExtendLobbySea(base->data, anim->data, outBase, outAnim, err)) return false;
+    files["data/lobby/tpisea/base.md2"] = std::move(outBase);
+    files["data/lobby/tpisea/basem1.md2"] = std::move(outAnim);
+    const std::string meshes = "base.md2\r\nbasem1.md2\r\n";
+    files["data/lobby/tpisea/qickload.txt"] = std::vector<uint8_t>(meshes.begin(), meshes.end());
+    files["data/lobby/tpisea/textures/qickload.txt"] = std::vector<uint8_t>(list.begin(), list.end());
+    files["data/lobby/tpisea/stexture/qickload.txt"] = std::vector<uint8_t>(list.begin(), list.end());
+    for (auto& [path, bytes] : files) out.files[path] = std::move(bytes);
+    return true;
+}
+
+void WriteTextures(Zone& zone, TpiIslandFiles& out, const std::string& folder, const std::string& extraTextures,
+                   const std::string& meshes) {
     std::string list;
     for (const auto& [stem, bytes] : zone.resolved) {
         std::vector<uint8_t> tga;
@@ -688,8 +813,10 @@ void WriteTextures(Zone& zone, TpiIslandFiles& out, const std::string& folder) {
         out.files[folder + "textures/" + stem + ".tga"] = std::move(tga);
         list += stem + ".tga\r\n";
     }
+    list += extraTextures;
     std::vector<uint8_t> listBytes(list.begin(), list.end());
-    out.files[folder + "qickload.txt"] = listBytes;
+    std::string folderList = list + meshes;
+    out.files[folder + "qickload.txt"] = std::vector<uint8_t>(folderList.begin(), folderList.end());
     out.files[folder + "textures/qickload.txt"] = listBytes;
     out.files[folder + "stexture/qickload.txt"] = listBytes;
 }
@@ -703,7 +830,7 @@ std::string Descriptor(const Recipe& r, int slot) {
     return t;
 }
 
-bool BuildWorld(const TpiDisc& disc, const Recipe& r, int slot, TpiIslandFiles& out, std::string& reason) {
+bool BuildWorld(const TpiDisc& disc, const Recipe& r, int slot, const Waves* waves, TpiIslandFiles& out, std::string& reason) {
     Zone zone;
     zone.recipe = &r;
     zone.source = disc.source;
@@ -737,8 +864,10 @@ bool BuildWorld(const TpiDisc& disc, const Recipe& r, int slot, TpiIslandFiles& 
     for (const Pick& pick : r.scenery)
         if (pick.piece) PlacePiece(zone, isle, pick);
     RecomputeBoxes(isle);
-    out.files[folder + r.prefix + "_isle.md2"] = WriteMd2(isle);
-    WriteTextures(zone, out, folder);
+    std::string extraTextures, meshes;
+    if (waves) AddWaves(*waves, isle, r, out, folder, extraTextures, meshes);
+    else out.files[folder + r.prefix + "_isle.md2"] = WriteMd2(isle);
+    WriteTextures(zone, out, folder, extraTextures, meshes);
     const std::string text = Descriptor(r, slot);
     out.files[std::string("data/lobby/") + r.world + ".txt"] = std::vector<uint8_t>(text.begin(), text.end());
     char line[160];
@@ -752,20 +881,33 @@ bool BuildWorld(const TpiDisc& disc, const Recipe& r, int slot, TpiIslandFiles& 
 
 }  // namespace
 
-bool BuildTpiIslandFiles(const TpiDisc& disc, TpiIslandFiles& out, std::string& reason) {
+bool BuildTpiIslandFiles(const TpiDisc& disc, TpiIslandFiles& out, std::string& reason, const std::vector<TpiWadMember>* lobby) {
     if (!disc.source) {
         reason = "no source to read the copy from";
         return false;
     }
+    // The waves and the sea come from the player's Theme Park World; without its lobby.wad (or with one not as expected)
+    // the islands are built without waves and the sea is the original's.
+    Waves waves;
+    bool haveWaves = false;
+    if (lobby) {
+        std::string err;
+        haveWaves = ReadWaves(*lobby, waves, err);
+        if (!haveWaves) out.log.push_back("waves: " + err + ", the islands have none");
+        if (!WriteSea(*lobby, out, err)) out.log.push_back("sea: " + err + ", the sea is the original's");
+        else out.log.push_back("sea: carried on past the island screen's reach (data/lobby/tpisea)");
+    } else {
+        out.log.push_back("no lobby.wad: the islands have no waves and the sea is the original's");
+    }
     int slot = 4;   // the originals use 0 to 3; with the mod on the ring code places the three worlds and ignores this
     for (const Recipe& r : kRecipes)
-        if (!BuildWorld(disc, r, slot++, out, reason)) return false;
+        if (!BuildWorld(disc, r, slot++, haveWaves ? &waves : nullptr, out, reason)) return false;
     return true;
 }
 
-bool BuildTpiIslands(const TpiDisc& disc, const std::string& outRoot, std::string& reason) {
+bool BuildTpiIslands(const TpiDisc& disc, const std::string& outRoot, std::string& reason, const std::vector<TpiWadMember>* lobby) {
     TpiIslandFiles built;
-    if (!BuildTpiIslandFiles(disc, built, reason)) return false;
+    if (!BuildTpiIslandFiles(disc, built, reason, lobby)) return false;
     namespace fs = std::filesystem;
     for (const auto& [path, bytes] : built.files) {
         const fs::path target = fs::path(outRoot) / path;

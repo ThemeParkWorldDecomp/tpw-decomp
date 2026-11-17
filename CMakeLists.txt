@@ -99,6 +99,15 @@ if(TPW_BUILD_ASSETS_TESTS)
   add_test(NAME tpi_island COMMAND tpw_tpi_island_tests)
   add_executable(tpw_tpi_island_tool assets/tpi_island_tool.cpp)
   target_link_libraries(tpw_tpi_island_tool PRIVATE tpw_assets)
+  # The islands' wave bands and their texture animations (assets/tpi_ripple.h), and the island screen's larger sea
+  # (assets/tpi_lobby_sea.h; with the port's fixes it also checks the sea against include/tpi_island_ring.h's places,
+  # below): synthetic meshes and animations shaped as lobby.wad's, no game data.
+  add_executable(tpw_tpi_ripple_tests assets/tests/host_tpi_ripple.cpp)
+  target_link_libraries(tpw_tpi_ripple_tests PRIVATE tpw_assets)
+  add_test(NAME tpi_ripple COMMAND tpw_tpi_ripple_tests)
+  add_executable(tpw_tpi_lobby_sea_tests assets/tests/host_tpi_lobby_sea.cpp)
+  target_link_libraries(tpw_tpi_lobby_sea_tests PRIVATE tpw_assets)
+  add_test(NAME tpi_lobby_sea COMMAND tpw_tpi_lobby_sea_tests)
 endif()
 
 if(TPW_BUILD_TESTS)

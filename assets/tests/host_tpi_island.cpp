@@ -12,6 +12,8 @@
 #include "tpi_fsh.h"
 #include "tpi_island.h"
 #include "tpi_island_md2.h"
+#include "tpi_lobby_fixture.h"
+#include "tpi_ripple.h"
 #include "tpi_wad.h"
 
 using namespace tpw::assets;
@@ -572,12 +574,145 @@ void TestGroundLayers() {
     CHECK(stepped);
 }
 
+// With the player's lobby.wad (a synthetic one here): each island gets the originals' wave band round its foot, with its
+// two animations and the texture, all listed where the game looks for them; the larger sea is written to
+// data/lobby/tpisea. Without one, or with one that lacks them, the files are as before and the log says why.
+void TestBuildWithLobby() {
+    const std::string root = "Game/";
+    TpiDisc disc;
+    disc.source = MakeCopy(root);
+    disc.root = root;
+    TpiIslandFiles plain;
+    std::string reason;
+    CHECK(BuildTpiIslandFiles(disc, plain, reason));
+    const std::vector<TpiWadMember> lobby = tpi_lobby_fixture::MakeLobby();
+    TpiIslandFiles out;
+    CHECK(BuildTpiIslandFiles(disc, out, reason, &lobby));
+    if (!reason.empty()) std::printf("reason: %s\n", reason.c_str());
+    const char* worlds[3] = {"arabian", "water", "science"};
+    const char* prefixes[3] = {"ara", "pol", "inv"};
+    auto text = [&](const std::string& path) {
+        const std::vector<uint8_t>& b = File(out, path);
+        return std::string(b.begin(), b.end());
+    };
+    for (int w = 0; w < 3; ++w) {
+        const std::string folder = std::string("data/lobby/") + worlds[w] + "/", p = prefixes[w];
+        CHECK(Has(out, folder + p + "_isleM1.md2") && Has(out, folder + p + "_isleM2.md2"));
+        CHECK(File(out, folder + "textures/ripple.wct") == std::vector<uint8_t>({'W', 'C', 'T', 1}));
+        CHECK(File(out, folder + "stexture/ripple.wct") == std::vector<uint8_t>({'W', 'C', 'T', 2}));
+        // The texture in both texture lists, the island and its animations in the folder's (the game finds the
+        // animations through it), CRLF.
+        CHECK(text(folder + "textures/qickload.txt").find("ripple.wct\r\n") != std::string::npos);
+        CHECK(text(folder + "stexture/qickload.txt").find("ripple.wct\r\n") != std::string::npos);
+        const std::string list = text(folder + "qickload.txt");
+        CHECK(list.find(p + "_isle.md2\r\n") != std::string::npos);
+        CHECK(list.find(p + "_isleM1.md2\r\n") != std::string::npos && list.find(p + "_isleM2.md2\r\n") != std::string::npos);
+        // The island: what it had, plus the band as its own node under the root, see-through, flat at the foot.
+        Md2Model isle, before;
+        std::string err;
+        CHECK(ReadMd2(File(out, folder + p + "_isle.md2"), isle, err));
+        CHECK(ReadMd2(File(plain, folder + p + "_isle.md2"), before, err));
+        CHECK(isle.nodes.size() == before.nodes.size() + 1);
+        CHECK(isle.textures.size() == before.textures.size() + 1);
+        if (isle.nodes.size() != before.nodes.size() + 1 || isle.textures.empty()) continue;
+        const Md2Node& band = isle.nodes.back();
+        CHECK(band.name == "Ripple" && band.parent == 0 && band.matrix == IdentityMatrix());
+        CHECK(isle.textures.back().material == 0x33 && isle.textures.back().frames == std::vector<std::string>({"ripple.tga"}));
+        CHECK(band.faceSets.size() == 1 && band.faceSets[0].texture == static_cast<int>(isle.textures.size() - 1));
+        bool flat = !band.vertices.empty();
+        for (const Vec3& v : band.vertices) flat = flat && std::fabs(v.y - band.vertices[0].y) < 1e-4f;
+        CHECK(flat);
+        // The band's quads as the fixture's island has them: mapped 0 to 1 across, the inner edge about 5 long.
+        bool mapped = band.faces.size() % 2 == 0 && !band.faces.empty();
+        for (size_t c = 0; c < band.u.size(); ++c)
+            mapped = mapped && (band.u[c] == 0 || band.u[c] == 1) && (band.v[c] == 0 || band.v[c] == 1);
+        CHECK(mapped);
+        // The animations move every corner of the band by the originals' drift, over their lengths, with their records.
+        for (int k = 0; k < 2; ++k) {
+            UvAnim anim;
+            CHECK(ReadUvAnim(File(out, folder + p + "_isleM" + std::to_string(k + 1) + ".md2"), anim, err));
+            CHECK(!anim.other && anim.f00 == 0x14 && anim.frames == (k == 0 ? 100u : 200u) && anim.nodes.size() == 1);
+            if (anim.nodes.size() != 1) continue;
+            const UvNodeAnim& track = anim.nodes[0];
+            CHECK(track.Node() == FileNodeIndex(isle, isle.nodes.size() - 1));
+            CHECK(track.record[8] == (k == 0 ? 0x11 : 0x22));
+            CHECK(track.tracks.size() == band.u.size());
+            bool drift = track.tracks.size() == band.u.size();
+            const float d = k == 0 ? -1.0f : -2.0f;
+            for (size_t c = 0; drift && c < band.u.size(); ++c) {
+                const std::vector<UvKey>& keys = track.tracks[c];
+                drift = keys.size() == 2 && keys[0].frame == 0 && keys[1].frame == (k == 0 ? 100 : 200) && keys[0].u == band.u[c] &&
+                        keys[0].v == band.v[c] && std::fabs(keys[1].u - keys[0].u - d) < 1e-5f && std::fabs(keys[1].v - keys[0].v - d) < 1e-5f;
+            }
+            CHECK(drift);
+        }
+        // The rest of the world's files as without the lobby.
+        CHECK(File(out, folder + p + "_gate.md2") == File(plain, folder + p + "_gate.md2"));
+        CHECK(File(out, std::string("data/lobby/") + worlds[w] + ".txt") == File(plain, std::string("data/lobby/") + worlds[w] + ".txt"));
+    }
+    // The band lies round the slab's foot: outside the slab's own outline, inside the island's box widened by its width.
+    {
+        Md2Model isle;
+        std::string err;
+        CHECK(ReadMd2(File(out, "data/lobby/arabian/ara_isle.md2"), isle, err));
+        std::array<float, 6> slab = isle.nodes[0].box;
+        std::array<float, 6> band = isle.nodes.back().box;
+        CHECK(band[0] < slab[0] && band[3] > slab[3] && band[2] < slab[2] && band[5] > slab[5]);
+        CHECK(band[0] > slab[0] - 10 && band[3] < slab[3] + 10);
+    }
+    // The sea: the extended terrain files, their textures and the lists the game reads.
+    for (const char* f : {"base.md2", "basem1.md2", "qickload.txt", "textures/qickload.txt", "stexture/qickload.txt",
+                          "textures/lak2.wct", "textures/lak3.wct", "stexture/lak2.wct", "stexture/lak3.wct"})
+        CHECK(Has(out, std::string("data/lobby/tpisea/") + f));
+    CHECK(text("data/lobby/tpisea/qickload.txt") == "base.md2\r\nbasem1.md2\r\n");
+    CHECK(text("data/lobby/tpisea/textures/qickload.txt") == "lak2.wct\r\nlak3.wct\r\n");
+    CHECK(File(out, "data/lobby/tpisea/stexture/lak3.wct") == std::vector<uint8_t>({'W', 'C', 'T', 6}));
+    Md2Model sea;
+    std::string err;
+    CHECK(ReadMd2(File(out, "data/lobby/tpisea/base.md2"), sea, err, true));
+    CHECK(sea.nodes.size() == 3 && sea.box[3] - sea.box[0] > 2 * LobbySeaRadius(tpi_lobby_fixture::kSeaX, tpi_lobby_fixture::kSeaZ) - 4);
+    bool logged = false;
+    for (const std::string& line : out.log) logged = logged || line.find("sea: carried on") != std::string::npos;
+    CHECK(logged);
+    // Nothing else is new: the same files as without the lobby, plus the waves' and the sea's.
+    size_t extra = 0;
+    for (const auto& [path, bytes] : out.files)
+        if (!plain.files.count(path)) ++extra;
+    CHECK(extra == 3 * 4 + 9);   // per world M1, M2 and the two ripple.wct; the sea's nine
+    CHECK(out.files.size() == plain.files.size() + extra);
+    bool noted = false;
+    for (const std::string& line : plain.log) noted = noted || line.find("no lobby.wad") != std::string::npos;
+    CHECK(noted);
+
+    // A lobby.wad without the terrain: the waves still, the sea the original's, said in the log.
+    const std::vector<TpiWadMember> noSea = tpi_lobby_fixture::MakeLobby(false);
+    TpiIslandFiles partial;
+    CHECK(BuildTpiIslandFiles(disc, partial, reason, &noSea));
+    CHECK(Has(partial, "data/lobby/water/pol_isleM1.md2") && !Has(partial, "data/lobby/tpisea/base.md2"));
+    bool said = false;
+    for (const std::string& line : partial.log) said = said || line.find("the sea is the original's") != std::string::npos;
+    CHECK(said);
+    // One without the island's animations: no waves, the islands exactly as without a lobby, the sea still.
+    std::vector<TpiWadMember> noWaves;
+    for (const TpiWadMember& m : lobby)
+        if (m.name.find("isleM") == std::string::npos) noWaves.push_back(m);
+    TpiIslandFiles still;
+    CHECK(BuildTpiIslandFiles(disc, still, reason, &noWaves));
+    CHECK(!Has(still, "data/lobby/water/pol_isleM1.md2") && Has(still, "data/lobby/tpisea/base.md2"));
+    CHECK(File(still, "data/lobby/water/pol_isle.md2") == File(plain, "data/lobby/water/pol_isle.md2"));
+    CHECK(File(still, "data/lobby/water/qickload.txt") == File(plain, "data/lobby/water/qickload.txt"));
+    bool none = false;
+    for (const std::string& line : still.log) none = none || line.find("the islands have none") != std::string::npos;
+    CHECK(none);
+}
+
 int main() {
     TestMatrices();
     TestRoundTrip();
     TestAttachAndScale();
     TestChannelOrder();
     TestBuild();
+    TestBuildWithLobby();
     TestGroundLayers();
     std::printf("tpi_island: %d checks passed, %d failed\n", g_pass, g_fail);
     return g_fail == 0 ? 0 : 1;

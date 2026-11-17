@@ -18,6 +18,13 @@
 //   data/lobby/<w>/textures/<stem>.tga      every texture both meshes name (lower-case stems, 32-bit TGA)
 //   data/lobby/<w>/stexture/<stem>.tga      the same files for the low-detail setting
 //   data/lobby/<w>/qickload.txt             the texture list (also in textures/ and stexture/), one name per line
+// and, from the player's Theme Park World lobby.wad when the converter has it (tpi_ripple.h, tpi_lobby_sea.h):
+//   data/lobby/<w>/<p>_isleM1.md2, M2       the waves' two animations (the island then has a "Ripple" node, and the
+//                                           folder's qickload.txt also names the island and these two)
+//   data/lobby/<w>/textures/ripple.wct      the waves' texture, as the player's lobby.wad has it (also in stexture/)
+//   data/lobby/tpisea/base.md2, basem1.md2  the island screen's terrain and its animation with the sea carried on
+//                                           outwards, which the game loads in place of the original's with the mod on
+//   data/lobby/tpisea/textures/<stem>.wct   the sea's two textures (also in stexture/), and the three qickload.txt
 #pragma once
 
 #include <cstdint>
@@ -26,6 +33,7 @@
 #include <vector>
 
 #include "tpi_disc.h"
+#include "tpi_wad.h"
 
 namespace tpw::assets {
 
@@ -37,9 +45,13 @@ struct TpiIslandFiles {
 };
 
 // The three worlds' island files, in memory. False with a reason when a world's gate or terrain cannot be read.
-bool BuildTpiIslandFiles(const TpiDisc& disc, TpiIslandFiles& out, std::string& reason);
+// `lobby` is the members of the player's Theme Park World data/lobby.wad, for the waves and the sea; without it (or
+// when it lacks what they need, which the log says) the islands have no waves and nothing of the sea is written.
+bool BuildTpiIslandFiles(const TpiDisc& disc, TpiIslandFiles& out, std::string& reason,
+                         const std::vector<TpiWadMember>* lobby = nullptr);
 
 // The same, written under outRoot (folders are created). False with a reason when a file cannot be written.
-bool BuildTpiIslands(const TpiDisc& disc, const std::string& outRoot, std::string& reason);
+bool BuildTpiIslands(const TpiDisc& disc, const std::string& outRoot, std::string& reason,
+                     const std::vector<TpiWadMember>* lobby = nullptr);
 
 }  // namespace tpw::assets

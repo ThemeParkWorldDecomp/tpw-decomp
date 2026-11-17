@@ -70,6 +70,7 @@
 #include "TPEmbed.h"
 #include "TPEngine.h"
 #include "TPGlobals.h"
+#include "TpiWorlds.h"
 #include "TPMain.h"
 #include "TPMovie.h"
 #include "TPSettings.h"
