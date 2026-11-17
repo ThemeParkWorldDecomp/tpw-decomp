@@ -29,6 +29,7 @@
 #include "tb_textureentry.h"
 #include "tpw_probe.h"
 #include "Wavelet.h"
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -635,6 +636,7 @@ void CHField::CalcLine(uint8_t* codes, SVertex* vertices, uint32_t* spare, int32
     uint8_t unused[4];   // the clipper's answer (the AND and the OR of the codes): not used
     CClipping::CPP_TestData(unused, gei_Clipping, codes + low, first, count, 0x10, 0xff);
 }
+
 
 int32_t CHField::Prepare() {
     if ((gei_System.mFlags & (CSystem::kViewChanged | CSystem::kLightsChanged)) == 0) return 1;

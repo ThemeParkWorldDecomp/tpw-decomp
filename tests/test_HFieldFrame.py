@@ -1034,6 +1034,39 @@ class FreeCameraLowTest:
         return T.same_values(expected, got, "", False)
 
 
+# ----------------------------------------------------------------- the port's cap on procedural cells
+
+# The port's fix proccap (src/engine/tb_hfield.cpp): when more cells of the procedural textures' window are in view than
+# the list (2500) and the handler's ring hold, Prepare lists only the nearest of them, so its list, its count (small state
+# 517, mF1296C), the overlays, the cells and the handler's calls differ from the original's by design; the host test
+# proc_cap (tests/host_proc_cap.cpp) checks which cells it keeps. Such a case (tpw_hf_proc_cap in
+# tests/unit_HFieldFrame.cpp answers the cap) must match the original in everything else, and list no more than the
+# cap. Every other case, and every case of a build without the port fixes, is compared whole.
+LISTED = 517
+
+
+class PrepareTest(FnTest):
+    def __init__(self):
+        FnTest.__init__(self, "CHField::Prepare", hf_ppc, hf_host, edge=prepare_edges, rnd=prepare_random)
+
+    def run_case(self, runner, case):
+        probe = runner.lib.tpw_hf_proc_cap
+        probe.argtypes, probe.restype = [], C.c_int32
+        runner.emu.reset_scratch()
+        expected = hf_ppc(runner.emu, case)
+        got = hf_host(runner.lib, case)
+        cap = probe()
+        if cap <= 0:
+            return T.same_values(expected, got, "", False)
+        listed = got["state"]["small"][LISTED]
+        problems = [] if 0 <= listed <= cap else [f"proccap: {listed} cells listed, more than the cap {cap}"]
+        for side in (expected, got):
+            side["state"]["small"][LISTED] = 0
+            side["state"]["big"] = b""
+            side["log"] = []
+        return problems + T.same_values(expected, got, "", False)
+
+
 # ----------------------------------------------------------------- the tests
 
 
@@ -1041,7 +1074,7 @@ def setup(runner):
     T.install_std_stubs(runner.emu)
 
 
-TESTS = [FnTest("CHField::Prepare", hf_ppc, hf_host, edge=prepare_edges, rnd=prepare_random),
+TESTS = [PrepareTest(),
          FnTest("CHField::DivideAndConquer", hf_ppc, hf_host, edge=divide_edges, rnd=divide_random),
          FarZoomTest(),
          FreeCameraLowTest(),

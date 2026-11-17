@@ -124,6 +124,7 @@ int32_t Same(const unsigned char* saved, const void* after, size_t size, const s
 
 }  // namespace
 
+
 // ---- Globals the unit reads (defined by untranslated or other files in the game) ----------
 CSystem gei_System;
 CDisplay gei_Display;
@@ -379,6 +380,12 @@ int32_t tpw_hf_far_zoom(int32_t on) {
 // gPortFarZoom, include/TPCamera.h) and answers 1; -1 when the library was built without the port fixes.
 int32_t tpw_hf_free_low(int32_t on) {
     (void)on;
+    return -1;
+}
+
+// After Prepare: how many cells the port's fix proccap let it list when it kept only the nearest (the smaller of 2500
+// and the handler's ring), 0 when it did not; -1 when the library was built without the port fixes.
+int32_t tpw_hf_proc_cap() {
     return -1;
 }
 

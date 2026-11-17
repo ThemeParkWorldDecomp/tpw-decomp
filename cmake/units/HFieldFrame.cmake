@@ -6,5 +6,6 @@ set(TPW_UNIT_HFieldFrame_KEEP
   __ZN7CHField16DivideAndConquerEv   # CHField::DivideAndConquer()
   __ZN7CHField7PrepareEv   # CHField::Prepare()
   _gFrequencyIndex
+  _gPortProcCapped   # the port's fix proccap (only in the port's builds)
   _gTileOverlays
 )

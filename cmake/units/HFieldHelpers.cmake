@@ -8,4 +8,5 @@ set(TPW_UNIT_HFieldHelpers_KEEP
   __ZN7CHField19qSortTextures_lpTexEP12QuadSaveInfoii   # CHField::qSortTextures_lpTex(QuadSaveInfo*, int, int)
   __ZN7CHField24ProcessTextureParametersEPjP11sHFieldQuad   # CHField::ProcessTextureParameters(unsigned int*, sHFieldQuad*)
   __ZN7CHField8CalcLineEPhP7SVertexPjiii   # CHField::CalcLine(unsigned char*, SVertex*, unsigned int*, int, int, int)
+  _gPortProcCapped   # the port's fix proccap (only in the port's builds)
 )
