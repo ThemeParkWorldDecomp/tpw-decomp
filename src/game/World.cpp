@@ -46,6 +46,7 @@
 #include "TPGlobals.h"
 #include "TpiGateFlow.h"
 #include "TpiGenerations.h"
+#include "TpiGreatLake.h"
 #include "TPMain.h"
 #include "UIInterface.h"
 #include "World.h"

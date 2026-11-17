@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <cstring>
 #include <iterator>
+#include <limits>
 #include <map>
 
 #include "tpi_island_md2.h"
@@ -996,6 +997,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                 const int64_t x = ox + static_cast<int64_t>(i), y = mapY(j);
                 if (x < 0 || y < 0 || x >= int64_t(g.w) || y >= int64_t(g.h))
                     continue;
+                result.closedCells.emplace_back(int(x), int(y));
                 const size_t q = static_cast<size_t>(y) * g.w + static_cast<size_t>(x);
                 if ((quadFlags[q] & kQuadHidden) != 0) {
                     ++result.alreadyHidden;
@@ -1008,6 +1010,27 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                     ++result.open;
                 }
             }
+
+        // Its water: the top of the highest drawn node that lies wholly below the ground of its closed cells (a drained
+        // lake's remaining water surface; the lake's rim reaches above the ground and is not it).
+        if (!result.closedCells.empty()) {
+            float ground = std::numeric_limits<float>::max();
+            for (const auto& [x, y] : result.closedCells)
+                for (int dz = 0; dz < 2; ++dz)
+                    for (int dx = 0; dx < 2; ++dx)
+                        ground = std::min(ground, heights[size_t(y + dz) * (g.w + 1) + size_t(x + dx)]);
+            for (size_t n = 1; n < placed.nodes.size(); ++n) {
+                const Md2Node& node = placed.nodes[n];
+                if (node.vertices.empty())
+                    continue;
+                float top = -std::numeric_limits<float>::max();
+                for (const Vec3& v : node.vertices) top = std::max(top, Transform(v, node.matrix).y);
+                if (top < ground && (!result.hasSurface || top > result.surface)) {
+                    result.hasSurface = true;
+                    result.surface = top;
+                }
+            }
+        }
 
         // One that clears once its land is bought: each of its nodes is named with its footprint and the cells it hid
         // ("tpishut X Y W H M"), for the game to hide and show those quads again; one that hid none (the swamp, whose

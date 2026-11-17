@@ -487,9 +487,10 @@ const Bytes kGreyTga = {1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 8, 0x20,
 // A 2 by 2 texture whose every texel is opaque (a 0x24 palette: R, G, B): it is written as a 24-bit TGA.
 const Bytes kOpaqueFsh = MakeFsh(2, 2, {0, 3, 3, 0}, 0x24, kPalette, false);
 
-Bytes Item(const std::string& name, int32_t id, const std::string& extra = "", const Bytes& mesh = B("mesh")) {
+Bytes Item(const std::string& name, int32_t id, const std::string& extra = "", const Bytes& mesh = B("mesh"),
+           const std::vector<TpiWadMember>& more = {}) {
     const Bytes fsh = MakeFsh(2, 2, {0, 1, 2, 3}, 0x2a, kPalette, true);
-    return BuildTpiWad({{name + ".sam", B("Info.Id\t" + std::to_string(id) + "\nInfo.Name\t\"" + name + "\"\nInfo.WorkingLife 3\n" + extra)},
+    std::vector<TpiWadMember> members = {{name + ".sam", B("Info.Id\t" + std::to_string(id) + "\nInfo.Name\t\"" + name + "\"\nInfo.WorkingLife 3\n" + extra)},
                         {name + ".MD2", mesh},
                         {"flag.fsh", fsh},
                         {"flag.tga", B("old tga")},
@@ -500,7 +501,9 @@ Bytes Item(const std::string& name, int32_t id, const std::string& extra = "", c
                         {"textures/qickload.txt", B(name + "t.fsh\nsign1.tga\n")},
                         {"textures/blink.ifl", B("x.tga\r\n" + name + "t.fsh\r\n" + name + "t.fsh\r\n")},
                         {"textures/" + name + "m.MD2", B("mesh")},
-                        {"stexture/" + name + "t.fsh", fsh}});
+                        {"stexture/" + name + "t.fsh", fsh}};
+    members.insert(members.end(), more.begin(), more.end());
+    return BuildTpiWad(members);
 }
 
 // The gate's mesh is a real one (a box 40 wide, 30 tall): the island builder (tpi_island.h) reads it for the lobby's
@@ -604,6 +607,56 @@ Bytes BoatMesh() {
     return d;
 }
 
+// A drained lake as Land of Invention's (science's lake.wad, replaced by dlake.wad once cleared): "pond" blocks quad
+// (1,0) before and after it is cleared ('H', then 'X', the water left), and "dpond", what is drawn once it is, has a rim
+// that rises above the ground and a water surface below it, at -2: the lake ride's water level.
+Bytes PondObstacle() {
+    namespace md2 = tpw::assets::tpi_island;
+    md2::Md2Model pond;
+    pond.name = "pond.MD2";
+    md2::Md2Texture water;
+    water.frames.push_back("water.tga");
+    pond.textures.push_back(water);
+    md2::NodeBuilder b;
+    b.Quad(md2::Vec3{10, 0, 0}, md2::Vec3{20, 0, 0}, md2::Vec3{20, 0, 10}, md2::Vec3{10, 0, 10}, 0, 0, 1, 0, 1, 1, 0, 1, 0);
+    pond.nodes.push_back(b.Build("pond"));
+    md2::RecomputeBoxes(pond);
+    const Bytes fsh = MakeFsh(2, 2, {0, 1, 2, 3}, 0x2a, kPalette, true);
+    return BuildTpiWad({{"pond.sam", B("Info.Id 1703\r\nInfo.Shape\r\n---\r\nH\r\n---\r\nObstacle.AfterShape\r\n---\r\nX\r\n"
+                                       "---\r\nInfo.IsObstacle 1\r\nObstacle.ShapeOffsetX 1\r\nObstacle.ShapeOffsetY 0\r\n"
+                                       "Obstacle.ReplaceWithID 1704\r\n")},
+                        {"pond.MD2", md2::WriteMd2(pond)},
+                        {"textures/water.fsh", fsh}});
+}
+
+Bytes DrainedPond() {
+    namespace md2 = tpw::assets::tpi_island;
+    md2::Md2Model pond;
+    pond.name = "dpond.MD2";
+    md2::Md2Texture water;
+    water.frames.push_back("water.tga");
+    pond.textures.push_back(water);
+    md2::NodeBuilder rim, surface;
+    rim.Box(md2::Vec3{10, -3, 0}, md2::Vec3{11, 0.5f, 10}, 4.0f, 0);
+    surface.Quad(md2::Vec3{10, -2, 0}, md2::Vec3{20, -2, 0}, md2::Vec3{20, -2.5f, 10}, md2::Vec3{10, -2.5f, 10}, 0, 0, 1, 0, 1,
+                 1, 0, 1, 0);
+    pond.nodes.push_back(rim.Build("rim"));
+    pond.nodes.push_back(surface.Build("surface"));
+    pond.nodes.back().parent = 0;
+    md2::RecomputeBoxes(pond);
+    return BuildTpiWad({{"dpond.sam", B("Info.Id 1704\r\n")}, {"dpond.MD2", md2::WriteMd2(pond)}});
+}
+
+// The lake ride, as The Great Lake (science's vict_hs.wad): a boat bumper ride (Bumper.BumperType -11) whose bumper.sam
+// gives the circles its boats sail in (one given twice) and its buoys, each list ended by an x of 512, in Theme Park
+// Inc's units (10 to a cell): the circle's centre (15,5) lies in cell (1,0), the pond's water.
+const char* const kLakeBumper =
+    "Info.PositionOverideX 15\r\nInfo.StartX 15\r\nInfo.StartY 5\r\n"
+    "ColObjects[0].X 15\r\nColObjects[0].Y 5\r\nColObjects[0].Rad 4\r\n"
+    "ColObjects[1].X\t15\r\nColObjects[1].Y\t5\r\nColObjects[1].Rad\t4\r\n"
+    "ColObjects[2].X 512\r\n"
+    "Buoys[0].X 14\r\nBuoys[0].Y 4\r\nBuoys[1].X 16\r\nBuoys[1].Y 6\r\nBuoys[2].X 512\r\nBuoys[2].Y 512\r\n";
+
 void MakeWorld(const fs::path& levels, const std::string& world, const std::string& tct) {
     const fs::path w = levels / world;
     WriteFile(w / "Standard.sam", B("MapInfo.HeightfieldWidth 96\nTicketBooth[0].PosX 40\nTicketBooth[1].PosY 41\nNumTicketBooths 2\n"));
@@ -619,6 +672,11 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     if (world == "water") {
         terrain.push_back({"base.MD2", TerrainMesh()});
         WriteFile(w / "obstacles" / "lake.wad", LakeObstacle());
+    }
+    if (world == "science") {
+        terrain.push_back({"base.MD2", TerrainMesh()});
+        WriteFile(w / "obstacles" / "pond.wad", PondObstacle());
+        WriteFile(w / "obstacles" / "dpond.wad", DrainedPond());
     }
     WriteFile(w / "terrain.wad", BuildTpiWad(terrain));
     WriteFile(w / "Sharetex.wad", BuildTpiWad({{"black.tga", B("tga")}, {"s.fsh", fsh}}));
@@ -640,6 +698,10 @@ void MakeWorld(const fs::path& levels, const std::string& world, const std::stri
     WriteFile(w / "rides" / "loop.wad",
               BuildTpiWad({{"loop.sam", B("Info.Id 3114\n")}, {"coaster.sam", B("Info.Id 7\nTrack.pcTextureFilename \"t\"\nTrack.fScrollRate 0.5\nTrack.Bogus 1\n")}}));
     WriteFile(w / "rides" / "babylon.wad", Item("babylon", 3113, "", BoatMesh()));
+    // In every world, though only science has a lake for it: water's lake obstacle has no water below its ground and
+    // arabian's terrain has no height field.
+    WriteFile(w / "rides" / "yacht.wad",
+              Item("yacht", 3116, "Bumper.BumperType -11\n", BoatMesh(), {{"bumper.sam", B(kLakeBumper)}}));
     // The shops' RipOffOK as the three worlds have it: Arabian Nights 100 (Theme Park World's), Polar Zone none (commented
     // out), Land of Invention 0. The burger costs 10 (Invention: its folder's) and sells for 30, three times that, with
     // a RipOffOK of its own of 500 (Arabian), none (Polar, which sells it at 15, one and a half times) or 20 (Invention).
@@ -984,9 +1046,9 @@ void TestConvertTree(const fs::path& scratch) {
         CHECK(ReadFile(out / world / "advisor.wad") == DonorWad(donor, "advisor"));
     }
     CHECK(TpiSamInteger(S(ReadFile(a / "rides" / "babylon" / "babylon.sam")), "Info", "Id", id) && id == 5000);
-    CHECK(TpiSamInteger(S(ReadFile(a / "shops" / "burger" / "burger.sam")), "Info", "Id", id) && id == 5030);
-    CHECK(TpiSamInteger(S(ReadFile(a / "sideshow" / "hoopla" / "hoopla.sam")), "Info", "Id", id) && id == 5040);
-    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "Gates" / "Gates.sam")), "Info", "Id", id) && id == 5050);
+    CHECK(TpiSamInteger(S(ReadFile(a / "shops" / "burger" / "burger.sam")), "Info", "Id", id) && id == 5040);
+    CHECK(TpiSamInteger(S(ReadFile(a / "sideshow" / "hoopla" / "hoopla.sam")), "Info", "Id", id) && id == 5050);
+    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "Gates" / "Gates.sam")), "Info", "Id", id) && id == 5060);
     // The gate (global.sam's ParkName.GateObjectId) carries the world's name, which its board shows.
     const std::string gates = S(ReadFile(a / "features" / "Gates" / "Gates.sam"));
     CHECK(gates.find("Info.Name\t\t\t\"Arabian Nights\"") != std::string::npos && gates.find("\"Gates\"") == std::string::npos);
@@ -1060,12 +1122,12 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(!fs::exists(a / "rides" / "carpet" / "carpet.RSE") && !fs::exists(a / "rides" / "carpet" / "carpet.rse"));
     CHECK(!fs::exists(out / "water" / "features" / "bus" / "bus.RSE"));
     const std::string fotobth = S(ReadFile(a / "upgrades" / "fotobth" / "fotobth.sam"));
-    CHECK(TpiSamInteger(fotobth, "Info", "Id", id) && id == 5060);
+    CHECK(TpiSamInteger(fotobth, "Info", "Id", id) && id == 5070);
     CHECK(TpiSamInteger(fotobth, "AddOn", "UpgradesId", id) && id == 5010);
-    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "ftoilet" / "ftoilet.sam")), "Info", "Id", id) && id == 5070);
-    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "litbin" / "litbin.sam")), "Info", "Id", id) && id == 5080);
-    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 5090);
-    CHECK(TpiSamInteger(S(ReadFile(out / "science" / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 7090);
+    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "ftoilet" / "ftoilet.sam")), "Info", "Id", id) && id == 5080);
+    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "litbin" / "litbin.sam")), "Info", "Id", id) && id == 5090);
+    CHECK(TpiSamInteger(S(ReadFile(a / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 5100);
+    CHECK(TpiSamInteger(S(ReadFile(out / "science" / "features" / "nstaff" / "nstaff.sam")), "Info", "Id", id) && id == 7100);
     CHECK(TpiSamInteger(S(ReadFile(a / "rides" / "loop" / "loop.sam")), "Info", "Id", id) && id == 5020);
     const std::string track = S(ReadFile(a / "rides" / "loop" / "coaster.sam"));
     CHECK(track.find("Track.fScrollRate 0.5") != std::string::npos && track.find("Track.pcTextureFilename") != std::string::npos);
@@ -1167,7 +1229,7 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK_EQ_STR(S(ReadFile(a / "TpiPeeps.sam")), peepsHeader + "WeatherEffects.QualityForHeatWaveLow\t\t95\n");
     CHECK_EQ_STR(S(ReadFile(out / "water" / "TpiPeeps.sam")), peepsHeader);
     const std::string global = S(ReadFile(a / "global.sam"));
-    CHECK(TpiSamInteger(global, "ParkName", "GateObjectId", id) && id == 5050);
+    CHECK(TpiSamInteger(global, "ParkName", "GateObjectId", id) && id == 5060);
     // Key costs in Theme Park Inc's own order (its missions open Land of Invention, then Polar Zone, then Arabian Nights):
     // 1, 3 and 5, each one the lobby can draw (1 to 5, never 0).
     for (const auto& [world, keys] : {std::pair{"arabian", 5}, std::pair{"water", 3}, std::pair{"science", 1}}) {
@@ -1192,9 +1254,42 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(record.find("left out: facilities/nstaff (") == std::string::npos);
     CHECK(record.find("features/noid") != std::string::npos);
     CHECK(record.find("rides/carpet: Info.WorkingLife") != std::string::npos);
-    CHECK(record.find("items converted: 36, left out: 6") != std::string::npos);
+    CHECK(record.find("items converted: 39, left out: 6") != std::string::npos);
     CHECK(record.find("wake hidden: rides/babylon/babylon.MD2") != std::string::npos);
     CHECK(record.find("wake hidden: rides/carpet") == std::string::npos);
+    // The lake ride (include/TpiGreatLake.h): science's TpiLake.sam gives its id, the pond's water and level, its circles
+    // (the twice given one once) and buoys; its boats are copied as they are, wake and all. The other worlds have no
+    // lake for it: no TpiLake.sam, and its wakes hidden as any boat's.
+    {
+        const fs::path sci = out / "science";
+        int32_t boatsId = 0;
+        CHECK(TpiSamInteger(S(ReadFile(sci / "rides" / "yacht" / "yacht.sam")), "Info", "Id", boatsId) && boatsId > 0);
+        CHECK(fs::exists(sci / "TpiLake.sam"));
+        CHECK_EQ_STR(S(ReadFile(sci / "TpiLake.sam")),
+                     "# TPI Worlds and Rides: The Great Lake's water and its boats' circles and buoys, from the player's "
+                     "copy\nLake.RideId " +
+                         std::to_string(boatsId) +
+                         "\nLake.WaterLevel -2.000\nLake.Water 0 1 1\nLake.Circle 15 5 4\nLake.Buoy 14 4\nLake.Buoy 16 6\n");
+        CHECK(ReadFile(sci / "rides" / "yacht" / "yacht.MD2") == BoatMesh());
+        CHECK(ReadFile(sci / "rides" / "babylon" / "babylon.MD2") != BoatMesh());
+        CHECK(record.find("TpiLake.sam: ride rides/yacht (" + std::to_string(boatsId) +
+                          ") on obstacle pond's water, 1 cells in 1 runs, level -2.000, 1 circles, 2 buoys; its boats' "
+                          "wake kept\n") != std::string::npos);
+        CHECK(record.find("obstacle pond: replaced by dpond") != std::string::npos);
+        for (const char* world : {"arabian", "water"}) {
+            CHECK(!fs::exists(out / world / "TpiLake.sam"));
+            const Bytes boats = ReadFile(out / world / "rides" / "yacht" / "yacht.MD2");
+            CHECK(boats.size() == BoatMesh().size() && boats != BoatMesh());
+        }
+        CHECK(record.find("lake ride rides/yacht: no obstacle's water holds its 1 circles; its boats stay on its plot\n") !=
+              std::string::npos);
+        size_t hidden = 0;
+        for (size_t at = record.find("wake hidden: rides/yacht/yacht.MD2 (no lake for its boats)\n"); at != std::string::npos;
+             at = record.find("wake hidden: rides/yacht/yacht.MD2 (no lake for its boats)\n", at + 1))
+            ++hidden;
+        CHECK(hidden == 2);
+        CHECK(record.find("wake hidden: rides/yacht/yacht.MD2 (Theme Park Inc") == std::string::npos);
+    }
     CHECK(record.find("features/bus (Info.Id 1600 -> 1600, ") != std::string::npos &&
           record.find(", given a script that plays its build animation once", record.find("features/bus (")) <
               record.find("\n", record.find("features/bus (")));
@@ -1213,7 +1308,7 @@ void TestConvertTree(const fs::path& scratch) {
           record.find(", visitors can use it (its folder's Info.IsChoosable was 0)", record.find("upgrades/fotobth (")) <
               record.find("\n", record.find("upgrades/fotobth (")));
     CHECK(record.find("visitors can use it", record.find("shops/burger (")) > record.find("\n", record.find("shops/burger (")));
-    CHECK(record.find("shops/burger (Info.Id 3300 -> 5030, ") != std::string::npos &&
+    CHECK(record.find("shops/burger (Info.Id 3300 -> 5040, ") != std::string::npos &&
           record.find("no price per use", record.find("shops/burger (")) > record.find("\n", record.find("shops/burger (")));
     CHECK(record.find("gate features/Gates named \"Arabian Nights\"") != std::string::npos);
     CHECK(record.find("animated texture rides/carpet/textures/blink.ifl written as blink.tga, its most used frame (carpett.tga)") != std::string::npos);

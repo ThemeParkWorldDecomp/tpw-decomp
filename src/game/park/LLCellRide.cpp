@@ -23,6 +23,7 @@
 #include "TPEngine.h"
 #include "TpiBumperKind.h"
 #include "TpiGateFlow.h"
+#include "TpiGreatLake.h"
 #include "TPSound.h"
 #include "TrackCell.h"
 #include "ui_main.h"

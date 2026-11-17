@@ -40,6 +40,7 @@
 #include "TPSound.h"
 #include "TpiBumperKind.h"
 #include "TpiGateFlow.h"
+#include "TpiGreatLake.h"
 #include "ui_main.h"
 #include "World.h"
 #include <cmath>
@@ -1440,6 +1441,7 @@ void Dispatch(int target, uint32_t* ride, int32_t x, int32_t y) {
 }
 
 }  // namespace
+
 
 int32_t BMP_CreateRide(int32_t kind, int32_t x, int32_t y, int32_t rot, int32_t id, int32_t f10) {
     uint32_t* world = World_5();

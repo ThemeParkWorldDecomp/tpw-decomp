@@ -96,6 +96,9 @@ struct TpiObstacleResult {
     int leaves = 0;                       // leaves named for the game to swing open (an opening gate's)
     int shut = 0;                         // nodes named "tpishut ..." (shown until its land is bought)
     std::vector<std::string> leftOut;     // the shown nodes left out (the crew, the props, the markers, moved nodes)
+    std::vector<std::pair<int, int>> closedCells;   // its closed shape cells ('H', 'X') on the map (x, y), as drawn
+    bool hasSurface = false;              // a drawn node lies wholly below the ground of its closed cells (a lake's water)
+    float surface = 0;                    // then the highest such node's top, in world units (the water level)
 };
 
 struct TpiObstacleReport {

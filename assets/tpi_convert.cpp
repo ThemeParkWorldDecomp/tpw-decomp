@@ -39,6 +39,8 @@
 #include <algorithm>
 #include <cctype>
 #include <chrono>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iterator>
@@ -342,12 +344,13 @@ bool HideWake(const Bytes &in, Bytes &out) {
 
 // Sam files: filtered through `samTable` with `samOptions` when the member's extension is .sam (nullptr: copied).
 // Online_*.sam members are left out, and so are meshes kept among the textures (TPI's gokarts has copies there).
-// A boat's wake node is drawn as a point (HideWake).
+// A boat's wake node is drawn as a point (HideWake), but with `keepWake` (the lake ride's boats, which the game sails on
+// its lake: include/TpiGreatLake.h), whose meshes are copied as they are.
 // An animated texture list (.ifl; TPI's penguins and seals blink with one) becomes a .tga of its most used frame, as
 // Theme Park World has no animated textures and the mesh asks for "<stem>.tga".
 Converted ConvertMembers(const std::vector<TpiWadMember> &in, const std::vector<SamRow> *samTable,
                          const TpiSamOptions *samOptions, const std::vector<SamRow> *coasterTable, const std::string &what,
-                         Log &log) {
+                         Log &log, bool keepWake = false) {
     Converted out;
     std::vector<const TpiWadMember *> ifls;
     std::set<std::string> fshStems;   // lower "folder/stem"
@@ -396,7 +399,7 @@ Converted ConvertMembers(const std::vector<TpiWadMember> &in, const std::vector<
             ifls.push_back(&m);
         } else if (ext == ".md2" && (Lower(Base(Dir(m.name))) == "textures" || Lower(Base(Dir(m.name))) == "stexture")) {
             log.text << "    left out: " << what << "/" << m.name << " (a mesh among the textures)\n";
-        } else if (TpiWadMember t{m.name, {}}; ext == ".md2" && HideWake(m.data, t.data)) {
+        } else if (TpiWadMember t{m.name, {}}; ext == ".md2" && !keepWake && HideWake(m.data, t.data)) {
             log.text << "    wake hidden: " << what << "/" << m.name << " (Theme Park Inc draws it on its lake)\n";
             out.members.push_back(std::move(t));
         } else if (ext == ".sam" && Lower(base).compare(0, 7, "online_") == 0) {
@@ -752,6 +755,147 @@ std::string TpiPeepsSam(const Levels &levels, const std::string &world, Log &log
         out += SamLinesStarting(std::string(bytes.begin(), bytes.end()), {"WeatherEffects.QualityForHeatWaveLow"}, count);
     }
     log.text << "    TpiPeeps.sam: " << count << " lines\n";
+    return out;
+}
+
+// The lake ride: a bumper ride of Theme Park Inc's boat kind (Bumper.BumperType -11, The Great Lake) whose own
+// bumper.sam gives the circles and buoys its boats sail between (ColObjects, Buoys; the ride table has neither, so
+// FilterTpiSam leaves them out of the converted ride).
+struct LakeRide {
+    int32_t id = -1;            // its converted Info.Id
+    std::string name;           // "rides/vict_hs", for the report
+    std::string bumper;         // its bumper.sam as Theme Park Inc has it
+    std::string folder;         // where it is written ("rides/vict_hs")
+    std::vector<TpiWadMember> meshes;   // its meshes, written with their wakes (hidden after all when there is no lake)
+};
+
+bool IsLakeRide(const Item &item, const std::string &samText, LakeRide &lake) {
+    int32_t kind = 0;
+    if (!TpiSamInteger(samText, "Bumper", "BumperType", kind) || kind != -11)
+        return false;
+    for (const auto &m : item.members) {
+        if (!Dir(m.name).empty() || Lower(Base(m.name)) != "bumper.sam")
+            continue;
+        std::string text(m.data.begin(), m.data.end());
+        if (text.find("ColObjects[") == std::string::npos)
+            continue;
+        lake.id = item.newId;
+        lake.name = item.tpiFolder + "/" + item.name;
+        lake.bumper = std::move(text);
+        lake.folder = item.outFolder + "/" + item.name;
+        for (const auto &mesh : item.members) {
+            const std::string folder = Lower(Base(Dir(mesh.name)));
+            if (Extension(mesh.name) == ".md2" && folder != "textures" && folder != "stexture")
+                lake.meshes.push_back(mesh);
+        }
+        return true;
+    }
+    return false;
+}
+
+// "Group[i].Field value" lines of a .sam (the value an integer), by index: Theme Park Inc's ColObjects and Buoys lists.
+std::map<int, std::map<std::string, int32_t>> SamIndexed(const std::string &text, const std::string &group) {
+    std::map<int, std::map<std::string, int32_t>> out;
+    size_t at = 0;
+    while (at < text.size()) {
+        size_t end = text.find('\n', at);
+        if (end == std::string::npos)
+            end = text.size();
+        std::string line = text.substr(at, end - at);
+        at = end + 1;
+        size_t i = line.find_first_not_of(" \t");
+        if (i == std::string::npos || line.compare(i, group.size() + 1, group + "[") != 0)
+            continue;
+        i += group.size() + 1;
+        const size_t close = line.find(']', i);
+        if (close == std::string::npos || close + 1 >= line.size() || line[close + 1] != '.')
+            continue;
+        const std::string index = line.substr(i, close - i);
+        const size_t fieldAt = close + 2, fieldEnd = line.find_first_of(" \t\r", fieldAt);
+        if (index.empty() || index.find_first_not_of("0123456789") != std::string::npos || fieldEnd == std::string::npos)
+            continue;
+        const std::string field = line.substr(fieldAt, fieldEnd - fieldAt);
+        const size_t valueAt = line.find_first_not_of(" \t", fieldEnd);
+        if (valueAt == std::string::npos)
+            continue;
+        char *stop = nullptr;
+        const long value = std::strtol(line.c_str() + valueAt, &stop, 10);
+        if (stop == line.c_str() + valueAt)
+            continue;
+        out[std::stoi(index)][field] = static_cast<int32_t>(value);
+    }
+    return out;
+}
+
+// The world's TpiLake.sam (include/TpiGreatLake.h, read by the game in the mod's worlds only): the lake ride's id, the
+// water the lake obstacle leaves once it is drained (its cleared shape's closed cells, row runs "y x0 x1") and its water
+// level, and the ride's circles (duplicates once) and buoys in Theme Park Inc's units (10 to a cell), each list up to its
+// end marker (x 512). Empty when no obstacle's water holds every circle's centre.
+std::string TpiLakeSam(const LakeRide &lake, const TpiObstacleReport &report, Log &log) {
+    struct Circle {
+        int32_t x, y, r;
+    };
+    std::vector<Circle> circles;
+    for (const auto &[index, f] : SamIndexed(lake.bumper, "ColObjects")) {
+        auto x = f.find("X"), y = f.find("Y"), r = f.find("Rad");
+        if (x == f.end() || x->second >= 512)
+            break;
+        if (y == f.end() || r == f.end() || r->second <= 0)
+            continue;
+        bool seen = false;
+        for (const Circle &c : circles) seen = seen || (c.x == x->second && c.y == y->second && c.r == r->second);
+        if (!seen)
+            circles.push_back({x->second, y->second, r->second});
+    }
+    std::vector<std::pair<int32_t, int32_t>> buoys;
+    for (const auto &[index, f] : SamIndexed(lake.bumper, "Buoys")) {
+        auto x = f.find("X"), y = f.find("Y");
+        if (x == f.end() || y == f.end() || x->second >= 512 || y->second >= 512)
+            break;
+        buoys.emplace_back(x->second, y->second);
+    }
+    const TpiObstacleResult *water = nullptr;
+    for (const auto &o : report.obstacles) {
+        if (!o.skipped.empty() || !o.hasSurface || o.closedCells.empty() || circles.empty())
+            continue;
+        const std::set<std::pair<int, int>> cells(o.closedCells.begin(), o.closedCells.end());
+        bool all = true;
+        for (const Circle &c : circles) all = all && cells.count({c.x / 10, c.y / 10}) != 0;
+        if (all) {
+            water = &o;
+            break;
+        }
+    }
+    if (water == nullptr) {
+        log.text << "    lake ride " << lake.name << ": no obstacle's water holds its " << circles.size()
+                 << " circles; its boats stay on its plot\n";
+        return std::string();
+    }
+    std::string out = "# TPI Worlds and Rides: The Great Lake's water and its boats' circles and buoys, from the player's copy\n";
+    out += "Lake.RideId " + std::to_string(lake.id) + "\n";
+    char level[32];
+    std::snprintf(level, sizeof level, "%.3f", static_cast<double>(water->surface));
+    out += std::string("Lake.WaterLevel ") + level + "\n";
+    std::set<std::pair<int, int>> byRow;   // (y, x)
+    for (const auto &[x, y] : water->closedCells) byRow.insert({y, x});
+    int runs = 0;
+    for (auto it = byRow.begin(); it != byRow.end();) {
+        const int y = it->first, x0 = it->second;
+        int x1 = x0;
+        ++it;
+        while (it != byRow.end() && it->first == y && it->second == x1 + 1) {
+            x1 = it->second;
+            ++it;
+        }
+        out += "Lake.Water " + std::to_string(y) + " " + std::to_string(x0) + " " + std::to_string(x1) + "\n";
+        ++runs;
+    }
+    for (const Circle &c : circles)
+        out += "Lake.Circle " + std::to_string(c.x) + " " + std::to_string(c.y) + " " + std::to_string(c.r) + "\n";
+    for (const auto &[x, y] : buoys) out += "Lake.Buoy " + std::to_string(x) + " " + std::to_string(y) + "\n";
+    log.text << "    TpiLake.sam: ride " << lake.name << " (" << lake.id << ") on obstacle " << water->name << "'s water, "
+             << byRow.size() << " cells in " << runs << " runs, level " << level << ", " << circles.size() << " circles, "
+             << buoys.size() << " buoys; its boats' wake kept\n";
     return out;
 }
 
@@ -1301,6 +1445,7 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
     TpiSamOptions gateOptions = itemOptions;
     gateOptions.append = {std::string("Info.Name\t\t\t\"") + spec.display + "\""};
     bool gateNamed = false;
+    LakeRide lake;
     for (const auto &item : items) {
         const std::string what = item.tpiFolder + "/" + item.name;
         const bool gate = item.oldId == gateId;
@@ -1328,7 +1473,8 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             if (!shownName.empty() && shownName != infoName)
                 options.append.push_back("Info.Name\t\t\t\"" + shownName + "\"");
         }
-        Converted c = ConvertMembers(item.members, &rideTable, &options, &coasterTable, what, log);
+        const bool lakeRide = lake.id < 0 && ride && IsLakeRide(item, samText, lake);
+        Converted c = ConvertMembers(item.members, &rideTable, &options, &coasterTable, what, log, lakeRide);
         const bool script = item.outFolder == "features" && NeedsFeatureScript(c.members, item.name);
         if (script)
             c.members.push_back({item.name + ".RSE", FeatureScript(item.name)});
@@ -1418,6 +1564,7 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
                                &m.data);
         }
     std::vector<TpiObstacle> obstacles;
+    std::string lakeSam;   // TpiLake.sam, once the obstacles are merged
     for (const auto &[rel, entry] : levels.under(world + "/obstacles/")) {
         if (rel.find('/') != std::string::npos || Extension(rel) != ".wad")
             continue;
@@ -1471,6 +1618,8 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             report, err);
         if (!merged)
             Fail(world + "/obstacles: " + err);
+        if (lake.id >= 0)
+            lakeSam = TpiLakeSam(lake, report, log);
         for (const auto &o : report.obstacles) {
             log.text << "    obstacle " << o.name << ": ";
             if (!o.skipped.empty()) {
@@ -1499,6 +1648,13 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
         log.text << "    terrain: " << report.addedTextures.size() << " obstacle textures added, " << report.stillClear.size()
                  << " hidden quads nothing covers\n";
     }
+    // A lake ride whose lake was not found keeps its boats on its plot, as before: their wakes are hidden after all.
+    if (lake.id >= 0 && lakeSam.empty())
+        for (const auto &m : lake.meshes)
+            if (TpiWadMember t{m.name, {}}; HideWake(m.data, t.data)) {
+                w.file(lake.folder + "/" + m.name, t.data);
+                log.text << "    wake hidden: " << lake.name << "/" << m.name << " (no lake for its boats)\n";
+            }
     for (const auto &wad : wads) {
         w.file(wad.first, BuildTpiWad(wad.second.members));
         log.text << "    wad " << wad.first << " (" << wad.second.members.size() << " files)\n";
@@ -1542,6 +1698,8 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
                        {"TicketBooth[1].PosY", "FixedItemInfo.TicketBoothBPosY"}};
     w.text("Standard.sam", FilterWorldSam(levels, world, "Standard.sam", TableFor("standard.sam", tables), standard, log));
     w.text("TpiPeeps.sam", TpiPeepsSam(levels, world, log));
+    if (!lakeSam.empty())
+        w.text("TpiLake.sam", lakeSam);
     TpiSamOptions global;
     global.drop = {"StaffPoolInfo.*", "ParkInfo.AvailableFromStart"};
     global.idFields = {"ParkName.GateObjectId"};
