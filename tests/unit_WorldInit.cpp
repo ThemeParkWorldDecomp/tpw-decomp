@@ -50,6 +50,16 @@ int64_t Canon(const void* pointer) {
     return static_cast<int64_t>(a & 0xffffffffu);
 }
 
+// A grid's end, from its base. When the base is one of the test's raw words (0 included), the end (base + (size << 14), added in
+// pointer width on the host, wrapping in 32 bits on the Mac) is reported as its raw low 32 bits too: Canon alone would find a raw
+// word plus up to 4 GB inside gBlock whenever the shim happens to be loaded just above 4 GB (the 0.5.6 suite, case 179, 2026-11-16).
+int64_t CanonEnd(const void* base, const void* end) {
+    const uintptr_t b = reinterpret_cast<uintptr_t>(base);
+    if (Canon(base) == static_cast<int64_t>(b & 0xffffffffu))
+        return static_cast<int64_t>(reinterpret_cast<uintptr_t>(end) & 0xffffffffu);
+    return Canon(end);
+}
+
 template <class T>
 T* Ptr(uint32_t word) {
     return reinterpret_cast<T*>(static_cast<uintptr_t>(word));
@@ -145,10 +155,10 @@ void tpw_wi_get_state(int64_t* out, uint8_t* text) {
     out[7] = Canon(gBlockSave.mBlocks[1].mData);
     out[8] = static_cast<uint32_t>(gBlockSave.mBlocks[1].mSize);
     out[9] = Canon(gMapGridBase);
-    out[10] = Canon(gMapGridEnd);
+    out[10] = CanonEnd(gMapGridBase, gMapGridEnd);
     out[11] = static_cast<uint32_t>(gMapGridCellSize);
     out[12] = Canon(gTrackGridBase);
-    out[13] = Canon(gTrackGridEnd);
+    out[13] = CanonEnd(gTrackGridBase, gTrackGridEnd);
     out[14] = static_cast<uint32_t>(gTrackGridCellSize);
     out[15] = static_cast<uint32_t>(gExitError.mError);
     out[16] = static_cast<uint32_t>(gExitError.mType);
