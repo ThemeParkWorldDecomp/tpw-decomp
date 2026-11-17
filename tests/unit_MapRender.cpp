@@ -343,6 +343,12 @@ void CDisplay::SetWindow(float x, float y, float width, float height) {
                      gei_LightManager->mF04});
 }
 void CDisplay::ResetWindow() { ev("ResetWindow", {lab(this)}); }
+// The port's free camera low view (freecam, CMapWho::Render) moves the fog space out and back: recorded, and kept.
+void CDisplay::SetFogSpace(float nearDistance, float farDistance) {
+    ev("FogSpace", {lab(this), fbits(nearDistance), fbits(farDistance)});
+    mFogNear = nearDistance;
+    mFogFar = farDistance;
+}
 
 // The height field and the gamut.
 int32_t CHField::DivideAndConquer() {
@@ -647,6 +653,19 @@ int32_t tpw_mr_run(int32_t op, int32_t arg) {
     }
     }
     return -99;
+}
+
+// Sets the port's free camera with its low view (gPortFreeCamera, gPortFreeLowView, include/TPCamera.h) and answers 1;
+// -1 when the library was built without the port fixes, which have no such switch.
+int32_t tpw_mr_free_low(int32_t on) {
+    (void)on;
+    return -1;
+}
+
+// The display's fog space (mFogNear, mFogFar) as bit patterns.
+void tpw_mr_fog_space(uint32_t* out) {
+    out[0] = fbits(gei_Display.mFogNear);
+    out[1] = fbits(gei_Display.mFogFar);
 }
 
 // Everything the unit may have changed, in the order test_MapRender.py reads it.

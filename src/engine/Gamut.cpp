@@ -273,6 +273,7 @@ _D3DVECTOR CGamut::GetHFieldIntersection(_D3DVECTOR* corner) {
     return hit;
 }
 
+
 int32_t CGamut::CalculateGamut() {
     float farthest = kFarthestStart;
     SGamutQuads* cells = reinterpret_cast<SGamutQuads*>(&mFC4);     // GetQuads

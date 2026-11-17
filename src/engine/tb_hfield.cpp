@@ -428,6 +428,7 @@ private:
 
 }  // namespace
 
+
 int32_t CHField::DivideAndConquer() {
     const float viewDistance =
         (gei_Display.mFlags & CDisplay::kEnableFog) != 0 ? gei_Display.mFirstPersonViewDistance : kViewDistanceNoFog;

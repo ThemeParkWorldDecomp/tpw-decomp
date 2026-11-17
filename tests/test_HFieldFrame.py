@@ -980,53 +980,116 @@ class FarZoomTest:
         return T.same_values(expected, got, "", False)
 
 
-# ----------------------------------------------------------------- the port's free camera, its low view
+# ----------------------------------------------------------------- the port's free camera
 
-# The port's fix freecam: with the Free camera on (gPortFreeCamera) and held low (gPortFreeLowView, below 25 degrees),
-# CMapWho::Render sets fog and RenderWindow draws the ground through DivideAndConquer, as first person does, so the
-# park is drawn out to the View distance. DivideAndConquer itself must then be the original's first-person one at that
-# distance, with "Zoom out further" (gPortFarZoom) on as well: the far zoom's whole-map walk is for fog off only. So
-# every case runs with fog on (display 0x2000), the three switches on in the host, and the PowerPC side's original
-# run is what it must match: the View distances the launcher offers, low cameras inside, on and outside the map
-# looking along the ground, and random cases.
+# The port's fix freecam: with the Free camera on (gPortFreeCamera), DivideAndConquer tests every cell of the map, fog on
+# (its low view, gPortFreeLowView, draws through CMapWho::Render with fog) or off, as the far zoom does with fog off,
+# against a far plane that reaches the map's farthest corner. Its cells, rows, far plane and calls are those of the
+# original when the view distance covers the whole map, so the PowerPC side runs the case as FarZoomTest does (fog on,
+# the distance WHOLE_MAP_DISTANCE, the procedural textures' window from its run with kTestWholeMap), and its first
+# AdjustProjection then gets free_far_plane's far plane instead of the original's 1000. Each case runs with the free
+# camera alone (switch 1) or with the low view and the far zoom too (switch 7), the game's two states. With
+# kTestWholeMap the whole map is tested already and only the far plane changes. The original with the switches off is
+# DivideAndConquer's own test, and FarZoomTest's.
 VIEW_DISTANCES = (60.0, 120.0, 230.0, 400.0, 1000.0)
+FREE_SWITCHES = (1, 7)
+PROJECTION_FAR = 1000.0
+FREE_FAR_STEP = 100.0
+FREE_FAR_MOST = 1.0e6       # kPortFreeFogNear
+RECORD_HEIGHT = 0xA5A5A5A5  # the record's lowest and highest heights (mF20): its fill on both sides
 
 
-def free_low_edges():
-    for distance in VIEW_DISTANCES:
-        for extra in (0, 0x20):
-            yield divide_case(display=0x2000 | extra, distance=fb(distance))
-            for x, z, m02, m22 in ((40.0, 30.0, 0.0, 1.0), (40.0, 30.0, 1.0, 0.0), (40.0, 30.0, -0.7, -0.7),
-                                   (0.0, 0.0, 0.7, 0.7), (79.99, 59.99, -0.7, -0.7), (-60.0, 30.0, 1.0, 0.0),
-                                   (40.0, -45.0, 0.0, 1.0), (110.01, 30.0, -1.0, 0.0), (40.0, 200.0, 0.0, -1.0)):
-                yield with_view(divide_case(display=0x2000 | extra, distance=fb(distance)), x, z, m02, m22)
-    for w, h in ((1, 1), (127, 30), (30, 124), (96, 85)):
-        yield with_view(divide_case(w=w, h=h, display=0x2000, distance=fb(230.0)), 20.0, 20.0, 0.5, 0.5)
+def c_fmax(x, y):
+    """C's fmax: a NaN loses."""
+    if x != x:
+        return y
+    if y != y:
+        return x
+    return max(x, y)
 
 
-def free_low_random(r):
-    c = divide_random(r)
-    c["display"] |= 0x2000
-    return c
+def free_far_plane(c):
+    """PortFreeFarPlane (src/engine/tb_hfield.cpp) for the case, as the bits of a single."""
+    camera_x, camera_y, camera_z = bf(c["view"][12]), bf(c["view"][13]), bf(c["view"][14])
+    cell_x, cell_z = bf(c["cell"][0]), bf(c["cell"][1])
+    x0 = bf(c["origin"][0]) - camera_x
+    z0 = bf(c["origin"][1]) - camera_z
+    x1 = x0 + float(c["w"] & MASK) * cell_x
+    z1 = z0 + float(c["h"] & MASK) * cell_z
+    height = bf(RECORD_HEIGHT)
+    dx = c_fmax(abs(x0), abs(x1))
+    dy = c_fmax(abs(height - camera_y), abs(height - camera_y))
+    dz = c_fmax(abs(z0), abs(z1))
+    total = dx * dx + dy * dy + dz * dz
+    farthest = math.sqrt(total) + c_fmax(cell_x, cell_z)
+    if not math.isfinite(farthest) or farthest <= PROJECTION_FAR:
+        return fb(PROJECTION_FAR)
+    return fb(min(math.ceil(farthest / FREE_FAR_STEP) * FREE_FAR_STEP, FREE_FAR_MOST))
 
 
-class FreeCameraLowTest:
-    name = "CHField::DivideAndConquer, port free camera low view"
+def free_edges():
+    cameras = ((40.0, 30.0, 0.0, 1.0), (40.0, 30.0, 1.0, 0.0), (40.0, 30.0, -0.7, -0.7), (0.0, 0.0, 0.7, 0.7),
+               (79.99, 59.99, -0.7, -0.7), (-60.0, 30.0, 1.0, 0.0), (40.0, -45.0, 0.0, 1.0), (110.01, 30.0, -1.0, 0.0),
+               (40.0, 200.0, 0.0, -1.0), (1040.0, 30.0, -1.0, 0.0), (40.0, -1100.0, 0.0, 1.0), (-900.0, -900.0, 0.7, 0.7),
+               (1e6, 0.0, -1.0, 0.0), (-3e5, 4e5, 0.6, -0.8))
+    for switch in FREE_SWITCHES:
+        for display in (0x2000, 0, 0x20, 0x2020):
+            for distance in (VIEW_DISTANCES if display & 0x2000 else (400.0,)):
+                yield dict(divide_case(display=display, distance=fb(distance)), free=switch)
+                for x, z, m02, m22 in cameras:
+                    yield dict(with_view(divide_case(display=display, distance=fb(distance)), x, z, m02, m22), free=switch)
+        # maps as large as the game's (Land of Invention: 96 by 85 cells of 10), the camera inside, on the edge and outside
+        for w, h, cell in ((1, 1, 2.0), (127, 30, 2.0), (30, 124, 2.0), (96, 85, 10.0), (127, 124, 10.0), (96, 85, 16.0)):
+            for x, z in ((20.0, 20.0), (0.0, 0.0), (-150.0, -150.0), (w * cell + 150.0, h * cell / 2)):
+                c = divide_case(w=w, h=h, display=0x2000, distance=fb(700.0), cell=[fb(cell), fb(cell)])
+                yield dict(far_zoom_sane(with_view(c, x, z, 0.5, 0.5)), free=switch)
+        for origin in ((10.0, -10.0), (-100.0, 100.0), (-500.0, 2000.0)):
+            yield dict(with_view(divide_case(display=0x2000, distance=fb(700.0), origin=[fb(origin[0]), fb(origin[1])]),
+                                 40.0, 30.0), free=switch)
+        for y in (0.0, 15.0, 500.0, -2000.0, 1e7):
+            c = divide_case(display=0x2000, distance=fb(700.0))
+            c["view"] = list(c["view"])
+            c["view"][13] = fb(y)
+            yield dict(c, free=switch)
+
+
+def free_random(r):
+    return dict(far_zoom_sane(divide_random(r)), free=r.choice(FREE_SWITCHES))
+
+
+def free_expected(runner, case):
+    """The PowerPC side's whole-map run of the case, with the free camera's far plane."""
+    runner.emu.reset_scratch()
+    if case["display"] & 0x20:
+        expected = hf_ppc(runner.emu, case)
+    else:
+        window = hf_ppc(runner.emu, dict(case, display=case["display"] | 0x20))["state"]["small"][WINDOW]
+        runner.emu.reset_scratch()
+        expected = hf_ppc(runner.emu, dict(case, display=case["display"] | 0x2000, distance=fb(WHOLE_MAP_DISTANCE)))
+        expected["state"]["small"][WINDOW] = window
+    log = expected["log"]
+    first = next(i for i, (name, _, _) in enumerate(log) if name == "AdjustProjection")
+    name, ints, texts = log[first]
+    log[first] = (name, (ints[0], free_far_plane(case)) + tuple(ints[2:]), texts)
+    return expected
+
+
+class FreeCameraTest:
+    name = "CHField::DivideAndConquer, port free camera"
 
     def edge_cases(self):
-        return list(free_low_edges())
+        return list(free_edges())
 
     def random_case(self, r):
-        return free_low_random(r)
+        return free_random(r)
 
     def run_case(self, runner, case):
         switch = runner.lib.tpw_hf_free_low
         switch.argtypes, switch.restype = [C.c_int32], C.c_int32
         if switch(0) != 1:
             return []   # built without the port fixes: there is no switch
-        runner.emu.reset_scratch()
-        expected = hf_ppc(runner.emu, case)
-        switch(1)
+        expected = free_expected(runner, case)
+        switch(case["free"])
         try:
             got = hf_host(runner.lib, case)
         finally:
@@ -1077,7 +1140,7 @@ def setup(runner):
 TESTS = [PrepareTest(),
          FnTest("CHField::DivideAndConquer", hf_ppc, hf_host, edge=divide_edges, rnd=divide_random),
          FarZoomTest(),
-         FreeCameraLowTest(),
+         FreeCameraTest(),
          FnTest("CGamut::GetVertices", hf_ppc, hf_host, edge=vertices_edges, rnd=vertices_random),
          FnTest("CTextureCache::Refresh", tc_ppc, tc_host, edge=refresh_edges, rnd=refresh_random),
          FnTest("CTextureCache::Execute", tc_ppc, tc_host, edge=execute_edges, rnd=execute_random)]

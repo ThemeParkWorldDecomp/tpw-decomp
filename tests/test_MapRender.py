@@ -842,8 +842,80 @@ def small_random(r):
                 queues={"Blt": [r.choice([0, 0, 1, T.s32(r.getrandbits(32))])], **adds}, dd_result=r.getrandbits(32))
 
 
+# -- Render with the port's free camera looking low (freecam): as the original's first person (the fog flag on, the
+# first person flag from IsFirstPerson), but the fog space moved out of reach while it draws and put back at the end.
+
+FREE_FOG_NEAR, FREE_FOG_FAR = fb(1.0e6), fb(2.0e6)
+FOG_FLAG, SPECULAR_FLAG, DISPLAY_FLAGS_AT = 0x2000, 0x400, 32
+
+
+class FreeLowViewTest:
+    """The host runs the case with tpw_mr_free_low(1); the PowerPC side runs the original's first person (the case's
+    display flags with the fog flag, IsFirstPerson answering 1). The host's log must be the original's with a FogSpace
+    to the fog space out of reach first and one back to the case's last, and the fog drawn with the fog space out of
+    reach; the display's flags and fog space are the case's again after. When Render returns before it draws, and
+    without the port's fixes (tpw_mr_free_low gives -1), the host must be the original's run of the case as it is."""
+    name = "CMapWho::Render, port free camera low view"
+
+    def edge_cases(self):
+        return list(render_edges())
+
+    def random_case(self, r):
+        return render_random(r)
+
+    def run_case(self, runner, c):
+        free_low, fog_space = runner.lib.tpw_mr_free_low, runner.lib.tpw_mr_fog_space
+        free_low.argtypes, free_low.restype = [C.c_int32], C.c_int32
+        fog_space.argtypes, fog_space.restype = [C.POINTER(C.c_uint32)], None
+        flags = c["display"]["flags"]
+        fixed = free_low(1) == 1
+        try:
+            runner.emu.reset_scratch()
+            p = ppc(runner.emu, c)
+            # Render returns before it draws (another window in front, ALTTAB_RestoreState failing): nothing changes.
+            draws = any(e[0] == "ResetWindow" for e in p["log"])
+            fixed = fixed and draws
+            if fixed:
+                runner.emu.reset_scratch()
+                p = ppc(runner.emu, {**c, "display": {**c["display"], "flags": flags | FOG_FLAG},
+                                     "queues": {**c["queues"], "IsFirstPerson": [1] * 8}})
+            h = host(runner.lib, c)
+            space = (C.c_uint32 * 2)()
+            fog_space(space)
+        finally:
+            free_low(0)
+        d = c["display"]
+        out = []
+        if fixed:
+            moves = [e for e in h["log"] if e[0] == "FogSpace"]
+            if moves[:1] != [("FogSpace", (L_DISPLAY, FREE_FOG_NEAR, FREE_FOG_FAR), ())] or \
+                    moves[-1:] != [("FogSpace", (L_DISPLAY, d["fog_near"], d["fog_far"]), ())] or len(moves) != 2:
+                out.append(f"fog space moves {moves}")
+            log = []
+            for e in h["log"]:
+                if e[0] == "FogSpace":
+                    continue
+                if e[0] == "Fog":
+                    if e[1][1:3] != (FREE_FOG_NEAR, FREE_FOG_FAR):
+                        out.append(f"fog drawn with {e}")
+                    e = (e[0], (e[1][0], d["fog_near"], d["fog_far"]) + e[1][3:], e[2])
+                log.append(e)
+            h = {**h, "log": log}
+            # The original asserts on fog with specular light when its flags have both; the port adds the fog flag
+            # after that check.
+            if flags & SPECULAR_FLAG and not flags & FOG_FLAG:
+                p = {**p, "log": [e for e in p["log"] if not (e[0] == "Assert" and "ENABLEFOG" in e[2][0])]}
+            state = list(p["state"])
+            state[DISPLAY_FLAGS_AT] = flags
+            p = {**p, "state": state}
+        if list(space) != [d["fog_near"], d["fog_far"]]:
+            out.append(f"fog space after {list(space)}")
+        return out + T.same_values(p, h)
+
+
 TESTS = [FnTest("CMapWho::RenderWindow", ppc, host, edge=window_edges, rnd=window_random),
          FnTest("CMapWho::Render", ppc, host, edge=render_edges, rnd=render_random),
+         FreeLowViewTest(),
          FnTest("CMapWho::PrepareWorldspace", ppc, host, edge=worldspace_edges, rnd=worldspace_random),
          FnTest("CMapWho::ALTTAB_RestoreState", ppc, host, edge=alttab_edges, rnd=alttab_random),
          FnTest("options, GetQuads, CMeshDelay, CLoadSurface::Display, FPU", ppc, host, edge=small_edges,
