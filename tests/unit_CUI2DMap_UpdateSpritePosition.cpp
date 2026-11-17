@@ -6,6 +6,10 @@
 // The callees outside the unit are fakes that record what the real ones read: the sprite's SetPosition and SetScale, the CDraw object, the coaster
 // track queries, the colour scale, the four Antialiased line routines, the cell queries, the assertion and GetDBInfo. The globals of other files
 // the unit reads (the screen size, the thing table, the world pointer) are defined here, zero at start.
+// The cell queries' answer queues are 3000 long (the test's store cases), so the call log holds as many per queue: with the default 64 a
+// big map ran past the end and the host repeated the 64th answer where the Mac went on down its queue.
+#define TPW_CALLLOG_QUEUE_VALUES 3000
+#include "calllog.cpp"
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -21,7 +25,6 @@
 #include "ThingReceivers.h"
 #include "World.h"
 #include "analyser.h"
-#include "calllog.h"
 #include "platform/arena.h"
 #include "ride_layout.h"
 #include "platform/d3d_types.h"

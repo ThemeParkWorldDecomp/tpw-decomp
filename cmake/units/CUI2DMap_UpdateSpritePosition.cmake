@@ -9,3 +9,4 @@ set(TPW_UNIT_CUI2DMap_UpdateSpritePosition_KEEP
   _gUI2DMapColours
   _gUI2DMapGridThingListEnd
 )
+set(TPW_UNIT_CUI2DMap_UpdateSpritePosition_OWN_CALLLOG ON)

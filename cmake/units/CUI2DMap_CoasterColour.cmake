@@ -21,3 +21,4 @@ set(TPW_UNIT_CUI2DMap_CoasterColour_KEEP
   _gUI2DMapTgaName
   _gUI2DMapVtableSlot
 )
+set(TPW_UNIT_CUI2DMap_CoasterColour_OWN_CALLLOG ON)
