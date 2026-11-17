@@ -3017,7 +3017,7 @@ void TestThemeParkInc(const std::string& scratch) {
         ImportReport r = imp.Import({drop + "/disc"});
         CHECK(r.errors.empty());
         CHECK_EQ(r.themeParkInc.size(), 1);
-        const std::string prefix = "Theme Park Inc copy recognised (Theme Park Inc); ";
+        const std::string prefix = "SimCoaster AKA Theme Park Inc copy recognised (Theme Park Inc); ";
         CHECK(!r.themeParkInc.empty() && r.themeParkInc[0].compare(0, prefix.size(), prefix) == 0);
         CHECK(!r.themeParkIncConverted);
         CHECK_EQ(r.written, 0);
@@ -3028,7 +3028,7 @@ void TestThemeParkInc(const std::string& scratch) {
         if (!r.themeParkInc.empty()) std::printf("  %s\n", r.themeParkInc[0].c_str());
         std::vector<ImportProgress> ev = Events(imp);
         CHECK(std::any_of(ev.begin(), ev.end(), [](const ImportProgress& e) {
-            return e.kind == ImportProgress::Kind::Content && e.message.find("Theme Park Inc copy recognised") == 0;
+            return e.kind == ImportProgress::Kind::Content && e.message.find("SimCoaster AKA Theme Park Inc copy recognised") == 0;
         }));
         // not converted: nothing remembered
         LauncherIni ini;
@@ -3062,7 +3062,7 @@ void TestThemeParkInc(const std::string& scratch) {
                                                             {"Demo/Data/Online.sam", "Theme Park Inc Online Settings\r\n"}}));
         ImportReport demo = imp.Import({drop + "/demo.zip"});
         CHECK_EQ(demo.errors.size(), 1);
-        CHECK(AnyContains(demo.errors, "Theme Park Inc copy refused") && AnyContains(demo.errors, "demo.zip"));
+        CHECK(AnyContains(demo.errors, "SimCoaster AKA Theme Park Inc copy refused") && AnyContains(demo.errors, "demo.zip"));
         CHECK(demo.themeParkInc.empty());
         CHECK_EQ(demo.written, 0);
         CHECK_EQ(demo.unknownFiles, 0);

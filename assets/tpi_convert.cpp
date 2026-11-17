@@ -91,7 +91,7 @@ bool WriteTpiConverterStamp(const fs::path &dataRoot, std::string &reason) {
     try {
         fs::path path = TpiConverterStampPath(dataRoot);
         if (fs::is_symlink(fs::symlink_status(path))) {
-            reason = "Theme Park Inc converter stamp is a symbolic link";
+            reason = "SimCoaster AKA Theme Park Inc converter stamp is a symbolic link";
             return false;
         }
         fs::create_directories(path.parent_path());
@@ -101,14 +101,14 @@ bool WriteTpiConverterStamp(const fs::path &dataRoot, std::string &reason) {
             std::ofstream out(part, std::ios::binary | std::ios::trunc);
             out << kTpiConverterVersion << "\n";
             if (!out) {
-                reason = "cannot write the Theme Park Inc converter stamp";
+                reason = "cannot write the SimCoaster AKA Theme Park Inc converter stamp";
                 return false;
             }
         }
         fs::rename(part, path);
         return true;
     } catch (const std::exception &e) {
-        reason = std::string("cannot write the Theme Park Inc converter stamp: ") + e.what();
+        reason = std::string("cannot write the SimCoaster AKA Theme Park Inc converter stamp: ") + e.what();
         return false;
     }
 }
@@ -1996,7 +1996,7 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
     fs::path staging;
     try {
         if (!disc.source)
-            Fail("the Theme Park Inc copy has no source");
+            Fail("the SimCoaster AKA Theme Park Inc copy has no source");
         Levels levels;
         levels.source = disc.source.get();
         const std::string prefix = Lower(disc.root) + "data/levels/";
@@ -2010,7 +2010,7 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
         std::sort(levels.entries.begin(), levels.entries.end(),
                   [](const auto &a, const auto &b) { return a.first < b.first; });
         if (levels.entries.empty())
-            Fail("no Data/levels folder in the Theme Park Inc copy");
+            Fail("no Data/levels folder in the SimCoaster AKA Theme Park Inc copy");
 
         const fs::path assets = dataRoot / "assets";
         const fs::path top = assets / ".staging";
@@ -2086,7 +2086,7 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
     } catch (const std::exception &e) {
         if (!staging.empty())
             ClearTree(staging);
-        reason = std::string("Theme Park Inc conversion failed: ") + e.what();
+        reason = std::string("SimCoaster AKA Theme Park Inc conversion failed: ") + e.what();
         return false;
     }
 }
@@ -2112,7 +2112,7 @@ bool ConvertTpiFromPath(const std::string &path, const fs::path &dataRoot, std::
     TpiDisc disc;
     const TpiStatus status = RecogniseTpi(source, disc, reason);
     if (status == TpiStatus::NotThemeParkInc) {
-        reason = path + " is not a copy of Theme Park Inc";
+        reason = path + " is not a copy of SimCoaster AKA Theme Park Inc";
         return false;
     }
     if (status == TpiStatus::Rejected)

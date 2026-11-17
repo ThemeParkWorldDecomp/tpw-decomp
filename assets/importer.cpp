@@ -1210,7 +1210,7 @@ void Importer::RememberTpiDisc(const std::string& path, const std::string& sha25
     if (!SaveIniLocked(err)) progress_.Push([&] {
         ImportProgress ev;
         ev.kind = ImportProgress::Kind::Content;
-        ev.message = "Theme Park Inc copy not remembered: " + err;
+        ev.message = "SimCoaster AKA Theme Park Inc copy not remembered: " + err;
         return ev;
     }());
 }
@@ -1321,8 +1321,8 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
                 std::string reason;
                 const bool converted = ConvertTpi(disc, fs::u8path(config_.dataRoot), reason);
                 const std::string line = converted
-                    ? "Theme Park Inc: 3 worlds converted from the " + disc.edition + " copy."
-                    : "Theme Park Inc copy recognised (" + disc.edition + "); " + OneLine(reason);
+                    ? "SimCoaster AKA Theme Park Inc: 3 worlds converted from the " + disc.edition + " copy."
+                    : "SimCoaster AKA Theme Park Inc copy recognised (" + disc.edition + "); " + OneLine(reason);
                 run.report.themeParkInc.push_back(line);
                 run.report.themeParkIncConverted = run.report.themeParkIncConverted || converted;
                 if (converted && !disc.path.empty()) RememberTpiDisc(disc.path, disc.sha256);
@@ -1544,8 +1544,8 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
                 }
                 run.themeParkInc.push_back(std::move(disc));
             } else {
-                const std::string line = (display.empty() ? std::string("Theme Park Inc copy refused: ")
-                                                          : display + ": Theme Park Inc copy refused: ") + OneLine(reason);
+                const std::string line = (display.empty() ? std::string("SimCoaster AKA Theme Park Inc copy refused: ")
+                                                          : display + ": SimCoaster AKA Theme Park Inc copy refused: ") + OneLine(reason);
                 run.report.errors.push_back(line);
                 ImportProgress ev;
                 ev.kind = ImportProgress::Kind::Error;

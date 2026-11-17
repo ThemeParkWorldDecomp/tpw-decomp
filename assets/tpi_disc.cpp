@@ -158,7 +158,7 @@ bool AddOnOnly(const Source& source) {
 }
 const char kAddOnReason[] =
     "this is an add-on for the game (the SimCoaster Bonus Disk's rides and coasters), not the game: the mod needs a "
-    "copy of Theme Park Inc or SimCoaster itself";
+    "copy of SimCoaster AKA Theme Park Inc itself";
 
 // The worlds of a Data view: Supported when all three are whole, else Rejected with the reason. disc.worlds is filled.
 TpiStatus CheckWorlds(const std::shared_ptr<Source>& data, const std::vector<std::string>& hint, TpiDisc& disc,
