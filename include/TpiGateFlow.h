@@ -8,6 +8,7 @@
 // two rows above stop A and the crossing's bus side (on the road) are not walkable, so a visitor leaving waits for ever on
 // the plaza in front of the gate, and a visitor arriving gets no walk to the crossing and wanders in without paying.
 // In the mod's worlds the second row of the stop's cells is the row below the stop, and the crossing's bus side is in the
-// crossing's column on that row too: both on the pavement. Header only and pure, so the host test sees what the game does.
+// crossing's column on that row too: both on the pavement. The entrance's eight flags, which hang over Theme Park World's
+// poles, are not drawn there. Header only and pure, so the host test sees what the game does.
 #pragma once
 

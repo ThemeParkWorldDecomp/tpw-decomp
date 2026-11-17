@@ -1,6 +1,7 @@
 // host_tpi_gate_flow.cpp: the TPI Worlds and Rides mod's walks outside the park gate (include/TpiGateFlow.h,
 // TPW_MOD_HOOK tpi_worlds) on the host, without game data: the four cells a visitor leaving waits for the bus on, with
-// Theme Park World's rows and the mod's, the crossing's bus side in the mod's worlds, and when the mod's walks are used.
+// Theme Park World's rows and the mod's, the crossing's bus side in the mod's worlds, when the mod's walks are used, and
+// how many of the entrance's flags are drawn.
 // The cells are made up here (a cell id is x + (y << 7) + 1). Exits nonzero on the first failed check's count.
 #include <cstdint>
 #include <cstdio>
@@ -78,6 +79,24 @@ int main() {
     gModTpiWorlds = false;
     Check(!TpiWorldInPlay(), "hook off after a mod world: Mac's walks");
     TpiNoteTheme(nullptr);
+
+    // The entrance flags: none in the mod's worlds, all eight (any count, as given) otherwise.
+    for (bool flag : {false, true}) {
+        gModTpiWorlds = flag;
+        const std::string state = flag ? "on" : "off";
+        for (const char* theme : {"arabian", "water", "science"}) {
+            TpiNoteTheme(theme);
+            Check(TpiEntranceFlags(8) == (flag ? 0 : 8), state + ": flags in " + theme);
+        }
+        for (const char* theme : {"jungle", "hallow", "fantasy", "space"}) {
+            TpiNoteTheme(theme);
+            Check(TpiEntranceFlags(8) == 8, state + ": all eight flags in " + theme);
+            Check(TpiEntranceFlags(3) == 3, state + ": the count as given in " + theme);
+        }
+        TpiNoteTheme(nullptr);
+        Check(TpiEntranceFlags(8) == 8, state + ": all eight flags with no theme");
+    }
+    gModTpiWorlds = false;
 
     if (gFailures != 0) return gFailures;
     std::printf("host_tpi_gate_flow: all checks passed\n");
