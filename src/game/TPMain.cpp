@@ -306,6 +306,7 @@ void ThemeParkWorld::HandleActivateWindow(GrafPort* window, bool active) {   // 
     }
 }
 
+
 // Command 3 (quit) asks for confirmation in the lobby (state 2) and in a park (state
 // 10); in any other state it ends UGamework::Run at once.
 void ThemeParkWorld::HandleCommand(int32_t command, uint32_t modifiers) {   // 0x10001170

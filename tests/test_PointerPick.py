@@ -19,6 +19,15 @@ widened 3D view. "the widescreen pick" runs 16:9 cases on the original as they a
 with x scaled that way, the rest unchanged. A library built without the port fixes keeps the 4:3 corners; there its own log is scaled the
 same way, so the test is the 4:3 comparison again.
 
+The free camera (freecam, gPortFreeCamera): with the launcher's "Free camera" on, the camera can look at the horizon, where pointer
+rays run level or upward and the original's ride walk never ends. The port then skips the walk for a ray that does not descend, and
+stops it once the ray is outside the map and moving further out. "the ray above the horizon" runs level and upward rays: the original
+is run with its walk cut after the first step (the FindPointedRide fake sets f16, the walk's height, to minus infinity, so the loop
+test fails) and its FindPointedRide calls are left out of the log, the host with the setting on must make none and agree on all the
+rest. "the ray along the ground" runs rays that descend slowly and leave the map before they reach the ground: the original walks on
+outside the map, and its log is cut at the first loop step (told from the crossing calls by their return address) that is outside the
+map and moving out, which is where the host stops. A library built without the port fixes runs no case of either.
+
 Not tested: a ray that never ends (the original loops while the height is at or above the limit, so the cases keep the ray descending or
 make FindPointedRide answer a ride in the end); NaN and infinite inputs.
 """
@@ -27,6 +36,7 @@ import math
 import struct
 
 from unicorn import UC_HOOK_CODE
+from unicorn.ppc_const import UC_PPC_REG_LR
 
 import calllog as CL
 import ppcemu
@@ -88,7 +98,9 @@ def fpr_double(e, i):
 
 
 class HardwareRounding:
-    """fmadds, fmsubs, fnmadds and fnmsubs with the processor's single rounding (see test_RideAnimInterp.py)."""
+    """fmadds, fmsubs, fnmadds and fnmsubs with the processor's single rounding (see test_RideAnimInterp.py), and fctiwz of a value
+    above INT32_MAX (or +infinity) saturated to 0x7fffffff as the processor does, where Unicorn (QEMU 5.0) gives 0x80000000 (as in
+    test_FrameRest.py). The second only comes up in the free camera's level rays, whose cell ranges are infinite."""
 
     changed = 0
     seen = 0
@@ -110,16 +122,24 @@ class HardwareRounding:
         if self.pending is not None:
             target, value = self.pending
             self.pending = None
-            corrected = struct.unpack(">Q", struct.pack(">d", value))[0]
-            if fpr(e, target) != corrected and not (value != value and fpr_double(e, target) != fpr_double(e, target)):
+            if value is None:
                 HardwareRounding.changed += 1
-            uc.reg_write(ppcemu.FPR[target], corrected)
+                uc.reg_write(ppcemu.FPR[target], (fpr(e, target) & 0xFFFFFFFF00000000) | 0x7FFFFFFF)
+            else:
+                corrected = struct.unpack(">Q", struct.pack(">d", value))[0]
+                if fpr(e, target) != corrected and not (value != value and fpr_double(e, target) != fpr_double(e, target)):
+                    HardwareRounding.changed += 1
+                uc.reg_write(ppcemu.FPR[target], corrected)
         word = struct.unpack(">I", e.read(address, 4))[0]
+        rd, ra, rb, rc = (word >> 21) & 31, (word >> 16) & 31, (word >> 11) & 31, (word >> 6) & 31
+        if word >> 26 == 63 and (word >> 1) & 0x3FF == 15:          # fctiwz frD, frB
+            if fpr_double(e, rb) >= 2147483648.0:
+                self.pending = (rd, None)
+            return
         if word >> 26 != 59 or ((word >> 1) & 31) not in (28, 29, 30, 31):
             return
         kind = (word >> 1) & 31
         HardwareRounding.seen += 1
-        rd, ra, rb, rc = (word >> 21) & 31, (word >> 16) & 31, (word >> 11) & 31, (word >> 6) & 31
         a, c, b = fpr_double(e, ra), fpr_double(e, rc), fpr_double(e, rb)
         if not all(math.isfinite(x) for x in (a, c, b)):
             return
@@ -231,7 +251,7 @@ def rnd(r):
 # ------------------------------------------------------------------ the original (PowerPC side)
 
 
-def ppc(e, case):
+def ppc(e, case, on_find=None):
     ride_addr = [0, e.alloc(16), e.alloc(16)]
     camera, matrix = A["gCameraViewPoint"], A["gCameraMatrix"]
     e.cl = CL.PpcLog({ride_addr[1]: 1, ride_addr[2]: 2, camera: 3, matrix: 4},
@@ -245,6 +265,8 @@ def ppc(e, case):
         cam = e.u32(e.r(1) + 0x38)
         e.cl.rec("FindPointedRide", [cell_x, cell_z, axis, x, y, z, y_step])
         e.cl.rec("FindPointedRide2", [e.u32(direction), e.u32(direction + 4), e.u32(direction + 8), e.cl.lab(cam), step])
+        if on_find is not None:
+            on_find(e)
         answer = e.cl.ret("FindPointedRide")
         if answer:
             e.write(A["gPointedRidePosition"], struct.pack(">III", e.cl.ret("RidePos"), e.cl.ret("RidePos"), e.cl.ret("RidePos")))
@@ -400,7 +422,121 @@ def host_wide(lib, case):
     return out, log
 
 
+# ------------------------------------------------------------------ the free camera (freecam, a port setting)
+
+NEG_INF_BITS = 0xFFF0000000000000   # minus infinity as a double, the way the registers hold it
+
+
+def free_case(r, kind):
+    """kind "up": all three corners above the horizon, so the ray rises wherever the pointer is; "level": the corners level, the
+    ray's height step exactly 0; "slow": the corners a little below the horizon, the ray long and low."""
+    if kind == "up":
+        ys = (r.uniform(0.5, 0.6), r.uniform(0.55, 1.0), r.uniform(0.55, 1.0))
+    elif kind == "level":
+        ys = (0.0, 0.0, 0.0)
+    else:
+        y = r.uniform(-0.02, -0.005)
+        ys = (y, y, y)   # the same at the three corners, so the ray descends wherever the pointer is
+    ax, az = r.uniform(-1.0, 1.0), r.uniform(-1.0, 1.0)
+    pts = []
+    for y in ys:
+        pts += [ax + r.uniform(-0.1, 0.1), y, az + r.uniform(-0.1, 0.1)]
+    c = make(r, mode=2, flags=r.choice([2, 3, 6]), rides=[0], ride0=r.choice([0, 1, 2]), nulls=r.choice([0, 0, 0, 1, 2, 4]))
+    c["vec"] = [fb(f32(v)) for v in pts]
+    if kind == "slow":
+        # the camera above every height of the field, so the slow ray leaves the map long before it reaches the ground
+        lo, hi = (struct.unpack(">f", struct.pack(">I", c["field"][k]))[0] for k in (4, 5))
+        cam = [struct.unpack(">f", struct.pack(">I", w))[0] for w in c["cam"]]
+        cam[1] = f32(max(lo, hi) + r.uniform(4.0, 20.0))
+        c["cam"] = [fb(v) for v in cam]
+    c["kind"] = kind
+    return c
+
+
+def free_on(lib):
+    lib.tpw_pp_freecam.restype, lib.tpw_pp_freecam.argtypes = C.c_int32, [C.c_int32]
+    return lib.tpw_pp_freecam(0) == 1
+
+
+def host_free(lib, case):
+    lib.tpw_pp_freecam(1)
+    try:
+        return host(lib, case)
+    finally:
+        lib.tpw_pp_freecam(0)
+
+
+def ppc_above(e, case):
+    seen = []
+
+    def cut(e):
+        if not seen:
+            e.uc.reg_write(ppcemu.FPR[16], NEG_INF_BITS)
+        seen.append(1)
+        assert len(seen) < 100, "the walk did not stop"
+
+    out, log = ppc(e, case, cut)
+    return out, [ev for ev in log if not ev[0].startswith("FindPointedRide")]
+
+
+def bits_f(w):
+    return struct.unpack(">f", struct.pack(">I", w & MASK))[0]
+
+
+def ppc_ground(e, case):
+    sites = []
+
+    def site(e):
+        sites.append(e.uc.reg_read(UC_PPC_REG_LR))
+        assert len(sites) < 20000, "the walk did not stop"
+
+    out, log = ppc(e, case, site)
+    ox, oz, sx, sz = (bits_f(w) for w in case["field"][0:4])
+    end_x, end_z = f32(ox + f32(sx * case["w"])), f32(oz + f32(sz * case["d"]))
+    main = sites[0]
+    cut, n = None, 0
+    for i, (name, ints, _texts) in enumerate(log):
+        if name != "FindPointedRide":
+            continue
+        x, z = bits_f(ints[3]), bits_f(ints[5])
+        two = log[i + 1][1]
+        dx, dz = bits_f(two[0]), bits_f(two[2])
+        if sites[n] == main and ((x < ox and dx <= 0) or (x > end_x and dx >= 0) or (z < oz and dz <= 0) or (z > end_z and dz >= 0)):
+            cut = i
+            break
+        n += 1
+    if cut is not None:
+        log = log[:cut] + [ev for ev in log[cut:] if not ev[0].startswith("FindPointedRide")]
+    return out, log
+
+
+class FreeCameraPickTest(FnTest):
+    def run_case(self, runner, case):
+        if not free_on(runner.lib):
+            return []
+        return FnTest.run_case(self, runner, case)
+
+
+def above_edges():
+    import random
+    r = random.Random(4242)
+    for kind in ("up", "level", "up", "level"):
+        yield free_case(r, kind)
+    for i in range(8):
+        yield free_case(r, "up" if i % 2 else "level")
+
+
+def ground_edges():
+    import random
+    r = random.Random(4343)
+    for _ in range(10):
+        yield free_case(r, "slow")
+
+
 TESTS = [
     FnTest("CalculatePointerWorldPosn", ppc, host, edge=edges, rnd=rnd),
     FnTest("the widescreen pick", ppc_wide, host_wide, edge=wide_edges, rnd=wide_case),
+    FreeCameraPickTest("the ray above the horizon", ppc_above, host_free, edge=above_edges,
+                       rnd=lambda r: free_case(r, r.choice(["up", "level"]))),
+    FreeCameraPickTest("the ray along the ground", ppc_ground, host_free, edge=ground_edges, rnd=lambda r: free_case(r, "slow")),
 ]

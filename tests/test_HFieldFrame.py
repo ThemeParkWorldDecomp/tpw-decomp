@@ -980,6 +980,60 @@ class FarZoomTest:
         return T.same_values(expected, got, "", False)
 
 
+# ----------------------------------------------------------------- the port's free camera, its low view
+
+# The port's fix freecam: with the Free camera on (gPortFreeCamera) and held low (gPortFreeLowView, below 25 degrees),
+# CMapWho::Render sets fog and RenderWindow draws the ground through DivideAndConquer, as first person does, so the
+# park is drawn out to the View distance. DivideAndConquer itself must then be the original's first-person one at that
+# distance, with "Zoom out further" (gPortFarZoom) on as well: the far zoom's whole-map walk is for fog off only. So
+# every case runs with fog on (display 0x2000), the three switches on in the host, and the PowerPC side's original
+# run is what it must match: the View distances the launcher offers, low cameras inside, on and outside the map
+# looking along the ground, and random cases.
+VIEW_DISTANCES = (60.0, 120.0, 230.0, 400.0, 1000.0)
+
+
+def free_low_edges():
+    for distance in VIEW_DISTANCES:
+        for extra in (0, 0x20):
+            yield divide_case(display=0x2000 | extra, distance=fb(distance))
+            for x, z, m02, m22 in ((40.0, 30.0, 0.0, 1.0), (40.0, 30.0, 1.0, 0.0), (40.0, 30.0, -0.7, -0.7),
+                                   (0.0, 0.0, 0.7, 0.7), (79.99, 59.99, -0.7, -0.7), (-60.0, 30.0, 1.0, 0.0),
+                                   (40.0, -45.0, 0.0, 1.0), (110.01, 30.0, -1.0, 0.0), (40.0, 200.0, 0.0, -1.0)):
+                yield with_view(divide_case(display=0x2000 | extra, distance=fb(distance)), x, z, m02, m22)
+    for w, h in ((1, 1), (127, 30), (30, 124), (96, 85)):
+        yield with_view(divide_case(w=w, h=h, display=0x2000, distance=fb(230.0)), 20.0, 20.0, 0.5, 0.5)
+
+
+def free_low_random(r):
+    c = divide_random(r)
+    c["display"] |= 0x2000
+    return c
+
+
+class FreeCameraLowTest:
+    name = "CHField::DivideAndConquer, port free camera low view"
+
+    def edge_cases(self):
+        return list(free_low_edges())
+
+    def random_case(self, r):
+        return free_low_random(r)
+
+    def run_case(self, runner, case):
+        switch = runner.lib.tpw_hf_free_low
+        switch.argtypes, switch.restype = [C.c_int32], C.c_int32
+        if switch(0) != 1:
+            return []   # built without the port fixes: there is no switch
+        runner.emu.reset_scratch()
+        expected = hf_ppc(runner.emu, case)
+        switch(1)
+        try:
+            got = hf_host(runner.lib, case)
+        finally:
+            switch(0)
+        return T.same_values(expected, got, "", False)
+
+
 # ----------------------------------------------------------------- the tests
 
 
@@ -990,6 +1044,7 @@ def setup(runner):
 TESTS = [FnTest("CHField::Prepare", hf_ppc, hf_host, edge=prepare_edges, rnd=prepare_random),
          FnTest("CHField::DivideAndConquer", hf_ppc, hf_host, edge=divide_edges, rnd=divide_random),
          FarZoomTest(),
+         FreeCameraLowTest(),
          FnTest("CGamut::GetVertices", hf_ppc, hf_host, edge=vertices_edges, rnd=vertices_random),
          FnTest("CTextureCache::Refresh", tc_ppc, tc_host, edge=refresh_edges, rnd=refresh_random),
          FnTest("CTextureCache::Execute", tc_ppc, tc_host, edge=execute_edges, rnd=execute_random)]

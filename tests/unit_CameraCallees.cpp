@@ -10,6 +10,7 @@
 #include "TPEngine.h"
 #include "ThingReceivers.h"
 #include "calllog.h"
+#include "keyboard.h"
 #include "keytable_actions.h"
 #include "m3d2.h"
 #include "platform/arena.h"

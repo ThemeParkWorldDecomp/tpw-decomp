@@ -375,6 +375,13 @@ int32_t tpw_hf_far_zoom(int32_t on) {
     return -1;
 }
 
+// Sets the port's free camera with its low view and the far zoom together (gPortFreeCamera, gPortFreeLowView,
+// gPortFarZoom, include/TPCamera.h) and answers 1; -1 when the library was built without the port fixes.
+int32_t tpw_hf_free_low(int32_t on) {
+    (void)on;
+    return -1;
+}
+
 }  // extern "C"
 
 // ---- The texture cache part ---------------------------------------------------------------

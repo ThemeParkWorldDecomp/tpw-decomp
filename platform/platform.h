@@ -91,6 +91,23 @@ struct Config {
     std::vector<ScriptedMove> moves;
     // A scripted right click (--rclick X,Y@N): as --click, with the right button.
     std::vector<ScriptedClick> rightClicks;
+    // A scripted wheel event (--wheel DX,DY@N): SDL's precise deltas DX and DY (fractions for a trackpad's) on pass N, at the
+    // pointer, as a real wheel event goes (the free camera's tpw::gPortWheel first, then the whole steps to the game).
+    struct ScriptedWheel {
+        int32_t pass;
+        float x, y;
+    };
+    std::vector<ScriptedWheel> wheels;
+    // A scripted camera drag (--cam-drag BUTTON:DX,DY@N[/K], BUTTON 0 left, 1 right, 2 middle): the button goes down on pass
+    // N as a real one does for tpw::gPortDragStart, moves DX, DY window pixels in K equal steps (default 8) on passes N + 1 to
+    // N + K, and comes up on pass N + K + 1; a button the camera does not take goes to the game as a click there.
+    struct ScriptedCamDrag {
+        int32_t pass;
+        int32_t button;
+        float dx, dy;
+        int32_t steps;
+    };
+    std::vector<ScriptedCamDrag> camDrags;
     // A scripted key (--key NAME@N: down on pass N, up on pass N + 1) or a held key (--hold NAME@N-M: down on pass N, up on
     // pass M), sent as a real key of that SDL scancode is (HandleTyping, the key state and the events' modifiers). NAME is
     // esc, return, space, tab, cmd, ctrl, shift, option or an SDL key name (a letter, a digit, "Delete", "F1").
@@ -298,6 +315,22 @@ inline bool (*gPortKeyTogether)(uint8_t macKeyCode) = nullptr;
 // UI_DevicePointerOut (UI_Base.h, pointerleave), set before the game starts. None: the pointer keeps its last place, as
 // on the Mac, where the game filled the screen.
 inline void (*gPortPointerLeft)() = nullptr;
+
+// The launcher's "Free camera" (gamework.cpp, include/PortFreeCamera.h), all set before the game starts; none, the
+// original's way. The wheel, before the whole-steps check: SDL's precise deltas as they come (they follow the system's
+// natural scrolling), whether either is fractional (a trackpad's), the Mac modifiers held at the event and the time in
+// milliseconds; true when the camera took it, and the game is not told.
+inline bool (*gPortWheel)(float x, float y, bool fractional, uint16_t macModifiers, uint64_t nowMs) = nullptr;
+// A button going down (0 left, 1 right, 2 middle) with the Mac modifiers: 0 the game's, 1 a drag of the camera's, 2 a
+// drag whose quick click (no further than a few pixels, within a quarter second) still goes to the game. During a drag the
+// run loop holds the mouse in relative mode and sends its moves (window pixels) to gPortDragMove, and the game is told
+// nothing; the drag ends at its button's key-up, at the focus loss, or when gPortDragGoing, asked at each pass, says no.
+inline int (*gPortDragStart)(int button, uint16_t macModifiers) = nullptr;
+inline void (*gPortDragMove)(float dx, float dy) = nullptr;
+inline bool (*gPortDragGoing)() = nullptr;
+inline void (*gPortDragEnd)() = nullptr;
+// A trackpad's pinch (SDL 3.4's SDL_EVENT_PINCH_UPDATE): the scale since the last update, above 1 spreading.
+inline void (*gPortPinch)(float scale) = nullptr;
 
 // The number of GDI handles (DCs, fonts, bitmaps) alive in gdi.cpp; the platform test checks that none leak.
 size_t GdiLiveHandles();

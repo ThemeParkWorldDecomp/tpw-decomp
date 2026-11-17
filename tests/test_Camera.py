@@ -588,6 +588,33 @@ class FarZoomTest(HandleCameraTest):
         return HandleCameraTest.run_case(self, runner, case)
 
 
+# ------------------------------------------------------------------ the free camera off (freecam, a port setting)
+
+# The launcher's "Free camera" (gPortFreeCamera, include/TPCamera.h) is off by default, and off the camera must be the
+# original's exactly. Each case runs first with the setting on and its input state dirty (Z and X held, a turn, a tilt, a
+# zoom and a move asked for: tpw_cam_free_camera in tests/unit_Camera.cpp), so the free camera's code runs and leaves its
+# state behind; then with the setting off and the state dirty again, and that run is compared with the original's, every
+# word. A build without the port's fixes has no setting and runs no case.
+
+
+def host_free_off(lib, case):
+    lib.tpw_cam_free_camera.argtypes = [C.c_int32, C.c_int32]
+    lib.tpw_cam_free_camera(1, 1)
+    try:
+        host(lib, case)
+    finally:
+        lib.tpw_cam_free_camera(0, 1)
+    return host(lib, case)
+
+
+class FreeCameraOffTest(HandleCameraTest):
+    def run_case(self, runner, case):
+        if not port_fix(runner.lib):
+            return []
+        return HandleCameraTest.run_case(self, runner, case)
+
+
 TESTS = [HandleCameraTest("HandleCamera", ppc, host, edge=edges, rnd=rnd), FnTest("SetLMatrixOrientationHi", ppc_orient, host_orient,
                                                                                   edge=orient_edges, rnd=orient_rnd),
-         FarZoomTest("HandleCamera far zoom", ppc_far, host_far, edge=far_edges, rnd=rnd)]
+         FarZoomTest("HandleCamera far zoom", ppc_far, host_far, edge=far_edges, rnd=rnd),
+         FreeCameraOffTest("HandleCamera free camera off", ppc, host_free_off, edge=edges, rnd=rnd)]

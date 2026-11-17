@@ -83,6 +83,11 @@ extern "C" int32_t tpw_pp_unitwidth(int32_t width) {
     (void)width;
     return 0;
 }
+// The free camera (freecam, gPortFreeCamera in include/TPCamera.h); returns 1, or 0 when the library is built without the port fixes.
+extern "C" int32_t tpw_pp_freecam(int32_t on) {
+    (void)on;
+    return 0;
+}
 extern "C" void tpw_pp_table(const uint32_t* words, int32_t n) {
     for (int32_t i = 0; i < n; ++i) reinterpret_cast<TPGlobals*>(gGlobalsStorage)->mSinTable[i] = FromBits(words[i]);
 }
