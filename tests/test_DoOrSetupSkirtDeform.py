@@ -267,11 +267,15 @@ def build(s, case):
             A[i] = s.alloc(0xA0)
         if nd["hasB"]:
             B[i] = s.alloc(0xA0)
+    # trees of different shapes pair a b node with an a node of fewer vertices, and the function reads the a node's vertices up to the
+    # b node's count, past the end of its own; every array has room for the case's largest count, so that read finds zeros on both
+    # sides (the host's allocator puts a header before each block where the emulator's packs them)
+    room = max((nd["n"] for nd in nodes), default=0) // 4 + 1
     for i, nd in enumerate(nodes):
         cnt = nd["n"]
         nblocks = cnt // 4 + 1
         if A[i]:
-            v = s.alloc(0x30 * nblocks)
+            v = s.alloc(0x30 * room)
             s.words(v, nd["averts"])
             s.words(A[i], [nd["aflags"]])
             s.words(A[i] + 0x10, nd["amat"])
@@ -280,7 +284,7 @@ def build(s, case):
             s.words(A[i] + 0x78, nd["abox"])
             blocks[("a", i)] = (v, nblocks)
         if B[i]:
-            v = s.alloc(0x30 * nblocks)
+            v = s.alloc(0x30 * room)
             s.words(v, nd["bverts"])
             s.words(B[i], [nd["bflags"]])
             s.words(B[i] + 0x10, nd["bmat"])
