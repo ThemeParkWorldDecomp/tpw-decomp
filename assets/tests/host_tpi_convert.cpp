@@ -789,6 +789,33 @@ Bytes SfxMap(const std::vector<std::vector<SfxEvent>>& categories) {
     return d;
 }
 
+// A park music bank (.sdt, tpi_lobby_music.h) of `count` whole MPEG-2 layer II entries of 100 bytes, and its map: one
+// event whose one sound names them all at `length` ms (assets/tests/host_tpi_lobby_music.cpp tests the choice itself).
+Bytes MusicBank(uint32_t count) {
+    Bytes d(4 + 4 * count, 0);
+    Put32(d, 0, count);
+    for (uint32_t i = 0; i < count; ++i) {
+        const size_t at = d.size();
+        Put32(d, 4 + 4 * i, static_cast<uint32_t>(at));
+        d.resize(at + 0x28 + 100, static_cast<uint8_t>(i));
+        Put32(d, at, 0x28);
+        Put32(d, at + 4, 100);
+        std::memcpy(&d[at + 8], "seg.mp2", 8);
+        Put32(d, at + 0x18, 22050 | 16 << 16 | 0x25 << 24);
+        d[at + 0x28] = 0xff;
+        d[at + 0x29] = 0xf5;
+    }
+    return d;
+}
+Bytes MusicMap(uint32_t count, uint32_t length) {
+    Bytes d = SfxMap({{{2, {{count, 0, 0x64, 0x64}}}}});
+    for (uint32_t i = 0; i < count; ++i) {
+        Put32(d, d.size() - 16 * (count - i), i + 1);
+        Put32(d, d.size() - 16 * (count - i) + 8, length);
+    }
+    return d;
+}
+
 void TestSfxPatch() {
     const std::vector<std::vector<SfxEvent>> layout = {
         {{114, {{3, 1, 0x05, 0x05}}}, {224, {{9, 0, 0x64, 0x64}, {2, 2, 0x64, 0x64}}}},
@@ -1033,6 +1060,10 @@ void TestConvertTree(const fs::path& scratch) {
     WriteFile(levels / "science" / "sound" / "cat_ambientSFX.map", ambient);
     WriteFile(levels / "science" / "sound" / "cat_ridesSFX.map", ambient);
     WriteFile(levels / "water" / "sound" / "cat_ambientSFX.map", ambient);
+    // Land of Invention's park music, four segments of 19.2 s: its lobby music is made of the first three. The other two
+    // worlds' music has no map (arabian's bank is not one either), so their lobby music stays the donor's.
+    WriteFile(levels / "science" / "Music" / "MusicHD.sdt", MusicBank(4));
+    WriteFile(levels / "science" / "Music" / "cat_musicSFX.map", MusicMap(4, 19200));
     RegisterTestTables();
     MakeDonorItems(dataRoot, "eur");
     // A second edition with the donor items spelt differently; the first game folder that has them is used.
@@ -1285,6 +1316,19 @@ void TestConvertTree(const fs::path& scratch) {
           SfxMap({{{114, {{3, 0, 0x05, 0x05}}}, {224, {{9, 0, 0x06, 0x06}}}}}));
     CHECK(ReadFile(out / "science" / "Sound" / "cat_ridesSFX.map") == ambient);
     CHECK(ReadFile(out / "water" / "Sound" / "cat_ambientSFX.map") == ambient);
+    // The island screen's music (tpi_lobby_music.h): Land of Invention's from its park music, the others the donor's.
+    {
+        const Bytes lobby = ReadFile(out / "science" / "Sound" / "LobbyMusicHD.sdt");
+        const Bytes music = MusicBank(4);
+        CHECK(lobby.size() == 16 + 3 * 140 && lobby[0] == 3 && std::equal(lobby.begin() + 16, lobby.end(), music.begin() + 20));
+        const Bytes events = ReadFile(out / "science" / "Sound" / "cat_locallobbymusicSFX.map");
+        CHECK(events.size() == 162 && events[52] == 1 && events[68] == 0x06 && events[69] == 0x02 && events[122] == 0x00 &&
+              events[123] == 0x4b);   // event 1, looping; the first sample's length 19200 (0x4b00)
+        CHECK(ReadFile(out / "science" / "Sound" / "cat_locallobbymusicBANK.map").size() == 60);
+        CHECK(ReadFile(out / "science" / "Music" / "MusicHD.sdt") == music);
+        CHECK(!fs::exists(a / "Sound" / "LobbyMusicHD.sdt") && !fs::exists(out / "water" / "Sound" / "LobbyMusicHD.sdt"));
+        CHECK(!fs::exists(out / "water" / "Sound" / "cat_locallobbymusicSFX.map"));
+    }
     // The world's .sam files.
     const std::string standard = S(ReadFile(a / "Standard.sam"));
     CHECK_EQ_STR(standard, "MapInfo.HeightfieldWidth 96\nFixedItemInfo.TicketBoothAPosX 40\nFixedItemInfo.TicketBoothBPosY 41\n"
@@ -1351,6 +1395,10 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(record.find("world arabian:") != std::string::npos);
     CHECK(record.find("Sound/cat_ambientSFX.map: event 224 volume 100 to 6\n") != std::string::npos);
     CHECK(record.find("left as it is") == std::string::npos);
+    CHECK(record.find("lobby music: park music group 1, samples 1 (seg.mp2, 19200 ms) 2 (seg.mp2, 19200 ms) 3 (seg.mp2, "
+                      "19200 ms)\n") != std::string::npos);
+    CHECK(record.find("lobby music: the donor's (the world has no Music/cat_musicSFX.map and Music/MusicHD.sdt)\n") !=
+          std::string::npos);
     CHECK(record.find("left out: obstacles/ (terrain.wad has no base.MD2)") != std::string::npos);
     CHECK(record.find("obstacle lake: before clearing, 1 nodes, 2 faces in the terrain; blocked cells: 1 made hidden, 0 hidden "
                       "already, 0 left open") !=

@@ -27,6 +27,8 @@
 //    the quads Theme Park Inc textured fully transparent under them are hidden;
 //  - sky, 2D map, scape, music and sounds are copied as they are, but for the few sounds tuned for the PC's 3D sound
 //    whose volume is lowered (kSfxPatches, tpi_sfx.h);
+//  - the island screen's music (Sound/LobbyMusicHD.sdt and its cat_locallobbymusic maps), which Theme Park Inc does
+//    not have, is made from three segments of the world's own park music (tpi_lobby_music.h);
 //  - the worlds' entertainers, costumes and costume heads come out of Theme Park Inc's esprites.wad as loose files
 //    under data/esprites/<world>/ (kSpriteGroups), which the game finds before its own esprites.wad; a world with two
 //    entertainers gets the first again under a new name, as the game takes three.
@@ -57,6 +59,7 @@
 #include "tpi_fsh.h"
 #include "tpi_island.h"
 #include "tpi_island_md2.h"
+#include "tpi_lobby_music.h"
 #include "tpi_names.h"
 #include "tpi_sam.h"
 #include "tpi_sfx.h"
@@ -1741,6 +1744,26 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
         }
         if (count)
             log.text << "    copied " << folder.out << "/ (" << count << " files)\n";
+    }
+    // The island screen's music, three segments of the world's own park music (tpi_lobby_music.h), in the place of the
+    // donor's; without them the donor's plays.
+    {
+        const Entry *map = levels.find(world + "/music/cat_musicsfx.map");
+        const Entry *bank = levels.find(world + "/music/musichd.sdt");
+        TpiLobbyMusic lobby;
+        std::string reason = "the world has no Music/cat_musicSFX.map and Music/MusicHD.sdt";
+        if (map != nullptr && bank != nullptr && BuildTpiLobbyMusic(levels.read(*map), levels.read(*bank), lobby, reason)) {
+            w.file("Sound/LobbyMusicHD.sdt", lobby.bank);
+            w.file("Sound/cat_locallobbymusicBANK.map", lobby.bankMap);
+            w.file("Sound/cat_locallobbymusicSFX.map", lobby.sfxMap);
+            log.text << "    lobby music: park music group " << lobby.picks.front().group << ", samples";
+            for (const TpiLobbyPick &p : lobby.picks)
+                log.text << " " << p.sample << " (" << p.name << ", " << p.length << " ms)";
+            log.text << "\n";
+            if (lobby.unusable != 0)
+                log.text << "    lobby music: " << lobby.unusable << " samples of the park music map have no whole bank entry\n";
+        } else
+            log.text << "    lobby music: the donor's (" << reason << ")\n";
     }
 
     // The world's own .sam files.
