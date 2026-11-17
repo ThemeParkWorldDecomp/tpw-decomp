@@ -659,7 +659,8 @@ const char* const kLakeBumper =
 
 void MakeWorld(const fs::path& levels, const std::string& world, const std::string& tct) {
     const fs::path w = levels / world;
-    WriteFile(w / "Standard.sam", B("MapInfo.HeightfieldWidth 96\nTicketBooth[0].PosX 40\nTicketBooth[1].PosY 41\nNumTicketBooths 2\n"));
+    WriteFile(w / "Standard.sam", B("MapInfo.HeightfieldWidth 96\nTicketBooth[0].PosX 40\nTicketBooth[1].PosY 41\nNumTicketBooths 2\n"
+                                    "#GoldenTicketLocal.Visitors\t\t7\n#GoldenTicketLocal.PeopleInPark\t\t7\n"));
     WriteFile(w / "global.sam", B("#Keys.CostToEnter 0\nParkInfo.AvailableFromStart 0\nParkName.GateObjectId 3601\nStaffPoolInfo.Size 3\n"));
     WriteFile(w / "Hoardings.sam", B("HoardingClicks[0].X 0\nHoardingClicks[0].Y 0\n"));
     WriteFile(w / "EndHoardings.sam", B("HoardingClicks[0].X 2\n"));
@@ -916,8 +917,35 @@ Bytes TpwSpriteWad() {
     return BuildTpiWad(wad);
 }
 
+// Each Theme Park World world's key cost (global.sam) and local golden ticket thresholds (Standard.sam, in the order
+// of the game's seven GoldenTicketLocal fields): made-up values. Hallow costs as many keys as jungle, with values of its
+// own, so the converter's choice of the first world (jungle) shows.
+struct TpwTickets {
+    const char* world;
+    int keys;
+    int32_t values[7];
+};
+const TpwTickets kTpwTickets[] = {{"jungle", 1, {300, 40, 60, 30, 2000, 250, 2}},
+                                  {"hallow", 1, {310, 41, 61, 31, 2100, 260, 2}},
+                                  {"fantasy", 3, {900, 80, 70, 60, 6000, 500, 3}},
+                                  {"space", 5, {1500, 120, 80, 90, 9000, 800, 4}}};
+const char* const kTicketFields[] = {"Visitors", "PeopleInPark", "Happiness", "AtLeastThisManyHappyPeople", "ProfitYear",
+                                     "RecentVisitors", "RecentVisitorMonths"};
+
+void MakeTpwTickets(const fs::path& dataRoot, const char* game) {
+    for (const TpwTickets& t : kTpwTickets) {
+        const fs::path levels = dataRoot / "assets" / game / "Theme Park Data" / "data" / "levels" / t.world;
+        std::string standard = "MapInfo.HeightfieldWidth 128\r\n# Golden tickets\r\n";
+        for (int i = 0; i < 7; ++i)
+            standard += std::string("GoldenTicketLocal.") + kTicketFields[i] + "\t\t\t" + std::to_string(t.values[i]) + "\r\n";
+        WriteFile(levels / "Standard.sam", B(standard));
+        WriteFile(levels / "global.sam", B("ParkName.GateObjectId 3601\r\nKeys.CostToEnter\t\t\t" + std::to_string(t.keys) + "\r\n"));
+    }
+}
+
 void MakeDonorItems(const fs::path& dataRoot, const char* game) {
     WriteFile(dataRoot / "assets" / game / "Theme Park Data" / "data" / "esprites.wad", TpwSpriteWad());
+    MakeTpwTickets(dataRoot, game);
     for (const char* donor : {"jungle", "hallow", "space"}) {
         const fs::path levels = dataRoot / "assets" / game / "Theme Park Data" / "data" / "levels" / donor;
         WriteFile(levels / "rides" / "mystery.wad", DonorWad(donor, "mystery"));
@@ -925,6 +953,45 @@ void MakeDonorItems(const fs::path& dataRoot, const char* game) {
         WriteFile(levels / "features" / "groundc.wad", DonorWad(donor, "groundc"));
         WriteFile(levels / "Advisor.wad", DonorWad(donor, "advisor"));
     }
+}
+
+// The seven local thresholds the game reads from a world's Standard.sam (the world's file loaded over data:levels:
+// Standard.sam, which has none, so a missing statement is 0): `all` when every one is there.
+struct LocalThresholds {
+    int32_t values[7] = {};
+    bool all = true;
+};
+LocalThresholds ReadThresholds(const std::string& standard) {
+    LocalThresholds t;
+    for (int i = 0; i < 7; ++i)
+        if (!TpiSamInteger(standard, "GoldenTicketLocal", kTicketFields[i], t.values[i])) {
+            t.values[i] = 0;
+            t.all = false;
+        }
+    return t;
+}
+
+// The turn each of the six local tickets comes on (-1: not within the play) under one made-up play, by the rules of
+// CGoldenTicketControl::CheckForLocal (src/game/park/GoldenTickets.cpp): a check every 100th turn, each ticket when its
+// measure is greater than its threshold (the happiness one with the visitors in the park greater than its count too,
+// the recent visitors one with the park older than its months too); the research ticket (3) has no threshold and does
+// not come in this play. The play: from the first check on, 25 visitors arrive each check, 6 more stay in the park each
+// check up to 400, the happiness climbs a point a check from 40 to 90, the profit of the year climbs 150 a check from
+// -3000, and a month is 10 checks.
+std::vector<int32_t> TicketTurns(const LocalThresholds& t) {
+    std::vector<int32_t> turns(6, -1);
+    const auto visitorsAt = [](int32_t check) { return 25 * check; };
+    for (int32_t check = 1; check <= 1000; ++check) {
+        const int32_t visitors = visitorsAt(check), inPark = std::min(6 * check, 400), happiness = std::min(40 + check, 90);
+        const int32_t profit = -3000 + 150 * check, months = check / 10;
+        // The visitors of the last N months (of this month so far for 0).
+        const int32_t recent = visitors - visitorsAt(t.values[6] > 0 ? std::max(check - 10 * t.values[6], 0) : 10 * months);
+        const bool earned[6] = {visitors > t.values[0], inPark > t.values[1], happiness > t.values[2] && inPark > t.values[3],
+                                false, profit > t.values[4], recent > t.values[5] && months > t.values[6]};
+        for (int i = 0; i < 6; ++i)
+            if (turns[i] < 0 && earned[i]) turns[i] = 100 * check;
+    }
+    return turns;
 }
 
 void TestConvertTree(const fs::path& scratch) {
@@ -946,6 +1013,7 @@ void TestConvertTree(const fs::path& scratch) {
                 "PeepHungerWeatherEffects[0].Snow 1.0\r\nPeepHappinessWeatherEffects[1].Rain -1.5\r\nUmbrellaModifier 1\r\n"));
     WriteFile(levels / "arabian" / "Standard.sam",
               B("MapInfo.HeightfieldWidth 96\nTicketBooth[0].PosX 40\nTicketBooth[1].PosY 41\nNumTicketBooths 2\n"
+                "#GoldenTicketLocal.Visitors\t\t7\n"
                 "WeatherEffects.QualityForHeatWaveHigh\t100\r\nWeatherEffects.QualityForHeatWaveLow\t\t95\r\n"));
     // Build animations (an item's "c" mesh): Arabian's bus has one and no script, its end has one and a script of its
     // own, and its carpet (a ride) has one and no script. Only the bus is given the feature script.
@@ -1219,7 +1287,12 @@ void TestConvertTree(const fs::path& scratch) {
     CHECK(ReadFile(out / "water" / "Sound" / "cat_ambientSFX.map") == ambient);
     // The world's .sam files.
     const std::string standard = S(ReadFile(a / "Standard.sam"));
-    CHECK_EQ_STR(standard, "MapInfo.HeightfieldWidth 96\nFixedItemInfo.TicketBoothAPosX 40\nFixedItemInfo.TicketBoothBPosY 41\n");
+    CHECK_EQ_STR(standard, "MapInfo.HeightfieldWidth 96\nFixedItemInfo.TicketBoothAPosX 40\nFixedItemInfo.TicketBoothBPosY 41\n"
+                           "#GoldenTicketLocal.Visitors\t\t7\n\n# Written by the Theme Park Inc converter.\n"
+                           "GoldenTicketLocal.Visitors\t\t1500\nGoldenTicketLocal.PeopleInPark\t\t120\n"
+                           "GoldenTicketLocal.Happiness\t\t80\nGoldenTicketLocal.AtLeastThisManyHappyPeople\t\t90\n"
+                           "GoldenTicketLocal.ProfitYear\t\t9000\nGoldenTicketLocal.RecentVisitors\t\t800\n"
+                           "GoldenTicketLocal.RecentVisitorMonths\t\t4\n");
     // Theme Park Inc's visitor types and weather effects, for the mod's generations (include/TpiGenerations.h), as they are.
     const std::string peepsHeader =
         "# TPI Worlds and Rides: Theme Park Inc's visitor types and weather effects, from the player's copy\n"
@@ -1238,6 +1311,38 @@ void TestConvertTree(const fs::path& scratch) {
         CHECK(cost >= 1 && cost <= 5);
     }
     CHECK(TpiSamInteger(global, "Tickets", "CanEarnTicketsInTheme", id) && id == 1);
+    // Golden tickets: each world's Standard.sam holds the local thresholds of the Theme Park World world of the same key
+    // cost (Invention 1: jungle, the first of the two; Polar 3: fantasy; Arabian 5: space), so its tickets come at that
+    // world's pace under the same play; with Theme Park Inc's own lines (all commented out) every threshold was 0 and the
+    // tickets came at the first checks.
+    const std::string convertedRecord = S(ReadFile(dataRoot / "assets" / "tpi" / "converted.txt"));
+    for (const auto& [world, tpwWorld] : {std::pair{"arabian", "space"}, std::pair{"water", "fantasy"}, std::pair{"science", "jungle"}}) {
+        const TpwTickets* want = nullptr;
+        for (const TpwTickets& t : kTpwTickets)
+            if (std::string(t.world) == tpwWorld) want = &t;
+        const std::string converted = S(ReadFile(out / world / "Standard.sam"));
+        const std::string tpw = S(ReadFile(dataRoot / "assets" / "eur" / "Theme Park Data" / "data" / "levels" / tpwWorld / "Standard.sam"));
+        const LocalThresholds got = ReadThresholds(converted);
+        CHECK(got.all);
+        for (int i = 0; i < 7; ++i) CHECK(got.values[i] == want->values[i]);
+        const std::vector<int32_t> pace = TicketTurns(got), tpwPace = TicketTurns(ReadThresholds(tpw));
+        CHECK(pace == tpwPace);
+        CHECK(convertedRecord.find(std::string("Standard.sam: golden ticket thresholds of the ") + tpwWorld + " world (" +
+                                   std::to_string(want->keys) + " keys to enter, as this world)") != std::string::npos);
+        std::printf("  tickets %s (as %s): turns", world, tpwWorld);
+        for (int32_t turn : pace) std::printf(" %d", turn);
+        std::printf("; with no thresholds:");
+        for (int32_t turn : TicketTurns(ReadThresholds(S(ReadFile(levels / world / "Standard.sam"))))) std::printf(" %d", turn);
+        std::printf("\n");
+    }
+    // The pace test itself: the same play in a world with no thresholds gives the visitor, park and happiness tickets
+    // at the first check and the others as soon as the profit or the months are above 0, and the three tiers give
+    // theirs later the dearer the world.
+    const std::vector<int32_t> unset = TicketTurns(ReadThresholds("MapInfo.HeightfieldWidth 96\n#GoldenTicketLocal.Visitors 7\n"));
+    CHECK(unset == std::vector<int32_t>({100, 100, 100, -1, 2100, 1100}));
+    const std::vector<int32_t> one = TicketTurns(ReadThresholds(S(ReadFile(out / "science" / "Standard.sam"))));
+    const std::vector<int32_t> five = TicketTurns(ReadThresholds(S(ReadFile(out / "arabian" / "Standard.sam"))));
+    for (size_t i : {0, 1, 2, 4, 5}) CHECK(unset[i] < one[i] && one[i] < five[i]);
     CHECK(global.find("StaffPoolInfo") == std::string::npos && global.find("AvailableFromStart") == std::string::npos);
     CHECK_EQ_STR(S(ReadFile(a / "Hoardings.sam")), "HoardingClicks[0].X 0\nHoardingClicks[0].Y 0\n");
     CHECK_EQ_STR(S(ReadFile(a / "EndHoardings.sam")), "HoardingClicks[0].X 2\n");
@@ -1351,6 +1456,26 @@ void TestConvertTree(const fs::path& scratch) {
     std::printf("  convert (no advisor): %s\n", reason.c_str());
     CHECK(reason.find("jungle world") != std::string::npos && reason.find("advisor.wad") != std::string::npos);
     CHECK(fs::exists(a / "rides" / "carpet" / "carpet.sam"));
+    MakeDonorItems(dataRoot, "eur");
+    // No world costing 3 keys (fantasy's thresholds gone, and the us edition's too): Polar Zone has no thresholds to
+    // take, so the conversion is refused rather than giving its tickets away again.
+    for (const char* game : {"eur", "us"}) {
+        MakeDonorItems(dataRoot, game);
+        WriteFile(dataRoot / "assets" / game / "Theme Park Data" / "data" / "levels" / "fantasy" / "Standard.sam",
+                  B("MapInfo.HeightfieldWidth 128\r\nGoldenTicketLocal.Visitors 900\r\n"));
+    }
+    CHECK(!ConvertTpi(disc, dataRoot, reason));
+    std::printf("  convert (no 3 key thresholds): %s\n", reason.c_str());
+    CHECK(reason.find("costing 3 keys") != std::string::npos && reason.find("Polar Zone") != std::string::npos &&
+          reason.find("import Theme Park World first") != std::string::npos);
+    CHECK(fs::exists(a / "rides" / "carpet" / "carpet.sam"));
+    // The second edition with them whole is used when the first has them only in part.
+    MakeDonorItems(dataRoot, "us");
+    CHECK(ConvertTpi(disc, dataRoot, reason));
+    CHECK(TpiSamInteger(S(ReadFile(out / "water" / "Standard.sam")), "GoldenTicketLocal", "ProfitYear", id) && id == 6000);
+    CHECK(S(ReadFile(dataRoot / "assets" / "tpi" / "converted.txt")).find("thresholds of the fantasy world (3 keys to enter, as this world) from " +
+                                                                           tpw::PathText(dataRoot / "assets" / "us")) != std::string::npos);
+    fs::remove_all(dataRoot / "assets" / "us", ec);
     MakeDonorItems(dataRoot, "eur");
     // A copy with a world missing is refused and leaves the old output in place.
     fs::remove_all(levels / "science", ec);

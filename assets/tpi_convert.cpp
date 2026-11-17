@@ -17,7 +17,8 @@
 //    the advisor, are copied from the donor world in the player's own Theme Park World data under <dataRoot>/assets
 //    (kDonorItems); nothing of Theme Park Inc's advisor is used;
 //  - the world's own .sam files (Standard, global, Hoardings, EndHoardings) are filtered the same way, with the
-//    few renamed statements and the lobby settings the mod needs (free entry, tickets);
+//    few renamed statements and the lobby settings the mod needs (key cost, tickets), and the local golden ticket
+//    thresholds of the Theme Park World world of the same key cost, from the player's own data (TicketThresholds);
 //  - the world wads (terrain, sharetex, ssharete, dynamic, queue, miscmesh, hoarding) are rebuilt stored
 //    (tpi_wad.h), the terrain's .tct named after the world; the world's obstacles (obstacles/*.wad: the lake, the
 //    bridges, the tunnels, the rocks, which a Theme Park Inc player paid to clear) become fixed scenery of the terrain,
@@ -1126,6 +1127,58 @@ void CopyDonorItems(const fs::path &assets, const WorldSpec &spec, Writer &w, Lo
     }
 }
 
+// ---- golden tickets: the world's local thresholds
+//
+// The game gives a park's six local golden tickets (CGoldenTicketControl::CheckForLocal, every 100th turn) when the
+// park's measures pass the GoldenTicketLocal.* values, which Theme Park World sets in each world's own Standard.sam
+// (data:levels:Standard.sam, loaded fresh before it, has none). Theme Park Inc's world files have these lines commented
+// out and its game never read them (its tickets came from its missions), so a converted world kept them all at 0 and
+// gave its tickets, and with them keys for every island, at the first checks. Each world takes the thresholds of the
+// Theme Park World world that costs as many keys to enter (jungle 1, fantasy 3, space 5), from the player's own data.
+const char *const kTicketFields[] = {"Visitors",   "PeopleInPark",   "Happiness",          "AtLeastThisManyHappyPeople",
+                                     "ProfitYear", "RecentVisitors", "RecentVisitorMonths"};
+const char *const kTpwWorlds[] = {"jungle", "hallow", "fantasy", "space"};
+
+std::string ReadText(const fs::path &path) {
+    if (path.empty())
+        return {};
+    std::ifstream in(path, std::ios::binary);
+    return std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+}
+
+// The GoldenTicketLocal.* statements for `spec`'s Standard.sam, from the first edition under <dataRoot>/assets whose
+// world of the same key cost has all seven.
+std::vector<std::string> TicketThresholds(const fs::path &assets, const WorldSpec &spec, Log &log) {
+    for (const char *game : kGameFolders)
+        for (const char *tpwWorld : kTpwWorlds) {
+            const fs::path levels = FindNoCase(assets / fs::u8path(game), std::string("data/levels/") + tpwWorld);
+            if (levels.empty())
+                continue;
+            int32_t cost = 0;
+            if (!TpiSamInteger(ReadText(FindNoCase(levels, "global.sam")), "Keys", "CostToEnter", cost) || cost != spec.keys)
+                continue;
+            const fs::path standard = FindNoCase(levels, "Standard.sam");
+            const std::string text = ReadText(standard);
+            std::vector<std::string> lines;
+            std::string values;
+            for (const char *field : kTicketFields) {
+                int32_t value = 0;
+                if (!TpiSamInteger(text, "GoldenTicketLocal", field, value))
+                    break;
+                lines.push_back(std::string("GoldenTicketLocal.") + field + "\t\t" + std::to_string(value));
+                values += std::string(values.empty() ? "" : ", ") + field + " " + std::to_string(value);
+            }
+            if (lines.size() != std::size(kTicketFields))
+                continue;
+            log.text << "    Standard.sam: golden ticket thresholds of the " << tpwWorld << " world (" << spec.keys
+                     << " keys to enter, as this world) from " << tpw::PathText(standard) << ": " << values << "\n";
+            return lines;
+        }
+    Fail(std::string("no Theme Park World world costing ") + std::to_string(spec.keys) +
+         " keys to enter with its golden ticket thresholds (GoldenTicketLocal.* in <data folder>/assets/<edition>/Theme Park "
+         "Data/data/levels/<world>/Standard.sam) for " + spec.display + ": import Theme Park World first");
+}
+
 // ---- sprites: the entertainers and their costumes
 //
 // The game takes a world's entertainers, costumes and costume heads from "<theme>\<group>\*.ESP", the theme being the
@@ -1696,6 +1749,7 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
                        {"TicketBooth[0].PosY", "FixedItemInfo.TicketBoothAPosY"},
                        {"TicketBooth[1].PosX", "FixedItemInfo.TicketBoothBPosX"},
                        {"TicketBooth[1].PosY", "FixedItemInfo.TicketBoothBPosY"}};
+    standard.append = TicketThresholds(assets, spec, log);
     w.text("Standard.sam", FilterWorldSam(levels, world, "Standard.sam", TableFor("standard.sam", tables), standard, log));
     w.text("TpiPeeps.sam", TpiPeepsSam(levels, world, log));
     if (!lakeSam.empty())
