@@ -80,6 +80,7 @@ CFSOnlineCity* ReturnCityInfo(CFSOnlineSystemCityList* list, int32_t city) {
 }  // namespace park_info_callee
 
 
+
 // 0x101783a4 (60): the same for the city list.
 void PostLoginCallbackFn_City(int32_t error, const void* context) {
     CFSOnlineSystemList<TbPtrList<CFSOnlineCity>, ccCityList>* list =
