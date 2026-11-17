@@ -16,6 +16,9 @@
 //   - the normal camera tilted 35 degrees over Land of Invention: the footprint stops near 230, as in the original;
 //   - the free camera there: the far corner's cell is in view, and the far plane reaches past 1000;
 //   - the free camera from 96 places, headings and tilts: every cell the normal camera draws is drawn too.
+// The island screen's own camera (gPortExternalView) is not the park's: with the Free camera on it finds the normal
+// camera's cells and far planes, bit for bit, in first person (after an island was clicked; the sea went flat there in
+// a 0.5.6 test build) and in the park view's way (before), and back in the park the free camera's are found again.
 // The launcher's Draw distance (drawdist, include/TPCamera.h PortDrawSpaceFor, src/engine/tb_hfield.cpp): Original by
 // default, the original's view distances and fog spaces bit for bit and the far plane 1000; Farther half as far again
 // and Whole world out to the map's far corner, with the far plane past it.
@@ -379,6 +382,34 @@ int main() {
             }
         }
         Check(missed == 0, "free camera, park views: the normal camera's cells are drawn", missed);
+    }
+    // The island screen's camera (gPortExternalView, set by HandleCamera, which also ends the low view there) with the
+    // Free camera on: the normal camera's cells and far planes, bit for bit, in first person and in the park view's way.
+    {
+        SetFree(false);
+        SetCamera(15.0f, 25.0f, 15.0f, heading, -5.0f * kPi / 180.0f);
+        const Result normal = Run(CDisplay::kEnableFog, 700.0f);
+        const SGamutQuads normalCells = *Field().QuadRows();
+        SetCamera(15.0f, 120.0f, 15.0f, heading, -35.0f * kPi / 180.0f);
+        const GamutResult normalView = RunGamut();
+        SetFree(true);
+        gPortFreeLowView = false;
+        gPortExternalView = true;
+        Check(!PortFreeCameraDraws(), "island screen: the Free camera's drawing changes are off");
+        SetCamera(15.0f, 25.0f, 15.0f, heading, -5.0f * kPi / 180.0f);
+        const Result r = Run(CDisplay::kEnableFog, 700.0f);
+        Check(r.testFar == normal.testFar && r.drawFar == normal.drawFar && !r.cornerInView &&
+                  std::memcmp(Field().QuadRows(), &normalCells, sizeof normalCells) == 0,
+              "island screen, first person: the normal camera's cells and far planes", r.drawFar);
+        SetCamera(15.0f, 120.0f, 15.0f, heading, -35.0f * kPi / 180.0f);
+        const GamutResult view = RunGamut();
+        Check(view.drawFar == normalView.drawFar && std::memcmp(&view.cells, &normalView.cells, sizeof view.cells) == 0,
+              "island screen, park view: the normal camera's cells and far plane", view.drawFar);
+        // Back in the park (HandleCamera clears it): the free camera's footprint again.
+        gPortExternalView = false;
+        Check(PortFreeCameraDraws(), "back in the park: the Free camera's drawing changes are on");
+        const GamutResult back = RunGamut();
+        Check(back.cornerInView, "back in the park, park view: the far corner is in view");
     }
     // The normal camera again after the free one: the original's.
     SetFree(false);
