@@ -108,6 +108,17 @@ struct Config {
         int32_t steps;
     };
     std::vector<ScriptedCamDrag> camDrags;
+    // A scripted gamepad (--pad ACTION@N): on pass N, "attach" plugs in a virtual gamepad of SDL's standard layout (and opens
+    // SDL's gamepad subsystem if the game has not), "detach" unplugs it, AXIS=VALUE sets one of its axes (leftx, lefty,
+    // rightx, righty, lt, rt; -32768 to 32767) and BUTTON=1 or BUTTON=0 presses or releases one of its buttons (a, b, x, y,
+    // back, start, lb, rb, l3, r3, up, down, left, right); its events come through SDL's event queue as a real pad's do.
+    struct ScriptedPad {
+        int32_t pass;
+        int32_t kind;    // 0 attach, 1 detach, 2 an axis, 3 a button
+        int32_t index;   // the SDL axis or button
+        int32_t value;
+    };
+    std::vector<ScriptedPad> pads;
     // A scripted key (--key NAME@N: down on pass N, up on pass N + 1) or a held key (--hold NAME@N-M: down on pass N, up on
     // pass M), sent as a real key of that SDL scancode is (HandleTyping, the key state and the events' modifiers). NAME is
     // esc, return, space, tab, cmd, ctrl, shift, option or an SDL key name (a letter, a digit, "Delete", "F1").
@@ -331,6 +342,14 @@ inline bool (*gPortDragGoing)() = nullptr;
 inline void (*gPortDragEnd)() = nullptr;
 // A trackpad's pinch (SDL 3.4's SDL_EVENT_PINCH_UPDATE): the scale since the last update, above 1 spreading.
 inline void (*gPortPinch)(float scale) = nullptr;
+// The launcher's "Gamepad", under Free camera (gamework.cpp, include/PortFreeCamera.h), set before the game starts: with
+// them the run loop opens SDL's gamepad subsystem and every gamepad connected, at the start or later, and sends their axes
+// (SDL_GamepadAxis, the level -32768 to 32767, a trigger's 0 to 32767) and buttons (SDL_GamepadButton, down or up) in SDL's
+// standard layout; gPortPadGone when one is unplugged or the game loses the focus (the levels go to 0, the buttons up).
+// None: no gamepad subsystem, the original's way.
+inline void (*gPortPadAxis)(int axis, int16_t value) = nullptr;
+inline bool (*gPortPadButton)(int button, bool down) = nullptr;
+inline void (*gPortPadGone)() = nullptr;
 
 // The number of GDI handles (DCs, fonts, bitmaps) alive in gdi.cpp; the platform test checks that none leak.
 size_t GdiLiveHandles();
