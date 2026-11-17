@@ -17,21 +17,27 @@
 //    or '@') is drawn posed as its animations leave it at their last frames: the deck raised, unfolded and turned
 //    flat (compressed morphs, the place along a shape, rotation and scale keys); one whose animations move most of it
 //    otherwise (the cliff, the rock, the swamp, the gates) is drawn as it is before clearing. The clearing crew, the
-//    site props and the markers are left out. Its nodes are added to base.MD2 under its root. The cells nothing may be
-//    built on are those of its .sam's Obstacle.AfterShape (the cleared state) when it is drawn cleared, else of its
-//    Info.Shape, placed at Obstacle.ShapeOffsetX/Y; its closed cells that the mesh covers at ground level become
-//    hidden quads, which the map takes as cells nothing goes on (src/game/park/TPHField.cpp HFieldCellStatus answers
-//    0 for them, and src/game/park/MapCell.cpp CMapCell::Reset makes such a cell mode 7), as it does Theme Park
-//    World's own scenery. Those quads are drawn again as geometry a little below the obstacle (Theme Park Inc drew the
-//    ground under it), so the seams at the obstacle's edge show ground, not the clear colour. A bridge's walkway cells
-//    over the river (its cleared shape's ',' and '@' cells, whose quads Theme Park Inc gave the deck's walking height
-//    and a fully transparent texture, and an open '.' cell beside one whose quad is such a quad too: the ramp down at a
-//    walkway's end) keep their hidden quads, so the deck alone is drawn there, and base.map gives them attribute 0x80
-//    alone, as Lost Kingdom's footbridge has: the map takes them as footbridge cells (CMapCell::Reset, mode 0x1e), which
-//    guests cross at the deck's height on their way to something and nothing is built on. A cleared tunnel's walkway
-//    cells (drawn without what moves, its cleared shape's ',' and '@' cells over shown quads: the passage's floor) are
-//    made footbridge cells the same way: their quads are hidden and drawn again as geometry at their own height (no
-//    lower), with their own texture, and base.map gives them attribute 0x80 alone.
+//    site props and the markers are left out. Its nodes are added to base.MD2 under its root, whose place the shape's
+//    offset gives and whose turn is kept (Polar Zone's swamp is modelled standing up and laid flat by its root's
+//    quarter turn about x; before converter 22 the turn was dropped too and it stood under the ground). The cells
+//    nothing may be built on are those of its .sam's Obstacle.AfterShape (the cleared state) when it is drawn
+//    cleared, else of its Info.Shape, placed at Obstacle.ShapeOffsetX/Y; its closed cells that the mesh covers at
+//    ground level become hidden quads, which the map takes as cells nothing goes on (src/game/park/TPHField.cpp
+//    HFieldCellStatus answers 0 for them, and src/game/park/MapCell.cpp CMapCell::Reset makes such a cell mode 7),
+//    as it does Theme Park World's own scenery. A closed cell over a hollow the mesh makes below the ground (Polar
+//    Zone's swamp: its bowl and its water lie under the ground, its rim on it) is hidden too, when the samples covered
+//    at ground level and those whose highest geometry lies under the ground make a covered cell between them
+//    (PitCoverage). Those quads are drawn again as geometry a little below the obstacle (Theme Park Inc drew the ground
+//    under it), so the seams at the obstacle's edge show ground, not the clear colour; a quad hidden over a hollow is
+//    not, as it would cover the hollow. A bridge's walkway cells over the river (its cleared shape's ',' and '@' cells,
+//    whose quads Theme Park Inc gave the deck's walking height and a fully transparent texture, and an open '.' cell
+//    beside one whose quad is such a quad too: the ramp down at a walkway's end) keep their hidden quads, so the deck
+//    alone is drawn there, and base.map gives them attribute 0x80 alone, as Lost Kingdom's footbridge has: the map
+//    takes them as footbridge cells (CMapCell::Reset, mode 0x1e), which guests cross at the deck's height on their way
+//    to something and nothing is built on. A cleared tunnel's walkway cells (drawn without what moves, its cleared
+//    shape's ',' and '@' cells over shown quads: the passage's floor) are made footbridge cells the same way: their
+//    quads are hidden and drawn again as geometry at their own height (no lower), with their own texture, and base.map
+//    gives them attribute 0x80 alone.
 // A shape's rows run from the highest map y down: the first row is at Obstacle.ShapeOffsetY plus the row count less one,
 // the last at Obstacle.ShapeOffsetY (Polar Zone's tunnel's walkway cells lie on the floor of its cutting only so; checked
 // against every obstacle of the three worlds, notes/tpi-worlds.md).
@@ -41,8 +47,8 @@
 // that a new park does not start with, as an opening gate's rule: the tunnel looks closed until its land is bought.
 // An obstacle that clears once its land is bought (kTpiClearsOnLand: Arabian Nights' rock and cliff, Polar Zone's
 // swamp) is drawn before clearing as any other, and each of its nodes is named "tpishut X Y W H M", M the cells whose
-// quads it hid (TpiShutName's mask), or "tpishut X Y W H" when it hid none; the game's hook hides its nodes and shows
-// those quads again once the park owns such a cell.
+// quads it hid (TpiShutName's mask: the swamp's 174 of its 224), or "tpishut X Y W H" when it hid none; the game's hook
+// hides its nodes and shows those quads again once the park owns such a cell.
 // An obstacle drawn before clearing that opens by itself once its objective is met (Obstacle.OpenedAutomaticly 1: Land
 // of Invention's gate) is drawn closed and closes only its cleared shape's closed cells (the posts), which become hidden
 // quads whatever covers them; the marker is left out, so the passage between the posts is ground. Each leaf (a shown
@@ -120,13 +126,14 @@ struct TpiObstacleReport {
 // The name an opening gate's leaf takes in the terrain: "tpigate X Y W H" (the gate's footprint: its first cell and its
 // size in cells; the gate opens once the park owns one of them or a cell next to them), then the leaf's closed and open
 // orientations as two quaternions (x y z w), each number as short as "%.4f" gives it without trailing zeros. Empty when
-// it would not fit the 63 characters a node name has in the converter's own reader.
+// it would be longer than 63 characters.
 std::string TpiGateLeafName(int x, int y, int w, int h, const float closed[4], const float open[4]);
 
 // The name a node shown only until an obstacle's land is bought takes in the terrain: "tpishut X Y W H" (the obstacle's
 // footprint, as a gate's), then, for an obstacle that clears, a space and the footprint's cells whose quads it hid, row
 // by row from (X, Y), four to a hexadecimal digit, the first cell of the four its lowest bit (`hid`, W x H of them, or
-// nullptr for none). Empty when it would not fit the 63 characters a node name has in the converter's own reader.
+// nullptr for none). Empty when the mask would hold more cells than the game reads (4 x 63, include/TpiObstacleShut.h
+// kTpiShutMaxCells: Polar Zone's swamp has 224), or, with no mask, when it would be longer than 63 characters.
 std::string TpiShutName(int x, int y, int w, int h, const std::vector<bool>* hid);
 
 bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<TpiObstacle>& obstacles,

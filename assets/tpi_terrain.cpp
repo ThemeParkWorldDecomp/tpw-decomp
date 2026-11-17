@@ -54,6 +54,8 @@ constexpr size_t kMaxName = 19;            // a texture name's characters (the m
 // beyond them).
 constexpr int32_t kTpiClearsOnLand[] = {3700, 3702, 2700};
 constexpr uint32_t kRecord = 0xa0, kMiniRecord = 0x58;
+// The most cells a "tpishut" name's mask may hold: the game's include/TpiObstacleShut.h kTpiShutMaxCells.
+constexpr size_t kShutMaxCells = 4 * 63;
 
 uint16_t L16(const Bytes& d, size_t at) { return static_cast<uint16_t>(d[at] | (d[at + 1] << 8)); }
 uint32_t L32(const Bytes& d, size_t at) {
@@ -113,20 +115,12 @@ bool ReadGrid(const Bytes& d, Grid& g, std::string& err) {
     return true;
 }
 
-// The number of samples of each quad that the nodes' geometry covers seen from above (x z), row by row. With `heights`
-// (the grid points' heights) only geometry from kGroundBelow below the ground to kGroundAbove above it counts.
-std::vector<int> Coverage(const Md2Model& model, const Grid& g, const std::vector<float>* heights) {
+// Calls `hit(sample, x, z, y)` for each sample (row by row, kSamples x kSamples to a quad) a face of the nodes covers
+// seen from above (x z), with the face's height there (NaN when the face is seen edge on).
+template <typename Hit>
+void RasterFaces(const Md2Model& model, const Grid& g, Hit&& hit) {
     const int sw = static_cast<int>(g.w) * kSamples, sh = static_cast<int>(g.h) * kSamples;
-    std::vector<uint8_t> hit(static_cast<size_t>(sw) * sh, 0);
     const std::vector<Matrix> world = WorldMatrices(model);
-    auto ground = [&](float x, float z) {
-        const float gx = std::clamp((x - g.ox) / g.cx, 0.0f, static_cast<float>(g.w));
-        const float gz = std::clamp((z - g.oz) / g.cz, 0.0f, static_cast<float>(g.h));
-        const uint32_t i = std::min(static_cast<uint32_t>(gx), g.w - 1), j = std::min(static_cast<uint32_t>(gz), g.h - 1);
-        const float fx = gx - static_cast<float>(i), fz = gz - static_cast<float>(j);
-        auto at = [&](uint32_t a, uint32_t b) { return (*heights)[static_cast<size_t>(b) * (g.w + 1) + a]; };
-        return (at(i, j) * (1 - fx) + at(i + 1, j) * fx) * (1 - fz) + (at(i, j + 1) * (1 - fx) + at(i + 1, j + 1) * fx) * fz;
-    };
     for (size_t n = 0; n < model.nodes.size(); ++n) {
         const Md2Node& node = model.nodes[n];
         for (const Md2Face& face : node.faces) {
@@ -156,24 +150,70 @@ std::vector<int> Coverage(const Md2Model& model, const Grid& g, const std::vecto
                     const bool neg = d0 < 0 || d1 < 0 || d2 < 0, pos = d0 > 0 || d1 > 0 || d2 > 0;
                     if (neg && pos)
                         continue;
-                    if (heights != nullptr) {
-                        // The face's height at the sample (d0, d1 and d2 weigh the corners opposite their edges).
-                        const float sum = d0 + d1 + d2;
-                        if (sum == 0)
-                            continue;
-                        const float y = (d1 * p[0].y + d2 * p[1].y + d0 * p[2].y) / sum, floor = ground(x, z);
-                        if (y < floor - kGroundBelow || y > floor + kGroundAbove)
-                            continue;
-                    }
-                    hit[static_cast<size_t>(sz) * sw + sx] = 1;
+                    // The face's height at the sample (d0, d1 and d2 weigh the corners opposite their edges).
+                    const float sum = d0 + d1 + d2;
+                    const float y = sum == 0 ? std::numeric_limits<float>::quiet_NaN()
+                                             : (d1 * p[0].y + d2 * p[1].y + d0 * p[2].y) / sum;
+                    hit(static_cast<size_t>(sz) * sw + sx, x, z, y);
                 }
         }
     }
+}
+
+// The height field's height at (x, z), between its grid points' heights.
+float GroundAt(const Grid& g, const std::vector<float>& heights, float x, float z) {
+    const float gx = std::clamp((x - g.ox) / g.cx, 0.0f, static_cast<float>(g.w));
+    const float gz = std::clamp((z - g.oz) / g.cz, 0.0f, static_cast<float>(g.h));
+    const uint32_t i = std::min(static_cast<uint32_t>(gx), g.w - 1), j = std::min(static_cast<uint32_t>(gz), g.h - 1);
+    const float fx = gx - static_cast<float>(i), fz = gz - static_cast<float>(j);
+    auto at = [&](uint32_t a, uint32_t b) { return heights[static_cast<size_t>(b) * (g.w + 1) + a]; };
+    return (at(i, j) * (1 - fx) + at(i + 1, j) * fx) * (1 - fz) + (at(i, j + 1) * (1 - fx) + at(i + 1, j + 1) * fx) * fz;
+}
+
+// The samples of each quad that are set, row by row.
+std::vector<int> PerQuad(const std::vector<uint8_t>& set, const Grid& g) {
+    const int sw = static_cast<int>(g.w) * kSamples, sh = static_cast<int>(g.h) * kSamples;
     std::vector<int> count(static_cast<size_t>(g.w) * g.h, 0);
     for (int sz = 0; sz < sh; ++sz)
         for (int sx = 0; sx < sw; ++sx)
-            count[static_cast<size_t>(sz / kSamples) * g.w + sx / kSamples] += hit[static_cast<size_t>(sz) * sw + sx];
+            count[static_cast<size_t>(sz / kSamples) * g.w + sx / kSamples] += set[static_cast<size_t>(sz) * sw + sx];
     return count;
+}
+
+// The number of samples of each quad that the nodes' geometry covers seen from above (x z), row by row. With `heights`
+// (the grid points' heights) only geometry from kGroundBelow below the ground to kGroundAbove above it counts.
+std::vector<int> Coverage(const Md2Model& model, const Grid& g, const std::vector<float>* heights) {
+    std::vector<uint8_t> hit(static_cast<size_t>(g.w) * kSamples * g.h * kSamples, 0);
+    RasterFaces(model, g, [&](size_t sample, float x, float z, float y) {
+        if (heights != nullptr) {
+            if (std::isnan(y))
+                return;
+            const float floor = GroundAt(g, *heights, x, z);
+            if (y < floor - kGroundBelow || y > floor + kGroundAbove)
+                return;
+        }
+        hit[sample] = 1;
+    });
+    return PerQuad(hit, g);
+}
+
+// The number of samples of each quad where the nodes' highest geometry lies below the ground (more than kGroundBelow
+// under it), row by row: where the obstacle is a hollow in the ground (Polar Zone's swamp, a pit whose rim is the
+// ground's), which shows only through a hidden quad.
+std::vector<int> PitCoverage(const Md2Model& model, const Grid& g, const std::vector<float>& heights) {
+    const size_t samples = static_cast<size_t>(g.w) * kSamples * g.h * kSamples;
+    std::vector<float> top(samples, -std::numeric_limits<float>::infinity());
+    std::vector<float> floor(samples, 0.0f);
+    RasterFaces(model, g, [&](size_t sample, float x, float z, float y) {
+        if (std::isnan(y))
+            return;
+        top[sample] = std::max(top[sample], y);
+        floor[sample] = GroundAt(g, heights, x, z);
+    });
+    std::vector<uint8_t> pit(samples, 0);
+    for (size_t i = 0; i < samples; ++i)
+        pit[i] = std::isfinite(top[i]) && top[i] < floor[i] - kGroundBelow;
+    return PerQuad(pit, g);
 }
 
 // The hidden quads that nothing covers, the terrain's own geometry or an obstacle's: they show the clear colour.
@@ -546,6 +586,7 @@ std::string TpiShutName(int x, int y, int w, int h, const std::vector<bool>* hid
                 if ((*hid)[at + k]) digit |= 1 << k;
             name += "0123456789abcdef"[digit];
         }
+        return hid->size() <= kShutMaxCells ? name : std::string();
     }
     return name.size() <= 63 ? name : std::string();
 }
@@ -635,6 +676,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
     const size_t terrainTextures = base.textures.size();
     std::vector<bool> madeHidden(quadFlags.size());
     std::vector<bool> floorQuad(quadFlags.size());   // the tunnels' walkway quads, hidden and drawn at their own height
+    std::vector<bool> pitQuad(quadFlags.size());     // hidden quads over a hollow an obstacle makes, not drawn again
     std::vector<uint16_t> quadTexture(quadFlags.size());
     for (size_t q = 0; q < quadTexture.size(); ++q) quadTexture[q] = L16(out[baseAt].data, g.quads + 4 * q + 2);
     std::vector<size_t> walkways;   // the bridges' and tunnels' walkway quads: footbridge cells in base.map
@@ -937,8 +979,10 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         // close no cell.
         Md2Model placed, shut;
         placed.nodes.push_back(Md2Node());
+        // Its root's place is dropped (the shape's offset places it), its turn kept: Polar Zone's swamp is modelled
+        // standing up and turned flat by its root (a quarter turn about x); without the turn it stood under the ground.
         Md2Model unrooted = model;
-        unrooted.nodes[0].matrix = IdentityMatrix();
+        unrooted.nodes[0].matrix[12] = unrooted.nodes[0].matrix[13] = unrooted.nodes[0].matrix[14] = 0.0f;
         const std::vector<Matrix> world = WorldMatrices(unrooted);
         const std::string shutName = tunnel ? TpiShutName(int(ox), int(oy), int(shapeW), int(rows.size()), nullptr)
                                             : std::string();
@@ -987,8 +1031,11 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         }
 
         // Its blocked cells become hidden quads where its geometry takes the ground's place (an opening gate's posts
-        // whatever covers them, as its marker, which did, is left out).
+        // whatever covers them, as its marker, which did, is left out), at the ground or as a hollow below it (Polar
+        // Zone's swamp: its bowl and its water lie under the ground and its rim on it; the swamp the player fills in is
+        // seen, so the quads over it are hidden, and hidden quads over a hollow are not drawn again below it).
         const std::vector<int> atGround = Coverage(placed, g, &heights);
+        const std::vector<int> pit = PitCoverage(placed, g, heights);
         std::vector<bool> hid(shapeW * rows.size(), false);   // the footprint's cells it hid, row by row from its first
         for (size_t j = 0; j < rows.size(); ++j)
             for (size_t i = 0; i < rows[j].size(); ++i) {
@@ -1001,9 +1048,10 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                 const size_t q = static_cast<size_t>(y) * g.w + static_cast<size_t>(x);
                 if ((quadFlags[q] & kQuadHidden) != 0) {
                     ++result.alreadyHidden;
-                } else if (atGround[q] >= kCoveredSamples || opens) {
+                } else if (atGround[q] >= kCoveredSamples || atGround[q] + pit[q] >= kCoveredSamples || opens) {
                     quadFlags[q] |= kQuadHidden;
                     madeHidden[q] = true;
+                    pitQuad[q] = pit[q] > 0;
                     hid[size_t(y - oy) * shapeW + i] = true;
                     ++result.blocked;
                 } else {
@@ -1033,8 +1081,8 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         }
 
         // One that clears once its land is bought: each of its nodes is named with its footprint and the cells it hid
-        // ("tpishut X Y W H M"), for the game to hide and show those quads again; one that hid none (the swamp, whose
-        // cells stay open) with its footprint alone.
+        // ("tpishut X Y W H M"), for the game to hide and show those quads again; one that hid none with its footprint
+        // alone.
         if (clearsOnLand) {
             const bool hidAny = std::find(hid.begin(), hid.end(), true) != hid.end();
             const std::string name =
@@ -1099,8 +1147,9 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
 
     // The quads the obstacles hid, and the shown ones beside them, lowered under the obstacles, each with its own texture
     // (the one the height field draws it with from afar; its turn, quad flags 0x78, is left out). Quads hidden before
-    // (the river's, the transparent ones) are left out: their texture is not the ground's. The tunnels' walkway quads
-    // are drawn at their own height, as the height field drew them.
+    // (the river's, the transparent ones) are left out: their texture is not the ground's. So are those over a hollow
+    // (pitQuad): lowered a little, they would still lie over it and hide it. The tunnels' walkway quads are drawn at
+    // their own height, as the height field drew them.
     NodeBuilder underGround;
     for (int64_t y = 0; y < int64_t(g.h); ++y)
         for (int64_t x = 0; x < int64_t(g.w); ++x) {
@@ -1109,7 +1158,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
             for (int64_t ny = std::max<int64_t>(y - 1, 0); ny <= std::min<int64_t>(y + 1, int64_t(g.h) - 1) && !near; ++ny)
                 for (int64_t nx = std::max<int64_t>(x - 1, 0); nx <= std::min<int64_t>(x + 1, int64_t(g.w) - 1) && !near; ++nx)
                     near = madeHidden[static_cast<size_t>(ny) * g.w + static_cast<size_t>(nx)];
-            if (!floorQuad[q] && (!near || ((quadFlags[q] & kQuadHidden) != 0 && !madeHidden[q])))
+            if (!floorQuad[q] && (!near || ((quadFlags[q] & kQuadHidden) != 0 && !madeHidden[q]) || pitQuad[q]))
                 continue;
             const uint16_t texture = quadTexture[q];
             if (texture >= terrainTextures)

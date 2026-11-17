@@ -4,7 +4,7 @@
 // closed it before it was cleared (its rubble, its wreckage) drawn too, each such node named "tpishut X Y W H": the
 // tunnel's footprint (its shape's first map cell and its size in cells). An obstacle that clears once its land is bought
 // (Arabian Nights' rock and cliff, Polar Zone's swamp) is drawn as it was before clearing, its cells closed, each of its
-// nodes named "tpishut X Y W H M" ("tpishut X Y W H" when it closed none, the swamp):
+// nodes named "tpishut X Y W H M" ("tpishut X Y W H" when it closed none; the swamp closes 174 since converter 22):
 // its footprint and the cells it closed (M, hex digits, four cells to a digit with the first the lowest bit, row by row
 // from (X, Y)). In the mod's worlds the game (src/game/TPEngine.cpp EngineTick2) shows those nodes while the park owns
 // none of the land the footprint and the cells next to it hold that a new park does not start with, the Invention gate's

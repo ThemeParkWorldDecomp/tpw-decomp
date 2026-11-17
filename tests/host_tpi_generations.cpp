@@ -204,7 +204,22 @@ int main() {
 
     // The kind of weather.
     Check(TpiWeatherKind(10, 50, 0, 1, 95) == kTpiStorm, "lightning: a storm");
-    Check(TpiWeatherKind(10, 50, 1, 0, 95) == kTpiSnow && TpiWeatherKind(30, 50, 0, 0, 95) == kTpiRain, "snow and rain");
+    Check(TpiWeatherKind(10, 50, 2, 0, 95) == kTpiSnow && TpiWeatherKind(30, 50, 1, 0, 95) == kTpiRain, "snow and rain");
+    // Snow is the rain object's type 2 (CWeather::SetPrecipitationType(1) gives it SetRainType(2)), rain its type 1; the
+    // weather's own precipitation type is never written, so it is no guide (0.5.5 read it and felt snow as rain).
+    Check(TpiWeatherKind(18, 300, 2, 0, 95) == kTpiSnow, "snow: the rain object's type 2");
+    Check(TpiWeatherKind(18, 300, 1, 0, 95) == kTpiRain && TpiWeatherKind(18, 300, 0, 0, 95) == kTpiRain,
+          "rain: the rain object's type 1 (or none yet)");
+    {
+        float happiness = 50, thirst = 50, hunger = 50;
+        TpiPeepTable table;
+        table.happiness[0][kTpiSnow] = 1;
+        table.thirst[0][kTpiSnow] = -1;
+        table.hunger[0][kTpiSnow] = 1;
+        table.happiness[0][kTpiRain] = -1;
+        TpiApplyWeather(happiness, thirst, hunger, 0, TpiWeatherKind(18, 300, 2, 0, 95), table);
+        Check(happiness == 51 && thirst == 49 && hunger == 51, "a kid in the snow: happier, less thirsty, hungrier");
+    }
     Check(TpiWeatherKind(96, 0, 0, 0, 95) == kTpiHeatwave && TpiWeatherKind(95, 0, 0, 0, 95) == kTpiHeatwave, "a heatwave");
     Check(TpiWeatherKind(94, 0, 0, 0, 95) == kTpiNoWeather && TpiWeatherKind(100, 0, 0, 0, 101) == kTpiNoWeather,
           "fair weather, and no heatwave quality given");

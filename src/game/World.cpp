@@ -39,6 +39,7 @@
 #include "Serialise.h"
 #include "StaffDB.h"
 #include "tb_hfield.h"
+#include "tb_rain.h"
 #include "ThingReceivers.h"
 #include "TPAdvisor.h"
 #include "TPCoaster.h"

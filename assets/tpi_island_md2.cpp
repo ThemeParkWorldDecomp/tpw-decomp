@@ -18,6 +18,8 @@ constexpr uint32_t kMagic = 0x1cd15d46;
 constexpr uint32_t kVersion = 0xdd;
 constexpr uint32_t kAnimVersion = 0xcb;
 constexpr size_t kHeader = 0xb8, kNode = 0xa0, kMini = 0x58, kName = 0x14, kHField = 0x30;
+// The most characters of a node's name read (the converter's own "tpishut" names run to 87: tpi_terrain.h TpiShutName).
+constexpr size_t kNodeName = 127;
 
 uint16_t L16(const std::vector<uint8_t>& d, size_t at) { return static_cast<uint16_t>(d[at] | (d[at + 1] << 8)); }
 uint32_t L32(const std::vector<uint8_t>& d, size_t at) {
@@ -206,7 +208,7 @@ bool ReadMd2(const std::vector<uint8_t>& d, Md2Model& model, std::string& err, b
         for (int i = 0; i < 16; ++i) n.matrix[i] = LF(d, at + 0x10 + 4 * i);
         n.f52 = L16(d, at + 0x52);
         const uint32_t nameOff = L32(d, at + 0x54);
-        n.name = nameOff && nameOff < d.size() ? CStr(d, nameOff, 64) : std::string();
+        n.name = nameOff && nameOff < d.size() ? CStr(d, nameOff, kNodeName) : std::string();
         if (!n.mini) {
             const uint32_t nv = L16(d, at + 0x58), nfs = L16(d, at + 0x5a), nf = L16(d, at + 0x5c), nc = L16(d, at + 0x5e);
             const uint32_t vp = L32(d, at + 0x60), pp = L32(d, at + 0x64), up = L32(d, at + 0x68), fsp = L32(d, at + 0x6c),

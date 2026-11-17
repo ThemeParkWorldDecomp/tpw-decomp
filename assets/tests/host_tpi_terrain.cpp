@@ -3,6 +3,7 @@
 // animations and .sam files, and a few TGAs; no game data.
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <map>
@@ -572,8 +573,8 @@ void TestCleared() {
                                        {"rockm1.MD2", Anim(0, {}, {{1, {1}, true}})},
                                        {"rockm2.MD2", Anim(0, {}, {})},
                                        {"textures/rock.tga", rock}}};
-    // The swamp: the same, but its mesh stands above the ground, so it closes nothing; it clears once its land is
-    // bought too (Info.Id 2700), so its node is named with its footprint alone.
+    // One that clears once its land is bought too (Info.Id 2700), but whose mesh stands above the ground, so it closes
+    // nothing: its node is named with its footprint alone (TestPit: Polar Zone's swamp, a hollow, closes its cells).
     md2::Md2Model swampMesh = Model("swamp.MD2", {"rock.tga"});
     AddNode(swampMesh, Square("mud", 10, 3, 0), 0, md2::Translation(30, 0, 0));
     md2::RecomputeBoxes(swampMesh);
@@ -954,13 +955,96 @@ void TestTunnel() {
 }
 
 // The name of what shows until its land is bought: its footprint, then, when given, the cells it hid, four to a hex
-// digit with the first cell the lowest bit; none past 63 characters.
+// digit with the first cell the lowest bit; a mask of at most 4 x 63 cells (the game's), past 63 characters too (Polar
+// Zone's swamp: 14 x 16), which the converter's reader reads back whole.
 void TestShutName() {
     CHECK(TpiShutName(43, 29, 12, 24, nullptr) == "tpishut 43 29 12 24");
     const std::vector<bool> hid = {true, false, true, true, false, true};
     CHECK(TpiShutName(28, 64, 2, 3, &hid) == "tpishut 28 64 2 3 d2");
-    const std::vector<bool> big(200, true);
-    CHECK(TpiShutName(100, 100, 10, 20, &big).empty());
+    std::vector<bool> swamp(14 * 16, true);
+    swamp[0] = false;
+    const std::string name = TpiShutName(8, 0, 14, 16, &swamp);
+    CHECK(name == "tpishut 8 0 14 16 e" + std::string(55, 'f'));
+    CHECK(name.size() == 74);
+    const std::vector<bool> big(4 * 63 + 1, true);
+    CHECK(TpiShutName(100, 100, 11, 23, &big).empty());
+    const std::vector<bool> most(4 * 63, true);
+    CHECK(TpiShutName(100, 100, 12, 21, &most).size() == 22 + 63);
+    md2::Md2Model m = Model("swamp.MD2", {"rock.tga"});
+    AddNode(m, Square(name, 10, 0, 0), 0, md2::IdentityMatrix());
+    md2::RecomputeBoxes(m);
+    md2::Md2Model back;
+    std::string err;
+    CHECK(md2::ReadMd2(md2::WriteMd2(m), back, err) && back.nodes.size() == 2 && back.nodes[1].name == name);
+}
+
+// Polar Zone's swamp (Info.Id 2700, clears once its land is bought): modelled standing up, its root turning it flat (a
+// quarter turn about x, and a place the shape's offset overrides); its bowl lies under the ground, its rim on it. The
+// root's turn is kept, so the bowl lies 5 below the ground over its Info.Shape's cells (0,1) and (1,1), and those cells,
+// a hollow seen from above, are hidden so it shows: (0,1) all bowl, (1,1) a quarter bowl and a quarter rim, neither alone
+// half of it. Its nodes are named with its footprint and those two cells; "tpi underground" draws the shown quads
+// beside them, not those two, which would lie over the bowl. Before converter 22 the root's turn was dropped, so the
+// bowl stood upright outside the map and the cells stayed open.
+void TestPit() {
+    const std::vector<std::pair<uint16_t, uint16_t>> quads(kW * kH, {0x0042, kTexGrass});
+    const Bytes grass = Tga(2, 2, 255), rock = Tga(2, 2, 200);
+    const std::vector<TpiWadMember> terrain = {{"base.MD2", Terrain(quads)},
+                                               {"textures/grass.tga", grass},
+                                               {"textures/qickload.txt", Text("grass.tga\n")}};
+    auto shared = [](const std::string&) -> const Bytes* { return nullptr; };
+
+    // Upright: local (x, y, z) lies at (x, z, -y) once turned, so local z is the height and -y the map's z.
+    md2::Md2Model mesh = Model("swamp.MD2", {"rock.tga"});
+    mesh.nodes[0].matrix = {1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 300, 7, 400, 1};
+    auto upright = [](const std::string& name, float x0, float x1, float height) {
+        md2::NodeBuilder b;
+        b.Quad(md2::Vec3{x0, -10, height}, md2::Vec3{x1, -10, height}, md2::Vec3{x1, -20, height},
+               md2::Vec3{x0, -20, height}, 0, 0, 1, 0, 1, 1, 0, 1, 0);
+        return b.Build(name);
+    };
+    AddNode(mesh, upright("swampNA", 0, 12.5f, -5), 0, md2::IdentityMatrix());   // 1: the bowl
+    AddNode(mesh, upright("rim", 17.5f, 20, 0), 0, md2::IdentityMatrix());       // 2: the rim, at the ground
+    md2::RecomputeBoxes(mesh);
+    const TpiObstacle swamp = {"swamp",
+                               {{"swamp.sam", Sam(1, {"HH."}, 0, 1, {"..."}, 2700)},
+                                {"swamp.MD2", md2::WriteMd2(mesh)},
+                                {"swampm1.MD2", Anim(0, {}, {{1, {1}, true}, {2, {1}, true}})},
+                                {"swampm2.MD2", Anim(0, {}, {})},
+                                {"textures/rock.tga", rock}}};
+
+    std::vector<TpiWadMember> members = terrain;
+    TpiObstacleReport report;
+    std::string err;
+    CHECK(MergeTpiObstacles(members, {swamp}, shared, report, err) && err.empty());
+    CHECK(report.obstacles.size() == 1);
+    if (report.obstacles.size() != 1) return;
+    const TpiObstacleResult& r = report.obstacles[0];
+    CHECK(r.name == "swamp" && r.state == "before clearing" && r.nodes == 2);
+    CHECK(r.blocked == 2 && r.alreadyHidden == 0 && r.open == 0 && r.shut == 2);
+
+    const TpiWadMember* base = Member(members, "base.MD2");
+    md2::Md2Model merged;
+    CHECK(base != nullptr && md2::ReadMd2(base->data, merged, err, true));
+    if (base == nullptr) return;
+    for (uint32_t y = 0; y < kH; ++y)
+        for (uint32_t x = 0; x < kW; ++x) {
+            const bool hidden = y == 1 && x < 2;
+            CHECK(Quad(base->data, x, y) == std::make_pair(uint16_t(hidden ? 0x0043 : 0x0042), kTexGrass));
+        }
+    std::vector<std::string> names;
+    for (const md2::Md2Node& n : merged.nodes) names.push_back(n.name);
+    CHECK((names == std::vector<std::string>{"root", "tpishut 0 1 3 1 3", "tpishut 0 1 3 1 3", "tpi underground"}));
+    if (merged.nodes.size() != 4) return;
+    // The bowl lies flat, 5 below the ground, over (0,1) and the first half of (1,1).
+    const std::vector<md2::Matrix> world = md2::WorldMatrices(merged);
+    for (const md2::Vec3& v : merged.nodes[1].vertices) {
+        const md2::Vec3 w = md2::Transform(v, world[1]);
+        CHECK(std::fabs(w.y + 5) < 1e-4f && w.x > -1e-4f && w.x < 12.5f + 1e-4f && w.z > 10 - 1e-4f && w.z < 20 + 1e-4f);
+    }
+    // "tpi underground": (0,0), (1,0), (2,0) and (2,1), not the two over the bowl.
+    const md2::Md2Node& under = merged.nodes[3];
+    CHECK(under.faces.size() == 8);
+    for (const md2::Vec3& v : under.vertices) CHECK(v.y == -0.6f && (v.x >= 20 || v.z <= 10));
 }
 
 // The leaf's name: each number as "%.4f" without trailing zeros (a negative zero as 0); none past 63 characters.
@@ -984,6 +1068,7 @@ int main() {
     TestOpeningGate();
     TestTunnel();
     TestShutName();
+    TestPit();
     TestGateLeafName();
     std::printf("tpi_terrain: %d passed, %d failed\n", g_pass, g_fail);
     return g_fail == 0 ? 0 : 1;
