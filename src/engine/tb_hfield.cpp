@@ -639,6 +639,7 @@ void CHField::CalcLine(uint8_t* codes, SVertex* vertices, uint32_t* spare, int32
 }
 
 
+
 int32_t CHField::Prepare() {
     if ((gei_System.mFlags & (CSystem::kViewChanged | CSystem::kLightsChanged)) == 0) return 1;
     // Not first person: the cells and grid points in view are the gamut's.

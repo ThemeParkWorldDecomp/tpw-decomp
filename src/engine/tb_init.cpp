@@ -240,6 +240,7 @@ int32_t CProcTextureHandler::CreateProcTexture(CTextureEntry* entry, int32_t x, 
     return 1;
 }
 
+
 // Compares the record's limits (flag bits 0..5 of its word at 4) against the measured values; the record pointer never
 // advances in the original, so every pass reads the same record. Answers the record's word 0 (0 when count <= 0).
 uint32_t SMachineParameters::Return(SCfgRecord* record, int32_t mode) {

@@ -192,6 +192,7 @@ int32_t CProcTextureHandler::PrepareList(PrepareEntry* tiles, sTileOverlay* over
     return 1;
 }
 
+
 void CMatrix::AdjustProjection(float farPlane) { ev("AdjustProjection", {lab(this), fbits(farPlane)}); }
 int32_t PreprocessMatrices() {
     ev("PreprocessMatrices");

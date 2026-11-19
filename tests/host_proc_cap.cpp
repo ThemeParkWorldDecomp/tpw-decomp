@@ -9,10 +9,15 @@
 //   - a view the list and the ring hold: every window cell listed, in Prepare's order, as in the original (both builds);
 //   - the whole map in view with a ring of 2500, 2000 and 1500 tiles: as many cells listed as the ring holds, the nearest
 //     ones, hidden cells never; GetTexturesUsed takes the listed entries in order and gives every other cell the mesh's;
-//   - more window cells in GetTexturesUsed than Prepare saw: never past the list's end.
+//   - more window cells in GetTexturesUsed than Prepare saw: never past the list's end;
+//   - the far ground's pool (groundpool): every window cell in view that is not listed asks the pool once, a chosen cell
+//     covering half the ring's size or less on the screen is not listed but asks the pool, and each such cell draws with
+//     the pool's tile, else the ring's tile it still has, else the mesh's; a regenerate flag makes the pool's tile again and
+//     lets go of the ring's.
 // The program runs the real CHField::Prepare, GetTexturesUsed and QSort_textures on a map of 128 by 128 cells; the gamut,
 // the texture cache and the handler are stand-ins. Made in both builds: without the port's fixes it checks only the view the
 // list holds (the original reads past the list in the others, as the game did). Exits nonzero on a failure.
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -25,6 +30,7 @@
 #include "tb_loadmanager.h"
 #include "tb_matrix.h"
 #include "tb_proctexture.h"
+#include "tb_resource_display.h"
 #include "tb_resource_system.h"
 #include "tb_resource_texture.h"
 #include "tb_texturecache.h"
@@ -59,6 +65,17 @@ alignas(CTextureEntry) unsigned char gProcEntryStorage[CHField::kMaxOverlays][si
 CTextureEntry* ProcEntry(int32_t n) { return reinterpret_cast<CTextureEntry*>(gProcEntryStorage[n]); }
 char gPages[3];   // a page is only an address: 1 the mesh's, 2 the procedural tiles'
 CMatrix gView;
+// The pool's stand-in: the tiles it has a texture for (their entry PoolEntry()), the cells that asked it and their pixels,
+// the tiles made dirty, and its runs.
+alignas(CTextureEntry) unsigned char gPoolEntryStorage[sizeof(CTextureEntry)];
+CTextureEntry& PoolEntry() { return *reinterpret_cast<CTextureEntry*>(gPoolEntryStorage); }
+alignas(CTextureEntry) unsigned char gRingEntryStorage[sizeof(CTextureEntry)];
+CTextureEntry& RingEntry() { return *reinterpret_cast<CTextureEntry*>(gRingEntryStorage); }
+std::vector<uint8_t> gPoolHas(0x10000, 0);
+std::vector<uint32_t> gAsks;
+std::vector<float> gAskPixels;
+std::vector<uint32_t> gDirty;
+int32_t gPoolRuns = 0;
 
 // The rows of cells the gamut answers, and what the stand-ins saw.
 SGamutQuads gQuads;
@@ -83,7 +100,10 @@ CTextureSettings gei_TextureSettings;
 CGamut* gei_Gamut = reinterpret_cast<CGamut*>(gGamutStorage);
 CTextureCache* gei_TCache = reinterpret_cast<CTextureCache*>(gCacheStorage);
 CMatrix* gei_ViewMatrix = &gView;
+CDisplay gei_Display;
+CMatrix gei_ProjectionMatrix;
 CSystem::CSystem() {}
+CDisplay::CDisplay() {}
 CTextureSettings::CTextureSettings() {}
 
 // ---- the stand-ins
@@ -91,6 +111,16 @@ SGamutQuads* CGamut::GetQuads() { return &gQuads; }
 SGamutQuads* CGamut::GetVertices() { return &gVertices; }
 void CTextureEntry::Lock() {}
 void CTextureCache::Prepare(CTextureEntry*, float) { ++gMeshPrepares; }
+
+#ifdef TPW_TEST_PORT_FIX
+CTextureEntry* PortGroundTexture(uint32_t tile) { return gPoolHas[tile & 0xffff] != 0 ? &PoolEntry() : nullptr; }
+void PortGroundDirty(uint32_t tile) { gDirty.push_back(tile); }
+void PortGroundAsk(uint32_t tile, float pixels, const sTileOverlay&) {
+    gAsks.push_back(tile);
+    gAskPixels.push_back(pixels);
+}
+void PortGroundRun(CProcTextureHandler*) { ++gPoolRuns; }
+#endif
 
 // The handler turns each tile in place into its texture entry, the n-th listed cell's being ProcEntry(n).
 int32_t CProcTextureHandler::PrepareList(PrepareEntry* entries, sTileOverlay*, int32_t count) {
@@ -121,6 +151,12 @@ void MakeWorld() {
     std::memset(gMeshEntryStorage, 0, sizeof gMeshEntryStorage);
     MeshEntry().mFlags = CTextureEntry::kOnPage;
     MeshEntry().mTexture = reinterpret_cast<CTextureBase*>(&gPages[1]);
+    std::memset(gPoolEntryStorage, 0, sizeof gPoolEntryStorage);
+    PoolEntry().mFlags = CTextureEntry::kOnPage;
+    PoolEntry().mTexture = reinterpret_cast<CTextureBase*>(&gPages[0]);
+    std::memset(gRingEntryStorage, 0, sizeof gRingEntryStorage);
+    RingEntry().mFlags = CTextureEntry::kOnPage;
+    RingEntry().mTexture = reinterpret_cast<CTextureBase*>(&gPages[2]);
     for (int32_t n = 0; n < CHField::kMaxOverlays; n++) {
         std::memset(gProcEntryStorage[n], 0, sizeof gProcEntryStorage[n]);
         ProcEntry(n)->mFlags = CTextureEntry::kOnPage;
@@ -185,6 +221,16 @@ void Begin(const Case& c) {
     std::memset(&gView, 0, sizeof gView);
     gView.m[3][0] = c.cameraX;
     gView.m[3][2] = c.cameraZ;
+    // A ring size of 0 (the handler's storage is cleared): every chosen cell keeps the ring's tile, as before the pool.
+    gei_Display.mWidth = 1024;
+    std::memset(&gei_ProjectionMatrix, 0, sizeof gei_ProjectionMatrix);
+    gei_ProjectionMatrix.m[0][0] = 0.70710678f;   // a 90 degree field of view: cotangent 1
+    gei_ProjectionMatrix.m[2][3] = 0.70710678f;
+    std::fill(gPoolHas.begin(), gPoolHas.end(), 0);
+    gAsks.clear();
+    gAskPixels.clear();
+    gDirty.clear();
+    gPoolRuns = 0;
     gei_System.mFlags = CSystem::kViewChanged;
     gei_TextureSettings.mFlags = CTextureSettings::kProcTexturesOn;
     gei_TextureSettings.mFormat = 4;
@@ -257,6 +303,12 @@ void Run(const char* name, const Case& c, int32_t expectedListed) {
         for (int32_t column = c.low; column < c.high; column++)
             if (!Hidden(c, column, row)) ++visible;
     Check(gMeshPrepares == visible - expectedListed, name, gMeshPrepares);
+#ifdef TPW_TEST_PORT_FIX
+    // The pool: asked once by every window cell in view that is not listed (only when listing is capped), run once.
+    Check(static_cast<int32_t>(gAsks.size()) == (expectedListed < windowCells ? windowCells - expectedListed : 0), name,
+          static_cast<long>(gAsks.size()));
+    Check(gPoolRuns == 1, name, gPoolRuns);
+#endif
 
     // GetTexturesUsed: the n-th listed cell takes the n-th entry, every other cell the mesh's.
     static void* pages[1024];
@@ -332,6 +384,83 @@ int main() {
         }
         Check(right, "more in view later");
         Check(procedural == CHField::kMaxOverlays, "more in view later", procedural);
+    }
+
+    // The pool's sizes: a ring of 64 texel tiles, a picture 1024 wide with a 90 degree field of view, so a cell d away covers
+    // 512 / d pixels and keeps the ring's tile only nearer than 16. Every second tile has the pool's texture; one far cell
+    // still has the ring's (and so draws with it), one far cell is to be made again and still has a ring tile (it lets it go).
+    {
+        const Case c{0, 128, 0, 127, 0, 0, 127, 127, 2000, 64.0f, 64.0f, 0};
+        Begin(c);
+        Handler().mSize = 64;
+        for (uint32_t tile = 0; tile < 0x10000; tile += 2) gPoolHas[tile] = 1;
+        alignas(SProcTexture) static unsigned char ringNodes[2][sizeof(SProcTexture)];
+        std::memset(ringNodes, 0, sizeof ringNodes);
+        SProcTexture* kept = reinterpret_cast<SProcTexture*>(ringNodes[0]);
+        SProcTexture* dropped = reinterpret_cast<SProcTexture*>(ringNodes[1]);
+        const int32_t keptColumn = 101, keptRow = 100;       // tile 0x6465: odd, no pool texture
+        const int32_t droppedColumn = 111, droppedRow = 110;   // tile 0x6e6f: odd
+        kept->mTexture = &RingEntry();
+        kept->mSlot = &Handler().mTiles[keptRow * 128 + keptColumn];
+        *kept->mSlot = kept;
+        dropped->mTexture = &RingEntry();
+        dropped->mSlot = &Handler().mTiles[droppedRow * 128 + droppedColumn];
+        *dropped->mSlot = dropped;
+        gQuadBlock[droppedRow * kSide + droppedColumn].mF00 = 0x100;
+        CHField& field = Field();
+        Check(field.Prepare() == 1, "pool sizes");
+        const uint32_t droppedTile = Tile(c, droppedColumn, droppedRow);
+        Check(gDirty.size() == 1 && gDirty[0] == droppedTile, "pool sizes: the regenerated tile is dirty",
+              static_cast<long>(gDirty.size()));
+        Check((gQuadBlock[droppedRow * kSide + droppedColumn].mF00 & 0x100) == 0, "pool sizes: its flag is cleared");
+        Check(Handler().mTiles[droppedRow * 128 + droppedColumn] == nullptr && dropped->mSlot == nullptr,
+              "pool sizes: its ring tile is let go");
+        Check(gPoolRuns == 1, "pool sizes: one run", gPoolRuns);
+        // Listed cells are near (512 / d over 32), asked cells far or not chosen; together every window cell.
+        std::vector<uint8_t> listed(kCells, 0);
+        for (uint32_t tile : gTiles) listed[(tile >> 8) * kSide + (tile & 0xff)] = 1;
+        bool near = true;
+        int32_t nearCells = 0;
+        for (int32_t row = 0; row < 128; row++) {
+            for (int32_t column = 0; column < 127; column++) {
+                const float dx = static_cast<float>(column) + 0.5f - c.cameraX;
+                const float dz = static_cast<float>(row) + 0.5f - c.cameraZ;
+                const float d = std::sqrt(dx * dx + dz * dz);
+                if (d < 15.9f) ++nearCells;
+                if (listed[row * kSide + column] != 0 ? d > 16.1f : d < 15.9f) near = false;
+            }
+        }
+        Check(near, "pool sizes: only the near cells listed");
+        Check(static_cast<int32_t>(gTiles.size()) >= nearCells && gTiles.size() < 2000, "pool sizes: listed",
+              static_cast<long>(gTiles.size()));
+        Check(gAsks.size() + gTiles.size() == 128 * 127, "pool sizes: every other cell asked",
+              static_cast<long>(gAsks.size()));
+        bool pixels = true;
+        for (float p : gAskPixels) if (!(p <= 32.5f)) pixels = false;
+        Check(pixels, "pool sizes: the far cells' pixels");
+        // GetTexturesUsed: listed cells their entry in order, the others the pool's, else the ring's, else the mesh's.
+        static void* pages[1024];
+        static CTextureEntry* entries[kCells];
+        int32_t count = 0;
+        field.GetTexturesUsed(pages, count, entries);
+        int32_t n = 0;
+        int32_t at = 0;
+        bool right = true;
+        for (int32_t row = 0; row < 128; row++) {
+            for (int32_t column = 0; column < 127; column++) {
+                const uint32_t tile = Tile(c, column, row);
+                CTextureEntry* expected = &MeshEntry();
+                if (listed[row * kSide + column] != 0)
+                    expected = ProcEntry(n++);
+                else if (gPoolHas[tile] != 0)
+                    expected = &PoolEntry();
+                else if (column == keptColumn && row == keptRow)
+                    expected = &RingEntry();
+                if (entries[at++] != expected) right = false;
+            }
+        }
+        Check(right, "pool sizes: the entries drawn");
+        Check(count == 3, "pool sizes: three pages", count);
     }
 #else
     std::printf("without the port's fixes only the view the list holds is checked: the original reads past it otherwise\n");

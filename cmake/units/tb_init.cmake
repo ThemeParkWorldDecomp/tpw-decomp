@@ -10,5 +10,6 @@ set(TPW_UNIT_tb_init_KEEP
   __ZN19CProcTextureHandler5CloseEv   # CProcTextureHandler::Close()
   __ZN19CProcTextureHandlerC1Ev   # CProcTextureHandler::CProcTextureHandler()
   __ZN19CProcTextureHandlerD1Ev   # CProcTextureHandler::~CProcTextureHandler()
+  __Z15PortGroundClearv   # PortGroundClear(), the port's fix groundpool (only in the port's builds)
   _gProcTextureBuffer
 )
