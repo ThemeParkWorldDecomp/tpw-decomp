@@ -29,6 +29,7 @@
 #include "TbError.h"
 #include "ThingReceivers.h"
 #include "TpiGateFlow.h"
+#include "TpiLandBuy.h"
 #include "TPConfig.h"
 #include "TPDialog.h"
 #include "TPEngine.h"
@@ -1007,12 +1008,18 @@ void ClearInside(CTrackCell* scanned) {
     if (AnyFlagged(square)) ClearAndRetile(square);
 }
 
+// Whether a scan of the fill stops before the cell at (x, y), leaving it as it is.
+bool ScanLeavesLevel(int32_t x, int32_t y) {
+    return false;
+}
+
 // The four scans across the park, one for each heading of the walk (the heading is the direction of the walk along the hoarding): the cells at
 // two cell steps from the walk's cell up to and including the first locked one. Heading 0x10 scans towards -x, 4 towards +y, 1 towards +x.
 void ScanTowardsMinusX(int32_t x, int32_t y) {
     int32_t k = x;
     int32_t locked;
     do {
+        if (ScanLeavesLevel(k - 2, y)) return;
         CTrackCell* scanned = TrackCellOfId(CellId(k - 2, y));
         ClearInside(scanned);
         locked = scanned->IsFlag(0x20);
@@ -1024,6 +1031,7 @@ void ScanTowardsPlusY(int32_t x, int32_t y) {
     int32_t k = y;
     int32_t locked;
     do {
+        if (ScanLeavesLevel(x, k + 2)) return;
         CTrackCell* scanned = TrackCellOfId(CellId(x, k + 2));
         ClearInside(scanned);
         locked = scanned->IsFlag(0x20);
@@ -1035,6 +1043,7 @@ void ScanTowardsPlusX(int32_t x, int32_t y) {
     int32_t k = x;
     int32_t locked;
     do {
+        if (ScanLeavesLevel(k + 2, y)) return;
         CTrackCell* scanned = TrackCellOfId(CellId(k + 2, y));
         ClearInside(scanned);
         locked = scanned->IsFlag(0x20);
@@ -1048,6 +1057,7 @@ void ScanTowardsMinusY(int32_t x, int32_t y, bool* reachedTop) {
     int32_t k = y - 2;
     int32_t locked;
     do {
+        if (ScanLeavesLevel(x, k)) return;
         CTrackCell* scanned = TrackCellOfId(CellId(x, k));
         ClearInside(scanned);
         k -= 2;
