@@ -13,6 +13,10 @@ which gFlyBases slots are set (and whether kept), and every word of the base (th
 written at the Mac's +0x7b8 on the PPC side and at the host field of the same name (the first sub ride type) on the host side
 (tests/ridelayout.py).
 
+With the port fixes on (unit flyzone; the port fix in EmployEric, src/game/rides/FlyingRide.cpp) the car's starting point along the
+fly zone's edge is the unsigned remainder of labs(rand) * 100 by the edge's length (include/FlyZone.h): the original runs with its two
+divw of it made a divwu (FLYZONE_DIVW, setup), which computes exactly that.
+
 No fused operations. Not tested: a zone span of 0 (divw by 0), a failed LbMem_Alloc (the original then reads address 0x4c), thing number
 0 with no thing in entry 0 (the original reads the thing's +0xe at NULL).
 """
@@ -104,7 +108,22 @@ STUBS.internal(CALLEE_SETANIM, stub_setanim)
 STUBS.internal(CALLEE_FIND, stub_find)
 
 
+PORT_FIX = False      # the unit library was built with the port fixes on (setup)
+
+# The port fix flyzone (include/FlyZone.h): the point along the fly zone's edge is the unsigned remainder of labs(rand) * 100 by the
+# edge's length, so with the port fixes on the original's divw of it at these addresses runs as a divwu (the same rD, rA and rB).
+FLYZONE_DIVW = (0x10074EE0, 0x10074F5C)       # EmployEric: along the x edge, along the z edge
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_fe_portfix.restype, runner.lib.tpw_fe_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_fe_portfix() == 1
+    if PORT_FIX:
+        for a in FLYZONE_DIVW:
+            w = runner.emu.u32(a)
+            assert w >> 26 == 31 and (w >> 1) & 0x1FF == 491, hex(w)
+            runner.emu.write(a, struct.pack(">I", (w & ~(0x1FF << 1)) | (459 << 1)))
     T.install_std_stubs(runner.emu)
 
 

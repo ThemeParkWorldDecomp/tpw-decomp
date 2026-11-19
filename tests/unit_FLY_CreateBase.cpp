@@ -113,4 +113,10 @@ int32_t tpw_fe_create(uint32_t thing, int32_t handle, int32_t x, int32_t y, int3
 }
 int32_t tpw_fe_employ(int32_t index) { return EmployEric(index); }
 
+// 1 when the unit is built with the port fixes on (unit flyzone): the point along the fly zone's edge is then the unsigned remainder of
+// labs(rand) * 100 by the edge's length (include/FlyZone.h), which the test gets from the original with its divw made a divwu.
+int32_t tpw_fe_portfix() {
+    return 0;
+}
+
 }  // extern "C"

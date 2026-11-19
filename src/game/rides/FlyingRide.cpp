@@ -9,6 +9,7 @@
 #include "CVariableTime.h"
 #include "Debug.h"
 #include "ESP_sprites.h"
+#include "FlyZone.h"
 #include "FS_Online.h"
 #include "HLSprite.h"
 #include "intrface.h"

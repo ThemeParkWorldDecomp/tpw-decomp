@@ -13,6 +13,10 @@ The world of a case: one to three fly bases (0x122c bytes each, every word set: 
 of gFlyBases, a sine table of 4096 random words, the fly zone, the heightfield size, the three lowest heights, seven ride sets and the
 world. What is compared: every word of every base after the call and the event log.
 
+With the port fixes on (unit flyzone; the port fix in FLY_Tick, src/game/rides/FlyingRide.cpp) a leaving car's point along the fly
+zone's edge (state 4 to 9) is the unsigned remainder of labs(rand) * 100 by the edge's length (include/FlyZone.h): the original runs with
+its two divw of it made a divwu (FLYZONE_DIVW, setup), which computes exactly that.
+
 No fused operations; fctiwz only of square roots, of 652 * atan2 and of the ground heights, all far inside 32 bits. Not tested: squared
 distances that overflow 32 bits (positions stay within about 500000 of each other, so the roots never see a negative number), a zone
 whose span is 0 or negative (the original divides by it).
@@ -112,7 +116,22 @@ STUBS.imp("labs", labs)
 STUBS.imp("atan2", atan2)
 
 
+PORT_FIX = False      # the unit library was built with the port fixes on (setup)
+
+# The port fix flyzone (include/FlyZone.h): the point along the fly zone's edge is the unsigned remainder of labs(rand) * 100 by the
+# edge's length, so with the port fixes on the original's divw of it at these addresses runs as a divwu (the same rD, rA and rB).
+FLYZONE_DIVW = (0x10076C98, 0x10076D2C)       # the leaving car (state 4 to 9): along the x edge, along the z edge
+
+
 def setup(runner):
+    global PORT_FIX
+    runner.lib.tpw_fly_portfix.restype, runner.lib.tpw_fly_portfix.argtypes = C.c_int32, []
+    PORT_FIX = runner.lib.tpw_fly_portfix() == 1
+    if PORT_FIX:
+        for a in FLYZONE_DIVW:
+            w = runner.emu.u32(a)
+            assert w >> 26 == 31 and (w >> 1) & 0x1FF == 491, hex(w)
+            runner.emu.write(a, struct.pack(">I", (w & ~(0x1FF << 1)) | (459 << 1)))
     T.install_std_stubs(runner.emu)
 
 
