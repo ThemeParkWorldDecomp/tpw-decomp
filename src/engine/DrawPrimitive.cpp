@@ -10,6 +10,7 @@
 #include "tb_clipping.h"
 #include "tb_ddraw.h"
 #include "tb_drawprimitive.h"
+#include "PortSpriteFringe.h"
 #include "tb_hfield.h"
 #include "tb_loadmanager.h"
 #include "tb_matrix.h"
@@ -203,7 +204,8 @@ int32_t CDrawPrimitive::ExecuteCurrentPrimitive() {
             return 0;
         }
         mCurrent->mFlags |= SPrimitive::kDrawn;
-    } else if (mode != SPrimitive::kNoDraw &&
+    }
+    else if (mode != SPrimitive::kNoDraw &&
                !(gei_System.mRenderer == kRendererNoSort && (mode & SPrimitive::kSortSkipped) != 0)) {
         SRenderLoadInfo* scratch = gei_RenderMemory->LoadInfo(kScratchFlags);
         const int32_t faces = primitive->mIndexCount / 3;

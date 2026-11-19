@@ -2,6 +2,7 @@
 
 #include "m3d2.h"
 #include "MapWho.h"
+#include "PortSpriteFringe.h"
 #include "platform/msl.h"
 #include "platform/samsutils.h"
 #include "platform/upixels.h"
@@ -1123,7 +1124,8 @@ int32_t SSpriteGameData::AddRegular() {
     SVertex vertices[4] = {};
     params.mVertices = vertices;
     if (CalcRegular(&params) == 0) return 0;
-    return gei_DrawPrimitive->AddSprite(&params, -1);
+    const int32_t result = gei_DrawPrimitive->AddSprite(&params, -1);
+    return result;
 }
 
 // tb_sprites_partial.cpp: the partial sprite draw (engine library of SimTheme Park 2.04b3; the original file is

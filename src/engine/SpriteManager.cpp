@@ -20,10 +20,12 @@
 #include "tb_texturecache.h"
 #include "tb_textureentry.h"
 #include "Wavelet.h"
+#include "PortSpriteFringe.h"
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <new>
+#include <vector>
 
 // tb_sprite.cpp, the engine's sprite files (engine library of SimTheme Park 2.04b3; the file
 // name is the one in its assertions; functions at 0x1002da98..0x1002f398 and 0x1003108c..
