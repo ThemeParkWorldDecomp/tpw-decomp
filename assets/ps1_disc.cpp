@@ -372,10 +372,12 @@ Ps1Status RecognisePs1(std::shared_ptr<Blob> blob, Ps1Disc& disc, std::string& r
         reader.Walk(U32(reader.primary, 158), U32(reader.primary, 166), "");
         Bytes cnf = reader.File("SYSTEM.CNF", 65536);
         std::string boot;
+        bool boot2 = false;
         std::istringstream lines(std::string(cnf.begin(), cnf.end()));
         std::string line;
         while (std::getline(lines, line)) {
             size_t eq = line.find('=');
+            boot2 = boot2 || (eq != std::string::npos && Upper(Trim(line.substr(0, eq))) == "BOOT2");
             if (eq != std::string::npos && Upper(Trim(line.substr(0, eq))) == "BOOT") {
                 boot = Upper(Trim(line.substr(eq + 1)));
                 size_t slash = boot.find_last_of('\\');
@@ -384,6 +386,7 @@ Ps1Status RecognisePs1(std::shared_ptr<Blob> blob, Ps1Disc& disc, std::string& r
                 break;
             }
         }
+        if (boot.empty() && boot2) return Ps1Status::NotPlayStation;   // a PlayStation 2 disc (ps2_disc.h)
         const std::map<std::string, std::string> regions = {{"SLUS_010.69", "USA"}, {"SLES_026.88", "Europe"}, {"SLPS_026.43", "Japan"}};
         auto region = regions.find(boot);
         Require(region != regions.end(), "SYSTEM.CNF does not name a supported PlayStation version of this game");

@@ -19,6 +19,8 @@
 #include "icon.h"
 #include "ps1_disc.h"
 #include "ps1_convert.h"
+#include "ps2_convert.h"
+#include "ps2_disc.h"
 #include "sam_check.h"
 #include "sha256.h"
 #include "sniff.h"
@@ -596,6 +598,8 @@ std::string ImportReport::Summary() const {
         ss << playStation.front();
     } else if (written == 0 && !cancelled && !aborted && !themeParkInc.empty()) {
         ss << themeParkInc.front();
+    } else if (written == 0 && !cancelled && !aborted && !playStation2.empty()) {
+        ss << playStation2.front();
     } else if (written == 0 && !cancelled && !aborted) {
         ss << "Nothing new: ";
         if (alreadyThere) ss << alreadyThere << " files were already in place.";
@@ -623,6 +627,7 @@ struct Importer::Run {
     std::vector<Work> work;
     std::vector<Ps1Disc> playStation;  // converted after ordinary files, so a combined PC/PS1 drop finds its donors
     std::vector<TpiDisc> themeParkInc; // the same for Theme Park Inc copies (tpi_disc.h), converted by tpi_convert.h
+    std::vector<Ps2Disc> playStation2; // the PS2 disc for the PS2 Guest Models mod (ps2_disc.h), converted by ps2_convert.h
     uint64_t totalBytes = 0, doneBytes = 0;
     std::set<std::string> different;             // destinations a file of the drop has another version of
     std::set<std::string> matchedDests;          // destinations a file of the drop matched
@@ -1331,6 +1336,21 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
                 ev.message = line;
                 progress_.Push(ev);
             }
+            for (const Ps2Disc& disc : run.playStation2) {
+                if (cancel_ || run.stop) break;
+                std::vector<std::string> log;
+                std::string reason;
+                const bool converted = ConvertPs2(disc, fs::u8path(config_.dataRoot), log, reason);
+                const std::string line = converted
+                    ? "PS2 Guest Models: " + std::to_string(Ps2Characters().size()) + " characters converted from the US PlayStation 2 disc (" + disc.boot + ")."
+                    : "PlayStation 2 disc recognised (US, " + disc.boot + "); " + OneLine(reason);
+                run.report.playStation2.push_back(line);
+                run.report.playStation2Converted = run.report.playStation2Converted || converted;
+                ImportProgress ev;
+                ev.kind = ImportProgress::Kind::Content;
+                ev.message = line;
+                progress_.Push(ev);
+            }
             run.report.cancelled = cancel_ && !run.stop;
         }
     } catch (...) {
@@ -1519,6 +1539,32 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
                          const std::string& folderRoot, int depth, const std::string& filePath) {
     if (const auto blob = source->ImageBlob()) {
         if (PlayStationImage(run, blob, display)) return;
+    }
+    // The PS2 disc (ps2_disc.h) is converted for the PS2 Guest Models mod (ps2_convert.h), after the ordinary files; none
+    // of its files is Theme Park World's, so nothing else of it is read. Another PS2 game, or another version of this
+    // one, is refused with what it is.
+    {
+        Ps2Disc disc;
+        std::string reason;
+        const Ps2Status status = RecognisePs2(*source, disc, reason);
+        if (status == Ps2Status::Supported) {
+            ++run.report.containers;
+            disc.path = !folderRoot.empty() ? folderRoot : filePath;
+            run.playStation2.push_back(std::move(disc));
+            return;
+        }
+        if (status == Ps2Status::Rejected || !reason.empty()) {
+            ++run.report.containers;
+            const std::string line = (display.empty() ? std::string("PlayStation 2 disc refused: ")
+                                                      : display + ": PlayStation 2 disc refused: ") + OneLine(reason);
+            run.report.errors.push_back(line);
+            ImportProgress ev;
+            ev.kind = ImportProgress::Kind::Error;
+            ev.path = display;
+            ev.message = line;
+            progress_.Push(ev);
+            return;
+        }
     }
     // A Theme Park Inc copy (tpi_disc.h) is converted (tpi_convert.h), after the ordinary files; its own files are
     // never imported as Theme Park World's. A folder or file dropped is remembered for the launcher's converter check.

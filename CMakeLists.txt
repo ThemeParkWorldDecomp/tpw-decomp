@@ -108,6 +108,14 @@ if(TPW_BUILD_ASSETS_TESTS)
   add_executable(tpw_tpi_lobby_sea_tests assets/tests/host_tpi_lobby_sea.cpp)
   target_link_libraries(tpw_tpi_lobby_sea_tests PRIVATE tpw_assets)
   add_test(NAME tpi_lobby_sea COMMAND tpw_tpi_lobby_sea_tests)
+  # The PS2 Guest Models mod's converter (assets/ps2_convert.h): a synthetic DATA.WAD, model, animation set and TGA
+  # built in code, no game data; and the command that converts a PS2 disc into a data folder.
+  add_executable(tpw_ps2_convert_tests assets/tests/host_ps2_convert.cpp)
+  target_link_libraries(tpw_ps2_convert_tests PRIVATE tpw_assets)
+  target_compile_definitions(tpw_ps2_convert_tests PRIVATE TPW_TEST_BUILD_SCRATCH="${CMAKE_BINARY_DIR}/ps2-convert-test-scratch")
+  add_test(NAME ps2_convert COMMAND tpw_ps2_convert_tests)
+  add_executable(tpw_ps2_convert_tool assets/ps2_convert_tool.cpp)
+  target_link_libraries(tpw_ps2_convert_tool PRIVATE tpw_assets)
 endif()
 
 if(TPW_BUILD_TESTS)

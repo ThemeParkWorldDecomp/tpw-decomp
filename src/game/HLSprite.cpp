@@ -33,6 +33,7 @@
 #include "platform/arena.h"
 #include "platform/samsutils.h"
 #include "ppc_math.h"
+#include "Ps2Characters.h"
 #include "RideDB.h"
 #include "rsse.h"
 #include "sprite_engine.h"

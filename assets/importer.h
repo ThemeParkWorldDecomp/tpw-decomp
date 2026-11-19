@@ -183,13 +183,17 @@ struct ImportReport {
     bool playStationConverted = false;
     std::vector<std::string> themeParkInc;  // recognised Theme Park Inc copies and their conversion result, one plain line each
     bool themeParkIncConverted = false;
+    std::vector<std::string> playStation2;  // recognised PS2 discs (ps2_disc.h) and their conversion result, one plain line each
+    bool playStation2Converted = false;
     // The game's icon (icon.h) when this drop wrote <data folder>/icon.png: where it came from ("TP.ico, 64x64, 8-bit");
     // empty when the drop held none, or none better than the one already there.
     std::string icon;
     // us, eur, gold, (3: unused, the language packs are `languages`), us-pc, eur-pc after the drop: EditionIndex order
     EditionStatus status[6];
     std::vector<LanguageStatus> languages;  // every language pack after the drop, in the manifest's order
-    bool ChangedNothing() const { return written == 0 && !playStationConverted && !themeParkIncConverted; }
+    bool ChangedNothing() const {
+        return written == 0 && !playStationConverted && !themeParkIncConverted && !playStation2Converted;
+    }
     // One plain line for the log and the Finished event, e.g. "Nothing new: 1683 files were already in place."
     std::string Summary() const;
 };

@@ -5,6 +5,7 @@
 #include "platform/samsutils.h"
 #include "platform/upixels.h"
 #include "ppc_math.h"
+#include "Ps2Characters.h"
 #include "sprite_engine.h"
 #include "tb_decode_wavelet.h"
 #include "tb_drawprimitive.h"
