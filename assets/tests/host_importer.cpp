@@ -42,7 +42,9 @@
 #include "../source.h"
 #include "test_archives.h"
 #include "test_installshield.h"
+#include "../tpi_convert.h"
 #include "../tpi_disc.h"
+#include "../tpi_wad.h"
 
 #ifndef TPW_DEVTOOLS_DIR
 #define TPW_DEVTOOLS_DIR "devtools"
@@ -2960,8 +2962,8 @@ void TestThemeParkInc(const std::string& scratch) {
         }
     }
 
-    // Refused copies: a demo with one world (installed and as cabinets), and the Bonus Disk's add-on (rides without
-    // the game).
+    // Refused copies: a demo with one world (installed and as cabinets), and level files without the game. The Bonus
+    // Disk's add-on (rides without the game) is recognised as one, for adding on top of a converted copy.
     TpiWriteFiles(drop + "/demo", tpwtest::FakeTpiFiles({"English"}, {"arabian"}));
     disc = TpiDisc();
     CHECK(RecogniseTpiPath(drop + "/demo", options, disc, reason) == TpiStatus::Rejected);
@@ -2979,14 +2981,35 @@ void TestThemeParkInc(const std::string& scratch) {
             {"Data", {{"Data\\levels\\water\\rides", "bonus.wad", std::string(3000, 'b'), true, true},
                       {"Data\\levels\\arabian\\rides", "bonus2.wad", std::string(3000, 'c'), true, false}}}};
         TpiWriteCabinets(drop + "/bonus", tpwtest::IsCabinetOf(bonus));
-        disc = TpiDisc();
-        CHECK(RecogniseTpiPath(drop + "/bonus", options, disc, reason) == TpiStatus::Rejected);
-        CHECK(reason.find("add-on") != std::string::npos);
-        // as a plain tree too
+        if (TpiRecognise("bonus", drop + "/bonus", options, disc, TpiStatus::AddOn) == TpiStatus::AddOn) {
+            CHECK(disc.edition == "SimCoaster Bonus Disk");
+            CHECK(disc.worlds == (std::vector<std::string>{"arabian", "water", ""}));
+            // only its add-on files, as its installer places them below Data
+            std::vector<std::string> paths;
+            for (const Entry& e : disc.source->Entries()) paths.push_back(e.path);
+            std::sort(paths.begin(), paths.end());
+            CHECK(paths == (std::vector<std::string>{"Data/levels/arabian/rides/bonus2.wad", "Data/levels/water/rides/bonus.wad"}));
+        }
+        // as a plain tree too, an installed game's folder holding only the Bonus Disk's files (the coasters, its
+        // registration files, a coaster in a subfolder and a wad outside an item folder are not items)
         WriteFile(drop + "/bonus-tree/Data/levels/water/rides/bonus.wad", std::string(3000, 'b'));
+        WriteFile(drop + "/bonus-tree/Data/My Coasters/Ice Lord.cos", std::string(200, 'c'));
+        WriteFile(drop + "/bonus-tree/Data/My Coasters/old/Ice Lord.cos", std::string(200, 'c'));
+        WriteFile(drop + "/bonus-tree/Data/cdk registration/lostsub.cdk", std::string(16, 'k'));
+        WriteFile(drop + "/bonus-tree/Data/levels/water/bonus.wad", std::string(300, 'b'));
+        if (TpiRecognise("bonus tree", drop + "/bonus-tree", options, disc, TpiStatus::AddOn) == TpiStatus::AddOn) {
+            CHECK(disc.worlds == (std::vector<std::string>{"", "water", ""}));
+            std::vector<std::string> paths;
+            for (const Entry& e : disc.source->Entries()) paths.push_back(e.path);
+            std::sort(paths.begin(), paths.end());
+            CHECK(paths == (std::vector<std::string>{"Data/My Coasters/Ice Lord.cos", "Data/levels/water/rides/bonus.wad"}));
+        }
+        // A world's own terrain without the rest of the game: part of a copy, refused.
+        WriteFile(drop + "/parts/Data/levels/water/rides/bonus.wad", std::string(3000, 'b'));
+        WriteFile(drop + "/parts/Data/levels/water/terrain.wad", std::string(3000, 't'));
         disc = TpiDisc();
-        CHECK(RecogniseTpiPath(drop + "/bonus-tree", options, disc, reason) == TpiStatus::Rejected);
-        CHECK(reason.find("add-on") != std::string::npos);
+        CHECK(RecogniseTpiPath(drop + "/parts", options, disc, reason) == TpiStatus::Rejected);
+        CHECK(reason.find("not the game") != std::string::npos);
     }
 
     // Not this game: random files, a Theme Park World-like tree, a cabinet set of another program.
@@ -3066,10 +3089,21 @@ void TestThemeParkInc(const std::string& scratch) {
         CHECK(demo.themeParkInc.empty());
         CHECK_EQ(demo.written, 0);
         CHECK_EQ(demo.unknownFiles, 0);
-        // the add-on: refused with its own reason
+        // the Bonus Disk without a converted copy: one line saying to import the game first, nothing kept, nothing
+        // imported from it
         ImportReport bonus = imp.Import({drop + "/bonus"});
-        CHECK_EQ(bonus.errors.size(), 1);
-        CHECK(AnyContains(bonus.errors, "add-on"));
+        CHECK(bonus.errors.empty());
+        CHECK_EQ(bonus.themeParkIncAddOn.size(), 1);
+        CHECK(AnyContains(bonus.themeParkIncAddOn, "import SimCoaster AKA Theme Park Inc first"));
+        CHECK(!bonus.themeParkIncAddOnAdded && !bonus.themeParkIncAddOnAlready);
+        CHECK(bonus.ChangedNothing());
+        CHECK(!bonus.themeParkIncAddOn.empty() && bonus.Summary() == bonus.themeParkIncAddOn[0]);
+        CHECK_EQ(bonus.written, 0);
+        CHECK_EQ(bonus.unknownFiles, 0);
+        CHECK(!fs::exists(TpiAddOnFolder(fs::u8path(root))));
+        // the parts of a copy: refused
+        ImportReport parts = imp.Import({drop + "/parts"});
+        CHECK(AnyContains(parts.errors, "SimCoaster AKA Theme Park Inc copy refused"));
         // two copies dropped together: two lines
         ImportReport two = imp.Import({drop + "/disc.iso", drop + "/installed"});
         CHECK(two.errors.empty());
@@ -3085,6 +3119,105 @@ void TestThemeParkInc(const std::string& scratch) {
     RemoveTree(root);
 }
 
+// The SimCoaster Bonus Disk on a data folder whose SimCoaster was converted: kept, said, and harmless to add again. The
+// conversion itself (its rides in their worlds) is host_tpi_convert.cpp TestAddOn.
+void TestTpiBonusDisk(const std::string& scratch) {
+    std::printf("SimCoaster Bonus Disk\n");
+    const std::string drop = scratch + "/bonus-drop", root = scratch + "/bonus-data";
+    RemoveTree(drop);
+    RemoveTree(root);
+    const auto wad = [](const std::string& name, int id) {
+        const std::string sam = "Info.Id " + std::to_string(id) + "\nInfo.Name \"" + name + "\"\n";
+        return TpiBytes(BuildTpiWad({{name + ".sam", std::vector<uint8_t>(sam.begin(), sam.end())},
+                                     {name + ".MD2", std::vector<uint8_t>(64, 'm')}}));
+    };
+    // the disc as it is: an ISO image of InstallShield cabinets, the rides in the "wad files" group, the coasters in
+    // "Prebuilt Coasterers", the registration files in "cdk files"
+    const std::vector<IsGroup> groups = {
+        {"Program Executable Files", {{"", "Setup.exe", "MZ bonus setup", false, false}}},
+        {"wad files", {{"Data\\levels\\water\\rides", "lostsub.wad", wad("lostsub", 4112), true, true},
+                       {"Data\\levels\\science\\rides", "wilbur.wad", wad("wilbur", 4105), true, false},
+                       {"Data\\levels\\science\\rides", "broken.wad", std::string(300, 'x'), false, false}}},
+        {"Prebuilt Coasterers", {{"Data\\My Coasters", "Ice Lord.cos", std::string(1400, 'c'), true, false},
+                                 {"Data\\My Coasters", "Blizzard.cos", std::string(1300, 'd'), true, false}}},
+        {"cdk files", {{"Data\\cdk registration", "lostsub.cdk", std::string(16, 'k'), false, false}}}};
+    WriteFile(drop + "/bonus.iso", TpiBytes(tpwtest::IsoImageOf(TpiIsoFiles(tpwtest::IsCabinetOf(groups)))));
+    WriteFile(drop + "/bonus.zip", tpwtest::ZipArchiveOf({{"SimCoaster - Bonus Disk (USA).iso",
+                                                          TpiBytes(tpwtest::IsoImageOf(TpiIsoFiles(tpwtest::IsCabinetOf(groups))))}}));
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    Importer imp(cfg);
+    std::string err, reason;
+    CHECK(imp.Open(err));
+    const fs::path kept = TpiAddOnFolder(fs::u8path(root)) / "Data";
+
+    // No SimCoaster converted yet: import it first.
+    ImportReport first = imp.Import({drop + "/bonus.iso"});
+    CHECK(first.errors.empty());
+    CHECK(first.themeParkIncAddOn.size() == 1 && AnyContains(first.themeParkIncAddOn, "import SimCoaster AKA Theme Park Inc first"));
+    CHECK(!fs::exists(kept));
+    Events(imp);
+
+    // A converted SimCoaster (its stamp) whose copy was not remembered: the files are kept, and the line says how to
+    // get them into the worlds.
+    CHECK(WriteTpiConverterStamp(fs::u8path(root), reason));
+    ImportReport keptOnly = imp.Import({drop + "/bonus.iso"});
+    CHECK(keptOnly.errors.empty());
+    CHECK(keptOnly.themeParkIncAddOn.size() == 1 &&
+          AnyContains(keptOnly.themeParkIncAddOn, "SimCoaster Bonus Disk kept; no SimCoaster AKA Theme Park Inc copy is remembered"));
+    CHECK(!keptOnly.themeParkIncAddOnAdded && !keptOnly.themeParkIncAddOnAlready);
+    CHECK_EQ(keptOnly.written, 0);
+    CHECK_EQ(keptOnly.unknownFiles, 0);
+    CHECK(ReadText((kept / "levels" / "water" / "rides" / "lostsub.wad").string()) == wad("lostsub", 4112));
+    CHECK(fs::is_regular_file(kept / "levels" / "science" / "rides" / "wilbur.wad"));
+    CHECK(fs::is_regular_file(kept / "My Coasters" / "Ice Lord.cos") && fs::is_regular_file(kept / "My Coasters" / "Blizzard.cos"));
+    CHECK(!fs::exists(kept / "levels" / "science" / "rides" / "broken.wad") && !fs::exists(kept / "cdk registration"));
+    std::vector<ImportProgress> ev = Events(imp);
+    CHECK(std::any_of(ev.begin(), ev.end(), [](const ImportProgress& e) {
+        return e.kind == ImportProgress::Kind::Content && e.message.find("SimCoaster Bonus Disk: left out levels/science/rides/broken.wad") == 0;
+    }));
+    // A remembered copy that is gone: the same, saying so.
+    {
+        LauncherIni ini;
+        CHECK(LoadLauncherIni(root + "/launcher.ini", ini, err));
+        ini.extra.emplace_back(kTpiDiscPathKey, drop + "/no-such-copy");
+        CHECK(SaveLauncherIni(root + "/launcher.ini", ini, err));
+        Importer again(cfg);
+        CHECK(again.Open(err));
+        ImportReport gone = again.Import({drop + "/bonus.zip"});
+        CHECK(gone.errors.empty());
+        CHECK(AnyContains(gone.themeParkIncAddOn, "the SimCoaster AKA Theme Park Inc copy converted before is gone"));
+        Events(again);
+    }
+    // The worlds already hold every kept file (the conversion's record says so): adding it again changes nothing.
+    {
+        std::ofstream record(fs::u8path(root) / "assets" / "tpi" / "converted.txt", std::ios::binary | std::ios::trunc);
+        record << "the add-on kept in assets/tpi/bonus:\n";
+        for (const char* file : {"Data/My Coasters/Blizzard.cos", "Data/My Coasters/Ice Lord.cos",
+                                 "Data/levels/science/rides/wilbur.wad", "Data/levels/water/rides/lostsub.wad"})
+            record << "    add-on file: " << file << " (" << fs::file_size(TpiAddOnFolder(fs::u8path(root)) / fs::u8path(file))
+                   << " bytes)\n";
+    }
+    CHECK(TpiAddOnConverted(fs::u8path(root)));
+    for (const std::string& path : {drop + "/bonus.iso", drop + "/bonus.zip"}) {
+        ImportReport same = imp.Import({path});
+        CHECK(same.errors.empty());
+        CHECK(same.themeParkIncAddOn.size() == 1 && AnyContains(same.themeParkIncAddOn, "already added (4 files already in place)"));
+        CHECK(same.themeParkIncAddOnAlready && !same.themeParkIncAddOnAdded);
+        CHECK(same.ChangedNothing());
+        if (same.themeParkIncAddOn.size() == 1) std::printf("  %s\n", same.themeParkIncAddOn[0].c_str());
+        Events(imp);
+    }
+    // the image and its zip in one drop: one line
+    ImportReport both = imp.Import({drop + "/bonus.iso", drop + "/bonus.zip"});
+    CHECK(both.errors.empty());
+    CHECK(both.themeParkIncAddOn.size() == 1 && both.themeParkIncAddOnAlready && both.ChangedNothing());
+    Events(imp);
+    CHECK(StagingEmpty(root));
+    RemoveTree(drop);
+    RemoveTree(root);
+}
+
 int main() {
     std::string scratch = Env("TPW_TEST_SCRATCH");
     bool haveScratch = !scratch.empty();
@@ -3095,6 +3228,7 @@ int main() {
     // TPW_TEST_ONLY=tpi runs the Theme Park Inc test alone (to run it many times by itself).
     if (Env("TPW_TEST_ONLY") == "tpi") {
         TestThemeParkInc(scratch);
+        TestTpiBonusDisk(scratch);
         RemoveTree(scratch);
         std::printf("importer: %d passed, %d failed, %d skipped\n", g_pass, g_fail, g_skip);
         return g_fail == 0 ? 0 : 1;
@@ -3116,6 +3250,7 @@ int main() {
     TestLanguageLines();
     TestLanguageSynthetic(scratch);
     TestThemeParkInc(scratch);
+    TestTpiBonusDisk(scratch);
     const std::string languageDisc = Env("TPW_TEST_LANGUAGE_DISC"), languages = Env("TPW_TEST_LANGUAGE");
     if (languageDisc.empty() || languages.empty()) Skip("the language disc: TPW_TEST_LANGUAGE_DISC or TPW_TEST_LANGUAGE is not set");
     else TestLanguageDisc(languageDisc, languages, scratch);

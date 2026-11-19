@@ -16,7 +16,10 @@
 
 namespace tpw::assets {
 
-enum class TpiStatus { NotThemeParkInc, Rejected, Supported };
+// AddOn: not the game but an add-on to it, the SimCoaster Bonus Disk (Extra Value Pack): two more rides (the Polar
+// Zone's lostsub, the Land of Invention's wilbur) and ready-made coasters, which its installer puts into an installed
+// game's Data folder. The disc's cabinets, its installed files, or a folder or archive of either, all count.
+enum class TpiStatus { NotThemeParkInc, Rejected, Supported, AddOn };
 
 struct TpiDisc {
     std::string edition;   // which release it is, for the report's line: "Theme Park Inc", "SimCoaster", ...
@@ -29,7 +32,9 @@ struct TpiDisc {
     // The copy's files in installed form: a Source whose root holds the game's Data folder as "Data/..." (always, so
     // root is ""), with the files below Data under the names the copy gives them (their case varies between copies:
     // FindTpiEntry). For a disc it reads the cabinets' "Data" group through installshield.h, so the converter never
-    // knows about cabinets; for an installed game it is a view of the dropped source's Data folder.
+    // knows about cabinets; for an installed game it is a view of the dropped source's Data folder. For an AddOn it
+    // holds only the add-on's files, as its installer places them: Data/levels/<world>/<item folder>/<item>.wad and
+    // Data/My Coasters/<coaster>.cos (tpi_convert.h StoreTpiAddOn).
     std::shared_ptr<Source> source;
     std::string root;
     // Where the copy sits inside the source it was recognised in: the prefix ('/' separated, trailing '/') of the
@@ -38,13 +43,15 @@ struct TpiDisc {
     std::string claimed;
     // The InstallShield major version of the cabinets, 0 for an installed game's plain files.
     int cabinetVersion = 0;
-    // The worlds found, in the order arabian, water, science ("" for one that is missing: Rejected).
+    // The worlds found, in the order arabian, water, science ("" for one that is missing: Rejected). For an AddOn the
+    // worlds it has files for, in the same order and the same way.
     std::vector<std::string> worlds;
 };
 
 // NotThemeParkInc leaves the ordinary importer in charge. Rejected gives one line explaining why a Theme Park Inc copy
-// must not be converted (a demo, a copy with files missing). Reads only the source's listing and small files; the
-// overload with options opens cabinet volumes inside zip and cab sources through a spill file (OpenEntryBlobSpilled).
+// must not be converted (a demo, a copy with files missing). AddOn is the Bonus Disk, added on top of the converted
+// worlds (tpi_convert.h StoreTpiAddOn); its edition is "SimCoaster Bonus Disk". Reads only the source's listing and
+// small files; the overload with options opens cabinet volumes inside zip and cab sources through a spill file (OpenEntryBlobSpilled).
 TpiStatus RecogniseTpi(const std::shared_ptr<Source>& source, TpiDisc& disc, std::string& reason);
 TpiStatus RecogniseTpi(const std::shared_ptr<Source>& source, const SniffOptions& options, TpiDisc& disc,
                        std::string& reason);

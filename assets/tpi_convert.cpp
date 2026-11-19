@@ -192,6 +192,7 @@ struct Log {
     int filesWritten = 0;
     uint64_t bytesWritten = 0;
     std::set<std::string> droppedStatements;   // "<file kind>: Group.Field"
+    TpiAddOnResult addOn;                      // what the add-on kept in TpiAddOnFolder gave (tpi_convert.h)
 };
 
 struct Writer {
@@ -652,6 +653,7 @@ struct Item {
     std::vector<TpiWadMember> members;
     int32_t oldId = -1;
     int32_t newId = -1;
+    bool addOn = false;      // from the add-on kept in TpiAddOnFolder, not the copy
 };
 
 struct ItemFolder {
@@ -673,6 +675,42 @@ const TpiWadMember *ItemSam(const Item &item) {
         if (Lower(m.name) == want)
             return &m;
     return nullptr;
+}
+
+// The name an item's own language file gives it (english.txt, else american.txt: UTF-16 lines, a tag line "NAME" and
+// the name on the next line, RideDB.cpp gRideStringTags), or empty. The game shows that name over Info.Name
+// (CRideDatabase::GetTypeName), so the Bonus Disk's lostsub is "Depth Charge" in the build menu. ASCII only.
+std::string ItemOwnName(const Item &item) {
+    for (const char *file : {"english.txt", "american.txt"}) {
+        for (const auto &m : item.members) {
+            if (Lower(m.name) != file)
+                continue;
+            std::vector<std::string> lines(1);
+            bool ascii = true;
+            size_t i = m.data.size() >= 2 && m.data[0] == 0xff && m.data[1] == 0xfe ? 2 : 0;
+            for (; i + 1 < m.data.size(); i += 2) {
+                const unsigned c = m.data[i] | (m.data[i + 1] << 8);
+                if (c == 10 || c == 13)
+                    lines.emplace_back();
+                else if (c >= 0x20 && c < 0x7f)
+                    lines.back() += static_cast<char>(c);
+                else if (c != 9)
+                    ascii = false;
+            }
+            for (size_t l = 0; ascii && l < lines.size(); ++l) {
+                if (lines[l].compare(0, 4, "NAME") != 0 || lines[l].find_first_not_of(" \t", 4) != std::string::npos)
+                    continue;
+                for (size_t n = l + 1; n < lines.size(); ++n) {
+                    const size_t a = lines[n].find_first_not_of(" \t");
+                    if (a == std::string::npos)
+                        continue;
+                    const size_t b = lines[n].find_last_not_of(" \t");
+                    return lines[n].substr(a, b - a + 1);
+                }
+            }
+        }
+    }
+    return std::string();
 }
 
 void CollectItems(const Levels &levels, const std::string &world, std::vector<Item> &items,
@@ -744,6 +782,39 @@ void CollectItems(const Levels &levels, const std::string &world, std::vector<It
     items = std::move(kept);
 }
 
+// The add-on's items of a world (TpiAddOnFolder), after the copy's own: each wad directly in an item folder. One the copy
+// already has (the same item folder and name: an installed game with the Bonus Disk on it) stays the copy's.
+void CollectAddOnItems(const Levels &addOn, const std::string &world, std::vector<Item> &items, Log &log) {
+    const size_t copyItems = items.size();
+    for (const ItemFolder &folder : kItemFolders) {
+        for (const auto &[rel, entry] : addOn.under(world + "/" + folder.tpi + "/")) {
+            if (rel.find('/') != std::string::npos || !EndsWith(rel, ".wad"))
+                continue;
+            Item item;
+            item.tpiFolder = folder.tpi;
+            item.outFolder = folder.out;
+            item.name = Base(entry->path).substr(0, Base(entry->path).size() - 4);
+            item.addOn = true;
+            bool inCopy = false;
+            for (size_t i = 0; i < copyItems; ++i)
+                inCopy = inCopy || (items[i].tpiFolder == item.tpiFolder && Lower(items[i].name) == Lower(item.name));
+            std::string err;
+            if (inCopy)
+                err = "already in the copy";
+            else if (!ReadTpiWad(addOn.read(*entry), item.members, err))
+                err = "not a wad the converter reads: " + err;
+            if (!err.empty()) {
+                log.text << "    left out: add-on " << folder.tpi << "/" << item.name << " (" << err << ")\n";
+                log.addOn.leftOut.push_back(item.name + ": " + err);
+                if (!inCopy)
+                    log.itemsLeftOut++;
+                continue;
+            }
+            items.push_back(std::move(item));
+        }
+    }
+}
+
 void AssignIds(std::vector<Item> &items, int32_t base, std::map<int32_t, int32_t> &ids, Log &log) {
     std::vector<Item> kept;
     int32_t next = base;
@@ -753,6 +824,8 @@ void AssignIds(std::vector<Item> &items, int32_t base, std::map<int32_t, int32_t
         if (sam == nullptr || !TpiSamInteger(std::string(sam->data.begin(), sam->data.end()), "Info", "Id", id)) {
             log.text << "    left out: " << item.tpiFolder << "/" << item.name << " (no " << item.name << ".sam with an Info.Id)\n";
             log.itemsLeftOut++;
+            if (item.addOn)
+                log.addOn.leftOut.push_back(item.name + ": no " + item.name + ".sam with an Info.Id");
             continue;
         }
         item.oldId = id;
@@ -763,6 +836,8 @@ void AssignIds(std::vector<Item> &items, int32_t base, std::map<int32_t, int32_t
         if (ids.count(id)) {
             log.text << "    left out: " << item.tpiFolder << "/" << item.name << " (Info.Id " << id << " used twice)\n";
             log.itemsLeftOut++;
+            if (item.addOn)
+                log.addOn.leftOut.push_back(item.name + ": its Info.Id " + std::to_string(id) + " is the copy's");
             continue;
         }
         if (keep) {
@@ -1609,8 +1684,9 @@ bool ReadObjectNames(const TpiDisc &disc, const Levels &levels, TpiStrings &name
     return false;
 }
 
-void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &staging, const fs::path &assets,
-                  std::map<std::string, std::vector<SamRow>> &tables, const TpiStrings *names, Log &log) {
+void ConvertWorld(const Levels &levels, const Levels *addOn, const WorldSpec &spec, const fs::path &staging,
+                  const fs::path &assets, std::map<std::string, std::vector<SamRow>> &tables, const TpiStrings *names,
+                  Log &log) {
     const std::string world = spec.folder;
     if (levels.under(world + "/").empty())
         Fail("the world " + world + " is missing from Data/levels");
@@ -1621,6 +1697,9 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
     std::vector<Item> items;
     std::map<std::string, Bytes> folderSams;
     CollectItems(levels, world, items, folderSams, log);
+    // the add-on's items take the ids after the copy's, so the copy's own keep theirs whether it is there or not
+    if (addOn != nullptr)
+        CollectAddOnItems(*addOn, world, items, log);
     std::map<int32_t, int32_t> ids;
     AssignIds(items, spec.idBase, ids, log);
     const std::vector<SamRow> &rideTable = TableFor("rides.sam", tables);
@@ -1677,6 +1756,11 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             if (!shownName.empty() && shownName != infoName)
                 options.append.push_back("Info.Name\t\t\t\"" + shownName + "\"");
         }
+        if (item.addOn) {
+            const std::string ownName = ItemOwnName(item);
+            log.addOn.added.push_back((!ownName.empty() ? ownName : !shownName.empty() ? shownName : item.name) + " (" +
+                                      spec.display + ")");
+        }
         const bool lakeRide = lake.id < 0 && ride && IsLakeRide(item, samText, lake);
         Converted c = ConvertMembers(item.members, &rideTable, &options, &coasterTable, what, log, lakeRide);
         const bool script = item.outFolder == "features" && NeedsFeatureScript(c.members, item.name);
@@ -1710,6 +1794,8 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
                          : TpiFixtureName(item.name) != nullptr ? "the port's name for a fixed item"
                                                                 : "in title case")
                      << ")";
+        if (item.addOn)
+            log.text << ", from the add-on";
         log.text << ")\n";
         log.itemsConverted++;
     }
@@ -1951,6 +2037,45 @@ void ConvertWorld(const Levels &levels, const WorldSpec &spec, const fs::path &s
             log.text << "    left out: " << name << "\n";
 }
 
+// ---- the add-on (TpiAddOnFolder)
+
+// The add-on folder's files, as (path below the folder, '/' separated, entry): none when there is no folder.
+struct AddOnFiles {
+    std::unique_ptr<Source> source;
+    std::vector<std::pair<std::string, const Entry *>> files;
+};
+AddOnFiles ListAddOn(const fs::path &dataRoot) {
+    AddOnFiles out;
+    std::error_code ec;
+    const fs::path folder = TpiAddOnFolder(dataRoot);
+    if (!fs::is_directory(fs::symlink_status(folder, ec)))
+        return out;
+    std::string err;
+    out.source = OpenFolder(tpw::PathText(folder), err);
+    if (!out.source)
+        Fail("cannot read the add-on folder: " + err);
+    for (const Entry &e : out.source->Entries())
+        if (e.kind == EntryKind::Data && !e.unreadable && !EndsWith(e.path, ".part"))
+            out.files.push_back({e.path, &e});
+    std::sort(out.files.begin(), out.files.end());
+    return out;
+}
+
+// converted.txt's line for an add-on file the conversion took (TpiAddOnConverted reads them back).
+std::string AddOnFileLine(const std::string &path, uint64_t size) {
+    return "add-on file: " + path + " (" + std::to_string(size) + " bytes)";
+}
+
+// A file name of the add-on that is safe to write as it is on every system the launcher runs on.
+bool PlainFileName(const std::string &name) {
+    if (name.empty() || name[0] == '.' || name.size() > 128)
+        return false;
+    for (unsigned char c : name)
+        if (c < 0x20 || c == 0x7f || std::strchr("\\/:*?\"<>|", c) != nullptr)
+            return false;
+    return name.back() != ' ' && name.back() != '.';
+}
+
 void ClearTree(const fs::path &path) {
     std::error_code ec;
     auto status = fs::symlink_status(path, ec);
@@ -1991,7 +2116,7 @@ void Install(const fs::path &staged, const fs::path &destination) {
 
 }   // namespace
 
-bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reason) {
+bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reason, TpiAddOnResult *addOnResult) {
     const auto started = std::chrono::steady_clock::now();
     fs::path staging;
     try {
@@ -2011,6 +2136,19 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
                   [](const auto &a, const auto &b) { return a.first < b.first; });
         if (levels.entries.empty())
             Fail("no Data/levels folder in the SimCoaster AKA Theme Park Inc copy");
+        // The add-on kept in the data folder (StoreTpiAddOn): its items join their worlds after the copy's own.
+        const AddOnFiles addOnFiles = ListAddOn(dataRoot);
+        Levels addOn;
+        addOn.source = addOnFiles.source.get();
+        int coasters = 0;
+        for (const auto &[path, entry] : addOnFiles.files) {
+            const std::string lower = Lower(path);
+            if (lower.compare(0, 12, "data/levels/") == 0)
+                addOn.entries.push_back({lower.substr(12), entry});
+            else if (lower.compare(0, 17, "data/my coasters/") == 0 && EndsWith(lower, ".cos"))
+                coasters++;
+        }
+        std::sort(addOn.entries.begin(), addOn.entries.end());
 
         const fs::path assets = dataRoot / "assets";
         const fs::path top = assets / ".staging";
@@ -2034,11 +2172,13 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
         }
 
         Log log;
+        log.addOn.coasters = coasters;
         std::map<std::string, std::vector<SamRow>> tables;
         TpiStrings names;
         const bool named = ReadObjectNames(disc, levels, names, log);
         for (const WorldSpec &spec : kWorlds)
-            ConvertWorld(levels, spec, staging, assets, tables, named ? &names : nullptr, log);
+            ConvertWorld(levels, addOn.entries.empty() ? nullptr : &addOn, spec, staging, assets, tables,
+                         named ? &names : nullptr, log);
         ConvertSprites(disc, levels, staging, assets, log);
         // The islands go into the staging folder too (its data/lobby/), so they reach assets/tpi/data in the same swap as the
         // worlds: the game never sees a world without its island or an island without its world.
@@ -2069,6 +2209,12 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
                << log.text.str() << "\nstatements Theme Park World has no setting for (dropped):\n";
         for (const auto &d : log.droppedStatements)
             record << "    " << d << "\n";
+        if (!addOnFiles.files.empty()) {
+            record << "\nthe add-on kept in assets/tpi/bonus (" << log.addOn.added.size() << " items added, "
+                   << coasters << " ready-made coasters kept, not built: Theme Park World has no ready-made coaster):\n";
+            for (const auto &[path, entry] : addOnFiles.files)
+                record << "    " << AddOnFileLine(path, entry->size) << "\n";
+        }
         {
             fs::path path = assets / "tpi" / "converted.txt";
             fs::path part = path;
@@ -2082,6 +2228,8 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
         }
         if (!WriteTpiConverterStamp(dataRoot, reason))
             return false;
+        if (addOnResult != nullptr)
+            *addOnResult = log.addOn;
         return true;
     } catch (const std::exception &e) {
         if (!staging.empty())
@@ -2091,7 +2239,7 @@ bool ConvertTpi(const TpiDisc &disc, const fs::path &dataRoot, std::string &reas
     }
 }
 
-bool ConvertTpiFromPath(const std::string &path, const fs::path &dataRoot, std::string &reason) {
+bool ConvertTpiFromPath(const std::string &path, const fs::path &dataRoot, std::string &reason, TpiAddOnResult *addOn) {
     std::string err;
     std::shared_ptr<Source> source;
     std::error_code ec;
@@ -2117,8 +2265,116 @@ bool ConvertTpiFromPath(const std::string &path, const fs::path &dataRoot, std::
     }
     if (status == TpiStatus::Rejected)
         return false;
+    if (status == TpiStatus::AddOn) {
+        reason = path + " is the SimCoaster Bonus Disk, not the game";
+        return false;
+    }
     disc.path = path;
-    return ConvertTpi(disc, dataRoot, reason);
+    return ConvertTpi(disc, dataRoot, reason, addOn);
+}
+
+fs::path TpiAddOnFolder(const fs::path &dataRoot) { return dataRoot / "assets" / "tpi" / "bonus"; }
+
+bool StoreTpiAddOn(const TpiDisc &addOn, const fs::path &dataRoot, TpiAddOnStore &store, std::string &reason) {
+    store = TpiAddOnStore();
+    try {
+        if (!addOn.source)
+            Fail("the SimCoaster Bonus Disk has no source");
+        const fs::path folder = TpiAddOnFolder(dataRoot);
+        std::error_code ec;
+        for (fs::path p = folder; p != dataRoot && !p.empty(); p = p.parent_path())
+            if (fs::is_symlink(fs::symlink_status(p, ec)))
+                Fail("the add-on folder is a symbolic link");
+        Levels reader;
+        reader.source = addOn.source.get();
+        for (const Entry &e : addOn.source->Entries()) {
+            if (e.kind != EntryKind::Data || e.unreadable)
+                continue;
+            if (e.path.compare(0, 5, "Data/") != 0)
+                continue;
+            const std::string rel = e.path.substr(5), lower = Lower(rel);
+            const std::string name = Base(rel);
+            const bool coaster = lower.compare(0, 12, "my coasters/") == 0 && EndsWith(lower, ".cos");
+            const bool wad = lower.compare(0, 7, "levels/") == 0 && EndsWith(lower, ".wad");
+            if (!coaster && !wad)
+                continue;
+            std::string why;
+            Bytes bytes;
+            if (!PlainFileName(name))
+                why = "a file name the launcher does not write";
+            else if (e.size == 0 || e.size > kMaxEntry)
+                why = e.size == 0 ? "an empty file" : "too big";
+            else
+                bytes = reader.read(e);
+            if (why.empty() && wad) {
+                Item item;
+                item.name = name.substr(0, name.size() - 4);
+                int32_t id = -1;
+                std::string err;
+                if (!ReadTpiWad(bytes, item.members, err))
+                    why = "not a wad the converter reads: " + err;
+                else if (const TpiWadMember *sam = ItemSam(item);
+                         sam == nullptr ||
+                         !TpiSamInteger(std::string(sam->data.begin(), sam->data.end()), "Info", "Id", id))
+                    why = "no " + item.name + ".sam with an Info.Id";
+            }
+            if (!why.empty()) {
+                store.leftOut.push_back(rel + ": " + why);
+                continue;
+            }
+            const fs::path destination = folder / "Data" / fs::u8path(rel);
+            if (fs::is_regular_file(fs::symlink_status(destination, ec)) && fs::file_size(destination, ec) == bytes.size()) {
+                std::ifstream in(destination, std::ios::binary);
+                const Bytes have((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+                if (have == bytes) {
+                    store.alreadyThere.push_back(rel);
+                    continue;
+                }
+            }
+            fs::create_directories(destination.parent_path());
+            fs::path part = destination;
+            part += ".part";
+            {
+                std::ofstream out(part, std::ios::binary | std::ios::trunc);
+                out.write(reinterpret_cast<const char *>(bytes.data()), static_cast<std::streamsize>(bytes.size()));
+                out.close();
+                if (!out)
+                    Fail("cannot write " + rel);
+            }
+            fs::rename(part, destination);
+            store.written.push_back(rel);
+        }
+        return true;
+    } catch (const std::exception &e) {
+        reason = std::string("the SimCoaster Bonus Disk could not be kept: ") + e.what();
+        return false;
+    }
+}
+
+bool TpiAddOnConverted(const fs::path &dataRoot) {
+    try {
+        const AddOnFiles files = ListAddOn(dataRoot);
+        if (files.files.empty())
+            return true;
+        std::ifstream in(dataRoot / "assets" / "tpi" / "converted.txt", std::ios::binary);
+        if (!in)
+            return false;
+        std::set<std::string> lines;
+        std::string line;
+        while (std::getline(in, line)) {
+            if (!line.empty() && line.back() == '\r')
+                line.pop_back();
+            const size_t start = line.find_first_not_of(' ');
+            if (start != std::string::npos)
+                lines.insert(line.substr(start));
+        }
+        for (const auto &[path, entry] : files.files)
+            if (!lines.count(AddOnFileLine(path, entry->size)))
+                return false;
+        return true;
+    } catch (const std::exception &) {
+        return false;
+    }
 }
 
 } // namespace tpw::assets

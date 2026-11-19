@@ -598,6 +598,8 @@ std::string ImportReport::Summary() const {
         ss << playStation.front();
     } else if (written == 0 && !cancelled && !aborted && !themeParkInc.empty()) {
         ss << themeParkInc.front();
+    } else if (written == 0 && !cancelled && !aborted && !themeParkIncAddOn.empty()) {
+        ss << themeParkIncAddOn.front();
     } else if (written == 0 && !cancelled && !aborted && !playStation2.empty()) {
         ss << playStation2.front();
     } else if (written == 0 && !cancelled && !aborted) {
@@ -627,6 +629,8 @@ struct Importer::Run {
     std::vector<Work> work;
     std::vector<Ps1Disc> playStation;  // converted after ordinary files, so a combined PC/PS1 drop finds its donors
     std::vector<TpiDisc> themeParkInc; // the same for Theme Park Inc copies (tpi_disc.h), converted by tpi_convert.h
+    std::vector<TpiDisc> themeParkIncAddOn;  // SimCoaster Bonus Disks (TpiStatus::AddOn), kept before the copies convert
+    bool addOnToConvert = false;             // a kept Bonus Disk is not in the converted worlds yet
     std::vector<Ps2Disc> playStation2; // the PS2 disc for the PS2 Guest Models mod (ps2_disc.h), converted by ps2_convert.h
     uint64_t totalBytes = 0, doneBytes = 0;
     std::set<std::string> different;             // destinations a file of the drop has another version of
@@ -1220,6 +1224,111 @@ void Importer::RememberTpiDisc(const std::string& path, const std::string& sha25
     }());
 }
 
+std::string Importer::IniValue(const char* key) const {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& e : ini_.extra)
+        if (e.first == key) return e.second;
+    return std::string();
+}
+
+void Importer::StoreTpiAddOns(Run& run) {
+    const fs::path dataRoot = fs::u8path(config_.dataRoot);
+    for (const TpiDisc& addOn : run.themeParkIncAddOn) {
+        if (cancel_ || run.stop) break;
+        std::string line;
+        TpiAddOnStore store;
+        std::string reason;
+        if (run.themeParkInc.empty() && ReadTpiConverterStamp(dataRoot) == 0) {
+            // nothing to add it to: the worlds come from the player's own SimCoaster AKA Theme Park Inc
+            line = "SimCoaster Bonus Disk recognised; import SimCoaster AKA Theme Park Inc first, then add the Bonus "
+                   "Disk again (it adds rides to that game's worlds).";
+        } else if (!StoreTpiAddOn(addOn, dataRoot, store, reason)) {
+            line = "SimCoaster Bonus Disk recognised; " + OneLine(reason);
+        } else {
+            for (const std::string& left : store.leftOut) {
+                ImportProgress ev;
+                ev.kind = ImportProgress::Kind::Content;
+                ev.message = "SimCoaster Bonus Disk: left out " + left;
+                progress_.Push(ev);
+            }
+            if (store.written.empty() && store.alreadyThere.empty()) {
+                line = "SimCoaster Bonus Disk recognised; none of its files could be used" +
+                       (store.leftOut.empty() ? std::string() : " (" + OneLine(store.leftOut.front()) + ")") + ".";
+            } else if (!store.written.empty() || !TpiAddOnConverted(dataRoot)) {
+                run.addOnToConvert = true;   // AddTpiAddOns says what it added
+                continue;
+            } else {
+                line = "SimCoaster Bonus Disk: already added (" + std::to_string(store.alreadyThere.size()) +
+                       " files already in place).";
+                run.report.themeParkIncAddOnAlready = true;
+            }
+        }
+        // the same disc twice in one drop (its image and a copy of its folder) says it once
+        auto& lines = run.report.themeParkIncAddOn;
+        if (std::find(lines.begin(), lines.end(), line) != lines.end()) continue;
+        lines.push_back(line);
+        ImportProgress ev;
+        ev.kind = ImportProgress::Kind::Content;
+        ev.message = line;
+        progress_.Push(ev);
+    }
+}
+
+namespace {
+// What a conversion with the kept Bonus Disk added, in one plain line.
+std::string AddOnLine(const TpiAddOnResult& result) {
+    std::string line = "SimCoaster Bonus Disk: ";
+    if (result.added.empty()) {
+        line += "no ride added";
+        if (!result.leftOut.empty()) line += " (" + OneLine(result.leftOut.front()) + ")";
+    } else {
+        line += "added ";
+        for (size_t i = 0; i < result.added.size(); ++i)
+            line += (i == 0 ? "" : i + 1 == result.added.size() ? " and " : ", ") + result.added[i];
+    }
+    if (result.coasters > 0)
+        line += "; its " + std::to_string(result.coasters) + " ready-made coasters are kept but cannot be built " +
+                "(Theme Park World has no ready-made coasters)";
+    return line + ".";
+}
+}  // namespace
+
+void Importer::AddTpiAddOns(Run& run, const TpiAddOnResult* copyResult) {
+    if (!run.addOnToConvert) return;
+    const fs::path dataRoot = fs::u8path(config_.dataRoot);
+    std::string line;
+    TpiAddOnResult result;
+    if (copyResult != nullptr) {
+        result = *copyResult;
+    } else {
+        // The copy converted before, converted again with the add-on, as the launcher's converter check does
+        // (launcher/tpi_refresh.cpp): only while it is still there and unchanged.
+        const std::string path = IniValue(kTpiDiscPathKey), sha256 = IniValue(kTpiDiscSha256Key);
+        std::error_code ec;
+        std::string why, hash;
+        if (path.empty())
+            why = "no SimCoaster AKA Theme Park Inc copy is remembered";
+        else if (sha256.empty() ? !fs::is_directory(fs::u8path(path), ec) : !fs::is_regular_file(fs::u8path(path), ec))
+            why = "the SimCoaster AKA Theme Park Inc copy converted before is gone";
+        else if (!sha256.empty() && (!HashPath(path, hash) || hash != sha256))
+            why = "the SimCoaster AKA Theme Park Inc copy converted before has changed";
+        else if (!ConvertTpiFromPath(path, dataRoot, why, &result))
+            why = "converting the SimCoaster AKA Theme Park Inc copy again failed: " + OneLine(why);
+        if (!why.empty())
+            line = "SimCoaster Bonus Disk kept; " + why + ": add your SimCoaster AKA Theme Park Inc copy again to "
+                   "add its rides.";
+    }
+    if (line.empty()) {
+        line = AddOnLine(result);
+        run.report.themeParkIncAddOnAdded = !result.added.empty();
+    }
+    run.report.themeParkIncAddOn.push_back(line);
+    ImportProgress ev;
+    ev.kind = ImportProgress::Kind::Content;
+    ev.message = line;
+    progress_.Push(ev);
+}
+
 bool Importer::SaveIniLocked(std::string& err) {
     ini_.dataFolder = config_.dataRoot;
     for (Edition e : kAllEditions) ini_.editions[EditionName(e)] = StatusLocked(e).StateWord();
@@ -1321,10 +1430,18 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
                 ev.message = line;
                 progress_.Push(ev);
             }
+            StoreTpiAddOns(run);
+            const TpiAddOnResult* copyAddOn = nullptr;
+            TpiAddOnResult addOnResult;
             for (const TpiDisc& disc : run.themeParkInc) {
                 if (cancel_ || run.stop) break;
                 std::string reason;
-                const bool converted = ConvertTpi(disc, fs::u8path(config_.dataRoot), reason);
+                TpiAddOnResult result;
+                const bool converted = ConvertTpi(disc, fs::u8path(config_.dataRoot), reason, &result);
+                if (converted) {
+                    addOnResult = result;
+                    copyAddOn = &addOnResult;
+                }
                 const std::string line = converted
                     ? "SimCoaster AKA Theme Park Inc: 3 worlds converted from the " + disc.edition + " copy."
                     : "SimCoaster AKA Theme Park Inc copy recognised (" + disc.edition + "); " + OneLine(reason);
@@ -1351,6 +1468,7 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
                 ev.message = line;
                 progress_.Push(ev);
             }
+            if (!cancel_ && !run.stop) AddTpiAddOns(run, copyAddOn);
             run.report.cancelled = cancel_ && !run.stop;
         }
     } catch (...) {
@@ -1578,7 +1696,9 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
             ++run.report.containers;
             tpiWhole = disc.claimed.empty();
             if (!tpiWhole) tpiClaimed = disc.claimed.substr(0, disc.claimed.size() - 1);
-            if (status == TpiStatus::Supported) {
+            if (status == TpiStatus::AddOn) {
+                run.themeParkIncAddOn.push_back(std::move(disc));
+            } else if (status == TpiStatus::Supported) {
                 if (!folderRoot.empty()) {
                     disc.path = folderRoot;
                 } else if (!filePath.empty()) {

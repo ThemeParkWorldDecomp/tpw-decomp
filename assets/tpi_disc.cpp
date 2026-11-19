@@ -142,8 +142,7 @@ std::string Edition(Source& data, const Index& index, const std::vector<std::str
     return "Theme Park Inc";
 }
 
-// Whether a source holds level files of this game (Data/levels/<world>/...) without the game itself: the SimCoaster
-// Bonus Disk (Extra Value Pack) installs two rides and prebuilt coasters into an installed game's folders.
+// Whether a source holds level files of this game (Data/levels/<world>/...) without the game itself.
 bool AddOnOnly(const Source& source) {
     for (const Entry& e : source.Entries()) {
         if (e.kind != EntryKind::Data) continue;
@@ -156,9 +155,110 @@ bool AddOnOnly(const Source& source) {
     }
     return false;
 }
-const char kAddOnReason[] =
-    "this is an add-on for the game (the SimCoaster Bonus Disk's rides and coasters), not the game: the mod needs a "
-    "copy of SimCoaster AKA Theme Park Inc itself";
+const char kPartsReason[] =
+    "this holds some of the game's level files but not the game: the mod needs a copy of SimCoaster AKA Theme Park Inc "
+    "itself";
+
+// The folders an add-on's items go in (tpi_convert.cpp kItemFolders).
+const char* const kAddOnItemFolders[] = {"rides", "shops", "sideshow", "features", "upgrades", "facilities"};
+
+// The add-on's file a Data entry is, as its path below Data ("levels/water/rides/lostsub.wad", "My Coasters/Blizzard.cos"),
+// or "" for any other file: an item's wad directly in a world's item folder, a coaster directly in My Coasters. The
+// entry's own path may hold anything before its Data folder (an installed game's folder, a cabinet's file group).
+std::string AddOnFile(const std::string& path) {
+    const std::string low = Lower(path);
+    for (size_t at = low.find("data/"); at != std::string::npos; at = low.find("data/", at + 1)) {
+        if (at != 0 && low[at - 1] != '/') continue;
+        const std::string rest = path.substr(at + 5), lowRest = low.substr(at + 5);
+        if (lowRest.compare(0, 12, "my coasters/") == 0) {
+            if (EndsWith(lowRest, ".cos") && lowRest.find('/', 12) == std::string::npos && lowRest.size() > 16)
+                return "My Coasters/" + rest.substr(12);
+            return {};
+        }
+        for (const char* world : kWorlds) {
+            const std::string folder = std::string("levels/") + world + "/";
+            if (lowRest.compare(0, folder.size(), folder) != 0) continue;
+            for (const char* items : kAddOnItemFolders) {
+                const std::string itemFolder = folder + items + "/";
+                if (lowRest.compare(0, itemFolder.size(), itemFolder) != 0) continue;
+                const std::string name = rest.substr(itemFolder.size());
+                if (!EndsWith(Lower(name), ".wad") || name.size() < 5 || name.find('/') != std::string::npos) return {};
+                return itemFolder + name;
+            }
+            return {};
+        }
+    }
+    return {};
+}
+
+// A view of an add-on's files only, each as Data/<AddOnFile> (the first of two with the same name, ignoring case).
+class AddOnView : public Source {
+public:
+    explicit AddOnView(std::shared_ptr<Source> inner) : inner_(std::move(inner)) {
+        std::set<std::string> seen;
+        for (const Entry& e : inner_->Entries()) {
+            if (e.kind != EntryKind::Data || e.unreadable) continue;
+            const std::string file = AddOnFile(e.path);
+            if (file.empty() || !seen.insert(Lower(file)).second) continue;
+            Entry out = e;
+            out.path = "Data/" + file;
+            out.id = entries_.size();
+            inner_index_.push_back(&e - inner_->Entries().data());
+            entries_.push_back(std::move(out));
+        }
+    }
+    const char* Kind() const override { return inner_->Kind(); }
+    const std::vector<Entry>& Entries() const override { return entries_; }
+    std::unique_ptr<Stream> Open(const Entry& entry, std::string& err) override {
+        if (entry.id >= inner_index_.size()) {
+            err = "no such entry";
+            return nullptr;
+        }
+        return inner_->Open(inner_->Entries()[inner_index_[size_t(entry.id)]], err);
+    }
+    std::shared_ptr<Blob> OpenBlob(const Entry& entry, std::string& err) override {
+        if (entry.id >= inner_index_.size()) return nullptr;
+        return inner_->OpenBlob(inner_->Entries()[inner_index_[size_t(entry.id)]], err);
+    }
+
+private:
+    std::shared_ptr<Source> inner_;
+    std::vector<Entry> entries_;
+    std::vector<size_t> inner_index_;
+};
+
+// A source with level files of this game but not the game (AddOnOnly): the Bonus Disk (AddOn) when it holds an item or
+// a coaster and none of the worlds' own terrain, else Rejected (part of a game copy).
+TpiStatus AddOnStatus(const std::shared_ptr<Source>& source, TpiDisc& disc, std::string& reason) {
+    for (const Entry& e : source->Entries()) {
+        if (e.kind != EntryKind::Data) continue;
+        const std::string low = Lower(e.path);
+        for (const char* world : kWorlds) {
+            const std::string terrain = std::string("data/levels/") + world + "/terrain.wad";
+            if (EndsWith(low, terrain) && (low.size() == terrain.size() || low[low.size() - terrain.size() - 1] == '/')) {
+                reason = kPartsReason;
+                return TpiStatus::Rejected;
+            }
+        }
+    }
+    auto view = std::make_shared<AddOnView>(source);
+    if (view->Entries().empty()) {
+        reason = kPartsReason;
+        return TpiStatus::Rejected;
+    }
+    disc.worlds.clear();
+    for (const char* world : kWorlds) {
+        const std::string folder = std::string("data/levels/") + world + "/";
+        bool has = false;
+        for (const Entry& e : view->Entries()) has = has || Lower(e.path).compare(0, folder.size(), folder) == 0;
+        disc.worlds.push_back(has ? world : "");
+    }
+    disc.edition = "SimCoaster Bonus Disk";
+    disc.source = view;
+    disc.root.clear();
+    reason.clear();
+    return TpiStatus::AddOn;
+}
 
 // The worlds of a Data view: Supported when all three are whole, else Rejected with the reason. disc.worlds is filled.
 TpiStatus CheckWorlds(const std::shared_ptr<Source>& data, const std::vector<std::string>& hint, TpiDisc& disc,
@@ -245,11 +345,9 @@ TpiStatus Cabinets(const std::shared_ptr<Source>& parent, const Index& index, co
     // the file group holding the game's Data folder (named "Data" on the discs seen, found by its content)
     const std::vector<std::string> folders = DataFolders(*cabinets);
     if (folders.empty()) {
-        if (AddOnOnly(*cabinets)) {
-            reason = kAddOnReason;
-            return TpiStatus::Rejected;
-        }
-        return TpiStatus::NotThemeParkInc;
+        if (!AddOnOnly(*cabinets)) return TpiStatus::NotThemeParkInc;
+        disc.claimed = dir;
+        return AddOnStatus(cabinets, disc, reason);
     }
     std::shared_ptr<Source> data = std::make_shared<RerootedSource>(cabinets, folders.front(), "Data/");
     disc.claimed = dir;
@@ -324,10 +422,7 @@ TpiStatus RecogniseTpi(const std::shared_ptr<Source>& source, const SniffOptions
         reason = why;
         return status;
     }
-    if (AddOnOnly(*source)) {
-        reason = kAddOnReason;
-        return TpiStatus::Rejected;
-    }
+    if (AddOnOnly(*source)) return AddOnStatus(source, disc, reason);
     return TpiStatus::NotThemeParkInc;
 }
 

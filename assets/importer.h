@@ -13,6 +13,7 @@
 //   assets/lang/<Name>/<game path>      the language packs (destinations "lang/<Name>/<game path>"; Languages())
 //   assets/ps1/data/levels/<theme>/...   converted PlayStation content, outside manifest verification
 //   assets/tpi/data/...                  converted Theme Park Inc content (tpi_convert.h), outside manifest verification
+//   assets/tpi/bonus/Data/...            the SimCoaster Bonus Disk's rides and coasters as on its disc (StoreTpiAddOn)
 //   assets/.staging/                    files being written and big images being unpacked; emptied on every start
 //   assets/verified.tsv                 size and modification time of every verified file (the startup check)
 //   launcher.ini                        data folder, edition states, last choice (LauncherIni)
@@ -69,6 +70,8 @@
 #include "source.h"
 
 namespace tpw::assets {
+
+struct TpiAddOnResult;  // tpi_convert.h
 
 // ---- launcher.ini
 
@@ -183,6 +186,11 @@ struct ImportReport {
     bool playStationConverted = false;
     std::vector<std::string> themeParkInc;  // recognised Theme Park Inc copies and their conversion result, one plain line each
     bool themeParkIncConverted = false;
+    // The SimCoaster Bonus Disk (tpi_disc.h TpiStatus::AddOn): one plain line each. Added: its rides are now in the
+    // converted worlds; already: they were before this drop (re-adding changed nothing).
+    std::vector<std::string> themeParkIncAddOn;
+    bool themeParkIncAddOnAdded = false;
+    bool themeParkIncAddOnAlready = false;
     std::vector<std::string> playStation2;  // recognised PS2 discs (ps2_disc.h) and their conversion result, one plain line each
     bool playStation2Converted = false;
     // The game's icon (icon.h) when this drop wrote <data folder>/icon.png: where it came from ("TP.ico, 64x64, 8-bit");
@@ -192,7 +200,8 @@ struct ImportReport {
     EditionStatus status[6];
     std::vector<LanguageStatus> languages;  // every language pack after the drop, in the manifest's order
     bool ChangedNothing() const {
-        return written == 0 && !playStationConverted && !themeParkIncConverted && !playStation2Converted;
+        return written == 0 && !playStationConverted && !themeParkIncConverted && !themeParkIncAddOnAdded &&
+               !playStation2Converted;
     }
     // One plain line for the log and the Finished event, e.g. "Nothing new: 1683 files were already in place."
     std::string Summary() const;
@@ -334,6 +343,12 @@ private:
     void RememberPs1Disc(const std::string& path, const std::string& sha256);
     // Keeps a converted Theme Park Inc copy's path and hash in launcher.ini (kTpiDiscPathKey, kTpiDiscSha256Key).
     void RememberTpiDisc(const std::string& path, const std::string& sha256);
+    // A launcher.ini value kept by the importer (kTpiDiscPathKey ...); empty when there is none.
+    std::string IniValue(const char* key) const;
+    // The SimCoaster Bonus Disks of a drop (TpiStatus::AddOn): kept in the data folder, then added to the worlds by the
+    // drop's own converted copy (copyResult) or, without one, by converting the remembered copy again.
+    void StoreTpiAddOns(Run& run);
+    void AddTpiAddOns(Run& run, const TpiAddOnResult* copyResult);
     EditionStatus StatusLocked(Edition edition) const;
     std::vector<LanguageStatus> LanguagesLocked() const;
 

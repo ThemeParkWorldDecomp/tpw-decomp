@@ -1914,6 +1914,129 @@ void TestNonAsciiPath(const fs::path& scratch) {
     fs::remove_all(home, ec);
 }
 
+// ---- the SimCoaster Bonus Disk (StoreTpiAddOn): its rides join their worlds after the copy's own items
+
+// The ids of a converted world's rides, by item name.
+std::map<std::string, int32_t> RideIds(const fs::path& world) {
+    std::map<std::string, int32_t> ids;
+    std::error_code ec;
+    for (const auto& entry : fs::directory_iterator(world / "rides", ec)) {
+        const fs::path sam = entry.path() / (entry.path().filename().string() + ".sam");
+        int32_t id = 0;
+        if (entry.is_directory() && fs::is_regular_file(sam) && TpiSamInteger(S(ReadFile(sam)), "Info", "Id", id))
+            ids[entry.path().filename().string()] = id;
+    }
+    return ids;
+}
+
+// A ride's own language file as the Bonus Disk's are: UTF-16 with a byte order mark, a tag line and its text below.
+Bytes Utf16Text(const std::string& text) {
+    Bytes out = {0xff, 0xfe};
+    for (const char c : text) {
+        out.push_back(static_cast<uint8_t>(c));
+        out.push_back(0);
+    }
+    return out;
+}
+
+void TestAddOn(const fs::path& scratch) {
+    const fs::path home = scratch / "tpi-addon";
+    const fs::path tree = home / "copy", bonus = home / "bonus", dataRoot = home / "data";
+    std::error_code ec;
+    fs::remove_all(home, ec);
+    for (const char* world : {"arabian", "water", "science"})
+        MakeWorld(tree / "Data" / "levels", world, std::string(world) + ".tct");
+    WriteFile(tree / "Data" / "esprites.wad", TpiSpriteWad());
+    RegisterTestTables();
+    MakeDonorItems(dataRoot, "eur");
+    std::string err, reason;
+    TpiDisc disc;
+    disc.edition = "Theme Park Inc";
+    disc.path = tpw::PathText(tree);
+    disc.source = OpenFolder(disc.path, err);
+    CHECK(disc.source != nullptr);
+    if (!disc.source) return;
+    // The copy alone: no add-on, nothing added, and a data folder without one counts as having it in its worlds.
+    TpiAddOnResult result;
+    CHECK(ConvertTpi(disc, dataRoot, reason, &result));
+    if (!reason.empty()) std::printf("  convert (add-on, before): %s\n", reason.c_str());
+    CHECK(result.added.empty() && result.leftOut.empty() && result.coasters == 0);
+    CHECK(TpiAddOnConverted(dataRoot));
+    const fs::path out = dataRoot / "assets" / "tpi" / "data" / "levels";
+    const std::map<std::string, int32_t> waterBefore = RideIds(out / "water"), scienceBefore = RideIds(out / "science");
+    CHECK(!waterBefore.empty() && !scienceBefore.empty());
+
+    // The Bonus Disk's files as its installer lays them out: a ride for Polar Zone, a ride for Land of Invention, a ride
+    // the copy already has (an installed game with the Bonus Disk on it), a file that is not a wad, a coaster file and a
+    // registration file (not kept).
+    // lostsub's own english.txt names it (the game shows that name, not Info.Name); wilbur has none.
+    const Bytes lostsub = Item("lostsub", 4112, "", B("mesh"),
+                               {{"english.txt", Utf16Text("NAME\r\nTest  Sub \r\n\r\nSIGNA\r\nTest\r\n")}});
+    WriteFile(bonus / "Data" / "levels" / "water" / "rides" / "lostsub.wad", lostsub);
+    WriteFile(bonus / "Data" / "levels" / "science" / "rides" / "wilbur.wad", Item("wilbur", 4105));
+    WriteFile(bonus / "Data" / "levels" / "water" / "rides" / "carpet.wad", Item("carpet", 3112));
+    WriteFile(bonus / "Data" / "levels" / "water" / "rides" / "broken.wad", B("not a wad"));
+    WriteFile(bonus / "Data" / "My Coasters" / "Ice Lord.cos", B("coaster"));
+    WriteFile(bonus / "Data" / "cdk registration" / "lostsub.cdk", B("cdk"));
+    TpiDisc addOn;
+    addOn.edition = "SimCoaster Bonus Disk";
+    addOn.source = OpenFolder(tpw::PathText(bonus), err);
+    CHECK(addOn.source != nullptr);
+    if (!addOn.source) return;
+    TpiAddOnStore store;
+    CHECK(StoreTpiAddOn(addOn, dataRoot, store, reason));
+    CHECK(store.written.size() == 4u);
+    CHECK(store.alreadyThere.empty());
+    CHECK(store.leftOut.size() == 1 && store.leftOut[0].find("broken.wad") != std::string::npos);
+    const fs::path kept = TpiAddOnFolder(dataRoot) / "Data";
+    CHECK(ReadFile(kept / "levels" / "water" / "rides" / "lostsub.wad") == lostsub);
+    CHECK(fs::is_regular_file(kept / "My Coasters" / "Ice Lord.cos"));
+    CHECK(!fs::exists(kept / "cdk registration"));
+    CHECK(!fs::exists(kept / "levels" / "water" / "rides" / "broken.wad"));
+    // kept but not in the worlds yet
+    CHECK(!TpiAddOnConverted(dataRoot));
+    // Kept again: harmless, every file already there.
+    CHECK(StoreTpiAddOn(addOn, dataRoot, store, reason));
+    CHECK(store.written.empty() && store.alreadyThere.size() == 4u);
+
+    // Converted with it: the copy's items keep their ids, the add-on's take the next ones in their worlds, the one the
+    // copy has stays the copy's.
+    for (int pass = 0; pass < 2; ++pass) {
+        result = TpiAddOnResult();
+        CHECK(ConvertTpi(disc, dataRoot, reason, &result));
+        if (!reason.empty()) std::printf("  convert (add-on): %s\n", reason.c_str());
+        CHECK(result.added.size() == 2u);
+        CHECK(std::find(result.added.begin(), result.added.end(), "Test  Sub (Polar Zone)") != result.added.end());
+        CHECK(std::find(result.added.begin(), result.added.end(), "Wilbur (Land of Invention)") != result.added.end());
+        CHECK(result.leftOut.size() == 1u && result.leftOut[0].find("already in the copy") != std::string::npos);
+        CHECK(result.coasters == 1);
+        if (result.added.size() != 2u)
+            for (const std::string& a : result.added) std::printf("  added: %s\n", a.c_str());
+        std::map<std::string, int32_t> water = RideIds(out / "water"), science = RideIds(out / "science");
+        int32_t lastWater = 0, lastScience = 0;
+        for (const auto& [name, id] : waterBefore) {
+            CHECK(water[name] == id);
+            lastWater = std::max(lastWater, id);
+        }
+        for (const auto& [name, id] : scienceBefore) {
+            CHECK(science[name] == id);
+            lastScience = std::max(lastScience, id);
+        }
+        CHECK(water.count("lostsub") && water["lostsub"] > lastWater && water["lostsub"] < 7000);
+        CHECK(science.count("wilbur") && science["wilbur"] > lastScience && science["wilbur"] < 8000);
+        CHECK(!fs::exists(out / "arabian" / "rides" / "lostsub") && !fs::exists(out / "water" / "rides" / "wilbur"));
+        CHECK(TpiAddOnConverted(dataRoot));
+        const std::string record = S(ReadFile(dataRoot / "assets" / "tpi" / "converted.txt"));
+        CHECK(record.find("add-on file: Data/levels/water/rides/lostsub.wad (") != std::string::npos);
+        CHECK(record.find("add-on file: Data/My Coasters/Ice Lord.cos (") != std::string::npos);
+    }
+    // A kept file changed afterwards: the worlds no longer hold it.
+    WriteFile(kept / "levels" / "science" / "rides" / "wilbur.wad", Item("wilbur", 4105, "Info.WorkingLife 4\n"));
+    CHECK(!TpiAddOnConverted(dataRoot));
+    CHECK(fs::is_empty(dataRoot / "assets" / ".staging"));
+    fs::remove_all(home, ec);
+}
+
 // ---- the real thing, when asked
 
 bool LoadTable(const fs::path& file, std::vector<SamRow>& rows) {
@@ -2041,11 +2164,16 @@ int main() {
 #endif
     if (scratch.empty()) {
         Skip("conversion of a Data tree: no scratch folder (TPW_TEST_SCRATCH)");
+    } else if (Env("TPW_TEST_ONLY") == "addon") {
+        // the Bonus Disk test alone (to run it many times by itself)
+        fs::create_directories(scratch);
+        TestAddOn(scratch);
     } else {
         fs::create_directories(scratch);
         TestConvertTree(scratch);
         TestSprites(scratch);
         TestNonAsciiPath(scratch);
+        TestAddOn(scratch);
         const std::string data = Env("TPW_TPI_DATA"), tables = Env("TPW_TPI_TABLES"), tpwAssets = Env("TPW_TPW_ASSETS");
         if (data.empty() || tables.empty() || tpwAssets.empty())
             Skip("real conversion: TPW_TPI_DATA, TPW_TPI_TABLES or TPW_TPW_ASSETS is not set");
