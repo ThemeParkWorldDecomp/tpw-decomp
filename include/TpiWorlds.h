@@ -34,8 +34,10 @@ inline constexpr TpiWorld kTpiWorlds[] = {
     {"science", "Land of Invention", "space"},
 };
 
-// The folders of a world that never fall back to the donor (platform/tpi_content.h's table), in any case.
-inline constexpr const char* kTpiOwnFolders[] = {"rides", "shops", "sideshow", "features", "upgrades", "facilities", "obstacles"};
+// The folders of a world that never fall back to the donor (platform/tpi_content.h's table), in any case: the build
+// lists' folders, and the sound and music banks (a sound the world lacks plays nothing, never the donor's).
+inline constexpr const char* kTpiOwnFolders[] = {"rides", "shops", "sideshow", "features", "upgrades", "facilities", "obstacles",
+                                                 "sound", "music"};
 
 // Two names equal in any case.
 inline bool TpiEqualNoCase(const char* a, const char* b) {

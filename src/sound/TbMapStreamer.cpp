@@ -18,7 +18,10 @@
 #include "TbSoundInfo.h"
 #include "TbSoundManager.h"
 #include "TbSoundPipe.h"
+#include "TpiGateFlow.h"
+#include "TpiSoundStandIns.h"
 #include <cmath>
+#include <vector>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -193,6 +196,7 @@ TbError TbMapStreamer::RegisterCatagory(const char* qualified, uint32_t& index) 
     }
     return TbError(-1);
 }
+
 TbError TbMapStreamer::RegisterCatagory(const char* path, const char* name, uint32_t& index) {
     if (static_cast<int32_t>(SetPath(path)) >= 0 && name != nullptr) {
         TbDynamicStringTemplate<char> full(path);

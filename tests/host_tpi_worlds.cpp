@@ -35,7 +35,9 @@ int main() {
         Check(donor == "fantasy" || donor == "hallow" || donor == "jungle" || donor == "space", "donor is an original world: " + donor);
         Check(TpiWorldOf(world.donor) == nullptr, "a donor is not a mod world: " + donor);
     }
-    Check(sizeof(kTpiOwnFolders) / sizeof(kTpiOwnFolders[0]) == 7 && std::string(kTpiOwnFolders[0]) == "rides", "own folders");
+    Check(sizeof(kTpiOwnFolders) / sizeof(kTpiOwnFolders[0]) == 9 && std::string(kTpiOwnFolders[0]) == "rides" &&
+              std::string(kTpiOwnFolders[7]) == "sound" && std::string(kTpiOwnFolders[8]) == "music",
+          "own folders: the build lists' and the sound and music banks");
 
     // Names equal in any case.
     Check(TpiEqualNoCase("Arabian", "aRABIAN"), "equal in any case");
