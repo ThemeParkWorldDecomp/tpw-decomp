@@ -3,7 +3,8 @@
 // made-up lake: TpiLake.sam's text is read whatever the locale; the ride is placed only where the cells behind
 // its footprint are water, in every rotation; its chain of circles stays over water and the plot and reaches every
 // circle; and boats that sail it for a long run (out to buoys, back to the plot) are never over land, never off the
-// circles and never stuck. Exits nonzero on the failed checks' count.
+// circles and never stuck; and which circles BMP_InsideArea lets a bump into (a water track's crossroad centre for its
+// own bumps, a lake circle only for its own boats). Exits nonzero on the failed checks' count.
 #include <clocale>
 #include <cmath>
 #include <cstdint>
@@ -305,6 +306,75 @@ int main() {
         TpiLake off = lake;
         off.loaded = false;
         Check(TpiLakeBuild(off, TpiLakeCircle{64 * kTpiLakeCell + 0x600, 64 * kTpiLakeCell + 0x600, 0x1100}, 0).Empty(), "not loaded: no chain");
+    }
+
+    // Which circles BMP_InsideArea moves a bump into in the mod's worlds: a water track's crossroad centre (the Mac's 0x80,
+    // kinds -5, -8, -12 and -13) is entered by its own ride's bumps, a lake chain's circle only by its own ride's boats,
+    // and the lake's circles keep the Mac's 0x80 (no bump to bump collision) as before.
+    {
+        struct Obj {
+            uint32_t flags;
+            int32_t x, y, r;
+            bool chainOfBump;   // on the chain of the bump's own ride
+        };
+        // BMP_InsideArea's walk with the hook: the first live object, not an outside one (0x40), with the point inside it.
+        const auto inside = [](const std::vector<Obj>& objs, int32_t x, int32_t y) {
+            for (size_t i = 0; i < objs.size(); ++i) {
+                const Obj& o = objs[i];
+                if ((o.flags & 1) == 0) continue;
+                if (TpiLakeCol(o.flags) && !TpiLakeColEnterable(o.flags, o.chainOfBump)) continue;
+                const double dx = double(x) - o.x, dy = double(y) - o.y;
+                if ((o.flags & 0x40) == 0 && dx * dx + dy * dy < double(o.r) * o.r) return int32_t(i);
+            }
+            return int32_t(-1);
+        };
+        // A crossroad section (BMP_TrackSectionPlaceSection, case 7) at (ux, uy): the centre circle, then its four corners.
+        const auto crossroad = [](int32_t ux, int32_t uy, bool centre80) {
+            std::vector<Obj> objs;
+            objs.push_back({0x1fu | (centre80 ? 0x80u : 0u), ux + 0xc00, uy + 0xc00, 0xc20, false});
+            objs.push_back({(0x1fu | 0x40u) & 0xffffffebu, ux + 0x1800, uy, 0x500, false});
+            objs.push_back({(0x1fu | 0x40u) & 0xffffffedu, ux, uy, 0x500, false});
+            objs.push_back({(0x1fu | 0x40u) & 0xfffffff5u, ux, uy + 0x1800, 0x500, false});
+            objs.push_back({(0x1fu | 0x40u) & 0xfffffff3u, ux + 0x1800, uy + 0x1800, 0x500, false});
+            return objs;
+        };
+        for (int32_t kind : {-5, -8, -12, -13, -6}) {
+            const bool centre80 = kind == -5 || kind == -8 || kind == -12 || kind == -13;
+            const std::vector<Obj> objs = crossroad(0x24000, 0x18000, centre80);
+            int entered = 0;
+            for (int32_t dy = -0x800; dy <= 0x800; dy += 0x100)
+                for (int32_t dx = -0x800; dx <= 0x800; dx += 0x100)
+                    if (inside(objs, 0x24000 + 0xc00 + dx, 0x18000 + 0xc00 + dy) == 0) ++entered;
+            Check(entered == 17 * 17, "kind " + std::to_string(kind) + ": a bump enters the crossroad's centre (" +
+                                          std::to_string(entered) + " of 289 points)");
+            Check(!TpiLakeCol(objs[0].flags), "kind " + std::to_string(kind) + ": a crossroad's centre is no lake circle");
+        }
+
+        // A lake chain of three circles (the plot's own first, unmarked, as TpiLakeJoin leaves it).
+        std::vector<Obj> lake;
+        lake.push_back({0x1fu, 0x10000, 0x10000, 0x1100, true});
+        lake.push_back({0x1fu | kTpiLakeColFlags, 0x11800, 0x10000, 0x1000, true});
+        lake.push_back({0x1fu | kTpiLakeColFlags, 0x13000, 0x10000, 0x1000, true});
+        Check(inside(lake, 0x11a00, 0x10000) == 1 && inside(lake, 0x13200, 0x10000) == 2, "the lake's own boat enters its circles");
+        for (Obj& o : lake) o.chainOfBump = false;
+        Check(inside(lake, 0x13200, 0x10000) == -1, "another ride's bump does not enter a lake circle");
+        Check(inside(lake, 0x10000, 0x10000) == 0, "the plot's own circle is the Mac's, entered by any bump");
+        Check((lake[1].flags & 0x80u) != 0 && (lake[2].flags & 0x80u) != 0, "the lake's circles keep the Mac's 0x80");
+
+        // No flags the Mac gives a collision object (0x1f, then 0x20, 0x40, 0x80 and 0x100 on, corner bits off) mark a lake.
+        int marked = 0;
+        for (uint32_t on = 0; on < 16; ++on)
+            for (uint32_t off = 0; off < 16; ++off) {
+                uint32_t f = 0x1fu;
+                if (on & 1) f |= 0x20u;
+                if (on & 2) f |= 0x40u;
+                if (on & 4) f |= 0x80u;
+                if (on & 8) f |= 0x100u;
+                f &= ~(off << 1);
+                if (TpiLakeCol(f)) ++marked;
+            }
+        Check(marked == 0, "no Mac collision object is taken for a lake circle (" + std::to_string(marked) + ")");
+        Check((kTpiLakeColFlag & 0x1ffu) == 0, "the lake mark is none of the Mac's bits");
     }
 
     if (gFailures == 0) std::printf("tpi_great_lake: all checks passed\n");
