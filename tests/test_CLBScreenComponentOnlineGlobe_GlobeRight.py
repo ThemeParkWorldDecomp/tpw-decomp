@@ -96,6 +96,7 @@ def setup(runner):
 
 class Side:
     started = False
+    raw = frozenset()       # the case's own random words (run sets them)
 
     def words(self, a, ws):
         self.write(a, b"".join(struct.pack(self.fmt, w & MASK) for w in ws))
@@ -110,7 +111,11 @@ class Side:
         raise NotImplementedError
 
     def cw(self, w):
-        """A word as the name of the global (plus small offset) it holds the address of."""
+        """A word as the name of the global (plus small offset) it holds the address of. One of the case's raw words is
+        reported as itself: the host's globals move with the library's load address, so a random word could fall within 0x100
+        of one's low 32 bits and be named on that side only (the 0.6.0 suite, CLightPoint::~CLightPoint case 94, 2026-11-18)."""
+        if w in self.raw:
+            return w
         best = None
         for name in ADDR:
             d = (w - (self.g(name) & MASK)) & MASK
@@ -436,7 +441,19 @@ KINDS = {"globe": k_globe, "list": k_list, "bitmap": k_bitmap, "mapdelta": k_map
          "light": k_light, "swap": k_swap, "block": k_block}
 
 
+def raw_words(x):
+    """Every integer in a case (its random words among them)."""
+    if isinstance(x, dict):
+        return set().union(*(raw_words(v) for v in x.values())) if x else set()
+    if isinstance(x, (list, tuple)):
+        return set().union(*(raw_words(v) for v in x)) if x else set()
+    if isinstance(x, int) and not isinstance(x, bool):
+        return {x & MASK}
+    return set()
+
+
 def run(s, case):
+    s.raw = frozenset(raw_words(case))
     try:
         return KINDS[case["kind"]](s, case)
     finally:
