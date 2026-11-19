@@ -98,6 +98,7 @@ int32_t CTextureCache::PackTextures(CTextureEntry** list) {
     return static_cast<int32_t>((action >> 8) - 8);
 }
 
+
 // The OpenGL page: only the three virtual members the frame calls record.
 CTextureBase::~CTextureBase() {}
 COpenGLTexture::COpenGLTexture() {}

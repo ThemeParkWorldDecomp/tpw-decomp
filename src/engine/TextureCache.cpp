@@ -1562,6 +1562,7 @@ int32_t CTextureCache::PackTextures(CTextureEntry** list) {
     return link->PageUpdated();
 }
 
+
 int32_t CTextureCache::GenerateTexturePages() {
     std::memset(mF1830, 0, sizeof mF1830);
     int32_t result = 1;
