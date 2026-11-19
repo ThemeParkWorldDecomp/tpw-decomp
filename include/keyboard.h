@@ -63,5 +63,6 @@ extern CKeyTableEntry gKeyEntriesDebug[71];       // 0x102a540c
 // every entry of each; EnableAllKeytables (0x10151010, untranslated) is the other way.
 void DisableAllKeytables();
 
+
 // unit w43
 void EnableAllKeytables();   // 0x10151010

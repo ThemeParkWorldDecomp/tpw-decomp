@@ -1,12 +1,17 @@
 // host_pc_keys.cpp: the keys each build gets (the port's fix pc-keys, src/game/keyboard.cpp). Each system keeps its own original's
 // controls: the Windows and Linux builds with the port's fixes have the PC original's, as its table and its Key Command Card give
 // them, and the Mac build, or any build without the fixes, has the Mac original's. The two differ in one key: the PC clears land
-// with Delete, the Mac with F7. Checked against the seven real static tables the game is built with:
+// with Delete, the Mac with F7. The Mac build with the fixes keeps the Mac's tables and clears land with Delete too: the park's
+// window asks its tables for a plain Delete as F7 (PortParkKey, keyboard.h; the maintainer, 2026-11-17). Checked against the seven real
+// static tables the game is built with:
 //   every key of every table is the Mac original's, but for the one row of the build's own system;
 //   every row of the Key Command Card that is a table's key reaches its action, with the key and modifiers HandleTyping makes of it;
 //   the PC build's Delete is in no other table (the debug and camera tables are asked before the game's) and its F7 in none
 //   of the four the park's window asks, the Mac build's the other way; Ctrl-F7 (delete a ride, the debug table) stays on both;
-//   the keys get there: SDL's Delete is the extended VK_DELETE (0x2e00), never the period (46), which turns an object.
+//   the keys get there: SDL's Delete is the extended VK_DELETE (0x2e00), never the period (46), which turns an object;
+//   over the park, as its window asks the four tables (with PortParkKey in a build with the fixes): Delete clears land in every
+//   build with the fixes, F7 on the Mac, Backspace backtracks everywhere, and Delete with a modifier is no key of any table
+//   (never Ctrl-F7, delete a ride); PortParkKey changes no other key and nothing on Windows and Linux.
 // The program is linked as tpw_launcher is, with its own stand-ins, so it needs no slicer and is made wherever the launcher is,
 // Windows CI among them. Run by ctest ("pc_keys"). Exits nonzero on a failure.
 #include <SDL3/SDL.h>
@@ -31,6 +36,16 @@ uint16_t MacModifiersFromSDL(uint16_t sdlModifiers);
 constexpr bool kPcKeys = true;    // Windows and Linux with the port's fixes: the PC original's keys
 #else
 constexpr bool kPcKeys = false;   // the Mac, or a build without the fixes: the Mac original's keys
+#endif
+#if TPW_HOST_PC_KEYS_FIXED && defined(__APPLE__)
+constexpr bool kMacDelete = true;   // the Mac with the port's fixes: its plain Delete clears land as F7 does
+#else
+constexpr bool kMacDelete = false;
+#endif
+#if TPW_HOST_PC_KEYS_FIXED
+constexpr bool kFixed = true;
+#else
+constexpr bool kFixed = false;
 #endif
 
 static int gStandIns = 0;
@@ -267,6 +282,75 @@ void TestClearLand() {
     Card("Ctrl+F7 deletes a ride (debug, both)", gDebug, kF7, kCtrl, delete_ride);
 }
 
+// The key the park's window (ui_main.cpp Engine_GameWinMsg) asks its tables for, on the key down and the key up: PortParkKey's
+// in a build with the fixes, the key itself in one without.
+int16_t ParkKey(int16_t key, int16_t mods) {
+#if TPW_HOST_PC_KEYS_FIXED
+    return PortParkKey(key, mods);
+#else
+    return key;
+#endif
+}
+
+// What a key pressed over the park reaches: the window asks the debug, camera, game and shortcuts tables in that order for the key
+// PortParkKey gives, and the entries that match it (the first of each table, as KeyDown and KeyUp take it). A table whose entry
+// has no action for the key answers 0 and the next is asked, so every match counts: exactly one is wanted.
+void Park(const std::string& what, int16_t key, int16_t mods, int32_t (*action)()) {
+    CKeyTable* const park[] = {&gDebug, &gCamera, &gGame, &gShortcuts};
+    const int16_t asked = ParkKey(key, mods);
+    int matches = 0;
+    const CKeyTableEntry* hit = nullptr;
+    for (CKeyTable* table : park) {
+        if (const CKeyTableEntry* entry = Find(*table, asked, mods)) {
+            matches++;
+            if (hit == nullptr) hit = entry;
+        }
+    }
+    if (action == nullptr) {
+        Check(matches == 0, "over the park, " + what + " reaches no table's key (asked as " + std::to_string(asked) + ")");
+    } else {
+        Check(matches == 1 && hit->mUpAction == reinterpret_cast<void*>(action),
+              "over the park, " + what + " reaches its action and nothing else (asked as " + std::to_string(asked) + ", " +
+                  std::to_string(matches) + " matches)");
+    }
+}
+
+// Clear land over the park, from the keys SDL gives: Delete in every build with the fixes, F7 on the Mac (with or without them).
+void TestParkClearLand() {
+    const int16_t del = SdlKey(SDL_SCANCODE_DELETE);
+    const int16_t f7 = SdlKey(SDL_SCANCODE_F7);
+    const int16_t backspace = SdlKey(SDL_SCANCODE_BACKSPACE);
+    const bool macTable = !kPcKeys;   // the Mac original's table: the Mac's builds, and every build without the fixes
+    std::printf("pc_keys: over the park, Delete %s land, F7 %s\n", kFixed ? "clears" : "does not clear",
+                macTable ? "clears it" : "does nothing");
+    Park("Delete", del, kNone, kFixed ? enter_area_delete_mode : nullptr);
+    Park("F7", f7, kNone, macTable ? enter_area_delete_mode : nullptr);
+    Park("Backspace", backspace, kNone, backtrack);
+    Park("the period", SdlKey(SDL_SCANCODE_PERIOD, '.'), kNone, turn_object_counterclockwise);
+    Park("Ctrl+F7", f7, kCtrl, delete_ride);
+    // Delete with a modifier is asked as itself: no table has it, so Ctrl+Delete is never Ctrl+F7 (delete a ride).
+    const SDL_Keymod kDeleteMods[] = {SDL_KMOD_LSHIFT, SDL_KMOD_LCTRL, SDL_KMOD_LGUI, SDL_KMOD_LALT,
+                                      SDL_KMOD_LCTRL | SDL_KMOD_LSHIFT};
+    for (SDL_Keymod sdl : kDeleteMods) {
+        const int16_t mods = TableMods(sdl);
+        Check(ParkKey(del, mods) == del, "Delete with modifiers " + std::to_string(mods) + " is asked as itself");
+        Park("Delete with modifiers " + std::to_string(mods), del, mods, nullptr);
+    }
+    // PortParkKey changes the Mac's plain Delete only: every other key and modifier, and every key on Windows and Linux, is itself.
+    int changed = 0;
+    for (int32_t key = -32768; key <= 32767; ++key) {
+        for (int16_t mods : {0, 3, 12, 15, 48, 51, 60, 63}) {
+            const int16_t asked = ParkKey(static_cast<int16_t>(key), mods);
+            if (asked == key) continue;
+            changed++;
+            Check(kMacDelete && key == kDelete && mods == kNone && asked == kF7,
+                  "PortParkKey changes key " + std::to_string(key) + " modifiers " + std::to_string(mods) + " to " +
+                      std::to_string(asked));
+        }
+    }
+    Check(changed == (kMacDelete ? 1 : 0), "PortParkKey changes " + std::to_string(changed) + " keys");
+}
+
 }  // namespace
 
 int main(int, char**) {
@@ -274,6 +358,7 @@ int main(int, char**) {
     TestRoute();
     TestCard();
     TestClearLand();
+    TestParkClearLand();
     Check(gStandIns == 0, "no stand-in was called");
     std::printf("pc_keys: %d checks, %d failed\n", gChecks, gFailures);
     return gFailures == 0 ? 0 : 1;
