@@ -2,7 +2,8 @@
 // (include/TpiObstacleShut.h, TPW_MOD_HOOK tpi_worlds) on the host, without game data: a node's name read back as the
 // converter writes it (assets/tpi_terrain.h TpiShutName), with and without the cells it closed, the names it turns down,
 // the rule that clears it (the gate's: the park owns a cell of its footprint or a cell next to it that a new park does
-// not start with), the folded node and what its closed cells' quads and map cells get. The names and the land are made
+// not start with), the folded node and what its closed cells' quads and map cells get, and that a loaded park's paths
+// and queues over its cleared cells are still drawn once the quads are shown. The names, the land and the tiles are made
 // up here. Exits nonzero on the first failed check's count.
 #include <cstdint>
 #include <cstdio>
@@ -83,6 +84,50 @@ int main() {
     Check(!TpiShutCellToClose(1, 0, 0) && !TpiShutCellToClose(0, 12, 0) && !TpiShutCellToClose(0, 0, 0x20) &&
               !TpiShutCellToClose(7, 0, 0) && !TpiShutCellToClose(0x1e, 0, 0),
           "cells: kept");
+
+    // What a closed cell gets when its quad changes. Shown again: the hidden quad's mode (7, attribute 0) and plain land
+    // are reset; a path, a queue or a ride is kept. Hidden again: plain land is reset, the rest kept.
+    Check(TpiShutResetsCell(1, 7, 0, 0, 0) && TpiShutResetsCell(1, 0, 0, 0, 0x40) && TpiShutResetsCell(-1, 0, 0, 0, 0),
+          "cells: reset");
+    Check(!TpiShutResetsCell(1, 1, 0, 0, 0) && !TpiShutResetsCell(1, 4, 0, 12, 0) && !TpiShutResetsCell(1, 0, 0, 0, 0x20) &&
+              !TpiShutResetsCell(-1, 1, 0, 0, 0) && !TpiShutResetsCell(-1, 7, 0, 0, 0) && !TpiShutResetsCell(0, 0, 0, 0, 0),
+          "cells: kept, not reset");
+
+    // A loaded park with the obstacle's land bought: the load draws each cell's own tile (CMap::UpdateMapInEngine), then
+    // the first tick shows the closed quads, drawing the copy's tile (0x37) over each, then resets or redraws the cell.
+    // Whatever is built there must still be drawn after it, plain land is the copy's. The tiles here are made up: 0x37
+    // the copy's, anything else the cell's own.
+    struct Cell {
+        int32_t mode;
+        uint8_t attribute;
+        uint16_t parent, flags;
+        uint32_t own;   // the tile its mode draws (CMapCell::SetHFieldTile; plain land and 5 draw the copy's)
+    };
+    const Cell cells[] = {
+        {1, 0, 0, 0x00, 0x10093},   // a path laid over the cleared rock after its land was bought
+        {1, 0, 0, 0x20, 0x10081},   // a path edge
+        {4, 0, 0, 0x00, 0x20002},   // a queue
+        {3, 0, 0, 0x00, 0x10082},   // a path's corner
+        {0x12, 0, 9, 0x00, 0x30004},   // a ride's cell, belonging to it
+        {0, 0, 0, 0x40, 0x37},      // plain land
+        {7, 0, 0, 0x00, 0x37},      // the hidden quad's mode a park saved before the land was bought: reset as land
+    };
+    for (const Cell& c : cells) {
+        const std::string name = "load: mode " + std::to_string(c.mode) + " flags " + std::to_string(c.flags);
+        uint32_t drawn = c.mode == 7 ? 0u : c.own;   // UpdateMapInEngine (a mode 7 cell's tile hides its quad)
+        const int32_t change = TpiShutQuadChange(true, true);
+        Check(change == 1, name + ": the quad is shown");
+        drawn = 0x37;   // SetHeightfieldTexture's copy tile
+        const bool reset = TpiShutResetsCell(change, c.mode, c.attribute, c.parent, c.flags);
+        if (reset) drawn = 0x37;   // CMapCell::Reset: plain land, its tile drawn
+        if (TpiShutRedrawsCell(change, reset, c.mode)) drawn = c.own;
+        Check(drawn == c.own, name + ": drawn as its own after the quad is shown");
+    }
+    // Nothing is drawn again when no quad changed or one is hidden again, nor over a reset cell, nor for plain land or a
+    // hidden quad's mode, whose tile would hide the quad just shown.
+    Check(!TpiShutRedrawsCell(0, false, 1) && !TpiShutRedrawsCell(-1, false, 1) && !TpiShutRedrawsCell(1, true, 1),
+          "redraw: only a shown quad's kept cell");
+    for (int32_t mode : {0, 2, 5, 7, 0x1e}) Check(!TpiShutRedrawsCell(1, false, mode), "redraw: not mode " + std::to_string(mode));
 
     if (gFailures != 0) {
         std::printf("%d failed\n", gFailures);
