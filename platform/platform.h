@@ -143,6 +143,10 @@ uint16_t ScriptedSDLModifiers();
 int32_t ScancodeFromKeyName(const char* name);
 // The pass of the run loop being run (from 1; counted only with --frames, else 0).
 int32_t CurrentPass();
+// With a test run's fixed clock (TPW_FIXED_CLOCK, platform/sams_core.cpp): a wait's yield moves it on a millisecond.
+void FixedClockYield();
+// Whether a test run's fixed clock is on (its wall clock: SamsUtilities::UTimer::GetWallSeconds).
+bool FixedClock();
 
 // One line in the platform log ("platform: ..." on stderr, and the log file of log_file.h). The game's own log lines
 // (ULogManager) and the stubs' "unimplemented" lines go through LogLine as well.

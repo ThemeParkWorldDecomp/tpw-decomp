@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 
 #include "Wavelet.h"
 #include "tb_particle.h"
@@ -730,6 +731,7 @@ namespace SamsUtilities {
 TPW_WEAK uint64_t UTimer::GetAbsolute() {
     return tpw_time_base + static_cast<uint64_t>(tpw_time_calls++) * tpw_time_step;
 }
+TPW_WEAK int64_t UTimer::GetWallSeconds() { return static_cast<int64_t>(std::time(nullptr)); }
 }  // namespace SamsUtilities
 
 TPW_WEAK void* TGALoadAndConvert(char* name, int32_t* width, int32_t* height, int32_t flags, lARGBType* palette,

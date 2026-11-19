@@ -285,6 +285,9 @@ public:
     // Absolute time in microseconds (64-bit; returned through a hidden 8-byte buffer on
     // the PowerPC). The engine turns it into milliseconds with an unsigned 64-bit divide.
     static uint64_t GetAbsolute();
+    // Port: the wall clock's seconds since 1970 (time(nullptr)); with a test run's fixed clock (TPW_FIXED_CLOCK,
+    // platform/sams_core.cpp) 1 January 2001 plus the fixed clock's seconds.
+    static int64_t GetWallSeconds();
     // 0x1000cfe8: the timer's period; `start` starts it.
     void SetRate(const UMicroseconds& rate, bool start);
 

@@ -11,6 +11,7 @@
 #include "lobby.h"
 #include "MapCell.h"
 #include "OptionsBalance.h"
+#include "platform/samsutils.h"
 #include "ppc_math.h"
 #include "rsse.h"
 #include "TbDynamicStringTemplate.h"

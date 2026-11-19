@@ -1,8 +1,10 @@
 // sams_core.cpp: the parts of Sam's Utilities with no window or file behind them: strings,
 // rectangles, memory, timers.
+#include <atomic>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <new>
 #include <thread>
 
@@ -190,9 +192,30 @@ static std::chrono::steady_clock::time_point StartTime() {
     return start;
 }
 
+// A test run's fixed clock (TPW_FIXED_CLOCK=N, never set for a player): the time is N microseconds a pass of the main
+// loop (with --frames), plus a millisecond for each SystemTask, which the waits outside the loop (the splash's) call, the
+// same on every machine and at every speed, so two runs of one script tick the same; 0 when unset.
+static std::atomic<uint64_t> gFixedClockYields{0};
+
+static uint64_t FixedClockStep() {
+    static const uint64_t step = [] {
+        const char* hook = std::getenv("TPW_FIXED_CLOCK");
+        const long long n = hook != nullptr ? std::atoll(hook) : 0;
+        if (n <= 0) return uint64_t{0};
+        tpw::Log("fixed clock: %lld microseconds a pass (TPW_FIXED_CLOCK, a test run)", n);
+        return static_cast<uint64_t>(n);
+    }();
+    return step;
+}
+
+static uint64_t FixedClockNow(uint64_t step) {
+    return static_cast<uint64_t>(tpw::CurrentPass()) * step + gFixedClockYields * 1000;
+}
+
 // Microseconds since the program started (the Mac's since boot; the game uses differences,
 // and one value to seed rand).
 uint64_t UTimer::GetAbsolute() {
+    if (const uint64_t step = FixedClockStep(); step != 0) return FixedClockNow(step);
     const auto start = StartTime();   // first: the first call must not read the clock before the start is taken
     const auto elapsed = std::chrono::steady_clock::now() - start;
     return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count());
@@ -200,10 +223,29 @@ uint64_t UTimer::GetAbsolute() {
 
 // A free-running counter (the PowerPC time base); nanoseconds here.
 uint64_t UTimer::GetAbsoluteCycles() {
+    if (const uint64_t step = FixedClockStep(); step != 0) return FixedClockNow(step) * 1000;
     const auto start = StartTime();
     const auto elapsed = std::chrono::steady_clock::now() - start;
     return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 }
+
+int64_t UTimer::GetWallSeconds() {
+    if (const uint64_t step = FixedClockStep(); step != 0)
+        return 978307200 + static_cast<int64_t>(FixedClockNow(step) / 1000000);
+    return static_cast<int64_t>(std::time(nullptr));
+}
+
+}  // namespace SamsUtilities
+
+namespace tpw {
+void FixedClockYield() {
+    if (SamsUtilities::FixedClockStep() != 0) ++SamsUtilities::gFixedClockYields;
+}
+
+bool FixedClock() { return SamsUtilities::FixedClockStep() != 0; }
+}  // namespace tpw
+
+namespace SamsUtilities {
 
 void UTimer::SetRate(const UMicroseconds& rate, bool start) {
     mRate = rate.mValue;
