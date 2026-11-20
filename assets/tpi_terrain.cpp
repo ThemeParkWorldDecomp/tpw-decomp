@@ -280,6 +280,12 @@ bool IsMarker(const std::string& name) {
     return n.compare(0, 11, "unbuildable") == 0 || n.compare(0, 12, "nonbuildable") == 0;
 }
 
+// The loose boulders Theme Park Inc's tunnels leave on and beside them once cleared ("GeoSphere08", 3ds Max's sphere:
+// Arabian Nights' twenty on its tunnel's top and at its west mouth, Polar Zone's two at its tunnel's mouth).
+bool IsBoulder(const std::string& name) {
+    return Lower(name).compare(0, 9, "geosphere") == 0;
+}
+
 // The mesh's node index (as ReadMd2 orders them: the root first, then the other records in file order) for each node
 // record, or false when the mesh's node tables cannot be read.
 bool RecordNodes(const Bytes& mesh, std::vector<size_t>& node, std::string& err) {
@@ -976,7 +982,9 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         // The shown nodes with geometry, each under the terrain's root at its place in the world. A cleared tunnel's
         // nodes that show before it is cleared and not once it is (its rubble, its wreckage), but its crew, props and
         // markers, are added too, named for the game to show only until its land is bought ("tpishut X Y W H"); they
-        // close no cell.
+        // close no cell. Its boulders (IsBoulder), which Theme Park Inc left once it was cleared, take that name too, so
+        // they go with the rubble once its land is bought (Arabian Nights' sit on its tunnel's top, over land that can be
+        // built on then); they close the cells they closed before.
         Md2Model placed, shut;
         placed.nodes.push_back(Md2Node());
         // Its root's place is dropped (the shape's offset places it), its turn kept: Polar Zone's swamp is modelled
@@ -1022,6 +1030,10 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                     copy.name = leaf;
                     ++result.leaves;
                 }
+            }
+            if (!shutName.empty() && IsBoulder(node.name)) {
+                copy.name = shutName;
+                ++result.shut;
             }
             for (Md2FaceSet& fs : copy.faceSets)
                 if (fs.texture >= 0) fs.texture = fs.texture < static_cast<int>(slot.size()) ? slot[fs.texture] : -1;

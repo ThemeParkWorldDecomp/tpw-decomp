@@ -954,6 +954,57 @@ void TestTunnel() {
         for (uint32_t x = 0; x < kW; ++x) CHECK(Attribute(map->data, x, y) == (x == 1 ? 0x80 : 0x01));
 }
 
+// A cleared tunnel's boulders ("GeoSphere..." nodes, Theme Park Inc's loose rocks, which stay once it is cleared) are
+// named as its rubble is ("tpishut 1 0 2 2"), so the game folds them with it once its land is bought; one lying at the
+// ground over a closed cell, (2,0), still hides its quad. An obstacle cleared without walkways (not a tunnel) keeps its
+// boulders' names.
+void TestTunnelBoulders() {
+    for (bool tunnel : {true, false}) {
+        std::vector<std::pair<uint16_t, uint16_t>> quads(kW * kH, {0x0042, kTexGrass});
+        const Bytes grass = Tga(2, 2, 255), clear = Tga(2, 2, 0);
+        std::vector<TpiWadMember> members = {{"base.MD2", Terrain(quads)},
+                                             {"base.map", BaseMap(0x01)},
+                                             {"textures/grass.tga", grass},
+                                             {"textures/trans01.tga", clear},
+                                             {"textures/qickload.txt", Text("grass.tga\n")}};
+        md2::Md2Model model = Model("tunnel.MD2", {"grass.tga"});
+        AddNode(model, Square("wall", 10, 0, 0), 0, md2::Translation(20, 0, 10));         // 1, over (2,1)
+        AddNode(model, Square("rubble", 10, 3, 0), 0, md2::Translation(10, 0, 0));        // 2
+        AddNode(model, Square("GeoSphere08", 10, 0, 0), 0, md2::Translation(20, 0, 0));   // 3, over (2,0)
+        AddNode(model, Square("geosphere09", 5, 3, 0), 0, md2::Translation(10, 0, 10));   // 4, above (1,1)
+        md2::RecomputeBoxes(model);
+        const std::vector<std::string> after = tunnel ? std::vector<std::string>{",X", ",X"}
+                                                      : std::vector<std::string>{".X", ".X"};
+        const TpiObstacle obstacle = {"tunnel",
+                                      {{"tunnel.sam", Sam(1, {"HH", "HH"}, 1, 0, after, 2703)},
+                                       {"tunnel.MD2", md2::WriteMd2(model)},
+                                       {"tunnelm1.MD2", Anim(0, {}, {})},
+                                       {"tunnelm2.MD2", Anim(0, {2}, {})},
+                                       {"textures/grass.tga", grass}}};
+        auto shared = [](const std::string&) -> const Bytes* { return nullptr; };
+        TpiObstacleReport report;
+        std::string err;
+        CHECK(MergeTpiObstacles(members, {obstacle}, shared, report, err));
+        CHECK(report.obstacles.size() == 1);
+        if (report.obstacles.size() != 1) continue;
+        const TpiObstacleResult& t = report.obstacles[0];
+        CHECK(t.state == "cleared" && t.blocked == 2 && t.open == 0);
+        CHECK(t.shut == (tunnel ? 3 : 0));
+        const TpiWadMember* base = Member(members, "base.MD2");
+        md2::Md2Model merged;
+        CHECK(base != nullptr && md2::ReadMd2(base->data, merged, err, true));
+        if (base == nullptr) continue;
+        std::vector<std::string> names;
+        for (const md2::Md2Node& n : merged.nodes) names.push_back(n.name);
+        if (tunnel)
+            CHECK((names == std::vector<std::string>{"root", "wall", "tpishut 1 0 2 2", "tpishut 1 0 2 2",
+                                                     "tpishut 1 0 2 2", "tpi underground"}));
+        else
+            CHECK((names == std::vector<std::string>{"root", "wall", "GeoSphere08", "geosphere09", "tpi underground"}));
+        CHECK(Quad(base->data, 2, 0).first == 0x0043 && Quad(base->data, 2, 1).first == 0x0043);
+    }
+}
+
 // The name of what shows until its land is bought: its footprint, then, when given, the cells it hid, four to a hex
 // digit with the first cell the lowest bit; a mask of at most 4 x 63 cells (the game's), past 63 characters too (Polar
 // Zone's swamp: 14 x 16), which the converter's reader reads back whole.
@@ -1067,6 +1118,7 @@ int main() {
     TestWalkwayLeftAlone();
     TestOpeningGate();
     TestTunnel();
+    TestTunnelBoulders();
     TestShutName();
     TestPit();
     TestGateLeafName();

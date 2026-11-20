@@ -45,6 +45,8 @@
 // added too, each named "tpishut X Y W H" (TpiShutName: the obstacle's footprint), and the game's hook (TPW_MOD_HOOK
 // tpi_worlds, include/TpiObstacleShut.h) shows them only while the park owns no cell of the footprint or next to it
 // that a new park does not start with, as an opening gate's rule: the tunnel looks closed until its land is bought.
+// Its loose boulders ("GeoSphere..." nodes, which Theme Park Inc kept once it was cleared: Arabian Nights' on its
+// tunnel's top) are named so too and go with the rubble, closing the cells they closed before (since converter 29).
 // An obstacle that clears once its land is bought (kTpiClearsOnLand: Arabian Nights' rock and cliff, Polar Zone's
 // swamp) is drawn before clearing as any other, and each of its nodes is named "tpishut X Y W H M", M the cells whose
 // quads it hid (TpiShutName's mask: the swamp's 174 of its 224), or "tpishut X Y W H" when it hid none; the game's hook
