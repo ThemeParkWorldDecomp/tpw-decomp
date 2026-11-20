@@ -38,6 +38,7 @@
 #include <cstdlib>
 
 
+
 // 0x1009722c, 712 bytes: takes a bridge away from the cell and turns the two bridge cells beside it (a, b) to what they become without it.
 // The two IsXYValid calls on the first block and the track end have their answers dropped (the Mac stores them in dead locals).
 // A direction other than 1, 4, 0x10, 0x40 leaves the two flags (callee-saved r26, r25) as the caller had them: here 0.
