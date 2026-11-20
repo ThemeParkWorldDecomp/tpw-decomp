@@ -1718,24 +1718,28 @@ void TestFilms(const std::string& scratch) {
         return imp.Status(e);
     };
     for (Edition e : {kEditionUs, kEditionEur}) {
-        const size_t required = CountRecords(e, true) - 9;   // a film and its .tgq are one required file
+        // A film and its .tgq are one intro film, and no film blocks Play (the game skips a missing one): not required.
+        const size_t required = CountRecords(e, true) - 18;
         EditionStatus none = status(e);
         CHECK_EQ(none.required, required);
         CHECK_EQ(none.requiredPresent, 0);
-        CHECK_EQ(none.missing[kSourceMacCd] + none.missing[kSourcePcCd], required);   // a film missing is the .mov
+        CHECK_EQ(none.introFilms, 9);
+        CHECK_EQ(none.introFilmsPresent, 0);
+        CHECK_EQ(none.missing[kSourceMacCd] + none.missing[kSourcePcCd], required + 9);   // a film missing is the .mov
         // the PC CD's films alone: each counts for its .mov
         place(e, ".tgq");
         EditionStatus pc = status(e);
         CHECK_EQ(pc.present, 9);
         CHECK_EQ(pc.required, required);
-        CHECK_EQ(pc.requiredPresent, 9);
+        CHECK_EQ(pc.requiredPresent, 0);
+        CHECK_EQ(pc.introFilmsPresent, 9);
         CHECK_EQ(none.missing[kSourceMacCd] - pc.missing[kSourceMacCd], 9);
         CHECK_EQ(none.missing[kSourcePcCd], pc.missing[kSourcePcCd]);
         // and the Mac CD's too: the same 9 required files
         place(e, ".mov");
         EditionStatus both = status(e);
         CHECK_EQ(both.present, 18);
-        CHECK_EQ(both.requiredPresent, 9);
+        CHECK_EQ(both.introFilmsPresent, 9);
         CHECK_EQ(both.missing[kSourceMacCd], pc.missing[kSourceMacCd]);
         // the Mac CD's alone, as before
         Importer layout(cfg);
@@ -1747,11 +1751,11 @@ void TestFilms(const std::string& scratch) {
         fs::remove(layout.VerifiedPath());
         EditionStatus mac = status(e);
         CHECK_EQ(mac.present, 9);
-        CHECK_EQ(mac.requiredPresent, 9);
+        CHECK_EQ(mac.introFilmsPresent, 9);
         CHECK_EQ(mac.missing[kSourceMacCd], pc.missing[kSourceMacCd]);
         CHECK_EQ(mac.missing[kSourcePcCd], pc.missing[kSourcePcCd]);
         std::printf("  %s: required %zu; with the PC films %zu present, missing mac %zu pc %zu; with the Mac films the same\n",
-                    EditionName(e), required, pc.requiredPresent, pc.missing[kSourceMacCd], pc.missing[kSourcePcCd]);
+                    EditionName(e), required, pc.introFilmsPresent, pc.missing[kSourceMacCd], pc.missing[kSourcePcCd]);
         RemoveTree(root);
     }
 }

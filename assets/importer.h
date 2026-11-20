@@ -93,6 +93,12 @@ std::string ResolveDataRoot(const std::string& prefPath);
 
 // ---- state of an edition
 
+struct FileGap {
+    std::string dest;                         // exact path in the game's folder
+    std::string effect;                       // what the player loses, in plain words
+    bool essential = true;                   // blocks Play
+};
+
 struct EditionStatus {
     Edition edition = kEditionUs;
     size_t records = 0, present = 0;             // every record of the edition, optional ones included
@@ -103,9 +109,16 @@ struct EditionStatus {
     uint64_t bytesPresent = 0;
     bool unlocked = false;                       // every required record is present
     size_t edited = 0;                           // present .sam files kept as the player's edit (EditedFiles)
+    size_t repaired = 0;                         // present settings repaired from the original defaults
+    size_t introFilms = 0, introFilmsPresent = 0; // logical films, either accepted format counts
+    std::vector<FileGap> gaps;                   // missing required files, including non-essential intro films
     // "absent" (nothing present), "partial" or "unlocked": the launcher.ini word.
     const char* StateWord() const;
 };
+
+// Shared by the importer and its host fixtures. Bits are Edition masks, indexed by manifest record.
+EditionStatus DescribeEdition(Edition edition, const std::vector<uint8_t>& present,
+                              const std::vector<uint8_t>& edited = {}, const std::vector<uint8_t>& repaired = {});
 
 // The disc a DiscSource tag means, for "still missing" texts: "the US Mac CD", "the PC CD", "the Gold CD".
 const char* SourceDiscName(DiscSource source);
@@ -178,6 +191,7 @@ private:
 struct ImportReport {
     bool cancelled = false;
     bool aborted = false;              // stopped by a write error (a full disk); errors says why
+    bool firstRelease = false;         // this drop matched several known changed files of the US 1999 disc
     uint64_t entries = 0;              // files seen, the contents of opened containers included
     uint64_t containers = 0;           // archives, images and installers opened
     uint64_t hashed = 0, bytesHashed = 0;
@@ -221,6 +235,7 @@ struct EditedFile {
     std::string path;            // where it is installed
     bool original = false;       // a copy of the verified file is kept (hashed again), so RestoreOriginal can put it back
     int unreadableLine = 0;      // the line the game's parser stops at (sam_check.h), 0 when it reads the whole file
+    bool repaired = false;       // defaults filled damaged/missing keys; readable player lines were retained
 };
 
 // ---- the importer
@@ -238,6 +253,7 @@ struct OpenCheck {
     std::string Notice() const;
     // edited .sam files kept (the section above), as "us/data/levels/Standard.sam", in manifest order
     std::vector<std::string> edited;
+    std::vector<std::string> repaired;
     // The log's line for them, e.g. "kept 1 edited .sam file, which the game reads: us/data/levels/Standard.sam
     // (Customized settings on the edition's tile restores an original)." Empty when there is none.
     std::string Kept() const;
@@ -353,6 +369,9 @@ private:
     void Count(Run& run, Edition edition, uint32_t record, bool written);
     void MarkPresent(Edition edition, uint32_t record, bool present);  // also clears the record's edited bit
     void MarkEdited(Edition edition, uint32_t record);
+    void ImportPlayerSettings(Run& run);
+    bool ValidatePlayerSam(Edition edition, uint32_t record, std::string& err);
+    void SetSamRepaired(Edition edition, uint32_t record, const std::string& text, bool repaired);
     void KeepOriginal(Edition edition, uint32_t record, const std::vector<uint8_t>* verified);
     bool IsPresent(Edition edition, uint32_t record) const;
     std::vector<uint32_t> RecordsByPath(const std::string& path) const;
@@ -376,6 +395,7 @@ private:
     mutable std::mutex mutex_;              // guards present_, edited_, ini_
     std::vector<uint8_t> present_;          // per record: Edition bits whose destination holds a file
     std::vector<uint8_t> edited_;           // per record: Edition bits whose present file is the player's edit (.sam)
+    std::vector<uint8_t> repaired_;         // per record: settings repaired from original defaults (persisted by hash)
     LauncherIni ini_;
     std::multimap<std::string, uint32_t> byPath_;  // lower-case destination -> record
     std::map<uint64_t, std::vector<uint32_t>> bySize_;  // size of an accepted content -> records (editions allowed)

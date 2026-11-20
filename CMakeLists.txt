@@ -74,6 +74,13 @@ if(TPW_BUILD_ASSETS_TESTS)
   target_compile_definitions(tpw_importer_tests PRIVATE TPW_DEVTOOLS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/devtools"
                              TPW_ARCHIVE_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/assets/tests/archives")
   add_test(NAME importer COMMAND tpw_importer_tests)
+  # The cards' gap list (DescribeEdition) on synthetic presence masks, and the US 1999 disc's fingerprints (pressing.h).
+  add_executable(tpw_import_status_tests assets/tests/host_import_status.cpp)
+  target_link_libraries(tpw_import_status_tests PRIVATE tpw_assets)
+  add_test(NAME import_status COMMAND tpw_import_status_tests)
+  add_executable(tpw_pressing_tests assets/tests/host_pressing.cpp)
+  target_link_libraries(tpw_pressing_tests PRIVATE tpw_assets)
+  add_test(NAME pressing COMMAND tpw_pressing_tests)
   # The Theme Park Inc converter's host test (fixtures built in code; TPW_TPI_DATA + TPW_TPI_TABLES run the real
   # conversion too). Its scratch tree goes into the build folder unless TPW_TEST_SCRATCH says otherwise.
   add_executable(tpw_tpi_convert_tests assets/tests/host_tpi_convert.cpp)
