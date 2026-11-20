@@ -68,6 +68,7 @@ CMapCell* CMapCell::GetNeighbouringCell(const MapDelta* delta, int32_t flag) {
     return reinterpret_cast<CMapCell*>(reinterpret_cast<uint8_t*>(gWorld) + 0x2d8 + (static_cast<int32_t>(id) - 1) * 0x44);
 }
 
+
 // ---- the serialisers of the landed cell code are linked but never run: their file and log callees only have to exist
 TbError LbFile_Read(void*, void*, uint32_t, uint32_t*) { return TbError(-1); }
 TbError LbFile_Write(void*, const void*, uint32_t, uint32_t*) { return TbError(-1); }

@@ -57,6 +57,7 @@ MapDelta MapDelta::operator*(int32_t k) const {
     return result;
 }
 
+
 // ---- the serialisers of the landed cell code are linked but never run: their file and log callees only have to exist
 TbError LbFile_Read(void*, void*, uint32_t, uint32_t*) { return TbError(-1); }
 TbError LbFile_Write(void*, const void*, uint32_t, uint32_t*) { return TbError(-1); }
