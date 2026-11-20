@@ -22,6 +22,7 @@
 #include "TPCoaster.h"
 #include "TPEngine.h"
 #include "TpiBumperKind.h"
+#include "TpiGateBuild.h"
 #include "TpiGateFlow.h"
 #include "TpiGreatLake.h"
 #include "TPSound.h"

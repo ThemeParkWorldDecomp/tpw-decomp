@@ -55,6 +55,7 @@
 #include "TPSettings.h"
 #include "TPSound.h"
 #include "TpiBumperKind.h"
+#include "TpiGateBuild.h"
 #include "TpiGateFlow.h"
 #include "TpiObstacleShut.h"
 #include "TpiOutside.h"

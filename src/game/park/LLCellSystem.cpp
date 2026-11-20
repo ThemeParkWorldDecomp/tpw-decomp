@@ -28,6 +28,7 @@
 #include "TbDynamicStringTemplate.h"
 #include "TbError.h"
 #include "ThingReceivers.h"
+#include "TpiGateBuild.h"
 #include "TpiGateFlow.h"
 #include "TpiLandBuy.h"
 #include "TPConfig.h"
