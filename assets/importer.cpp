@@ -609,6 +609,7 @@ std::string ImportReport::Summary() const {
     } else {
         ss << written << " files written, " << alreadyThere << " already in place.";
     }
+    for (const std::string& line : translations) ss << " " << line << ".";
     if (!differentVersions.empty()) ss << " " << differentVersions.size() << " different versions (not used).";
     if (unknownFiles) ss << " " << unknownFiles << " other files ignored.";
     if (!errors.empty()) ss << " " << errors.size() << " errors.";
@@ -637,6 +638,7 @@ struct Importer::Run {
     std::set<std::string> matchedDests;          // destinations a file of the drop matched
     std::set<std::pair<int, uint32_t>> counted;  // (edition index, record) written or counted as already there
     std::set<std::string> opened;                // canonical paths of files and folders already read in this drop
+    std::set<std::string> supplied;              // display names of the entries ImporterConfig::sourceSupplement took
     IconImage icon;                              // the best game icon seen so far (icon.h), and the file it came from
     std::string iconSource;
     bool stop = false;
@@ -1160,6 +1162,10 @@ std::vector<LanguageStatus> Importer::LanguagesLocked() const {
         s.state = complete ? LanguageStatus::State::Available
                            : (own ? LanguageStatus::State::Partial : LanguageStatus::State::Absent);
         out.push_back(std::move(s));
+    }
+    if (config_.extraLanguages) {
+        const auto additional = config_.extraLanguages();
+        out.insert(out.end(), additional.begin(), additional.end());
     }
     return out;
 }
@@ -1722,6 +1728,25 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
             if (tpiWhole) return;
         }
     }
+    // Caller-owned content is kept apart from the manifest's verified files. The entries it took are its own, so they are
+    // neither unknown files nor other versions of a game file.
+    if (config_.sourceSupplement && (config_.editions & kEditionLanguages) &&
+        (folderRoot.empty() || !Under(assetsCanon_, folderRoot))) {
+        SupplementResult supplement = config_.sourceSupplement(*source, cancel_);
+        run.report.written += supplement.written;
+        run.report.alreadyThere += supplement.alreadyThere;
+        for (const std::string& line : supplement.lines) run.report.translations.push_back(line);
+        for (const std::string& path : supplement.claimed) run.supplied.insert(display.empty() ? path : display + "/" + path);
+        for (const std::string& message : supplement.errors) {
+            const std::string line = display.empty() ? message : display + ": " + message;
+            run.report.errors.push_back(line);
+            ImportProgress ev;
+            ev.kind = ImportProgress::Kind::Error;
+            ev.path = display;
+            ev.message = line;
+            progress_.Push(ev);
+        }
+    }
     // a drop that holds the data folder does not read it back
     std::string skip;
     if (!folderRoot.empty() && Under(assetsCanon_, folderRoot) && assetsCanon_ != folderRoot) {
@@ -1897,7 +1922,7 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
             run.work.push_back(Work{source, e, name});
             run.totalBytes += e.size;
         } else {
-            Unmatched(run, e);
+            Unmatched(run, e, name);
         }
     }
 }
@@ -1941,7 +1966,8 @@ bool Importer::PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, con
     return true;
 }
 
-void Importer::Unmatched(Run& run, const Entry& entry) {
+void Importer::Unmatched(Run& run, const Entry& entry, const std::string& display) {
+    if (run.supplied.count(display)) return;   // a file of a translation the source supplement took
     std::vector<uint32_t> recs = RecordsByPath(EvidencePath(entry));
     const ManifestRecord* records = ManifestRecords();
     for (uint32_t r : recs) {
@@ -2090,7 +2116,7 @@ void Importer::Process(Run& run, Work& work) {
     }
     if (hits.empty()) {
         if (!staged.empty()) std::remove(staged.c_str());
-        Unmatched(run, e);
+        Unmatched(run, e, work.display);
         return;
     }
     ++run.report.matched;

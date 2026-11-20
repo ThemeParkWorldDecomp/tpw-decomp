@@ -58,9 +58,11 @@
 #include <atomic>
 #include <cstdint>
 #include <deque>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <string>
 #include <thread>
 #include <utility>
@@ -113,6 +115,9 @@ const char* SourceDiscName(DiscSource source);
 struct LanguageStatus {
     enum class State : uint8_t { Absent, Partial, Available };
     std::string name;                 // as ManifestLanguages() spells it
+    bool unofficial = false;         // a player-supplied translation, isolated from verified game files
+    std::string description;         // content identification, never the name of the dropped file
+    std::string changes;             // the kinds of files the translation actually supplies
     State state = State::Absent;
     bool oldTables = false;           // kLanguageOldTables: available all the same, the run-time layer adapts them
     bool baseDateFonts = false;       // kLanguageBaseDateFonts: its date fonts are the base edition's
@@ -193,6 +198,7 @@ struct ImportReport {
     bool themeParkIncAddOnAlready = false;
     std::vector<std::string> playStation2;  // recognised PS2 discs (ps2_disc.h) and their conversion result, one plain line each
     bool playStation2Converted = false;
+    std::vector<std::string> translations;  // what ImporterConfig::sourceSupplement took, one plain line each
     // The game's icon (icon.h) when this drop wrote <data folder>/icon.png: where it came from ("TP.ico, 64x64, 8-bit");
     // empty when the drop held none, or none better than the one already there.
     std::string icon;
@@ -246,11 +252,24 @@ inline constexpr const char* kPs1DiscSha256Key = "ps1_disc_sha256";
 inline constexpr const char* kTpiDiscPathKey = "tpi_disc_path";
 inline constexpr const char* kTpiDiscSha256Key = "tpi_disc_sha256";
 
+// What ImporterConfig::sourceSupplement did with one source: its counts and errors, a line for the report per thing it
+// took, and the entries it took (their paths in that source), which are then neither unknown files nor other versions.
+struct SupplementResult {
+    uint64_t written = 0, alreadyThere = 0;
+    std::vector<std::string> errors;
+    std::vector<std::string> lines;
+    std::set<std::string> claimed;
+};
+
 struct ImporterConfig {
     std::string dataRoot;           // the data folder (assets/ is created in it)
     std::string iniPath;            // empty: dataRoot/launcher.ini
     unsigned editions = kEditionUs | kEditionEur | kEditionGold | kEditionLanguages | kEditionUsPc | kEditionEurPc;  // which editions a drop may write
     uint64_t spillOver = 64ull << 20;  // big compressed images are unpacked into assets/.staging first (sniff.h)
+    // Optional caller-owned importer extension. The default importer remains manifest-only. Called once per source
+    // after other games are recognised; it may only write its own isolated content, and reports its counts/errors.
+    std::function<SupplementResult(Source&, const std::atomic<bool>&)> sourceSupplement;
+    std::function<std::vector<LanguageStatus>()> extraLanguages;
 };
 
 class Importer {
@@ -328,7 +347,7 @@ private:
     bool PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display,
                           const std::string& path = std::string());
     void Process(Run& run, Work& work);
-    void Unmatched(Run& run, const Entry& entry);
+    void Unmatched(Run& run, const Entry& entry, const std::string& display);
     bool Install(Run& run, std::string staged, const std::vector<std::pair<Edition, uint32_t>>& targets);
     bool WriteSmall(Run& run, const std::vector<uint8_t>& bytes, Edition edition, uint32_t record);
     void Count(Run& run, Edition edition, uint32_t record, bool written);
