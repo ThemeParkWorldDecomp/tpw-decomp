@@ -11,5 +11,12 @@
 // as UpdateHFieldDarkeningNormals picks the cell under a vertex, and the colours between the corners are blended as the
 // meshes' are, so the ground fades over one cell, beside the river's fade. Header only and pure, so the host test sees
 // what the game does.
+// The meshes the converter takes from Theme Park Inc's levels (the canyons' cliffs, the tunnel's top and mouths, the
+// sculptures) have vertices meant to lie on a cell's edge that lie a hair before it (up to about 0.01 world units, a
+// thousandth of a cell), so UpdateHFieldDarkeningNormals took the cell before the edge for them and the mesh's light
+// stepped one cell away from the ground's fade: a hard line along the edge of the park's land. In the mod's worlds a
+// vertex within a thousandth of a cell of a grid line counts as on it (TpiParkEdgeVertexCell), so it takes that grid
+// point's cell, as the ground's corner does.
 #pragma once
+
 

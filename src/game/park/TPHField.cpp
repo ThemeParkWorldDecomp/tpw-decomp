@@ -351,8 +351,9 @@ void UpdateHFieldDarkeningNormals(tag_sNode* node, sMatrix matrix) {
             const float ten = 10.0f;
             const float* vert = reinterpret_cast<const float*>(static_cast<const uint8_t*>(gScratchGeomBuffer) + map[i] * 12u);
             const float fx = vert[0] / ten;
+            const float fz = vert[2] / ten;
             const uint32_t cellX = static_cast<uint32_t>(FloatToCell(static_cast<double>(fx)));
-            const uint32_t cellZ = static_cast<uint32_t>(FloatToCell(static_cast<double>(vert[2] / ten)));
+            const uint32_t cellZ = static_cast<uint32_t>(FloatToCell(static_cast<double>(fz)));
             const uint32_t cellX2 = static_cast<uint32_t>(FloatToCell(static_cast<double>(fx)));
             if (cellX2 < width && cellZ < height) {
                 const uint16_t quad = gHeightfieldQuads[cellX + cellZ * width].mF00;

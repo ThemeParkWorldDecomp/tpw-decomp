@@ -2,8 +2,10 @@
 // tpi_worlds in CHField::Execute) on the host, without game data: which corners of a height field cell are darkened, each
 // from the cell under its grid point, on made-up ownership maps. Inside land the park does not own every corner is dark
 // and inside its own land none, as the original's per cell rule gives; across an edge the cells beside the edge's grid
-// line get dark corners only on the line's far side, so the ground fades over one cell. Exits nonzero on the failed
-// checks' count.
+// line get dark corners only on the line's far side, so the ground fades over one cell. The meshes' vertices take the cell
+// the same way: one a hair before a grid line, as the converted meshes' are, counts as on it and takes the corner's cell.
+// Exits nonzero on the failed checks' count.
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -144,6 +146,36 @@ int main() {
         Check(TpiParkEdgeCorners(quads.data(), 0, 1, 0, 0) == 0, "width 0");
         Check(TpiParkEdgeCorners(quads.data(), 1, 0, 0, 0) == 0, "height 0");
         Check(TpiParkEdgeCorners(quads.data(), 1, 1, 0, 0) == 0xf, "one cell, unowned");
+    }
+
+    // A mesh vertex's cell (TpiParkEdgeVertexCell, then FloatToCell's floor): on or a hair either side of a grid line it is
+    // that line's, the corner's; farther off it keeps its own. The hairs are the converted meshes' offsets in cells (world
+    // units / 10): the tunnel top's -0.0003, -0.0006 and -0.001 units, the tunnel's -0.0082, a cliff's +0.0002.
+    {
+        Check(kTpiParkEdgeSnap == 0.001f, "the snap is a thousandth of a cell");
+        for (int line : {0, 1, 59, 66, 72, 127}) {
+            const float l = static_cast<float>(line);
+            for (float units : {-0.0082f, -0.001f, -0.0006f, -0.0003f, -0.0002f, 0.0f, 0.0002f, 0.0003f}) {
+                const float cells = (l * 10.0f + units) / 10.0f;
+                Check(TpiParkEdgeVertexCell(cells) == l, "a hair off grid line " + std::to_string(line) + " is on it");
+                Check(static_cast<int>(std::floor(TpiParkEdgeVertexCell(cells))) == line,
+                      "so its cell is the corner's, " + std::to_string(line));
+            }
+            // Beyond the snap (the converted meshes' -0.0267 units and more, and a cell's middle) the position is kept.
+            for (float off : {-0.5f, -0.25f, -0.0027f, -0.0011f, 0.0011f, 0.0137f, 0.25f, 0.49f}) {
+                const float cells = l + off;
+                if (cells < 0.0f) continue;
+                Check(TpiParkEdgeVertexCell(cells) == cells, "off grid line " + std::to_string(line) + " is kept");
+            }
+        }
+        // Across an edge at grid line 3, the vertices on the line darken as the ground's corners on it do: from cell 3.
+        auto quads = Map(6, 1, 0);
+        for (uint32_t cell = 3; cell < 6; ++cell) quads[cell].mF00 = 0x400;
+        const bool cornerDark = (TpiParkEdgeCorners(quads.data(), 6, 1, 2, 0) & (1u << 3)) != 0;
+        for (float units : {-0.0082f, -0.001f, -0.0003f, 0.0f, 0.0003f}) {
+            const int32_t cell = static_cast<int32_t>(std::floor(TpiParkEdgeVertexCell((30.0f + units) / 10.0f)));
+            Check(cell == 3 && ((quads[cell].mF00 & kQuadUnowned) != 0) == cornerDark, "the edge's vertex matches its corner");
+        }
     }
 
     if (gFailures == 0) std::printf("tpi_park_edge: all checks passed\n");
