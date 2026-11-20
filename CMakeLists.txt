@@ -121,6 +121,9 @@ if(TPW_BUILD_ASSETS_TESTS)
   target_link_libraries(tpw_ps2_convert_tests PRIVATE tpw_assets)
   target_compile_definitions(tpw_ps2_convert_tests PRIVATE TPW_TEST_BUILD_SCRATCH="${CMAKE_BINARY_DIR}/ps2-convert-test-scratch")
   add_test(NAME ps2_convert COMMAND tpw_ps2_convert_tests)
+  # The European and Japanese discs (SLES_500.32, SLPS_200.48): synthetic images, a bin and cue and a folder of them,
+  # through recognition and the import.
+  add_test(NAME ps2_disc_releases COMMAND tpw_ps2_convert_tests --releases)
   add_executable(tpw_ps2_convert_tool assets/ps2_convert_tool.cpp)
   target_link_libraries(tpw_ps2_convert_tool PRIVATE tpw_assets)
 endif()

@@ -1559,8 +1559,8 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
                 std::string reason;
                 const bool converted = ConvertPs2(disc, fs::u8path(config_.dataRoot), log, reason);
                 const std::string line = converted
-                    ? "PS2 Guest Models: " + std::to_string(Ps2Characters().size()) + " characters converted from the US PlayStation 2 disc (" + disc.boot + ")."
-                    : "PlayStation 2 disc recognised (US, " + disc.boot + "); " + OneLine(reason);
+                    ? "PS2 Guest Models: " + std::to_string(Ps2Characters().size()) + " characters converted from the " + disc.region + " PlayStation 2 disc (" + disc.boot + ")."
+                    : "PlayStation 2 disc recognised (" + disc.region + ", " + disc.boot + "); " + OneLine(reason);
                 run.report.playStation2.push_back(line);
                 run.report.playStation2Converted = run.report.playStation2Converted || converted;
                 ImportProgress ev;

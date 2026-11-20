@@ -4,6 +4,7 @@
 // whole conversion from a synthetic disc folder. Every file is built here, in code, with made-up shapes; no game data.
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -27,6 +28,10 @@ using Bytes = std::vector<uint8_t>;
 namespace {
 
 int g_fail = 0, g_pass = 0;
+
+// The supported releases, as a refusal names them (ps2_disc.cpp).
+const std::string kSupported = "Theme Park Roller Coaster (USA, SLUS_200.99), Theme Park World (Europe, SLES_500.32) or "
+                               "Theme Park 2001 (Japan, SLPS_200.48)";
 
 #define CHECK(cond)                                                     \
     do {                                                                \
@@ -502,7 +507,7 @@ void TestDisc(const std::filesystem::path& scratch) {
     WriteBytes(disc / "DATA" / "DATA.WAD", wad);
     Ps2Disc found;
     CHECK(RecognisePs2Path(disc.u8string(), found, err) == Ps2Status::Supported);
-    CHECK(found.boot == "SLUS_200.99" && found.chars.size() == 49);
+    CHECK(found.region == "US" && found.boot == "SLUS_200.99" && found.chars.size() == 49);
 
     std::vector<std::string> log;
     CHECK(ReadPs2ConverterStamp(data) == 0);
@@ -591,7 +596,7 @@ void TestImport(const std::filesystem::path& scratch) {
     WriteBytes(disc / "SYSTEM.CNF", Bytes(other.begin(), other.end()));
     r = drop("other", disc, ev);
     CHECK(r.errors.size() == 1 && r.errors[0] == refused + "it is another PlayStation 2 game (SYSTEM.CNF boots SLUS_999.99), "
-                                                           "not Theme Park Roller Coaster (SLUS_200.99)");
+                                                           "not " + kSupported);
     CHECK(r.playStation2.empty() && r.unknownFiles == 0);
 
     // An ISO 9660 image of a PS2 disc (the PlayStation system identifier, as a PS1 disc's): not taken for a PS1 disc, and
@@ -607,14 +612,129 @@ void TestImport(const std::filesystem::path& scratch) {
     std::filesystem::remove_all(scratch);
 }
 
+// A complete small disc of another release (PAL by default): synthetic models, animations and texture, in a real ISO directory layout. Move the last
+// root file record into DATA's directory sector so recognition must actually read DATA/DATA.WAD from the image.
+Bytes MakeReleaseIso(const Bytes& wad, const std::string& boot = "SLES_500.32", bool executable = true) {
+    const std::string cnf = "BOOT2 = cdrom0:\\" + boot + ";1\r\nVER = 1.00\r\nVMODE = " + (boot == "SLES_500.32" ? "PAL" : "NTSC") + "\r\n";
+    const std::string elf = executable ? std::string("\x7f" "ELF\0\0\0\0", 8) : "not an executable";
+    Bytes iso = tpwtest::IsoImageOf({{"SYSTEM.CNF", cnf}, {boot, elf}, {"DATA", std::string(2048, '\0')},
+                                    {"DATA.WAD", std::string(wad.begin(), wad.end())}});
+    std::memcpy(iso.data() + 16 * 2048 + 8, "PLAYSTATION", 11);
+    size_t dataRecord = 20 * 2048;
+    for (int i = 0; i < 4; ++i) dataRecord += iso[dataRecord];   // '.', '..', SYSTEM.CNF, executable
+    const size_t wadRecord = dataRecord + iso[dataRecord];
+    const size_t directory = (uint32_t(iso[dataRecord + 2]) | uint32_t(iso[dataRecord + 3]) << 8 |
+                              uint32_t(iso[dataRecord + 4]) << 16 | uint32_t(iso[dataRecord + 5]) << 24) * size_t(2048);
+    std::copy_n(iso.begin() + wadRecord, iso[wadRecord], iso.begin() + directory);
+    iso[dataRecord + 25] = 2;
+    iso[dataRecord + 32] = 4;   // a directory name has no file version suffix
+    iso[wadRecord] = 0;
+    return iso;
+}
+
+// The European (SLES_500.32) and Japanese (SLPS_200.48) discs hold the US disc's 24 characters: both are taken, by
+// their own region, from an image, a bin and cue or a folder, and still pass every check the US disc does.
+void TestReleases(const std::filesystem::path& scratch) {
+    std::filesystem::remove_all(scratch);
+    std::vector<std::pair<std::string, std::vector<WadFile>>> folders;
+    for (const Ps2Character& ch : Ps2Characters())
+        folders.push_back({ch.folder, {{std::string(ch.folder) + ".mps", MakeMps(static_cast<uint16_t>(ch.triangles), "skin"), false},
+                                       {std::string(ch.folder) + ".aps", MakeAps(false), true}}});
+    folders.push_back({"Textures", {{"skin.tga", MakeTga(), true}}});
+    const Bytes wad = MakeWad(folders), iso = MakeReleaseIso(wad);
+    const std::filesystem::path image = scratch / "pal.iso";
+    WriteBytes(image, iso);
+    Ps2Disc found;
+    std::string err;
+    CHECK(RecognisePs2Path(image.u8string(), found, err) == Ps2Status::Supported);
+    CHECK(err.empty() && found.region == "European" && found.boot == "SLES_500.32" && found.chars.size() == 49);
+    CHECK(found.path == image.u8string());
+
+    // The launcher's actual drop converts all characters and names the disc's release in its report and event.
+    auto drop = [&](const std::filesystem::path& path, const char* name, const std::string& release = "European (SLES_500.32)") {
+        ImporterConfig cfg;
+        cfg.dataRoot = (scratch / name).u8string();
+        Importer imp(cfg);
+        CHECK(imp.Open(err));
+        const ImportReport r = imp.Import({path.u8string()});
+        const std::string line = "PS2 Guest Models: 24 characters converted from the " + release.substr(0, release.find(' ')) +
+                                 " PlayStation 2 disc " + release.substr(release.find(' ') + 1) + ".";
+        CHECK(r.errors.empty());
+        CHECK(r.playStation2Converted && r.playStation2.size() == 1 && r.playStation2[0] == line);
+        CHECK(r.playStation.empty() && r.written == 0 && r.unknownFiles == 0);
+        CHECK(ReadPs2ConverterStamp(scratch / name) == kPs2ConverterVersion);
+        for (const Ps2Character& ch : Ps2Characters()) {
+            std::string file = ch.folder;
+            for (char& c : file) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+            CHECK(std::filesystem::exists(Ps2ContentPath(scratch / name) / (file + ".p2m")));
+        }
+        const auto ev = imp.Progress().Drain();
+        CHECK(std::any_of(ev.begin(), ev.end(), [&](const ImportProgress& e) {
+            return e.kind == ImportProgress::Kind::Content && e.message == line;
+        }));
+    };
+    drop(image, "iso-data");
+
+    // Raw Mode 2 CD sectors and a cue beside the bin, matching the PAL disc's container shape.
+    Bytes raw((iso.size() / 2048) * 2352);
+    const uint8_t sync[] = {0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0};
+    for (size_t s = 0; s < iso.size() / 2048; ++s) {
+        std::copy_n(sync, 12, raw.begin() + s * 2352);
+        raw[s * 2352 + 15] = 2;
+        std::copy_n(iso.begin() + s * 2048, 2048, raw.begin() + s * 2352 + 24);
+    }
+    WriteBytes(scratch / "pal.bin", raw);
+    const std::string cue = "FILE \"pal.bin\" BINARY\n  TRACK 01 MODE2/2352\n    INDEX 01 00:00:00\n";
+    WriteBytes(scratch / "pal.cue", Bytes(cue.begin(), cue.end()));
+    CHECK(RecognisePs2Path((scratch / "pal.bin").u8string(), found, err) == Ps2Status::Supported);
+    CHECK(RecognisePs2Path((scratch / "pal.cue").u8string(), found, err) == Ps2Status::Supported);
+    drop(scratch / "pal.cue", "cue-data");
+
+    const auto folder = scratch / "folder";
+    const std::string cnf = "BOOT2 = cdrom0:\\sles_500.32;1\n";
+    WriteBytes(folder / "system.cnf", Bytes(cnf.begin(), cnf.end()));
+    WriteBytes(folder / "sles_500.32", {0x7f, 'E', 'L', 'F'});
+    WriteBytes(folder / "data" / "data.wad", wad);
+    CHECK(RecognisePs2Path(folder.u8string(), found, err) == Ps2Status::Supported);
+    drop(folder, "folder-data");
+
+    // The Japanese disc (Theme Park 2001).
+    const std::filesystem::path japan = scratch / "japan.iso";
+    WriteBytes(japan, MakeReleaseIso(wad, "SLPS_200.48"));
+    CHECK(RecognisePs2Path(japan.u8string(), found, err) == Ps2Status::Supported);
+    CHECK(err.empty() && found.region == "Japanese" && found.boot == "SLPS_200.48" && found.chars.size() == 49);
+    drop(japan, "japan-data", "Japanese (SLPS_200.48)");
+
+    // The newly accepted boots must still pass the executable, archive and all 24 model checks.
+    WriteBytes(image, MakeReleaseIso(wad, "SLES_500.32", false));
+    CHECK(RecognisePs2Path(image.u8string(), found, err) == Ps2Status::Rejected);
+    CHECK(err == "SLES_500.32 is not a PS2 executable" && found.chars.empty());
+    folders[1].second[0].bytes = MakeMps(7, "skin");
+    WriteBytes(image, MakeReleaseIso(MakeWad(folders)));
+    CHECK(RecognisePs2Path(image.u8string(), found, err) == Ps2Status::Rejected);
+    CHECK(err.find("Boy1a") != std::string::npos && found.chars.empty());
+    WriteBytes(image, MakeReleaseIso(Bytes{'b', 'a', 'd'}));
+    CHECK(RecognisePs2Path(image.u8string(), found, err) == Ps2Status::Rejected);
+    CHECK(err == "DATA.WAD is not an FKNL linkfile");
+    WriteBytes(image, MakeReleaseIso(wad, "SLES_999.99"));
+    CHECK(RecognisePs2Path(image.u8string(), found, err) == Ps2Status::Rejected);
+    CHECK(err == "SYSTEM.CNF boots SLES_999.99, not a supported disc: " + kSupported && found.chars.empty());
+    std::filesystem::remove_all(scratch);
+}
+
 }  // namespace
 
-int main() {
+int main(int argc, char** argv) {
+    const char* env = std::getenv("TPW_TEST_SCRATCH");
+    if (argc == 2 && std::string(argv[1]) == "--releases") {
+        TestReleases(std::filesystem::path(env ? env : TPW_TEST_BUILD_SCRATCH) / "ps2-releases");
+        std::printf("%d passed, %d failed\n", g_pass, g_fail);
+        return g_fail == 0 ? 0 : 1;
+    }
     TestModel();
     TestAnimations();
     TestTextures();
     TestPack();
-    const char* env = std::getenv("TPW_TEST_SCRATCH");
     TestDisc(std::filesystem::path(env ? env : TPW_TEST_BUILD_SCRATCH) / "ps2-convert");
     TestImport(std::filesystem::path(env ? env : TPW_TEST_BUILD_SCRATCH) / "ps2-import");
     std::printf("%d passed, %d failed\n", g_pass, g_fail);

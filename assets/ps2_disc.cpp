@@ -150,13 +150,19 @@ Ps2Status RecognisePs2(Source& source, Ps2Disc& disc, std::string& reason) {
         }
         if (boot.empty()) return Ps2Status::NotPs2;   // a PlayStation 1 disc names BOOT, not BOOT2
         const Entry* wadEntry = FindEntry(source, "DATA/DATA.WAD");
-        if (boot != "SLUS_200.99" && wadEntry == nullptr) {   // another PS2 game
-            reason = "it is another PlayStation 2 game (SYSTEM.CNF boots " + boot +
-                     "), not Theme Park Roller Coaster (SLUS_200.99)";
+        // The three releases, whose DATA.WAD holds the same 24 characters (the European and Japanese discs' converted
+        // models are the US disc's, byte for byte); each still passes the executable, DATA.WAD and model checks below.
+        static const std::map<std::string, std::string> regions = {
+            {"SLUS_200.99", "US"}, {"SLES_500.32", "European"}, {"SLPS_200.48", "Japanese"}};
+        static const std::string supported = "Theme Park Roller Coaster (USA, SLUS_200.99), Theme Park World (Europe, "
+                                             "SLES_500.32) or Theme Park 2001 (Japan, SLPS_200.48)";
+        const auto region = regions.find(boot);
+        if (region == regions.end() && wadEntry == nullptr) {   // another PS2 game
+            reason = "it is another PlayStation 2 game (SYSTEM.CNF boots " + boot + "), not " + supported;
             return Ps2Status::NotPs2;
         }
         ps2 = true;
-        Require(boot == "SLUS_200.99", "SYSTEM.CNF boots " + boot + ", not the supported US disc (SLUS_200.99)");
+        Require(region != regions.end(), "SYSTEM.CNF boots " + boot + ", not a supported disc: " + supported);
         const Entry* exe = FindEntry(source, boot);
         Require(exe != nullptr, boot + " is missing");
         const Bytes head = ReadEntry(source, *exe, 64 * 1024 * 1024);
@@ -164,6 +170,7 @@ Ps2Status RecognisePs2(Source& source, Ps2Disc& disc, std::string& reason) {
         Require(wadEntry != nullptr, "DATA/DATA.WAD is missing");
         const Bytes wad = ReadEntry(source, *wadEntry, 256 * 1024 * 1024);
         Ps2Disc found;
+        found.region = region->second;
         found.boot = boot;
         Require(ReadPs2Wad(wad, "Chars/", found.chars, reason), reason);
         for (const Ps2Character& ch : Ps2Characters()) {

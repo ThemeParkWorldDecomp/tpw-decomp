@@ -1,7 +1,8 @@
 // ps2_disc.h: the PS2 Guest Models mod's disc reader (tpw-mods ps2-characters). It recognises the player's own copy of
-// the PlayStation 2 version of the game (Theme Park Roller Coaster, USA, SLUS_200.99) by its content: SYSTEM.CNF boots
-// SLUS_200.99, DATA/DATA.WAD is an 'FKNL' linkfile whose Chars folder holds the 24 characters, and each character's model
-// has the triangle count the table in ps2_disc.cpp names. No disc data is built in: only those names and counts.
+// the PlayStation 2 version of the game by its content: SYSTEM.CNF boots the executable of one of its three releases
+// (Theme Park Roller Coaster, USA, SLUS_200.99; Theme Park World, Europe, SLES_500.32; Theme Park 2001, Japan,
+// SLPS_200.48), DATA/DATA.WAD is an 'FKNL' linkfile whose Chars folder holds the 24 characters, and each character's
+// model has the triangle count the table in ps2_disc.cpp names. No disc data is built in: only those names and counts.
 #pragma once
 
 #include <cstdint>
@@ -17,6 +18,7 @@ namespace tpw::assets {
 enum class Ps2Status { NotPs2, Rejected, Supported };
 
 struct Ps2Disc {
+    std::string region;   // the release, as the importer names it: "US", "European" or "Japanese"
     std::string boot;
     // The image file or folder the disc was read from, for the launcher to remember (as Ps1Disc's path).
     std::string path;
