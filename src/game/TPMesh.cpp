@@ -204,6 +204,7 @@ void DisableMeshDraw(tag_sMesh* mesh, HFieldXZ from, HFieldXZ to) {
     mesh->mF00 &= ~1u;
 }
 
+
 // The small functions the advisor calls (main app of SimTheme Park 2.04b3), each from a range of its own:
 //   GetDeferredAnim 0x100c7a74 and GetAnimLength 0x100c7bb4 (rsse.cpp, next to the animation tick),
 //   SetMeshInUISpace 0x1006553c (TPRide.cpp, the mesh draw switches),

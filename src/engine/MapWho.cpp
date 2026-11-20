@@ -136,6 +136,7 @@ constexpr int32_t kErrAltTabRestore = static_cast<int32_t>(0xb0754014);
 // Global list 6: the lights (CLight links there), prepared first by PrepareWorldspace.
 constexpr int32_t kLightList = 6;
 
+
 // Makes `head` the list being prepared (gei_MapWho's mF30, whichever map is drawing) and
 // prepares its links; 0 at the first that fails. Inline in the original (three copies; the
 // name is invented). The next link is read after each Prepare.
