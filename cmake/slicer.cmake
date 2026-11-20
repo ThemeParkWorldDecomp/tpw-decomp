@@ -23,9 +23,16 @@ set_property(GLOBAL PROPERTY TPW_SLICER ${CMAKE_CURRENT_LIST_DIR}/../devtools/sl
 # The path of a source under src/ (of this tree, or of tpw-port's overrides/src), or "" for any other source.
 function(_tpw_slice_src_path source result)
   set(path "")
+  if(IS_ABSOLUTE "${source}")
+    # The checkout's parents may themselves be named src. Match only paths relative to this tree, or to the port's
+    # overrides, which deferred calls from the submodule also see. The function's file stays in the decomp tree.
+    file(RELATIVE_PATH relative "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/.." "${source}")
+    if(NOT relative MATCHES "^src/")
+      file(RELATIVE_PATH relative "${CMAKE_SOURCE_DIR}/overrides" "${source}")
+    endif()
+    set(source "${relative}")
+  endif()
   if(source MATCHES "^src/(.+)$")
-    set(path ${CMAKE_MATCH_1})
-  elseif(source MATCHES "/src/(.+)$")
     set(path ${CMAKE_MATCH_1})
   endif()
   set(${result} "${path}" PARENT_SCOPE)
