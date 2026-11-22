@@ -619,6 +619,100 @@ void TestHitAreas() {
     }
 }
 
+// Fill Around Camera's full screen on this Mac: the whole panel, 2056 x 1329 points (4112 x 2658 pixels), plays at its
+// own shape in place of 16:10 (UI_AtScreenShape).
+void TestScreenShape() {
+    std::printf("-- the screen's own shape in place of 16:10\n");
+    constexpr int32_t kAtScreen[11][2] = {{594, 384},   {742, 480},   {928, 600},   {1238, 800},  {1392, 900},  {1624, 1050},
+                                          {1856, 1200}, {2476, 1600}, {3094, 2000}, {3712, 2400}, {4112, 2658}};
+    int32_t wide = 1920;
+    int32_t high = 1200;
+    UI_AtScreenShape(2056, 1329, wide, high);
+    CheckEqual(wide, 1856, "1920 x 1200 is 1856 x 1200 at 2056:1329");
+    CheckEqual(high, 1200, "the same height");
+    wide = 1600;
+    high = 1200;
+    UI_AtScreenShape(2056, 1329, wide, high);
+    CheckEqual(wide, 1600, "4:3 stays 4:3");
+    wide = 1920;
+    high = 1080;
+    UI_AtScreenShape(2056, 1329, wide, high);
+    CheckEqual(wide, 1920, "16:9 stays 16:9");
+    wide = 1920;
+    high = 1200;
+    UI_AtScreenShape(0, 0, wide, high);
+    CheckEqual(wide, 1920, "no screen shape: as always");
+    Check(UI_PlayedAspect(1, 2056, 1329) == 2056.0f / 1329.0f, "16:10 plays at the screen's shape");
+    Check(UI_PlayedAspect(0, 2056, 1329) == 0.0f, "4:3 at its own");
+    Check(UI_PlayedAspect(2, 2056, 1329) == 16.0f / 9.0f, "16:9 at its own");
+    Check(UI_PlayedAspect(1, 0, 0) == 1.6f, "no screen shape: 16:10 at its own");
+    UISizeStop stops[kUISizeStopLimit];
+    CheckEqual(UI_SizeStops(1, 0, 0, 4112, 2658, stops, 2056, 1329), 11, "16:10's list at the screen's shape, and the screen");
+    for (int32_t i = 0; i < 11; ++i) {
+        CheckEqual(stops[i].mWidth, kAtScreen[i][0], "the width, in order");
+        CheckEqual(stops[i].mHeight, kAtScreen[i][1], "the height, in order");
+    }
+    CheckEqual(UI_SizeStops(0, 0, 0, 4112, 2658, stops, 2056, 1329), 10, "4:3's list as always");
+    CheckEqual(stops[5].mWidth, 1600, "1600 x 1200");
+    CheckEqual(UI_SizeStops(2, 0, 0, 4112, 2658, stops, 2056, 1329), 10, "16:9's as always");
+    CheckEqual(stops[6].mWidth, 1920, "1920 x 1080");
+    CheckEqual(UI_SizeStops(1, 0, 0, 4112, 2658, stops), 11, "no screen shape: 16:10's own list and the screen");
+    CheckEqual(stops[6].mWidth, 1920, "1920 x 1200");
+    for (int32_t i = 0; i < 10; ++i) {
+        wide = kAtScreen[i][0];
+        high = kAtScreen[i][1];
+        UI_SavedSize(2056, 1329, 4112, 2658, wide, high);
+        CheckEqual(wide, kListed[1][i][0], "a stop at the screen's shape is saved at 16:10: width");
+        CheckEqual(high, kListed[1][i][1], "and height");
+        UI_AtScreenShape(2056, 1329, wide, high);
+        CheckEqual(wide, kAtScreen[i][0], "and a start at the screen's shape opens at the stop again");
+    }
+    wide = 4112;
+    high = 2658;
+    UI_SavedSize(2056, 1329, 4112, 2658, wide, high);
+    CheckEqual(wide, 4112, "the screen's own size is saved as it is, as always");
+    wide = 1600;
+    high = 1200;
+    UI_SavedSize(2056, 1329, 4112, 2658, wide, high);
+    CheckEqual(wide, 1600, "4:3 is saved as it is");
+    wide = 1856;
+    high = 1200;
+    UI_SavedSize(0, 0, 4112, 2658, wide, high);
+    CheckEqual(wide, 1856, "no screen shape: saved as it is");
+
+    std::printf("-- the options panel at the screen's shape\n");
+    gPortScreenWide = 4112;
+    gPortScreenHigh = 2658;
+    gPortScreenShapeWide = 2056;
+    gPortScreenShapeHigh = 1329;
+    OpenPanel(1856, 1200, PortResolutionSetting(6, 1));
+    CheckEqual(gUISizeStopCount, 11, "the screen's shape's stops and the screen");
+    CheckEqual(gButtonState[1], 1, "under 16:10's button");
+    Check(gReadout == "1856 x 1200", "the running size named");
+    options_panel::DoScroll(kSliderId, 4);
+    Check(gReadout == "1392 x 900", "a stop at the screen's shape");
+    CheckEqual(gPortWantedWide, 1392, "is the size asked for");
+    CheckEqual(Current(), PortResolutionExact(1440, 900), "and is saved at 16:10");
+    options_panel::DoScroll(kSliderId, 10);
+    Check(gReadout == "4112 x 2658", "the screen's own size");
+    CheckEqual(Current(), PortResolutionExact(4112, 2658), "saved as it is");
+    options_panel::DoScroll(kSliderId, 6);
+    CheckEqual(Current(), PortResolutionSetting(6, 1), "back on the panel's size: nothing to save");
+    PortShowShape(2);
+    Check(gReadout == "1920 x 1080", "16:9's button: 16:9's own sizes");
+    CheckEqual(Current(), PortResolutionExact(1920, 1080), "saved as it is");
+    PortShowShape(0);
+    Check(gReadout == "1600 x 1200", "4:3's: 4:3's own");
+    CheckEqual(Current(), PortResolutionExact(1600, 1200), "saved as it is");
+    PortShowShape(1);
+    Check(gReadout == "1856 x 1200", "and 16:10's back at the screen's shape, where it opened");
+    CheckEqual(Current(), PortResolutionSetting(6, 1), "with nothing to save");
+    gPortScreenWide = 0;
+    gPortScreenHigh = 0;
+    gPortScreenShapeWide = 0;
+    gPortScreenShapeHigh = 0;
+}
+
 int main() {
     gSetOnOffRoot = WindowOf(kSliderId);
     TestNearestShape();
@@ -633,6 +727,7 @@ int main() {
     TestSettingMeansPreset();
     TestResampling();
     TestOriginal();
+    TestScreenShape();
     std::printf("%s\n", gFailures == 0 ? "all ok" : "FAILURES");
     return gFailures == 0 ? 0 : 1;
 }
