@@ -370,8 +370,12 @@ Ps1Status RecognisePs1(std::shared_ptr<Blob> blob, Ps1Disc& disc, std::string& r
         Require(reader.Sectors() >= U32(reader.primary, 80), "image is truncated: shorter than its volume");
         Require(U16(reader.primary, 128) == 2048, "ISO logical block size is not 2048");
         reader.Walk(U32(reader.primary, 158), U32(reader.primary, 166), "");
-        Bytes cnf = reader.File("SYSTEM.CNF", 65536);
-        std::string boot;
+        // A PlayStation boots PSX.EXE when SYSTEM.CNF is absent, as some copies of the game are.
+        const bool hasCnf = reader.files.count("SYSTEM.CNF") == 1;
+        Require(hasCnf || reader.files.count("PSX.EXE") == 1,
+                "neither SYSTEM.CNF nor PSX.EXE is on the disc, so it has no program to start");
+        Bytes cnf = hasCnf ? reader.File("SYSTEM.CNF", 65536) : Bytes();
+        std::string boot = hasCnf ? "" : "PSX.EXE";
         bool boot2 = false;
         std::istringstream lines(std::string(cnf.begin(), cnf.end()));
         std::string line;
@@ -389,15 +393,28 @@ Ps1Status RecognisePs1(std::shared_ptr<Blob> blob, Ps1Disc& disc, std::string& r
         if (boot.empty() && boot2) return Ps1Status::NotPlayStation;   // a PlayStation 2 disc (ps2_disc.h)
         const std::map<std::string, std::string> regions = {{"SLUS_010.69", "USA"}, {"SLES_026.88", "Europe"}, {"SLPS_026.43", "Japan"}};
         auto region = regions.find(boot);
-        Require(region != regions.end(), "SYSTEM.CNF does not name a supported PlayStation version of this game");
+        Require(region != regions.end() || boot == "PSX.EXE",
+                "SYSTEM.CNF does not name a supported PlayStation version of this game");
         Bytes exe = reader.File(boot, 16 * 1024 * 1024);
         Require(exe.size() >= 8 && std::memcmp(exe.data(), "PS-X EXE", 8) == 0, boot + " is not a PS1 executable");
+        std::string area;
+        if (region == regions.end()) {
+            // PSX.EXE names no release, so the region comes from the executable header's own marker.
+            const std::map<std::string, std::string> markers = {{"North America area", "USA"}, {"Europe area", "Europe"},
+                                                                {"Japan area", "Japan"}};
+            const std::string prefix = "Sony Computer Entertainment Inc. for ";
+            std::string marker = exe.size() > 0x4c ? std::string(exe.begin() + 0x4c, exe.begin() + std::min<size_t>(exe.size(), 0x800)) : "";
+            marker = Trim(marker.substr(0, marker.find('\0')));
+            auto it = marker.compare(0, prefix.size(), prefix) == 0 ? markers.find(marker.substr(prefix.size())) : markers.end();
+            Require(it != markers.end(), boot + " is not marked for North America, Europe or Japan");
+            area = it->second;
+        }
         for (const std::string name : {"FOLIO.GAZ", "TPW.BIN", "TPW.OVL"}) Require(reader.files.count(name) == 1, name + " is missing");
         reader.CheckSectors("FOLIO.GAZ");
         reader.CheckSectors("TPW.BIN");
         Ps1Disc found;
         found.boot = boot;
-        found.region = region->second;
+        found.region = region != regions.end() ? region->second : area;
         Require(ReadPs1Folio(reader.File("FOLIO.GAZ"), found.entries, reason), reason);
         FindTables(found, reader.File("TPW.BIN", 16 * 1024 * 1024));
         disc = std::move(found);

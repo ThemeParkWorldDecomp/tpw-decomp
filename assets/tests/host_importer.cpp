@@ -343,12 +343,18 @@ std::vector<uint8_t> Ps1BinaryFixture() {
     return b;
 }
 
-std::vector<uint8_t> Ps1ImageFixture(const std::string& boot = "SLUS_010.69") {
+// A made-up disc: SYSTEM.CNF naming boot (none when systemCnf is false), the executable, with the header's region
+// marker when one is given, and the game's three files.
+std::vector<uint8_t> Ps1ImageFixture(const std::string& boot = "SLUS_010.69", const std::string& marker = "",
+                                     bool systemCnf = true) {
     struct File { std::string name; std::vector<uint8_t> bytes; uint32_t sector; };
     std::string cnf = "BOOT=cdrom:\\" + boot + ";1\r\n";
+    std::vector<uint8_t> exe = {'P', 'S', '-', 'X', ' ', 'E', 'X', 'E'};
+    if (!marker.empty()) { exe.resize(0x4c); exe.insert(exe.end(), marker.begin(), marker.end()); exe.resize(0x800); }
     std::vector<File> files = {{"SYSTEM.CNF", {cnf.begin(), cnf.end()}, 0},
-        {boot, {'P', 'S', '-', 'X', ' ', 'E', 'X', 'E'}, 0}, {"FOLIO.GAZ", Ps1FolioFixture(), 0},
+        {boot, exe, 0}, {"FOLIO.GAZ", Ps1FolioFixture(), 0},
         {"TPW.BIN", Ps1BinaryFixture(), 0}, {"TPW.OVL", {0}, 0}};
+    if (!systemCnf) files.erase(files.begin());
     uint32_t sector = 21;
     for (auto& f : files) { f.sector = sector; sector += uint32_t((f.bytes.size() + 2047) / 2048); }
     std::vector<uint8_t> image(size_t(sector) * 2048);
@@ -526,6 +532,71 @@ void TestPlayStation(const std::string& scratch) {
     CHECK(!Exists(backup) && ReadText(destination + "/latest") == "latest complete replacement");
     CHECK(!InstallPs1Ride(staged, destination, why));
     CHECK(ReadText(destination + "/latest") == "latest complete replacement");
+    RemoveTree(root); RemoveTree(drop);
+}
+
+// A disc without SYSTEM.CNF boots PSX.EXE, as a PlayStation does, and takes its region from the executable header's
+// marker. A disc with neither is refused, and one with SYSTEM.CNF reads as it always did.
+void TestPlayStationBootFile(const std::string& scratch) {
+    std::printf("PlayStation disc without SYSTEM.CNF\n");
+    const std::string sce = "Sony Computer Entertainment Inc. for ";
+    Ps1Disc disc;
+    std::string why;
+    auto image = Ps1ImageFixture("PSX.EXE", sce + "North America area", false);
+    CHECK(RecognisePs1(MakeMemoryBlob(image), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "USA" && disc.boot == "PSX.EXE" && why.empty());
+    CHECK_EQ(disc.rides.size(), 10); CHECK_EQ(disc.themes.size(), 4);
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1RawFixture(image, 2352)), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "USA");
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("PSX.EXE", sce + "Europe area", false)), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "Europe");
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("PSX.EXE", sce + "Japan area", false)), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "Japan");
+    // SYSTEM.CNF naming PSX.EXE: the same marker
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("PSX.EXE", sce + "Europe area")), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "Europe" && disc.boot == "PSX.EXE");
+    // no marker, or another one
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("PSX.EXE", "", false)), disc, why) == Ps1Status::Rejected);
+    CHECK(why == "PSX.EXE is not marked for North America, Europe or Japan");
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("PSX.EXE", sce + "Mars area", false)), disc, why) == Ps1Status::Rejected);
+    CHECK(why == "PSX.EXE is not marked for North America, Europe or Japan");
+    image = Ps1ImageFixture("PSX.EXE", sce + "North America area", false);
+    image[21 * 2048] = 0;
+    CHECK(RecognisePs1(MakeMemoryBlob(image), disc, why) == Ps1Status::Rejected);
+    CHECK(why == "PSX.EXE is not a PS1 executable");
+    // neither SYSTEM.CNF nor PSX.EXE
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("SLUS_010.69", sce + "North America area", false)), disc, why) ==
+          Ps1Status::Rejected);
+    CHECK(why == "neither SYSTEM.CNF nor PSX.EXE is on the disc, so it has no program to start");
+    CHECK(disc.boot.empty() && disc.entries.empty());
+    // SYSTEM.CNF present: the release its name says, whatever the header's marker
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("SLUS_010.69", sce + "Japan area")), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "USA" && disc.boot == "SLUS_010.69");
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("SLPS_026.43")), disc, why) == Ps1Status::Supported);
+    CHECK(disc.region == "Japan" && disc.boot == "SLPS_026.43");
+    CHECK(RecognisePs1(MakeMemoryBlob(Ps1ImageFixture("SLUS_999.99", sce + "North America area")), disc, why) == Ps1Status::Rejected);
+    CHECK(why == "SYSTEM.CNF does not name a supported PlayStation version of this game");
+
+    // the importer: the disc without SYSTEM.CNF is recognised and asks for the PC disc, the one with neither is refused
+    std::string root = scratch + "/ps1-boot-data", drop = scratch + "/ps1-boot-drop";
+    ImporterConfig cfg; cfg.dataRoot = root;
+    Importer imp(cfg); CHECK(imp.Open(why));
+    std::string imagePath = drop + "/disc.iso";
+    image = Ps1ImageFixture("PSX.EXE", sce + "North America area", false);
+    WriteFile(imagePath, std::string(image.begin(), image.end()));
+    auto recognised = imp.Import({imagePath});
+    CHECK(recognised.errors.empty());
+    CHECK_EQ(recognised.playStation.size(), 1);
+    CHECK(recognised.playStation[0].find("PlayStation disc recognised (USA, PSX.EXE); drop your US or European PC disc") == 0);
+    CHECK(!recognised.playStationConverted && !Exists(root + "/assets/ps1"));
+    image = Ps1ImageFixture("SLUS_010.69", "", false);
+    WriteFile(imagePath, std::string(image.begin(), image.end()));
+    auto refused = imp.Import({imagePath});
+    CHECK(refused.playStation.empty());
+    CHECK_EQ(refused.errors.size(), 1);
+    CHECK(refused.errors[0] == "disc.iso: PlayStation disc refused: neither SYSTEM.CNF nor PSX.EXE is on the disc, so it "
+                               "has no program to start");
+    CHECK(!refused.playStationConverted && !Exists(root + "/assets/ps1"));
     RemoveTree(root); RemoveTree(drop);
 }
 
@@ -3237,10 +3308,19 @@ int main() {
         std::printf("importer: %d passed, %d failed, %d skipped\n", g_pass, g_fail, g_skip);
         return g_fail == 0 ? 0 : 1;
     }
+    // TPW_TEST_ONLY=ps1 runs the PlayStation recognition tests alone.
+    if (Env("TPW_TEST_ONLY") == "ps1") {
+        TestPlayStation(scratch);
+        TestPlayStationBootFile(scratch);
+        RemoveTree(scratch);
+        std::printf("importer: %d passed, %d failed, %d skipped\n", g_pass, g_fail, g_skip);
+        return g_fail == 0 ? 0 : 1;
+    }
 
     TestSynthetic(scratch);
     TestPs1Stamp(scratch);
     TestPlayStation(scratch);
+    TestPlayStationBootFile(scratch);
     TestPs1Grass();
     TestPs1PlainGround();
     TestIcon(scratch);
