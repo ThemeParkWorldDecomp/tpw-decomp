@@ -328,6 +328,7 @@ TrueTypeRender::TrueTypeRender() {
 
 TrueTypeRender::~TrueTypeRender() {}
 
+
 int32_t TrueTypeRender::render_font_unicode(NS_MacDoze::InternalHandle* dc, const char16_t* text, Bitmap& out) {
     const uint32_t length = wcslen(text);
     if (length == 0) {
