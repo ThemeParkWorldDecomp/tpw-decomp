@@ -127,9 +127,11 @@ const char* SourceDiscName(DiscSource source);
 
 struct LanguageStatus {
     enum class State : uint8_t { Absent, Partial, Available };
-    std::string name;                 // as ManifestLanguages() spells it
+    std::string name;                 // as ManifestLanguages() spells it; an unofficial translation's ID
     bool unofficial = false;         // a player-supplied translation, isolated from verified game files
-    std::string description;         // content identification, never the name of the dropped file
+    // what names it: a known release by its hashes, its text's letters, the player's answer, or that nothing does; never
+    // the name of the dropped file alone
+    std::string description;
     std::string changes;             // the kinds of files the translation actually supplies
     State state = State::Absent;
     bool oldTables = false;           // kLanguageOldTables: available all the same, the run-time layer adapts them
