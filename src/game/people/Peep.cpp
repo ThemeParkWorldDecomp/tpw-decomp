@@ -31,6 +31,7 @@
 #include "TpiGenerations.h"
 #include "TPSound.h"
 #include "TpiGuests.h"
+#include "TpiUmbrellas.h"
 #include "VehicleSteer.h"
 #include "World.h"
 #include "WorldSavvy.h"

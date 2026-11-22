@@ -32,6 +32,7 @@
 #include "TpiGateFlow.h"
 #include "TpiGenerations.h"
 #include "TpiGuests.h"
+#include "TpiUmbrellas.h"
 #include "TPSound.h"
 #include "VehicleSteer.h"
 #include "World.h"

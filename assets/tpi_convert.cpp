@@ -947,6 +947,37 @@ std::string TpiOutsideSam(const std::vector<OutsideFeature> &outside, Log &log) 
     return out;
 }
 
+// An umbrella shop of the world (UsageInfo.AppearanceEffect 3, "Give the person an umbrella"): its converted Info.Id and
+// "shops/<name>".
+struct UmbrellaShop {
+    int32_t id = -1;
+    std::string name;
+};
+
+// The world's TpiUmbrellas.sam (include/TpiUmbrellas.h, read by the game in the mod's worlds only, never as a settings
+// table): one "UmbrellaShop <id>" line for each umbrella shop, its folder after it for the reader, then Theme Park Inc's
+// umbrella lines from its levels/Standard.sam as they are (the remarks after the values too): the bad weather an umbrella
+// keeps off, how often a balloon is thrown away for one, the umbrella's scale and camera adjustment, and each look's
+// height for it.
+std::string TpiUmbrellasSam(const Levels &levels, const std::vector<UmbrellaShop> &shops, Log &log) {
+    std::string out = "# TPI Worlds and Rides: the world's umbrella shops and Theme Park Inc's umbrella values, from the player's copy\n";
+    log.text << "    TpiUmbrellas.sam: " << shops.size() << (shops.size() == 1 ? " umbrella shop (" : " umbrella shops (");
+    for (size_t i = 0; i < shops.size(); ++i) {
+        out += "UmbrellaShop\t" + std::to_string(shops[i].id) + "\t\t# " + shops[i].name + "\n";
+        log.text << (i == 0 ? "" : ", ") << shops[i].name << " " << shops[i].id;
+    }
+    int count = 0;
+    if (const Entry *global = levels.find("standard.sam")) {
+        const Bytes bytes = levels.read(*global);
+        out += SamLinesStarting(std::string(bytes.begin(), bytes.end()),
+                                {"PeepInfo.UmbrellaModifier", "PeepInfo.DiscardBalloonPctModifier", "GenericUmbrellaModifiers.",
+                                 "PersonSpriteUmbrellaModifiers["},
+                                count);
+    }
+    log.text << "), " << count << " lines of Theme Park Inc's umbrella values\n";
+    return out;
+}
+
 // The lake ride: a bumper ride of Theme Park Inc's boat kind (Bumper.BumperType -11, The Great Lake) whose own
 // bumper.sam gives the circles and buoys its boats sail between (ColObjects, Buoys; the ride table has neither, so
 // FilterTpiSam leaves them out of the converted ride).
@@ -1585,6 +1616,36 @@ void ConvertGuests(const std::vector<TpiWadMember> &tpi, const std::string &tpiW
         }
 }
 
+// Theme Park Inc's umbrella (Generic/Umbrellas, Spr_um: one open umbrella in each of its colours), written into each world
+// as its own umbrellas group, which the game loads after the balloons in the mod's worlds (include/TpiUmbrellas.h).
+void ConvertUmbrellas(const std::vector<TpiWadMember> &tpi, const std::string &tpiWhy, Writer &w, Log &log) {
+    std::string why = tpiWhy;
+    std::vector<TpiWadMember> files;
+    if (why.empty()) {
+        files = SpriteGroupFiles(tpi, "Generic", "Umbrellas", why);
+        if (!why.empty())
+            why = "Generic/Umbrellas: " + why;
+    }
+    int sprites = 0;
+    for (auto &f : files) {
+        f.name = Upper(f.name);
+        sprites += Extension(f.name) == ".esp";
+    }
+    if (why.empty() && sprites == 0)
+        why = "Theme Park Inc's esprites.wad has no Generic/Umbrellas sprite";
+    if (!why.empty()) {
+        log.text << "    umbrellas (Theme Park Inc's Generic/Umbrellas): none (" << why << ")\n";
+        return;
+    }
+    for (const WorldSpec &spec : kWorlds) {
+        const std::string out = std::string(spec.folder) + "/Umbrellas";
+        for (const auto &f : files)
+            w.file(out + "/" + f.name, f.data);
+        log.text << "    " << out << ": " << sprites << (sprites == 1 ? " sprite, " : " sprites, ") << files.size()
+                 << " files, Theme Park Inc's Generic/Umbrellas, held by the visitors who buy one in the mod's worlds\n";
+    }
+}
+
 void ConvertSprites(const TpiDisc &disc, const Levels &levels, const fs::path &staging, const fs::path &assets, Log &log) {
     log.text << "sprites (data/esprites):\n";
     std::vector<TpiWadMember> tpi;
@@ -1646,6 +1707,7 @@ void ConvertSprites(const TpiDisc &disc, const Levels &levels, const fs::path &s
         }
     }
     ConvertGuests(tpi, tpiWhy, w, log);
+    ConvertUmbrellas(tpi, tpiWhy, w, log);
     log.text << "    the generic groups and Theme Park World's own themes: the player's esprites.wad, untouched\n";
 }
 
@@ -1716,6 +1778,7 @@ void ConvertWorld(const Levels &levels, const Levels *addOn, const WorldSpec &sp
     bool gateNamed = false;
     LakeRide lake;
     std::vector<OutsideFeature> outside;
+    std::vector<UmbrellaShop> umbrellaShops;
     for (const auto &item : items) {
         const std::string what = item.tpiFolder + "/" + item.name;
         const bool gate = item.oldId == gateId;
@@ -1741,6 +1804,12 @@ void ConvertWorld(const Levels &levels, const Levels *addOn, const WorldSpec &sp
         const bool outsideFeature = TpiSamInteger(samText, "Info", "IsOutsideFeature", outsideFlag) && outsideFlag != 0;
         if (outsideFeature)
             outside.push_back({item.newId, item.outFolder + "/" + item.name});
+        // An umbrella shop (UsageInfo.AppearanceEffect 3) gives what Theme Park World's ride database cannot say (it takes
+        // 0 to 2, so FilterTpiSam drops the 3): TpiUmbrellas.sam names them.
+        int32_t appearance = 0;
+        const bool umbrellaShop = TpiSamInteger(samText, "UsageInfo", "AppearanceEffect", appearance) && appearance == 3;
+        if (umbrellaShop)
+            umbrellaShops.push_back({item.newId, item.outFolder + "/" + item.name});
         int32_t ripOff = 0;
         const int32_t ripOffWas =
             uiType == 1 ? RaiseShopRipOffOK(samText, FolderSamText(folderSams, item.outFolder), options, ripOff) : -1;
@@ -1788,6 +1857,8 @@ void ConvertWorld(const Levels &levels, const Levels *addOn, const WorldSpec &sp
             log.text << ", never wears out (Info.IsSpecial)";
         if (outsideFeature)
             log.text << ", placed when a park starts (Info.IsOutsideFeature)";
+        if (umbrellaShop)
+            log.text << ", gives an umbrella (UsageInfo.AppearanceEffect 3, TpiUmbrellas.sam)";
         if (!shownName.empty() && shownName != infoName)
             log.text << ", named \"" << shownName << "\" (was \"" << infoName << "\", "
                      << (fromBank                                ? "from the object names"
@@ -2017,6 +2088,8 @@ void ConvertWorld(const Levels &levels, const Levels *addOn, const WorldSpec &sp
         w.text("TpiLake.sam", lakeSam);
     if (!outside.empty())
         w.text("TpiOutside.sam", TpiOutsideSam(outside, log));
+    if (!umbrellaShops.empty())
+        w.text("TpiUmbrellas.sam", TpiUmbrellasSam(levels, umbrellaShops, log));
     TpiSamOptions global;
     global.drop = {"StaffPoolInfo.*", "ParkInfo.AvailableFromStart"};
     global.idFields = {"ParkName.GateObjectId"};

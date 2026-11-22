@@ -51,6 +51,7 @@
 #include "TPEngine.h"
 #include "TPGlobals.h"
 #include "TpiGuests.h"
+#include "TpiUmbrellas.h"
 #include "TPMain.h"
 #include "TPOptions.h"
 #include "TPResource.h"

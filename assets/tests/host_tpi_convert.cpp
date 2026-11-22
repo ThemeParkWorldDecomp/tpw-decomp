@@ -1676,8 +1676,8 @@ void TestConvertTree(const fs::path& scratch) {
 // Theme Park Inc's esprites.wad for the sprite test: Arabian whole (one sprite spelt in lower case, its costume heads
 // with no first person view), Polar Zone without costumes, with an entertainer whose first person picture is missing
 // and with its costume heads in a lower-case folder, Land of Invention with a costume head whose picture is missing and
-// a second entertainer whose name is the first's with a 2 (in lower case); the generic visitors it takes; generic
-// (the gardeners) and intro groups it leaves alone.
+// a second entertainer whose name is the first's with a 2 (in lower case); the generic visitors and the umbrella it
+// takes (the umbrella spelt in lower case, as Theme Park Inc's); generic (the gardeners) and intro groups it leaves alone.
 Bytes TpiSpriteWad() {
     std::vector<TpiWadMember> wad;
     AddSprite(wad, "Arabian\\Costumeheads", "SPR_AK", false);
@@ -1704,6 +1704,7 @@ Bytes TpiSpriteWad() {
     wad.push_back({"Water\\Entertainers\\SPR_PG.ESP", Esp("first person, no FPC", true)});
     wad.push_back({"Water\\Entertainers\\SPR_PG.TPC", B("tpc Water\\EntertainersSPR_PG")});
     AddSprite(wad, "Water\\costumeheads", "SPR_ES", false);
+    AddSprite(wad, "Generic\\Umbrellas", "Spr_um");
     AddSprite(wad, "Generic\\Gardeners", "SPR_GA");
     AddSprite(wad, "wIntro\\Entertainers", "SPR_IN");
     return BuildTpiWad(wad);
@@ -1734,6 +1735,13 @@ void TestSprites(const fs::path& scratch) {
     fs::remove_all(dataRoot, ec);
     const fs::path levels = tree / "Data" / "levels";
     for (const char* world : {"arabian", "water", "science"}) MakeWorld(levels, world, std::string(world) + ".tct");
+    // Polar Zone's umbrella shop (UsageInfo.AppearanceEffect 3, which Theme Park World's ride database cannot hold) and
+    // Theme Park Inc's umbrella values in its Standard.sam (made-up values in its form, remarks after some).
+    WriteFile(levels / "water" / "shops" / "brolly.wad", Item("brolly", 3301, "UsageInfo.AppearanceEffect 3\n"));
+    WriteFile(levels / "Standard.sam",
+              B("MapInfo.HeightfieldWidth 1\r\nPeepInfo.UmbrellaModifier\t1\t# one point\r\nPeepInfo.ExitLevel 400\r\n"
+                "PeepInfo.DiscardBalloonPctModifier 100\r\nGenericUmbrellaModifiers.ScalingFactor 1.25\r\n"
+                "#PersonSpriteUmbrellaModifiers[0].Y 9\r\nPersonSpriteUmbrellaModifiers[4].Y\t6.2\r\n"));
     WriteFile(tree / "Data" / "esprites.wad", TpiSpriteWad());
     RegisterTestTables();
     MakeDonorItems(dataRoot, "eur");
@@ -1834,6 +1842,31 @@ void TestSprites(const fs::path& scratch) {
                       "worlds; actions filled: SPR_TK 11 from 15, 14 from 15\n") != std::string::npos);
     CHECK(record.find("    science/Kidsheads: 2 sprites, 4 files, Theme Park Inc's Generic/Grandparentsheads, extra visitors in "
                       "the mod's worlds\n") != std::string::npos);
+    // Theme Park Inc's umbrella in every world as its own group, its names in upper case; the umbrella shop and Theme
+    // Park Inc's umbrella values in the TpiUmbrellas.sam of the world that has one (include/TpiUmbrellas.h), none elsewhere.
+    for (const char* world : {"arabian", "water", "science"}) {
+        const auto umbrellas = GroupFiles(sprites / world / "Umbrellas");
+        CHECK(umbrellas.size() == 3 && umbrellas.count("SPR_UM.ESP") && umbrellas.count("SPR_UM.FPC") &&
+              umbrellas.count("SPR_UM.TPC") && S(umbrellas.at("SPR_UM.TPC")) == "tpc Generic\\UmbrellasSpr_um" &&
+              umbrellas.at("SPR_UM.ESP") == Esp("Generic\\UmbrellasSpr_um", true));
+        CHECK(record.find(std::string("    ") + world + "/Umbrellas: 1 sprite, 3 files, Theme Park Inc's Generic/Umbrellas, held by "
+                          "the visitors who buy one in the mod's worlds\n") != std::string::npos);
+    }
+    const fs::path out = dataRoot / "assets" / "tpi" / "data" / "levels";
+    const std::string umbrellasSam = S(ReadFile(out / "water" / "TpiUmbrellas.sam"));
+    const size_t shopAt = umbrellasSam.find("UmbrellaShop\t");
+    CHECK(shopAt != std::string::npos && umbrellasSam.find("\t\t# shops/brolly\n", shopAt) != std::string::npos);
+    CHECK(umbrellasSam.find("PeepInfo.UmbrellaModifier\t1\t# one point\nPeepInfo.DiscardBalloonPctModifier 100\n"
+                            "GenericUmbrellaModifiers.ScalingFactor 1.25\nPersonSpriteUmbrellaModifiers[4].Y\t6.2\n") !=
+          std::string::npos);
+    CHECK(umbrellasSam.find("ExitLevel") == std::string::npos && umbrellasSam.find("[0].Y") == std::string::npos);
+    CHECK(fs::exists(out / "water" / "shops" / "brolly" / "brolly.sam"));
+    CHECK(!fs::exists(out / "arabian" / "TpiUmbrellas.sam") && !fs::exists(out / "science" / "TpiUmbrellas.sam"));
+    const size_t brolly = record.find("shops/brolly (Info.Id 3301 -> ");
+    CHECK(brolly != std::string::npos &&
+          record.find(", gives an umbrella (UsageInfo.AppearanceEffect 3, TpiUmbrellas.sam)", brolly) < record.find("\n", brolly));
+    CHECK(record.find("    TpiUmbrellas.sam: 1 umbrella shop (shops/brolly ") != std::string::npos &&
+          record.find("), 4 lines of Theme Park Inc's umbrella values\n") != std::string::npos);
     CHECK(record.find("    water/Costumes: 1 sprite, 3 files, from the hallow world's in ") != std::string::npos &&
           record.find("(Theme Park Inc's: no sprite)") != std::string::npos);
     CHECK(record.find("science/Costumeheads: 1 sprite, 2 files, from the space world's in ") != std::string::npos &&
@@ -1849,6 +1882,7 @@ void TestSprites(const fs::path& scratch) {
     CHECK(GroupFiles(sprites / "arabian" / "Entertainers").count("SPR_EJ.ESP"));
     CHECK(!fs::exists(sprites / "water" / "Costumeheads"));
     CHECK(!fs::exists(sprites / "arabian" / "Kids") && !fs::exists(sprites / "water" / "Kidsheads"));
+    CHECK(!fs::exists(sprites / "water" / "Umbrellas"));
     CHECK(S(ReadFile(dataRoot / "assets" / "tpi" / "converted.txt"))
               .find("extra visitors (Theme Park Inc's kids, parents and grandparents): none (Theme Park Inc's copy has no "
                     "Data/esprites.wad)") !=

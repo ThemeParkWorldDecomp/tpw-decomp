@@ -20,6 +20,7 @@
 #include "helpers/ResearchLabHelpers.h"
 #include "helpers/rsseHelpers.h"
 #include "HLSprite.h"
+#include "TPCamera.h"
 #include "LbFile.h"
 #include "LbSCBack.h"
 #include "LevelInit2.h"
@@ -49,6 +50,7 @@
 #include "TpiGenerations.h"
 #include "TpiGreatLake.h"
 #include "TpiOutside.h"
+#include "TpiUmbrellas.h"
 #include "platform/samsutils.h"
 #include "TPMain.h"
 #include "UIInterface.h"
@@ -319,6 +321,7 @@ uint16_t MakeFeatureObject(const RideInfo* ride) {
 }
 
 }  // namespace
+
 
 
 

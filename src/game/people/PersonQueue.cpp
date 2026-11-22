@@ -21,6 +21,7 @@
 #include "TPCoaster.h"
 #include "TpiGateFlow.h"
 #include "TpiGuests.h"
+#include "TpiUmbrellas.h"
 #include "TPSound.h"
 #include "VehicleSteer.h"
 #include "World.h"
