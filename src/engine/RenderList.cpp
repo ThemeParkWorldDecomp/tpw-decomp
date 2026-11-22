@@ -25,6 +25,7 @@
 #include <cstring>
 #include <new>
 
+
 // tb_resource_display.cpp (engine library of SimTheme Park 2.04b3): CDisplay and the
 // render list's start-up. PARTIAL: CRenderList's members (0x100262e0..0x10026954) and
 // the rest of the inventory's range are still to do; CRenderMemory, which the inventory
