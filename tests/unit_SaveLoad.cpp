@@ -25,6 +25,7 @@
 #include "FS_UserInfo.h"
 #include "LbFile.h"
 #include "SaveLoad.h"
+#include "SavedRideTypes.h"
 #include "Serialise.h"
 #include "TPGlobals.h"
 #include "TPString.h"

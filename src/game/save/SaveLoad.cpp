@@ -40,6 +40,7 @@
 #include "rsse.h"
 #include "SaveLegalText.inc"
 #include "SaveLoad.h"
+#include "SavedRideTypes.h"
 #include "Serialise.h"
 #include "SkyObjects.h"
 #include "TbError.h"

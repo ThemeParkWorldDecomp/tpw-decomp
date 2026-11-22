@@ -32,6 +32,7 @@
 #include "RideDB.h"
 #include "rsse.h"
 #include "SaveLoad.h"
+#include "SavedRideTypes.h"
 #include "tb_ddraw.h"
 #include "tb_hfield.h"
 #include "tb_init.h"
@@ -1284,6 +1285,7 @@ uint16_t Half_2(const uint8_t* p) {
 
 
 }  // namespace
+
 
 int32_t LoadRides(void* file) {
     uint32_t sizeWord = 0;
