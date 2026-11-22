@@ -215,6 +215,13 @@ struct ImportReport {
     std::vector<std::string> playStation2;  // recognised PS2 discs (ps2_disc.h) and their conversion result, one plain line each
     bool playStation2Converted = false;
     std::vector<std::string> translations;  // what ImporterConfig::sourceSupplement took, one plain line each
+    // Destinations ("data/...", sorted) the drop holds only in a translation's version: files ImporterConfig::
+    // sourceSupplement took in place of the game's own, so a disc translated in place does not have them.
+    std::vector<std::string> translatedOnly;
+    // InstallShield setups of the game the importer cannot open, by folder ("Мир SIM.iso/ThemeParkWorld"): a SETUP.INI
+    // or DATA.TAG that names the game beside a data1.cab or data1.hdr with InstallShield's signature. Nothing in them is
+    // read but those small files and the signature.
+    std::vector<std::string> installers;
     // The game's icon (icon.h) when this drop wrote <data folder>/icon.png: where it came from ("TP.ico, 64x64, 8-bit");
     // empty when the drop held none, or none better than the one already there.
     std::string icon;

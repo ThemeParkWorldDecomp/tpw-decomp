@@ -1831,6 +1831,47 @@ void TestFilms(const std::string& scratch) {
     }
 }
 
+// An InstallShield setup of the game (ImportReport::installers): recognised by its SETUP.INI or DATA.TAG naming the game
+// beside a data1.cab with InstallShield's signature, and said as such; the cabinet itself is never opened. Another
+// game's setup, or a setup without the signature, is not.
+void TestInstallers(const std::string& scratch) {
+    std::printf("installers\n");
+    std::string root = scratch + "/installers-data", drop = scratch + "/installers-drop";
+    RemoveTree(root);
+    RemoveTree(drop);
+    ImporterConfig cfg;
+    cfg.dataRoot = root;
+    Importer imp(cfg);
+    std::string err;
+    CHECK(imp.Open(err));
+
+    const std::string cabinet = "ISc(" + Junk(4096);
+    WriteFile(drop + "/Compilation/ThemeParkWorld/SETUP.INI", "[Startup]\r\nAppName=Theme Park World\r\n");
+    WriteFile(drop + "/Compilation/ThemeParkWorld/data1.cab", cabinet);
+    WriteFile(drop + "/Compilation/ThemeParkWorld/layout.bin", Junk(700));
+    WriteFile(drop + "/Compilation/Other/SETUP.INI", "[Startup]\r\nAppName=Another Game\r\n");
+    WriteFile(drop + "/Compilation/Other/data1.cab", cabinet);
+    WriteFile(drop + "/Compilation/Plain/DATA.TAG", "[TagInfo]\r\nApplication=SimTheme Park\r\n");
+    WriteFile(drop + "/Compilation/Plain/data1.cab", Junk(4096));
+    ImportReport r = imp.Import({drop + "/Compilation"});
+    CHECK_EQ(r.installers.size(), 1);
+    CHECK(!r.installers.empty() && r.installers.front() == "Compilation/ThemeParkWorld");
+    CHECK_EQ(r.written, 0);
+    CHECK(r.errors.empty());
+    CHECK(r.Summary().find("inside an installer the launcher cannot open (Compilation/ThemeParkWorld)") !=
+          std::string::npos);
+    Events(imp);
+
+    // the same setup inside a zip, named by its DATA.TAG
+    WriteFile(drop + "/setup.zip", ZipOf("TPW/DATA.TAG", "Application=Theme Park World\r\nVersion=1.1\r\n", false, 0));
+    ImportReport z = imp.Import({drop + "/setup.zip"});
+    CHECK(z.installers.empty());   // the zip holds the DATA.TAG alone: no cabinet beside it
+    Events(imp);
+
+    RemoveTree(root);
+    RemoveTree(drop);
+}
+
 void TestDamagedContainers(const std::string& scratch) {
     std::printf("damaged containers\n");
     std::string root = scratch + "/damaged-data", drop = scratch + "/damaged-drop";
@@ -3301,6 +3342,13 @@ int main() {
     fs::create_directories(scratch);
 
     // TPW_TEST_ONLY=tpi runs the Theme Park Inc test alone (to run it many times by itself).
+    // TPW_TEST_ONLY=installers runs the installer test alone.
+    if (Env("TPW_TEST_ONLY") == "installers") {
+        TestInstallers(scratch);
+        RemoveTree(scratch);
+        std::printf("importer: %d passed, %d failed, %d skipped\n", g_pass, g_fail, g_skip);
+        return g_fail == 0 ? 0 : 1;
+    }
     if (Env("TPW_TEST_ONLY") == "tpi") {
         TestThemeParkInc(scratch);
         TestTpiBonusDisk(scratch);
@@ -3330,6 +3378,7 @@ int main() {
     TestOriginals(scratch);
     TestFilms(scratch);
     TestDamagedContainers(scratch);
+    TestInstallers(scratch);
     TestArchives(scratch);
     TestLanguageLines();
     TestLanguageSynthetic(scratch);

@@ -428,6 +428,36 @@ bool HashPath(const std::string& path, std::string& hex) {
     return true;
 }
 
+// The two halves of an InstallShield setup of the game (ImportReport::installers), as a file of a folder shows one: a
+// SETUP.INI or DATA.TAG that names the game (the US disc's "SimTheme Park", the Russian Project's "Theme Park World"),
+// and a data1.cab or data1.hdr that starts with InstallShield's signature "ISc(". 0 for any other file.
+constexpr int kSetupNamesGame = 1, kSetupCabinet = 2;
+int SetupPart(Source& source, const Entry& e) {
+    const std::string name = Lower(BaseName(e.path));
+    const bool text = name == "setup.ini" || name == "data.tag";
+    const bool cabinet = name == "data1.cab" || name == "data1.hdr";
+    if (e.kind != EntryKind::Data || (!text && !cabinet) || (text && e.size > 65536) || e.size < 4) return 0;
+    std::string err;
+    std::unique_ptr<Stream> in = source.Open(e, err);
+    if (!in) return 0;
+    if (cabinet) {
+        char head[4];
+        size_t got = 0;
+        while (got < sizeof head) {
+            const int64_t n = in->Read(head + got, sizeof head - got, err);
+            if (n <= 0) return 0;
+            got += static_cast<size_t>(n);
+        }
+        return std::memcmp(head, "ISc(", 4) == 0 ? kSetupCabinet : 0;
+    }
+    std::vector<uint8_t> bytes;
+    if (!ReadAll(*in, 65536, bytes, err)) return 0;
+    const std::string body = Lower(std::string(bytes.begin(), bytes.end()));
+    for (const char* game : {"theme park world", "simtheme park", "sim theme park"})
+        if (body.find(game) != std::string::npos) return kSetupNamesGame;
+    return 0;
+}
+
 }  // namespace
 
 // ---- launcher.ini
@@ -604,6 +634,8 @@ std::string ImportReport::Summary() const {
         ss << themeParkIncAddOn.front();
     } else if (written == 0 && !cancelled && !aborted && !playStation2.empty()) {
         ss << playStation2.front();
+    } else if (written == 0 && alreadyThere == 0 && !cancelled && !aborted && !installers.empty()) {
+        ss << "Nothing new: the game is inside an installer the launcher cannot open (" << installers.front() << ").";
     } else if (written == 0 && !cancelled && !aborted) {
         ss << "Nothing new: ";
         if (alreadyThere) ss << alreadyThere << " files were already in place.";
@@ -641,6 +673,7 @@ struct Importer::Run {
     std::set<std::pair<int, uint32_t>> counted;  // (edition index, record) written or counted as already there
     std::set<std::string> opened;                // canonical paths of files and folders already read in this drop
     std::set<std::string> supplied;              // display names of the entries ImporterConfig::sourceSupplement took
+    std::set<std::string> translated;            // destinations one of those entries is another version of
     IconImage icon;                              // the best game icon seen so far (icon.h), and the file it came from
     std::string iconSource;
     std::vector<size_t> pressingMatches;
@@ -1597,6 +1630,8 @@ ImportReport Importer::DoImport(const std::vector<std::string>& paths) {
     }
     run.report.firstRelease = IdentifyPressing(kEditionUsPc, run.pressingMatches) == Pressing::UsFirstRelease;
     // a destination the drop also holds the right file for is not news (a disc's other languages, say)
+    for (const std::string& dest : run.translated)
+        if (!run.matchedDests.count(dest)) run.report.translatedOnly.push_back(dest);
     for (const std::string& dest : run.different) {
         if (run.matchedDests.count(dest)) continue;
         run.report.differentVersions.push_back(dest);
@@ -1850,6 +1885,7 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
     const std::vector<Entry>& entries = source->Entries();
     std::map<std::string, const Entry*> byPath;   // for the parts of a multi-volume archive inside a container
     std::set<std::string> setsDone;               // the first parts of the sets opened from inside a container
+    std::map<std::string, int> setups;            // SetupPart bits by folder (ImportReport::installers)
     for (const Entry& e : entries) {
         if (cancel_ || run.stop) return;
         if (!skip.empty() && Under(e.path, skip)) continue;
@@ -1932,6 +1968,7 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
             run.report.unknownBytes += e.size;
             continue;
         }
+        if (const int part = SetupPart(*source, e)) setups[e.path.substr(0, e.path.find_last_of('/') + 1)] |= part;
         bool known = bySize_.count(e.size) != 0;
         if (!known && e.kind == EntryKind::Data && e.size <= kSmall) {
             for (uint32_t record : RecordsByPath(EvidencePath(e)))
@@ -2024,6 +2061,12 @@ void Importer::Enumerate(Run& run, const std::shared_ptr<Source>& source, const 
             Unmatched(run, e, name);
         }
     }
+    for (const auto& [dir, parts] : setups) {
+        if (parts != (kSetupNamesGame | kSetupCabinet)) continue;
+        std::string where = display.empty() ? dir : dir.empty() ? display : display + "/" + dir;
+        if (!where.empty() && where.back() == '/') where.pop_back();
+        run.report.installers.push_back(where.empty() ? std::string(".") : where);
+    }
 }
 
 bool Importer::PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, const std::string& display,
@@ -2066,9 +2109,14 @@ bool Importer::PlayStationImage(Run& run, const std::shared_ptr<Blob>& blob, con
 }
 
 void Importer::Unmatched(Run& run, const Entry& entry, const std::string& display) {
-    if (run.supplied.count(display)) return;   // a file of a translation the source supplement took
     std::vector<uint32_t> recs = RecordsByPath(EvidencePath(entry));
     const ManifestRecord* records = ManifestRecords();
+    if (run.supplied.count(display)) {
+        // a file of a translation the source supplement took: the game's own file it stands for is not in the drop
+        for (uint32_t r : recs)
+            if (!(records[r].flags & kFlagFinfo)) run.translated.insert(records[r].dest);
+        return;
+    }
     for (uint32_t r : recs) {
         // a Finder info file is rebuilt from the Finder info, so another one proves nothing
         if (records[r].flags & kFlagFinfo) continue;
