@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <new>
 
+
 // GetTrackMapCellHeight 0x1009d8d0 (1756 bytes): the height a track piece takes from the map cell and its three neighbours.
 
 namespace {
