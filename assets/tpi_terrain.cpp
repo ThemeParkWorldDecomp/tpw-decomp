@@ -1110,23 +1110,32 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                 }
             }
 
-        // Its water: the top of the highest drawn node that lies wholly below the ground of its closed cells (a drained
-        // lake's remaining water surface; the lake's rim reaches above the ground and is not it).
+        // Its water: the highest drawn node that lies wholly below the ground of its closed cells (a drained lake's
+        // remaining water surface; the lake's rim reaches above the ground and is not it). The ground is the median of
+        // their corners, so one dip under the lake (Land of Invention's at -2.07) does not shut out water whose waves
+        // reach above it; the level is the node's median height, where its waves rest (Land of Invention's -3.29, its
+        // crests -2.05 and troughs -4.69), not its highest crest.
         if (!result.closedCells.empty()) {
-            float ground = std::numeric_limits<float>::max();
+            std::vector<float> corners;
             for (const auto& [x, y] : result.closedCells)
                 for (int dz = 0; dz < 2; ++dz)
                     for (int dx = 0; dx < 2; ++dx)
-                        ground = std::min(ground, heights[size_t(y + dz) * (g.w + 1) + size_t(x + dx)]);
+                        corners.push_back(heights[size_t(y + dz) * (g.w + 1) + size_t(x + dx)]);
+            std::nth_element(corners.begin(), corners.begin() + corners.size() / 2, corners.end());
+            const float ground = corners[corners.size() / 2];
+            float best = -std::numeric_limits<float>::max();
             for (size_t n = 1; n < placed.nodes.size(); ++n) {
                 const Md2Node& node = placed.nodes[n];
                 if (node.vertices.empty())
                     continue;
-                float top = -std::numeric_limits<float>::max();
-                for (const Vec3& v : node.vertices) top = std::max(top, Transform(v, node.matrix).y);
-                if (top < ground && (!result.hasSurface || top > result.surface)) {
+                std::vector<float> ys;
+                for (const Vec3& v : node.vertices) ys.push_back(Transform(v, node.matrix).y);
+                const float top = *std::max_element(ys.begin(), ys.end());
+                if (top < ground && top > best) {
+                    std::nth_element(ys.begin(), ys.begin() + ys.size() / 2, ys.end());
+                    best = top;
                     result.hasSurface = true;
-                    result.surface = top;
+                    result.surface = ys[ys.size() / 2];
                 }
             }
         }

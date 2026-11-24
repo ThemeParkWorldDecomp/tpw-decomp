@@ -1184,6 +1184,47 @@ void TestPit() {
     for (const md2::Vec3& v : under.vertices) CHECK(v.y == -0.6f && (v.x >= 20 || v.z <= 10));
 }
 
+// A drained lake's water level, as Land of Invention's: over its two closed cells the ground is 0 but for one dip of
+// -2.2 (two of their eight corners), its rim rises above the ground, its water's waves rest at -3 with a crest at -2
+// (above the dip), and a flat bed lies at -8 under them. The water is the level, at its median -3: neither the bed
+// (which the dip once made the highest node below the ground) nor the crest.
+void TestWaterLevel() {
+    const std::vector<std::pair<uint16_t, uint16_t>> quads(kW * kH, {0x0042, kTexGrass});
+    Bytes base = Terrain(quads);
+    const float dip = -2.2f;
+    std::memcpy(base.data() + L32(base, L32(base, 0x6c) + 0x28) + 4 * (2 + 1 * (kW + 1)), &dip, 4);
+    CHECK(Height(base, 2, 1) == dip);
+    const Bytes grass = Tga(2, 2, 255);
+    const std::vector<TpiWadMember> terrain = {{"base.MD2", base},
+                                               {"textures/grass.tga", grass},
+                                               {"textures/qickload.txt", Text("grass.tga\n")}};
+    auto shared = [](const std::string&) -> const Bytes* { return nullptr; };
+
+    md2::Md2Model lake = Model("dlake.MD2", {"grass.tga"});
+    AddNode(lake, Square("rim", 10, 0.5f, 0), 0, md2::Translation(10, 0, 0));             // 1
+    md2::NodeBuilder water;
+    water.Quad(md2::Vec3{10, -3, 0}, md2::Vec3{30, -3, 0}, md2::Vec3{30, -2, 10}, md2::Vec3{10, -3, 10}, 0, 0, 1, 0, 1, 1, 0,
+               1, 0);
+    AddNode(lake, water.Build("surface"), 0, md2::IdentityMatrix());                      // 2
+    AddNode(lake, Square("bed", 20, -8, 0), 0, md2::Translation(10, 0, 0));               // 3
+    md2::RecomputeBoxes(lake);
+    const TpiObstacle obstacle = {"dlake",
+                                  {{"dlake.sam", Sam(1, {"HH"}, 1, 0)},
+                                   {"dlake.MD2", md2::WriteMd2(lake)},
+                                   {"dlakem.MD2", Anim(0, {}, {})}}};
+
+    std::vector<TpiWadMember> members = terrain;
+    TpiObstacleReport report;
+    std::string err;
+    CHECK(MergeTpiObstacles(members, {obstacle}, shared, report, err) && err.empty());
+    CHECK(report.obstacles.size() == 1);
+    if (report.obstacles.size() != 1) return;
+    const TpiObstacleResult& r = report.obstacles[0];
+    CHECK(r.name == "dlake" && r.skipped.empty() && r.nodes == 3);
+    CHECK((r.closedCells == std::vector<std::pair<int, int>>{{1, 0}, {2, 0}}));
+    CHECK(r.hasSurface && r.surface == -3.0f);
+}
+
 // The leaf's name: each number as "%.4f" without trailing zeros (a negative zero as 0); none past 63 characters.
 void TestGateLeafName() {
     const float closed[4] = {0, -0.0f, 0.5f, 1}, open[4] = {-0.25f, 0.12345f, 0, -1};
@@ -1209,6 +1250,7 @@ int main() {
     TestTunnelTopLid();
     TestShutName();
     TestPit();
+    TestWaterLevel();
     TestGateLeafName();
     std::printf("tpi_terrain: %d passed, %d failed\n", g_pass, g_fail);
     return g_fail == 0 ? 0 : 1;

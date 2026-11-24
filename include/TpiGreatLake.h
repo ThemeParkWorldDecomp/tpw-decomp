@@ -1,6 +1,6 @@
 // TpiGreatLake.h: the TPI Worlds and Rides mod's Great Lake (TPW_MOD_HOOK tpi_worlds): in the Land of Invention the
 // Great Lake (Theme Park Inc's vict_hs, a bumper ride of kind -11 with boats) is placed in front of the lake, and its
-// boats leave the ride's plot, sail on the lake and come back to the plot to unload.
+// boats leave the ride's plot and sail on the lake, where they stay.
 // Theme Park Inc's bumper.sam for the ride gives the circles its boats may sail in (ColObjects) and the buoys they sail
 // to (Buoys), both in map units of 10 a cell, laid out on the lake in front of the ride's fixed spot. Theme Park World's
 // kind -11 has one circle on the ride's plot and a ring of 8 buoys in it. The converter (assets/tpi_convert.cpp,
@@ -14,7 +14,9 @@
 // (BMP_InsideArea keeps a boat inside the circles). The ring's buoys move to Theme Park Inc's buoys.
 // Steering (SetNavRoute, TpiLakeAim): a boat whose target is in another circle steers to the middle of the overlap of
 // its circle and the next circle on the shortest chain to the target's circle, so it never runs into the shore.
-// Unloading (BMP_AI): when the ride's time is up a boat sails back to the plot's circle before it unloads.
+// Unloading (BMP_AI, the Mac's own, no hook): when the ride's time is up a boat unloads where it is, its riders
+// beamed off, and waits on the lake; the next riders are beamed onto a waiting boat (BMP_AddJoiningListToBump), as in
+// Theme Park Inc. Before 0.6.3 a hook sailed each boat back to the plot's circle to unload under the station.
 // Drawing (BMP_DrawCarsForRide): a boat over water floats at the water level, a little above it so its wake shows.
 // Header only and pure, so the host test sees what the game does.
 #pragma once
