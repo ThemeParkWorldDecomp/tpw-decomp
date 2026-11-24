@@ -79,6 +79,7 @@ uint32_t wallhug_tricky(wallhug_path* path, NavMode mode) {
     return 1;
 }
 
+
 uint32_t CMap::GetTimeStampCell(uint32_t x, uint32_t y) {
     ev("CMap::GetTimeStampCell", {x, y});
     return 0;

@@ -66,6 +66,7 @@ uint32_t wallhug_tricky(wallhug_path* path, NavMode mode) {
     return static_cast<uint32_t>(ret("wh_answer", 1));
 }
 
+
 // 0x10102724 (the map's own stamp of the cell at the map square (x, y)).
 uint32_t CMap::GetTimeStampCell(uint32_t x, uint32_t y) {
     ev("CMap::GetTimeStampCell", {MapOffset(this), x, y});

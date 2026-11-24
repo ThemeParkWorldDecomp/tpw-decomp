@@ -686,6 +686,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
     std::vector<uint16_t> quadTexture(quadFlags.size());
     for (size_t q = 0; q < quadTexture.size(); ++q) quadTexture[q] = L16(out[baseAt].data, g.quads + 4 * q + 2);
     std::vector<size_t> walkways;   // the bridges' and tunnels' walkway quads: footbridge cells in base.map
+    std::vector<std::pair<size_t, uint16_t>> topGround;   // a cleared top's hidden quads and the top's ground texture
 
     // The terrain's texture folders as they grow, and the names their lists gain.
     Folders folders = TextureFolders(out);
@@ -987,6 +988,11 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
         // built on then); they close the cells they closed before.
         Md2Model placed, shut;
         placed.nodes.push_back(Md2Node());
+        // Arabian Nights' roof becomes ordinary ground only after the purchase. Its old mesh stays with the rubble
+        // until then. The game raises the live height field, retaining the level copy for tunnel walkers below.
+        int roofX = 0, roofY = 0, roofW = 0, roofH = 0;
+        float roofHeight = 0;
+        bool roofExtra = false;
         // Its root's place is dropped (the shape's offset places it), its turn kept: Polar Zone's swamp is modelled
         // standing up and turned flat by its root (a quarter turn about x); without the turn it stood under the ground.
         Md2Model unrooted = model;
@@ -1022,6 +1028,39 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
             Md2Node copy = node;
             copy.parent = 0;
             copy.matrix = world[n];
+            int32_t obstacleId = 0;
+            if (tunnel && !node.vertices.empty() && Lower(node.name) == "tunneltop" &&
+                TpiSamInteger(text, "Info", "Id", obstacleId) && obstacleId == 3703) {
+                float minx = std::numeric_limits<float>::infinity(), minz = minx, miny = minx;
+                float maxx = -minx, maxz = -minx, maxy = -minx;
+                for (const Vec3& v : node.vertices) {
+                    const Vec3 p = Transform(v, world[n]);
+                    minx = std::min(minx, p.x); maxx = std::max(maxx, p.x);
+                    minz = std::min(minz, p.z); maxz = std::max(maxz, p.z);
+                    miny = std::min(miny, p.y); maxy = std::max(maxy, p.y);
+                }
+                const int x0 = int(std::lround((minx - g.ox) / g.cx));
+                const int y0 = int(std::lround((minz - g.oz) / g.cz));
+                const int x1 = int(std::lround((maxx - g.ox) / g.cx));
+                const int y1 = int(std::lround((maxz - g.oz) / g.cz));
+                if (std::isfinite(miny) && maxy - miny < 0.5f && x0 >= ox && y0 >= oy && x1 > x0 && y1 > y0 &&
+                    x1 <= ox + int64_t(shapeW) && y1 <= oy + int64_t(rows.size()) &&
+                    x1 <= int(g.w) && y1 <= int(g.h) && (x1 - x0) * (y1 - y0) <= 64) {
+                    roofX = x0; roofY = y0; roofW = x1 - x0; roofH = y1 - y0;
+                    roofHeight = maxy + 0.05f; // above the adjoining mouth's tiny surface lift, so paths are visible
+                    // One adjoining slope can run under the mouth's flat lip rather than tunneltop. Take that shown
+                    // corner cell too when its plateau edge meets the roof, without filling the canyon beside it.
+                    if (x1 < int(g.w) && x1 < ox + int64_t(shapeW) && (x1 - x0 + 1) * (y1 - y0) <= 64) {
+                        const size_t q = size_t(y0) * g.w + size_t(x1);
+                        const float a = heights[size_t(y0) * (g.w + 1) + size_t(x1)];
+                        const float b = heights[size_t(y0) * (g.w + 1) + size_t(x1 + 1)];
+                        roofExtra = (quadFlags[q] & kQuadHidden) == 0 && std::fabs(a - miny) < 0.5f &&
+                                    std::fabs(b - miny) < 0.5f;
+                    }
+                    copy.name = shutName;
+                    ++result.shut;
+                }
+            }
             const auto turn = turns.find(n);
             if (turn != turns.end() && node.parent == 0) {
                 const std::string leaf = TpiGateLeafName(int(ox), int(oy), int(footprintW), int(openRows.size()),
@@ -1152,6 +1191,100 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
                 ++result.walkway;
             }
 
+        if (roofW > 0) {
+            const int drawnW = roofW;
+            if (roofExtra) ++roofW;
+            std::vector<bool> onTop(size_t(g.w) * g.h, false);
+            for (int y = roofY; y < roofY + roofH; ++y)
+                for (int x = roofX; x < roofX + roofW; ++x)
+                    if (x < roofX + drawnW || y == roofY) onTop[size_t(y) * g.w + size_t(x)] = true;
+            // A hidden quad beside the top that what stays once it is cleared covers at the roof's own level (Arabian
+            // Nights' tunnel_entrance: its flat sand over the canyon's rim beside the roof, at the roof's height) is
+            // raised with the top, so the top's ground covers that sand there rather than showing it, lighter and a
+            // little lower, in a band of cells along the top's edge. Taken outwards from the top, a cell beside one
+            // already taken, while the top stays within the obstacle's footprint and 64 quads.
+            Md2Model stays;
+            stays.nodes.push_back(Md2Node());
+            for (size_t n = 1; n < placed.nodes.size(); ++n)
+                if (placed.nodes[n].name != shutName) stays.nodes.push_back(placed.nodes[n]);
+            std::vector<uint8_t> atRoof(size_t(g.w) * kSamples * g.h * kSamples, 0);
+            const float roofLevel = roofHeight - 0.05f;
+            RasterFaces(stays, g, [&](size_t sample, float, float, float y) {
+                if (y >= roofLevel - 0.25f && y <= roofHeight) atRoof[sample] = 1;
+            });
+            const std::vector<int> lid = PerQuad(atRoof, g);
+            for (bool grew = true; grew;) {
+                grew = false;
+                for (int y = int(std::max<int64_t>(oy, 0)); y < oy + int64_t(rows.size()) && y < int(g.h); ++y)
+                    for (int x = int(std::max<int64_t>(ox, 0)); x < ox + int64_t(shapeW) && x < int(g.w); ++x) {
+                        const size_t q = size_t(y) * g.w + size_t(x);
+                        if (onTop[q] || floorQuad[q] || (quadFlags[q] & kQuadHidden) == 0 || lid[q] < kCoveredSamples)
+                            continue;
+                        const bool beside = (x > 0 && onTop[q - 1]) || (x + 1 < int(g.w) && onTop[q + 1]) ||
+                                            (y > 0 && onTop[q - g.w]) || (y + 1 < int(g.h) && onTop[q + g.w]);
+                        const int x0 = std::min(x, roofX), y0 = std::min(y, roofY);
+                        const int x1 = std::max(x + 1, roofX + roofW), y1 = std::max(y + 1, roofY + roofH);
+                        if (!beside || (x1 - x0) * (y1 - y0) > 64) continue;
+                        onTop[q] = true;
+                        roofX = x0; roofY = y0; roofW = x1 - x0; roofH = y1 - y0;
+                        grew = true;
+                    }
+            }
+            unsigned long long raised = 0;
+            for (int y = roofY; y < roofY + roofH; ++y)
+                for (int x = roofX; x < roofX + roofW; ++x)
+                    if (onTop[size_t(y) * g.w + size_t(x)])
+                        raised |= 1ull << ((y - roofY) * roofW + x - roofX);
+            // The top's hidden quads other than the floor's (the canyon's cliff quads in its rectangle, the lid) keep
+            // the cliff's texture, never drawn while hidden; once the top is cleared the height field draws them with
+            // it where procedural textures are off (crates in Arabian Nights). They take the top's own ground texture,
+            // the one most of its shown quads have, written with the quads at the end (the quads under the obstacles
+            // keep their own).
+            std::vector<int> shownTextures(terrainTextures, 0);
+            for (int y = roofY; y < roofY + roofH; ++y)
+                for (int x = roofX; x < roofX + roofW; ++x) {
+                    const size_t q = size_t(y) * g.w + size_t(x);
+                    if (onTop[q] && (quadFlags[q] & kQuadHidden) == 0 && quadTexture[q] < terrainTextures)
+                        ++shownTextures[quadTexture[q]];
+                }
+            const auto ground = std::max_element(shownTextures.begin(), shownTextures.end());
+            if (ground != shownTextures.end() && *ground > 0)
+                for (int y = roofY; y < roofY + roofH; ++y)
+                    for (int x = roofX; x < roofX + roofW; ++x) {
+                        const size_t q = size_t(y) * g.w + size_t(x);
+                        if (onTop[q] && !floorQuad[q] && (quadFlags[q] & kQuadHidden) != 0)
+                            topGround.emplace_back(q, uint16_t(ground - shownTextures.begin()));
+                    }
+            // Only the hidden floor quads need a second drawn surface. All other top quads are real height-field
+            // ground and take normal paths, features and rides. No second map mode is invented over the floor.
+            NodeBuilder top;
+            for (int y = roofY; y < roofY + roofH; ++y)
+                for (int x = roofX; x < roofX + roofW; ++x) {
+                    const size_t q = size_t(y) * g.w + size_t(x);
+                    if (!floorQuad[q] || ((raised >> ((y - roofY) * roofW + x - roofX)) & 1u) == 0) continue;
+                    const uint16_t texture = quadTexture[q];
+                    if (texture >= terrainTextures) continue;
+                    const float x0 = g.ox + x * g.cx, z0 = g.oz + y * g.cz;
+                    top.Quad({x0, roofHeight, z0}, {x0, roofHeight, z0 + g.cz},
+                             {x0 + g.cx, roofHeight, z0 + g.cz}, {x0 + g.cx, roofHeight, z0},
+                             0, 0, 0, 1, 1, 1, 1, 0, texture);
+                }
+            if (!top.Empty()) {
+                unsigned long long hidden = 0;
+                for (int y = roofY; y < roofY + roofH; ++y)
+                    for (int x = roofX; x < roofX + roofW; ++x)
+                        if ((quadFlags[size_t(y) * g.w + size_t(x)] & kQuadHidden) != 0)
+                            hidden |= 1ull << ((y - roofY) * roofW + x - roofX);
+                char name[128];
+                std::snprintf(name, sizeof(name), "tpitop %d %d %d %d %d %d %d %d %.4g %llx %llx", int(ox), int(oy),
+                              int(shapeW), int(rows.size()), roofX, roofY, roofW, roofH, double(roofHeight), hidden, raised);
+                placed.nodes.push_back(top.Build(name));
+                placed.nodes.back().parent = 0;
+                ++result.nodes;
+                result.faces += int(placed.nodes.back().faces.size());
+            }
+        }
+
         for (size_t n = 1; n < placed.nodes.size(); ++n) base.nodes.push_back(std::move(placed.nodes[n]));
         for (size_t n = 0; n < shut.nodes.size(); ++n) base.nodes.push_back(std::move(shut.nodes[n]));
         report.obstacles.push_back(result);
@@ -1218,6 +1351,7 @@ bool MergeTpiObstacles(std::vector<TpiWadMember>& terrain, const std::vector<Tpi
     Grid mg;
     if (!ReadGrid(merged, mg, err))
         return false;
+    for (const auto& [q, texture] : topGround) quadTexture[q] = texture;
     for (size_t q = 0; q < quadFlags.size(); ++q) {
         Put16(merged, mg.quads + 4 * q, quadFlags[q]);
         Put16(merged, mg.quads + 4 * q + 2, quadTexture[q]);

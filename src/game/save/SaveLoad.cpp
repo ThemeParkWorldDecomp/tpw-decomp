@@ -59,6 +59,8 @@
 #include "TpiGateBuild.h"
 #include "TpiGateFlow.h"
 #include "TpiObstacleShut.h"
+#include "TpiTunnelTop.h"
+#include "tb_hfield.h"
 #include "TpiOutside.h"
 #include "TpiSaveRepair.h"
 #include "UI_Base.h"

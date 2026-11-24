@@ -751,6 +751,7 @@ float TimeToEdge(float position, float step) {
 // is cleared, else it is pushed 0.001 over the edge. The other axis moves the same fraction and is snapped to its square when that
 // leaves it. A step that reaches no edge (both times 1.0 or more) is applied whole. Answers 1 while something remains to walk.
 // A tie (tx == tz) with both steps nonzero makes the x step 1.01 times smaller and its time 1.01 times larger, so the axes differ.
+
 int32_t GetNextGridsquare(s3DPoint* from, s3DPoint* step, s3DPoint* out) {
     uint32_t ix = cw_cvt_fp2unsigned(static_cast<double>(from->x / kCell));
     uint32_t iz = cw_cvt_fp2unsigned(static_cast<double>(from->z / kCell));

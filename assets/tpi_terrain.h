@@ -47,6 +47,9 @@
 // that a new park does not start with, as an opening gate's rule: the tunnel looks closed until its land is bought.
 // Its loose boulders ("GeoSphere..." nodes, which Theme Park Inc kept once it was cleared: Arabian Nights' on its
 // tunnel's top) are named so too and go with the rubble, closing the cells they closed before (since converter 29).
+// Converter 31 also folds Arabian Nights' rubble-textured roof after purchase, replacing it with the terrain's own
+// ground. A "tpitop" node records the roof rectangle and original hidden flags for the game's runtime height and
+// load repair (include/TpiTunnelTop.h). Floor cells stay fixed footbridges; roof paths cannot cross those two rows.
 // An obstacle that clears once its land is bought (kTpiClearsOnLand: Arabian Nights' rock and cliff, Polar Zone's
 // swamp) is drawn before clearing as any other, and each of its nodes is named "tpishut X Y W H M", M the cells whose
 // quads it hid (TpiShutName's mask: the swamp's 174 of its 224), or "tpishut X Y W H" when it hid none; the game's hook

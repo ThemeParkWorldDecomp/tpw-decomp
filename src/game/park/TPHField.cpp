@@ -1292,6 +1292,7 @@ float DetermineHFieldHeightQuick(float x, float z) {
     return ppc_fmadds(1.0f - fracZ, -(h[v01] - h[v00]), lower);
 }
 
+
 // Unit v5901: the AI-world cell helpers of the level code (Destroy3DObjectFromAIWorld, Assign3DObjectToAIWorld,
 // GetWorldGSquareHeight, DetermineInnerBaseInsets, GetRideIDAtCell).
 

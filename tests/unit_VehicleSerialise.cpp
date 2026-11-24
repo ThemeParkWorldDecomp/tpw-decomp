@@ -135,6 +135,7 @@ char* VehicleRuntimeCopyName(char* destination, const char* source) {
     if (!gPriming) ev("strcpy", {lab(object), 4, Type(object)}, {source});
     return std::strcpy(destination, source);
 }
+
 extern "C" {
 uint64_t tpw_vsr_alloc(uint32_t n) { return reinterpret_cast<uintptr_t>(tpw::ArenaAllocZeroed(n)); }
 uint64_t tpw_vsr_addr(int index) {

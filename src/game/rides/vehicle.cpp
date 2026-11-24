@@ -59,6 +59,7 @@ template<class Type> void InitializeBehaviour(Type& object, const char* name, Ve
 }
 } // namespace
 
+
 // 0x10134a74, 268 B and 0x10134bc0, 252 B. Each Fixed is converted separately.
 template<> int32_t SAVEVARSTRUCT<Vector2d>(void* file, Vector2d* value, const char* name, int32_t noLog) {
     if (noLog == 0) gSaveLoad.WriteSerialiseLog(8, name, CSaveLoad::LogfileState(0));

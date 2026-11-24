@@ -1005,6 +1005,92 @@ void TestTunnelBoulders() {
     }
 }
 
+// A synthetic Arabian roof above a floor route. Converter metadata preserves the original quad mask/heights and
+// the old rubble roof until purchase; the replacement is plain terrain texture over only the footbridge cells.
+void TestTunnelTop() {
+    std::vector<std::pair<uint16_t, uint16_t>> quads(kW * kH, {0x0042, kTexGrass});
+    const Bytes grass = Tga(2, 2, 255);
+    std::vector<TpiWadMember> members = {{"base.MD2", Terrain(quads)}, {"base.map", BaseMap(0x01)},
+                                        {"textures/grass.tga", grass}};
+    auto model = Model("tunnel.MD2", {"grass.tga", "unbuild01.tga"});
+    AddNode(model, Square("wall", 10, 0, 0), 0, md2::Translation(20, 0, 10));
+    AddNode(model, Square("rubble", 10, 3, 0), 0, md2::Translation(10, 0, 0));
+    AddNode(model, Square("tunneltop", 20, 20, 1), 0, md2::Translation(10, 0, 0));
+    md2::RecomputeBoxes(model);
+    const TpiObstacle obstacle = {"tunnel", {{"tunnel.sam", Sam(1, {"HH", "HH"}, 1, 0, {",X", ",."}, 3703)},
+        {"tunnel.MD2", md2::WriteMd2(model)}, {"tunnelm1.MD2", Anim(0, {}, {})},
+        {"tunnelm2.MD2", Anim(0, {2}, {})}, {"textures/grass.tga", grass}, {"textures/unbuild01.tga", grass}}};
+    TpiObstacleReport report;
+    std::string err;
+    CHECK(MergeTpiObstacles(members, {obstacle}, [](const std::string&) -> const Bytes* { return nullptr; }, report, err));
+    const TpiWadMember* base = Member(members, "base.MD2");
+    CHECK(base != nullptr);
+    if (!base) return;
+    md2::Md2Model merged;
+    CHECK(md2::ReadMd2(base->data, merged, err, true));
+    bool found = false;
+    int shuts = 0;
+    for (const auto& node : merged.nodes) {
+        CHECK(node.name != "tunneltop");
+        if (node.name == "tpishut 1 0 2 2") ++shuts;
+        if (node.name != "tpitop 1 0 2 2 1 0 2 2 20.05 d f") continue;
+        found = true;
+        CHECK(node.faces.size() == 4);
+        for (const auto& v : node.vertices) { CHECK(std::fabs(v.y - 20.05f) < 0.0001f); CHECK(v.x >= 10 && v.x <= 20); }
+        for (const auto& fs : node.faceSets) CHECK(fs.texture == kTexGrass);
+    }
+    CHECK(found); CHECK(shuts == 2);
+    const uint32_t hf = L32(base->data, 0x6c), heights = L32(base->data, hf + 0x28);
+    for (unsigned v = 0; v < (kW + 1) * (kH + 1); ++v) CHECK(L32(base->data, heights + 4 * v) == 0);
+    const auto* map = Member(members, "base.map");
+    CHECK(map != nullptr);
+    if (map) for (unsigned y = 0; y < kH; ++y) CHECK(Attribute(map->data, 1, y) == 0x80);
+}
+
+// The same roof with what stays once it is cleared lying flat at the roof's height over the hidden quad (0, 0) beside it
+// (Arabian Nights' tunnel_entrance over the canyon's rim): that quad is raised with the top. One lower down over the hidden
+// quad (0, 1), and one at the roof's height over the hidden quad (3, 0) outside the footprint, are not.
+void TestTunnelTopLid() {
+    std::vector<std::pair<uint16_t, uint16_t>> quads(kW * kH, {0x0042, kTexGrass});
+    quads[0].first = quads[kW].first = quads[3].first = 0x0043;
+    quads[0].second = quads[3].second = quads[kW + 1].second = kTexRock;   // a cliff quad under the lid, one off the top, a floor
+    const Bytes grass = Tga(2, 2, 255);
+    std::vector<TpiWadMember> members = {{"base.MD2", Terrain(quads)}, {"base.map", BaseMap(0x01)},
+                                        {"textures/grass.tga", grass}};
+    auto model = Model("tunnel.MD2", {"grass.tga", "unbuild01.tga"});
+    AddNode(model, Square("wall", 10, 0, 0), 0, md2::Translation(20, 0, 10));
+    AddNode(model, Square("rubble", 10, 3, 0), 0, md2::Translation(10, 0, 0));
+    AddNode(model, Square("tunneltop", 20, 20, 1), 0, md2::Translation(10, 0, 0));
+    AddNode(model, Square("entrance", 10, 20, 0), 0, md2::Translation(0, 0, 0));
+    AddNode(model, Square("ledge", 10, 15, 0), 0, md2::Translation(0, 0, 10));
+    AddNode(model, Square("far", 10, 20, 0), 0, md2::Translation(30, 0, 0));
+    md2::RecomputeBoxes(model);
+    const TpiObstacle obstacle = {"tunnel", {{"tunnel.sam", Sam(1, {"HHH", "HHH"}, 0, 0, {".,X", ".,."}, 3703)},
+        {"tunnel.MD2", md2::WriteMd2(model)}, {"tunnelm1.MD2", Anim(0, {}, {})},
+        {"tunnelm2.MD2", Anim(0, {2}, {})}, {"textures/grass.tga", grass}, {"textures/unbuild01.tga", grass}}};
+    TpiObstacleReport report;
+    std::string err;
+    CHECK(MergeTpiObstacles(members, {obstacle}, [](const std::string&) -> const Bytes* { return nullptr; }, report, err));
+    const TpiWadMember* base = Member(members, "base.MD2");
+    CHECK(base != nullptr);
+    if (!base) return;
+    md2::Md2Model merged;
+    CHECK(md2::ReadMd2(base->data, merged, err, true));
+    int tops = 0;
+    for (const auto& node : merged.nodes)
+        if (node.name.rfind("tpitop ", 0) == 0) {
+            ++tops;
+            CHECK(node.name == "tpitop 0 0 3 2 0 0 3 2 20.05 3b 37");
+        }
+    CHECK(tops == 1);
+    // The top's hidden quads take its ground's texture (crates in Arabian with procedural textures off); its floor
+    // quads and the hidden quads off the top keep theirs.
+    CHECK(Quad(base->data, 0, 0) == std::make_pair(uint16_t(0x0043), kTexGrass));
+    CHECK(Quad(base->data, 2, 1).second == kTexGrass);
+    CHECK(Quad(base->data, 1, 1).second == kTexRock);
+    CHECK(Quad(base->data, 3, 0) == std::make_pair(uint16_t(0x0043), kTexRock));
+}
+
 // The name of what shows until its land is bought: its footprint, then, when given, the cells it hid, four to a hex
 // digit with the first cell the lowest bit; a mask of at most 4 x 63 cells (the game's), past 63 characters too (Polar
 // Zone's swamp: 14 x 16), which the converter's reader reads back whole.
@@ -1119,6 +1205,8 @@ int main() {
     TestOpeningGate();
     TestTunnel();
     TestTunnelBoulders();
+    TestTunnelTop();
+    TestTunnelTopLid();
     TestShutName();
     TestPit();
     TestGateLeafName();
