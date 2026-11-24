@@ -2,8 +2,9 @@
 // the host, without game data (the values below are made up, in the converter's file's form): TpiUmbrellas.sam read back,
 // the umbrella shops known only in the mod's worlds with the umbrella sprite loaded, a visitor holding one by its balloon
 // life, the balloon thrown away for it as DiscardBalloonPctModifier says, its colour and each look's height, its place
-// moved toward the camera, the bad weather it keeps off, and that nothing changes outside the mod's worlds or for a
-// visitor with a balloon. Exits nonzero on the first failed check's count.
+// moved toward the camera, its place in the hand in first person (the FP lines, each facing's hand place, and a file from
+// before the FP lines placed as in third person), the bad weather it keeps off, and that nothing changes outside the
+// mod's worlds or for a visitor with a balloon. Exits nonzero on the first failed check's count.
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
@@ -56,6 +57,45 @@ static const char kUmbrellas[] =
     "#PersonSpriteUmbrellaModifiers[8].Y\t\t9.9\r\n"
     "PersonSpriteUmbrellaModifiers[9].Y\t\t5.6\r\n"
     "PersonSpriteUmbrellaModifiers[12].Y\t\t7.0\r\n";
+
+// The same file with Theme Park Inc's first-person lines as its Standard.sam has them: the kids' row 0, the fat bloke's
+// row 4 and the old bloke's row 9 whole, row 5 short of its FPHandPosDistance, row 8 with a field commented out, row 3 a
+// field out of range, and a field not known.
+static const char kUmbrellasFp[] =
+    "UmbrellaShop\t6230\t\t# shops/brolly\n"
+    "PersonSpriteUmbrellaModifiers[0].Y\t\t\t\t\t5.7\t\t# the child\r\n"
+    "PersonSpriteUmbrellaModifiers[0].FPY\t\t\t\t2.0\r\n"
+    "PersonSpriteUmbrellaModifiers[0].FPCentreOffsetX\t0.2\r\n"
+    "PersonSpriteUmbrellaModifiers[0].FPCentreOffsetZ\t0.0\r\n"
+    "PersonSpriteUmbrellaModifiers[0].FPHandPosAngle\t\t60\r\n"
+    "PersonSpriteUmbrellaModifiers[0].FPHandPosDistance\t0.8\r\n"
+    "PersonSpriteUmbrellaModifiers[4].Y\t6.2\n"
+    "PersonSpriteUmbrellaModifiers[4].FPY\t3.0\n"
+    "PersonSpriteUmbrellaModifiers[4].FPCentreOffsetX\t0.2\n"
+    "PersonSpriteUmbrellaModifiers[4].FPCentreOffsetZ\t0.0\n"
+    "PersonSpriteUmbrellaModifiers[4].FPHandPosAngle\t65\n"
+    "PersonSpriteUmbrellaModifiers[4].FPHandPosDistance\t1.2\n"
+    "PersonSpriteUmbrellaModifiers[5].FPY\t3.0\n"
+    "PersonSpriteUmbrellaModifiers[5].FPCentreOffsetX\t0.2\n"
+    "PersonSpriteUmbrellaModifiers[5].FPCentreOffsetZ\t0.0\n"
+    "PersonSpriteUmbrellaModifiers[5].FPHandPosAngle\t45\n"
+    "PersonSpriteUmbrellaModifiers[8].FPY\t2.0\n"
+    "PersonSpriteUmbrellaModifiers[8].FPCentreOffsetX\t0.2\n"
+    "#PersonSpriteUmbrellaModifiers[8].FPCentreOffsetZ\t0.0\n"
+    "PersonSpriteUmbrellaModifiers[8].FPHandPosAngle\t55\n"
+    "PersonSpriteUmbrellaModifiers[8].FPHandPosDistance\t0.9\n"
+    "PersonSpriteUmbrellaModifiers[3].FPY\t2.0\n"
+    "PersonSpriteUmbrellaModifiers[3].FPCentreOffsetX\t0.2\n"
+    "PersonSpriteUmbrellaModifiers[3].FPCentreOffsetZ\t0.0\n"
+    "PersonSpriteUmbrellaModifiers[3].FPHandPosAngle\t60\n"
+    "PersonSpriteUmbrellaModifiers[3].FPHandPosDistance\t-0.8\n"
+    "PersonSpriteUmbrellaModifiers[9].FPY 2.2\n"
+    "PersonSpriteUmbrellaModifiers[9].FPCentreOffsetX 0.2\n"
+    "PersonSpriteUmbrellaModifiers[9].FPCentreOffsetZ 0.0\n"
+    "PersonSpriteUmbrellaModifiers[9].FPHandPosAngle 45\n"
+    "PersonSpriteUmbrellaModifiers[9].FPHandPosDistance 1.0\n"
+    "PersonSpriteUmbrellaModifiers[9].FPWobble 3.0\n"
+    "PersonSpriteUmbrellaModifiers[10].FPY 2.0\n";
 
 static bool Near(float a, float b) { return std::fabs(a - b) < 1e-5f; }
 
@@ -167,6 +207,79 @@ int main() {
     Check(at[0] == 10.0f && at[1] == 2.0f && at[2] == 0.0f, "no camera: not moved");
     TpiUmbrellaPlace(13.0f, 2.0f, 4.0f, camera, t, at);
     Check(at[0] == 13.0f && at[1] == 2.0f && at[2] == 4.0f, "at the camera: not moved");
+
+    // The FP lines read back: each row's five fields, rows short of one not whole, a field out of range or not known passed over.
+    TpiUmbrellaTable fp;
+    Check(TpiParseUmbrellas(kUmbrellasFp, sizeof kUmbrellasFp - 1, fp), "the file with FP lines reads");
+    Check(fp.fpSet[0] == kTpiUmbrellaFpAll && fp.fpSet[4] == kTpiUmbrellaFpAll && fp.fpSet[9] == kTpiUmbrellaFpAll,
+          "rows 0, 4 and 9 whole");
+    Check(Near(fp.fpY[0], 2.0f) && Near(fp.fpCentre[0][0], 0.2f) && Near(fp.fpCentre[0][1], 0.0f) && Near(fp.fpAngle[0], 60.0f) &&
+              Near(fp.fpDistance[0], 0.8f) && Near(fp.fpY[4], 3.0f) && Near(fp.fpAngle[4], 65.0f) && Near(fp.fpDistance[4], 1.2f) &&
+              Near(fp.fpY[9], 2.2f),
+          "the FP values");
+    Check(fp.fpSet[5] == (kTpiUmbrellaFpAll & ~kTpiUmbrellaFpDistance) &&
+              fp.fpSet[8] == (kTpiUmbrellaFpAll & ~kTpiUmbrellaFpCentreZ) &&
+              fp.fpSet[3] == (kTpiUmbrellaFpAll & ~kTpiUmbrellaFpDistance) && fp.fpSet[1] == 0,
+          "a field missing, commented out or out of range: the row not whole");
+    Check(fp.ySet == ((1u << 0) | (1u << 4)) && Near(fp.y[0], 5.7f) && Near(fp.y[4], 6.2f), "Y beside the FP lines");
+    // The old file (no FP lines): no row has any FP field, so no hand place.
+    bool noFp = true;
+    for (int32_t r = 0; r < kTpiUmbrellaRows; ++r) noFp = noFp && t.fpSet[r] == 0;
+    Check(noFp, "a file from before the FP lines: no FP fields");
+
+    // Each facing's hand place, worked in true radians: FPCentreOffsetX + sin(a) * distance, FPCentreOffsetZ + cos(a) *
+    // distance, a = facing * 45 + FPHandPosAngle.
+    bool hands = true;
+    for (int32_t f = 0; f < kTpiUmbrellaFacings; ++f) {
+        const double a0 = (45.0 * f + 60.0) * 3.14159265358979323846 / 180.0, a4 = (45.0 * f + 65.0) * 3.14159265358979323846 / 180.0;
+        hands = hands && Near(fp.hand[0][f][0], 0.2f + static_cast<float>(std::sin(a0)) * 0.8f) &&
+                Near(fp.hand[0][f][1], static_cast<float>(std::cos(a0)) * 0.8f) &&
+                Near(fp.hand[4][f][0], 0.2f + static_cast<float>(std::sin(a4)) * 1.2f) &&
+                Near(fp.hand[4][f][1], static_cast<float>(std::cos(a4)) * 1.2f);
+        if (!hands) std::printf("facing %d: %f %f\n", f, fp.hand[0][f][0], fp.hand[0][f][1]);
+    }
+    Check(hands, "the eight facings' hand places, rows 0 and 4");
+    // Some by hand: facing 0 at 60 degrees, sin 0.866 and cos 0.5; facing 6 (270) at 330 degrees, sin -0.5 and cos 0.866.
+    Check(Near(fp.hand[0][0][0], 0.2f + 0.8660254f * 0.8f) && Near(fp.hand[0][0][1], 0.5f * 0.8f) &&
+              Near(fp.hand[0][6][0], 0.2f - 0.5f * 0.8f) && Near(fp.hand[0][6][1], 0.8660254f * 0.8f),
+          "the hand place at 60 and 330 degrees");
+    // Not Theme Park Inc's whole radians: 60 degrees is 1.047 radians, which it cuts to 1 (sin 0.841, not 0.866).
+    Check(std::fabs(fp.hand[0][0][0] - (0.2f + 0.84147f * 0.8f)) > 0.01f, "the true radians, not cut to whole ones");
+    // The angle taken modulo 360, below 0 as well.
+    float h[2], g[2];
+    TpiUmbrellaHandAt(315.0f, 0.2f, 0.0f, 60.0f, 0.8f, h);
+    TpiUmbrellaHandAt(0.0f, 0.2f, 0.0f, 15.0f, 0.8f, g);
+    Check(Near(h[0], g[0]) && Near(h[1], g[1]), "315 + 60 is 15");
+    TpiUmbrellaHandAt(0.0f, 0.0f, 0.1f, -90.0f, 1.0f, h);
+    Check(Near(h[0], -1.0f) && Near(h[1], 0.1f), "-90 is 270");
+    Check(fp.hand[5][0][0] == 0.0f && fp.hand[8][3][1] == 0.0f, "rows not whole: no hand place");
+
+    // The facing from the facing word: eighths of a turn of 2048, rounded.
+    Check(TpiUmbrellaFacing(0) == 4 && TpiUmbrellaFacing(0x37f) == 7 && TpiUmbrellaFacing(0x380) == 0 && TpiUmbrellaFacing(0x400) == 0 &&
+              TpiUmbrellaFacing(0x47f) == 0 && TpiUmbrellaFacing(0x480) == 1 && TpiUmbrellaFacing(0x7ff) == 4,
+          "the facing from the facing word");
+
+    // The hand place: the visitor's place plus its row's hand place for its facing, FPY high, not moved toward the camera.
+    Check(TpiUmbrellaHandPlace(10.0f, 20.0f, 9, 2, gTpiUmbrellaRow, 16, fp, at), "the fat bloke: a hand place");
+    Check(Near(at[0], 10.0f + fp.hand[4][2][0] * kTpiUmbrellaFpUnit) && Near(at[1], 3.0f * kTpiUmbrellaFpUnit) &&
+              Near(at[2], 20.0f + fp.hand[4][2][1] * kTpiUmbrellaFpUnit),
+          "the fat bloke's hand, facing 2");
+    Check(TpiUmbrellaHandPlace(10.0f, 20.0f, 13, 7, gTpiUmbrellaRow, 16, fp, at) && Near(at[1], 2.2f * kTpiUmbrellaFpUnit) &&
+              Near(at[0], 10.0f + fp.hand[9][7][0] * kTpiUmbrellaFpUnit),
+          "the old bloke's own row");
+    Check(TpiUmbrellaHandPlace(10.0f, 20.0f, 15, 1, gTpiUmbrellaRow, 16, fp, at) && Near(at[1], 2.0f * kTpiUmbrellaFpUnit) &&
+              Near(at[2], 20.0f + fp.hand[0][1][1] * kTpiUmbrellaFpUnit),
+          "the tall woman's row not whole: row 0's");
+    Check(TpiUmbrellaHandPlace(10.0f, 20.0f, -1, 9, gTpiUmbrellaRow, 16, fp, at) && Near(at[0], 10.0f + fp.hand[0][1][0] * kTpiUmbrellaFpUnit),
+          "a look not known: row 0's; facing taken modulo 8");
+    // Off to one side of the visitor, under its overhead height.
+    const float side = std::sqrt((at[0] - 10.0f) * (at[0] - 10.0f) + (at[2] - 20.0f) * (at[2] - 20.0f));
+    Check(side > 0.1f && at[1] < TpiUmbrellaHeight(0, gTpiUmbrellaRow, 16, fp), "to one side, at the hand");
+    // A file from before the FP lines: no hand place, out not touched, so the third-person place is taken.
+    at[0] = at[1] = at[2] = -7.0f;
+    Check(!TpiUmbrellaHandPlace(10.0f, 20.0f, 9, 2, gTpiUmbrellaRow, 16, t, at) && at[0] == -7.0f && at[1] == -7.0f && at[2] == -7.0f,
+          "the old file: no hand place");
+    Check(!TpiUmbrellaHandPlace(10.0f, 20.0f, 0, 0, gTpiUmbrellaRow, 16, TpiUmbrellaTable{}, at), "no table: no hand place");
 
     // The weather it keeps off: rain, a storm or snow takes `modifier` points less, never turned into a gain; a heatwave,
     // no weather or a gain as it is.

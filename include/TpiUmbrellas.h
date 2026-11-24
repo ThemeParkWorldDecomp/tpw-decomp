@@ -4,7 +4,7 @@
 // ride database takes only 0 (nothing), 1 (a balloon) and 2 (a costume), so the converted shop's 3 is dropped and the
 // shop gives nothing. The converter writes the ids of the shops that said 3, with Theme Park Inc's umbrella lines of its
 // levels/Standard.sam (PeepInfo.UmbrellaModifier and DiscardBalloonPctModifier, GenericUmbrellaModifiers.*,
-// PersonSpriteUmbrellaModifiers[i].Y), into each of the mod's worlds as TpiUmbrellas.sam (assets/tpi_convert.cpp,
+// PersonSpriteUmbrellaModifiers[i].Y and .FP*), into each of the mod's worlds as TpiUmbrellas.sam (assets/tpi_convert.cpp,
 // TpiUmbrellasSam), and Theme Park Inc's Generic\Umbrellas\Spr_um sprite as the world's own umbrellas group;
 // CWorld::SetupNewLevel reads the file (TpiParseUmbrellas) into gTpiUmbrellas and ESP_LoadSprites loads the sprite after
 // the balloons, outside their count (gTpiUmbrellaSprites), so a random balloon is never an umbrella.

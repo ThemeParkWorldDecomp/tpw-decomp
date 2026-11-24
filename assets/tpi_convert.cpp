@@ -958,7 +958,7 @@ struct UmbrellaShop {
 // table): one "UmbrellaShop <id>" line for each umbrella shop, its folder after it for the reader, then Theme Park Inc's
 // umbrella lines from its levels/Standard.sam as they are (the remarks after the values too): the bad weather an umbrella
 // keeps off, how often a balloon is thrown away for one, the umbrella's scale and camera adjustment, and each look's
-// height for it.
+// height for it, with its place in the hand in first person (the FP fields).
 std::string TpiUmbrellasSam(const Levels &levels, const std::vector<UmbrellaShop> &shops, Log &log) {
     std::string out = "# TPI Worlds and Rides: the world's umbrella shops and Theme Park Inc's umbrella values, from the player's copy\n";
     log.text << "    TpiUmbrellas.sam: " << shops.size() << (shops.size() == 1 ? " umbrella shop (" : " umbrella shops (");
