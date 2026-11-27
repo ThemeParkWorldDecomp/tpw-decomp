@@ -17,8 +17,6 @@
 #include "ParkTime.h"
 #include "platform/msl.h"
 #include "ppc_math.h"
-#include "Ps1PickRotation.h"
-#include "RideBadges.h"
 #include "RideDB.h"
 #include "TbColour.h"
 #include "TbGraphicFile.h"

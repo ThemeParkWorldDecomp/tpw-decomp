@@ -15,7 +15,6 @@
 #include "OnlineBalance.h"
 #include "platform/macdoze.h"
 #include "platform/msl.h"
-#include "port_wasd.h"
 #include "ResolutionBalance.h"
 #include "SoundBalance.h"
 #include "tb_resource_display.h"

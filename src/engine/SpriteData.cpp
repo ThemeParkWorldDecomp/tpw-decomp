@@ -2,7 +2,6 @@
 
 #include "m3d2.h"
 #include "MapWho.h"
-#include "PortSpriteFringe.h"
 #include "platform/msl.h"
 #include "platform/samsutils.h"
 #include "platform/upixels.h"

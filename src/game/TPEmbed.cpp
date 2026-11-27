@@ -19,7 +19,6 @@
 #include "platform/msl.h"
 #include "platform/samsutils.h"
 #include "ppc_math.h"
-#include "Ps2Characters.h"
 #include "rsse.h"
 #include "ThingReceivers.h"
 #include "TPCamera.h"

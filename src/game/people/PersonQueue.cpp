@@ -2,7 +2,6 @@
 
 #include "analyser.h"
 #include "CellBase.h"
-#include "CellIdLookup.h"
 #include "CMessageCentre.h"
 #include "CMsg.h"
 #include "Debug.h"
@@ -19,9 +18,6 @@
 #include "ThingParts2.h"
 #include "ThingReceivers.h"
 #include "TPCoaster.h"
-#include "TpiGateFlow.h"
-#include "TpiGuests.h"
-#include "TpiUmbrellas.h"
 #include "TPSound.h"
 #include "VehicleSteer.h"
 #include "World.h"

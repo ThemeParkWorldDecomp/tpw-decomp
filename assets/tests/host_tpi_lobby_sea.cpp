@@ -13,10 +13,7 @@
 #include "tpi_lobby_sea.h"
 #include "tpi_ripple.h"
 
-// TPI_SEA_RING_TWO: set by CMakeLists.txt in a build with the port's fixes, which has include/tpi_island_ring.h.
-#ifdef TPI_SEA_RING_TWO
-#include "tpi_island_ring.h"
-#endif
+// With the port's fixes the sea is also checked against the second ring's places (tpw-decomp has no copy of them).
 
 using namespace tpw::assets;
 using namespace tpw::assets::tpi_island;
@@ -82,17 +79,6 @@ void TestRadius() {
                 const double angle = 2 * kPi * a / 16;
                 CHECK(InReach(x + kSpinRadius * static_cast<float>(std::sin(angle)), z + kSpinRadius * static_cast<float>(std::cos(angle))));
             }
-#ifdef TPI_SEA_RING_TWO
-    // The second ring's: the camera's circle round each island inside the reach, the island well inside the sea.
-    for (const tpw::TpiRingPlace& place : tpw::kTpiRingTwoPlaces) {
-        for (int a = 0; a < 16; ++a) {
-            const double angle = 2 * kPi * a / 16;
-            CHECK(InReach(place.x + kSpinRadius * static_cast<float>(std::sin(angle)),
-                          place.z + kSpinRadius * static_cast<float>(std::cos(angle))));
-        }
-        CHECK(std::hypot(place.x - kSeaX, place.z - kSeaZ) + kIslandReach + kLobbySeaMargin < r);
-    }
-#endif
 }
 
 void TestRingPlan() {

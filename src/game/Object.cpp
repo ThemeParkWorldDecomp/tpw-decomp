@@ -31,8 +31,6 @@
 #include "TPCoaster.h"
 #include "TPConfig.h"
 #include "TPEngine.h"
-#include "TpiGateFlow.h"
-#include "TpiRideScript.h"
 #include "ui_main.h"
 #include "UIInterface.h"
 #include "World.h"

@@ -13,8 +13,6 @@
 #include "TbSoundBank.h"
 #include "TbSoundInfo.h"
 #include "TbSoundManager.h"
-#include "TpiGateFlow.h"
-#include "TpiSoundStandIns.h"
 #include <cstddef>
 #include <cstdint>
 #include <cstring>

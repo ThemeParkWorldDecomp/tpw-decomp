@@ -4,7 +4,6 @@
 #define TPW_V51039_STRONG
 #include "AdvisorQueue.h"
 #include "analyser.h"
-#include "CellIdLookup.h"
 #include "Cheat.h"
 #include "Debug.h"
 #include "FillLenderList.h"
@@ -37,7 +36,6 @@
 #include "platform/msl.h"
 #include "platform/samsutils.h"
 #include "platform/upixels.h"
-#include "port_wasd.h"
 #include "Quickload.h"
 #include "RideDB.h"
 #include "rsse.h"

@@ -24,7 +24,6 @@
 #include "tb_textureentry.h"
 #include "tpw_probe.h"
 #include "Wavelet.h"
-#include "PortSpriteFringe.h"
 #include <cstdint>
 #include <cstdio>
 #include <cstring>

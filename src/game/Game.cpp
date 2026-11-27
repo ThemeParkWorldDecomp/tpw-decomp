@@ -31,7 +31,6 @@
 #include "TPConfig.h"
 #include "TPEngine.h"
 #include "TPGlobals.h"
-#include "TpiGateFlow.h"
 #include "TpiWorlds.h"
 #include "TPMain.h"
 #include "TPResource.h"

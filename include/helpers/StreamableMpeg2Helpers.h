@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <new>
 
-#include "SoundPoolLock.h"
 
 // A size of 0 counts as 1; a block of the class's size comes from the list of idle objects when there is one, anything else
 // from the runtime's operator new (import 0x1002eac4, __nw__FUl).

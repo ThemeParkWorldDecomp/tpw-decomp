@@ -2,7 +2,6 @@
 
 #include "CMpegBase.h"
 #include "helpers/LbMpegHelpers.h"
-#include "helpers/SoundPoolLock.h"
 #include "platform/interfacelib.h"
 #include "platform/macdoze.h"
 #include "platform/samsutils.h"

@@ -32,7 +32,6 @@
 #include "RideDB.h"
 #include "rsse.h"
 #include "SaveLoad.h"
-#include "SavedRideTypes.h"
 #include "tb_ddraw.h"
 #include "tb_hfield.h"
 #include "tb_init.h"

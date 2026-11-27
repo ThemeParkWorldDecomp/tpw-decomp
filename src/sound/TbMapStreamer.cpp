@@ -18,8 +18,6 @@
 #include "TbSoundInfo.h"
 #include "TbSoundManager.h"
 #include "TbSoundPipe.h"
-#include "TpiGateFlow.h"
-#include "TpiSoundStandIns.h"
 #include <cmath>
 #include <vector>
 #include <cstdint>

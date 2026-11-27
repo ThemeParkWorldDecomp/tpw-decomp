@@ -14,8 +14,6 @@
 #include "Ptr32.h"
 #include "TPCoaster.h"
 #include "TPEngine.h"
-#include "TpiGuests.h"
-#include "TpiUmbrellas.h"
 #include "World.h"
 #include <climits>
 #include <cstdint>

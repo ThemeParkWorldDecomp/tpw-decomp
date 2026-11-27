@@ -2,7 +2,6 @@
 
 #include "analyser.h"
 #include "Debug.h"
-#include "EntertainerSecondActs.h"
 #include "ESP_sprites.h"
 #include "HLSprite.h"
 #include "MainBalance.h"

@@ -10,7 +10,6 @@
 #include "tb_clipping.h"
 #include "tb_ddraw.h"
 #include "tb_drawprimitive.h"
-#include "PortSpriteFringe.h"
 #include "tb_hfield.h"
 #include "tb_loadmanager.h"
 #include "tb_matrix.h"

@@ -13,7 +13,6 @@
 #include "TbSoundPipeChannel.h"
 #include "TbSoundSampleCallback.h"
 #include "TbSoundSampleMPEG2.h"
-#include "TpiGateFlow.h"
 #include <cmath>
 #include <cstring>
 #include <new>

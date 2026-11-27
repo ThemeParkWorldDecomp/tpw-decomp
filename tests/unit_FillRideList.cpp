@@ -20,7 +20,6 @@
 #include "MainWindowCallback.h"
 #include "ObjectControl.h"
 #include "ObjectParts.h"
-#include "RideBadges.h"
 #include "RideDB.h"
 #include "TPEngine.h"
 #include "TbColour.h"

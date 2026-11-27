@@ -38,9 +38,6 @@
 #include "TPEmbed.h"
 #include "TPEngine.h"
 #include "TPSound.h"
-#include "TpiBumperKind.h"
-#include "TpiGateFlow.h"
-#include "TpiGreatLake.h"
 #include "ui_main.h"
 #include "World.h"
 #include <cmath>
